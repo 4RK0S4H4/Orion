@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pages · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<style>
+  @layer s4.components {
+    .pg-note { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+    .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
+  }
+</style>
+</head>
+<body>
+<!-- This reference page is a small app, because pages only make sense inside one. -->
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#orders" data-view="orders" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="cart"></span></span><span class="s4-nav-label">Orders</span></a>
+      <a class="s4-nav-item" href="#about" data-view="about"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="info"></span></span><span class="s4-nav-label">About</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Orders</h1></div>
+      <div class="s4-app-bar-actions"><a class="s4-button" data-variant="text" href="../">Components</a></div>
+    </header>
+    <main class="s4-content">
+      <section class="s4-view s4-stack" data-view="orders" data-title="Orders">
+        <p class="pg-note">Pick an order: it opens as a page. The bar gets a Back button and the page's title, the address changes, and the browser's Back (or the phone's Back gesture) brings you here again, scrolled where you were.</p>
+        <ul class="s4-list" id="pg-orders" aria-label="Orders">
+          <li><button class="s4-list-item" type="button" data-page-open="order" data-page-id="1042" data-page-title="Order 1042"><span class="s4-list-leading"><span class="s4-avatar">LF</span></span><span class="s4-list-content"><span class="s4-list-headline">Order 1042</span><span class="s4-list-supporting">Lena Fischer · 3 items</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="success">Paid</span></span></button></li>
+          <li><button class="s4-list-item" type="button" data-page-open="order" data-page-id="1041" data-page-title="Order 1041"><span class="s4-list-leading"><span class="s4-avatar">SO</span></span><span class="s4-list-content"><span class="s4-list-headline">Order 1041</span><span class="s4-list-supporting">Sam Ortiz · 1 item</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="warning">Due</span></span></button></li>
+          <li><button class="s4-list-item" type="button" data-page-open="order" data-page-id="1040" data-page-title="Order 1040"><span class="s4-list-leading"><span class="s4-avatar">PN</span></span><span class="s4-list-content"><span class="s4-list-headline">Order 1040</span><span class="s4-list-supporting">Priya Nair · 7 items</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="success">Paid</span></span></button></li>
+        </ul>
+      </section>
+      <section class="s4-view s4-stack" data-view="about" data-title="About" hidden>
+        <p class="pg-note">A second destination, so you can see that choosing a destination closes any open page.</p>
+      </section>
+
+      <section class="s4-subpage" data-page="order" data-title="Order" hidden>
+        <article class="s4-stack">
+          <header class="s4-page-header"><h2 class="s4-page-title" id="pg-title">Order 1042</h2><div class="s4-page-meta"><span id="pg-who">Lena Fischer</span><span class="s4-status" id="pg-state" data-tone="success">Paid</span></div></header>
+          <section class="s4-pane">
+            <dl class="s4-dl">
+              <div class="s4-dl-row"><dt>Items</dt><dd id="pg-items">3</dd></div>
+              <div class="s4-dl-row"><dt>Placed</dt><dd>Nov 12</dd></div>
+              <div class="s4-dl-row"><dt>Ships To</dt><dd>Berlin</dd></div>
+            </dl>
+            <div class="s4-row"><button class="s4-button" type="button" data-page-open="customer" data-page-title="Customer">View Customer</button><button class="s4-button" data-variant="tonal" type="button" data-page-back>Back To Orders</button></div>
+          </section>
+        </article>
+      </section>
+      <section class="s4-subpage" data-page="customer" data-title="Customer" hidden>
+        <article class="s4-stack">
+          <header class="s4-page-header"><h2 class="s4-page-title" id="pg-customer">Lena Fischer</h2><div class="s4-page-meta"><span>Customer since 2023</span></div></header>
+          <p class="pg-note">Pages stack: this one was opened from the order. Back goes to the order, then to the list. Tapping Orders in the navigation goes all the way out.</p>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#orders" data-view="orders" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="cart"></span></span><span class="s4-nav-label">Orders</span></a>
+    <a class="s4-nav-item" href="#about" data-view="about"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="info"></span></span><span class="s4-nav-label">About</span></a>
+  </nav>
+</div>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script>
+var orders = document.getElementById('pg-orders');
+document.querySelector('[data-page="order"]').addEventListener('s4-open', function (e) {
+  var row = orders.querySelector('[data-page-id="' + e.detail.id + '"]') || orders.querySelector('[data-page-id]');
+  var bits = row.querySelector('.s4-list-supporting').textContent.split(' · '), state = row.querySelector('.s4-status');
+  document.getElementById('pg-title').textContent = row.querySelector('.s4-list-headline').textContent;
+  this.dataset.title = row.querySelector('.s4-list-headline').textContent;
+  document.getElementById('pg-who').textContent = bits[0];
+  document.getElementById('pg-customer').textContent = bits[0];
+  document.getElementById('pg-items').textContent = parseInt(bits[1], 10);
+  var out = document.getElementById('pg-state'); out.textContent = state.textContent; out.dataset.tone = state.dataset.tone;
+});
+</script>
+</body>
+</html>

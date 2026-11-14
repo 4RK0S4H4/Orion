@@ -11,6 +11,7 @@
 <style>
   .ld-detail-head { display: flex; align-items: center; gap: var(--s4-space-3); }
   .ld-detail-head > :nth-child(2) { flex: 1; min-inline-size: 0; }
+  .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
 </style>
 </head>
 <body>
@@ -37,7 +38,7 @@
     </header>
     <main class="s4-content" data-width="wide">
       <section class="s4-view" data-view="inbox" data-title="Inbox">
-        <div class="s4-split" id="inbox">
+        <div class="s4-split" id="inbox" data-detail-title="Message">
           <section class="s4-split-pane" aria-label="Messages">
             <div class="s4-search" role="search" data-filter="#inbox-list">
               <span class="s4-icon" data-icon="search"></span>
@@ -73,7 +74,7 @@
               <div class="ld-detail-head">
                 <span class="s4-avatar" data-size="l" id="d-avatar">MC</span>
                 <div><h2 class="s4-title-large s4-emphasized" id="d-subject" style="margin:0">Invoice for October</h2><p class="s4-body-medium s4-on-surface-variant" id="d-from" style="margin:0">Maya Chen</p></div>
-                <button class="s4-icon-button" type="button" aria-label="More" data-menu="item-more"><span class="s4-icon" data-icon="more-vert"></span></button>
+                <button class="s4-icon-button" type="button" aria-label="Open Full Page" data-tooltip="Open Full Page" id="d-open"><span class="s4-icon" data-icon="book"></span></button><button class="s4-icon-button" type="button" aria-label="More" data-menu="item-more"><span class="s4-icon" data-icon="more-vert"></span></button>
               </div>
               <p class="s4-body-large" id="d-body" style="margin:0">Can you send the October invoice before Friday?</p>
               <dl class="s4-dl">
@@ -100,6 +101,23 @@
           </section>
         </div>
         <button class="s4-fab" data-fixed type="button" data-sheet="compose"><span class="s4-icon" data-icon="edit"></span><span class="s4-fab-label">Compose</span></button>
+      </section>
+      <!-- The reader: a page you go into (decision 0050). Back in the top bar, its own URL (#inbox/reader/2), the phone's Back gesture. -->
+      <section class="s4-subpage" data-page="reader" data-title="Message" hidden>
+        <article class="s4-stack" data-width="reading">
+          <header class="s4-page-header">
+            <h2 class="s4-page-title" id="r-subject">Invoice for October</h2>
+            <div class="s4-page-meta"><span class="s4-avatar" data-size="s" id="r-avatar">MC</span><span id="r-from">Maya Chen</span><span id="r-time" class="s4-num">9:41</span></div>
+          </header>
+          <div class="s4-prose"><p id="r-body">Can you send the October invoice before Friday?</p><p>Let me know if anything is missing and I will send it over the same day.</p><p>Thanks,<br><span id="r-sign">Maya</span></p></div>
+          <div class="s4-row"><button class="s4-button" type="button" data-expand="r-reply">Reply</button><button class="s4-button" data-variant="tonal" type="button" id="r-archive">Archive</button></div>
+          <div class="s4-expand" id="r-reply" data-variant="inset" hidden>
+            <form class="s4-expand-body" data-sent="Reply sent">
+              <div class="s4-text-field"><textarea id="r-reply-text" rows="3" required></textarea><label for="r-reply-text">Reply</label></div>
+              <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Send</button></div>
+            </form>
+          </div>
+        </article>
       </section>
       <section class="s4-view" data-view="people" data-title="People" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="people"></span></span><h2 class="s4-empty-title">No People Yet</h2><p class="s4-empty-text">People you write to show up here.</p></div></section>
       <section class="s4-view" data-view="archive" data-title="Archive" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="archive"></span></span><h2 class="s4-empty-title">Nothing Archived</h2><p class="s4-empty-text">Archived messages stay here for a year.</p></div></section>
@@ -149,7 +167,23 @@ document.querySelectorAll('.s4-expand form').forEach(function (f) {
 list.addEventListener('s4-change', function () {
   S4.expand.close('reply'); S4.expand.close('forward');
   document.getElementById('reply-label').textContent = 'Reply To ' + document.getElementById('d-from').textContent;
-});</script>
+});
+/* the reader page: filled from the row it was opened for (the id in the URL), so a shared link or a reload lands on it */
+var reader = document.querySelector('.s4-subpage[data-page="reader"]'), appEl = document.querySelector('.s4-app');
+function openReader() { var row = list.querySelector('[aria-selected="true"]'); if (row) S4.pages.open(appEl, 'reader', { id: row.dataset.value, title: row.querySelector('.s4-list-overline').textContent }); }
+document.getElementById('d-open').addEventListener('click', openReader);
+list.addEventListener('dblclick', function (e) { if (e.target.closest('.s4-list-item')) openReader(); });
+reader.addEventListener('s4-open', function (e) {
+  var row = list.querySelector('[data-value="' + e.detail.id + '"]') || list.querySelector('[aria-selected="true"]'); if (!row) return;
+  var from = row.querySelector('.s4-list-overline').textContent;
+  document.getElementById('r-subject').textContent = row.querySelector('.s4-list-headline').textContent;
+  document.getElementById('r-avatar').textContent = row.querySelector('.s4-avatar').textContent;
+  document.getElementById('r-from').textContent = from;
+  document.getElementById('r-sign').textContent = from.split(' ')[0];
+  document.getElementById('r-body').textContent = row.querySelector('.s4-list-supporting').textContent;
+  document.getElementById('r-time').textContent = row.querySelector('.s4-list-trailing .s4-list-supporting').textContent;
+});
+document.getElementById('r-archive').addEventListener('click', function () { S4.pages.back(appEl); S4.snackbar({ text: 'Message archived', action: 'Undo' }); });</script>
 <div class="s4-menu" id="row-menu" aria-label="Message actions">
   <button class="s4-menu-item" type="button" data-value="reply" data-shortcut="mod+r"><span class="s4-icon" data-icon="edit"></span>Reply<kbd class="s4-kbd"></kbd></button>
   <button class="s4-menu-item" type="button" data-value="archive" data-shortcut="mod+e"><span class="s4-icon" data-icon="archive"></span>Archive<kbd class="s4-kbd"></kbd></button>

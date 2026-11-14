@@ -56,7 +56,7 @@
       var cur = app.querySelector('.s4-nav-item[aria-current="page"][data-view]');
       var list = views(app);
       /* deep links: #name in the URL opens that view (reload, shared links); the nav follows */
-      var hash = decodeURIComponent(location.hash.slice(1)), deep = null;
+      var hash = decodeURIComponent(location.hash.slice(1)).split('/')[0], deep = null;   /* #view or #view/page/id (page.js) */
       if (hash && list.some(function (v) { return v.dataset.view === hash; })) {
         app.querySelectorAll('.s4-nav-item[data-view]').forEach(function (x) {
           if (x.dataset.view === hash) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
@@ -83,6 +83,7 @@
         mirror(app, nav, e.detail.index);
         app._s4lastIndex = e.detail.index;
         var view = e.detail.item.dataset.view;
+        if (view && S4.pages) S4.pages.reset(app);   /* a destination was chosen: any pushed page closes first */
         if (view) show(app, view, prev == null || e.detail.index >= prev ? 1 : -1);
       });
     });

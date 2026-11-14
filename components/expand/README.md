@@ -32,7 +32,7 @@ Inline confirm (the button turns into the question):
 | `data-expand="id"` | any button | opens or closes that expand; gets `aria-expanded` and `aria-controls` | |
 | `data-variant` | `.s4-expand` | `inset` (a filled, rounded container for a composer or small form) | none: plain, part of the page |
 | `data-group` | `.s4-expand` | a shared name: opening one closes the others (Reply and Forward) | independent |
-| `data-autofocus` | `.s4-expand` or a control inside | `none` on the expand keeps focus on the opener; on a control, that control takes focus | the first field |
+| `data-autofocus` | a button inside | that button takes focus when it opens (never a field) | the expand itself |
 | `data-expand-close="value"` | a button inside | closes it; `value` arrives in `s4-close` | |
 | `data-confirm="id"` / `data-confirm-close="value"` | buttons | swap a button (or its `[data-confirm-row]`) for a `.s4-confirm` and back | |
 
@@ -59,8 +59,9 @@ Script: `S4.expand.open(id, { from })`, `S4.expand.close(id, value)`, `S4.expand
 - Don't open an expand far from its button, or more than one at a time in the same place (use `data-group`).
 - Don't use the inline confirm for something serious that cannot be undone: that is what a dialog is for.
 
-**Accessibility:** the opener carries `aria-expanded` and `aria-controls`. Opening moves focus to the first field
-(you asked for it here; this is not a dialog); Escape closes and returns focus to the opener. The page is never inert.
+**Accessibility:** the opener carries `aria-expanded` and `aria-controls`. Opening moves focus to the expand itself,
+never into a field (decision 0049: no keyboard pops up until the person taps the field); Tab goes to its first
+control. Escape closes and returns focus to the opener. The page is never inert.
 The inline confirm moves focus to its first answer and back to the button.
 
 **Motion:** Reveal (the box grows on the calm reveal spring, its content follows); the confirm uses Switch.

@@ -53,7 +53,7 @@ document.getElementById('pw-toggle').addEventListener('click', function () {
 form.addEventListener('submit', function (e) {
   e.preventDefault();
   var email = document.getElementById('email'), field = email.closest('.s4-text-field');
-  if (!email.value || !email.checkValidity()) { field.setAttribute('data-error', 'Enter the email you signed up with.'); email.focus(); return; }
+  if (!email.value || !email.checkValidity()) { field.setAttribute('data-error', 'Enter the email you signed up with.'); return; }
   field.removeAttribute('data-error');
   S4.snackbar({ text: 'Signed in' });
 });</script>

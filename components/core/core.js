@@ -29,6 +29,9 @@
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },
     css: function (name, el) { return getComputedStyle(el || root).getPropertyValue(name).trim(); },
+    /* true for anything that brings up a keyboard. Decision 0049: a script never moves focus into one of these;
+       only the person does, by tapping it (opening something with a key press is the one exception, see S4.palette) */
+    typable: function (el) { return !!el && el.matches && el.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]), textarea, select, [contenteditable]'); },
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }

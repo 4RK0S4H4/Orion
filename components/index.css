@@ -11,6 +11,7 @@
 /* navigation and shell */
 @import url("app/app.css");
 @import url("layout/layout.css");
+@import url("page/page.css");
 @import url("top-app-bar/top-app-bar.css");
 @import url("nav-bar/nav-bar.css");
 @import url("nav-rail/nav-rail.css");

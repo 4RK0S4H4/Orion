@@ -47,6 +47,8 @@ Published as one quiz in the new Orion quiz UI: [`explore/ideas.html`](../../exp
 
 ## Done
 
+- **43.** Reply focused its field and the keyboard came up ([image](img/2026-11-14-reply-focuses-field.jpg)); "I never want this to happen anywhere": done 2026-11-14 (nothing focuses a field by itself, decision 0049; the suite checks it).
+- **44.** "We never switch pages" (a message should open a reader view): done 2026-11-14 (pages with Back, title, URL and the Back gesture, decision 0050).
 - **40.** One motion philosophy (owner, 2026-11-14: audit every transition, one page, a small fixed set of named patterns, a check): done 2026-11-14 (ten patterns, pattern tokens, every component moved, `npm run check:motion`, [motion page](../../components/motion/motion.html) with the scrubber, decision 0046).
 - **38.** Expand in place instead of dialogs ([image](img/2026-11-14-reply-opens-dialog.png): Reply opened a "New Message" dialog away from the message): done 2026-11-14 (the placement ladder, `.s4-expand` and the inline confirm, Reply and Forward open a composer under the message in both mail templates, New Note opens in place in the showcase, decision 0047). The handoff named two reference images; only this one was saved.
 - **39.** Orion on every GitHub Pages page, quizzes included: done 2026-11-14 (the review lab kit is built on the live bundle, reversing "review blue", decision 0048).

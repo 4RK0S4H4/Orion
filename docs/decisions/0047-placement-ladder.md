@@ -19,7 +19,7 @@ Rules that come with it:
 - **A dialog is the last resort**, never the default for "the user clicked a button".
 - **Do, then offer Undo** (a snackbar) instead of asking "Are you sure?" whenever the action can be reversed.
 - An expand sits **directly under its opener**, inside the same pane, and is short (a few fields, one row of actions).
-- Because the person asked for it right there, an expand **focuses its first field** (dialogs still never do, 0043).
+- ~~An expand focuses its first field.~~ Reversed the same day by the owner ([0049](0049-never-focus-a-field.md)): nothing ever focuses a field by itself.
 - Escape closes an expand and returns focus to its opener. The page is never inert.
 
 ## Built

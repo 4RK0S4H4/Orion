@@ -1,8 +1,10 @@
 /* Expand: content that opens in place (decision 0047, the first rung of the placement ladder).
    - [data-expand="id"] toggles <div class="s4-expand" id hidden>. [data-expand-close="value"] inside it, or Escape,
      closes it. Expands that share data-group="name" close each other.
-   - Because you asked for it right here, the first field inside takes focus (unlike a dialog); data-autofocus picks
-     another control, data-autofocus="none" on the expand turns it off. Focus returns to the opener on close.
+   - Opening never focuses a text field (decision 0049: on a phone that throws the keyboard up before you have seen
+     what opened). The expand itself takes focus, so Tab goes to its first control and Escape works; the person taps
+     the field when they want to type. data-autofocus on a button (never a field) picks that button instead.
+     Focus returns to the opener on close.
    - S4.expand.open(id | el, { from }) / close(id | el, value) / toggle(id | el). Fires s4-open and s4-close { value }.
    - Inline confirm: [data-confirm="id"] hides its own row (the closest [data-confirm-row], or the button) and shows
      <span class="s4-confirm" id hidden> in its place; [data-confirm-close="value"] puts the row back and fires
@@ -10,7 +12,6 @@
    Motion: Reveal for expands, Switch (enter) for the confirm. */
 (function () {
   var S4 = window.S4;
-  var FIELD = 'textarea:not([disabled]), input:not([disabled]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select:not([disabled])';
   /* the navigation rail has its own data-expand="auto" (it widens by itself): not an opener */
   var OPENER = '[data-expand]:not(.s4-nav-rail)';
   function el(x) { return typeof x === 'string' ? document.getElementById(x) : x; }
@@ -25,8 +26,9 @@
     x.hidden = false;
     openers(x).forEach(function (b) { b.setAttribute('aria-expanded', 'true'); });
     var p = S4.transition.reveal(x, { open: true });
-    var want = x.dataset.autofocus === 'none' ? null : (x.querySelector('[autofocus], [data-autofocus]') || x.querySelector(FIELD));
-    if (want) want.focus({ preventScroll: true });
+    var want = x.querySelector('[data-autofocus]');
+    if (!want || S4.util.typable(want)) { want = x; if (!x.hasAttribute('tabindex')) x.setAttribute('tabindex', '-1'); }
+    want.focus({ preventScroll: true });
     p.then(function (done) { if (done && x.scrollIntoView) x.scrollIntoView({ block: 'nearest', behavior: S4.motion.reduced() ? 'auto' : 'smooth' }); });
     S4.util.emit(x, 's4-open', { from: x._s4from });
     return p;

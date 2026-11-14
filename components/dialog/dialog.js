@@ -3,7 +3,8 @@
      (decision 0001: the opener becomes the dialog). [data-close="value"] or Escape closes it, collapsing back into the opener.
    - S4.dialog.open(id | el, { from: element }) / S4.dialog.close(id | el, value). The dialog fires s4-open and s4-close
      { value } (value is "" for Escape or a click on the scrim).
-   - Focus: the dialog itself, never a text field (decision 0043); [autofocus] / [data-autofocus] on a control opts in.
+   - Focus: the dialog itself, never a text field (decisions 0043 and 0049: there is no opt-in for fields any more);
+     [data-autofocus] on a button picks that button.
      Focus returns to the opener. Bottom and side sheets are floating panels and open the same way. */
 (function () {
   var S4 = window.S4;
@@ -14,7 +15,8 @@
      focus, so Tab goes to its first control and Escape and screen readers work as usual. */
   function initialFocus(d) {
     var a = d.querySelector('[autofocus], [data-autofocus]');
-    if (a) return a;
+    if (a && !S4.util.typable(a)) return a;
+    if (a) a.removeAttribute('autofocus');
     if (!d.hasAttribute('tabindex')) d.setAttribute('tabindex', '-1');
     return d;
   }

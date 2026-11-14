@@ -27,7 +27,7 @@ quick drop and fade (decision 0022). On glass, over a 32% scrim.
 | `data-origin="none"` | Fade in place instead of growing from the opener |
 | JS | `S4.dialog.open(id, { from })`, `S4.dialog.close(id, value)`; events `s4-open`, `s4-close` |
 
-**Focus:** `[autofocus]` wins; otherwise the first focusable element that isn't destructive, so Enter never confirms a delete
+**Focus:** the dialog itself takes focus when it opens, never a text field (decisions 0043 and 0049; there is no opt-in for fields). `data-autofocus` on a button picks that button. Tab then goes to the first control; focus returns to the opener on close.
 by accident. Focus returns to the opener.
 
 **Do:** questions as headlines in sentence case ("Delete this bill?"); actions say what they do ("Delete", not "OK"); confirm

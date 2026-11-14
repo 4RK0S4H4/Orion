@@ -25,7 +25,7 @@ pops in like a dialog. Nothing slides up the screen and nothing docks to an edge
 | `data-persistent` | A click outside doesn't close it. |
 
 Opening, closing, `[data-close]`, focus and events work exactly like the [dialog](../dialog/) (`S4.sheet.open/close`
-are the same functions). Opening never focuses a text field; add `data-autofocus` to a control to ask for it.
+are the same functions). Opening never focuses a text field (decision 0049); `data-autofocus` on a button picks that button.
 `.s4-sheet-handle` in older markup draws nothing, and panels are not dragged.
 
 **Do:** use a bottom panel for a quick add or a set of choices; a side panel for filters or details beside content on

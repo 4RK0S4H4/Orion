@@ -95,7 +95,7 @@ for (const page of htmlIn('templates')) {
 const refs = {};
 const GROUPS = [
   ['Actions', ['button', 'icon-button', 'button-group', 'fab']],
-  ['Navigation and shell', ['app', 'layout', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'breadcrumbs', 'pagination', 'stepper']],
+  ['Navigation and shell', ['app', 'layout', 'page', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'breadcrumbs', 'pagination', 'stepper']],
   ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state']],
   ['Content', ['prose', 'message']],
   ['Inputs', ['text-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],

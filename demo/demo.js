@@ -18,7 +18,7 @@
   $('#account-menu').addEventListener('s4-select', function (e) { $('#account-value').textContent = e.detail.item.dataset.value; });
   /* New Note opens in place at the top of Home (decision 0047); from another view, go Home first */
   $('#new-note-form').addEventListener('submit', function (e) { e.preventDefault(); S4.expand.close('new-note', 'save'); e.target.reset(); S4.snackbar({ text: 'Note saved', action: 'Undo' }); });
-  $$('[data-expand="new-note"][data-go]').forEach(function (b) { b.addEventListener('click', function () { var home = $('.s4-nav-item[data-view="home"]'); if (home && !home.hasAttribute('aria-current')) { home.click(); setTimeout(function () { if ($('#new-note').hidden === false) $('#nn-title').focus(); }, 400); } }, true); });
+  $$('[data-expand="new-note"][data-go]').forEach(function (b) { b.addEventListener('click', function () { var home = $('.s4-nav-item[data-view="home"]'); if (home && !home.hasAttribute('aria-current')) { home.click(); } }, true); });
   $('#share-note').addEventListener('s4-close', function (e) { if (e.detail.value === 'share') S4.snackbar('Note shared'); });
   $('#demo-comment').addEventListener('s4-close', function (e) { if (e.detail.value === 'post') S4.snackbar('Comment posted'); });
   $('#demo-confirm').addEventListener('s4-close', function (e) { if (e.detail.value === 'remove') S4.snackbar({ text: 'Tag removed', action: 'Undo' }); });

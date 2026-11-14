@@ -1,0 +1,48 @@
+/* Pages (S4 addition, decision 0050): a full screen you push into, with Back in the top app bar.
+   <section class="s4-subpage" data-page="message" data-title="Message" hidden> … </section>   a sibling of the .s4-views
+   .s4-page-header: an optional block at the top of a page (a big title, who and when, actions).
+   Behaviour, URLs and the Back gesture: page.js. */
+@layer s4.components {
+  .s4-subpage { display: block; min-inline-size: 0; }
+  .s4-subpage[hidden] { display: none; }
+  .s4-subpage:focus { outline: none; }
+  /* a page sliding in must never make the screen wider, even for a moment */
+  .s4-content:has(> .s4-subpage) { overflow-x: clip; }
+  .s4-app-bar-back[hidden] { display: none; }
+
+  .s4-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-2);
+    padding-block: var(--s4-space-2) var(--s4-space-4);
+    min-inline-size: 0;
+  }
+  .s4-page-title {
+    margin: 0;
+    font-family: var(--md-sys-typescale-headline-medium-font);
+    font-size: var(--md-sys-typescale-headline-medium-size);
+    line-height: var(--md-sys-typescale-headline-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight);
+    color: var(--md-sys-color-on-surface);
+    overflow-wrap: anywhere;
+  }
+  .s4-page-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-2) var(--s4-space-3);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+
+  /* one level in: a pushed page is not a destination, so on a phone the bottom navigation steps aside and the
+     view's own pinned button goes with it; the in-pane "back to list" row is replaced by the bar's Back */
+  @container s4-app (max-width: 839.98px) {
+    .s4-app[data-sub] > .s4-nav-bar { display: none; }
+  }
+  .s4-app[data-sub] .s4-view .s4-fab[data-fixed] { display: none; }
+  .s4-app[data-sub] .s4-row:has(> [data-split-back]:only-child) { display: none; }
+}

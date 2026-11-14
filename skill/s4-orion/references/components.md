@@ -6,7 +6,7 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 ## Contents
 
 - **Actions:** [button](#button), [icon-button](#icon-button), [button-group](#button-group), [fab](#fab)
-- **Navigation and shell:** [app](#app), [layout](#layout), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
+- **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
 - **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state)
 - **Content:** [prose](#prose), [message](#message)
 - **Inputs:** [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
@@ -336,6 +336,79 @@ the accessibility tree; Back (browser or button) returns focus to the list's pag
 
 **Tokens:** `--s4-layout-content-reading`, `--s4-layout-content-wide`, `--s4-layout-list-width`,
 `--s4-layout-inspector-width`, `--s4-layout-pane-gap`, `--s4-size-top-app-bar`, `--s4-motion-pattern-shared-axis-distance`.
+
+---
+
+<a id="page"></a>
+
+## Pages
+
+Going somewhere: a full screen you push into from a view or from another page, with Back in the top app bar, its own
+title, its own URL and the phone's Back gesture. Use it whenever a thing deserves the whole screen: reading a message,
+an order, a profile, a document, a step-by-step task.
+
+```html
+<main class="s4-content">
+  <section class="s4-view" data-view="inbox" data-title="Inbox">
+    <button class="s4-list-item" data-page-open="message" data-page-id="42" data-page-title="Maya Chen">…</button>
+  </section>
+  <section class="s4-subpage" data-page="message" data-title="Message" hidden>
+    <header class="s4-page-header">
+      <h2 class="s4-page-title">Invoice for October</h2>
+      <div class="s4-page-meta"><span>Maya Chen</span><span>9:41</span></div>
+    </header>
+    …
+  </section>
+</main>
+```
+
+| Attribute | On | What |
+|---|---|---|
+| `data-page="name"` | `.s4-subpage` | the page's name (a sibling of the `.s4-view`s, starts `hidden`) |
+| `data-title` | `.s4-subpage` | the top app bar title while it is open |
+| `data-page-open="name"` | any control | opens that page; `data-page-id` and `data-page-title` say which item and what to call it |
+| `data-page-back` | any control | goes back one level (the top app bar's Back button is added for you) |
+| `data-detail-title` | `.s4-split` | the bar title when the split shows its detail on a phone (it goes one level in the same way) |
+
+Script: `S4.pages.open(app, name, { id, title })`, `S4.pages.back(app)`, `S4.pages.home(app)` (all the way out),
+`S4.pages.current(app)` gives `{ name, id }` or `null`. The page fires `s4-open { id, from }` just before it shows:
+fill it from your data there. It fires `s4-close` when left.
+
+**What it does for you**
+- **Back, three ways:** the bar's Back button, the phone's Back gesture or the browser's Back button, and
+  `data-page-back`. Forward works too.
+- **A URL per page:** `#inbox/message/42`. Opening or reloading that link lands on the page; Back returns to its view.
+- **The bar follows:** Back appears, the title becomes the page's, and both return when you leave.
+- **On a phone the bottom navigation steps aside** while a page is open (a pushed page is not a destination). The
+  side navigation stays on wide screens. Tapping the destination you are in takes you back to its start.
+- **Your place is kept:** the view you left is scrolled back to where you were.
+- **Pages can stack:** a page can open another page.
+
+**When to use what (where things open)**
+1. In place, an expand, a menu, a pane, a floating panel, a dialog: the placement ladder (see [expand](#expand)) is
+   for acting on what you are looking at **without leaving**.
+2. **A page** is for **going to** something: you want to read it, work on it or come back to it later by link.
+3. **A view** (`.s4-view` + the navigation) is a top-level destination of the app.
+
+On a wide screen a list with a detail pane (`.s4-split`) shows both; give the detail an "Open Full Page" button for
+focused reading. On a phone the split already behaves like a page.
+
+**Do**
+- Give every page a clear title and, when it shows one item, an id, so its link can be shared.
+- Fill the page in `s4-open`, from the id: a reload must show the same thing.
+- Keep the page's main actions at its end or in the top app bar's actions.
+
+**Don't**
+- Don't open a page for a quick answer or a short form: that is the placement ladder.
+- Don't put top-level destinations on a page; don't hide Back.
+- Don't focus a field when a page opens (decision 0049).
+
+**Accessibility:** the page takes focus when it opens (so a screen reader starts there) and focus is never moved into
+a field. Back is a real button named "Back". The URL changes, so browser history, reload and sharing work.
+
+**Motion:** Switch: forward going in, back coming out.
+
+**Tokens:** type scale `headline-medium`, `body-medium`; `on-surface`, `on-surface-variant`; spacing `--s4-space-*`.
 
 ---
 
@@ -1281,7 +1354,7 @@ Inline confirm (the button turns into the question):
 | `data-expand="id"` | any button | opens or closes that expand; gets `aria-expanded` and `aria-controls` | |
 | `data-variant` | `.s4-expand` | `inset` (a filled, rounded container for a composer or small form) | none: plain, part of the page |
 | `data-group` | `.s4-expand` | a shared name: opening one closes the others (Reply and Forward) | independent |
-| `data-autofocus` | `.s4-expand` or a control inside | `none` on the expand keeps focus on the opener; on a control, that control takes focus | the first field |
+| `data-autofocus` | a button inside | that button takes focus when it opens (never a field) | the expand itself |
 | `data-expand-close="value"` | a button inside | closes it; `value` arrives in `s4-close` | |
 | `data-confirm="id"` / `data-confirm-close="value"` | buttons | swap a button (or its `[data-confirm-row]`) for a `.s4-confirm` and back | |
 
@@ -1308,8 +1381,9 @@ Script: `S4.expand.open(id, { from })`, `S4.expand.close(id, value)`, `S4.expand
 - Don't open an expand far from its button, or more than one at a time in the same place (use `data-group`).
 - Don't use the inline confirm for something serious that cannot be undone: that is what a dialog is for.
 
-**Accessibility:** the opener carries `aria-expanded` and `aria-controls`. Opening moves focus to the first field
-(you asked for it here; this is not a dialog); Escape closes and returns focus to the opener. The page is never inert.
+**Accessibility:** the opener carries `aria-expanded` and `aria-controls`. Opening moves focus to the expand itself,
+never into a field (decision 0049: no keyboard pops up until the person taps the field); Tab goes to its first
+control. Escape closes and returns focus to the opener. The page is never inert.
 The inline confirm moves focus to its first answer and back to the button.
 
 **Motion:** Reveal (the box grows on the calm reveal spring, its content follows); the confirm uses Switch.
@@ -2116,7 +2190,7 @@ quick drop and fade (decision 0022). On glass, over a 32% scrim.
 | `data-origin="none"` | Fade in place instead of growing from the opener |
 | JS | `S4.dialog.open(id, { from })`, `S4.dialog.close(id, value)`; events `s4-open`, `s4-close` |
 
-**Focus:** `[autofocus]` wins; otherwise the first focusable element that isn't destructive, so Enter never confirms a delete
+**Focus:** the dialog itself takes focus when it opens, never a text field (decisions 0043 and 0049; there is no opt-in for fields). `data-autofocus` on a button picks that button. Tab then goes to the first control; focus returns to the opener on close.
 by accident. Focus returns to the opener.
 
 **Do:** questions as headlines in sentence case ("Delete this bill?"); actions say what they do ("Delete", not "OK"); confirm
@@ -2153,7 +2227,7 @@ pops in like a dialog. Nothing slides up the screen and nothing docks to an edge
 | `data-persistent` | A click outside doesn't close it. |
 
 Opening, closing, `[data-close]`, focus and events work exactly like the [dialog](#dialog) (`S4.sheet.open/close`
-are the same functions). Opening never focuses a text field; add `data-autofocus` to a control to ask for it.
+are the same functions). Opening never focuses a text field (decision 0049); `data-autofocus` on a button picks that button.
 `.s4-sheet-handle` in older markup draws nothing, and panels are not dragged.
 
 **Do:** use a bottom panel for a quick add or a set of choices; a side panel for filters or details beside content on

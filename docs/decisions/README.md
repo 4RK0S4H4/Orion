@@ -79,3 +79,5 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0046 | One motion philosophy: ten named patterns, pattern tokens, `check:motion` | Active (built; owner to look at the motion page) |
 | 0047 | The placement ladder: expand in place before a menu, pane, panel or dialog | Active (built; owner to look) |
 | 0048 | Orion on every page, quizzes included (reverses "review blue") | Active (built; owner to look) |
+| 0049 | Nothing puts the cursor in a text field by itself | Active (owner's rule) |
+| 0050 | Pages: going into a thing, with Back, a title and a URL | Active (built; owner to look) |

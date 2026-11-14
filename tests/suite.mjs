@@ -6,7 +6,7 @@
                ids; every control has a name; every field has a label
      focus     no focus ring is cut off by a bar, a scrolling pane or the edge of the screen (issue 42)
      touch     at 390, nothing you tap is smaller than 24px (WCAG 2.2)
-     use       it then uses the page: opens and closes every dialog, panel, menu, expand, inline confirm, accordion,
+     use       it then uses the page: opens and closes every dialog, panel, menu, expand, page, inline confirm, accordion,
                tab, date picker and select, visits every view, hovers a tooltip. Each overlay must fit the screen, close
                with Escape and give focus back; nothing may be left open, stuck mid-animation or throw.
    Usage: node tests/suite.mjs [--browser=chromium|webkit] [--only=text] [--shots] [--workers=4]
@@ -178,8 +178,8 @@ async function use(page, add, phone) {
       const isOpen = await page.evaluate((id) => { const d = document.getElementById(id); return !!d && d.open; }, id);
       if (!isOpen) { add(`dialog "${id}" did not open`); continue; }
       const f = await fits(id); if (f) add(`dialog "${id}" ${f}`);
-      const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !a.matches('[autofocus], [data-autofocus]'); }, id);
-      if (fieldFocused) add(`dialog "${id}" focused a text field when it opened (decision 0043)`);
+      const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); }, id);
+      if (fieldFocused) add(`dialog "${id}" put the cursor in a text field when it opened (decision 0049)`);
       await page.keyboard.press('Escape'); await settle(520);
       const still = !(await until((id) => !document.getElementById(id).open, id));
       if (still) { add(`dialog "${id}" did not close with Escape`); await closeAll(); continue; }
@@ -208,6 +208,7 @@ async function use(page, add, phone) {
       const st = await page.evaluate((id) => { const x = document.getElementById(id); return { hidden: x.hidden, h: x.getBoundingClientRect().height, exp: [...document.querySelectorAll(`[data-expand="${id}"]`)].every((o) => o.getAttribute('aria-expanded') === 'true'), inline: x.style.height || x.style.overflow }; }, id);
       if (st.hidden || st.h < 8) { add(`expand "${id}" did not open`); continue; }
       if (!st.exp) add(`expand "${id}": its opener does not say aria-expanded="true"`);
+      if (await page.evaluate(() => { const a = document.activeElement; return !!a && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); })) add(`expand "${id}" put the cursor in a text field when it opened (decision 0049)`);
       if (st.inline) add(`expand "${id}" kept a leftover inline style after opening (${st.inline})`);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ov > 1) add(`expand "${id}" causes sideways scroll (${ov}px)`);
       await page.keyboard.press('Escape'); await settle(650);
@@ -215,6 +216,23 @@ async function use(page, add, phone) {
       if (!closed) add(`expand "${id}" did not close with Escape`);
       const after = await page.evaluate(() => document.documentElement.scrollHeight);
       if (closed && (await shownView()) === viewBefore && Math.abs(after - before) > 2) add(`expand "${id}" left the page ${after - before}px taller after closing`);
+    }
+    /* pages: going in shows the page with Back in the bar, never a focused field; Back returns to where you were */
+    const pageOpeners = await page.evaluate(() => [...new Set([...document.querySelectorAll('[data-page-open]')].filter((b) => b.getBoundingClientRect().width && !b.closest('[hidden]')).map((b) => b.dataset.pageOpen))]);
+    for (const name of pageOpeners) {
+      const b = (await visible(`[data-page-open="${name}"]`))[0]; if (!b) continue;
+      const depth0 = await page.evaluate(() => +(document.querySelector('.s4-app').dataset.sub || 0));
+      if (!(await click(b, `opener of page "${name}"`))) continue;
+      await settle(600);
+      const st = await page.evaluate((n) => { const p = document.querySelector(`.s4-subpage[data-page="${n}"]`), k = document.querySelector('.s4-app-bar-back'), a = document.activeElement; return { shown: !!p && !p.hidden, back: !!k && !k.hidden, field: !!a && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select'), wide: document.documentElement.scrollWidth - innerWidth, hash: location.hash }; }, name);
+      if (!st.shown) { add(`page "${name}" did not open`); continue; }
+      if (!st.back) add(`page "${name}": the top app bar shows no Back button`);
+      if (st.field) add(`page "${name}" put the cursor in a text field when it opened (decision 0049)`);
+      if (st.wide > 1) add(`page "${name}": sideways scroll (${st.wide}px)`);
+      if (!st.hash.includes('/' + name)) add(`page "${name}" did not get its own URL (${st.hash})`);
+      await page.goBack(); await settle(600);
+      const out = await until((a) => +(document.querySelector('.s4-app').dataset.sub || 0) === a[0] && document.querySelector(`.s4-subpage[data-page="${a[1]}"]`).hidden, [depth0, name]);
+      if (!out) { add(`page "${name}" did not close with the browser's Back`); await page.evaluate(() => S4.pages.reset(document.querySelector('.s4-app'))); }
     }
     /* inline confirm */
     for (const b of await visible('[data-confirm]')) {
