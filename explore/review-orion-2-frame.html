@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Orion Overhaul Review: sample</title>
-<link rel="stylesheet" href="../components/orion.css?v=b2a08eb">
+<link rel="stylesheet" href="../components/orion.css?v=401f4b3">
 <style>
   body { margin: 0; }
   .fr { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-4); }
@@ -35,12 +35,24 @@
   <div class="s4-row"><button class="s4-button" type="button">Pay Bill</button><button class="s4-button" data-variant="tonal" type="button">Remind Me</button><label class="s4-switch"><input type="checkbox" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span>Autopay</label></div>
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=75e15e4"></script>
+<script src="../components/orion.js?v=7179f47"></script>
 <script>
   var q = new URLSearchParams(location.search), root = document.documentElement;
   if (q.get('mode')) root.dataset.theme = q.get('mode');
   if (q.get('density')) root.dataset.density = q.get('density');
   if (q.get('chip')) root.dataset.chip = q.get('chip');
+  /* palette review: alternative neutral grays, set as role overrides for the forced mode */
+  var N = {
+    crisp: { light: ['#ffffff', '#ffffff', '#f5f5f5', '#efefef', '#e9e9e9', '#e2e2e2', '#171717', '#454545', '#c9c9c9', '#d6d6d6'],
+             dark:  ['#0e0e0e', '#090909', '#181818', '#1e1e1e', '#282828', '#333333', '#ededed', '#bdbdbd', '#454545', '#454545'] },
+    cool:  { light: ['#ffffff', '#ffffff', '#f4f4f6', '#eeeef1', '#e8e8ec', '#e0e0e6', '#18181b', '#45454d', '#c8c8d0', '#d7d7df'],
+             dark:  ['#0d0d0f', '#08080a', '#17171a', '#1d1d21', '#27272c', '#323238', '#ececf0', '#b9b9c2', '#44444c', '#43434b'] }
+  }[q.get('neutral')];
+  if (N) {
+    var v = N[q.get('mode') === 'light' ? 'light' : 'dark'], k = ['surface', 'surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest', 'on-surface', 'on-surface-variant', 'outline-variant', 'secondary-container'];
+    k.forEach(function (name, i) { root.style.setProperty('--md-sys-color-' + name, v[i]); });
+    root.style.setProperty('--md-sys-color-background', v[0]); root.style.setProperty('--md-sys-color-on-secondary-container', v[6]);
+  }
   if (q.get('seed')) S4.theme({ seed: '#' + q.get('seed'), surfaces: q.get('surfaces') || 'neutral' });
 </script>
 </body>

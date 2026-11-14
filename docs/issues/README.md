@@ -19,13 +19,7 @@ decision and show options in a motion lab with the scrubber before building.
 
 ## Open (2026-11-14)
 
-Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and wait for the owner's look in the [Overhaul Review](../../explore/review-orion-2.html). Still open: 7 and idea A.
-
-### 7. Liquid hover between list rows (owner reviews on a computer)
-**Reminder for the owner: review the row hover options on a computer** ([Lab 2](../../explore/motion-liquid-2.html), question 1: Today, Edges Settle, Edges Lean, Corners Melt) and say which one, or describe it. Owner's direction so far: a minor animation of the hover box's edges, not a box that travels between rows.
-Original note: moving the pointer from one row to the next should feel liquid: the hover/selection shape flows to the next row and its
-rounded corners morph as it goes (like the sliding nav pill, but softer). Subtle. Applies to lists and similar rows.
-![List rows](img/2026-11-14-list-hover-liquid.png)
+Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Still open: idea A.
 
 ### 24. ~~Banner on glass~~ (scrapped)
 Scrapped by the owner (2026-11-14): they meant snackbars, not banners. Banners stay solid content. See issue 28.
@@ -41,6 +35,7 @@ tinted states)? Does it read on a solid content surface with nothing interesting
 
 ## Done
 
+- **7.** Liquid hover between list rows: done 2026-11-14 (Edges Lean, decision 0044).
 - **1.** Rail collapse animation glitches: done 2026-11-14 (rail is rows; only its edge moves, decision 0043).
 - **2.** Duotone icons turn completely white when selected: done 2026-11-14 (selected icons keep both tones, decision 0043).
 - **3.** Rail items on desktop: label beside the icon, hamburger menu button: done 2026-11-14 (rows with the label beside the icon, hamburger, solid main action, decision 0043).

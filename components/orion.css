@@ -376,6 +376,7 @@
     --s4-color-on-info-container: #0a376f;
     --s4-color-badge: #d93025;
     --s4-color-on-badge: #ffffff;
+    --s4-color-control: #858585;
     --md-sys-motion-spring-fast-spatial: linear(0, 0.019 2.5%, 0.069 5%, 0.139 7.5%, 0.222 10%, 0.311 12.5%, 0.401 15%, 0.49 17.5%, 0.573 20%, 0.65 22.5%, 0.719 25%, 0.78 27.5%, 0.832 30%, 0.877 32.5%, 0.914 35%, 0.945 37.5%, 0.969 40%, 0.989 42.5%, 1.003 45%, 1.013 47.5%, 1.021 50%, 1.025 52.5%, 1.028 55%, 1.028 57.5%, 1.028 60%, 1.027 62.5%, 1.025 65%, 1.022 67.5%, 1.02 70%, 1.017 72.5%, 1.015 75%, 1.012 77.5%, 1.01 80%, 1.008 82.5%, 1.006 85%, 1.005 87.5%, 1.004 90%, 1.003 92.5%, 1.002 95%, 1.001 97.5%, 1);
     --md-sys-motion-spring-spatial: linear(0, 0.017 2.5%, 0.061 5%, 0.123 7.5%, 0.195 10%, 0.274 12.5%, 0.353 15%, 0.431 17.5%, 0.505 20%, 0.575 22.5%, 0.638 25%, 0.695 27.5%, 0.746 30%, 0.791 32.5%, 0.83 35%, 0.863 37.5%, 0.892 40%, 0.916 42.5%, 0.935 45%, 0.952 47.5%, 0.965 50%, 0.976 52.5%, 0.984 55%, 0.991 57.5%, 0.996 60%, 0.999 62.5%, 1.002 65%, 1.004 67.5%, 1.005 70%, 1.006 72.5%, 1.006 75%, 1.006 77.5%, 1.006 80%, 1.006 82.5%, 1.005 85%, 1.005 87.5%, 1.004 90%, 1.004 92.5%, 1.003 95%, 1.003 97.5%, 1);
     --md-sys-motion-spring-slow-spatial: linear(0, 0.017 2.5%, 0.06 5%, 0.12 7.5%, 0.19 10%, 0.265 12.5%, 0.341 15%, 0.416 17.5%, 0.487 20%, 0.553 22.5%, 0.614 25%, 0.669 27.5%, 0.719 30%, 0.763 32.5%, 0.801 35%, 0.834 37.5%, 0.863 40%, 0.888 42.5%, 0.909 45%, 0.926 47.5%, 0.941 50%, 0.953 52.5%, 0.963 55%, 0.972 57.5%, 0.979 60%, 0.984 62.5%, 0.988 65%, 0.992 67.5%, 0.994 70%, 0.997 72.5%, 0.998 75%, 0.999 77.5%, 1 80%, 1.001 82.5%, 1.001 85%, 1.001 87.5%, 1.001 90%, 1.002 92.5%, 1.002 95%, 1.001 97.5%, 1);
@@ -466,6 +467,7 @@
       --s4-color-on-info-container: #d5e4ff;
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
+      --s4-color-control: #787878;
     }
     }
   :where(:root[data-theme="dark"]) {
@@ -541,6 +543,7 @@
     --s4-color-on-info-container: #d5e4ff;
     --s4-color-badge: #d93025;
     --s4-color-on-badge: #ffffff;
+    --s4-color-control: #787878;
   }
   @media (prefers-contrast: more) {
     :where(:root:not([data-contrast])) {
@@ -606,6 +609,7 @@
       --s4-color-success: #0b4429;
       --s4-color-warning: #4d3200;
       --s4-color-info: #0a376f;
+      --s4-color-control: #5e5e5e;
     }
     }
   :where(:root[data-contrast="high"]) {
@@ -671,6 +675,7 @@
     --s4-color-success: #0b4429;
     --s4-color-warning: #4d3200;
     --s4-color-info: #0a376f;
+    --s4-color-control: #5e5e5e;
   }
   @media (prefers-color-scheme: dark) and (prefers-contrast: more) {
     :where(:root:not([data-theme="light"]):not([data-contrast])) {
@@ -749,6 +754,7 @@
       --s4-color-on-info-container: #d5e4ff;
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
+      --s4-color-control: #ababab;
     }
     }
   @media (prefers-color-scheme: dark) {
@@ -828,6 +834,7 @@
       --s4-color-on-info-container: #d5e4ff;
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
+      --s4-color-control: #ababab;
     }
     }
   @media (prefers-contrast: more) {
@@ -907,6 +914,7 @@
       --s4-color-on-info-container: #d5e4ff;
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
+      --s4-color-control: #ababab;
     }
     }
   :where(:root[data-theme="dark"][data-contrast="high"]) {
@@ -985,6 +993,7 @@
     --s4-color-on-info-container: #d5e4ff;
     --s4-color-badge: #d93025;
     --s4-color-on-badge: #ffffff;
+    --s4-color-control: #ababab;
   }
   @media (prefers-reduced-motion: reduce) {
     :where(:root) {
@@ -3136,6 +3145,22 @@
   }
 
   /* ---------- parts ---------- */
+  /* Row hover, "Edges Lean" (decision 0044, issue 7): each row has its own hover box and nothing travels between rows.
+     The box arrives a touch small and its edges flow out on the ink spring; the edge nearest where the pointer came
+     from arrives first (list.js sets --_lean to 0% from above, 100% from below). Transform and opacity only. */
+  :is(a, button, label).s4-list-item::before,
+  .s4-list-item[tabindex]::before,
+  .s4-list-item[role="option"]::before {
+    transform: scale(0.985, 0.84);
+    transform-origin: 50% var(--_lean, 50%);
+    transition:
+      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
+      transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+  }
+  :is(a, button, label).s4-list-item:is(:hover, :focus-visible, :active)::before,
+  .s4-list-item[tabindex]:is(:hover, :focus-visible, :active)::before,
+  label.s4-list-item:has(:focus-visible)::before { transform: none; }
+
   .s4-list-leading,
   .s4-list-trailing {
     display: flex;
@@ -4280,9 +4305,9 @@
   }
   .s4-text-field:has(> .s4-text-field-select[aria-expanded="true"]) .s4-text-field-chevron { rotate: 180deg; }
   .s4-text-field > select > option { background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
-  .s4-text-field > :is(input, textarea)::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 0.7; }
+  .s4-text-field > :is(input, textarea)::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 0.85; }   /* 0.85 keeps 4.5:1 on the field's fill (decision 0044) */
   /* text-field.js sets placeholder=" " on fields without one: keep that invisible */
-  .s4-text-field > :is(input, textarea):placeholder-shown:not(:focus)::placeholder { opacity: 0.7; }
+  .s4-text-field > :is(input, textarea):placeholder-shown:not(:focus)::placeholder { opacity: 0.85; }
 
   /* ---------- icons, prefix, suffix ---------- */
   .s4-text-field > :is(.s4-icon, .s4-icon-button) { grid-row: 2; color: var(--_icon-color); }
@@ -4776,7 +4801,7 @@
 @layer s4.components {
   .s4-checkbox {
     --_border: transparent;
-    --_fill: var(--md-sys-color-surface-container-highest);
+    --_fill: var(--s4-color-control);   /* decision 0044: an empty box keeps 3:1 against its surface */
     --_mark: var(--md-sys-color-on-primary);
     --_state: var(--md-sys-color-on-surface);
     --_box: calc(var(--s4-space-4) + var(--s4-space-1));   /* 20dp */
@@ -4849,7 +4874,7 @@
   .s4-checkbox-box { transition: background-color var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink); }
   @media (hover: hover) {
     .s4-checkbox:hover:not(:has(> input:disabled)) .s4-checkbox-box { transform: scale(1.1); }
-    .s4-checkbox:hover:not(:has(> input:disabled)):not(:has(> input:is(:checked, :indeterminate))) { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--md-sys-color-surface-container-highest)); }
+    .s4-checkbox:hover:not(:has(> input:disabled)):not(:has(> input:is(:checked, :indeterminate))) { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--s4-color-control)); }
   }
   .s4-checkbox:has(> input:focus-visible) .s4-checkbox-box {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
@@ -4865,6 +4890,7 @@
 
   /* ---------- disabled ---------- */
   .s4-checkbox:has(> input:disabled) {
+    --_fill: color-mix(in srgb, var(--s4-color-control) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     --_border: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     cursor: default;
@@ -4946,7 +4972,7 @@
     height: var(--_size);
     margin: calc((var(--_layer) - var(--_size)) / 2);
     border: 0;
-    background: var(--md-sys-color-surface-container-highest);   /* decision 0023: a filled disc, no outline */
+    background: var(--s4-color-control);   /* decision 0023: a filled disc, no outline; 0044: 3:1 against its surface */
     border-radius: var(--md-sys-shape-corner-full);
     transition: background-color var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
   }
@@ -4969,7 +4995,7 @@
   /* hover and press: the disc itself answers (no halo, decision 0043) */
   @media (hover: hover) {
     .s4-radio:hover:not(:has(> input:disabled)) .s4-radio-ring { transform: scale(1.1); }
-    .s4-radio:hover:not(:has(> input:disabled)):not(:has(> input:checked)) .s4-radio-ring { background: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--md-sys-color-surface-container-highest)); }
+    .s4-radio:hover:not(:has(> input:disabled)):not(:has(> input:checked)) .s4-radio-ring { background: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--s4-color-control)); }
   }
   .s4-radio:has(> input:focus-visible) .s4-radio-ring {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
@@ -4983,6 +5009,8 @@
     cursor: default;
   }
   .s4-radio[data-error], .s4-radio:has(> input[aria-invalid="true"]) { --_ring: var(--md-sys-color-error); --_state: var(--md-sys-color-error); }
+
+  .s4-radio:has(> input:disabled) .s4-radio-ring { background: color-mix(in srgb, var(--s4-color-control) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
 
   @media (forced-colors: active) {
     .s4-radio-ring { forced-color-adjust: none; border-color: CanvasText; }

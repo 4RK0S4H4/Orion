@@ -23,8 +23,10 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - Bottom and side sheets are floating glass panels that pop in; no handle or drag.
 - Items on glass are tints; fields in error keep their fill; chips keep their size when selected; checkbox, radio and switch have no hover halo; table rows hover as a flat band; lists are inset on every side; avatars are neutral by default; duotone icons have clearer tones.
 - Dialogs and panels no longer focus a text field when they open.
+- List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.
 - Slider reaches both ends; stop dots no longer peek out beside the handle. The composer's buttons line up with its field. The select on the text field reference page opens the glass menu.
 
 ## [1.0.0] - Unreleased

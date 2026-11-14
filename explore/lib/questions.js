@@ -247,5 +247,12 @@ window.S4_REVIEW_DEMOS = [
       { id: 'date', label: 'Date picker', options: [{ v: 'Yes', label: 'Keep it' }, { v: 'No', label: 'Not quite; see notes' }] },
       { id: 'desktop', label: 'Desktop app template', options: [{ v: 'Yes', label: 'Keep it' }, { v: 'No', label: 'Not quite; see notes' }] }
     ]
+  },
+  {
+    id: 'palette', title: 'Palette Review', href: 'explore/review-palette.html',
+    questions: [
+      { id: 'neutral', label: 'The base grays', options: [{ v: 'A', label: 'Today' }, { v: 'B', label: 'Crisper' }, { v: 'C', label: 'Crisper and cool' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'controls', label: 'Empty checkboxes and radios', options: [{ v: 'Yes', label: 'Keep it' }, { v: 'No', label: 'Too heavy; see notes' }] }
+    ]
   }
 ];

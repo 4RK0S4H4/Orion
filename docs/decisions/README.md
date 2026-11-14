@@ -72,5 +72,6 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0039 | Docked glass gets the full edge | Superseded by 0040 |
 | 0040 | Docked glass lights only its free edge | Active, awaiting the owner's iPhone check |
 | 0041 | Orion as a framework: layouts, templates, content components | Proposed (built, awaiting the owner's review) |
-| 0042 | Liquid motion for ink, plain motion for glass | Active (row hover still open) |
-| 0043 | The overhaul: neutral color, density, side navigation, items on glass, floating panels, date picker, desktop apps | Built, awaiting the owner's review |
+| 0042 | Liquid motion for ink, plain motion for glass | Active (row hover settled in 0044) |
+| 0043 | The overhaul: neutral color, density, side navigation, items on glass, floating panels, date picker, desktop apps | Active (accepted in 0044) |
+| 0044 | Overhaul accepted; row hover Edges Lean; base palette contrast (control color, placeholders) | Active (the base grays question is open) |

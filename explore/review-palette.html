@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: Palette Review</title>
+<link rel="stylesheet" href="../components/orion.css?v=401f4b3">
+<style>
+body{margin:0;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)}
+h1,h2,p{margin:0}
+.bar{display:flex;align-items:center;padding:12px 24px;background:var(--md-sys-color-surface-container)}
+.bar h1{font-size:20px;line-height:28px;font-weight:500}
+.page{max-width:1100px;margin:0 auto;padding:24px 16px 120px;display:flex;flex-direction:column;gap:40px}
+.intro{max-width:80ch;color:var(--md-sys-color-on-surface-variant);display:flex;flex-direction:column;gap:12px}
+.sec > h2{font-size:24px;line-height:32px;font-weight:500;margin-bottom:6px}
+.sec > p{color:var(--md-sys-color-on-surface-variant);max-width:85ch;margin-bottom:16px}
+.cards{--rv-min:300px}
+.pv{border-radius:20px;overflow:hidden;background:var(--md-sys-color-surface-container-low)}
+.pv iframe{display:block;width:100%;height:520px;border:0}
+.pv.pair{display:grid;grid-template-columns:1fr;gap:2px}
+.pv.note{padding:16px;color:var(--md-sys-color-on-surface-variant);font:400 14px/20px Inter,system-ui,sans-serif}
+.pv.note a{color:var(--md-sys-color-primary)}
+</style>
+</head>
+<body>
+<header class="bar"><h1>S4 Orion: Palette Review</h1></header>
+<main class="page">
+  <div class="intro">
+    <p>You asked me to check the base light and dark colors. The contrast gaps I found are fixed (see below). What is left is taste: how the grays themselves should look. Tap the card you want and copy your answers at the end.</p>
+  </div>
+  <div id="sections" style="display:flex;flex-direction:column;gap:40px"></div>
+</main>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=7179f47"></script>
+<script src="lib/questions.js?v=0dd191f"></script>
+<script src="lib/review.js?v=2d9b250"></script>
+<script>
+function section(id, title, text, opts) {
+  const sec = document.createElement('section'); sec.className = 'sec';
+  sec.innerHTML = `<h2>${title}</h2><p>${text}</p><div class="cards rv-group" role="radiogroup" aria-label="${title}"></div>`;
+  document.getElementById('sections').appendChild(sec);
+  opts.forEach(o => {
+    const pv = document.createElement('div');
+    if (o.frames) { pv.className = 'pv pair'; pv.innerHTML = o.frames.map(f => `<iframe loading="lazy" title="${o.name}" src="review-orion-2-frame.html?${f}"></iframe>`).join(''); }
+    else { pv.className = 'pv note'; pv.innerHTML = o.html; }
+    sec.querySelector('.cards').appendChild(S4Review.card({ pick: id + ':' + o.k, letter: o.k, title: o.name, desc: o.desc, tag: o.tag || '', preview: pv }));
+  });
+}
+section('neutral', '1. The Base Grays', 'The colors every app starts with, light on top and dark below. All three pass the same contrast checks; this is about which looks best to you.', [
+  { k: 'A', name: 'Today', tag: 'Today', desc: 'Pure gray. Off-white page in light mode, soft black in dark mode, small steps between surfaces.', frames: ['mode=light', 'mode=dark'] },
+  { k: 'B', name: 'Crisper', desc: 'Pure gray, but a white page in light mode and a deeper black in dark mode, so cards and fields stand out more.', frames: ['neutral=crisp&mode=light', 'neutral=crisp&mode=dark'] },
+  { k: 'C', name: 'Crisper and Cool', desc: 'Like B with a very slight cool tint in the grays (the zinc grays many frameworks use).', frames: ['neutral=cool&mode=light', 'neutral=cool&mode=dark'] },
+]);
+section('controls', '2. Empty Checkboxes and Radios', 'They were too faint to see (about 1.2:1 against the page). Now a mid gray that keeps 3:1.', [
+  { k: 'Yes', name: 'Keep It', tag: 'Built', desc: 'Clear enough and not too heavy.', html: 'Try it: <a href="../components/checkbox/checkbox.html">Checkbox page</a> and <a href="../components/radio/radio.html">Radio page</a>' },
+  { k: 'No', name: 'Too Heavy', desc: 'Find another way to make them visible; say what in the notes.', html: 'Describe it in the notes at the end.' },
+]);
+S4Review.page('palette');
+
+</script>
+</body>
+</html>

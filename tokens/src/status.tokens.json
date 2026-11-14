@@ -325,6 +325,49 @@
             }
           }
         }
+      },
+      "control": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5216,
+            0.5216,
+            0.5216
+          ],
+          "hex": "#858585"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.4706,
+                0.4706,
+                0.4706
+              ],
+              "hex": "#787878"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.3686,
+                0.3686,
+                0.3686
+              ],
+              "hex": "#5e5e5e"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.6706,
+                0.6706,
+                0.6706
+              ],
+              "hex": "#ababab"
+            }
+          }
+        },
+        "$description": "An empty control (unchecked checkbox, unselected radio): a neutral that keeps 3:1 against the surfaces controls sit on (decision 0044)."
       }
     }
   }

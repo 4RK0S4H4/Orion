@@ -1,6 +1,6 @@
-# 0043: The overhaul: one language for phones, desktop windows and desktop apps (built, awaiting the owner's review, 2026-11-14)
+# 0043: The overhaul: one language for phones, desktop windows and desktop apps (accepted, 2026-11-14)
 
-**Status:** built on the owner's request ("review this design language … really overhaul it … mobile, desktop, and even
+**Status:** accepted by the owner in the Overhaul Review (all ten answers match what was built; see [0044](0044-review-answers-row-hover-palette.md)). Built on the owner's request ("review this design language … really overhaul it … mobile, desktop, and even
 desktop apps", 2026-11-14), from the open issues and the direction of the earlier ones. The choices the issues wanted
 shown as options are in the [Overhaul Review](../../explore/review-orion-2.html); the first card of each question is
 what is built. Amends 0001 and 0003 (color), 0007 (menu icon), 0011 and 0022 (sheets), 0015 (items on glass), 0023

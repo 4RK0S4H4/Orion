@@ -119,9 +119,9 @@
   }
   .s4-text-field:has(> .s4-text-field-select[aria-expanded="true"]) .s4-text-field-chevron { rotate: 180deg; }
   .s4-text-field > select > option { background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
-  .s4-text-field > :is(input, textarea)::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 0.7; }
+  .s4-text-field > :is(input, textarea)::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 0.85; }   /* 0.85 keeps 4.5:1 on the field's fill (decision 0044) */
   /* text-field.js sets placeholder=" " on fields without one: keep that invisible */
-  .s4-text-field > :is(input, textarea):placeholder-shown:not(:focus)::placeholder { opacity: 0.7; }
+  .s4-text-field > :is(input, textarea):placeholder-shown:not(:focus)::placeholder { opacity: 0.85; }
 
   /* ---------- icons, prefix, suffix ---------- */
   .s4-text-field > :is(.s4-icon, .s4-icon-button) { grid-row: 2; color: var(--_icon-color); }

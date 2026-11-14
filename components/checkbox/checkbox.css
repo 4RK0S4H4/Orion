@@ -9,7 +9,7 @@
 @layer s4.components {
   .s4-checkbox {
     --_border: transparent;
-    --_fill: var(--md-sys-color-surface-container-highest);
+    --_fill: var(--s4-color-control);   /* decision 0044: an empty box keeps 3:1 against its surface */
     --_mark: var(--md-sys-color-on-primary);
     --_state: var(--md-sys-color-on-surface);
     --_box: calc(var(--s4-space-4) + var(--s4-space-1));   /* 20dp */
@@ -82,7 +82,7 @@
   .s4-checkbox-box { transition: background-color var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink); }
   @media (hover: hover) {
     .s4-checkbox:hover:not(:has(> input:disabled)) .s4-checkbox-box { transform: scale(1.1); }
-    .s4-checkbox:hover:not(:has(> input:disabled)):not(:has(> input:is(:checked, :indeterminate))) { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--md-sys-color-surface-container-highest)); }
+    .s4-checkbox:hover:not(:has(> input:disabled)):not(:has(> input:is(:checked, :indeterminate))) { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--s4-color-control)); }
   }
   .s4-checkbox:has(> input:focus-visible) .s4-checkbox-box {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
@@ -98,6 +98,7 @@
 
   /* ---------- disabled ---------- */
   .s4-checkbox:has(> input:disabled) {
+    --_fill: color-mix(in srgb, var(--s4-color-control) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     --_border: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     cursor: default;

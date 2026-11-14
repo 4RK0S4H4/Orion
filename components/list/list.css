@@ -93,6 +93,22 @@
   }
 
   /* ---------- parts ---------- */
+  /* Row hover, "Edges Lean" (decision 0044, issue 7): each row has its own hover box and nothing travels between rows.
+     The box arrives a touch small and its edges flow out on the ink spring; the edge nearest where the pointer came
+     from arrives first (list.js sets --_lean to 0% from above, 100% from below). Transform and opacity only. */
+  :is(a, button, label).s4-list-item::before,
+  .s4-list-item[tabindex]::before,
+  .s4-list-item[role="option"]::before {
+    transform: scale(0.985, 0.84);
+    transform-origin: 50% var(--_lean, 50%);
+    transition:
+      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
+      transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+  }
+  :is(a, button, label).s4-list-item:is(:hover, :focus-visible, :active)::before,
+  .s4-list-item[tabindex]:is(:hover, :focus-visible, :active)::before,
+  label.s4-list-item:has(:focus-visible)::before { transform: none; }
+
   .s4-list-leading,
   .s4-list-trailing {
     display: flex;

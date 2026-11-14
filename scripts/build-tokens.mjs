@@ -164,6 +164,7 @@ const PAIRS = [
   ['inverse-on-surface', 'inverse-surface', 4.5], ['inverse-primary', 'inverse-surface', 3],
   /* status colors (decision 0043): text on every surface, text on its own container, the badge */
   ...['success', 'warning', 'info'].flatMap((r) => [...SURFACES.map((s) => [`--s4-color-${r}`, s, 4.5]), [`--s4-color-on-${r}-container`, `--s4-color-${r}-container`, 4.5]]),
+  ...['surface', 'surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high'].map((s) => ['--s4-color-control', s, 3]),
   ...SURFACES.map((s) => ['error', s, 4.5]), ['--s4-color-on-badge', '--s4-color-badge', 4.5],
 ];
 const contrastReport = [];

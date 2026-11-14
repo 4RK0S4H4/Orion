@@ -60,3 +60,13 @@ S4.register('list', function (scope) {
     });
   });
 });
+
+/* Row hover leans toward where the pointer came from (decision 0044): entering a row from above, its top edge arrives
+   first; from below, its bottom edge. Only sets a custom property; the motion is in list.css. */
+document.addEventListener('pointerover', function (e) {
+  if (e.pointerType !== 'mouse' || !e.target.closest) return;
+  var row = e.target.closest('.s4-list-item');
+  if (!row || (e.relatedTarget && row.contains(e.relatedTarget))) return;
+  var r = row.getBoundingClientRect();
+  row.style.setProperty('--_lean', e.clientY < r.top + r.height / 2 ? '0%' : '100%');
+});
