@@ -13,7 +13,7 @@
   var end = function () { return list.reduce(function (m, a) { try { return Math.max(m, a.effect.getComputedTiming().endTime); } catch (e) { return m; } }, 0); };
   function show() {
     fill.style.width = (frac * 100) + '%';
-    label.textContent = !on ? 'Freeze, then open the menu' : !list.length ? 'Now open it' : Math.round(frac * 100) + '%  ·  ' + Math.round(frac * end()) + ' ms';
+    label.textContent = !on ? 'Freeze, then tap something' : !list.length ? 'Now tap it' : Math.round(frac * 100) + '%  ·  ' + Math.round(frac * end()) + ' ms';
   }
   function setAt(f) {
     if (!list.length) return;

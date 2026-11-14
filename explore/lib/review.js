@@ -62,7 +62,7 @@
   /* An option card: the whole card is the answer. o = { pick:'qid:v', letter, title, desc, tag?, preview?: Element, side?: Element } */
   function card(o) {
     var el = document.createElement('div'); el.className = 'rv-card'; el.setAttribute('role', 'radio'); el.setAttribute('aria-checked', 'false'); el.tabIndex = 0; el.dataset.pick = o.pick;
-    el.innerHTML = '<div class="rv-head"><span class="s4-radio" aria-hidden="true"><input type="radio" tabindex="-1"><span class="s4-radio-ring"></span></span><div class="rv-titles">' + (o.tag ? '<span class="s4-status rv-tag">' + esc(o.tag) + '</span>' : '') +
+    el.innerHTML = '<div class="rv-head"><span class="s4-radio" aria-hidden="true"><input type="radio" tabindex="-1" aria-hidden="true"><span class="s4-radio-ring"></span></span><div class="rv-titles">' + (o.tag ? '<span class="s4-status rv-tag">' + esc(o.tag) + '</span>' : '') +
       '<b>' + esc(o.letter) + '. ' + esc(o.title) + '</b>' + (o.desc ? '<small>' + esc(o.desc) + '</small>' : '') + '</div><span class="s4-status rv-badge">Selected</span></div>';
     el.setAttribute('aria-label', o.letter + '. ' + o.title);
     if (o.side) { var acts = document.createElement('div'); acts.className = 'rv-actions'; acts.setAttribute('data-no-pick', ''); acts.appendChild(o.side); el.appendChild(acts); }
