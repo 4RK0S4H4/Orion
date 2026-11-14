@@ -77,3 +77,4 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0044 | Overhaul accepted; row hover Edges Lean; base palette contrast (control color, placeholders) | Active |
 | 0045 | Crisper base grays; any accent color, monochrome is one choice; list dividers between rows | Active |
 | 0046 | One motion philosophy: ten named patterns, pattern tokens, `check:motion` | Active (built; owner to look at the motion page) |
+| 0047 | The placement ladder: expand in place before a menu, pane, panel or dialog | Active (built; owner to look) |

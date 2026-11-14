@@ -80,7 +80,8 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
   choice that opens a dialog or menu.
 - Switches apply immediately (no Save button). Confirm with nothing, or a snackbar only when the effect is invisible.
 - A destructive setting goes last, in a pane with `data-color="error"`, with a tonal error button that opens a
-  confirm dialog.
+  confirm dialog (serious and cannot be undone: the one place a dialog is right; smaller removals use the inline
+  confirm or act at once with Undo).
 - Appearance settings: see **Theme controls**.
 
 ## Forms

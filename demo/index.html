@@ -18,7 +18,7 @@
     <div class="s4-nav-rail-header">
       <button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation"
               data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
-      <button class="s4-fab" type="button" data-sheet="new-note" aria-label="New Note"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button>
+      <button class="s4-fab" type="button" data-expand="new-note" data-go="home" aria-label="New Note"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button>
     </div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#home" data-view="home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
@@ -56,6 +56,16 @@
             <button class="s4-chip" data-type="filter" aria-pressed="false" type="button" data-filter-value="shared"><span class="s4-chip-check"></span>Shared</button>
             <button class="s4-chip" data-type="filter" aria-pressed="false" type="button" data-filter-value="starred"><span class="s4-chip-check"></span>Starred</button>
           </div>
+          <!-- New Note opens in place, at the top of the notes (decision 0047), not in a sheet -->
+          <div class="s4-expand" id="new-note" data-variant="inset" hidden>
+            <form class="s4-expand-body" id="new-note-form" novalidate>
+              <h2 class="s4-expand-title">New Note</h2>
+              <div class="s4-text-field"><label for="nn-title">Title</label><input id="nn-title" autocomplete="off"></div>
+              <div class="s4-text-field"><label for="nn-body">Note</label><textarea id="nn-body" rows="3"></textarea></div>
+              <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Share With My Team</label>
+              <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Save Note</button></div>
+            </form>
+          </div>
           <div class="s4-grid demo-cards">
             <article class="s4-card" data-variant="filled">
               <div class="s4-card-body"><h3 class="s4-card-title">Weekend Plans</h3><p class="s4-card-supporting">Three things to finish before Saturday.</p></div>
@@ -80,7 +90,7 @@
             <p class="s4-empty-text">Try a different word, or clear the search.</p>
           </div>
         </div>
-        <button class="s4-fab" data-fixed data-sheet="new-note" type="button"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button>
+        <button class="s4-fab" data-fixed data-expand="new-note" type="button"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button>
       </section>
 
       <!-- Controls -->
@@ -239,14 +249,28 @@
             </div>
           </section>
 
+          <section class="s4-pane" aria-labelledby="h-place">
+            <h2 class="s4-pane-title" id="h-place">In Place</h2>
+            <p class="s4-pane-supporting">New content opens where you asked for it, before anything floats over the page.</p>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" data-expand="demo-comment">Add Comment</button>
+              <button class="s4-button" data-variant="tonal" type="button" data-confirm="demo-confirm">Remove Tag</button>
+              <span class="s4-confirm" id="demo-confirm" hidden><span class="s4-confirm-text">Remove this tag?</span><button class="s4-button" data-variant="text" data-size="s" type="button" data-confirm-close="">Keep</button><button class="s4-button" data-color="error" data-size="s" type="button" data-confirm-close="remove">Remove</button></span></div>
+            <div class="s4-expand" id="demo-comment" data-variant="inset" hidden>
+              <div class="s4-expand-body">
+                <div class="s4-text-field"><label for="dc-text">Comment</label><textarea id="dc-text" rows="2"></textarea></div>
+                <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="button" data-expand-close="post">Post</button></div>
+              </div>
+            </div>
+          </section>
+
           <section class="s4-pane" aria-labelledby="h-over">
             <h2 class="s4-pane-title" id="h-over">Overlays</h2>
             <p class="s4-pane-supporting">Each button opens one overlay.</p>
             <div class="s4-row">
               <button class="s4-button" data-variant="tonal" type="button" data-menu="more-menu">Menu</button>
               <button class="s4-button" data-variant="tonal" type="button" data-dialog="confirm-delete">Dialog</button>
-              <button class="s4-button" data-variant="tonal" type="button" data-sheet="new-note">Bottom Sheet</button>
-              <button class="s4-button" data-variant="tonal" type="button" data-sheet="filters">Side Sheet</button>
+              <button class="s4-button" data-variant="tonal" type="button" data-sheet="share-note">Floating Panel</button>
+              <button class="s4-button" data-variant="tonal" type="button" data-sheet="filters">Side Panel</button>
               <button class="s4-button" data-variant="tonal" type="button" id="snack-btn">Snackbar</button>
               <button class="s4-button" data-variant="text" type="button" data-rich-tooltip="about-tip">Rich Tooltip</button>
             </div>
@@ -369,18 +393,16 @@
   <span>A space keeps related notes together.</span>
 </div>
 
-<!-- New note: bottom sheet -->
-<dialog class="s4-bottom-sheet" id="new-note" aria-labelledby="nn-h">
-  <span class="s4-sheet-handle" aria-hidden="true"></span>
-  <h2 class="s4-sheet-title" id="nn-h">New Note</h2>
+<!-- A floating panel, for a task with no place in the page -->
+<dialog class="s4-bottom-sheet" id="share-note" aria-labelledby="sn-h">
+  <h2 class="s4-sheet-title" id="sn-h">Share Note</h2>
   <div class="s4-sheet-content">
     <form class="demo-form" novalidate>
-      <div class="s4-text-field"><label for="nn-title">Title</label><input id="nn-title" autocomplete="off"></div>
-      <div class="s4-text-field"><label for="nn-body">Note</label><textarea id="nn-body" rows="3"></textarea></div>
-      <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Share With My Team</label>
+      <div class="s4-text-field"><label for="sn-to">Share With</label><input id="sn-to" type="email" autocomplete="off"></div>
+      <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Let Them Edit</label>
     </form>
   </div>
-  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-close="save" type="button">Save Note</button></div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-close="share" type="button">Share</button></div>
 </dialog>
 
 <!-- Confirm destructive -->

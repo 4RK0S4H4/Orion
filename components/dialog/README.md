@@ -1,5 +1,7 @@
 # Dialog
 
+> **A dialog is the last rung of the placement ladder (decision 0047).** Use it only when the app cannot go on without an answer: something serious that cannot be undone, or leaving with unsaved work. A reply, a comment, an add form, a rename or a filter opens in place with [expand](../expand/); a reversible action just happens and offers Undo in a snackbar.
+
 Asks for a decision or a short input. It **pops** in: rises 16px and fades in on the spatial spring, and closes with a
 quick drop and fade (decision 0022). On glass, over a 32% scrim.
 

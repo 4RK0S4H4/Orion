@@ -38,7 +38,7 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 | Template | For | Layout |
 |---|---|---|
 | `dashboard.html` | analytics, finance, admin, status, trackers | shell + views; stats, chart pane, attention list, table view |
-| `list-detail.html` | mail, CRM, tickets, orders, contacts, any CRUD | `.s4-split` list-detail, compose dialog, FAB |
+| `list-detail.html` | mail, CRM, tickets, orders, contacts, any CRUD | `.s4-split` list-detail, reply composer in place (`.s4-expand`), compose panel, FAB |
 | `desktop-app.html` | anything that ships as a desktop app or lives in a desktop window all day (installed web app, Electron, Tauri) | `data-window`, title bar, compact density, shortcuts, right-click menus |
 | `settings.html` | any app's settings | reading width; theme controls, segmented lists, danger pane |
 | `sign-in.html` | sign-in, sign-up, onboarding, one-task screens | no navigation, reading width, centered pane |
@@ -135,20 +135,21 @@ last destination. Keep one shell (`.s4-app`) per page.
 - Charts: draw them in the app (SVG or divs) from role colors: past values `surface-container-highest`, the current or
   selected value `primary`, labels `on-surface-variant`, a text alternative (`role="img"` + `aria-label`).
 
-**Overlays**
-- A short list of choices from a button: **menu**. A decision or a short input: **dialog**. A short task without leaving:
-  **floating panel**: `.s4-bottom-sheet` (quick add; floats at the bottom) or `.s4-side-sheet` (filters, details; floats at the side on wide screens). Panels are glass, inset from every edge, and never slide or dock. Confirmation after an
-  action: **snackbar** with Undo. Naming an icon: **tooltip**.
+**Where new content goes: the placement ladder** (decision 0047; use the first rung that fits)
+1. **In place:** the thing itself changes (a switch, an inline confirm: `data-confirm="id"` + `.s4-confirm`).
+2. **Expand:** a reply, comment, add form, details or options open under what was touched and push the page:
+   `<button data-expand="id">` + `<div class="s4-expand" id data-variant="inset" hidden><div class="s4-expand-body">…<div class="s4-expand-actions">…</div></div></div>`.
+3. **Menu:** a short list of choices from a button. 4. **Pane:** detail beside the content (`.s4-split`).
+5. **Floating panel:** a longer task with no place in the page (`.s4-bottom-sheet` quick add, `.s4-side-sheet` filters, a new message). Panels are glass, inset from every edge, and never slide or dock.
+6. **Dialog:** only when the app cannot go on without an answer (serious and cannot be undone). Never open a dialog for a reply, a rename, an add form or a filter.
+- Confirmation after an action: **snackbar** with Undo. Naming an icon: **tooltip**.
 - Confirm only what can't be undone. Prefer Undo in a snackbar.
 
-**Motion** (built in; use the APIs, never hand-write durations or easings)
-- Dialogs and floating panels **pop**: rise 16px and fade in (`[data-dialog]`, `[data-sheet]`, or `S4.transition.pop(el, { open })`).
-- Menus fade in where they sit and their items follow (built into `[data-menu]`); sibling views and tabs use **shared axis**; snackbars and tooltips are glass and **rise** into place (built in).
+**Motion** (decision 0046: ten named patterns, nothing else; full table in `references/motion.md`)
+- In CSS a transition names a pattern token: `transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state);` State (color, opacity), Ink (a state fill moving), Morph (a control's own shape or size), Bend (an icon turning). Never a raw duration, easing, spring token or `transition: all`.
+- In script call the pattern, never `element.animate()`: `S4.transition.reveal(el, { open })` (content opening in place), `follow` (menus), `pop` (dialogs, panels), `rise` / `tip` (snackbars, tooltips), `sharedAxis` / `enter` (switching views), `move` (reorder). Most are built into the components.
 - Decision 0043: dialogs and panels never focus a text field when they open (no `autofocus` on inputs); date fields are plain `<input type="date">` in a text field (the glass calendar is automatic; `data-range-end="id"` for a range); errors are `data-error="Message"` on the field, never a red fill; a selected chip is `aria-pressed="true"` and never gets a check icon.
-- Decision 0042: liquid motion (the `ink` spring, edges that lead and trail) only for ink, the solid fills that show state; glass surfaces move plainly.
-- Transitions only move and fade (decision 0022): never animate clip-path, size, color or blur, never clone elements.
-- Never scale a surface's content to make it appear (it stretches text). Bounce is fine on movement; fades never bounce.
-- Custom animation: `S4.motion.animate(el, keyframes, 'spatial')` (reads the spring tokens and reduced motion).
+- Liquid motion (overshoot, leading edges) only for ink, the solid fills that show state; glass moves plainly (a few pixels and a fade). Never scale a surface to make it appear, never slide from a screen edge, never clone elements.
 
 **Glass** (read `references/glass.md` before adding any)
 - Only floating chrome and overlays get glass, and the components already have it. Content is never glass.
@@ -188,7 +189,7 @@ last destination. Keep one shell (`.s4-app`) per page.
 | Styling bare elements (`button {}`, `h2 {}`) in app CSS | Leaks into components | Style the app's own classes |
 | Editing `orion.css` / copying component CSS into the app | Forks the system | App CSS with tokens; ask to change the system |
 | Tinting surfaces with the accent, or a second accent color | The base stays neutral; one accent keeps selection and actions readable | One `seed`; status tones for meaning |
-| Hand-written `transition: all .3s ease` | Wrong curve, ignores reduced motion | `var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial)` |
+| Hand-written `transition: all .3s ease` | Wrong curve, ignores reduced motion | a pattern token: `transform var(--s4-motion-ink)` |
 
 ## Worked example
 

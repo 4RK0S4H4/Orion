@@ -20,7 +20,7 @@
     <button class="s4-icon-button" type="button" aria-label="Search" data-tooltip="Search" data-shortcut="mod+k" id="tb-search"><span class="s4-icon" data-icon="search"></span></button>
   </header>
   <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
-    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation" data-shortcut="mod+b"><span class="s4-icon" data-icon="menu"></span></button><button class="s4-fab" type="button" aria-label="Compose" data-dialog="compose" data-shortcut="mod+n"><span class="s4-icon" data-icon="edit"></span><span class="s4-fab-label">Compose</span></button></div>
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation" data-shortcut="mod+b"><span class="s4-icon" data-icon="menu"></span></button><button class="s4-fab" type="button" aria-label="Compose" data-sheet="compose" data-shortcut="mod+n"><span class="s4-icon" data-icon="edit"></span><span class="s4-fab-label">Compose</span></button></div>
     <div class="s4-nav-rail-items">
     <a class="s4-nav-item" href="#inbox" data-view="inbox" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="inbox"></span></span><span class="s4-nav-label">Inbox</span></a>
     <a class="s4-nav-item" href="#people" data-view="people"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">People</span></a>
@@ -81,11 +81,25 @@
                 <div class="s4-dl-row"><dt>Label</dt><dd><span class="s4-status">Clients</span></dd></div>
                 <div class="s4-dl-row"><dt>Attachments</dt><dd>None</dd></div>
               </dl>
-              <div class="s4-row"><button class="s4-button" type="button" data-dialog="compose">Reply</button><button class="s4-button" data-variant="tonal" type="button">Forward</button></div>
+              <div class="s4-row"><button class="s4-button" type="button" data-expand="reply">Reply</button><button class="s4-button" data-variant="tonal" type="button" data-expand="forward">Forward</button></div>
+              <!-- Reply and Forward open in place, under the message (decision 0047): no dialog covers what you are answering -->
+              <div class="s4-expand" id="reply" data-variant="inset" data-group="respond" hidden>
+                <form class="s4-expand-body" data-sent="Reply sent">
+                  <div class="s4-text-field"><textarea id="reply-text" rows="3" required></textarea><label for="reply-text" id="reply-label">Reply To Maya Chen</label></div>
+                  <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Send</button></div>
+                </form>
+              </div>
+              <div class="s4-expand" id="forward" data-variant="inset" data-group="respond" hidden>
+                <form class="s4-expand-body" data-sent="Message forwarded">
+                  <div class="s4-text-field"><input id="forward-to" type="email" autocomplete="email" required><label for="forward-to">Forward To</label></div>
+                  <div class="s4-text-field"><textarea id="forward-text" rows="2"></textarea><label for="forward-text">Add A Note</label></div>
+                  <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Forward</button></div>
+                </form>
+              </div>
             </section>
           </section>
         </div>
-        <button class="s4-fab" data-fixed type="button" data-dialog="compose"><span class="s4-icon" data-icon="edit"></span><span class="s4-fab-label">Compose</span></button>
+        <button class="s4-fab" data-fixed type="button" data-sheet="compose"><span class="s4-icon" data-icon="edit"></span><span class="s4-fab-label">Compose</span></button>
       </section>
       <section class="s4-view" data-view="people" data-title="People" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="people"></span></span><h2 class="s4-empty-title">No People Yet</h2><p class="s4-empty-text">People you write to show up here.</p></div></section>
       <section class="s4-view" data-view="archive" data-title="Archive" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="archive"></span></span><h2 class="s4-empty-title">Nothing Archived</h2><p class="s4-empty-text">Archived messages stay here for a year.</p></div></section>
@@ -103,13 +117,15 @@
   <hr class="s4-menu-divider">
   <button class="s4-menu-item" type="button" data-color="error"><span class="s4-icon" data-icon="delete"></span>Delete</button>
 </div>
-<dialog class="s4-dialog" id="compose" aria-labelledby="compose-h">
-  <h2 class="s4-dialog-headline" id="compose-h">New Message</h2>
-  <div class="s4-dialog-content s4-stack">
+<!-- A new message has no place in the page, so it is a floating panel (the placement ladder, decision 0047) -->
+<dialog class="s4-side-sheet" id="compose" aria-labelledby="compose-h">
+  <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="compose-h">New Message</h2><button class="s4-icon-button" data-close type="button" aria-label="Close"><span class="s4-icon" data-icon="close"></span></button></div>
+  <div class="s4-sheet-content s4-stack">
     <div class="s4-text-field"><input id="to" type="email" autocomplete="email"><label for="to">To</label></div>
-    <div class="s4-text-field"><textarea id="msg" rows="3"></textarea><label for="msg">Message</label></div>
+    <div class="s4-text-field"><input id="subject" type="text" autocomplete="off"><label for="subject">Subject</label></div>
+    <div class="s4-text-field"><textarea id="msg" rows="6"></textarea><label for="msg">Message</label></div>
   </div>
-  <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-close="send" type="button">Send</button></div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Discard</button><button class="s4-button" data-close="send" type="button">Send</button></div>
 </dialog>
 <script src="icons.js"></script>
 <script src="orion.js"></script>
@@ -125,7 +141,15 @@ list.addEventListener('s4-change', function () {
   document.getElementById('d-time').textContent = row.querySelector('.s4-list-trailing .s4-list-supporting').textContent;
 });
 document.getElementById('do-archive').addEventListener('click', function () { S4.snackbar({ text: 'Message archived', action: 'Undo' }); });
-document.getElementById('compose').addEventListener('s4-close', function (e) { if (e.detail && e.detail.value === 'send') S4.snackbar({ text: 'Message sent' }); });</script>
+document.getElementById('compose').addEventListener('s4-close', function (e) { if (e.detail && e.detail.value === 'send') S4.snackbar({ text: 'Message sent' }); });
+/* the composer under the message: send closes it and confirms with a snackbar; picking another message closes it */
+document.querySelectorAll('.s4-expand form').forEach(function (f) {
+  f.addEventListener('submit', function (e) { e.preventDefault(); S4.expand.close(f.closest('.s4-expand'), 'send'); f.reset(); S4.snackbar({ text: f.dataset.sent, action: 'Undo' }); });
+});
+list.addEventListener('s4-change', function () {
+  S4.expand.close('reply'); S4.expand.close('forward');
+  document.getElementById('reply-label').textContent = 'Reply To ' + document.getElementById('d-from').textContent;
+});</script>
 <div class="s4-menu" id="row-menu" aria-label="Message actions">
   <button class="s4-menu-item" type="button" data-value="reply" data-shortcut="mod+r"><span class="s4-icon" data-icon="edit"></span>Reply<kbd class="s4-kbd"></kbd></button>
   <button class="s4-menu-item" type="button" data-value="archive" data-shortcut="mod+e"><span class="s4-icon" data-icon="archive"></span>Archive<kbd class="s4-kbd"></kbd></button>
@@ -135,7 +159,8 @@ document.getElementById('compose').addEventListener('s4-close', function (e) { i
 <script>
   document.getElementById('row-menu').addEventListener('s4-select', function (e) {
     var row = this.contextTarget, name = row ? row.querySelector('.s4-list-headline').textContent : 'Message';
-    S4.snackbar({ text: (e.detail.item.dataset.value === 'delete' ? 'Deleted: ' : e.detail.item.dataset.value === 'archive' ? 'Archived: ' : 'Replying to: ') + name });
+    if (e.detail.item.dataset.value === 'reply') { if (row) row.click(); S4.expand.open('reply'); return; }
+    S4.snackbar({ text: (e.detail.item.dataset.value === 'delete' ? 'Deleted: ' : 'Archived: ') + name, action: 'Undo' });
   });
   document.getElementById('tb-search').addEventListener('click', function () { var i = document.querySelector('.s4-search-input'); if (i) i.focus(); });
 </script>
