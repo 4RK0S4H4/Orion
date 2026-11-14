@@ -36,6 +36,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 
 ### Fixed
 - Focus rings were cut off in the accordion, in scrolling chip rows and in the desktop title bar.
+- Switching views no longer makes the page wider than the screen for a moment.
 - The search bar's focus ring is no longer cut off at the top of a pane.
 - A checkbox no longer flashes a square while it unchecks.
 - Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.
