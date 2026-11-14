@@ -11,7 +11,7 @@ and deliberate:
 
 - **Inter** as the typeface, **Solar** icons (Bold Duotone, Linear arrows) behind neutral names. Phosphor Duotone and Phosphor Bold Duotone are built in as alternatives: `S4.icon.use('phosphor-duotone')` switches the page (credit the set in use).
 - **Title Case** labels; sentences stay sentence case.
-- **Monochrome by default.** An app that wants color sets one seed, and the seed colors only accents (main button, FAB, selection, switches, focus); surfaces stay neutral gray (decision 0043). Status uses the fixed tones `success`, `warning`, `info`, `error`.
+- **Any accent color on a neutral base.** Surfaces, text and outlines are neutral gray; one accent colors the main button, FAB, selection, switches and focus (decisions 0043, 0045). The accent can be any color; black and white (`mono`, what the stylesheet ships with) is one choice, not the rule. Status uses the fixed tones `success`, `warning`, `info`, `error`.
 - **Very clear glass on floating chrome only** (app bars over scrolled content, nav bar, toolbars, menus, dialogs, sheets),
   with a contrast floor that keeps text WCAG AA over any backdrop. Content is always solid.
 - **Simple, sturdy motion:** dialogs and floating panels pop in, menus fade in place with their items following, ink (state fills) moves with a subtle liquid spring, shared axis between views; only movement and fades, on M3 Expressive springs.
@@ -107,7 +107,7 @@ last destination. Keep one shell (`.s4-app`) per page.
 ## Decision rules
 
 **Color**
-- No seed unless the user names a color or brand. Monochrome is the default look, not a placeholder.
+- **Choose the accent for the app.** A brand or named color wins: `S4.theme({ seed: '#2e7d32' })`, or a ready-made one: `S4.theme({ seed: 'blue' })` (`mono`, `blue`, `indigo`, `violet`, `pink`, `red`, `orange`, `amber`, `green`, `teal`). With nothing to go on, ask, or use `mono` (the owner's own favorite). Every accent is proven against the neutral base by `check-accent`, so none needs hand-tuning.
 - A named color ("make it green"): `S4.theme({ seed: '#2e7d32', variant: 'vibrant' })`. An exact brand hex that must show as
   is: `variant: 'fidelity'`. Subtle or photo-derived: `'tonal'`.
 - Use roles, never hex: page `surface`; cards and panes `surface-container-low`; menus and nav `surface-container`;
@@ -187,7 +187,7 @@ last destination. Keep one shell (`.s4-app`) per page.
 | Icon-only button without `aria-label` | Unusable with a screen reader | Add `aria-label` (and `data-tooltip`) |
 | Styling bare elements (`button {}`, `h2 {}`) in app CSS | Leaks into components | Style the app's own classes |
 | Editing `orion.css` / copying component CSS into the app | Forks the system | App CSS with tokens; ask to change the system |
-| A seed color "because it looks nicer" | Monochrome is the user's chosen default | Seed only when asked |
+| Tinting surfaces with the accent, or a second accent color | The base stays neutral; one accent keeps selection and actions readable | One `seed`; status tones for meaning |
 | Hand-written `transition: all .3s ease` | Wrong curve, ignores reduced motion | `var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial)` |
 
 ## Worked example

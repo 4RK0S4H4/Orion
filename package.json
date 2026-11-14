@@ -15,8 +15,9 @@
     "check:icons": "node scripts/build-icons.mjs --check",
     "build": "npm run build:tokens && npm run build:icons && npm run build:bundle",
     "check:glass": "node scripts/check-glass.mjs",
-    "check": "npm run check:tokens && npm run check:icons && npm run check:glass && npm run check:bundle",
+    "check": "npm run check:tokens && npm run check:icons && npm run check:glass && npm run check:accent && npm run check:bundle",
     "build:bundle": "node scripts/build.mjs",
-    "check:bundle": "node scripts/build.mjs --check"
+    "check:bundle": "node scripts/build.mjs --check",
+    "check:accent": "node scripts/check-accent.mjs"
   }
 }

@@ -16,8 +16,8 @@
     --md-sys-color-inverse-primary: #c6c6c6;
     --md-sys-color-secondary: #5e5e5e;
     --md-sys-color-on-secondary: #ffffff;
-    --md-sys-color-secondary-container: #d4d4d4;
-    --md-sys-color-on-secondary-container: #1b1b1b;
+    --md-sys-color-secondary-container: #d6d6d6;
+    --md-sys-color-on-secondary-container: #171717;
     --md-sys-color-tertiary: #3b3b3b;
     --md-sys-color-on-tertiary: #e2e2e2;
     --md-sys-color-tertiary-container: #747474;
@@ -26,24 +26,24 @@
     --md-sys-color-on-error: #ffffff;
     --md-sys-color-error-container: #ffdad6;
     --md-sys-color-on-error-container: #410002;
-    --md-sys-color-background: #f9f9f9;
-    --md-sys-color-on-background: #1b1b1b;
-    --md-sys-color-surface: #f9f9f9;
-    --md-sys-color-on-surface: #1b1b1b;
+    --md-sys-color-background: #ffffff;
+    --md-sys-color-on-background: #171717;
+    --md-sys-color-surface: #ffffff;
+    --md-sys-color-on-surface: #171717;
     --md-sys-color-surface-variant: #e2e2e2;
-    --md-sys-color-on-surface-variant: #474747;
-    --md-sys-color-surface-dim: #dadada;
-    --md-sys-color-surface-bright: #f9f9f9;
+    --md-sys-color-on-surface-variant: #454545;
+    --md-sys-color-surface-dim: #dcdcdc;
+    --md-sys-color-surface-bright: #ffffff;
     --md-sys-color-surface-container-lowest: #ffffff;
-    --md-sys-color-surface-container-low: #f3f3f3;
-    --md-sys-color-surface-container: #eeeeee;
-    --md-sys-color-surface-container-high: #e8e8e8;
+    --md-sys-color-surface-container-low: #f5f5f5;
+    --md-sys-color-surface-container: #efefef;
+    --md-sys-color-surface-container-high: #e9e9e9;
     --md-sys-color-surface-container-highest: #e2e2e2;
     --md-sys-color-surface-tint: #5e5e5e;
-    --md-sys-color-outline: #777777;
-    --md-sys-color-outline-variant: #c6c6c6;
-    --md-sys-color-inverse-surface: #303030;
-    --md-sys-color-inverse-on-surface: #f1f1f1;
+    --md-sys-color-outline: #757575;
+    --md-sys-color-outline-variant: #c9c9c9;
+    --md-sys-color-inverse-surface: #2e2e2e;
+    --md-sys-color-inverse-on-surface: #f2f2f2;
     --md-sys-color-shadow: #000000;
     --md-sys-color-scrim: #000000;
     --md-sys-color-primary-fixed: #5e5e5e;
@@ -403,8 +403,8 @@
       --md-sys-color-inverse-primary: #5e5e5e;
       --md-sys-color-secondary: #c6c6c6;
       --md-sys-color-on-secondary: #1b1b1b;
-      --md-sys-color-secondary-container: #474747;
-      --md-sys-color-on-secondary-container: #e2e2e2;
+      --md-sys-color-secondary-container: #454545;
+      --md-sys-color-on-secondary-container: #ededed;
       --md-sys-color-tertiary: #e2e2e2;
       --md-sys-color-on-tertiary: #1b1b1b;
       --md-sys-color-tertiary-container: #919191;
@@ -413,24 +413,24 @@
       --md-sys-color-on-error: #410004;
       --md-sys-color-error-container: #4a1719;
       --md-sys-color-on-error-container: #ffdad7;
-      --md-sys-color-background: #131313;
-      --md-sys-color-on-background: #e2e2e2;
-      --md-sys-color-surface: #131313;
-      --md-sys-color-on-surface: #e2e2e2;
-      --md-sys-color-surface-variant: #474747;
-      --md-sys-color-on-surface-variant: #c6c6c6;
-      --md-sys-color-surface-dim: #131313;
-      --md-sys-color-surface-bright: #393939;
-      --md-sys-color-surface-container-lowest: #0e0e0e;
-      --md-sys-color-surface-container-low: #1b1b1b;
-      --md-sys-color-surface-container: #1f1f1f;
-      --md-sys-color-surface-container-high: #2a2a2a;
-      --md-sys-color-surface-container-highest: #353535;
+      --md-sys-color-background: #0e0e0e;
+      --md-sys-color-on-background: #ededed;
+      --md-sys-color-surface: #0e0e0e;
+      --md-sys-color-on-surface: #ededed;
+      --md-sys-color-surface-variant: #454545;
+      --md-sys-color-on-surface-variant: #bdbdbd;
+      --md-sys-color-surface-dim: #0e0e0e;
+      --md-sys-color-surface-bright: #363636;
+      --md-sys-color-surface-container-lowest: #090909;
+      --md-sys-color-surface-container-low: #181818;
+      --md-sys-color-surface-container: #1e1e1e;
+      --md-sys-color-surface-container-high: #282828;
+      --md-sys-color-surface-container-highest: #333333;
       --md-sys-color-surface-tint: #c6c6c6;
-      --md-sys-color-outline: #919191;
-      --md-sys-color-outline-variant: #474747;
-      --md-sys-color-inverse-surface: #e2e2e2;
-      --md-sys-color-inverse-on-surface: #303030;
+      --md-sys-color-outline: #8f8f8f;
+      --md-sys-color-outline-variant: #454545;
+      --md-sys-color-inverse-surface: #ededed;
+      --md-sys-color-inverse-on-surface: #2e2e2e;
       --md-sys-color-shadow: #000000;
       --md-sys-color-scrim: #000000;
       --md-sys-color-primary-fixed: #5e5e5e;
@@ -479,8 +479,8 @@
     --md-sys-color-inverse-primary: #5e5e5e;
     --md-sys-color-secondary: #c6c6c6;
     --md-sys-color-on-secondary: #1b1b1b;
-    --md-sys-color-secondary-container: #474747;
-    --md-sys-color-on-secondary-container: #e2e2e2;
+    --md-sys-color-secondary-container: #454545;
+    --md-sys-color-on-secondary-container: #ededed;
     --md-sys-color-tertiary: #e2e2e2;
     --md-sys-color-on-tertiary: #1b1b1b;
     --md-sys-color-tertiary-container: #919191;
@@ -489,24 +489,24 @@
     --md-sys-color-on-error: #410004;
     --md-sys-color-error-container: #4a1719;
     --md-sys-color-on-error-container: #ffdad7;
-    --md-sys-color-background: #131313;
-    --md-sys-color-on-background: #e2e2e2;
-    --md-sys-color-surface: #131313;
-    --md-sys-color-on-surface: #e2e2e2;
-    --md-sys-color-surface-variant: #474747;
-    --md-sys-color-on-surface-variant: #c6c6c6;
-    --md-sys-color-surface-dim: #131313;
-    --md-sys-color-surface-bright: #393939;
-    --md-sys-color-surface-container-lowest: #0e0e0e;
-    --md-sys-color-surface-container-low: #1b1b1b;
-    --md-sys-color-surface-container: #1f1f1f;
-    --md-sys-color-surface-container-high: #2a2a2a;
-    --md-sys-color-surface-container-highest: #353535;
+    --md-sys-color-background: #0e0e0e;
+    --md-sys-color-on-background: #ededed;
+    --md-sys-color-surface: #0e0e0e;
+    --md-sys-color-on-surface: #ededed;
+    --md-sys-color-surface-variant: #454545;
+    --md-sys-color-on-surface-variant: #bdbdbd;
+    --md-sys-color-surface-dim: #0e0e0e;
+    --md-sys-color-surface-bright: #363636;
+    --md-sys-color-surface-container-lowest: #090909;
+    --md-sys-color-surface-container-low: #181818;
+    --md-sys-color-surface-container: #1e1e1e;
+    --md-sys-color-surface-container-high: #282828;
+    --md-sys-color-surface-container-highest: #333333;
     --md-sys-color-surface-tint: #c6c6c6;
-    --md-sys-color-outline: #919191;
-    --md-sys-color-outline-variant: #474747;
-    --md-sys-color-inverse-surface: #e2e2e2;
-    --md-sys-color-inverse-on-surface: #303030;
+    --md-sys-color-outline: #8f8f8f;
+    --md-sys-color-outline-variant: #454545;
+    --md-sys-color-inverse-surface: #ededed;
+    --md-sys-color-inverse-on-surface: #2e2e2e;
     --md-sys-color-shadow: #000000;
     --md-sys-color-scrim: #000000;
     --md-sys-color-primary-fixed: #5e5e5e;
@@ -3237,7 +3237,22 @@
   .s4-list[data-lines="3"] .s4-list-item :is(.s4-list-leading, .s4-list-trailing) { align-self: flex-start; }
 
   /* ---------- dividers between items ---------- */
-  .s4-list[data-dividers] > li + li:not(.s4-list-subheader) { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+  /* Dividers (decision 0045): a hairline in the gap between two rows, inset to the rows' content so it never reaches the
+     rounded corners of a hover or selected box, and it fades away beside a row that is hovered, focused, pressed or
+     selected, so a box never has a line running into it. */
+  .s4-list[data-dividers] { gap: 0; }
+  .s4-list[data-dividers] > li + li:not(.s4-list-subheader)::before {
+    content: "";
+    display: block;
+    block-size: var(--s4-size-divider);
+    margin: calc(var(--s4-space-1) / 2) var(--s4-space-3);
+    background: var(--md-sys-color-outline-variant);
+    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+  }
+  .s4-list[data-dividers] > li:has(> :is(a, button, label, [tabindex], [role="option"]).s4-list-item:is(:hover, :focus-visible, :active), > .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])), > .s4-list-item :focus-visible)::before,
+  .s4-list[data-dividers] > li:has(> :is(a, button, label, [tabindex], [role="option"]).s4-list-item:is(:hover, :focus-visible, :active), > .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])), > .s4-list-item :focus-visible) + li::before,
+  .s4-list[data-dividers] > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"]))::before,
+  .s4-list[data-dividers] > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) + li::before { opacity: 0; }
 
   /* ---------- grouped lists: subheader with an optional subtotal ---------- */
   .s4-list-subheader {
@@ -4855,7 +4870,8 @@
     position: absolute;
     inset: calc(var(--s4-space-1) / 2 + 1px);
     background: var(--_mark);
-    mask: var(--_mask, none) center / 100% no-repeat;
+    /* the check is the default mask, so the mark keeps its shape while it fades out (with no mask it flashed as a square) */
+    mask: var(--_mask, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.2 7.4l2.5 2.5 5.1-5.6' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")) center / 100% no-repeat;
     opacity: 0;
     transform: scale(0.6);
     transition: opacity var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);

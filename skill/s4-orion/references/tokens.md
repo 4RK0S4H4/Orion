@@ -14,8 +14,8 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--md-sys-color-inverse-primary` | #c6c6c6 | #5e5e5e |  |
 | `--md-sys-color-secondary` | #5e5e5e | #c6c6c6 | Less prominent accents. |
 | `--md-sys-color-on-secondary` | #ffffff | #1b1b1b |  |
-| `--md-sys-color-secondary-container` | #d4d4d4 | #474747 | Selected states: nav indicator, selected chips, tonal buttons. |
-| `--md-sys-color-on-secondary-container` | #1b1b1b | #e2e2e2 | Text and icons on secondary-container. |
+| `--md-sys-color-secondary-container` | #d6d6d6 | #454545 | Selected states: nav indicator, selected chips, tonal buttons. |
+| `--md-sys-color-on-secondary-container` | #171717 | #ededed | Text and icons on secondary-container. |
 | `--md-sys-color-tertiary` | #3b3b3b | #e2e2e2 | Contrasting accents. |
 | `--md-sys-color-on-tertiary` | #e2e2e2 | #1b1b1b |  |
 | `--md-sys-color-tertiary-container` | #747474 | #919191 |  |
@@ -24,24 +24,24 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--md-sys-color-on-error` | #ffffff | #410004 |  |
 | `--md-sys-color-error-container` | #ffdad6 | #4a1719 |  |
 | `--md-sys-color-on-error-container` | #410002 | #ffdad7 |  |
-| `--md-sys-color-background` | #f9f9f9 | #131313 |  |
-| `--md-sys-color-on-background` | #1b1b1b | #e2e2e2 |  |
-| `--md-sys-color-surface` | #f9f9f9 | #131313 | The default background. |
-| `--md-sys-color-on-surface` | #1b1b1b | #e2e2e2 | Default text and icons. |
-| `--md-sys-color-surface-variant` | #e2e2e2 | #474747 |  |
-| `--md-sys-color-on-surface-variant` | #474747 | #c6c6c6 | Secondary text and icons. |
-| `--md-sys-color-surface-dim` | #dadada | #131313 |  |
-| `--md-sys-color-surface-bright` | #f9f9f9 | #393939 |  |
-| `--md-sys-color-surface-container-lowest` | #ffffff | #0e0e0e | Lowest-emphasis container (on surface). |
-| `--md-sys-color-surface-container-low` | #f3f3f3 | #1b1b1b | Low-emphasis container: cards, panes. |
-| `--md-sys-color-surface-container` | #eeeeee | #1f1f1f | Default container: nav bar, menus. |
-| `--md-sys-color-surface-container-high` | #e8e8e8 | #2a2a2a | High-emphasis container: dialogs, search. |
-| `--md-sys-color-surface-container-highest` | #e2e2e2 | #353535 | Highest-emphasis container: filled text fields. |
+| `--md-sys-color-background` | #ffffff | #0e0e0e |  |
+| `--md-sys-color-on-background` | #171717 | #ededed |  |
+| `--md-sys-color-surface` | #ffffff | #0e0e0e | The default background. |
+| `--md-sys-color-on-surface` | #171717 | #ededed | Default text and icons. |
+| `--md-sys-color-surface-variant` | #e2e2e2 | #454545 |  |
+| `--md-sys-color-on-surface-variant` | #454545 | #bdbdbd | Secondary text and icons. |
+| `--md-sys-color-surface-dim` | #dcdcdc | #0e0e0e |  |
+| `--md-sys-color-surface-bright` | #ffffff | #363636 |  |
+| `--md-sys-color-surface-container-lowest` | #ffffff | #090909 | Lowest-emphasis container (on surface). |
+| `--md-sys-color-surface-container-low` | #f5f5f5 | #181818 | Low-emphasis container: cards, panes. |
+| `--md-sys-color-surface-container` | #efefef | #1e1e1e | Default container: nav bar, menus. |
+| `--md-sys-color-surface-container-high` | #e9e9e9 | #282828 | High-emphasis container: dialogs, search. |
+| `--md-sys-color-surface-container-highest` | #e2e2e2 | #333333 | Highest-emphasis container: filled text fields. |
 | `--md-sys-color-surface-tint` | #5e5e5e | #c6c6c6 |  |
-| `--md-sys-color-outline` | #777777 | #919191 | Important boundaries: outlined buttons, text field outlines. |
-| `--md-sys-color-outline-variant` | #c6c6c6 | #474747 | Decorative boundaries: dividers. |
-| `--md-sys-color-inverse-surface` | #303030 | #e2e2e2 | Snackbars and other inverted surfaces. |
-| `--md-sys-color-inverse-on-surface` | #f1f1f1 | #303030 |  |
+| `--md-sys-color-outline` | #757575 | #8f8f8f | Important boundaries: outlined buttons, text field outlines. |
+| `--md-sys-color-outline-variant` | #c9c9c9 | #454545 | Decorative boundaries: dividers. |
+| `--md-sys-color-inverse-surface` | #2e2e2e | #ededed | Snackbars and other inverted surfaces. |
+| `--md-sys-color-inverse-on-surface` | #f2f2f2 | #2e2e2e |  |
 | `--md-sys-color-shadow` | #000000 | #000000 |  |
 | `--md-sys-color-scrim` | #000000 | #000000 | Behind modal surfaces (used at 32% opacity). |
 | `--md-sys-color-primary-fixed` | #5e5e5e | #5e5e5e |  |

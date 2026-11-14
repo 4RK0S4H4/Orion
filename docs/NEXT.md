@@ -3,23 +3,17 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-14): overhaul accepted; one palette question open
+## Now (2026-11-14): nothing waiting on a lab
 
-The owner accepted the whole overhaul ([0043](decisions/0043-adaptive-neutral-overhaul.md)) and chose **Edges Lean**
-for the row hover, now built ([0044](decisions/0044-review-answers-row-hover-palette.md)). Compact density stays
-opt-in. On the owner's request the base light and dark colors were checked: empty checkboxes and radios and
-placeholder text were below the bar and are fixed.
+Accepted and built: the overhaul (0043), Edges Lean row hover and palette contrast (0044), Crisper base grays, any
+accent with monochrome as one choice, new list dividers, checkbox fix ([0045](decisions/0045-crisper-grays-any-accent-dividers.md)).
 
-**Pause here** for the [Palette Review](../explore/review-palette.html) (2 questions: the base grays as today,
-crisper, or crisper and cool; and whether the new empty-control gray is right).
+Waiting only on the owner's device looks: iPhone for 0037, 0040 and everything in 0043 to 0045 (WebKit is untested
+here), and a computer for the desktop template and compact density.
 
-Still waiting on iPhone checks: 0037, 0040, and everything in 0043 and 0044 (WebKit is untested here).
+## Plan
 
-## Plan after the answers
-
-1. Apply the Palette Review answer: B or C means new values for the neutral roles in `scripts/generate-color.mjs`
-   (override the monochrome scheme), then `check:tokens`, `check-glass` and the page checker on every template.
-2. Idea A (touched things turn into glass) as a lab.
+1. Idea A (touched things turn into glass) as a lab.
 3. Still unanswered from the framework review (0041): approve 0041, release, minified bundles and per-set icons, pruning.
    (Rail auto-expand and the rail FAB are settled by 0043.)
 4. Release: CHANGELOG date, tag, re-package the skill, tell the owner to re-download it.
@@ -38,6 +32,7 @@ Still waiting on iPhone checks: 0037, 0040, and everything in 0043 and 0044 (Web
 
 ## Session log
 
+- 2026-11-14 (palette): Crisper grays, named accents and the any-accent check, list dividers, checkbox square fix (0045). Next: the plan below.
 - 2026-11-14 (answers): 0043 accepted; row hover Edges Lean built; palette contrast fixes; Palette Review published (0044). Next: owner's palette answer.
 - 2026-11-14 (overhaul): decision 0043 built (see Now). Overhaul Review published. Date picker README and the showcase additions are the loose ends. Next: owner's answers.
 - 2026-11-14 (motion): Lab 2 answered; 0042 accepted and built (spring tokens ink/rise/settle/tip/reveal/bend; accordion, glass snackbar and tooltip, menu items follow, skeleton wave, progress, radio ink, rich tooltip corners). Issues 11, 19, 25-31 done. Open: row hover (owner reviews on a computer). Next: color (22) and the rest of the issues, in order.

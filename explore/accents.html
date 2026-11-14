@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: Accents</title>
+<link rel="stylesheet" href="../components/orion.css?v=94049f5">
+<style>
+body{margin:0;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)}
+h1,h2,p{margin:0}
+.bar{display:flex;align-items:center;padding:12px 24px;background:var(--md-sys-color-surface-container)}
+.bar h1{font-size:20px;line-height:28px;font-weight:500}
+.page{max-width:1100px;margin:0 auto;padding:24px 16px 120px;display:flex;flex-direction:column;gap:40px}
+.intro{max-width:80ch;color:var(--md-sys-color-on-surface-variant);display:flex;flex-direction:column;gap:12px}
+.sec > h2{font-size:24px;line-height:32px;font-weight:500;margin-bottom:6px}
+.sec > p{color:var(--md-sys-color-on-surface-variant);max-width:85ch;margin-bottom:16px}
+.cards{--rv-min:300px}
+.pv{border-radius:20px;overflow:hidden;background:var(--md-sys-color-surface-container-low)}
+.pv iframe{display:block;width:100%;height:520px;border:0}
+.pv.pair{display:grid;grid-template-columns:1fr;gap:2px}
+.pv.note{padding:16px;color:var(--md-sys-color-on-surface-variant);font:400 14px/20px Inter,system-ui,sans-serif}
+.pv.note a{color:var(--md-sys-color-primary)}
+</style>
+</head>
+<body>
+<header class="bar"><h1>S4 Orion: Accents</h1></header>
+<main class="page">
+  <div class="intro">
+    <p>The same screen in each ready-made accent, light on top and dark below. The gray base never changes; only the main button, selection, switches and focus take the accent. Any other color works the same way: <code>S4.theme({ seed: "#0b57d0" })</code> or <code>S4.theme({ seed: "blue" })</code>.</p>
+  </div>
+  <div id="sections" style="display:flex;flex-direction:column;gap:40px"></div>
+</main>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=5c6f42b"></script>
+<script>
+function section(id, title, text, opts) {
+  const sec = document.createElement('section'); sec.className = 'sec';
+  sec.innerHTML = `<h2>${title}</h2><p>${text}</p><div class="cards rv-group" role="radiogroup" aria-label="${title}"></div>`;
+  document.getElementById('sections').appendChild(sec);
+  opts.forEach(o => {
+    const pv = document.createElement('div');
+    if (o.frames) { pv.className = 'pv pair'; pv.innerHTML = o.frames.map(f => `<iframe loading="lazy" title="${o.name}" src="review-orion-2-frame.html?${f}"></iframe>`).join(''); }
+    else { pv.className = 'pv note'; pv.innerHTML = o.html; }
+    sec.querySelector('.cards').appendChild(S4Review.card({ pick: id + ':' + o.k, letter: o.k, title: o.name, desc: o.desc, tag: o.tag || '', preview: pv }));
+  });
+}
+const ACC = [['mono','Mono'],['blue','Blue'],['indigo','Indigo'],['violet','Violet'],['pink','Pink'],['red','Red'],['orange','Orange'],['amber','Amber'],['green','Green'],['teal','Teal']];
+const sec = document.createElement('section'); sec.className = 'sec';
+sec.innerHTML = '<div class="cards rv-group" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">' + ACC.map(a => `<div><h2 style="font-size:16px;line-height:24px;margin:0 0 8px">${a[1]}</h2><div class="pv pair"><iframe loading="lazy" title="${a[1]} light" src="review-orion-2-frame.html?accent=${a[0]}&mode=light"></iframe><iframe loading="lazy" title="${a[1]} dark" src="review-orion-2-frame.html?accent=${a[0]}&mode=dark"></iframe></div></div>`).join('') + '</div>';
+document.getElementById('sections').appendChild(sec);
+</script>
+</body>
+</html>

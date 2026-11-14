@@ -18,6 +18,9 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - `S4.theme({ surfaces: 'neutral' | 'tinted' })`; rail group titles and footer; `data-autofocus`; `data-placement="center"` on panels; glass fill tokens.
 
 ### Changed
+- Base grays are "Crisper": a white page in light mode, a deeper black in dark mode, clearer surface steps (decision 0045).
+- Orion is documented as any accent on a neutral base; monochrome is the shipped accent, not a rule. Named accents: `S4.theme({ seed: 'blue' })`. New gate `npm run check:accent`.
+- List dividers sit between rows, inset, and fade beside a hovered or selected row.
 - A seed colors only accents; surfaces stay neutral (stock M3 with `surfaces: 'tinted'`).
 - The navigation rail is side navigation: rows, 72 wide collapsed, hamburger menu icon, solid main action, expands by itself from 1200.
 - Bottom and side sheets are floating glass panels that pop in; no handle or drag.
@@ -26,6 +29,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- A checkbox no longer flashes a square while it unchecks.
 - Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.
 - Slider reaches both ends; stop dots no longer peek out beside the handle. The composer's buttons line up with its field. The select on the text field reference page opens the glass menu.
 

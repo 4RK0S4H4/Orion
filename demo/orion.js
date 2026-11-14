@@ -99,6 +99,8 @@
      Monochrome (no seed) uses the roles already in tokens.css. A seed generates every M3 role with Material Color
      Utilities (m3color.js, loaded on demand) for light and dark, written in the same zero-specificity blocks as
      tokens.css, so device dark mode and high contrast keep working. */
+  /* Decision 0045: Orion takes any color as its accent (S4.theme({ seed: '#0b57d0' }) or a named one from
+     S4.theme.accents, e.g. 'blue'); 'mono' (black and white) is one choice among them, not the rule. */
   var state = { seed: null, variant: 'vibrant', mode: 'system', contrast: 0, surfaces: 'neutral' };
   /* m3color.js sits next to orion.js (skill assets) or in components/assets/ (repo); <script data-m3color="..."> overrides. */
   var m3src = (document.currentScript && document.currentScript.dataset.m3color) ||
@@ -121,7 +123,7 @@
     if (state.surfaces === 'tinted') return s;
     var pal = M.palettes(state.seed, state.variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
     var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
-    o['secondary-container'] = tone(dark ? 30 : 90);       /* selection: a soft tint of the accent */
+    o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
     o['on-secondary-container'] = tone(dark ? 90 : 10);
     o['--s4-focus-ring-color'] = s.primary;
     return o;
@@ -158,7 +160,10 @@
   S4.theme = function (opts) {
     if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces };
     var colorChanged = false;
-    if ('seed' in opts) { state.seed = opts.seed && String(opts.seed).toLowerCase() !== '#000000' ? opts.seed : null; colorChanged = true; }
+    if ('seed' in opts) {
+      var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
+      state.seed = seed && String(seed).toLowerCase() !== '#000000' ? seed : null; colorChanged = true;
+    }
     if (opts.variant) { state.variant = opts.variant; colorChanged = true; }
     if (opts.surfaces) { state.surfaces = opts.surfaces === 'tinted' ? 'tinted' : 'neutral'; colorChanged = true; }
     if (opts.mode) { state.mode = opts.mode; if (opts.mode === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', opts.mode); }
@@ -173,6 +178,7 @@
     if (key) { S4.theme.key = key; try { localStorage.setItem(key, JSON.stringify(S4.theme())); } catch (e) {} }
     return S4.theme();
   };
+  S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
   S4.theme.restore = function (key, defaults) {
     var saved = null; try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}

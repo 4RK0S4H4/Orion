@@ -20,6 +20,9 @@ const lum = (c) => { const [r, g, b] = c.map((v) => { v = Math.min(255, Math.max
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 const mix = (a, b, t) => a.map((v, i) => v * t + b[i] * (1 - t));
 const hue = (h) => { const s = 0.7, l = 0.45, k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [f(0), f(8), f(4)].map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join(''); };
+/* the default monochrome scheme is the token values (the base grays are tuned by hand, decision 0045), not the raw generated ones */
+const tokenScheme = (mode) => Object.fromEntries(Object.keys(T).filter((n) => n.startsWith('--md-sys-color-')).map((n) => [n.slice(15), mode === 'light' ? T[n].value : (T[n].modes?.[mode] ?? T[n].value)]));
+const schemeOf = (seed, v, mode) => (seed === '#000000' ? tokenScheme(mode) : M3.scheme(seed, v, mode === 'dark', 0));
 const seeds = [['#000000', ['monochrome']], ...Array.from({ length: 24 }, (_, i) => [hue(i * 15), ['vibrant', 'tonal', 'fidelity', 'expressive']])];
 
 let failures = 0, worstAll = Infinity;
@@ -29,7 +32,7 @@ for (const mode of ['light', 'dark']) {
   const lo = filt(0), hi = filt(255);
   let worst = { r: Infinity };
   for (const [seed, variants] of seeds) for (const v of variants) {
-    const s = M3.scheme(seed, v, mode === 'dark', 0), tint = rgb(s['surface-container']), text = rgb(s['on-surface']);
+    const s = schemeOf(seed, v, mode), tint = rgb(s['surface-container']), text = rgb(s['on-surface']);
     const r = Math.min(ratio(text, mix(tint, [lo, lo, lo], t)), ratio(text, mix(tint, [hi, hi, hi], t)));
     if (r < worst.r) worst = { r, seed, v };
     if (r < 4.5) { failures++; console.error(`  x ${mode}: ${seed} ${v}: on-surface on glass is ${r.toFixed(2)}:1`); }
@@ -38,10 +41,10 @@ for (const mode of ['light', 'dark']) {
   /* items on glass (decision 0043): on-surface text on a filled control (ink tint) and on a selected item (accent tint),
      with neutral surfaces (the default) and with stock tinted surfaces */
   const fo = val('--s4-glass-fill-opacity', mode), so = val('--s4-glass-fill-selected-opacity', mode);
-  const mono = M3.scheme('#000000', 'monochrome', mode === 'dark', 0);
+  const mono = tokenScheme(mode);
   let fillWorst = { r: Infinity };
   for (const [seed, variants] of seeds) for (const v of variants) {
-    const s = M3.scheme(seed, v, mode === 'dark', 0);
+    const s = schemeOf(seed, v, mode);
     for (const surf of [mono, s]) {
       const tint = rgb(surf['surface-container']), text = rgb(surf['on-surface']), accent = rgb(s.primary);
       for (const back of [lo, hi]) {
@@ -58,7 +61,7 @@ for (const mode of ['light', 'dark']) {
   const tfDefault = val('--s4-glass-tint-opacity-fab', mode), tfColor = val('--s4-glass-tint-opacity-fab-color', mode);
   let fabWorst = { r: Infinity }, fabMono = Infinity, fabMonoDefault = Infinity;
   for (const [seed, variants] of seeds) for (const v of variants) {
-    const s = M3.scheme(seed, v, mode === 'dark', 0);
+    const s = schemeOf(seed, v, mode);
     for (const [bg, fg] of fabPairs) {
       const tf = bg === 'primary-container' ? tfDefault : tfColor;   /* the default FAB, or a data-color FAB */
       const tint = rgb(s[bg]), text = rgb(s[fg]);

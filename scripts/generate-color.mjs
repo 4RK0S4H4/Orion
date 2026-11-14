@@ -33,6 +33,30 @@ const modes = {
    too loud as a fill). Light and both high-contrast modes keep the generated values. */
 Object.assign(modes.dark, { error: '#ff8983', 'on-error': '#410004', 'error-container': '#4a1719', 'on-error-container': '#ffdad7' });
 
+/* Decision 0045, "Crisper" base grays (owner's Palette Review): a white page in light mode and a deeper black in dark
+   mode, with clearer steps between surfaces. Pure gray, standard contrast only; both high-contrast modes keep the
+   generated values. Applies to the default monochrome scheme, which is also every seeded app's neutral base (0043). */
+if (gen.variant === 'monochrome') {
+  Object.assign(modes.light, {
+    background: '#ffffff', surface: '#ffffff', 'surface-bright': '#ffffff', 'surface-dim': '#dcdcdc',
+    'surface-container-lowest': '#ffffff', 'surface-container-low': '#f5f5f5', 'surface-container': '#efefef',
+    'surface-container-high': '#e9e9e9', 'surface-container-highest': '#e2e2e2', 'surface-variant': '#e2e2e2',
+    'on-background': '#171717', 'on-surface': '#171717', 'on-surface-variant': '#454545',
+    outline: '#757575', 'outline-variant': '#c9c9c9',
+    'secondary-container': '#d6d6d6', 'on-secondary-container': '#171717',
+    'inverse-surface': '#2e2e2e', 'inverse-on-surface': '#f2f2f2',
+  });
+  Object.assign(modes.dark, {
+    background: '#0e0e0e', surface: '#0e0e0e', 'surface-bright': '#363636', 'surface-dim': '#0e0e0e',
+    'surface-container-lowest': '#090909', 'surface-container-low': '#181818', 'surface-container': '#1e1e1e',
+    'surface-container-high': '#282828', 'surface-container-highest': '#333333', 'surface-variant': '#454545',
+    'on-background': '#ededed', 'on-surface': '#ededed', 'on-surface-variant': '#bdbdbd',
+    outline: '#8f8f8f', 'outline-variant': '#454545',
+    'secondary-container': '#454545', 'on-secondary-container': '#ededed',
+    'inverse-surface': '#ededed', 'inverse-on-surface': '#2e2e2e',
+  });
+}
+
 const color = (hex) => {
   const h = hex.toLowerCase(), c = [1, 3, 5].map((i) => +(parseInt(h.slice(i, i + 2), 16) / 255).toFixed(4));
   return { colorSpace: 'srgb', components: c, hex: h };

@@ -11,7 +11,7 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | Topic | Read |
 |---|---|
 | Base system: M3 Expressive roles, type, shape, springs, monochrome default, Inter, Title Case | 0001, 0003 |
-| Color: neutral surfaces, the accent only on accents, fixed status colors | 0043 |
+| Color: neutral base (Crisper grays), any accent color only on accents, fixed status colors | 0043, 0045 |
 | Density (comfortable, compact), desktop windows and desktop apps | 0043 |
 | Side navigation: rows, hamburger, solid main action | 0043 |
 | Floating panels (the former sheets), date picker, controls without halos | 0043 |
@@ -74,4 +74,5 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0041 | Orion as a framework: layouts, templates, content components | Proposed (built, awaiting the owner's review) |
 | 0042 | Liquid motion for ink, plain motion for glass | Active (row hover settled in 0044) |
 | 0043 | The overhaul: neutral color, density, side navigation, items on glass, floating panels, date picker, desktop apps | Active (accepted in 0044) |
-| 0044 | Overhaul accepted; row hover Edges Lean; base palette contrast (control color, placeholders) | Active (the base grays question is open) |
+| 0044 | Overhaul accepted; row hover Edges Lean; base palette contrast (control color, placeholders) | Active |
+| 0045 | Crisper base grays; any accent color, monochrome is one choice; list dividers between rows | Active |

@@ -63,7 +63,8 @@
     position: absolute;
     inset: calc(var(--s4-space-1) / 2 + 1px);
     background: var(--_mark);
-    mask: var(--_mask, none) center / 100% no-repeat;
+    /* the check is the default mask, so the mark keeps its shape while it fades out (with no mask it flashed as a square) */
+    mask: var(--_mask, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.2 7.4l2.5 2.5 5.1-5.6' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")) center / 100% no-repeat;
     opacity: 0;
     transform: scale(0.6);
     transition: opacity var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);

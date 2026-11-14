@@ -15,7 +15,7 @@ The personal layer is short and deliberate:
 - **Inter** as the typeface, with its full OpenType features.
 - **Solar icons**: Bold Duotone where the icon carries the screen, Linear at small sizes.
 - **Title Case** for labels; sentences stay sentence case.
-- **Monochrome by default.** Color comes from one seed when an app wants it, and then only on accents: surfaces stay neutral (decision 0043).
+- **Any accent on a neutral base.** Surfaces stay neutral gray; one accent color, any color, marks actions and selection (decisions 0043, 0045). Black and white is the owner's favorite accent and what the stylesheet ships with, but it is a choice, not the language.
 - **Glass on floating chrome** and nowhere else.
 - **Simple, sturdy motion**: dialogs and floating panels pop, menus fade in place, shared axis between views; controls answer where they are (decisions 0022, 0042, 0043).
 - **Normal before expressive** (decision 0043): where Material decorates (tinted surfaces, halos, sheets that slide up the screen), Orion does the plain thing.
@@ -25,7 +25,7 @@ The personal layer is short and deliberate:
 
 Every color is a role: primary, surface containers, outlines, and so on. Surfaces, text and outlines are neutral grays; a seed generates the accent roles (primary, selection, focus) with Material Color Utilities; status colors are fixed.
 Nobody picks hex values for components. To raise contrast you raise the contrast level, which regenerates every role;
-you don't darken one color by hand. The default seed is monochrome, so an app without a brand looks calm and neutral, and
+you don't darken one color by hand. The shipped accent is monochrome, so an app that sets nothing looks calm and neutral, and
 an app with one gets a complete, accessible scheme from a single value.
 
 ## 3. Solid content, glass chrome

@@ -35,6 +35,8 @@ tinted states)? Does it read on a solid content surface with nothing interesting
 
 ## Done
 
+- **36.** List dividers overhang the rounded hover box ([image](img/2026-11-14-list-dividers-hover.png)): done 2026-11-14 (dividers sit between rows, inset, and fade beside an active row, decision 0045).
+- **37.** Checkbox flashes a square when unchecked: done 2026-11-14 (the mark keeps its mask, decision 0045).
 - **7.** Liquid hover between list rows: done 2026-11-14 (Edges Lean, decision 0044).
 - **1.** Rail collapse animation glitches: done 2026-11-14 (rail is rows; only its edge moves, decision 0043).
 - **2.** Duotone icons turn completely white when selected: done 2026-11-14 (selected icons keep both tones, decision 0043).
