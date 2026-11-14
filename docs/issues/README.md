@@ -46,6 +46,7 @@ tinted states)? Does it read on a solid content surface with nothing interesting
 
 ## Done
 
+- **42.** Search bar's focus ring cut off at the top (owner's screenshot, 2026-11-14, not saved: it arrived without a file): done 2026-11-14 (the ring is drawn inside the bar's edge). Issue 41's test pass should look for other rings clipped by a bar or a scrolling edge.
 - **36.** List dividers overhang the rounded hover box ([image](img/2026-11-14-list-dividers-hover.png)): done 2026-11-14 (dividers sit between rows, inset, and fade beside an active row, decision 0045).
 - **37.** Checkbox flashes a square when unchecked: done 2026-11-14 (the mark keeps its mask, decision 0045).
 - **7.** Liquid hover between list rows: done 2026-11-14 (Edges Lean, decision 0044).

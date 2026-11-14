@@ -29,6 +29,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- The search bar's focus ring is no longer cut off at the top of a pane.
 - A checkbox no longer flashes a square while it unchecks.
 - Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.
 - Slider reaches both ends; stop dots no longer peek out beside the handle. The composer's buttons line up with its field. The select on the text field reference page opens the glass menu.

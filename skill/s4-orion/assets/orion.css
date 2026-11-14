@@ -2671,10 +2671,11 @@
   .s4-search-input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 1; }
   .s4-search-input::-webkit-search-cancel-button,
   .s4-search-input::-webkit-search-decoration { appearance: none; display: none; }
-  /* focus: the M3 ring around the whole bar */
+  /* focus: the ring is drawn inside the bar's edge. A search bar usually sits at the very top of a pane, under the top
+     app bar or against a scrolling edge, where a ring outside the bar gets cut off. */
   .s4-search:has(> .s4-search-input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
-    outline-offset: var(--s4-focus-ring-offset);
+    outline-offset: calc(-1 * var(--s4-focus-ring-width));
   }
   .s4-search:has(> .s4-search-input:disabled) {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
