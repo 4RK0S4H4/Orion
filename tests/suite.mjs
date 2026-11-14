@@ -139,10 +139,16 @@ function focusAudit() {
 
 /* ---------- using the page ---------- */
 async function use(page, add, phone) {
-  const settle = (ms = 420) => page.waitForTimeout(ms);
+  /* wait for motion to end rather than for a fixed time: a slow machine must not look like a bug */
+  const settle = async (ms = 420) => {
+    await page.waitForTimeout(Math.min(ms, 160));
+    await page.waitForFunction(() => !document.getAnimations().some((a) => { try { return a.playState === 'running' && a.effect.getComputedTiming().iterations !== Infinity; } catch (e) { return false; } }), null, { timeout: 4000 }).catch(() => {});
+    await page.waitForTimeout(120);
+  };
+  const until = (fn, argv) => page.waitForFunction(fn, argv, { timeout: 3000 }).then(() => true, () => false);
   const visible = async (sel) => { const all = await page.locator(sel).all(); const out = []; for (const l of all) if (await l.isVisible().catch(() => false)) out.push(l); return out; };
   const fits = (id) => page.evaluate((id) => { const d = document.getElementById(id); if (!d) return 'missing'; const r = d.getBoundingClientRect(); if (!r.width || !r.height) return 'not shown'; return r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1 ? `does not fit the screen (${Math.round(r.left)},${Math.round(r.top)} to ${Math.round(r.right)},${Math.round(r.bottom)} in ${innerWidth}x${innerHeight})` : ''; }, id);
-  const click = async (l, what) => { try { await l.scrollIntoViewIfNeeded({ timeout: 1500 }); await l.click({ timeout: 2500 }); return true; } catch (e) { add(`${what}: could not be clicked (${String(e.message).split('\n')[0].slice(0, 90)})`); return false; } };
+  const click = async (l, what) => { try { await l.scrollIntoViewIfNeeded({ timeout: 5000 }); await l.click({ timeout: 5000 }); return true; } catch (e) { add(`${what}: could not be clicked (${String(e.message).split('\n')[0].slice(0, 90)})`); return false; } };
   const closeAll = async () => { for (let i = 0; i < 3; i++) { const open = await page.evaluate(() => document.querySelectorAll('dialog[open], .s4-menu:popover-open, [popover]:popover-open').length).catch(() => 0); if (!open) return; await page.keyboard.press('Escape'); await settle(350); } };
 
   /* every view of an app shell, then the checks inside each */
@@ -153,8 +159,12 @@ async function use(page, add, phone) {
       const nav = (await visible(`.s4-nav-item[data-view="${view}"]`))[0];
       if (!nav) { add(`view "${view}" has no visible navigation item`); continue; }
       if (!(await click(nav, `navigation to "${view}"`))) continue;
+      /* the page must not get wider than the screen even while the views switch */
+      let peak = 0; for (let i = 0; i < 8; i++) { peak = Math.max(peak, await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)); await page.waitForTimeout(30); }
+      if (peak > 1) add(`view "${view}": the page is ${peak}px too wide while the views switch`);
       await settle(520);
-      const shown = await page.evaluate((v) => { const s = document.querySelector(`.s4-view[data-view="${v}"]`); return !s || !s.hidden; }, view);
+      const shown = await until((v) => { const s = document.querySelector(`.s4-view[data-view="${v}"]`); return !s || !s.hidden; }, view);
+      await settle();
       if (!shown) add(`view "${view}" did not show after its navigation item was clicked`);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (ov > 1) add(`view "${view}": sideways scroll (${ov}px)`);
@@ -171,7 +181,7 @@ async function use(page, add, phone) {
       const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !a.matches('[autofocus], [data-autofocus]'); }, id);
       if (fieldFocused) add(`dialog "${id}" focused a text field when it opened (decision 0043)`);
       await page.keyboard.press('Escape'); await settle(520);
-      const still = await page.evaluate((id) => document.getElementById(id).open, id);
+      const still = !(await until((id) => !document.getElementById(id).open, id));
       if (still) { add(`dialog "${id}" did not close with Escape`); await closeAll(); continue; }
       const back = await page.evaluate((id) => { const a = document.activeElement; return !!a && (a.dataset.dialog === id || a.dataset.sheet === id); }, id);
       if (!back) add(`dialog "${id}" did not give focus back to its opener`);
@@ -184,8 +194,8 @@ async function use(page, add, phone) {
       await settle(480);
       const f = await fits(id); if (f) add(`menu "${id}" ${f}`);
       await page.keyboard.press('Escape'); await settle(380);
-      const still = await page.evaluate((id) => { const m = document.getElementById(id); if (!m) return false; const r = m.getBoundingClientRect(); return r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'; }, id);
-      if (still) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
+      const gone = await until((id) => { const m = document.getElementById(id); if (!m) return true; const r = m.getBoundingClientRect(); return !(r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'); }, id);
+      if (!gone) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
     }
     /* expand in place */
     const expands = await page.evaluate(() => [...new Set([...document.querySelectorAll('[data-expand]:not(.s4-nav-rail)')].filter((b) => b.getBoundingClientRect().width && !b.closest('[hidden]')).map((b) => b.dataset.expand))]);
@@ -201,7 +211,7 @@ async function use(page, add, phone) {
       if (st.inline) add(`expand "${id}" kept a leftover inline style after opening (${st.inline})`);
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (ov > 1) add(`expand "${id}" causes sideways scroll (${ov}px)`);
       await page.keyboard.press('Escape'); await settle(650);
-      const closed = await page.evaluate((id) => document.getElementById(id).hidden, id);
+      const closed = await until((id) => document.getElementById(id).hidden, id);
       if (!closed) add(`expand "${id}" did not close with Escape`);
       const after = await page.evaluate(() => document.documentElement.scrollHeight);
       if (closed && (await shownView()) === viewBefore && Math.abs(after - before) > 2) add(`expand "${id}" left the page ${after - before}px taller after closing`);

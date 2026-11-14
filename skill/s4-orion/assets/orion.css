@@ -1824,6 +1824,8 @@
 
   /* ---------- views: sibling destinations switched by app.js with the shared axis pattern ---------- */
   .s4-view { display: block; }
+  /* a view sliding in (Switch) must never make the page wider than the screen, even for a moment */
+  .s4-content:has(> .s4-view) { overflow-x: clip; }
 
   /* ---------- page helpers ---------- */
   /* A page heading row inside .s4-content: title on the left, actions on the right. */
