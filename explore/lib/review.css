@@ -1,80 +1,128 @@
-/* S4 Orion review UI. Deliberately NOT S4 Orion: a fixed "review blue" that never follows the demo's theme or seed,
-   so the questionnaire (cards, radios, buttons, answers) always reads as separate from the design being reviewed.
-   Anything inside .rv-preview is the demo. */
-:root{--rv-accent:#0b57d0;--rv-on-accent:#fff;--rv-soft:#d3e3fd;--rv-on-soft:#041e49;--rv-card:#eef0f4;--rv-card-2:#fff;--rv-ink:#1f1f1f;--rv-ink-2:#444746;--rv-line:#c4c7c5;--rv-font:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-:root[data-theme=dark]{--rv-accent:#a8c7fa;--rv-on-accent:#062e6f;--rv-soft:#0b3a82;--rv-on-soft:#d3e3fd;--rv-card:#1e2024;--rv-card-2:#2b2d31;--rv-ink:#e3e3e3;--rv-ink-2:#c4c7c5;--rv-line:#444746}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--rv-accent:#a8c7fa;--rv-on-accent:#062e6f;--rv-soft:#0b3a82;--rv-on-soft:#d3e3fd;--rv-card:#1e2024;--rv-card-2:#2b2d31;--rv-ink:#e3e3e3;--rv-ink-2:#c4c7c5;--rv-line:#444746}}
+/* The review lab UI, built on the live S4 Orion bundle (decision 0048, reversing the old "review blue").
+   The questionnaire is Orion itself: Orion tokens, buttons, chips, radios, fields, panes and motion patterns, loaded
+   from ../components/orion.css, so a decision made in one quiz shows in the next. review.js adds that stylesheet to
+   labs that predate the bundle. What is being judged always sits inside .rv-preview, in a recessed "Preview" well;
+   everything outside it is the quiz. Layout only here: looks come from the components. */
+@layer s4.components {
+  /* ---------- option card: the whole card is the answer ---------- */
+  .rv-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--rv-min, 300px)), 1fr)); gap: var(--s4-space-4); }
+  .rv-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-3);
+    padding: var(--s4-space-4);
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    cursor: pointer;
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (hover: hover) { .rv-card:hover { background: var(--md-sys-color-surface-container); } }
+  .rv-card:focus-visible { outline: var(--s4-focus-ring-width, 3px) solid var(--md-sys-color-primary); outline-offset: 2px; }
+  .rv-card[aria-checked="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .rv-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s4-space-1) var(--s4-space-3); align-items: start; }
+  .rv-head > .s4-radio { pointer-events: none; min-block-size: 0; padding: 0; margin-block-start: var(--s4-space-1); }
+  .rv-titles { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
+  .rv-titles b { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); }
+  .rv-titles small { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); color: var(--md-sys-color-on-surface-variant); }
+  .rv-card[aria-checked="true"] .rv-titles small { color: inherit; }
+  .rv-tag { align-self: flex-start; }
+  .rv-actions { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .rv-badge { visibility: hidden; align-self: start; }
+  .rv-card[aria-checked="true"] .rv-badge { visibility: visible; }
 
-/* ---------- option card: the whole card is the answer ---------- */
-.rv-group{display:grid;grid-template-columns:repeat(auto-fit,minmax(var(--rv-min,300px),1fr));gap:16px}
-.rv-card{position:relative;display:flex;flex-direction:column;gap:14px;padding:14px;border-radius:20px;background:var(--rv-card);color:var(--rv-ink);font-family:var(--rv-font);cursor:pointer;outline:2px solid transparent;outline-offset:-2px;transition:background-color .15s,outline-color .15s;-webkit-tap-highlight-color:transparent}
-.rv-card:hover{outline-color:color-mix(in srgb,var(--rv-accent) 45%,transparent)}
-.rv-card:focus-visible{outline:3px solid var(--rv-accent);outline-offset:2px}
-.rv-card[aria-checked=true]{background:var(--rv-soft);color:var(--rv-on-soft);outline-color:var(--rv-accent)}
-.rv-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:2px 2px 0}
-.rv-radio{width:22px;height:22px;margin-top:2px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--rv-ink-2);display:grid;place-items:center;transition:box-shadow .15s,background-color .15s}
-.rv-card[aria-checked=true] .rv-radio{background:var(--rv-accent);box-shadow:none}
-.rv-card[aria-checked=true] .rv-radio::after{content:"";width:12px;height:12px;background:var(--rv-on-accent);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.3l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.3l2.3 2.3 4.7-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
-.rv-titles{display:flex;flex-direction:column;gap:3px;min-width:0}
-.rv-titles b{font-size:16px;line-height:24px;font-weight:650}
-.rv-titles small{font-size:13px;line-height:18px;color:var(--rv-ink-2)}
-.rv-card[aria-checked=true] .rv-titles small{color:inherit;opacity:.85}
-.rv-tag{align-self:flex-start;font-size:11px;line-height:16px;font-weight:600;letter-spacing:.4px;padding:1px 8px;border-radius:999px;background:var(--rv-card-2);color:var(--rv-ink-2)}
-.rv-actions{display:flex;flex-wrap:wrap;gap:8px;margin:-4px 0 0 36px}
-.rv-badge{display:none;align-self:start;font-size:12px;line-height:20px;font-weight:700;padding:0 10px;border-radius:999px;background:var(--rv-accent);color:var(--rv-on-accent)}
-.rv-card[aria-checked=true] .rv-badge{display:inline-block}
+  /* ---------- what is being judged: a recessed well, so the quiz around it never reads as part of the option ---------- */
+  .rv-preview {
+    position: relative;
+    cursor: auto;
+    margin-block-start: var(--s4-space-4);
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+  }
+  .rv-preview::before {
+    content: "Preview";
+    position: absolute;
+    inset-block-end: 100%;
+    inset-inline-start: var(--s4-space-1);
+    padding-block-end: var(--s4-space-1);
+    font-size: var(--md-sys-typescale-label-small-size);
+    line-height: var(--md-sys-typescale-label-small-line-height);
+    font-weight: var(--md-sys-typescale-label-small-weight);
+    color: var(--md-sys-color-on-surface-variant);
+    pointer-events: none;
+  }
+  .rv-card[aria-checked="true"] .rv-preview::before { color: inherit; }
 
-/* ---------- the demo lives in a labelled preview frame ---------- */
-.rv-preview{position:relative;cursor:auto;border-radius:16px;outline:1.5px dashed var(--rv-line);outline-offset:0}
-.rv-card[aria-checked=true] .rv-preview{outline-color:color-mix(in srgb,var(--rv-accent) 55%,transparent)}
-.rv-preview::before{content:"Preview";position:absolute;z-index:20;top:-9px;left:14px;padding:0 6px;font:700 10px/18px var(--rv-font);letter-spacing:.8px;text-transform:uppercase;color:var(--rv-ink-2);background:var(--rv-card);border-radius:4px;pointer-events:none}
-.rv-card[aria-checked=true] .rv-preview::before{background:var(--rv-soft);color:var(--rv-on-soft)}
+  /* ---------- answers summary ---------- */
+  .rv { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-body-large-font); }
+  .rv-sec { scroll-margin-top: var(--s4-space-16); max-inline-size: var(--s4-layout-content-max, 1200px); margin: var(--s4-space-10) auto; padding: 0 var(--s4-space-4); }
+  .rv-box { gap: var(--s4-space-5); }
+  .rv-box h2 { margin: 0; font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight, 600); }
+  .rv-box > p { margin: 0; color: var(--md-sys-color-on-surface-variant); max-inline-size: 80ch; }
+  .rv-qs { display: flex; flex-direction: column; gap: var(--s4-space-5); }
+  .rv-q { display: flex; flex-direction: column; gap: var(--s4-space-2); border: 0; margin: 0; padding: 0; min-inline-size: 0; }
+  .rv-q legend { padding: 0; margin-block-end: var(--s4-space-2); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); }
+  .rv-q .rv-help { margin: 0 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .rv-opts { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .rv-opt b { font-weight: inherit; }
+  .rv-opt span:not(.s4-chip-check)::before { content: "· "; }
+  .rv-extra { font-size: var(--md-sys-typescale-body-small-size); color: var(--md-sys-color-on-surface-variant); }
+  .rv-extra:empty { display: none; }
+  .rv-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
+  .rv-status { font-size: var(--md-sys-typescale-body-medium-size); color: var(--md-sys-color-on-surface-variant); }
+  .rv-hint { font-size: var(--md-sys-typescale-body-medium-size); color: var(--md-sys-color-on-surface-variant); }
+  .rv-pre { margin: 0; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-high); font-family: var(--md-ref-typeface-mono, ui-monospace, monospace); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .rv-list { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+  .rv-item { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-2) var(--s4-space-4); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-high); }
+  .rv-item a { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .rv-item .rv-pre { flex-basis: 100%; background: var(--md-sys-color-surface-container-highest); }
+  .rv-hist > summary { cursor: pointer; font-weight: var(--md-sys-typescale-label-large-weight); }
+  .rv-hist > .rv-list { margin-block-start: var(--s4-space-3); }
 
-/* ---------- review buttons ---------- */
-.rv-btn,.rv-pick,.rv-play{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:0 18px;border:0;border-radius:999px;font:600 14px/20px var(--rv-font);letter-spacing:.1px;cursor:pointer;white-space:nowrap;text-decoration:none;-webkit-tap-highlight-color:transparent}
-.rv-btn{background:var(--rv-card-2);color:var(--rv-ink);box-shadow:inset 0 0 0 1px var(--rv-line)}
-.rv-btn.pri{background:var(--rv-accent);color:var(--rv-on-accent);box-shadow:none}
-.rv-btn.txt{background:transparent;color:var(--rv-ink-2);box-shadow:none}
-.rv-btn[data-done]{background:var(--rv-soft);color:var(--rv-on-soft);box-shadow:none}
-.rv-pick{background:transparent;color:var(--rv-accent);box-shadow:inset 0 0 0 1.5px var(--rv-accent)}
-.rv-pick[aria-pressed=true]{background:var(--rv-accent);color:var(--rv-on-accent);box-shadow:none}
-.rv-play{min-height:36px;padding:0 14px;background:var(--rv-card-2);color:var(--rv-accent);box-shadow:inset 0 0 0 1px var(--rv-line)}
-.rv-card[aria-checked=true] .rv-play{background:var(--rv-card-2)}
-.rv-btn:focus-visible,.rv-pick:focus-visible,.rv-play:focus-visible,.rv-opt:focus-visible,.rv-note:focus-visible,.rv-fab:focus-visible{outline:3px solid var(--rv-accent);outline-offset:2px}
+  /* the floating "Your Answers" button is an Orion FAB, kept clear of a bottom nav */
+  .rv-fab.s4-fab { position: fixed; z-index: var(--s4-z-fab, 20); inset-inline-end: var(--s4-space-4); inset-block-end: calc(var(--rv-fab-bottom, var(--s4-space-4)) + env(safe-area-inset-bottom, 0px)); }
+  .rv-fab .s4-fab-label span { opacity: 0.75; margin-inline-start: var(--s4-space-1); font-variant-numeric: tabular-nums; }
 
-/* tool bars on demo pages: their controls are review UI too */
-.bar .seg{background:var(--rv-card)}
-.bar .seg button{color:var(--rv-ink-2);font-family:var(--rv-font)}
-.bar .seg button[aria-pressed=true]{background:var(--rv-accent);color:var(--rv-on-accent)}
-.bar .ctl > span{color:var(--rv-ink-2)}
-.rv-hint{font:500 13px/18px var(--rv-font);color:var(--rv-ink-2)}
+  /* phone previews (phone-review.js) */
+  .ph-strip { display: flex; gap: var(--s4-space-3); overflow-x: auto; padding: var(--s4-space-3); }
+  .ph-frame { flex: 0 0 auto; inline-size: 390px; block-size: 760px; border: 0; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface); }
 
-/* ---------- answers summary ---------- */
-.rv{color:var(--rv-ink);font-family:var(--rv-font)}
-.rv-sec{scroll-margin-top:80px;max-width:1500px;margin:0 auto 40px;padding:0 24px}
-.rv-box{background:var(--rv-card);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:20px}
-.rv-box h2{margin:0;font-size:28px;line-height:36px;font-weight:600}
-.rv-box > p{margin:0;color:var(--rv-ink-2);max-width:80ch}
-.rv-q{display:flex;flex-direction:column;gap:10px;border:0;margin:0;padding:0}
-.rv-q legend{padding:0;margin-bottom:10px;font-size:16px;line-height:24px;font-weight:650}
-.rv-q .rv-help{margin:-6px 0 4px;color:var(--rv-ink-2);font-size:13px;line-height:18px}
-.rv-opts{display:flex;flex-wrap:wrap;gap:8px}
-.rv-opt{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 16px;border:0;border-radius:999px;background:var(--rv-card-2);color:var(--rv-ink);font:inherit;font-weight:500;cursor:pointer;box-shadow:inset 0 0 0 1px var(--rv-line);text-align:left}
-.rv-opt b{font-weight:700}
-.rv-opt:hover{box-shadow:inset 0 0 0 1.5px var(--rv-accent)}
-.rv-opt[aria-checked=true]{background:var(--rv-accent);color:var(--rv-on-accent);box-shadow:none}
-.rv-extra{font-size:13px;color:var(--rv-ink-2);font-variant-numeric:tabular-nums}
-.rv-note{width:100%;min-height:88px;padding:12px 16px;border:0;border-radius:12px;background:var(--rv-card-2);color:var(--rv-ink);font:inherit;font-size:16px;line-height:24px;box-shadow:inset 0 0 0 1px var(--rv-line);resize:vertical}
-.rv-acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.rv-status{font-size:13px;color:var(--rv-ink-2)}
-.rv-fab{position:fixed;z-index:90;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));display:inline-flex;align-items:center;gap:10px;height:56px;padding:0 20px;border:0;border-radius:16px;background:var(--rv-accent);color:var(--rv-on-accent);font:600 14px var(--rv-font);cursor:pointer;box-shadow:0 4px 12px rgb(0 0 0/.24)}
-.rv-fab span{display:inline-grid;place-items:center;min-width:28px;height:22px;padding:0 8px;border-radius:999px;background:color-mix(in srgb,var(--rv-on-accent) 14%,transparent);font-size:12px;font-variant-numeric:tabular-nums}
-.rv-list{display:flex;flex-direction:column;gap:8px}
-.rv-item{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 16px;border-radius:12px;background:var(--rv-card-2)}
-.rv-item a{color:inherit;font-weight:600;text-decoration:none} .rv-item a:hover{text-decoration:underline}
-.rv-item .rv-status{margin-left:auto}
-.rv-pre{margin:0;padding:12px 16px;border-radius:12px;background:var(--rv-card-2);font:13px/18px ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;color:var(--rv-ink-2);max-height:240px;overflow:auto}
-.rv-hist summary{cursor:pointer;font-weight:600;padding:6px 0}
-.rv-hist .rv-item{flex-direction:column;align-items:stretch}
-@media (max-width:600px){.rv-box{padding:16px}.rv-fab{height:48px;padding:0 16px}.rv-card{padding:12px}}
-@media (prefers-reduced-motion:reduce){.rv-card,.rv-radio{transition:none}}
+  /* tool bars on older lab pages: their segmented controls are quiz UI too */
+  .bar .seg { display: inline-flex; gap: var(--s4-space-1); padding: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
+  .bar .seg button { border: 0; border-radius: var(--md-sys-shape-corner-full); background: none; color: var(--md-sys-color-on-surface-variant); font: inherit; cursor: pointer; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
+  .bar .seg button[aria-pressed="true"] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  .bar .ctl > span { color: var(--md-sys-color-on-surface-variant); }
+
+  /* ---------- the scrubber (scrub.js): an Orion glass toolbar ---------- */
+  .rv-scrub {
+    position: fixed;
+    inset-inline-start: 50%;
+    inset-block-end: calc(var(--rv-scrub-bottom, var(--s4-space-3)) + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    z-index: 2147483000;
+    box-sizing: border-box;
+    inline-size: min(96vw, 32rem);
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    padding: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .rv-scrub > button { flex: none; block-size: var(--s4-space-10); padding: 0 var(--s4-space-4); border: 0; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-inverse-on-surface); color: var(--md-sys-color-inverse-surface); font: inherit; font-weight: var(--md-sys-typescale-label-large-weight); }
+  .rv-scrub > button.on { background: var(--md-sys-color-inverse-primary); color: var(--md-sys-color-inverse-surface); }
+  .rv-scrub .tr { position: relative; flex: 1; block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: color-mix(in srgb, var(--md-sys-color-inverse-on-surface) 18%, transparent); overflow: hidden; }
+  .rv-scrub .fl { position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: 0; background: color-mix(in srgb, var(--md-sys-color-inverse-on-surface) 30%, transparent); }
+  .rv-scrub .tx { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; font-variant-numeric: tabular-nums; }
+}

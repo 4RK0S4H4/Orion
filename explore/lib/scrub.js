@@ -1,10 +1,11 @@
-/* Animation scrubber for review labs. Include before the page's own scripts: <script src="lib/scrub.js"></script>.
+/* Animation scrubber for review labs and the motion page. Include before the page's own scripts: <script src="lib/scrub.js"></script>.
    One slim bar: [Freeze] and a slider. Tap Freeze, open or close the menu / dialog / sheet (it stops at 0%), drag or tap the slider to any moment
    and screenshot it. Tap Freeze again to let the animation run on. Works on animations made with element.animate and on CSS transitions (all Orion motion).
    The bar does its own hit-testing at window level, because an open menu closes on any outside tap and a modal dialog makes the rest of the page
    inert; and it only captures animations started by a real tap on the page. */
 (function () {
   'use strict';
+  var SRC = (document.currentScript && document.currentScript.src) || '', BASE = SRC.replace(/scrub\.js.*$/, ''), VER = (SRC.match(/\?v=[\w.-]+/) || [''])[0];
   var on = false, list = [], native = Element.prototype.animate, lastTap = -1e9, batchAt = -1e9, frac = 0, dragging = false;
   var bar, toggle, track, fill, label;
   var now = function () { return performance.now(); };
@@ -42,11 +43,9 @@
   document.addEventListener('transitionrun', grab, true);
   function build() {
     bar = document.createElement('div'); bar.className = 'rv rv-scrub';
-    bar.innerHTML = '<style>.rv-scrub{position:fixed;left:50%;bottom:calc(var(--rv-scrub-bottom,10px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:2147483000;width:min(96vw,520px);box-sizing:border-box;padding:6px;border-radius:14px;background:#0b57d0;color:#fff;font:600 13px/16px Inter,system-ui,sans-serif;display:flex;gap:6px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}' +
-      '.rv-scrub button{flex:0 0 auto;height:40px;border:0;border-radius:10px;background:#fff;color:#0b57d0;font:inherit;padding:0 14px}.rv-scrub button.on{background:#a8c7fa}' +
-      '.rv-scrub .tr{position:relative;flex:1;height:40px;border-radius:10px;background:rgba(255,255,255,.25);overflow:hidden}.rv-scrub .fl{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.4)}' +
-      '.rv-scrub .tx{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:500;pointer-events:none}</style>' +
-      '<button type="button">Freeze</button><div class="tr"><div class="fl"></div><div class="tx"></div></div>';
+    /* styled by review.css (an Orion bar on Orion tokens, decision 0048); pages without the review kit get the stylesheet here */
+    if (!document.getElementById('rv-css')) { var l = document.createElement('link'); l.id = 'rv-css'; l.rel = 'stylesheet'; l.href = BASE + 'review.css' + VER; document.head.appendChild(l); }
+    bar.innerHTML = '<button type="button">Freeze</button><div class="tr"><div class="fl"></div><div class="tx"></div></div>';
     document.body.appendChild(bar);
     var nav = document.querySelector('.s4-nav-bar'); if (nav) bar.style.setProperty('--rv-scrub-bottom', (nav.getBoundingClientRect().height + 8) + 'px');   /* sit above a bottom nav, never on it */
     toggle = bar.querySelector('button'); track = bar.querySelector('.tr'); fill = bar.querySelector('.fl'); label = bar.querySelector('.tx'); show();

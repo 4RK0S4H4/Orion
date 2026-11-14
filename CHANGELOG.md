@@ -20,6 +20,8 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - `S4.theme({ surfaces: 'neutral' | 'tinted' })`; rail group titles and footer; `data-autofocus`; `data-placement="center"` on panels; glass fill tokens.
 
 ### Changed
+- Review labs are built on the live Orion bundle (decision 0048); the scrubber also freezes CSS transitions.
+- Mail templates: Reply and Forward open a composer under the message; Compose is a floating panel (decision 0047).
 - Every component's transitions use a motion pattern token; the nav bar pill, tab indicator and switch handle move as Ink, the FAB morphs like buttons. `S4.transition.slide` now pops (nothing slides from an edge).
 - Base grays are "Crisper": a white page in light mode, a deeper black in dark mode, clearer surface steps (decision 0045).
 - Orion is documented as any accent on a neutral base; monochrome is the shipped accent, not a rule. Named accents: `S4.theme({ seed: 'blue' })`. New gate `npm run check:accent`.

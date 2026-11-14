@@ -98,7 +98,7 @@ function walk(dir, out = []) {
   return out;
 }
 /* explore/ holds old review labs (history, not the system); the lab kit that new labs share is checked */
-const KIT = ['explore/lib/quiz.css', 'explore/lib/quiz.js', 'explore/lib/scrub.js'].filter((f) => existsSync(join(root, f)));
+const KIT = ['explore/lib/review.css', 'explore/lib/review.js', 'explore/lib/scrub.js', 'explore/lib/phone-review.js'].filter((f) => existsSync(join(root, f)));
 const files = ['index.html'].concat(walk('components'), walk('demo'), walk('templates'), KIT)
   .filter((f) => !GENERATED.test(f) && !ENGINE.includes(f) && f !== 'components/motion/motion.css');
 let n = 0;
