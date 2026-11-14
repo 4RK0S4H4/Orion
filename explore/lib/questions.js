@@ -255,4 +255,18 @@ window.S4_REVIEW_DEMOS = [
       { id: 'controls', label: 'Empty checkboxes and radios', options: [{ v: 'Yes', label: 'Keep it' }, { v: 'No', label: 'Too heavy; see notes' }] }
     ]
   }
+  ,
+  {
+    id: 'ideas', title: 'What To Build Next', href: 'explore/ideas.html',
+    questions: [
+      { id: 'palette', label: 'Command palette', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'panes', label: 'Resizable panes', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'states', label: 'Designed states (empty, loading, error, offline)', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'forms', label: 'Forms that behave', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'rewards', label: 'Small rewards', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'direct', label: 'Direct manipulation (reorder, swipe, multi-select)', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'charts', label: 'Charts', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Not For Orion' }] },
+      { id: 'templates', label: 'Next app template', options: [{ v: 'A', label: 'Editor' }, { v: 'B', label: 'Calendar' }, { v: 'C', label: 'Kanban Board' }, { v: 'D', label: 'Media Gallery' }, { v: 'E', label: 'Checkout' }, { v: 'F', label: 'Onboarding' }, { v: 'All', label: 'All Six' }, { v: 'None', label: 'None For Now' }] }
+    ]
+  }
 ];

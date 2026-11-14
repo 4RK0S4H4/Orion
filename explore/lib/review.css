@@ -23,8 +23,8 @@
   @media (hover: hover) { .rv-card:hover { background: var(--md-sys-color-surface-container); } }
   .rv-card:focus-visible { outline: var(--s4-focus-ring-width, 3px) solid var(--md-sys-color-primary); outline-offset: 2px; }
   .rv-card[aria-checked="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-  .rv-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s4-space-1) var(--s4-space-3); align-items: start; }
-  .rv-head > .s4-radio { pointer-events: none; min-block-size: 0; padding: 0; margin-block-start: var(--s4-space-1); }
+  .rv-head { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--s4-space-1) var(--s4-space-3); align-items: center; }
+  .rv-head > .s4-radio { pointer-events: none; min-block-size: 0; padding: 0; }
   .rv-titles { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
   .rv-titles b { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); }
   .rv-titles small { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); color: var(--md-sys-color-on-surface-variant); }

@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: What To Build Next</title>
+<link rel="stylesheet" href="../components/orion.css?v=c905e31">
+<style>
+  @layer s4.components {
+    .iq-bar { display: flex; align-items: center; padding: var(--s4-space-3) var(--s4-space-4); background: var(--md-sys-color-surface-container); }
+    .iq-bar h1 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+    .iq-page { max-inline-size: 64rem; margin: 0 auto; padding: var(--s4-space-6) var(--s4-space-4) var(--s4-space-16); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+    .iq-intro { margin: 0; max-inline-size: 70ch; color: var(--md-sys-color-on-surface-variant); }
+    .iq-sec > h2 { margin: 0 0 var(--s4-space-1); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); }
+    .iq-sec > p { margin: 0 0 var(--s4-space-4); max-inline-size: 70ch; color: var(--md-sys-color-on-surface-variant); }
+    .iq-demo { margin: 0 0 var(--s4-space-4); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); display: flex; flex-direction: column; gap: var(--s4-space-3); min-inline-size: 0; }
+    .iq-demo-label { margin: 0; font-size: var(--md-sys-typescale-label-medium-size); color: var(--md-sys-color-on-surface-variant); }
+    .iq-cards { --rv-min: 14rem; }
+
+    /* 1. command palette */
+    .iq-palette { align-self: center; inline-size: min(100%, 28rem); padding: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; flex-direction: column; gap: var(--s4-space-1); }
+    .iq-palette .s4-list { padding: 0; }
+    .iq-key { margin-inline-start: auto; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); font-variant-numeric: tabular-nums; }
+    /* 2. panes */
+    .iq-split { display: grid; grid-template-columns: var(--iq-w, 40%) var(--s4-space-3) minmax(0, 1fr); min-block-size: 9rem; }
+    .iq-split > section { border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); padding: var(--s4-space-3); min-inline-size: 0; overflow: hidden; }
+    .iq-grip { cursor: col-resize; touch-action: none; display: grid; place-items: center; border: 0; padding: 0; background: none; }
+    .iq-grip::before { content: ""; inline-size: var(--s4-space-1); block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); transition: background-color var(--s4-motion-state); }
+    .iq-grip:hover::before, .iq-grip:focus-visible::before { background: var(--md-sys-color-primary); }
+    /* 3. states */
+    .iq-states { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: var(--s4-space-3); }
+    .iq-states > div { border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); padding: var(--s4-space-3); display: flex; flex-direction: column; gap: var(--s4-space-2); min-inline-size: 0; }
+    .iq-states .s4-empty { padding: var(--s4-space-2) 0; }
+    .iq-saved { display: inline-flex; align-items: center; gap: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); opacity: 0; transition: opacity var(--s4-motion-state); }
+    .iq-saved[data-on] { opacity: 1; }
+    /* 5. rewards */
+    .iq-reward { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-4); }
+    .iq-check { inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--s4-color-success-container, var(--md-sys-color-secondary-container)); color: var(--s4-color-on-success-container, var(--md-sys-color-on-secondary-container)); display: grid; place-items: center; transform: scale(0); transition: transform var(--s4-motion-ink); }
+    .iq-check svg { inline-size: 60%; block-size: 60%; }
+    .iq-check path { fill: none; stroke: currentColor; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; transition: stroke-dashoffset var(--s4-motion-ink-calm); }
+    .iq-reward[data-done] .iq-check { transform: none; }
+    .iq-reward[data-done] .iq-check path { stroke-dashoffset: 0; }
+    .iq-count { font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); font-variant-numeric: tabular-nums; }
+    /* 6. direct manipulation */
+    .iq-selbar { display: flex; align-items: center; gap: var(--s4-space-2); padding: var(--s4-space-2) var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+    .iq-selbar b { margin-inline-end: auto; font-weight: var(--md-sys-typescale-label-large-weight); }
+    .iq-handle { color: var(--md-sys-color-on-surface-variant); cursor: grab; }
+    /* 7. charts */
+    .iq-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--s4-space-3); }
+    .iq-charts > figure { margin: 0; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); padding: var(--s4-space-3); display: flex; flex-direction: column; gap: var(--s4-space-2); }
+    .iq-charts figcaption { font-size: var(--md-sys-typescale-label-large-size); color: var(--md-sys-color-on-surface-variant); }
+    .iq-charts svg { inline-size: 100%; block-size: 6rem; overflow: visible; }
+    .iq-bars rect { fill: var(--md-sys-color-surface-container-highest); }
+    .iq-bars rect[data-now] { fill: var(--md-sys-color-primary); }
+    .iq-line path { fill: none; stroke: var(--md-sys-color-primary); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+    .iq-line path[data-area] { stroke: none; fill: var(--md-sys-color-primary); opacity: 0.12; }
+    .iq-ring circle { fill: none; stroke-width: 10; stroke: var(--md-sys-color-surface-container-highest); }
+    .iq-ring circle[data-v] { stroke: var(--md-sys-color-primary); stroke-linecap: round; }
+    /* 8. templates */
+    .iq-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: var(--s4-space-2); }
+    .iq-tiles > div { border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); padding: var(--s4-space-3); display: flex; flex-direction: column; gap: var(--s4-space-1); }
+    .iq-tiles b { font-weight: var(--md-sys-typescale-label-large-weight); }
+    .iq-tiles small { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  }
+</style>
+</head>
+<body>
+<header class="iq-bar"><h1>What To Build Next</h1></header>
+<main class="iq-page">
+  <p class="iq-intro">Eight ideas for making Orion work for any app and feel good to use. Each has a small sketch of what it would be (real Orion parts, not final design). Tap an answer under each one, then copy your answers at the end. This page is also the first quiz in the new look: everything here is live Orion.</p>
+
+  <section class="iq-sec" data-q="palette">
+    <h2>1. Command Palette</h2>
+    <p>Search everything and run any action from one box, opened with a shortcut. The desktop counterpart of the nav bar.</p>
+    <div class="iq-demo">
+      <div class="iq-palette s4-glass">
+        <div class="s4-search"><span class="s4-icon" data-icon="search"></span><input class="s4-search-input" type="search" placeholder="Search Or Run A Command" aria-label="Search or run a command"></div>
+        <ul class="s4-list">
+          <li><button class="s4-list-item" type="button"><span class="s4-icon" data-icon="edit"></span><span class="s4-list-content"><span class="s4-list-headline">New Message</span></span><span class="iq-key">Ctrl N</span></button></li>
+          <li><button class="s4-list-item" type="button"><span class="s4-icon" data-icon="archive"></span><span class="s4-list-content"><span class="s4-list-headline">Archive Selected</span></span><span class="iq-key">Ctrl E</span></button></li>
+          <li><button class="s4-list-item" type="button"><span class="s4-icon" data-icon="dark-mode"></span><span class="s4-list-content"><span class="s4-list-headline">Switch To Dark Mode</span></span></button></li>
+          <li><button class="s4-list-item" type="button"><span class="s4-icon" data-icon="settings"></span><span class="s4-list-content"><span class="s4-list-headline">Go To Settings</span></span></button></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="panes">
+    <h2>2. Resizable Panes</h2>
+    <p>Drag the edge between a list and its detail to resize; double-click to collapse. The width is remembered. Try the grip.</p>
+    <div class="iq-demo">
+      <div class="iq-split" id="iq-split">
+        <section><b>Inbox</b><p class="s4-body-medium s4-on-surface-variant" style="margin:0">Maya Chen<br>Jonas Weber<br>Priya Nair</p></section>
+        <button class="iq-grip" type="button" aria-label="Resize panes" id="iq-grip"></button>
+        <section><b>Invoice for October</b><p class="s4-body-medium s4-on-surface-variant" style="margin:0">Can you send the October invoice before Friday?</p></section>
+      </div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="states">
+    <h2>3. Designed States</h2>
+    <p>Every list, table and pane gets a designed empty, loading, error and offline state, so an app never shows a blank box.</p>
+    <div class="iq-demo">
+      <div class="iq-states">
+        <div><p class="iq-demo-label">Empty</p><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="inbox"></span></span><h3 class="s4-empty-title">All Caught Up</h3><p class="s4-empty-text">New messages show up here.</p></div></div>
+        <div><p class="iq-demo-label">Loading</p><div class="s4-skeleton" style="height: var(--s4-space-10)" aria-busy="true"></div><div class="s4-skeleton" style="height: var(--s4-space-10)"></div><div class="s4-skeleton" style="height: var(--s4-space-10)"></div></div>
+        <div><p class="iq-demo-label">Error</p><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="warning"></span></span><h3 class="s4-empty-title">Couldn’t Load</h3><p class="s4-empty-text">Check your connection and try again.</p><button class="s4-button" data-variant="tonal" data-size="s" type="button">Try Again</button></div></div>
+        <div><p class="iq-demo-label">Offline</p><div class="s4-banner" role="status"><span class="s4-icon" data-icon="info"></span><p class="s4-banner-text">You’re offline. Changes are saved and sent later.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="forms">
+    <h2>4. Forms That Behave</h2>
+    <p>Errors appear when you leave a field, never while you type. Changes save by themselves with a quiet “Saved” mark. Undo instead of “Are you sure?”. Type in the field, then tap outside it.</p>
+    <div class="iq-demo">
+      <div class="s4-text-field" id="iq-email-field"><input id="iq-email" type="email" autocomplete="off" value="maya@"><label for="iq-email">Email</label><div class="s4-text-field-supporting" id="iq-email-help">We only use it for receipts.</div></div>
+      <div class="s4-row"><span class="iq-saved" id="iq-saved"><span class="s4-icon" data-icon="check"></span>Saved</span></div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="rewards">
+    <h2>5. Small Rewards</h2>
+    <p>A check that draws itself, a number that counts to its value, a row that settles after a drag. Each uses an existing motion pattern, so fun never breaks consistency.</p>
+    <div class="iq-demo">
+      <div class="iq-reward" id="iq-reward">
+        <button class="s4-button" type="button" id="iq-pay">Mark As Paid</button>
+        <span class="iq-check" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        <span class="iq-count" id="iq-count" aria-live="polite">$0.00</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="direct">
+    <h2>6. Direct Manipulation</h2>
+    <p>Drag to reorder, swipe a row for its actions on a phone, and select several rows to get a toolbar for all of them in place of the top bar.</p>
+    <div class="iq-demo">
+      <div class="iq-selbar"><b>2 Selected</b><button class="s4-icon-button" type="button" aria-label="Archive"><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" type="button" aria-label="Delete"><span class="s4-icon" data-icon="delete"></span></button><button class="s4-icon-button" type="button" aria-label="Clear selection"><span class="s4-icon" data-icon="close"></span></button></div>
+      <ul class="s4-list">
+        <li><div class="s4-list-item" aria-selected="true"><span class="s4-icon iq-handle" data-icon="menu"></span><span class="s4-list-content"><span class="s4-list-headline">Launch checklist</span></span></div></li>
+        <li><div class="s4-list-item" aria-selected="true"><span class="s4-icon iq-handle" data-icon="menu"></span><span class="s4-list-content"><span class="s4-list-headline">Budget draft</span></span></div></li>
+        <li><div class="s4-list-item"><span class="s4-icon iq-handle" data-icon="menu"></span><span class="s4-list-content"><span class="s4-list-headline">Photos from the offsite</span></span></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="charts">
+    <h2>7. Charts</h2>
+    <p>A small set of chart styles on the tokens: bars, a line and a ring. Orion has stats today but no charts.</p>
+    <div class="iq-demo">
+      <div class="iq-charts">
+        <figure><figcaption>Spending By Month</figcaption><svg class="iq-bars" viewBox="0 0 120 60" preserveAspectRatio="none" role="img" aria-label="Bar chart, six months, rising"><rect x="2" y="34" width="14" height="26" rx="4"/><rect x="22" y="26" width="14" height="34" rx="4"/><rect x="42" y="30" width="14" height="30" rx="4"/><rect x="62" y="18" width="14" height="42" rx="4"/><rect x="82" y="22" width="14" height="38" rx="4"/><rect x="102" y="6" width="14" height="54" rx="4" data-now/></svg></figure>
+        <figure><figcaption>Balance</figcaption><svg class="iq-line" viewBox="0 0 120 60" preserveAspectRatio="none" role="img" aria-label="Line chart, rising"><path data-area d="M0 46 L20 40 L40 44 L60 28 L80 32 L100 16 L120 10 L120 60 L0 60 Z"/><path d="M0 46 L20 40 L40 44 L60 28 L80 32 L100 16 L120 10"/></svg></figure>
+        <figure><figcaption>Budget Used: 62%</figcaption><svg class="iq-ring" viewBox="0 0 60 60" role="img" aria-label="Ring chart, 62 percent"><circle cx="30" cy="30" r="22"/><circle data-v cx="30" cy="30" r="22" pathLength="100" stroke-dasharray="62 100" transform="rotate(-90 30 30)"/></svg></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="iq-sec" data-q="templates">
+    <h2>8. More App Templates</h2>
+    <p>Starter apps for kinds of app Orion has no template for yet. Pick the one to build first; name others in the notes.</p>
+    <div class="iq-demo">
+      <div class="iq-tiles">
+        <div><b>A. Editor</b><small>A document with a toolbar and an outline.</small></div>
+        <div><b>B. Calendar</b><small>Month, week and day with events.</small></div>
+        <div><b>C. Kanban Board</b><small>Columns of cards you drag across.</small></div>
+        <div><b>D. Media Gallery</b><small>A grid of photos with a viewer.</small></div>
+        <div><b>E. Checkout</b><small>A multi-step form with a summary.</small></div>
+        <div><b>F. Onboarding</b><small>A few welcome steps before the app.</small></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=01aadf9"></script>
+<script src="lib/questions.js?v=bc14cc2"></script>
+<script src="lib/review.js?v=b349d69"></script>
+<script>
+/* answer cards under each sketch */
+var demo = window.S4_REVIEW_DEMOS.filter(function (d) { return d.id === 'ideas'; })[0];
+document.querySelectorAll('.iq-sec').forEach(function (sec) {
+  var q = demo.questions.filter(function (x) { return x.id === sec.dataset.q; })[0];
+  var g = document.createElement('div'); g.className = 'iq-cards rv-group'; g.setAttribute('role', 'radiogroup'); g.setAttribute('aria-label', q.label);
+  q.options.forEach(function (o) { g.appendChild(S4Review.card({ pick: q.id + ':' + o.v, letter: o.v, title: o.label, desc: o.desc || '' })); });
+  sec.appendChild(g);
+});
+S4Review.page('ideas');
+
+/* 2. the grip resizes the two panes (pointer and arrow keys) */
+(function () {
+  var split = document.getElementById('iq-split'), grip = document.getElementById('iq-grip'), w = 40;
+  function set(v) { w = Math.max(20, Math.min(70, v)); split.style.setProperty('--iq-w', w + '%'); }
+  grip.addEventListener('pointerdown', function (e) {
+    grip.setPointerCapture(e.pointerId);
+    var move = function (ev) { var r = split.getBoundingClientRect(); set((ev.clientX - r.left) / r.width * 100); };
+    var up = function () { grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); };
+    grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+  });
+  grip.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') set(w - 5); if (e.key === 'ArrowRight') set(w + 5); });
+  grip.addEventListener('dblclick', function () { set(w > 20 ? 20 : 40); });
+})();
+/* 4. validate on blur, never while typing; a quiet Saved mark */
+(function () {
+  var input = document.getElementById('iq-email'), field = document.getElementById('iq-email-field'), saved = document.getElementById('iq-saved');
+  input.addEventListener('input', function () { field.removeAttribute('data-error'); saved.removeAttribute('data-on'); });
+  input.addEventListener('blur', function () {
+    var ok = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(input.value);
+    if (ok) { field.removeAttribute('data-error'); saved.setAttribute('data-on', ''); }
+    else field.setAttribute('data-error', 'That doesn’t look like an email address.');
+  });
+})();
+/* 5. the check draws itself and the number counts to its value */
+document.getElementById('iq-pay').addEventListener('click', function () {
+  var box = document.getElementById('iq-reward'), out = document.getElementById('iq-count');
+  if (box.hasAttribute('data-done')) { box.removeAttribute('data-done'); out.textContent = '$0.00'; this.textContent = 'Mark As Paid'; return; }
+  box.setAttribute('data-done', ''); this.textContent = 'Undo';
+  var to = 212.48, t0 = performance.now(), ms = S4.motion.reduced() ? 0 : 600;
+  (function tick(now) { var k = ms ? Math.min(1, (now - t0) / ms) : 1, e = 1 - Math.pow(1 - k, 3); out.textContent = '$' + (to * e).toFixed(2); if (k < 1 && box.hasAttribute('data-done')) requestAnimationFrame(tick); })(t0);
+});
+</script>
+</body>
+</html>
