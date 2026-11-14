@@ -11,6 +11,7 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.
 
 ### Added
+- **Production suite** (`npm test`): every component page, template and the showcase in Chromium and WebKit, in CI.
 - **Motion patterns** (decision 0046): `--s4-motion-state|ink|ink-calm|morph|morph-calm|bend|reveal-content|loop`, `S4.transition.reveal|follow|scrim|enter|move`, the motion page (`components/motion/motion.html`) and the gate `npm run check:motion`.
 - **Expand in place** (decision 0047): `.s4-expand`, `data-expand`, `S4.expand`, and the inline confirm `.s4-confirm` / `data-confirm`.
 - Density: `data-density="compact|auto"` and the `--s4-density-compact-*` tokens.
@@ -34,6 +35,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- Focus rings were cut off in the accordion, in scrolling chip rows and in the desktop title bar.
 - The search bar's focus ring is no longer cut off at the top of a pane.
 - A checkbox no longer flashes a square while it unchecks.
 - Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.

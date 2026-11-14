@@ -3,24 +3,34 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-14): next session starts here
+## Now (2026-11-14, evening): waiting on the owner
 
-Everything through [0045](decisions/0045-crisper-grays-any-accent-dividers.md) is accepted and built. The owner then
-asked for the next round, **to be started in a new session**: issues **38 to 41** in
-[`issues/README.md`](issues/README.md) (open the two reference images first), plus the idea list B there.
+Issues 38 to 41 are built and published; decisions 0046 to 0048 are recorded. Nothing is half done.
 
-Order for the next session:
-1. **Issue 40, one motion philosophy** first (audit, one page, named patterns, a check). Everything built after it
-   uses the patterns. Lab only for patterns that visibly change.
-2. **Issue 38, expand in place instead of dialogs:** the placement ladder as a decision, the in-place components, then
-   the templates (start with Reply in `list-detail.html` and `desktop-app.html`, the owner's example) and the showcase.
-3. **Issue 39, Orion on every Pages page including quizzes** (reverses "review blue"; new decision; update CLAUDE.md).
-4. **Issue 41, production pass:** the Playwright suite in Chromium and WebKit in CI, fix everything, then release.
-5. Show the owner idea list B as one quiz (in the new Orion quiz UI) and build what they pick.
+**Needs the owner's look or answer:**
+1. [Motion page](https://4rk0s4h4.github.io/s4-orion/components/motion/motion.html): the ten named patterns, with
+   the scrubber (0046). Small visible changes are listed in the decision.
+2. Reply under the message: [list-detail](https://4rk0s4h4.github.io/s4-orion/templates/list-detail.html),
+   [desktop app](https://4rk0s4h4.github.io/s4-orion/templates/desktop-app.html),
+   [Expand In Place](https://4rk0s4h4.github.io/s4-orion/components/expand/expand.html) (0047). Open question in the
+   decision: should floating panels become non-modal?
+3. The new quiz look (0048) and the first quiz in it:
+   [What To Build Next](https://4rk0s4h4.github.io/s4-orion/explore/ideas.html) (idea list B). **Build what the owner
+   picks from it.**
+4. Approve the release (see Plan 4) once 1 to 3 look right.
 
-No approval needed to start 1 to 4; pause after publishing each for the owner's look.
+**Next session, without asking:** read the owner's quiz answers and build the picks, each on a motion pattern and the
+placement ladder, each with a reference page that the suite covers. Keep `npm run check` and `npm test` green.
 
-Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 0045; a computer for the desktop template.
+**How to verify WebKit:** this cloud environment cannot download WebKit (blocked by its network rules), so
+`npm test` runs Chromium here and warns. CI (`.github/workflows/check.yml`, job `pages`) runs both browsers on every
+push: read its result with the GitHub Actions tools after pushing and fix what it finds.
+
+**Handoff gap to know about:** the previous session's notes said issues 38 to 41 were written in the issues file with
+two reference images; only the titles and one image (Reply opens a dialog) were there. They were built from the
+owner's instructions for this session. If the owner had a second screenshot, ask for it.
+
+Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 0048; a computer for the desktop template.
 
 ## Plan
 
@@ -28,7 +38,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 004
 3. Still unanswered from the framework review (0041): approve 0041, release, minified bundles and per-set icons, pruning.
    (Rail auto-expand and the rail FAB are settled by 0043.)
 4. Release: CHANGELOG date, tag, re-package the skill, tell the owner to re-download it.
-5. Desktop next steps: resizable split panes, a command palette (search + shortcuts), a menu bar pattern, a real
+5. Desktop next steps (resizable panes and the command palette are in the idea quiz): a menu bar pattern, a real
    Electron or Tauri shell example wired to `s4-window`.
 6. Showcase: add the date picker, a floating side panel, status tones and a compact-density toggle.
 
@@ -43,6 +53,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 004
 
 ## Session log
 
+- 2026-11-14 (production round): one motion philosophy (0046), placement ladder and expand in place (0047), quizzes on the live bundle (0048), production suite in Chromium and WebKit in CI, idea list B quiz. Next: the owner's looks and quiz picks.
 - 2026-11-14 (handoff): owner's next round recorded as issues 38 to 41 and idea list B; nothing built. Next session: start at "Now".
 - 2026-11-14 (palette): Crisper grays, named accents and the any-accent check, list dividers, checkbox square fix (0045). Next: the plan below.
 - 2026-11-14 (answers): 0043 accepted; row hover Edges Lean built; palette contrast fixes; Palette Review published (0044). Next: owner's palette answer.

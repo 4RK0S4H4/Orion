@@ -19,7 +19,7 @@ decision and show options in a motion lab with the scrubber before building.
 
 ## Open (2026-11-14)
 
-Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Open now: 38 to 41 and the ideas below.
+Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Issues 38 to 41 were built on 2026-11-14 (decisions 0046 to 0048, see Done); they wait for the owner's look. Open: idea A, and the owner's picks from idea list B ([quiz](../../explore/ideas.html)).
 
 ### 24. ~~Banner on glass~~ (scrapped)
 Scrapped by the owner (2026-11-14): they meant snackbars, not banners. Banners stay solid content. See issue 28.
@@ -34,6 +34,7 @@ tinted states)? Does it read on a solid content surface with nothing interesting
 ![Chips](img/2026-11-14-chips-expanding-check.png)
 
 ### B. Ideas for "works for any app, intuitive and fun" (proposed 2026-11-14, owner to pick)
+Published as one quiz in the new Orion quiz UI: [`explore/ideas.html`](../../explore/ideas.html). Build what the owner picks.
 - **Command palette** (search everything and run any action, opened with mod+K): the desktop counterpart of the nav bar.
 - **Resizable and collapsible panes** for list-detail and desktop apps, with remembered widths.
 - **States as first-class patterns:** every list, table and pane has a designed empty, loading, error and offline state.
@@ -46,6 +47,10 @@ tinted states)? Does it read on a solid content surface with nothing interesting
 
 ## Done
 
+- **40.** One motion philosophy (owner, 2026-11-14: audit every transition, one page, a small fixed set of named patterns, a check): done 2026-11-14 (ten patterns, pattern tokens, every component moved, `npm run check:motion`, [motion page](../../components/motion/motion.html) with the scrubber, decision 0046).
+- **38.** Expand in place instead of dialogs ([image](img/2026-11-14-reply-opens-dialog.png): Reply opened a "New Message" dialog away from the message): done 2026-11-14 (the placement ladder, `.s4-expand` and the inline confirm, Reply and Forward open a composer under the message in both mail templates, New Note opens in place in the showcase, decision 0047). The handoff named two reference images; only this one was saved.
+- **39.** Orion on every GitHub Pages page, quizzes included: done 2026-11-14 (the review lab kit is built on the live bundle, reversing "review blue", decision 0048).
+- **41.** Production pass (polished, zero bugs, ready for production): suite built 2026-11-14 (`tests/suite.mjs`: every component page, template and the showcase in Chromium and WebKit, in CI). Found and fixed: focus rings cut off in the accordion, in scrolling chip rows and in the desktop title bar; Escape on an expand's opener; a `data-expand` clash with the rail; three reference pages missing the motion script. Not covered by a machine: how it looks on a real iPhone and a real desktop window (the owner's look).
 - **42.** Search bar's focus ring cut off at the top (owner's screenshot, 2026-11-14, not saved: it arrived without a file): done 2026-11-14 (the ring is drawn inside the bar's edge). Issue 41's test pass should look for other rings clipped by a bar or a scrolling edge.
 - **36.** List dividers overhang the rounded hover box ([image](img/2026-11-14-list-dividers-hover.png)): done 2026-11-14 (dividers sit between rows, inset, and fade beside an active row, decision 0045).
 - **37.** Checkbox flashes a square when unchecked: done 2026-11-14 (the mark keeps its mask, decision 0045).
