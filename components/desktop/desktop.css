@@ -89,7 +89,7 @@
     color: inherit;
     cursor: default;
     --s4-icon-size: var(--s4-space-4);
-    transition: background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects), color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
   }
   @media (hover: hover) {
     .s4-window-control:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent); color: var(--md-sys-color-on-surface); }

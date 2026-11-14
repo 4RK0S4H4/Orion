@@ -46,7 +46,7 @@
     background: currentColor;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: opacity var(--s4-motion-state);
   }
   @media (hover: hover) { .s4-accordion-item > summary:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); } }
   .s4-accordion-item > summary:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
@@ -54,7 +54,7 @@
   .s4-accordion-item > summary > .s4-icon {
     color: var(--md-sys-color-on-surface-variant);
     transform: perspective(calc(var(--s4-size-icon) * 2.5)) rotateX(0deg);
-    transition: transform var(--s4-motion-spring-bend-duration) var(--s4-motion-spring-bend);
+    transition: transform var(--s4-motion-bend);
   }
   .s4-accordion-item[open]:not([data-closing]) > summary > .s4-icon { transform: perspective(calc(var(--s4-size-icon) * 2.5)) rotateX(180deg); }
   .s4-accordion-body {
@@ -66,7 +66,7 @@
   }
   .s4-accordion-body { box-sizing: border-box; }
   /* without the script, the body still fades in */
-  .s4-accordion:not([data-s4accordion]) .s4-accordion-item[open] > .s4-accordion-body { animation: s4-accordion-in var(--md-sys-motion-spring-effects-duration) var(--md-sys-motion-spring-effects); }
+  .s4-accordion:not([data-s4accordion]) .s4-accordion-item[open] > .s4-accordion-body { animation: s4-accordion-in var(--s4-motion-reveal-content); }
   @keyframes s4-accordion-in { from { opacity: 0; } }
   @media (forced-colors: active) { .s4-accordion-item { border: 1px solid CanvasText; } .s4-accordion-item > summary::before { display: none; } }
 }

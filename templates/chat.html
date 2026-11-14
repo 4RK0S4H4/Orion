@@ -7,7 +7,7 @@
 <!-- Template: Chat. For messaging, support, comments and AI assistants: a thread of bubbles with a glass composer stuck above the nav bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=09ef0f9">
+<link rel="stylesheet" href="../components/orion.css?v=71c08b5">
 </head>
 <body>
 <div class="s4-app">
@@ -51,7 +51,7 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=5c6f42b"></script>
+<script src="../components/orion.js?v=30995bd"></script>
 <script>S4.theme.restore('orion-template-theme', { mode: 'system' });
 document.getElementById('composer').addEventListener('submit', function (e) {
   e.preventDefault();
@@ -60,7 +60,7 @@ document.getElementById('composer').addEventListener('submit', function (e) {
   var p = document.createElement('p'); p.textContent = text; li.appendChild(p);
   var m = document.createElement('span'); m.className = 's4-message-meta'; m.textContent = 'Now'; li.appendChild(m);
   document.getElementById('thread').appendChild(li); box.value = ''; box.dispatchEvent(new Event('input'));
-  S4.motion.animate(li, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], 'spatial', { fill: 'none' });
+  S4.transition.rise(li, { open: true });
   window.scrollTo({ top: document.body.scrollHeight });
 });
 document.getElementById('msg').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.form.requestSubmit(); } });

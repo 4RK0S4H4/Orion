@@ -29,7 +29,7 @@
     font-variant-numeric: tabular-nums;
     text-decoration: none;
     cursor: pointer;
-    transition: background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects), color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
   }
   .s4-page::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, var(--s4-size-touch-target)); height: max(100%, var(--s4-size-touch-target)); transform: translate(-50%, -50%); }
   .s4-page[aria-current] { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }

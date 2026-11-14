@@ -1,3 +1,26 @@
-/* Motion needs no stylesheet of its own since decision 0022: every transition only animates transform and opacity
-   (see motion.js). The layer is kept so the bundle order stays stable. */
-@layer s4.motion {}
+/* The motion patterns (decision 0046). Every transition in S4 Orion names one of these; nothing else may set a duration
+   or an easing (npm run check:motion rejects it). Each token is a "<duration> <easing>" pair for the transition and
+   animation shorthands: `transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state);`
+   The patterns that make a surface appear (reveal, follow, pop, rise, switch) live in motion.js as S4.transition.*.
+   Reduced motion comes with the springs underneath: everything that moves takes 0ms, fades stay. See docs/foundations/motion.md. */
+@layer s4.motion {
+  :where(:root) {
+    /* State: a control answers in place. Color, opacity and shadow only. */
+    --s4-motion-state: var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    /* Ink: a state fill moves or grows (indicator pills, handles, marks, the row lean). A subtle liquid overshoot. */
+    --s4-motion-ink: var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+    /* Ink that must land exactly (progress fills, ink leaving). */
+    --s4-motion-ink-calm: var(--s4-motion-spring-fast-spatial-calm-duration) var(--s4-motion-spring-fast-spatial-calm);
+    /* Morph: a control changes its own shape or size (press to square, a segment widening, the FAB's label). */
+    --s4-motion-morph: var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
+    /* Morph that must land exactly (the rail's edge, rows moving to a new order). */
+    --s4-motion-morph-calm: var(--s4-motion-spring-settle-duration) var(--s4-motion-spring-settle);
+    /* Bend: an icon turns into its next state (chevrons, sort arrows). */
+    --s4-motion-bend: var(--s4-motion-spring-bend-duration) var(--s4-motion-spring-bend);
+    /* Reveal: content opens in place and pushes what is below it (S4.transition.reveal sizes the box); without the
+       script, what is inside still fades in on reveal-content. */
+    --s4-motion-reveal-content: var(--md-sys-motion-spring-effects-duration) var(--md-sys-motion-spring-effects);
+    /* Loop: waiting. The only motion that repeats; the easing inside one cycle. */
+    --s4-motion-loop: var(--md-sys-motion-spring-slow-effects);
+  }
+}

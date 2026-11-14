@@ -60,7 +60,7 @@ document.getElementById('composer').addEventListener('submit', function (e) {
   var p = document.createElement('p'); p.textContent = text; li.appendChild(p);
   var m = document.createElement('span'); m.className = 's4-message-meta'; m.textContent = 'Now'; li.appendChild(m);
   document.getElementById('thread').appendChild(li); box.value = ''; box.dispatchEvent(new Event('input'));
-  S4.motion.animate(li, [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], 'spatial', { fill: 'none' });
+  S4.transition.rise(li, { open: true });
   window.scrollTo({ top: document.body.scrollHeight });
 });
 document.getElementById('msg').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.form.requestSubmit(); } });

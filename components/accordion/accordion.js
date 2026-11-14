@@ -9,25 +9,19 @@ S4.register('accordion', function (scope) {
     /* the browser's own name="…" exclusivity would snap the other item shut with no motion: the script takes it over */
     acc.querySelectorAll('.s4-accordion-item[name]').forEach(function (d) { d.dataset.name = d.getAttribute('name'); d.removeAttribute('name'); });
     function body(d) { return d.querySelector(':scope > .s4-accordion-body'); }
-    function stop(b) { b.getAnimations().forEach(function (a) { a.cancel(); }); b.style.height = ''; b.style.overflow = ''; }
     function open(d) {
       var b = body(d); if (!b) { d.open = true; return; }
-      var from = d.hasAttribute('data-closing') ? b.getBoundingClientRect().height : 0;
-      stop(b); d.removeAttribute('data-closing'); d.open = true;
-      var to = b.scrollHeight; b.style.overflow = 'hidden';
-      var a = S4.motion.animate(b, [{ height: from + 'px' }, { height: to + 'px' }], 'reveal', { fill: 'none' });
-      a.onfinish = function () { b.style.overflow = ''; };
-      if (!from) Array.prototype.forEach.call(b.children.length ? b.children : [b], function (c) {
-        S4.motion.animate(c, [{ opacity: 0, transform: 'translateY(-4px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 40 });
-      });
+      d.removeAttribute('data-closing'); d.open = true;
+      S4.transition.reveal(b, { open: true });
       S4.util.emit(d, 's4-toggle', { open: true });
     }
     function close(d) {
       var b = body(d); if (!b) { d.open = false; return; }
-      var from = b.getBoundingClientRect().height;
-      stop(b); d.setAttribute('data-closing', ''); b.style.overflow = 'hidden';
-      var a = S4.motion.animate(b, [{ height: from + 'px' }, { height: '0px' }], 'reveal', { fill: 'forwards' });
-      a.onfinish = function () { if (!d.hasAttribute('data-closing')) return; d.open = false; d.removeAttribute('data-closing'); stop(b); };
+      d.setAttribute('data-closing', '');
+      S4.transition.reveal(b, { open: false }).then(function (done) {
+        if (!done || !d.hasAttribute('data-closing')) return;
+        d.open = false; d.removeAttribute('data-closing'); S4.transition.restore(b);
+      });
       S4.util.emit(d, 's4-toggle', { open: false });
     }
     acc.addEventListener('click', function (e) {

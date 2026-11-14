@@ -58,7 +58,7 @@
     -webkit-tap-highlight-color: transparent;
     outline-offset: calc(-1 * var(--s4-focus-ring-width));
     --s4-icon-size: var(--s4-size-icon);
-    transition: color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: color var(--s4-motion-state);
   }
   @media (hover: hover) {
     .s4-tab[aria-selected="false"]:not(:disabled, [aria-disabled="true"]):hover { --_fg: var(--md-sys-color-on-surface); }
@@ -90,8 +90,7 @@
   }
   .s4-tabs-indicator[data-animate] {
     transition:
-      transform var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      inline-size var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial);
+      transform var(--s4-motion-ink), inline-size var(--s4-motion-ink);
   }
 
   /* ---------- scrollable ---------- */

@@ -14,13 +14,8 @@
     if (narrow(split)) {
       window.scrollTo({ top: 0, behavior: 'instant' });
       var pane = split.querySelector(on ? '.s4-split-pane + .s4-split-pane' : '.s4-split-pane');
-      if (pane) {
-        /* shared axis, like a view switch: in from the side you're heading, movement spatial, fade effects */
-        var d = (parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 30) * (on ? 1 : -1);
-        pane.getAnimations().forEach(function (a) { a.cancel(); });
-        S4.motion.animate(pane, [{ transform: 'translateX(' + d + 'px)' }, { transform: 'none' }], 'spatial', { fill: 'none' });
-        S4.motion.animate(pane, [{ opacity: 0 }, { opacity: 1 }], 'effects', { fill: 'none' });
-      }
+      /* a view switch: in from the side you're heading */
+      if (pane) S4.transition.enter(pane, on ? 1 : -1);
       if (!fromHistory) {
         if (on) history.pushState({ s4split: true }, '');
         else if (history.state && history.state.s4split) { history.back(); }

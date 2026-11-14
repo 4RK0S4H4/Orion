@@ -40,11 +40,11 @@
     text-decoration: none;
     --s4-icon-size: var(--_icon);
     transition:
-      border-radius var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial),
-      width var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial),
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      box-shadow var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      border-radius var(--s4-motion-morph),
+      width var(--s4-motion-morph),
+      background-color var(--s4-motion-state),
+      color var(--s4-motion-state),
+      box-shadow var(--s4-motion-state);
   }
   /* 48dp touch target in both directions, even for the 32dp and 40dp sizes */
   .s4-icon-button::after {

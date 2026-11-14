@@ -38,8 +38,6 @@
     --_icon-color: var(--md-sys-color-primary);
     --_outline: transparent;
     --_elevation: var(--md-sys-elevation-level0);
-    --_spatial: var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
-    --_effects: var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
 
     display: inline-flex;
     align-items: center;
@@ -64,9 +62,9 @@
     user-select: none;
     --s4-icon-size: var(--_icon);
     transition:
-      background-color var(--_effects),
-      color var(--_effects),
-      box-shadow var(--_effects);
+      background-color var(--s4-motion-state),
+      color var(--s4-motion-state),
+      box-shadow var(--s4-motion-state);
   }
   /* 48dp touch target */
   .s4-chip::after {

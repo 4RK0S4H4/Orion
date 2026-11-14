@@ -58,8 +58,7 @@
     text-align: start;
     text-decoration: none;
     transition:
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      background-color var(--s4-motion-state), color var(--s4-motion-state);
   }
   :is(a, button, label).s4-list-item,
   .s4-list-item[tabindex] { cursor: pointer; user-select: none; }
@@ -102,8 +101,7 @@
     transform: scale(0.985, 0.84);
     transform-origin: 50% var(--_lean, 50%);
     transition:
-      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+      opacity var(--s4-motion-state), transform var(--s4-motion-ink);
   }
   :is(a, button, label).s4-list-item:is(:hover, :focus-visible, :active)::before,
   .s4-list-item[tabindex]:is(:hover, :focus-visible, :active)::before,
@@ -195,7 +193,7 @@
     block-size: var(--s4-size-divider);
     margin: calc(var(--s4-space-1) / 2) var(--s4-space-3);
     background: var(--md-sys-color-outline-variant);
-    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: opacity var(--s4-motion-state);
   }
   .s4-list[data-dividers] > li:has(> :is(a, button, label, [tabindex], [role="option"]).s4-list-item:is(:hover, :focus-visible, :active), > .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])), > .s4-list-item :focus-visible)::before,
   .s4-list[data-dividers] > li:has(> :is(a, button, label, [tabindex], [role="option"]).s4-list-item:is(:hover, :focus-visible, :active), > .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])), > .s4-list-item :focus-visible) + li::before,

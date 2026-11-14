@@ -46,10 +46,10 @@
     vertical-align: middle;
     --s4-icon-size: var(--_icon);
     transition:
-      padding var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      box-shadow var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      padding var(--s4-motion-morph),
+      background-color var(--s4-motion-state),
+      color var(--s4-motion-state),
+      box-shadow var(--s4-motion-state);
   }
   @media (hover: hover) { .s4-fab:hover:not(:disabled) { --_elevation: var(--md-sys-elevation-level4); } }
   .s4-fab:active:not(:disabled) { --_elevation: var(--md-sys-elevation-level3); }
@@ -62,9 +62,9 @@
     max-width: var(--_label-w, 20em);   /* fab.js measures the label so the fold starts at once */
     margin-inline-start: var(--_gap);
     transition:
-      max-width var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      margin var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      max-width var(--s4-motion-morph),
+      margin var(--s4-motion-morph),
+      opacity var(--s4-motion-state);
   }
   .s4-fab[data-collapsed] { padding-inline: calc((var(--_h) - var(--_icon)) / 2); }
   .s4-fab[data-collapsed] > .s4-fab-label { max-width: 0; margin-inline-start: 0; opacity: 0; }

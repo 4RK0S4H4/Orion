@@ -20,11 +20,11 @@
   .s4-button-group:not([data-connected]) > .s4-button {
     --_give: calc(var(--_h) * 0.15);
     transition:
-      padding var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial),
-      border-radius var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial),
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      box-shadow var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      padding var(--s4-motion-morph),
+      border-radius var(--s4-motion-morph),
+      background-color var(--s4-motion-state),
+      color var(--s4-motion-state),
+      box-shadow var(--s4-motion-state);
   }
   .s4-button-group:not([data-connected]) > .s4-button:active:not(:disabled) { padding-inline: calc(var(--_pad) + var(--_give)); }
   .s4-button-group:not([data-connected]) > .s4-button:is(:has(+ .s4-button:active:not(:disabled)), .s4-button:active:not(:disabled) + *) {

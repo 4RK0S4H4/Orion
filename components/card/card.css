@@ -35,9 +35,9 @@
     font-weight: var(--md-sys-typescale-body-medium-weight);
     text-align: start;
     transition:
-      box-shadow var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      box-shadow var(--s4-motion-state),
+      background-color var(--s4-motion-state),
+      color var(--s4-motion-state);
   }
 
   /* ---------- variants ---------- */

@@ -96,7 +96,7 @@
     background: var(--_handle);
     transform: translate(-50%, -50%);
     pointer-events: none;
-    transition: width var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
+    transition: width var(--s4-motion-morph);
   }
   /* value label */
   .s4-slider-label {
@@ -120,8 +120,7 @@
     transform: translateX(-50%) scale(0.5);
     transform-origin: 50% 100%;
     transition:
-      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      transform var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
+      opacity var(--s4-motion-state), transform var(--s4-motion-ink);
   }
   .s4-slider[data-label]:has(> input:is(:active, :focus-visible)) .s4-slider-label,
   .s4-slider[data-label][data-dragging] .s4-slider-label { opacity: 1; transform: translateX(-50%) scale(1); }

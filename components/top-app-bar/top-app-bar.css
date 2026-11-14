@@ -37,7 +37,7 @@
       max(var(--s4-space-2), env(safe-area-inset-left, 0px));
     background: var(--_bg);
     color: var(--md-sys-color-on-surface);
-    transition: background-color var(--md-sys-motion-spring-effects-duration) var(--md-sys-motion-spring-effects);
+    transition: background-color var(--s4-motion-state);
   }
   .s4-top-app-bar[data-scrolled] { --_bg: var(--md-sys-color-surface-container); }
 

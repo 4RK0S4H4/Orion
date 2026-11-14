@@ -25,7 +25,7 @@
     background: var(--_bg);
     color: var(--md-sys-color-on-surface-variant);
     cursor: text;
-    transition: background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: background-color var(--s4-motion-state);
   }
   /* a leading icon button (menu, back) sits closer to the edge, like trailing ones */
   .s4-search:has(> .s4-icon-button:first-child) { padding-inline-start: var(--s4-space-2); }

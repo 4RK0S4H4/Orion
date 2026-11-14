@@ -51,7 +51,7 @@
     cursor: pointer;
     user-select: none;
     outline: none;
-    transition: color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: color var(--s4-motion-state);
   }
   .s4-nav-item[aria-current]:not([aria-current="false"]) {
     --_fg: var(--md-sys-color-on-surface);
@@ -67,7 +67,7 @@
     block-size: var(--s4-size-nav-indicator-height);
     border-radius: var(--s4-shape-nav-indicator);
     color: var(--_icon-fg);
-    transition: color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: color var(--s4-motion-state);
   }
   /* the pill (::after) and the M3 state layer (::before) both live on the indicator, as in M3 */
   .s4-nav-indicator::before,
@@ -82,7 +82,7 @@
     z-index: -1;
     background: var(--_fg);
     opacity: 0;
-    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: opacity var(--s4-motion-state);
   }
   .s4-nav-indicator::after {
     z-index: -2;
@@ -90,8 +90,7 @@
     opacity: 0;
     transform: scaleX(0.5);
     transition:
-      transform var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      opacity var(--md-sys-motion-spring-effects-duration) var(--md-sys-motion-spring-effects);
+      transform var(--s4-motion-ink), opacity var(--s4-motion-state);
   }
   .s4-nav-item[aria-current]:not([aria-current="false"]) .s4-nav-indicator::after { opacity: 1; transform: none; }
 
@@ -112,9 +111,9 @@
   }
   .s4-nav-pill[data-animate] {
     transition:
-      transform var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      inline-size var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial),
-      block-size var(--md-sys-motion-spring-spatial-duration) var(--md-sys-motion-spring-spatial);
+      transform var(--s4-motion-ink),
+      inline-size var(--s4-motion-ink),
+      block-size var(--s4-motion-ink);
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }

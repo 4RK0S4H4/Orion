@@ -27,7 +27,7 @@
     d.showModal();
     initialFocus(d).focus({ preventScroll: true });
     S4.transition.restore(d);
-    d.animate([{ opacity: 0 }, { opacity: 1 }], { duration: S4.motion.spring('effects').duration, easing: S4.motion.spring('effects').easing, pseudoElement: '::backdrop' });
+    S4.transition.scrim(d, true);
     var p = motion(d, true);
     S4.util.emit(d, 's4-open', { from: from });
     return p;
@@ -41,7 +41,7 @@
     var d = el(id); if (!d || !d.open || d._s4closing) return Promise.resolve();
     d._s4closing = true;
     var from = d._s4from;
-    d.animate([{ opacity: 1 }, { opacity: 0 }], { duration: S4.motion.spring('fast-effects').duration, easing: S4.motion.spring('fast-effects').easing, pseudoElement: '::backdrop', fill: 'forwards' });
+    S4.transition.scrim(d, false);
     var p = motion(d, false);
     return p.then(function () {
       d.close(value || '');

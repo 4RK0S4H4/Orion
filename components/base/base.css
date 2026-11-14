@@ -71,7 +71,7 @@
     background: var(--_state-color, currentColor);
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: opacity var(--s4-motion-state);
   }
   @media (hover: hover) {
     :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Motion · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .mo-rules { margin: 0; padding-inline-start: var(--s4-space-5); display: grid; gap: var(--s4-space-2); max-inline-size: 70ch; }
+  .mo-fam { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .mo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: var(--s4-space-4); }
+  .mo-card { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); min-inline-size: 0; }
+  .mo-card h3 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .mo-card > p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  .mo-card code { font-size: var(--md-sys-typescale-body-small-size); color: var(--md-sys-color-on-surface-variant); overflow-wrap: anywhere; }
+  .mo-stage { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-3); min-block-size: var(--s4-space-16); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); }
+  .mo-stage.col { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+  .mo-views { position: relative; min-block-size: var(--s4-space-12); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Motion</h1></header>
+<main class="ex-main">
+  <p>Every transition in S4 Orion is one of ten named patterns. Nothing else is allowed: <code>npm run check</code> rejects it. Use the blue bar at the bottom to freeze any of them and drag through it.</p>
+
+  <section class="ex-sec">
+    <h2>The Philosophy</h2>
+    <ol class="mo-rules">
+      <li><b>Motion says what happened, nothing more.</b> A thing moves because it changed, arrived, left or went somewhere.</li>
+      <li><b>Subtle but liquid.</b> Quick, never instant. The interesting moments belong to ink: the solid fills that show state.</li>
+      <li><b>Glass moves plainly.</b> A few pixels and a fade. It never stretches, scales or slides in from a screen edge.</li>
+      <li><b>What you touched answers where you touched it.</b> Controls change in place; new content opens where you asked for it.</li>
+      <li><b>One pattern per situation, the same everywhere.</b> A new component picks a pattern; it never invents one.</li>
+      <li><b>Sturdy.</b> One transition per element. Nothing cloned. Under reduced motion only fades remain.</li>
+    </ol>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In Place</h2>
+    <p>A control changed.</p>
+    <div class="mo-grid">
+      <div class="mo-card"><h3>State</h3><p>A control answers: hover, press, focus, selected. Color only, 90ms.</p>
+        <div class="mo-stage"><button class="s4-chip" type="button" aria-pressed="false">Unread</button><button class="s4-chip" type="button" aria-pressed="true">Flagged</button><button class="s4-button" data-variant="tonal" type="button">Hover Me</button></div>
+        <code>--s4-motion-state</code></div>
+      <div class="mo-card"><h3>Ink</h3><p>A state fill moves or grows, with a subtle liquid overshoot.</p>
+        <div class="mo-stage"><label class="s4-switch"><input type="checkbox" role="switch"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span>Autopay</label>
+          <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Remind Me</label>
+          <label class="s4-radio"><input type="radio" name="mo-r" checked><span class="s4-radio-ring"></span>Card</label><label class="s4-radio"><input type="radio" name="mo-r"><span class="s4-radio-ring"></span>Bank</label></div>
+        <div class="s4-tabs" role="tablist" aria-label="Ink Demo"><button class="s4-tab" type="button" role="tab" aria-selected="true">Due</button><button class="s4-tab" type="button" role="tab" aria-selected="false">Paid</button><button class="s4-tab" type="button" role="tab" aria-selected="false">Overdue</button></div>
+        <code>--s4-motion-ink · --s4-motion-ink-calm</code></div>
+      <div class="mo-card"><h3>Morph</h3><p>A control changes its own shape or size. Press and hold a button; toggle the FAB.</p>
+        <div class="mo-stage"><button class="s4-button" type="button">Press Me</button>
+          <div class="s4-button-group" data-connected aria-label="View"><button class="s4-button" data-variant="tonal" type="button" aria-pressed="true">Day</button><button class="s4-button" data-variant="tonal" type="button" aria-pressed="false">Week</button><button class="s4-button" data-variant="tonal" type="button" aria-pressed="false">Month</button></div>
+          <button class="s4-fab" type="button" id="mo-fab"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button></div>
+        <code>--s4-motion-morph · --s4-motion-morph-calm</code></div>
+      <div class="mo-card"><h3>Bend</h3><p>An icon turns into its next state.</p>
+        <div class="mo-stage col"><div class="s4-accordion"><details class="s4-accordion-item"><summary>Open Me<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">The chevron bends over like a page turned backward.</div></details></div></div>
+        <code>--s4-motion-bend</code></div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Appear</h2>
+    <p>Something new showed up. Try them in this order: it is also the order to reach for them.</p>
+    <div class="mo-grid">
+      <div class="mo-card"><h3>Reveal</h3><p>Content opens in the page and pushes what is below. What is inside follows.</p>
+        <div class="mo-stage col" style="--s4-expand-gap: var(--s4-space-3)"><div class="s4-row"><button class="s4-button" type="button" data-expand="mo-reply">Reply</button></div>
+          <div class="s4-expand" id="mo-reply" data-variant="inset" hidden><div class="s4-expand-body"><div class="s4-text-field"><textarea id="mo-reply-t" rows="2"></textarea><label for="mo-reply-t">Reply</label></div><div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="">Cancel</button><button class="s4-button" type="button" data-expand-close="send">Send</button></div></div></div>
+          <p class="s4-body-medium s4-on-surface-variant" style="margin:0">This line is pushed down.</p></div>
+        <code>S4.transition.reveal(el, { open })</code></div>
+      <div class="mo-card"><h3>Follow</h3><p>Anchored glass fades in where it sits; its items follow one after another.</p>
+        <div class="mo-stage"><button class="s4-button" data-variant="tonal" data-menu="mo-menu" type="button">Sort By<span class="s4-icon" data-icon="chevron-down"></span></button></div>
+        <code>S4.transition.follow(menu, { open })</code></div>
+      <div class="mo-card"><h3>Pop</h3><p>Floating glass that takes over rises 16px and fades in. The page dims with it.</p>
+        <div class="mo-stage"><button class="s4-button" data-variant="tonal" data-dialog="mo-dialog" type="button">Open Dialog</button></div>
+        <code>S4.transition.pop(el, { open })</code></div>
+      <div class="mo-card"><h3>Rise</h3><p>A notice rises into place. Tooltips are the small rise.</p>
+        <div class="mo-stage"><button class="s4-button" data-variant="tonal" type="button" id="mo-snack">Show Snackbar</button><button class="s4-icon-button" aria-label="Copy" data-tooltip="Copy" type="button"><span class="s4-icon" data-icon="copy"></span></button></div>
+        <code>S4.transition.rise(el, { open }) · S4.transition.tip(el, { open })</code></div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Change View</h2>
+    <div class="mo-grid">
+      <div class="mo-card"><h3>Switch</h3><p>The old view slides away and fades; the new one comes in from the side you are heading.</p>
+        <div class="mo-stage col"><div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="mo-prev">Back</button><button class="s4-button" data-variant="tonal" type="button" id="mo-next">Next</button></div>
+          <div class="mo-views"><p class="s4-title-medium" style="margin:0" data-mo-view>Step 1: Your Details</p><p class="s4-title-medium" style="margin:0" data-mo-view hidden>Step 2: Payment</p><p class="s4-title-medium" style="margin:0" data-mo-view hidden>Step 3: Review</p></div></div>
+        <code>S4.transition.sharedAxis(from, to, dir) · S4.transition.enter(view, dir)</code></div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Wait</h2>
+    <div class="mo-grid">
+      <div class="mo-card"><h3>Loop</h3><p>The only motion that repeats: one slow cycle, still under reduced motion.</p>
+        <div class="mo-stage col"><div class="s4-progress" aria-label="Syncing"></div><div class="s4-skeleton" style="height: var(--s4-space-10)" aria-busy="true"></div><div class="s4-row"><div class="s4-progress" data-type="circular" aria-label="Loading"></div></div></div>
+        <code>--s4-motion-loop</code></div>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/motion/</code> · the rules: <a href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/foundations/motion.md">docs/foundations/motion.md</a> · the check: <code>scripts/check-motion.mjs</code></p>
+</main>
+<div class="s4-menu" id="mo-menu" aria-label="Sort By">
+  <button class="s4-menu-item" type="button">Newest First</button><button class="s4-menu-item" type="button">Oldest First</button><button class="s4-menu-item" type="button">Sender</button><button class="s4-menu-item" type="button">Size</button>
+</div>
+<dialog class="s4-dialog" id="mo-dialog" aria-labelledby="mo-dialog-h">
+  <h2 class="s4-dialog-headline" id="mo-dialog-h">Discard Draft?</h2>
+  <div class="s4-dialog-content">Your reply has not been sent.</div>
+  <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Keep</button><button class="s4-button" data-close="discard" type="button">Discard</button></div>
+</dialog>
+<script src="../../explore/lib/scrub.js"></script>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+document.getElementById('mo-fab').addEventListener('click', function () { this.toggleAttribute('data-collapsed'); });
+document.getElementById('mo-snack').addEventListener('click', function () { S4.snackbar({ text: 'Message archived', action: 'Undo' }); });
+(function () {
+  var views = Array.prototype.slice.call(document.querySelectorAll('[data-mo-view]')), i = 0, state = {};
+  function go(d) { var n = Math.max(0, Math.min(views.length - 1, i + d)); if (n === i) return; S4.transition.sharedAxis(views[i], views[n], d, state); i = n; }
+  document.getElementById('mo-prev').addEventListener('click', function () { go(-1); });
+  document.getElementById('mo-next').addEventListener('click', function () { go(1); });
+})();
+document.querySelectorAll('.mo-card .s4-chip').forEach(function (c) { c.addEventListener('click', function () { c.setAttribute('aria-pressed', String(c.getAttribute('aria-pressed') !== 'true')); }); });
+</script>
+</body>
+</html>

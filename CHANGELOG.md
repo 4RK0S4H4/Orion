@@ -11,6 +11,8 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.
 
 ### Added
+- **Motion patterns** (decision 0046): `--s4-motion-state|ink|ink-calm|morph|morph-calm|bend|reveal-content|loop`, `S4.transition.reveal|follow|scrim|enter|move`, the motion page (`components/motion/motion.html`) and the gate `npm run check:motion`.
+- **Expand in place** (decision 0047): `.s4-expand`, `data-expand`, `S4.expand`, and the inline confirm `.s4-confirm` / `data-confirm`.
 - Density: `data-density="compact|auto"` and the `--s4-density-compact-*` tokens.
 - Desktop: `data-window` on `.s4-app`, `.s4-titlebar`, `.s4-window-controls`, `.s4-kbd`, `data-shortcut`, `data-context-menu`, `S4.desktop`, the `s4-window` and `s4-context` events, `templates/desktop-app.html`.
 - Date picker for `input[type=date]` in a text field (range, min/max, disabled dates, keyboard).
@@ -18,6 +20,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - `S4.theme({ surfaces: 'neutral' | 'tinted' })`; rail group titles and footer; `data-autofocus`; `data-placement="center"` on panels; glass fill tokens.
 
 ### Changed
+- Every component's transitions use a motion pattern token; the nav bar pill, tab indicator and switch handle move as Ink, the FAB morphs like buttons. `S4.transition.slide` now pops (nothing slides from an edge).
 - Base grays are "Crisper": a white page in light mode, a deeper black in dark mode, clearer surface steps (decision 0045).
 - Orion is documented as any accent on a neutral base; monochrome is the shipped accent, not a rule. Named accents: `S4.theme({ seed: 'blue' })`. New gate `npm run check:accent`.
 - List dividers sit between rows, inset, and fade beside a hovered or selected row.

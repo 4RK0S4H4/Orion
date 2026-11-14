@@ -38,7 +38,7 @@
     scrollbar-width: none;
     background: var(--md-sys-color-surface-container-low);
     color: var(--md-sys-color-on-surface-variant);
-    transition: inline-size var(--s4-motion-spring-settle-duration) var(--s4-motion-spring-settle);
+    transition: inline-size var(--s4-motion-morph-calm);
   }
   .s4-nav-rail[data-expanded] { --_w: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
 
@@ -112,8 +112,7 @@
   }
   .s4-nav-rail-items > .s4-nav-pill[data-animate] {
     transition:
-      transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink),
-      block-size var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+      transform var(--s4-motion-ink), block-size var(--s4-motion-ink);
   }
   .s4-nav-rail-title {
     padding: var(--s4-space-4) calc((var(--_row) - var(--s4-size-icon)) / 2) var(--s4-space-1);
@@ -131,7 +130,7 @@
   .s4-nav-rail .s4-nav-label,
   .s4-nav-rail-header > .s4-fab > :not(.s4-icon),
   .s4-nav-rail-title {
-    transition: opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: opacity var(--s4-motion-state);
   }
   .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-nav-rail-header > .s4-fab > :not(.s4-icon)) { opacity: 0; }
   .s4-nav-rail:not([data-expanded]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }

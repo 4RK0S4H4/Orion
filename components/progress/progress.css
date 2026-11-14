@@ -50,14 +50,14 @@
     inset-inline-start: 0;
     width: calc(var(--_value) * 100%);
     background: var(--_indicator);
-    transition: width var(--s4-motion-spring-spatial-calm-duration) var(--s4-motion-spring-spatial-calm);
+    transition: width var(--s4-motion-ink-calm);
   }
   .s4-progress:not([data-type="circular"])[data-value]::after {
     inset-inline-end: 0;
     /* the gap only opens once there is an indicator to separate from */
     width: max(0px, calc((1 - var(--_value)) * 100% - var(--_gap) * min(1, var(--_value) * 1000)));
     background: var(--_track);
-    transition: width var(--s4-motion-spring-spatial-calm-duration) var(--s4-motion-spring-spatial-calm);
+    transition: width var(--s4-motion-ink-calm);
   }
 
   /* ---------- linear, indeterminate: two indicators sweep across; the track is drawn around them with gaps ---------- */
@@ -84,9 +84,9 @@
   /* Decision 0042: one indicator slides through like a drop: the front edge runs ahead to 55%, then the back edge
      catches up while the front reaches the end. Line 2 rests off the start. */
   @keyframes s4-progress-linear {
-    0% { --_h1: 0%; --_t1: 0%; --_h2: calc(var(--_gap) * -2); --_t2: calc(var(--_gap) * -2); animation-timing-function: var(--md-sys-motion-spring-slow-effects); }
-    40% { --_h1: 55%; --_t1: 0%; animation-timing-function: var(--md-sys-motion-spring-slow-effects); }
-    78% { --_h1: 100%; --_t1: 55%; animation-timing-function: var(--md-sys-motion-spring-slow-effects); }
+    0% { --_h1: 0%; --_t1: 0%; --_h2: calc(var(--_gap) * -2); --_t2: calc(var(--_gap) * -2); animation-timing-function: var(--s4-motion-loop); }
+    40% { --_h1: 55%; --_t1: 0%; animation-timing-function: var(--s4-motion-loop); }
+    78% { --_h1: 100%; --_t1: 55%; animation-timing-function: var(--s4-motion-loop); }
     100% { --_h1: 100%; --_t1: 100%; --_h2: calc(var(--_gap) * -2); --_t2: calc(var(--_gap) * -2); }
   }
 
@@ -117,8 +117,7 @@
     stroke-linecap: round;
     stroke-width: 4;
     transition:
-      stroke-dasharray var(--s4-motion-spring-spatial-calm-duration) var(--s4-motion-spring-spatial-calm),
-      stroke-dashoffset var(--s4-motion-spring-spatial-calm-duration) var(--s4-motion-spring-spatial-calm);
+      stroke-dasharray var(--s4-motion-ink-calm), stroke-dashoffset var(--s4-motion-ink-calm);
   }
   .s4-progress-indicator { stroke: var(--_indicator); }
   .s4-progress-track { stroke: var(--_track); }
@@ -136,7 +135,7 @@
   .s4-progress[data-type="circular"]:not([data-value]) > svg { animation: s4-progress-spin var(--s4-progress-circular-spin) linear infinite; }
   .s4-progress[data-type="circular"]:not([data-value]) .s4-progress-indicator {
     transition: none;
-    animation: s4-progress-arc var(--s4-progress-circular-cycle) var(--md-sys-motion-spring-slow-effects) infinite;
+    animation: s4-progress-arc var(--s4-progress-circular-cycle) var(--s4-motion-loop) infinite;
   }
   @keyframes s4-progress-spin { from { transform: rotate(-90deg); } to { transform: rotate(270deg); } }
   /* 0042: the arc breathes as it turns: the head runs ahead to 60%, then the tail catches up to a short arc */

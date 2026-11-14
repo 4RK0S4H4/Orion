@@ -310,12 +310,7 @@
     }
     function cellFor(d) { for (var i = 0; i < cells.length; i++) if (cells[i].dataset.date === d && !cells[i].hasAttribute('data-outside')) return cells[i]; return null; }
     /* the new month fades in with a small slide from the side it came from (opacity and transform only) */
-    function slide(target, dir) {
-      if (anim) { anim.cancel(); anim = null; }
-      var dx = S4.motion.reduced() || !dir ? 0 : 8 * dir * (getComputedStyle(popup).direction === 'rtl' ? -1 : 1);
-      var a = anim = S4.motion.animate(target, [{ opacity: 0, transform: 'translateX(' + dx + 'px)' }, { opacity: 1, transform: 'none' }], 'effects');
-      a.finished.then(function () { a.cancel(); if (anim === a) anim = null; }, function () {});
-    }
+    function slide(target, dir) { S4.transition.enter(target, dir, { distance: 8 }); }
     function setView(y, m, dir) {
       var t = make(y, m, 1); if (!inYears(t)) return;
       var changed = t.getFullYear() !== view.y || t.getMonth() !== view.m;
@@ -390,7 +385,7 @@
       p.from = place();
       if (open.indexOf(p) < 0) open.push(p);
       btn.setAttribute('aria-expanded', 'true');
-      S4.transition.drop(popup, { from: p.from });
+      S4.transition.follow(popup, { from: p.from });
       var cell = cellFor(focus); (cell || title).focus({ preventScroll: true });
       S4.util.emit(popup, 's4-open', {});
     }
@@ -399,7 +394,7 @@
       if (!isOpen(p) || p.closing) return;
       p.closing = true;
       var i = open.indexOf(p); if (i >= 0) open.splice(i, 1);
-      S4.transition.drop(popup, { open: false, from: p.from }).then(function () {
+      S4.transition.follow(popup, { open: false, from: p.from }).then(function () {
         if (!p.closing) return;   /* reopened meanwhile */
         p.closing = false;
         try { popup.hidePopover(); } catch (e) {} popup.removeAttribute('data-open');

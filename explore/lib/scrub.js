@@ -1,6 +1,6 @@
 /* Animation scrubber for review labs. Include before the page's own scripts: <script src="lib/scrub.js"></script>.
    One slim bar: [Freeze] and a slider. Tap Freeze, open or close the menu / dialog / sheet (it stops at 0%), drag or tap the slider to any moment
-   and screenshot it. Tap Freeze again to let the animation run on. Works on animations made with element.animate (all Orion motion).
+   and screenshot it. Tap Freeze again to let the animation run on. Works on animations made with element.animate and on CSS transitions (all Orion motion).
    The bar does its own hit-testing at window level, because an open menu closes on any outside tap and a modal dialog makes the rest of the page
    inert; and it only captures animations started by a real tap on the page. */
 (function () {
@@ -28,6 +28,18 @@
     }
     return a;
   };
+  /* CSS transitions (state, ink, morph, bend): caught as they start, the same way */
+  function grab() {
+    if (!on || now() - lastTap > 500 || !document.getAnimations) return;
+    document.getAnimations().forEach(function (a) {
+      if (!(window.CSSTransition && a instanceof CSSTransition) || list.indexOf(a) >= 0) return;
+      var t = a.effect && a.effect.target; if (t && bar && bar.contains(t)) return;
+      if (now() - batchAt > 120) { list = []; frac = 0; }
+      batchAt = now(); list.push(a); try { a.pause(); a.currentTime = 0; } catch (e) {}
+    });
+    show();
+  }
+  document.addEventListener('transitionrun', grab, true);
   function build() {
     bar = document.createElement('div'); bar.className = 'rv rv-scrub';
     bar.innerHTML = '<style>.rv-scrub{position:fixed;left:50%;bottom:calc(var(--rv-scrub-bottom,10px) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:2147483000;width:min(96vw,520px);box-sizing:border-box;padding:6px;border-radius:14px;background:#0b57d0;color:#fff;font:600 13px/16px Inter,system-ui,sans-serif;display:flex;gap:6px;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}' +

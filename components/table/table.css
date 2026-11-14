@@ -119,15 +119,14 @@
     white-space: nowrap;
     cursor: pointer;
     --s4-icon-size: var(--s4-size-icon-small);
-    transition: color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: color var(--s4-motion-state);
   }
   /* numbers: the arrow goes before the label so the label stays aligned with the figures */
   .s4-table th.num .s4-table-sort { flex-direction: row-reverse; }
   .s4-table-sort .s4-icon {
     opacity: 0;
     transition:
-      opacity var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      transform var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
+      opacity var(--s4-motion-state), transform var(--s4-motion-bend);
   }
   @media (hover: hover) {
     .s4-table-sort:hover { color: var(--md-sys-color-on-surface); }
@@ -160,15 +159,14 @@
   .s4-table tr[tabindex]:active { --_state: var(--md-sys-state-pressed-state-layer-opacity); }
   .s4-table tr[tabindex] > :is(td, th) {
     background-color: color-mix(in srgb, currentColor calc(var(--_state) * 100%), transparent);
-    transition: background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: background-color var(--s4-motion-state);
   }
 
   /* Rows are a grid, not pills: the hover, focus and press layer is a flat band from edge to edge, clipped by the wrap's
      rounded corners (decision 0043; rounded row ends bent the divider lines and read as glass). */
   .s4-table tbody tr {
     transition:
-      background-color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects),
-      color var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+      background-color var(--s4-motion-state), color var(--s4-motion-state);
   }
 
   /* ---------- compact (< 600): rows become stacked blocks ---------- */

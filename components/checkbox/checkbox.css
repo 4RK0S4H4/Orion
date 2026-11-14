@@ -14,7 +14,6 @@
     --_state: var(--md-sys-color-on-surface);
     --_box: calc(var(--s4-space-4) + var(--s4-space-1));   /* 20dp */
     --_layer: var(--s4-size-icon-button);
-    --_effects: var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
 
     position: relative;
     display: inline-flex;
@@ -54,7 +53,7 @@
     border: 0;
     border-radius: var(--md-sys-shape-corner-full);   /* decision 0023: a filled circle, no outline */
     background: var(--_fill);
-    transition: background-color var(--_effects), border-color var(--_effects);
+    transition: background-color var(--s4-motion-state), border-color var(--s4-motion-state);
   }
   /* the mark: a thin check or a short dash that fits well inside the box (decision 0043), drawn with a mask so it takes
      --_mark. It settles in with the ink spring (transform and opacity only). */
@@ -67,7 +66,7 @@
     mask: var(--_mask, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3.2 7.4l2.5 2.5 5.1-5.6' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")) center / 100% no-repeat;
     opacity: 0;
     transform: scale(0.6);
-    transition: opacity var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+    transition: opacity var(--s4-motion-state), transform var(--s4-motion-ink);
   }
   .s4-checkbox:has(> input:checked),
   .s4-checkbox:has(> input:indeterminate) {
@@ -80,7 +79,7 @@
   .s4-checkbox:has(> input:is(:checked, :indeterminate)) .s4-checkbox-box::after { opacity: 1; transform: none; }
 
   /* ---------- hover, focus, pressed: the box itself answers (no halo around it, decision 0043) ---------- */
-  .s4-checkbox-box { transition: background-color var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink); }
+  .s4-checkbox-box { transition: background-color var(--s4-motion-state), transform var(--s4-motion-ink); }
   @media (hover: hover) {
     .s4-checkbox:hover:not(:has(> input:disabled)) .s4-checkbox-box { transform: scale(1.1); }
     .s4-checkbox:hover:not(:has(> input:disabled)):not(:has(> input:is(:checked, :indeterminate))) { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) 22%, var(--s4-color-control)); }

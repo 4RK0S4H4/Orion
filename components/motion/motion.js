@@ -1,22 +1,23 @@
-/* S4 Orion transition patterns, simplified (decision 0022; glass motion updated by 0042: glass moves plainly, ink may be
-   liquid). Each only moves and fades:
-     S4.transition.pop(surface, { open })                     dialogs, the phone sheet card: rise 16px and fade in on the spatial spring
-     S4.transition.drop(menu, { open })                       menus (0042): the glass fades in where it sits, then its items
-                                                              follow one after another, each rising 4px; closes with a quick fade
-     S4.transition.slide(el, { open, edge })                  sheets from the edge they live on
-     S4.transition.rise(el, { open })                         snackbars (0042): rise 14px into place on the rise spring and fade in
-     S4.transition.tip(el, { open })                          tooltips (0042): rise 4px fast and fade in; leave faster
-     S4.transition.sharedAxis(outView, inView, direction)     switching sibling views (tabs, destinations, steps)
-     S4.transition.fade(el, open)                             anything else
-   Rules that keep it simple and robust in every browser:
-     - only transform and opacity ever animate (never clip-path, size, color or backdrop-filter), so glass is glass from the
-       first frame and WebKit has nothing to get wrong;
-     - nothing is cloned or measured beyond the element itself;
-     - each element runs one transition at a time: a new one cancels the old and starts from where the old one was showing,
-       so tapping fast never jumps or leaves something stuck;
-     - under reduced motion the spatial springs take 0ms and only fades remain.
-   Each returns a Promise that resolves (true when it finished, false when a newer transition replaced it).
-   containerTransform() and unfold() are kept as the old names for pop() and drop(). */
+/* S4 Orion motion patterns in script (decision 0046, one motion philosophy; builds on 0022 and 0042).
+   Components never call element.animate or pick a spring themselves: they name a pattern here (npm run check:motion).
+     Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
+     Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow
+     Pop      S4.transition.pop(surface, { open })             floating glass (dialogs, panels): rises 16px and fades in
+              S4.transition.scrim(dialog, open)                the dimmed page behind a modal fades with it
+     Rise     S4.transition.rise(el, { open })                 notices (snackbars, a new message): rise 14px and fade in
+              S4.transition.tip(el, { open })                  the small rise (tooltips): 4px
+     Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
+              S4.transition.enter(view, dir)                   one view arriving on its own (a pane, a month)
+     Morph    S4.transition.move(el, dx, dy)                   a thing lands in a new place (rows after a sort)
+     State    S4.transition.fade(el, open)                     a plain fade, when nothing moves
+   Rules that keep it robust in every browser:
+     - surfaces that appear only move (transform) and fade (opacity); reveal is the one pattern that sizes a box, and
+       only the box being opened;
+     - nothing is cloned; glass is glass from the first frame;
+     - each element runs one transition at a time: a new one starts from where the old one was showing;
+     - under reduced motion everything that moves takes 0ms and only fades remain.
+   Each returns a Promise (true when it finished, false when a newer transition replaced it).
+   drop(), slide(), containerTransform() and unfold() are old names kept so existing apps keep working. */
 (function () {
   var S4 = window.S4, M = S4.motion;
 
@@ -83,23 +84,64 @@
     return moveFade(el, open, 'translateY(' + (opts && opts.from === 'bottom' ? -d : d) + 'px)', open ? ['tip', 'fast-effects'] : ['fast-effects', 'fast-effects']);
   }
 
-  /* ---------- slide from edge: sheets ---------- */
-  function slide(el, opts) {
-    opts = opts || {};
-    var edge = opts.edge || 'bottom', rtl = getComputedStyle(el).direction === 'rtl', open = opts.open !== false;
-    var off = edge === 'bottom' ? 'translateY(calc(100% + ' + (opts.gap || '0px') + '))'
-      : edge === 'end' ? 'translateX(' + (rtl ? '-' : '') + '100%)' : 'translateX(' + (rtl ? '' : '-') + '100%)';
-    var now = begin(el);
-    var a = track(el, M.animate(el, [{ transform: now ? now.transform : (open ? off : 'none') }, { transform: open ? 'none' : off }], open ? (opts.spring || 'slow-spatial') : 'spatial-calm'));
-    return settle(el, [a], !open);
-  }
-
   /* ---------- fade ---------- */
   function fade(el, open) {
     open = open !== false;
     var now = begin(el);
     var a = track(el, M.animate(el, [{ opacity: now ? now.opacity : (open ? 0 : 1) }, { opacity: open ? 1 : 0 }], open ? 'effects' : 'fast-effects'));
     return settle(el, [a], !open);
+  }
+
+  /* ---------- reveal: content opens in place (accordion, inline expand, disclosure, a chip leaving its set) ----------
+     The box grows from nothing on the calm reveal spring and pushes what is below it; its children fade in just behind,
+     each rising 4px. Closing shrinks it back; the end state is held until the caller hides it and calls restore().
+     axis 'x' closes a thing sideways out of a row (width, side padding and the gap after it). */
+  function reveal(el, opts) {
+    opts = opts || {};
+    var open = opts.open !== false, x = opts.axis === 'x';
+    var running = (el._s4anims || []).some(function (a) { return a.playState === 'running'; });
+    var r = el.getBoundingClientRect(), from = running || !open ? (x ? r.width : r.height) : 0;
+    begin(el);
+    el.style.overflow = 'hidden';
+    var anims = [], kids = Array.prototype.slice.call(el.children.length ? el.children : []);
+    if (x) {
+      var cs = getComputedStyle(el), gap = opts.gap || 0;
+      anims.push(track(el, M.animate(el, [
+        { width: from + 'px', paddingLeft: cs.paddingLeft, paddingRight: cs.paddingRight, opacity: 1, marginInlineEnd: '0px' },
+        { width: '0px', paddingLeft: '0px', paddingRight: '0px', opacity: 0, marginInlineEnd: -gap + 'px' }], 'fast-spatial-calm')));
+    } else {
+      var to = open ? el.scrollHeight : 0;
+      anims.push(track(el, M.animate(el, [{ height: from + 'px' }, { height: to + 'px' }], 'reveal')));
+      if (open && !running) kids.forEach(function (c) {
+        anims.push(track(el, M.animate(c, [{ opacity: 0, transform: 'translateY(' + (M.reduced() ? 0 : -4) + 'px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 40 })));
+      });
+    }
+    return settle(el, anims, !open).then(function (done) { if (done && open) el.style.overflow = ''; return done; });
+  }
+
+  /* ---------- scrim: the page behind a modal dims with it ---------- */
+  function scrim(dialog, open) {
+    open = open !== false;
+    var s = M.spring(open ? 'effects' : 'fast-effects');
+    return dialog.animate([{ opacity: open ? 0 : 1 }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
+  }
+
+  /* ---------- enter: one view arriving on its own (the second half of a switch) ---------- */
+  function enter(el, dir, opts) {
+    var now = begin(el);
+    var dist = M.reduced() || !dir ? 0 : ((opts && opts.distance) || parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 30);
+    var d = dist * (dir < 0 ? -1 : 1) * (getComputedStyle(el).direction === 'rtl' ? -1 : 1);
+    var t = track(el, M.animate(el, [{ transform: now ? now.transform : 'translateX(' + d + 'px)' }, { transform: 'none' }], 'spatial'));
+    var o = track(el, M.animate(el, [{ opacity: now ? now.opacity : 0 }, { opacity: 1 }], 'effects'));
+    return settle(el, [t, o], false);
+  }
+
+  /* ---------- move: a thing lands in a new place (FLIP). dx, dy: where it was, measured from where it is now ---------- */
+  function move(el, dx, dy) {
+    begin(el);
+    if (!dx && !dy) return Promise.resolve(true);
+    var a = track(el, M.animate(el, [{ transform: 'translate(' + (dx || 0) + 'px, ' + (dy || 0) + 'px)' }, { transform: 'none' }], 'settle'));
+    return settle(el, [a], false);
   }
 
   /* ---------- shared axis: switching sibling views ----------
@@ -134,13 +176,16 @@
   /* after a surface is hidden: drop any held end state so the next open starts clean */
   function restore(surface, source) {
     begin(surface);
-    surface.style.visibility = '';
+    surface.style.visibility = ''; surface.style.overflow = '';
     if (source) source.style.visibility = '';
   }
 
   S4.transition = {
-    pop: pop, drop: drop, rise: rise, tip: tip, slide: slide, fade: fade, sharedAxis: sharedAxis, restore: restore,
-    /* old names, same behavior as the new patterns */
+    reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
+    restore: restore,
+    /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */
+    drop: drop,
+    slide: function (el, opts) { return pop(el, opts); },
     containerTransform: function (surface, source, opts) { return pop(surface, opts); },
     unfold: drop
   };

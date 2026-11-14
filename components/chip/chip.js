@@ -42,15 +42,9 @@ S4.register('chip', function (scope) {
       var set = chip.parentElement, chips = set ? Array.prototype.slice.call(set.querySelectorAll(':scope > .s4-chip')) : [];
       var i = chips.indexOf(chip), next = chips[i + 1] || chips[i - 1];
       var target = next && (next.querySelector('.s4-chip-remove') || (next.matches('button, a') ? next : null));
-      var cs = getComputedStyle(chip);
       var gap = set ? parseFloat(getComputedStyle(set).columnGap) || 0 : 0;
-      chip.style.overflow = 'hidden';
-      var a = S4.motion.animate(chip, [
-        { width: chip.offsetWidth + 'px', paddingLeft: cs.paddingLeft, paddingRight: cs.paddingRight, opacity: 1, marginInlineEnd: '0px' },
-        { width: '0px', paddingLeft: '0px', paddingRight: '0px', opacity: 0, marginInlineEnd: -gap + 'px' }
-      ], 'fast-spatial-calm');
       var done = function () { chip.remove(); if (target) target.focus(); };
-      if (a && a.finished) a.finished.then(done, done); else done();
+      S4.transition.reveal(chip, { open: false, axis: 'x', gap: gap }).then(done, done);
     };
     b.addEventListener('click', function (e) { e.stopPropagation(); remove(); });
     b.addEventListener('keydown', function (e) { if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); remove(); } });

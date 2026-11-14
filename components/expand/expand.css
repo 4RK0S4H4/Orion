@@ -1,0 +1,65 @@
+/* Expand (S4 addition, decision 0047): content that opens in place, right under what you touched, and pushes the rest
+   of the page down instead of covering it. The first choice before a menu, a panel or a dialog.
+   <button class="s4-button" type="button" data-expand="reply" aria-expanded="false">Reply</button>
+   <div class="s4-expand" id="reply" hidden>
+     <div class="s4-expand-body"> … </div>
+   </div>
+   data-variant="inset": the body is a filled, rounded container (a composer, a small form).
+   .s4-expand-actions: the row of buttons at the end. Motion: the Reveal pattern (expand.js). */
+@layer s4.components {
+  .s4-expand {
+    /* the box itself has no padding and cancels its parent's gap, so it can grow from nothing without a jump;
+       the body carries the space instead */
+    --_gap: var(--s4-expand-gap, var(--s4-space-4));
+    display: block;
+    min-inline-size: 0;
+    margin: 0;
+    margin-block-start: calc(var(--_gap) * -1);
+    padding: 0;
+  }
+  .s4-stack > .s4-expand { --_gap: var(--s4-expand-gap, var(--s4-gap, var(--s4-layout-gap))); }
+  .s4-expand[hidden] { display: none; }
+  .s4-expand:focus { outline: none; }
+  .s4-expand-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-3);
+    min-inline-size: 0;
+    margin-block-start: var(--_gap);
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-expand[data-variant="inset"] > .s4-expand-body {
+    padding: var(--s4-space-4);
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-surface-container-high);
+  }
+  .s4-expand-title {
+    margin: 0;
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-expand-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--s4-space-2);
+  }
+  /* things at the start of the action row (attach, formatting) stay at the start */
+  .s4-expand-actions > [data-start] { margin-inline-end: auto; }
+
+  /* Inline confirm: the button's own row turns into the question, in place (no dialog). */
+  .s4-confirm { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-confirm[hidden] { display: none; }
+  .s4-confirm-text {
+    margin-inline-end: var(--s4-space-1);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
+}

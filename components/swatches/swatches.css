@@ -19,7 +19,6 @@
     --_c: var(--s4-swatch-color, var(--md-sys-color-primary));
     --_ring: transparent;
     --_gap: 0px;
-    --_spatial: var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
 
     display: inline-block;
     flex: none;
@@ -33,7 +32,7 @@
     box-shadow: inset 0 0 0 2px var(--_ring);
     cursor: pointer;
     vertical-align: middle;
-    transition: padding var(--_spatial), box-shadow var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
+    transition: padding var(--s4-motion-morph), box-shadow var(--s4-motion-state);
   }
   @supports (color: oklch(from red l c h)) {
     .s4-swatch {
@@ -58,7 +57,7 @@
     background: var(--md-sys-color-surface-container-highest);
     transform: translate(-50%, -50%) scale(0);
     pointer-events: none;
-    transition: transform var(--_spatial);
+    transition: transform var(--s4-motion-ink);
   }
   .s4-swatch-check::after {
     content: "";

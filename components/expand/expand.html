@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Expand In Place · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .demo-col { inline-size: min(100%, 36rem); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Expand In Place</h1></header>
+<main class="ex-main">
+  <p>New content opens right where you asked for it and pushes the page down, instead of covering it with a dialog. This is the first rung of the placement ladder: in place, then a menu, then a pane, then a floating panel, and a dialog only when the app cannot go on without an answer.</p>
+
+  <section class="ex-sec">
+    <h2>Reply Under The Message</h2>
+    <p>The composer opens under the message. The message stays readable while you write.</p>
+    <div class="ex-board col">
+      <section class="s4-pane demo-col">
+        <h3 class="s4-pane-title">Invoice for October</h3>
+        <p class="s4-body-large" style="margin:0">Can you send the October invoice before Friday?</p>
+        <div class="s4-row"><button class="s4-button" type="button" data-expand="x-reply">Reply</button><button class="s4-button" data-variant="tonal" type="button" data-expand="x-forward">Forward</button></div>
+        <div class="s4-expand" id="x-reply" data-variant="inset" data-group="x-mail" hidden>
+          <form class="s4-expand-body" id="x-reply-form">
+            <div class="s4-text-field"><textarea id="x-reply-text" rows="3" required></textarea><label for="x-reply-text">Reply To Maya Chen</label></div>
+            <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Send</button></div>
+          </form>
+        </div>
+        <div class="s4-expand" id="x-forward" data-variant="inset" data-group="x-mail" hidden>
+          <form class="s4-expand-body" id="x-forward-form">
+            <div class="s4-text-field"><input id="x-forward-to" type="email" autocomplete="off" required><label for="x-forward-to">Forward To</label></div>
+            <div class="s4-text-field"><textarea id="x-forward-text" rows="2"></textarea><label for="x-forward-text">Add A Note</label></div>
+            <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Forward</button></div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Add To A List</h2>
+    <p>A small form opens above the list it adds to.</p>
+    <div class="ex-board col">
+      <section class="s4-pane demo-col">
+        <div class="s4-row" style="justify-content:space-between"><h3 class="s4-pane-title">Payment Methods</h3><button class="s4-button" data-variant="tonal" data-size="s" type="button" data-expand="x-add"><span class="s4-icon" data-icon="add"></span>Add</button></div>
+        <div class="s4-expand" id="x-add" data-variant="inset" hidden>
+          <div class="s4-expand-body">
+            <div class="s4-text-field"><input id="x-card" type="text" inputmode="numeric" autocomplete="off"><label for="x-card">Card Number</label></div>
+            <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="button" data-expand-close="save">Save</button></div>
+          </div>
+        </div>
+        <ul class="s4-list">
+          <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Visa ending 4242</span><span class="s4-list-supporting">Default</span></span></div></li>
+          <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Checking ending 0191</span><span class="s4-list-supporting">Backup</span></span></div></li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Details Without A Container</h2>
+    <p>The default variant has no fill: it reads as part of the page.</p>
+    <div class="ex-board col">
+      <section class="s4-pane demo-col">
+        <p class="s4-body-large" style="margin:0">Your plan renews on November 28.</p>
+        <div class="s4-row"><button class="s4-button" data-variant="text" type="button" data-expand="x-more">What Is Included</button></div>
+        <div class="s4-expand" id="x-more" hidden><div class="s4-expand-body"><p class="s4-body-medium s4-on-surface-variant" style="margin:0">Unlimited projects, 50 GB of storage, and priority support. You can change or cancel the plan at any time before it renews.</p></div></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Confirm In Place</h2>
+    <p>The button turns into the question. Nothing covers the page; Escape or Keep answers no. Use a dialog only when the action cannot be undone and is serious.</p>
+    <div class="ex-board">
+      <button class="s4-button" data-variant="tonal" type="button" data-confirm="x-confirm">Remove Card</button>
+      <span class="s4-confirm" id="x-confirm" hidden><span class="s4-confirm-text">Remove this card?</span><button class="s4-button" data-variant="text" data-size="s" type="button" data-confirm-close="">Keep</button><button class="s4-button" data-color="error" data-size="s" type="button" data-confirm-close="remove">Remove</button></span>
+      <span class="s4-on-surface-variant" id="x-out" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/expand/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+['x-reply-form', 'x-forward-form'].forEach(function (id) {
+  document.getElementById(id).addEventListener('submit', function (e) {
+    e.preventDefault(); S4.expand.close(e.target.closest('.s4-expand'), 'send'); e.target.reset();
+    S4.snackbar({ text: id === 'x-reply-form' ? 'Reply sent' : 'Message forwarded', action: 'Undo' });
+  });
+});
+document.getElementById('x-add').addEventListener('s4-close', function (e) { if (e.detail.value === 'save') S4.snackbar('Card added'); });
+document.getElementById('x-confirm').addEventListener('s4-close', function (e) { document.getElementById('x-out').textContent = e.detail.value === 'remove' ? 'Card removed' : ''; });
+</script>
+</body>
+</html>

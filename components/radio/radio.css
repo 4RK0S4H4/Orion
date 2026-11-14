@@ -23,7 +23,6 @@
     --_state: var(--md-sys-color-on-surface);
     --_size: var(--s4-space-5);
     --_layer: var(--s4-size-icon-button);
-    --_effects: var(--md-sys-motion-spring-fast-effects-duration) var(--md-sys-motion-spring-fast-effects);
 
     position: relative;
     display: inline-flex;
@@ -62,7 +61,7 @@
     border: 0;
     background: var(--s4-color-control);   /* decision 0023: a filled disc, no outline; 0044: 3:1 against its surface */
     border-radius: var(--md-sys-shape-corner-full);
-    transition: background-color var(--_effects), transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+    transition: background-color var(--s4-motion-state), transform var(--s4-motion-ink);
   }
   /* the ink: a full primary disc that grows in when checked */
   .s4-radio-ring::after {
@@ -72,12 +71,12 @@
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_state);
     transform: scale(0);
-    transition: transform var(--s4-motion-spring-fast-spatial-calm-duration) var(--s4-motion-spring-fast-spatial-calm), background-color var(--_effects);
+    transition: transform var(--s4-motion-ink-calm), background-color var(--s4-motion-state);
   }
   .s4-radio:has(> input:checked) { --_state: var(--md-sys-color-primary); }
   .s4-radio:has(> input:checked) .s4-radio-ring::after {
     transform: scale(1);
-    transition: transform var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink), background-color var(--_effects);
+    transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state);
   }
 
   /* hover and press: the disc itself answers (no halo, decision 0043) */
