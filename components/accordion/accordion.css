@@ -50,6 +50,8 @@
   }
   @media (hover: hover) { .s4-accordion-item > summary:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); } }
   .s4-accordion-item > summary:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  /* the item clips its corners, so the ring is drawn inside the header's edge (never cut off) */
+  .s4-accordion-item > summary:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-accordion-item > summary:active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
   .s4-accordion-item > summary > .s4-icon {
     color: var(--md-sys-color-on-surface-variant);

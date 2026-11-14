@@ -52,7 +52,7 @@ function lintCss(css, where) {
       if (/^(transition|animation)(-duration|-timing-function|-delay)?$/.test(prop)) {
         const words = val.split(/[\s,]+/);
         if (words.some((w) => /^-?\d*\.?\d+m?s$/.test(w) && !/^0m?s$/.test(w)) || /\b(ease|ease-in|ease-out|ease-in-out|cubic-bezier|steps)\b/.test(val))
-          out.push(`${at} → ${prop}: ${raw} (use the spring tokens or S4.motion.animate)`);
+          out.push(`${at} → ${prop}: ${raw} (use a motion pattern token such as var(--s4-motion-state), or S4.transition.*)`);
       }
     }
     if (sel.startsWith('@')) continue;

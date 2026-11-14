@@ -58,6 +58,8 @@
   }
   .s4-titlebar :is(button, a, input, select, textarea, .s4-search, .s4-text-field, [data-no-drag]) { -webkit-app-region: no-drag; app-region: no-drag; }
   /* frameless macOS window: room for the traffic lights at the start */
+  /* the bar sits against the window's top edge: rings are drawn inside the control so they are never cut off */
+  .s4-titlebar :is(.s4-icon-button, .s4-button):focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-titlebar[data-controls="start"] { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
   .s4-titlebar-title {
     flex: 1 1 auto;

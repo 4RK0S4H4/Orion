@@ -11,6 +11,8 @@
 (function () {
   var S4 = window.S4;
   var FIELD = 'textarea:not([disabled]), input:not([disabled]):not([type="hidden"]):not([type="checkbox"]):not([type="radio"]), select:not([disabled])';
+  /* the navigation rail has its own data-expand="auto" (it widens by itself): not an opener */
+  var OPENER = '[data-expand]:not(.s4-nav-rail)';
   function el(x) { return typeof x === 'string' ? document.getElementById(x) : x; }
   function openers(x) { return Array.prototype.slice.call(document.querySelectorAll('[data-expand="' + x.id + '"]')); }
   function isOpen(x) { return !x.hidden && !x._s4closing; }
@@ -62,7 +64,7 @@
   }
 
   S4.register('expand', function (scope) {
-    S4.util.all(scope, '[data-expand]').forEach(function (b) {
+    S4.util.all(scope, OPENER).forEach(function (b) {
       var x = el(b.dataset.expand);
       if (x && !b.hasAttribute('aria-expanded')) b.setAttribute('aria-expanded', String(!x.hidden));
       if (x && !b.hasAttribute('aria-controls')) b.setAttribute('aria-controls', x.id);
@@ -70,7 +72,7 @@
     if (!S4.util.once(document.documentElement, 'expand')) return;
     document.addEventListener('click', function (e) {
       var t = e.target.closest ? e.target : e.target.parentElement; if (!t) return;
-      var b = t.closest('[data-expand]');
+      var b = t.closest(OPENER);
       if (b) { toggle(b.dataset.expand, { from: b }); return; }
       var c = t.closest('[data-expand-close]');
       if (c) { var x = c.closest('.s4-expand'); if (x) close(x, c.dataset.expandClose); return; }
@@ -85,6 +87,7 @@
       var box = t.closest('.s4-confirm');
       if (box) { e.preventDefault(); answer(box, ''); return; }
       var x = t.closest('.s4-expand');
+      if (!x) { var o = t.closest(OPENER); x = o && el(o.dataset.expand); }   /* Escape on the opener closes what it opened */
       if (x && isOpen(x)) { e.preventDefault(); close(x, ''); }
     });
   });

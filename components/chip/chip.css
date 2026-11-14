@@ -23,7 +23,11 @@
     overscroll-behavior-x: contain;
     contain: inline-size;   /* the row's width comes from its container, never from its chips (no page overflow) */
     scrollbar-width: none;
-    padding-block: var(--s4-space-1);   /* room for the focus ring and elevated shadows */
+    /* a scrolling row clips on every side: room for the focus ring all round, taken back with a margin so the chips
+       stay aligned with what is above and below */
+    padding: var(--s4-space-2);
+    margin: calc(var(--s4-space-2) * -1);
+    scroll-padding-inline: var(--s4-space-2);
   }
   .s4-chip-set[data-scroll]::-webkit-scrollbar { display: none; }
   .s4-chip-set[data-scroll] > .s4-chip { flex: none; }
