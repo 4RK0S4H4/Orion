@@ -3,13 +3,24 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-14): nothing waiting on a lab
+## Now (2026-11-14): next session starts here
 
-Accepted and built: the overhaul (0043), Edges Lean row hover and palette contrast (0044), Crisper base grays, any
-accent with monochrome as one choice, new list dividers, checkbox fix ([0045](decisions/0045-crisper-grays-any-accent-dividers.md)).
+Everything through [0045](decisions/0045-crisper-grays-any-accent-dividers.md) is accepted and built. The owner then
+asked for the next round, **to be started in a new session**: issues **38 to 41** in
+[`issues/README.md`](issues/README.md) (open the two reference images first), plus the idea list B there.
 
-Waiting only on the owner's device looks: iPhone for 0037, 0040 and everything in 0043 to 0045 (WebKit is untested
-here), and a computer for the desktop template and compact density.
+Order for the next session:
+1. **Issue 40, one motion philosophy** first (audit, one page, named patterns, a check). Everything built after it
+   uses the patterns. Lab only for patterns that visibly change.
+2. **Issue 38, expand in place instead of dialogs:** the placement ladder as a decision, the in-place components, then
+   the templates (start with Reply in `list-detail.html` and `desktop-app.html`, the owner's example) and the showcase.
+3. **Issue 39, Orion on every Pages page including quizzes** (reverses "review blue"; new decision; update CLAUDE.md).
+4. **Issue 41, production pass:** the Playwright suite in Chromium and WebKit in CI, fix everything, then release.
+5. Show the owner idea list B as one quiz (in the new Orion quiz UI) and build what they pick.
+
+No approval needed to start 1 to 4; pause after publishing each for the owner's look.
+
+Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 0045; a computer for the desktop template.
 
 ## Plan
 
@@ -32,6 +43,7 @@ here), and a computer for the desktop template and compact density.
 
 ## Session log
 
+- 2026-11-14 (handoff): owner's next round recorded as issues 38 to 41 and idea list B; nothing built. Next session: start at "Now".
 - 2026-11-14 (palette): Crisper grays, named accents and the any-accent check, list dividers, checkbox square fix (0045). Next: the plan below.
 - 2026-11-14 (answers): 0043 accepted; row hover Edges Lean built; palette contrast fixes; Palette Review published (0044). Next: owner's palette answer.
 - 2026-11-14 (overhaul): decision 0043 built (see Now). Overhaul Review published. Date picker README and the showcase additions are the loose ends. Next: owner's answers.

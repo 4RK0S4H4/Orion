@@ -19,7 +19,7 @@ decision and show options in a motion lab with the scrubber before building.
 
 ## Open (2026-11-14)
 
-Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Still open: idea A.
+Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Open now: 38 to 41 and the ideas below.
 
 ### 24. ~~Banner on glass~~ (scrapped)
 Scrapped by the owner (2026-11-14): they meant snackbars, not banners. Banners stay solid content. See issue 28.
@@ -32,6 +32,17 @@ a middle phase between solid and full glass. Questions to explore: does it keep 
 tinted states)? Does it read on a solid content surface with nothing interesting behind it? Is it consistent with
 "content is solid" (0004)? Try it in a lab on chips, fields, list rows and buttons before deciding anything.
 ![Chips](img/2026-11-14-chips-expanding-check.png)
+
+### B. Ideas for "works for any app, intuitive and fun" (proposed 2026-11-14, owner to pick)
+- **Command palette** (search everything and run any action, opened with mod+K): the desktop counterpart of the nav bar.
+- **Resizable and collapsible panes** for list-detail and desktop apps, with remembered widths.
+- **States as first-class patterns:** every list, table and pane has a designed empty, loading, error and offline state.
+- **Forms:** validation timing (on blur, never while typing), inline success, autosave with a quiet "Saved" mark, undo instead of "Are you sure?".
+- **Small rewards:** a check that draws itself on success, numbers that count to their value, a row that settles after a drag. Each uses an existing motion pattern, so "fun" never breaks consistency.
+- **Direct manipulation:** drag to reorder, swipe actions on rows (phone), multi-select with a contextual toolbar that replaces the top bar.
+- **Charts:** a small set of chart styles on the tokens (the system has stats but no charts).
+- **Reach:** RTL, long-text and large-font checks; print styles for articles and tables.
+- **App-type templates still missing:** editor or document app, calendar, kanban board, media gallery, checkout or multi-step form, onboarding.
 
 ## Done
 
