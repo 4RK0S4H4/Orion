@@ -7,7 +7,7 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 
 - **Actions:** [button](#button), [icon-button](#icon-button), [button-group](#button-group), [fab](#fab)
 - **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
-- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart)
+- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
 - **Content:** [prose](#prose), [message](#message)
 - **Inputs:** [form](#form), [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
 - **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [reward](#reward), [snackbar](#snackbar), [tooltip](#tooltip)
@@ -1589,6 +1589,160 @@ as "Other"); don't use a donut for more than five parts; don't use the status co
 announcing each; the Table button gives the full data.
 **Tokens:** `primary`, `--s4-chart-1…6`, `outline-variant`, `on-surface`, `on-surface-variant`, `inverse-surface`,
 label type scale. **Motion:** State (marks dim on hover).
+
+---
+
+<a id="ring"></a>
+
+## Ring
+
+S4 addition (decision 0053). One share of a whole, with what it means written in the middle: degree progress, a daily
+goal, storage used. The big sibling of circular progress and drawn the same way: a thick round-capped arc, a gap, then
+the track. Use progress for "something is working"; use a ring for "this is how far you are".
+
+```html
+<div class="s4-ring" data-value="0.36" aria-label="Degree Progress">
+  <span class="s4-ring-value">36%</span>
+  <span class="s4-ring-label">Complete</span>
+</div>
+```
+
+| Part / attribute | Values | Default |
+|---|---|---|
+| `data-value` | 0 to 1; changing it later animates the arc (Ink) | 0 |
+| `data-size` | `s` (72, value only), default (112), `l` (160) | default |
+| `data-ink="current"` | on a colored surface: the arc takes the text color, the track a quarter of it | — |
+| `.s4-ring-value` | the number, emphasized, tabular | — |
+| `.s4-ring-label` | one or two words under it | — |
+| `--s4-ring-size` | any size | 112 |
+
+`ring.js` draws the SVG and sets `role="progressbar"`, `aria-valuenow` and `aria-valuetext` (the written value).
+Always give it an `aria-label`.
+
+**Do**
+- Write the value in the middle; a ring with nothing in it is a circular progress.
+- One ring per screen region. Several values side by side are stats or a chart.
+
+**Don't**
+- Don't put a marker dot, a second arc or an icon on the ring.
+- Don't use it for something still loading (that is progress).
+
+---
+
+<a id="milestones"></a>
+
+## Milestones
+
+S4 addition (decision 0053). A road made of steps, with a marker where you are: courses toward a degree, chapters of a
+book, payments on a loan. One pill per step, 4dp apart; done steps are filled, the current one is filled as far as you
+are and carries the marker (an upright pill, the M3 Expressive slider handle). A stepper says which page of a task you
+are on; milestones say how far along a long road you are.
+
+```html
+<div class="s4-row" style="justify-content:space-between"><span class="s4-label-large">Road To Graduation</span><span class="s4-body-small">Goal Jun 30</span></div>
+<ol class="s4-milestones" aria-label="8 courses, 3 done">
+  <li data-state="done" data-label="Composition"></li>
+  <li data-state="current" data-value="0.45" data-label="Accounting"></li>
+  <li data-label="Statistics"></li>
+</ol>
+```
+
+| Part / attribute | Values | Default |
+|---|---|---|
+| `li[data-state]` | `done`, `current`, none (still ahead) | none |
+| `li[data-value]` | on the current step: how far through it, 0 to 1 | 0 |
+| `li[data-label]` | the step's name, read out and shown as a tooltip ("Accounting, you are here") | — |
+| `data-here`, `data-done` | the words added to the current and finished steps | "you are here", "done" |
+| `data-ink="current"` | on a colored surface | — |
+
+**Do**
+- Say the same thing in words next to it ("3 of 8 courses done").
+- Keep it to about 20 steps on a phone; group beyond that.
+
+**Don't**
+- Don't label every step under the road; the row above and the line below carry the words.
+- Don't make steps tappable here; the list of the same things is where you act.
+
+---
+
+<a id="timeline"></a>
+
+## Timeline
+
+S4 addition (decision 0053). When each thing happens along one shared span of time: courses in a term, phases of a
+project, bookings in a week. Every row has the same track; its bar sits where the thing starts and ends.
+
+```html
+<ol class="s4-timeline" data-now="0.34" aria-label="Course Timeline">
+  <li data-start="0" data-end="0.2" data-state="done">
+    <span class="s4-timeline-label">Composition</span><span class="s4-timeline-meta">Oct 1 → Oct 19</span>
+  </li>
+  <li data-start="0.2" data-end="0.46" data-state="current">…</li>
+  <li data-start="0.46" data-end="0.7">…</li>
+</ol>
+```
+
+| Part / attribute | Values | Default |
+|---|---|---|
+| `li[data-start]`, `li[data-end]` | 0 to 1 of the whole span | 0, 1 |
+| `li[data-state]` | `done` (quiet), `current` (accent), none (upcoming) | none |
+| `data-now` (on the list) | 0 to 1: draws the "now" marker on every track | — |
+| `.s4-timeline-label` | the name (one line, ellipsis) | — |
+| `.s4-timeline-meta` | the dates, always written out | — |
+
+Inside a surface that is not a pane, set `--_gap` on the list to that surface's color (the marker's cut-out).
+
+**Do**
+- Always write the dates; the bar is the picture, the text is the fact.
+- Order rows by start.
+
+**Don't**
+- Don't use it for one value (that is progress) or for amounts (that is a bar chart).
+
+---
+
+<a id="month"></a>
+
+## Month
+
+S4 addition (decision 0053). A month you read, with marks on its days. The date picker is for choosing a date; this is
+for seeing a plan: what is due, when you are busy, the day that must not be missed.
+
+```html
+<div class="s4-month" data-month="2026-11" data-legend aria-label="Schedule"
+     data-marks='{"2026-11-18":"dot","2026-11-26":"band","2026-11-27":"band","2026-11-30":"flag"}'
+     data-mark-labels='{"dot":"Course Due","band":"Busy","flag":"Deadline"}'></div>
+```
+
+Four marks, all filled (nothing outlined, nothing hatched):
+
+| Mark | Looks like | Means |
+|---|---|---|
+| today | the accent circle | set by itself (or `data-today`) |
+| `dot` | a small accent dot under the number | something happens that day |
+| `band` | a tonal band; days in a row join into one capsule | a stretch of time: busy, away, booked |
+| `flag` | a filled error-tone circle | the day that must not be missed |
+
+| Attribute | Values | Default |
+|---|---|---|
+| `data-month` | `YYYY-MM` | this month |
+| `data-marks` | JSON, date to mark(s), space separated | — |
+| `data-mark-labels` | JSON, mark to words (read out, and the key) | — |
+| `data-legend` | draws the key under the grid | — |
+| `data-week-start` | `0` Sunday, `1` Monday | 0 |
+| `data-min`, `data-max` | `YYYY-MM`: how far you can page | — |
+
+Tapping a day presses it and fires `s4-select` (`{ date, marks }`); show what is on that day right below the month
+(placement ladder: in place first). Paging fires `s4-month`. `S4.month.set(el, { month, marks, today })`,
+`S4.month.select(el, date)`. Arrow keys move between days.
+
+**Do**
+- Keep the same marks meaning the same thing across the app, and show the key.
+- Pair it with a list of the same things (a calendar is never the only way to read a plan).
+
+**Don't**
+- Don't add a fifth mark; if a day needs more, say it in the line that opens when it is tapped.
+- Don't use it to pick a date for a field (that is the date picker).
 
 ---
 

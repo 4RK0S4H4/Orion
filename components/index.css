@@ -35,6 +35,10 @@
 @import url("stepper/stepper.css");
 @import url("table/table.css");
 @import url("stat/stat.css");
+@import url("ring/ring.css");
+@import url("milestones/milestones.css");
+@import url("timeline/timeline.css");
+@import url("month/month.css");
 @import url("description-list/description-list.css");
 @import url("message/message.css");
 @import url("prose/prose.css");

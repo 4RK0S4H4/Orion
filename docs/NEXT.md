@@ -24,6 +24,12 @@ on the iPhone, and what do they think of the tracker mockup (it could become a r
 CLAUDE.md asks for before/after screenshots and approval first). Candidates it surfaced: a progress ring component, a
 segmented road/track component.
 
+**Added 2026-11-15 (latest):** decision 0053, "the app is the app" (adapt an app by keeping its screens and its own
+elements, drawn in Orion; make the component the app needs instead of bending the app to a component). Four
+components came out of it (ring, milestones, month, timeline; 61 now), the tracker mockup was rebuilt as that mixture,
+and the long swipe was fixed (issue 48). Waiting on the owner: the long swipe on the iPhone; is the mockup the right
+mixture (then it can become the redesign proposal for the tracker, with before/after screenshots first).
+
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
 2. Build two real apps end to end with the skill (one phone-first, one desktop) and fix what the skill gets wrong.

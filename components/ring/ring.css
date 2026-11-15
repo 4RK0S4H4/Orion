@@ -1,0 +1,100 @@
+/* Ring: one share of a whole, with what it means written in the middle. S4 addition (decision 0053).
+   <div class="s4-ring" data-value="0.36" aria-label="Degree Progress">
+     <span class="s4-ring-value">36%</span><span class="s4-ring-label">Complete</span>
+   </div>
+   The big sibling of circular progress and drawn the same way: a thick round-capped arc, a gap, then the track.
+   ring.js draws the SVG and sets role="progressbar". Sizes: data-size="s" (72, value only), default (112), "l" (160).
+   On a colored surface add data-ink="current": the arc takes the text color and the track a quarter of it.
+   Knobs: --s4-ring-size. At 100% the ring closes. */
+@layer s4.components {
+  .s4-ring {
+    --s4-ring-size: calc(var(--s4-space-16) + var(--s4-space-12));   /* 112 */
+    --_indicator: var(--md-sys-color-primary);
+    --_track: var(--md-sys-color-secondary-container);
+    --_value: 0;
+    /* a 12-unit stroke on an r=44 circle (circumference 276.5) is 4.34 units of 100 */
+    --_cap: 4.34;
+    --_gap-u: 3;
+    --_track-len: calc(100 - var(--_value) * 100 - var(--_gap-u) * 2 - var(--_cap));
+    --_full: clamp(0, calc((var(--_value) - 0.999) * 1000), 1);
+
+    position: relative;
+    display: inline-grid;
+    place-content: center;
+    justify-items: center;
+    flex: none;
+    box-sizing: border-box;
+    inline-size: var(--s4-ring-size);
+    block-size: var(--s4-ring-size);
+    padding: var(--s4-space-5);
+    text-align: center;
+  }
+  .s4-ring[data-ink="current"] {
+    --_indicator: currentColor;
+    --_track: color-mix(in srgb, currentColor 24%, transparent);
+  }
+  .s4-ring[data-size="s"] { --s4-ring-size: calc(var(--s4-space-16) + var(--s4-space-2)); padding: var(--s4-space-3); }
+  .s4-ring[data-size="l"] { --s4-ring-size: calc(var(--s4-space-16) * 2.5); padding: var(--s4-space-6); }
+  .s4-ring > svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+  }
+  .s4-ring circle {
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 12;
+    transition: stroke-dasharray var(--s4-motion-ink-calm), stroke-dashoffset var(--s4-motion-ink-calm);
+  }
+  .s4-ring .s4-ring-indicator {
+    stroke: var(--_indicator);
+    stroke-dasharray: max(0, calc(var(--_value) * 100 - var(--_cap) * (1 - var(--_full)))) 200;
+    stroke-dashoffset: calc(var(--_cap) / -2 * (1 - var(--_full)));
+    stroke-width: calc(12 * min(1, var(--_value) * 1000));   /* nothing at 0, not a dot */
+  }
+  .s4-ring .s4-ring-track {
+    stroke: var(--_track);
+    stroke-dasharray: max(0, var(--_track-len)) 200;
+    stroke-dashoffset: calc((var(--_value) * 100 + var(--_gap-u) + var(--_cap) / 2) * -1);
+    stroke-width: calc(12 * clamp(0, var(--_track-len), 1));
+  }
+  .s4-ring[data-size="s"] circle { stroke-width: 14; }
+  .s4-ring[data-size="s"] .s4-ring-indicator { stroke-width: calc(14 * min(1, var(--_value) * 1000)); }
+  .s4-ring[data-size="s"] .s4-ring-track { stroke-width: calc(14 * clamp(0, var(--_track-len), 1)); }
+  .s4-ring-value {
+    position: relative;
+    font-family: var(--md-sys-typescale-headline-small-font);
+    font-size: var(--md-sys-typescale-headline-small-size);
+    line-height: var(--md-sys-typescale-headline-small-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-small-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-headline-small-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-ring[data-size="s"] .s4-ring-value {
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-ring[data-size="l"] .s4-ring-value {
+    font-size: var(--md-sys-typescale-display-small-size);
+    line-height: var(--md-sys-typescale-display-small-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-display-small-weight);
+  }
+  .s4-ring-label {
+    position: relative;
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    opacity: 0.8;
+  }
+  .s4-ring[data-size="s"] .s4-ring-label { display: none; }
+  @media (forced-colors: active) {
+    .s4-ring-indicator { stroke: Highlight; }
+    .s4-ring-track { stroke: GrayText; }
+  }
+}

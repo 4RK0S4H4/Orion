@@ -11,6 +11,8 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.
 
 ### Added
+- **Ring, Milestones, Month, Timeline** (decision 0053, "the app is the app"): `.s4-ring` (a share of a whole, value in the middle), `.s4-milestones` (a road of steps with a marker), `.s4-month` (a month with marks: today, dot, band, flag; `S4.month`, `s4-select`), `.s4-timeline` (bars along one span). `data-ink="current"` for colored surfaces. 61 components.
+- Long swipe on a `data-swipe` row: the action color fills the row past the point of no return and letting go runs `data-swipe-primary` (it could not be reached before).
 - **Pages** (decision 0050): `.s4-subpage`, `data-page-open`, `S4.pages`: going into a thing with Back in the bar, a title, a URL and the Back gesture.
 - **Command palette** (`S4.palette`, mod+K, `data-palette`, `data-command`), **resizable panes** (`data-resizable` on `.s4-split`), **states** (`.s4-states`, `S4.states`), **forms** (`.s4-form`, `S4.form`, `data-autosave`), **small rewards** (`.s4-done-mark`, `data-count-to`), **direct manipulation** (`data-reorder`, `.s4-drag-handle`, `data-swipe`, `data-selectable`, `.s4-selection-bar`), **charts** (`.s4-chart`, `--s4-chart-1…6`) (decision 0051).
 - Templates: board, calendar, editor, media gallery, checkout, onboarding (15 in all).

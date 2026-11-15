@@ -1,0 +1,85 @@
+/* Timeline: when each thing happens along one shared span of time. S4 addition (decision 0053).
+   <ol class="s4-timeline" data-now="0.2" aria-label="Course Timeline">
+     <li data-start="0" data-end="0.25" data-state="done">
+       <span class="s4-timeline-label">Composition</span><span class="s4-timeline-meta">Nov 1 → Nov 12</span>
+     </li>
+     <li data-start="0.25" data-end="0.5" data-state="current">…</li>
+   </ol>
+   Every row has the same track; its bar sits from data-start to data-end (0–1 of the whole span). data-state: done
+   (quiet), current (accent), none (upcoming). data-now on the list draws the same upright marker as the milestones on
+   every track. timeline.js adds the track. A row may be a link or a button (wrap the label). Nothing here animates. */
+@layer s4.components {
+  .s4-timeline {
+    --_bar: var(--md-sys-color-secondary);
+    --_track: var(--md-sys-color-surface-container-highest);
+    --_now: 0;
+    display: grid;
+    gap: var(--s4-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s4-timeline > li {
+    --_start: 0;
+    --_end: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-inline-size: 0;
+  }
+  .s4-timeline > li[data-state="done"] { --_bar: var(--md-sys-color-outline); }
+  .s4-timeline > li[data-state="current"] { --_bar: var(--md-sys-color-primary); }
+  .s4-timeline-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-timeline > li[data-state="current"] .s4-timeline-label { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .s4-timeline-meta {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-tracking);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .s4-timeline-track {
+    position: relative;
+    grid-column: 1 / -1;
+    block-size: var(--s4-space-2);
+    margin-block: var(--s4-space-1);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_track);
+  }
+  .s4-timeline-track::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--_start) * 100%);
+    inline-size: max(var(--s4-space-2), calc((var(--_end) - var(--_start)) * 100%));
+    border-radius: inherit;
+    background: var(--_bar);
+  }
+  .s4-timeline[data-now] .s4-timeline-track::after {
+    content: "";
+    position: absolute;
+    inset-block: calc(var(--s4-space-1) * -1);
+    inset-inline-start: calc(var(--_now) * 100% - var(--s4-space-1) / 2);
+    inline-size: var(--s4-space-1);
+    border-radius: inherit;
+    background: var(--md-sys-color-on-surface);
+    box-shadow: 0 0 0 calc(var(--s4-space-1) / 2) var(--_gap, var(--md-sys-color-surface-container-low));
+  }
+  @media (forced-colors: active) {
+    .s4-timeline-track { border: 1px solid CanvasText; }
+    .s4-timeline-track::before { background: Highlight; }
+  }
+}

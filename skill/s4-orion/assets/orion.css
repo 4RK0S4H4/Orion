@@ -3739,6 +3739,10 @@
     padding-inline: var(--s4-space-2);
     visibility: hidden;
   }
+  /* a long swipe: the main action takes over the whole uncovered strip, in the accent, so letting go is clearly "do it" */
+  [data-swipe][data-swipe-commit] > .s4-swipe-actions { inset-inline-start: 0; justify-content: flex-end; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  [data-swipe][data-swipe-commit] > .s4-swipe-actions > :not([data-swipe-primary]) { display: none; }
+  [data-swipe][data-swipe-commit] > .s4-swipe-actions > [data-swipe-primary] { background: none; color: inherit; }
   /* uncovered only while the row is dragged or open (or the keyboard is on one of them) */
   [data-swipe]:is([data-swiping], [data-swiped]) > .s4-swipe-actions, .s4-swipe-actions:focus-within { visibility: visible; }
 
@@ -4375,6 +4379,404 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(var(--s4-stat-min, 160px), calc(50% - var(--s4-space-2))), 1fr));
     gap: var(--s4-space-6) var(--s4-space-4);
+  }
+}
+
+/* ---- ring/ring.css ---- */
+/* Ring: one share of a whole, with what it means written in the middle. S4 addition (decision 0053).
+   <div class="s4-ring" data-value="0.36" aria-label="Degree Progress">
+     <span class="s4-ring-value">36%</span><span class="s4-ring-label">Complete</span>
+   </div>
+   The big sibling of circular progress and drawn the same way: a thick round-capped arc, a gap, then the track.
+   ring.js draws the SVG and sets role="progressbar". Sizes: data-size="s" (72, value only), default (112), "l" (160).
+   On a colored surface add data-ink="current": the arc takes the text color and the track a quarter of it.
+   Knobs: --s4-ring-size. At 100% the ring closes. */
+@layer s4.components {
+  .s4-ring {
+    --s4-ring-size: calc(var(--s4-space-16) + var(--s4-space-12));   /* 112 */
+    --_indicator: var(--md-sys-color-primary);
+    --_track: var(--md-sys-color-secondary-container);
+    --_value: 0;
+    /* a 12-unit stroke on an r=44 circle (circumference 276.5) is 4.34 units of 100 */
+    --_cap: 4.34;
+    --_gap-u: 3;
+    --_track-len: calc(100 - var(--_value) * 100 - var(--_gap-u) * 2 - var(--_cap));
+    --_full: clamp(0, calc((var(--_value) - 0.999) * 1000), 1);
+
+    position: relative;
+    display: inline-grid;
+    place-content: center;
+    justify-items: center;
+    flex: none;
+    box-sizing: border-box;
+    inline-size: var(--s4-ring-size);
+    block-size: var(--s4-ring-size);
+    padding: var(--s4-space-5);
+    text-align: center;
+  }
+  .s4-ring[data-ink="current"] {
+    --_indicator: currentColor;
+    --_track: color-mix(in srgb, currentColor 24%, transparent);
+  }
+  .s4-ring[data-size="s"] { --s4-ring-size: calc(var(--s4-space-16) + var(--s4-space-2)); padding: var(--s4-space-3); }
+  .s4-ring[data-size="l"] { --s4-ring-size: calc(var(--s4-space-16) * 2.5); padding: var(--s4-space-6); }
+  .s4-ring > svg {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+  }
+  .s4-ring circle {
+    fill: none;
+    stroke-linecap: round;
+    stroke-width: 12;
+    transition: stroke-dasharray var(--s4-motion-ink-calm), stroke-dashoffset var(--s4-motion-ink-calm);
+  }
+  .s4-ring .s4-ring-indicator {
+    stroke: var(--_indicator);
+    stroke-dasharray: max(0, calc(var(--_value) * 100 - var(--_cap) * (1 - var(--_full)))) 200;
+    stroke-dashoffset: calc(var(--_cap) / -2 * (1 - var(--_full)));
+    stroke-width: calc(12 * min(1, var(--_value) * 1000));   /* nothing at 0, not a dot */
+  }
+  .s4-ring .s4-ring-track {
+    stroke: var(--_track);
+    stroke-dasharray: max(0, var(--_track-len)) 200;
+    stroke-dashoffset: calc((var(--_value) * 100 + var(--_gap-u) + var(--_cap) / 2) * -1);
+    stroke-width: calc(12 * clamp(0, var(--_track-len), 1));
+  }
+  .s4-ring[data-size="s"] circle { stroke-width: 14; }
+  .s4-ring[data-size="s"] .s4-ring-indicator { stroke-width: calc(14 * min(1, var(--_value) * 1000)); }
+  .s4-ring[data-size="s"] .s4-ring-track { stroke-width: calc(14 * clamp(0, var(--_track-len), 1)); }
+  .s4-ring-value {
+    position: relative;
+    font-family: var(--md-sys-typescale-headline-small-font);
+    font-size: var(--md-sys-typescale-headline-small-size);
+    line-height: var(--md-sys-typescale-headline-small-line-height);
+    letter-spacing: var(--md-sys-typescale-headline-small-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-headline-small-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-ring[data-size="s"] .s4-ring-value {
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-ring[data-size="l"] .s4-ring-value {
+    font-size: var(--md-sys-typescale-display-small-size);
+    line-height: var(--md-sys-typescale-display-small-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-display-small-weight);
+  }
+  .s4-ring-label {
+    position: relative;
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    opacity: 0.8;
+  }
+  .s4-ring[data-size="s"] .s4-ring-label { display: none; }
+  @media (forced-colors: active) {
+    .s4-ring-indicator { stroke: Highlight; }
+    .s4-ring-track { stroke: GrayText; }
+  }
+}
+
+/* ---- milestones/milestones.css ---- */
+/* Milestones: a road made of steps, with a marker where you are. S4 addition (decision 0053).
+   <ol class="s4-milestones" aria-label="11 courses, 3 done">
+     <li data-state="done" data-label="Composition"></li>
+     <li data-state="current" data-value="0.4" data-label="Algebra"></li>
+     <li data-label="Statistics"></li>
+   </ol>
+   One pill per step, 4dp apart (the gap of the progress bar). Done steps are filled, the current one is filled up to
+   its data-value (0–1) and carries the marker: an upright pill, the M3 Expressive slider handle, never a ring or a
+   pin. milestones.js adds the marker and turns data-label into the step's name for screen readers and tooltips.
+   A stepper says which page of a task you are on; this says how far along a long road you are.
+   On a colored surface add data-ink="current". Nothing here animates. */
+@layer s4.components {
+  .s4-milestones {
+    --_done: var(--md-sys-color-primary);
+    --_rest: var(--md-sys-color-surface-container-highest);
+    --_marker: var(--md-sys-color-on-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--s4-space-6);   /* room for the marker */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s4-milestones[data-ink="current"] {
+    --_done: currentColor;
+    --_rest: color-mix(in srgb, currentColor 24%, transparent);
+    --_marker: currentColor;
+  }
+  .s4-milestones > li {
+    --_value: 0;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    block-size: var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_rest);
+  }
+  .s4-milestones > li[data-state="done"] { background: var(--_done); }
+  /* the current step: filled part, marker, the rest */
+  .s4-milestones > li[data-state="current"] {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    flex-grow: 2;   /* where you are gets room to show how far */
+    background: none;
+  }
+  .s4-milestones > li[data-state="current"]::before,
+  .s4-milestones > li[data-state="current"]::after {
+    content: "";
+    block-size: 100%;
+    min-inline-size: 0;
+    border-radius: var(--md-sys-shape-corner-full);
+  }
+  .s4-milestones > li[data-state="current"]::before { flex: var(--_value) 1 0; background: var(--_done); }
+  .s4-milestones > li[data-state="current"]::after { flex: calc(1 - var(--_value)) 1 0; background: var(--_rest); }
+  .s4-milestones > li[data-at="start"]::before, .s4-milestones > li[data-at="end"]::after { display: none; }
+  .s4-milestones-here {
+    flex: none;
+    inline-size: var(--s4-space-1);
+    block-size: var(--s4-space-6);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_marker);
+  }
+  @media (forced-colors: active) {
+    .s4-milestones > li { border: 1px solid CanvasText; }
+    .s4-milestones > li[data-state="done"], .s4-milestones > li[data-state="current"]::before { background: Highlight; }
+    .s4-milestones-here { background: CanvasText; }
+  }
+}
+
+/* ---- timeline/timeline.css ---- */
+/* Timeline: when each thing happens along one shared span of time. S4 addition (decision 0053).
+   <ol class="s4-timeline" data-now="0.2" aria-label="Course Timeline">
+     <li data-start="0" data-end="0.25" data-state="done">
+       <span class="s4-timeline-label">Composition</span><span class="s4-timeline-meta">Nov 1 → Nov 12</span>
+     </li>
+     <li data-start="0.25" data-end="0.5" data-state="current">…</li>
+   </ol>
+   Every row has the same track; its bar sits from data-start to data-end (0–1 of the whole span). data-state: done
+   (quiet), current (accent), none (upcoming). data-now on the list draws the same upright marker as the milestones on
+   every track. timeline.js adds the track. A row may be a link or a button (wrap the label). Nothing here animates. */
+@layer s4.components {
+  .s4-timeline {
+    --_bar: var(--md-sys-color-secondary);
+    --_track: var(--md-sys-color-surface-container-highest);
+    --_now: 0;
+    display: grid;
+    gap: var(--s4-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s4-timeline > li {
+    --_start: 0;
+    --_end: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-inline-size: 0;
+  }
+  .s4-timeline > li[data-state="done"] { --_bar: var(--md-sys-color-outline); }
+  .s4-timeline > li[data-state="current"] { --_bar: var(--md-sys-color-primary); }
+  .s4-timeline-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-timeline > li[data-state="current"] .s4-timeline-label { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .s4-timeline-meta {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-tracking);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .s4-timeline-track {
+    position: relative;
+    grid-column: 1 / -1;
+    block-size: var(--s4-space-2);
+    margin-block: var(--s4-space-1);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_track);
+  }
+  .s4-timeline-track::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--_start) * 100%);
+    inline-size: max(var(--s4-space-2), calc((var(--_end) - var(--_start)) * 100%));
+    border-radius: inherit;
+    background: var(--_bar);
+  }
+  .s4-timeline[data-now] .s4-timeline-track::after {
+    content: "";
+    position: absolute;
+    inset-block: calc(var(--s4-space-1) * -1);
+    inset-inline-start: calc(var(--_now) * 100% - var(--s4-space-1) / 2);
+    inline-size: var(--s4-space-1);
+    border-radius: inherit;
+    background: var(--md-sys-color-on-surface);
+    box-shadow: 0 0 0 calc(var(--s4-space-1) / 2) var(--_gap, var(--md-sys-color-surface-container-low));
+  }
+  @media (forced-colors: active) {
+    .s4-timeline-track { border: 1px solid CanvasText; }
+    .s4-timeline-track::before { background: Highlight; }
+  }
+}
+
+/* ---- month/month.css ---- */
+/* Month: a month you read, with marks on its days. S4 addition (decision 0053).
+   <div class="s4-month" data-month="2026-11" data-legend aria-label="Schedule"
+        data-marks='{"2026-11-20":"dot","2026-11-26":"band","2026-11-27":"band","2026-12-31":"flag"}'
+        data-mark-labels='{"dot":"Course Due","band":"Busy","flag":"Deadline"}'></div>
+   month.js draws it. The date picker is for choosing a date; this is for seeing a plan. Four marks, all filled
+   (nothing outlined, nothing hatched):
+     today  the accent circle (set by itself, or data-today="2026-11-15")
+     dot    a small accent dot under the number: something happens that day
+     band   a tonal band; days in a row join into one capsule: a stretch of time (busy, away, booked)
+     flag   a filled error-tone circle: the day that must not be missed
+   Tapping a day selects it and fires s4-select ({ date, marks }); the app shows what is on that day below.
+   data-legend draws the key under the grid from data-mark-labels. data-week-start="1" starts weeks on Monday. */
+@layer s4.components {
+  .s4-month {
+    --_cell: var(--s4-space-10);   /* 40: the tap target */
+    --_disc: calc(var(--s4-space-10) - var(--s4-space-1));
+    display: grid;
+    gap: var(--s4-space-3);
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-month-head { display: flex; align-items: center; gap: var(--s4-space-1); }
+  .s4-month-title {
+    flex: 1;
+    margin: 0;
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  }
+  .s4-month-body { overflow-x: clip; }
+  .s4-month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--s4-space-1); }
+  .s4-month-weekday {
+    display: grid;
+    place-items: center;
+    block-size: var(--s4-space-8);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+  }
+  .s4-month-day {
+    --_disc-bg: transparent;
+    --_fg: inherit;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--_cell);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--_fg);
+    font: inherit;
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* the band: behind the whole cell, so days in a row join */
+  .s4-month-day::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset-block: calc((var(--_cell) - var(--_disc)) / 2);
+    inset-inline: 0;
+    background: transparent;
+  }
+  .s4-month-day[data-marks~="band"]::before { background: var(--md-sys-color-surface-container-highest); }
+  .s4-month-day[data-run="single"]::before { inset-inline: calc(50% - var(--_disc) / 2); border-radius: var(--md-sys-shape-corner-full); }
+  .s4-month-day[data-run="start"]::before { inset-inline-start: calc(50% - var(--_disc) / 2); border-start-start-radius: var(--md-sys-shape-corner-full); border-end-start-radius: var(--md-sys-shape-corner-full); }
+  .s4-month-day[data-run="end"]::before { inset-inline-end: calc(50% - var(--_disc) / 2); border-start-end-radius: var(--md-sys-shape-corner-full); border-end-end-radius: var(--md-sys-shape-corner-full); }
+  /* the disc: today, a flag, the selected day, hover */
+  .s4-month-day::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-block-start: calc((var(--_cell) - var(--_disc)) / 2);
+    inset-inline-start: calc(50% - var(--_disc) / 2);
+    inline-size: var(--_disc);
+    block-size: var(--_disc);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_disc-bg);
+    transition: background-color var(--s4-motion-state);
+  }
+  @media (hover: hover) {
+    .s4-month-day:hover { --_disc-bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent); }
+  }
+  .s4-month-day[aria-pressed="true"] { --_disc-bg: var(--md-sys-color-primary-container); --_fg: var(--md-sys-color-on-primary-container); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day[data-marks~="flag"] { --_disc-bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day[data-today] { --_disc-bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-space-1) * -1); border-radius: var(--md-sys-shape-corner-full); }
+  /* the dot */
+  .s4-month-dot {
+    position: absolute;
+    inset-block-end: calc(var(--s4-space-1) + var(--s4-space-1) / 2);
+    inset-inline-start: calc(50% - var(--s4-space-1) / 2);
+    inline-size: var(--s4-space-1);
+    block-size: var(--s4-space-1);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary);
+  }
+  .s4-month-day:is([data-today], [data-marks~="flag"], [aria-pressed="true"]) > .s4-month-dot { background: currentColor; }
+  /* the key */
+  .s4-month-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4-space-2) var(--s4-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+  }
+  .s4-month-legend > li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-month-key { flex: none; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .s4-month-key[data-mark="dot"] { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); margin-inline: var(--s4-space-1); }
+  .s4-month-key[data-mark="band"] { inline-size: var(--s4-space-5); background: var(--md-sys-color-surface-container-highest); }
+  .s4-month-key[data-mark="flag"] { background: var(--md-sys-color-error-container); }
+  @media (forced-colors: active) {
+    .s4-month-day[data-today]::after { background: Highlight; }
+    .s4-month-day[data-today] { color: HighlightText; forced-color-adjust: none; }
+    .s4-month-day[data-marks~="band"]::before, .s4-month-day[data-marks~="flag"]::after, .s4-month-day[aria-pressed="true"]::after { border: 1px solid CanvasText; background: none; }
+    .s4-month-dot { background: CanvasText; }
   }
 }
 

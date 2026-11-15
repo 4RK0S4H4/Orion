@@ -4,43 +4,37 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Degree Tracker · Orion Mockup</title>
-<!-- A quick mockup of the owner's degree tracker rebuilt in S4 Orion, to test the language on a real app (roadmap,
-     Horizon 1). Tinted color mode (decision 0052): the whole app takes the stage's color, teal for the transfer stage
-     and navy for the university stage, as the real app does. All names, dates and numbers here are invented. -->
+<!-- The owner's degree tracker, adapted to S4 Orion (decision 0053: the app is the app). Its own screens and its own
+     elements are kept: the hero with the ring and the road, the plan calendar, the course timeline, the "life
+     happened" choices. Each is drawn in Orion's language (.s4-ring, .s4-milestones, .s4-month, .s4-timeline), not
+     swapped for the nearest stock component. Tinted color mode (decision 0052): teal for the transfer stage, navy for
+     the university stage. All names, dates and numbers here are invented. -->
 <script>document.documentElement.dataset.theme = 'light';</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=395371e">
+<link rel="stylesheet" href="../components/orion.css?v=eccd2c6">
 <style>
   @layer s4.components {
-    /* the hero: where you stand, in the stage's color */
+    /* the app's own layout: tokens only */
     .dt-hero { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); --_fg-variant: var(--md-sys-color-on-primary); border-radius: var(--md-sys-shape-corner-extra-large); gap: var(--s4-space-5); }
     .dt-hero-top { display: flex; align-items: center; gap: var(--s4-space-5); }
-    .dt-ring { position: relative; flex: none; inline-size: 7rem; block-size: 7rem; }
-    .dt-ring svg { inline-size: 100%; block-size: 100%; transform: rotate(-90deg); }
-    .dt-ring circle { fill: none; stroke-width: 12; stroke-linecap: round; }
-    .dt-ring .trk { stroke: color-mix(in srgb, var(--md-sys-color-on-primary) 22%, transparent); }
-    .dt-ring .val { stroke: var(--md-sys-color-on-primary); transition: stroke-dashoffset var(--s4-motion-ink-calm); }
-    .dt-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: var(--md-sys-typescale-title-large-size); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); font-variant-numeric: tabular-nums; }
-    .dt-days { display: block; font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-emphasized-display-small-weight, 700); font-variant-numeric: tabular-nums; }
+    .dt-days { display: block; font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-display-medium-weight); font-variant-numeric: tabular-nums; }
     .dt-hero p { margin: 0; }
-    .dt-hero .s4-status { align-self: flex-start; --_bg: var(--md-sys-color-on-primary); --_fg: var(--md-sys-color-primary); background: var(--md-sys-color-on-primary); color: var(--md-sys-color-primary); }
-    /* the road: one segment per course, filled as they are finished */
-    .dt-road-head { display: flex; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-label-large-size); }
-    .dt-road { display: flex; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; }
-    .dt-road > li { flex: 1; block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: color-mix(in srgb, var(--md-sys-color-on-primary) 22%, transparent); transition: background-color var(--s4-motion-state); }
-    .dt-road > li[data-done] { background: var(--md-sys-color-on-primary); }
-    .dt-road > li[data-now] { background: color-mix(in srgb, var(--md-sys-color-on-primary) 60%, transparent); }
-    .dt-bar { block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); overflow: hidden; }
-    .dt-bar > i { display: block; block-size: 100%; inline-size: var(--w, 0%); border-radius: inherit; background: var(--md-sys-color-primary); transition: width var(--s4-motion-ink-calm); }
+    .dt-hero .s4-status { align-self: flex-start; background: var(--md-sys-color-on-primary); color: var(--md-sys-color-primary); }
+    .dt-road-head { display: flex; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); }
+    .dt-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); }
+    .dt-h { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+    .dt-wide { inline-size: 100%; }
     .dt-course { display: flex; flex-direction: column; gap: var(--s4-space-3); text-decoration: none; color: inherit; }
     .dt-course-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4-space-3); }
-    .dt-course h3 { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); }
+    .dt-course h3 { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); }
     .dt-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
-    .dt-meta { display: flex; justify-content: space-between; gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
-    .dt-item-done .s4-list-headline { text-decoration: line-through; color: var(--md-sys-color-on-surface-variant); }
-    .dt-h { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+    .dt-meta { display: flex; justify-content: space-between; gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+    .s4-pane.dt-degree { flex-direction: row; align-items: center; gap: var(--s4-space-4); text-decoration: none; color: inherit; }
+    .dt-degree > span:nth-child(2) { flex: 1; min-inline-size: 0; }
+    .dt-eyebrow { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-label-medium-weight, 600); letter-spacing: var(--md-sys-typescale-label-medium-tracking); }
     .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
-    .dt-note { margin: 0; padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+    #course-list:not([data-editing]) .s4-drag-handle { display: none; }
+    .dt-center { display: grid; justify-items: center; gap: var(--s4-space-4); text-align: center; }
   }
 </style>
 </head>
@@ -52,109 +46,182 @@
       <a class="s4-nav-item" href="#today" data-view="today" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Today</span></a>
       <a class="s4-nav-item" href="#courses" data-view="courses"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="book"></span></span><span class="s4-nav-label">Courses</span></a>
       <a class="s4-nav-item" href="#schedule" data-view="schedule"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Schedule</span></a>
-      <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+      <a class="s4-nav-item" href="#stage" data-view="stage"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="transfer"></span></span><span class="s4-nav-label">Stage</span></a>
     </div>
   </nav>
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Today</h1></div>
-      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Sunday, Nov 15</h1><p class="s4-app-bar-subtitle" id="stage-name">Transfer Stage</p></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Settings" data-tooltip="Settings" data-page-open="settings" data-page-title="Settings"><span class="s4-icon" data-icon="tune"></span></button></div>
     </header>
     <main class="s4-content">
       <!-- Today -->
-      <section class="s4-view s4-stack" data-view="today" data-title="Today">
+      <section class="s4-view s4-stack" data-view="today" data-title="Sunday, Nov 15">
         <section class="s4-pane dt-hero" aria-label="Where you stand">
           <div class="dt-hero-top">
-            <div class="dt-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="trk" cx="60" cy="60" r="50"></circle><circle class="val" id="ring" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"></circle></svg><b id="ring-pct">0%</b></div>
+            <div class="s4-ring" data-ink="current" data-value="0" id="ring" aria-label="Courses Complete"><span class="s4-ring-value" id="ring-pct">0%</span><span class="s4-ring-label">Complete</span></div>
             <div class="s4-stack" style="--s4-gap: var(--s4-space-2)">
-              <p><span class="dt-days" id="days" data-count-to="47"></span><span id="days-label">days until the university stage · Jan 1</span></p>
-              <span class="s4-status" id="pace">On Pace</span>
+              <p><span class="dt-days" id="days" data-count-to="46"></span><span id="days-label"></span></p>
+              <span class="s4-status" id="pace"></span>
             </div>
           </div>
           <div class="s4-stack" style="--s4-gap: var(--s4-space-2)">
-            <div class="dt-road-head"><span id="road-name">Road To University</span><span id="road-goal">Starts Jan 1</span></div>
-            <ol class="dt-road" id="road" aria-label="Courses on the road"></ol>
+            <div class="dt-road-head"><span id="road-name"></span><span id="road-goal"></span></div>
+            <ol class="s4-milestones" data-ink="current" id="road" aria-label="Courses on the road"></ol>
             <p class="s4-body-medium" id="road-sum"></p>
           </div>
         </section>
 
-        <div class="s4-row" style="justify-content:space-between"><h2 class="dt-h">Up Next</h2><button class="s4-button" data-variant="tonal" data-size="s" type="button" id="busy"><span class="s4-icon" data-icon="schedule"></span>Busy Today</button></div>
-        <div class="s4-states" id="next-states" data-state="ready">
-          <ul class="s4-list" data-when="ready" id="next-list" aria-label="Due next"></ul>
-          <div data-when="empty" class="s4-empty"><span class="s4-done-mark" data-size="l" data-done></span><h3 class="s4-empty-title">All Done</h3><p class="s4-empty-text">Nothing due today. Nice work.</p></div>
+        <div class="s4-banner" role="status" id="behind">
+          <span class="s4-icon" data-icon="warning"></span>
+          <p class="s4-banner-text">You’re 5 days behind the original plan.</p>
+          <div class="s4-banner-actions"><button class="s4-button" data-variant="text" type="button" id="replan">Re-Plan From Today</button></div>
         </div>
 
-        <h2 class="dt-h">Current Courses</h2>
+        <div class="dt-head"><h2 class="dt-h">Due Today &amp; Next</h2><a class="s4-button" data-variant="text" data-size="s" href="#courses" data-view="courses">See All</a></div>
+        <div class="s4-states" id="next-states" data-state="ready">
+          <ul class="s4-list" data-when="ready" id="next-list" aria-label="Due today and next"></ul>
+          <div data-when="empty" class="s4-empty"><span class="s4-done-mark" data-size="l" data-done></span><h3 class="s4-empty-title">All Done</h3><p class="s4-empty-text">Nothing due today. Nice work.</p></div>
+        </div>
+        <button class="s4-button dt-wide" data-variant="tonal" type="button" id="busy"><span class="s4-icon" data-icon="schedule"></span>Busy Today, Shift My Plan</button>
+
+        <section class="s4-pane" aria-label="Pace"><div class="s4-stat-row">
+          <div class="s4-stat" data-size="small"><span class="s4-stat-label">Pace Needed</span><span class="s4-stat-value" id="pace-need">1.4</span><span class="s4-stat-meta">items a day</span></div>
+          <div class="s4-stat" data-size="small"><span class="s4-stat-label">Streak</span><span class="s4-stat-value" id="streak">6</span><span class="s4-stat-meta">days in a row</span></div>
+        </div></section>
+
+        <h2 class="dt-h">Current Course</h2>
         <div class="s4-grid" id="current" style="--s4-min: 18rem"></div>
+
+        <h2 class="dt-h">Up Next</h2>
+        <ul class="s4-list" id="upnext" aria-label="Up next"></ul>
       </section>
 
       <!-- Courses -->
       <section class="s4-view s4-stack" data-view="courses" data-title="Courses" hidden>
+        <a class="s4-pane dt-degree" href="#courses/degree" data-page-open="degree" data-page-title="Degree Progress">
+          <span class="s4-ring" data-size="s" data-value="0.36" aria-label="Degree Progress"><span class="s4-ring-value">36%</span></span>
+          <span><span class="s4-title-medium" style="display:block">Degree Progress</span><span class="dt-sub" style="display:block">44 of 121 credits done</span></span>
+          <span class="s4-icon" data-icon="chevron-right"></span>
+        </a>
         <div class="s4-chip-set" data-select="single" data-scroll aria-label="Show" id="filter">
-          <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" data-value="all">All</button>
-          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="progress">In Progress</button>
-          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="upcoming">Upcoming</button>
-          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="done">Transferred</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" data-value="all">All</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="progress">Active</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="upcoming">Upcoming</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="done">Done</button>
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="deferred">Deferred</button>
         </div>
-        <p class="dt-note">Drag a course by its grip to change the order you take them in. The plan and every due date follow.</p>
         <div class="s4-states" id="course-states" data-state="ready">
           <ul class="s4-list" data-when="ready" data-reorder id="course-list" aria-label="Courses"></ul>
           <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="book"></span></span><h3 class="s4-empty-title">No Courses Here</h3><p class="s4-empty-text">Try another filter.</p></div>
         </div>
+        <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="edit-order" aria-pressed="false"><span class="s4-icon" data-icon="sort"></span>Edit Order</button><button class="s4-button" data-variant="tonal" type="button" data-expand="course-form"><span class="s4-icon" data-icon="add"></span>Add Course</button></div>
+        <div class="s4-expand" id="course-form" hidden>
+          <form class="s4-form s4-expand-body" id="course-add">
+            <div class="s4-text-field"><input id="n-name" name="name" autocomplete="off" required data-msg-required="Name the course."><label for="n-name">Course Name</label></div>
+            <div class="s4-text-field"><input id="n-maps" name="maps" autocomplete="off"><label for="n-maps">Counts As (Optional)</label></div>
+            <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Add Course</button></div>
+          </form>
+        </div>
       </section>
 
       <!-- Schedule -->
-      <section class="s4-view s4-stack" data-view="schedule" data-title="Schedule" hidden>
-        <section class="s4-pane"><figure class="s4-chart" data-type="column" data-labels="This Week,Next,Dec 1,Dec 8,Dec 15,Dec 22" data-values="5,6,4,6,5,3" data-name="Items Due"><figcaption class="s4-chart-title">Items Due Each Week</figcaption></figure></section>
+      <section class="s4-view s4-stack" data-view="schedule" data-title="Nov 15 → Dec 31" hidden>
+        <section class="s4-pane" aria-label="Plan calendar">
+          <div class="s4-month" id="cal" data-month="2026-11" data-today="2026-11-15" data-min="2026-11" data-max="2027-01" data-legend aria-label="Plan Calendar" data-mark-labels='{"dot":"Course Due","band":"Busy","flag":"Deadline"}'></div>
+          <p class="dt-sub" id="cal-day" aria-live="polite">Tap a day to see what is on it.</p>
+        </section>
+        <section class="s4-pane"><h2 class="s4-pane-title">Course Timeline</h2><ol class="s4-timeline" id="timeline" aria-label="Course timeline"></ol></section>
         <section class="s4-pane">
-          <div class="s4-row" style="justify-content:space-between"><h2 class="s4-pane-title">Busy Days</h2><button class="s4-button" data-variant="tonal" data-size="s" type="button" data-expand="busy-form"><span class="s4-icon" data-icon="add"></span>Add Busy Days</button></div>
+          <h2 class="s4-pane-title">Busy Days</h2>
+          <ul class="s4-list" id="busy-list" aria-label="Busy days" data-dividers></ul>
+          <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" data-expand="busy-form"><span class="s4-icon" data-icon="add"></span>Add Busy Days</button></div>
           <div class="s4-expand" id="busy-form" data-variant="inset" hidden>
             <form class="s4-form s4-expand-body" id="busy-add">
-              <div class="s4-form-row"><div class="s4-text-field"><input id="b-from" name="from" type="date" value="2026-11-26" required><label for="b-from">From</label></div><div class="s4-text-field"><input id="b-to" name="to" type="date" value="2026-11-27" required><label for="b-to">To</label></div></div>
+              <div class="s4-form-row"><div class="s4-text-field"><input id="b-from" name="from" type="date" value="2026-12-05" required><label for="b-from">From</label></div><div class="s4-text-field"><input id="b-to" name="to" type="date" value="2026-12-06" required><label for="b-to">To</label></div></div>
               <div class="s4-text-field"><input id="b-label" name="label" autocomplete="off"><label for="b-label">Label (Optional)</label></div>
               <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Add</button></div>
             </form>
           </div>
-          <ul class="s4-list" id="busy-list" aria-label="Busy days" data-dividers>
-            <li><div class="s4-list-item"><span class="s4-icon" data-icon="schedule"></span><span class="s4-list-content"><span class="s4-list-headline">Sundays</span><span class="s4-list-supporting">Repeats weekly · rest day</span></span></div></li>
-          </ul>
+          <p class="dt-sub">The plan skips busy days and moves every due date around them.</p>
         </section>
-        <section class="s4-pane"><h2 class="s4-pane-title">Course Timeline</h2><ul class="s4-list" id="timeline" aria-label="Course timeline" data-dividers></ul></section>
       </section>
 
-      <!-- Settings -->
-      <section class="s4-view s4-stack" data-view="settings" data-title="Settings" hidden>
-        <section class="s4-pane"><h2 class="s4-pane-title">Stage</h2><p class="s4-pane-supporting">The app takes the color of the stage you are in.</p>
-          <div class="s4-button-group" data-connected data-select="single" aria-label="Stage" id="stage"><button class="s4-button" type="button" value="transfer" aria-pressed="true">Transfer</button><button class="s4-button" type="button" value="uni" aria-pressed="false">University</button></div></section>
-        <section class="s4-pane"><h2 class="s4-pane-title">Appearance</h2>
-          <div class="s4-button-group" data-connected data-select="single" aria-label="Light or dark" id="mode"><button class="s4-button" type="button" value="light" aria-pressed="true">Light</button><button class="s4-button" type="button" value="dark" aria-pressed="false">Dark</button><button class="s4-button" type="button" value="system" aria-pressed="false">Match My Device</button></div>
-          <label class="s4-switch" style="justify-content:space-between"><span>Color The Whole App</span><input type="checkbox" role="switch" id="tinted" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label></section>
-        <section class="s4-pane"><h2 class="s4-pane-title">Dates</h2>
-          <form class="s4-form" id="dates" data-autosave>
-            <div class="s4-form-row"><div class="s4-text-field"><input id="d-transfer" name="transfer" type="date" value="2026-12-31" required><label for="d-transfer">Transfer Deadline</label></div><div class="s4-text-field"><input id="d-start" name="start" type="date" value="2027-01-01" required><label for="d-start">University Start Date</label></div></div>
-            <div class="s4-text-field"><input id="d-max" name="max" type="number" min="1" max="10" value="3" required data-msg-min="At least one item a day." data-msg-max="Ten a day at most."><label for="d-max">Most Items Per Day</label><div class="s4-text-field-supporting">The plan is flagged when a day needs more than this.</div></div>
-            <div class="s4-form-actions"><span class="s4-form-status"></span></div>
-          </form></section>
-        <section class="s4-pane"><h2 class="s4-pane-title">Backup</h2><div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="backup"><span class="s4-icon" data-icon="download"></span>Download Backup</button></div></section>
+      <!-- Stage: the app's two halves -->
+      <section class="s4-view s4-stack" data-view="stage" data-title="Stage" hidden>
+        <section class="s4-pane dt-center">
+          <span class="s4-ring" data-size="l" data-value="0.36" id="stage-ring" aria-label="Degree Progress"><span class="s4-ring-value">36%</span><span class="s4-ring-label">Of The Degree</span></span>
+          <h2 class="dt-h" id="stage-h"></h2>
+          <p class="dt-sub" id="stage-p" style="max-inline-size:36ch"></p>
+          <button class="s4-button" data-size="m" type="button" id="stage-switch"></button>
+        </section>
       </section>
 
       <!-- A course: a page you go into -->
       <section class="s4-subpage" data-page="course" data-title="Course" hidden>
         <article class="s4-stack">
-          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="c-name">Course</h2><div class="s4-subpage-meta"><span class="s4-status" id="c-status"></span><span id="c-maps"></span><span id="c-due"></span></div></header>
-          <section class="s4-pane"><div class="dt-meta"><span id="c-count"></span><span id="c-next"></span></div><div class="dt-bar"><i id="c-bar"></i></div></section>
+          <header class="s4-subpage-header"><p class="dt-eyebrow" id="c-eyebrow"></p><h2 class="s4-subpage-title" id="c-name">Course</h2><div class="s4-subpage-meta"><span id="c-maps"></span></div></header>
+          <section class="s4-pane" aria-label="Course numbers"><div class="s4-stat-row" style="--s4-stat-min: 5.5rem">
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Course Due</span><span class="s4-stat-value" id="c-due"></span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Done</span><span class="s4-stat-value" id="c-count"></span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Status</span><span class="s4-stat-value" id="c-status"></span></div>
+          </div><div class="s4-progress" id="c-bar" data-value="0" aria-label="Course progress"></div></section>
           <section class="s4-pane">
-            <div class="s4-row" style="justify-content:space-between"><h3 class="s4-pane-title">Remaining · Mini-Deadlines</h3><button class="s4-button" data-variant="tonal" data-size="s" type="button" data-expand="item-form"><span class="s4-icon" data-icon="add"></span>Add</button></div>
+            <h3 class="s4-pane-title">Quizzes And Exams</h3>
+            <div class="s4-states" id="item-states" data-state="ready">
+              <ul class="s4-list" data-when="ready" data-reorder id="item-list" aria-label="Items"></ul>
+              <div data-when="empty" class="s4-empty"><span class="s4-done-mark" data-size="l" data-done></span><h3 class="s4-empty-title">Every Item Is Done</h3><p class="s4-empty-text">Mark the course complete when you are ready.</p></div>
+            </div>
+            <button class="s4-button dt-wide" type="button" id="c-complete"><span class="s4-icon" data-icon="check"></span>Mark Course Complete</button>
+            <button class="s4-button dt-wide" data-variant="tonal" type="button" data-expand="item-form"><span class="s4-icon" data-icon="add"></span>Add Quizzes And Exams</button>
             <div class="s4-expand" id="item-form" data-variant="inset" hidden>
               <form class="s4-form s4-expand-body" id="item-add"><div class="s4-text-field"><input id="i-title" name="title" autocomplete="off" required data-msg-required="Name the quiz, exam or project."><label for="i-title">Quiz, Exam Or Project</label></div>
                 <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Add Item</button></div></form>
             </div>
-            <div class="s4-states" id="item-states" data-state="ready">
-              <ul class="s4-list" data-when="ready" data-reorder id="item-list" aria-label="Items"></ul>
-              <div data-when="empty" class="s4-empty"><span class="s4-done-mark" data-size="l" data-done></span><h3 class="s4-empty-title">Every Item Is Done</h3><p class="s4-empty-text">Finish the course when you are ready.</p></div>
-            </div>
           </section>
-          <section class="s4-pane"><h3 class="s4-pane-title">Life Happened?</h3><div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="c-push">Push Course Back A Week</button><button class="s4-button" data-variant="text" type="button" id="c-defer">Defer Course</button></div></section>
+          <section class="s4-pane"><h3 class="s4-pane-title">Life Happened?</h3>
+            <ul class="s4-list" aria-label="Life happened">
+              <li><button class="s4-list-item" type="button" id="c-push"><span class="s4-icon" data-icon="forward"></span><span class="s4-list-content"><span class="s4-list-headline">Push Course Back</span><span class="s4-list-supporting">Move it and everything after it by a week</span></span></button></li>
+              <li><button class="s4-list-item" type="button" id="c-defer"><span class="s4-icon" data-icon="pause"></span><span class="s4-list-content"><span class="s4-list-headline">Defer Course</span><span class="s4-list-supporting">Take it off the plan for now</span></span></button></li>
+              <li><button class="s4-list-item" type="button" id="c-uni"><span class="s4-icon" data-icon="transfer"></span><span class="s4-list-content"><span class="s4-list-headline">Take At University Instead</span><span class="s4-list-supporting">Move it to the university stage</span></span></button></li>
+            </ul>
+          </section>
+        </article>
+      </section>
+
+      <!-- Degree progress: a page -->
+      <section class="s4-subpage" data-page="degree" data-title="Degree Progress" hidden>
+        <article class="s4-stack">
+          <section class="s4-pane dt-center"><span class="s4-ring" data-size="l" data-value="0.36" aria-label="Degree Progress"><span class="s4-ring-value">36%</span><span class="s4-ring-label">44 Of 121 Credits</span></span></section>
+          <section class="s4-pane" aria-label="Credits"><div class="s4-stat-row" style="--s4-stat-min: 5.5rem">
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Done</span><span class="s4-stat-value">44</span><span class="s4-stat-meta">credits</span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">On This Road</span><span class="s4-stat-value">33</span><span class="s4-stat-meta">credits</span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">At University</span><span class="s4-stat-value">44</span><span class="s4-stat-meta">credits</span></div>
+          </div></section>
+          <section class="s4-pane"><h3 class="s4-pane-title">By Area</h3>
+            <ol class="s4-timeline" aria-label="Credits by area">
+              <li data-start="0" data-end="1" data-state="done"><span class="s4-timeline-label">General Education</span><span class="s4-timeline-meta">30 of 30</span></li>
+              <li data-start="0" data-end="0.4" data-state="current"><span class="s4-timeline-label">Business Core</span><span class="s4-timeline-meta">14 of 35</span></li>
+              <li data-start="0" data-end="0" ><span class="s4-timeline-label">Accounting Major</span><span class="s4-timeline-meta">0 of 44</span></li>
+              <li data-start="0" data-end="0"><span class="s4-timeline-label">Capstone</span><span class="s4-timeline-meta">0 of 12</span></li>
+            </ol>
+          </section>
+        </article>
+      </section>
+
+      <!-- Settings: a page behind the button in the bar -->
+      <section class="s4-subpage" data-page="settings" data-title="Settings" hidden>
+        <article class="s4-stack">
+          <section class="s4-pane"><h2 class="s4-pane-title">Appearance</h2>
+            <div class="s4-button-group" data-connected data-select="single" aria-label="Light or dark" id="mode"><button class="s4-button" type="button" value="light" aria-pressed="true">Light</button><button class="s4-button" type="button" value="dark" aria-pressed="false">Dark</button><button class="s4-button" type="button" value="system" aria-pressed="false">Match My Device</button></div>
+            <label class="s4-switch" style="justify-content:space-between"><span>Color The Whole App</span><input type="checkbox" role="switch" id="tinted" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label></section>
+          <section class="s4-pane"><h2 class="s4-pane-title">Dates</h2>
+            <form class="s4-form" id="dates" data-autosave>
+              <div class="s4-form-row"><div class="s4-text-field"><input id="d-transfer" name="transfer" type="date" value="2026-12-31" required><label for="d-transfer">Transfer Deadline</label></div><div class="s4-text-field"><input id="d-start" name="start" type="date" value="2027-01-01" required><label for="d-start">University Start Date</label></div></div>
+              <div class="s4-text-field"><input id="d-max" name="max" type="number" min="1" max="10" value="3" required data-msg-min="At least one item a day." data-msg-max="Ten a day at most."><label for="d-max">Most Items Per Day</label><div class="s4-text-field-supporting">The plan is flagged when a day needs more than this.</div></div>
+              <div class="s4-form-actions"><span class="s4-form-status"></span></div>
+            </form></section>
+          <section class="s4-pane"><h2 class="s4-pane-title">Backup</h2><div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="backup"><span class="s4-icon" data-icon="download"></span>Download Backup</button></div></section>
         </article>
       </section>
     </main>
@@ -163,96 +230,148 @@
     <a class="s4-nav-item" href="#today" data-view="today" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Today</span></a>
     <a class="s4-nav-item" href="#courses" data-view="courses"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="book"></span></span><span class="s4-nav-label">Courses</span></a>
     <a class="s4-nav-item" href="#schedule" data-view="schedule"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Schedule</span></a>
-    <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+    <a class="s4-nav-item" href="#stage" data-view="stage"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="transfer"></span></span><span class="s4-nav-label">Stage</span></a>
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=a9c1d13"></script>
+<script src="../components/orion.js?v=70def86"></script>
 <script>
 /* Invented sample data. The real app's courses, dates and progress are not in this file. */
-var STAGES = { transfer: { seed: '#0b7a70', road: 'Road To University', goal: 'Starts Jan 1', days: 47, label: 'days until the university stage · Jan 1' }, uni: { seed: '#00305e', road: 'Road To Graduation', goal: 'Goal Jun 30', days: 228, label: 'days until graduation · Jun 30' } };
-var stage = 'transfer', filter = 'all', seq = 100;
+var STAGES = {
+  transfer: { seed: '#0b7a70', name: 'Transfer Stage', road: 'Road To University', goal: 'Starts Jan 1', days: 46, label: 'days until the transfer deadline · Dec 31', h: 'Next: The University Stage', p: 'When your transfer courses are done, switch stages. The app turns navy and plans your university terms.', go: 'Switch To The University Stage' },
+  uni: { seed: '#00305e', name: 'University Stage', road: 'Road To Graduation', goal: 'Goal Jun 30', days: 227, label: 'days until graduation · Jun 30', h: 'You Are In The University Stage', p: 'Your transfer courses are kept. Switch back any time to look at them.', go: 'Back To The Transfer Stage' }
+};
+var stage = 'transfer', filter = 'all', seq = 100, behind = true, SPAN = ['2026-11-15', '2026-12-31'];
+function C(id, name, maps, status, from, to, items, done) { return { id: id, name: name, maps: maps, status: status, from: from, to: to, items: items || [], done: done || 0, cr: 3 }; }
+function I(t, d) { return { id: 'i' + (++seq), t: t, d: d }; }
 var courses = [
-  { id: 'k1', name: 'English Composition I', maps: 'Counts as Composition', status: 'done', due: 'Oct 20', items: [] },
-  { id: 'k2', name: 'College Algebra', maps: 'Counts as Applied Algebra', status: 'done', due: 'Nov 3', items: [] },
-  { id: 'k3', name: 'Principles of Accounting I', maps: 'Counts as Financial Accounting', status: 'progress', due: 'Nov 24', items: [{ id: 'i1', t: 'Chapter 5 quiz', d: 'Today' }, { id: 'i2', t: 'Chapter 6 quiz', d: 'Tomorrow' }, { id: 'i3', t: 'Practice exam', d: 'Nov 20' }, { id: 'i4', t: 'Final exam', d: 'Nov 24' }], done: 6 },
-  { id: 'k4', name: 'Business Law', maps: 'Counts as Business Law', status: 'progress', due: 'Dec 2', items: [{ id: 'i5', t: 'Unit 2 test', d: 'Today' }, { id: 'i6', t: 'Unit 3 test', d: 'Nov 22' }, { id: 'i7', t: 'Final exam', d: 'Dec 2' }], done: 2 },
-  { id: 'k5', name: 'Principles of Accounting II', maps: 'Counts as Managerial Accounting', status: 'upcoming', due: 'Dec 14', items: [{ id: 'i8', t: 'Module 1 quiz', d: 'Dec 4' }, { id: 'i9', t: 'Final exam', d: 'Dec 14' }], done: 0 },
-  { id: 'k6', name: 'Microeconomics', maps: 'Counts as Microeconomics', status: 'upcoming', due: 'Dec 23', items: [{ id: 'i10', t: 'Midterm', d: 'Dec 18' }, { id: 'i11', t: 'Final exam', d: 'Dec 23' }], done: 0 },
-  { id: 'k7', name: 'Statistics', maps: 'Counts as Applied Statistics', status: 'upcoming', due: 'Dec 30', items: [{ id: 'i12', t: 'Final exam', d: 'Dec 30' }], done: 0 }
+  C('k1', 'English Composition I', 'Composition', 'done', '2026-10-01', '2026-10-14'),
+  C('k2', 'College Algebra', 'Applied Algebra', 'done', '2026-10-15', '2026-10-30'),
+  C('k3', 'Intro To Psychology', 'Psychology', 'done', '2026-10-31', '2026-11-12'),
+  C('k4', 'Principles Of Accounting I', 'Financial Accounting', 'progress', '2026-11-13', '2026-11-24', [I('Chapter 5 quiz', '2026-11-15'), I('Chapter 6 quiz', '2026-11-16'), I('Practice exam', '2026-11-20'), I('Final exam', '2026-11-24')], 6),
+  C('k5', 'Business Law', 'Business Law', 'upcoming', '2026-11-25', '2026-12-02', [I('Unit 1 test', '2026-11-28'), I('Final exam', '2026-12-02')]),
+  C('k6', 'Principles Of Accounting II', 'Managerial Accounting', 'upcoming', '2026-12-03', '2026-12-09', [I('Final exam', '2026-12-09')]),
+  C('k7', 'Microeconomics', 'Microeconomics', 'upcoming', '2026-12-10', '2026-12-15', [I('Final exam', '2026-12-15')]),
+  C('k8', 'Macroeconomics', 'Macroeconomics', 'upcoming', '2026-12-16', '2026-12-20', [I('Final exam', '2026-12-20')]),
+  C('k9', 'Statistics', 'Applied Statistics', 'upcoming', '2026-12-21', '2026-12-23', [I('Final exam', '2026-12-23')]),
+  C('k10', 'Business Communication', 'Communication', 'upcoming', '2026-12-26', '2026-12-28', [I('Final project', '2026-12-28')]),
+  C('k11', 'Information Systems', 'Information Systems', 'upcoming', '2026-12-29', '2026-12-30', [I('Final exam', '2026-12-30')])
 ];
+var busy = [{ label: 'Family visit', from: '2026-11-26', to: '2026-11-27' }, { label: 'Holiday', from: '2026-12-24', to: '2026-12-25' }];
 var app = document.querySelector('.s4-app'), $ = function (id) { return document.getElementById(id); };
 function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function find(id) { return courses.filter(function (c) { return c.id === id; })[0]; }
-function total(c) { return (c.done || 0) + c.items.length; }
-var LABEL = { done: 'Transferred', progress: 'In Progress', upcoming: 'Upcoming', deferred: 'Deferred' }, TONE = { done: 'success', progress: 'primary', upcoming: '', deferred: 'warning' };
+function total(c) { return c.done + c.items.length; }
+function day(iso) { var p = iso.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function nice(iso) { return day(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function when(iso) { return iso === '2026-11-15' ? 'Today' : iso === '2026-11-16' ? 'Tomorrow' : nice(iso); }
+function unit(iso) { var a = day(SPAN[0]), b = day(SPAN[1]); return Math.min(1, Math.max(0, (day(iso) - a) / (b - a))); }
+function road() { return courses.filter(function (c) { return c.status !== 'uni'; }); }
+var LABEL = { done: 'Done', progress: 'Active', upcoming: 'Upcoming', deferred: 'Deferred' };
 
 function hero() {
-  var done = courses.filter(function (c) { return c.status === 'done'; }).length, pct = Math.round(done / courses.length * 100);
-  $('ring').setAttribute('stroke-dashoffset', 100 - pct); $('ring-pct').textContent = pct + '%';
-  $('road').innerHTML = courses.map(function (c) { return '<li' + (c.status === 'done' ? ' data-done' : c.status === 'progress' ? ' data-now' : '') + ' title="' + esc(c.name) + '"></li>'; }).join('');
-  $('road-sum').textContent = done + ' of ' + courses.length + ' courses done · ' + done * 3 + ' of ' + courses.length * 3 + ' credits';
+  var all = road(), done = all.filter(function (c) { return c.status === 'done'; }).length, cr = all.reduce(function (n, c) { return n + c.cr; }, 0);
+  $('ring').dataset.value = done / all.length; $('ring-pct').textContent = Math.round(done / all.length * 100) + '%';
+  $('road').innerHTML = all.map(function (c) { var t = total(c); return '<li' + (c.status === 'done' ? ' data-state="done"' : c.status === 'progress' ? ' data-state="current" data-value="' + (t ? c.done / t : 0) + '"' : '') + ' data-label="' + esc(c.name) + '"></li>'; }).join('');
+  $('road').setAttribute('aria-label', all.length + ' courses, ' + done + ' done');
+  $('road-sum').textContent = done + ' of ' + all.length + ' courses done · ' + done * 3 + ' of ' + cr + ' credits';
+  $('pace').textContent = behind ? 'At Risk · 5 Days Behind' : 'On Pace';
 }
 function today() {
   var due = [];
-  courses.forEach(function (c) { if (c.status === 'progress') c.items.forEach(function (i) { if (i.d === 'Today') due.push({ c: c, i: i }); }); });
-  $('next-list').innerHTML = due.map(function (x) { return '<li><label class="s4-list-item"><span class="s4-checkbox"><input type="checkbox" data-check="' + x.c.id + ':' + x.i.id + '" aria-label="Done: ' + esc(x.i.t) + '"><span class="s4-checkbox-box"></span></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(x.i.t) + '</span><span class="s4-list-supporting">' + esc(x.c.name) + '</span></span><span class="s4-list-trailing"><span class="s4-status">Today</span></span></label></li>'; }).join('');
+  courses.forEach(function (c) { if (c.status === 'progress') c.items.slice(0, 3).forEach(function (i) { due.push({ c: c, i: i }); }); });
+  $('next-list').innerHTML = due.map(function (x) { return '<li data-swipe><label class="s4-list-item"><span class="s4-checkbox"><input type="checkbox" data-check="' + x.c.id + ':' + x.i.id + '" aria-label="Done: ' + esc(x.i.t) + '"><span class="s4-checkbox-box"></span></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(x.i.t) + '</span><span class="s4-list-supporting">' + esc(x.c.name) + '</span></span><span class="s4-list-trailing"><span class="s4-status"' + (when(x.i.d) === 'Today' ? ' data-tone="primary"' : '') + '>' + when(x.i.d) + '</span></span></label><div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Move To The Next Day" data-swipe-primary data-later="' + x.c.id + ':' + x.i.id + '"><span class="s4-icon" data-icon="forward"></span></button></div></li>'; }).join('');
   S4.init($('next-list')); S4.states.set($('next-states'), due.length ? 'ready' : 'empty');
   $('current').innerHTML = courses.filter(function (c) { return c.status === 'progress'; }).map(function (c) {
     var t = total(c), n = c.items[0];
-    return '<a class="s4-pane dt-course" href="#today/course/' + c.id + '" data-page-open="course" data-page-id="' + c.id + '"><div class="dt-course-head"><div><h3>' + esc(c.name) + '</h3><p class="dt-sub">' + esc(c.maps) + '</p></div><span class="s4-status">Due ' + esc(c.due) + '</span></div><div class="dt-bar"><i style="--w:' + Math.round((c.done || 0) / t * 100) + '%"></i></div><div class="dt-meta"><span>' + (c.done || 0) + ' of ' + t + ' items</span><span>' + (n ? 'Next: ' + esc(n.t) : 'Ready to finish') + '</span></div></a>';
+    return '<a class="s4-pane dt-course" href="#today/course/' + c.id + '" data-page-open="course" data-page-id="' + c.id + '"><div class="dt-course-head"><div><h3>' + esc(c.name) + '</h3><p class="dt-sub">Counts as University · ' + esc(c.maps) + '</p></div><span class="s4-status">Due ' + nice(c.to) + '</span></div><div class="s4-progress" data-value="' + (t ? c.done / t : 1) + '" aria-label="Course progress"></div><div class="dt-meta"><span>' + c.done + ' of ' + t + ' items</span><span>' + (n ? 'Next: ' + esc(n.t) : 'Ready to finish') + '</span></div></a>';
   }).join('');
+  S4.init($('current'));
+  $('upnext').innerHTML = courses.filter(function (c) { return c.status === 'upcoming'; }).slice(0, 4).map(function (c) { return '<li><a class="s4-list-item" href="#today/course/' + c.id + '" data-page-open="course" data-page-id="' + c.id + '"><span class="s4-list-content"><span class="s4-list-headline">' + esc(c.name) + '</span><span class="s4-list-supporting">' + nice(c.from) + ' → ' + nice(c.to) + '</span></span><span class="s4-icon" data-icon="chevron-right"></span></a></li>'; }).join('');
+  S4.init($('upnext'));
 }
 function list() {
-  var rows = courses.filter(function (c) { return filter === 'all' || c.status === filter; });
-  $('course-list').innerHTML = rows.map(function (c) { return '<li data-id="' + c.id + '"><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move ' + esc(c.name) + '"></button><a class="s4-list-content" href="#courses/course/' + c.id + '" data-page-open="course" data-page-id="' + c.id + '" style="text-decoration:none;color:inherit"><span class="s4-list-headline">' + esc(c.name) + '</span><span class="s4-list-supporting">' + esc(c.maps) + ' · Due ' + esc(c.due) + '</span></a><span class="s4-list-trailing"><span class="s4-status"' + (TONE[c.status] ? ' data-tone="' + TONE[c.status] + '"' : '') + '>' + LABEL[c.status] + '</span></span></div></li>'; }).join('');
+  var rows = road().filter(function (c) { return filter === 'all' || c.status === filter; });
+  $('course-list').innerHTML = rows.map(function (c) { return '<li data-id="' + c.id + '"><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move ' + esc(c.name) + '"></button><a class="s4-list-content" href="#courses/course/' + c.id + '" data-page-open="course" data-page-id="' + c.id + '" style="text-decoration:none;color:inherit"><span class="s4-list-headline">' + esc(c.name) + '</span><span class="s4-list-supporting">Counts as ' + esc(c.maps) + ' · ' + c.cr + ' credits</span></a><span class="s4-list-trailing"><span class="s4-status"' + (c.status === 'done' ? ' data-tone="success"' : c.status === 'progress' ? ' data-tone="primary"' : c.status === 'deferred' ? ' data-tone="warning"' : '') + '>' + (c.status === 'done' || c.status === 'deferred' ? LABEL[c.status] : 'Due ' + nice(c.to)) + '</span></span></div></li>'; }).join('');
   S4.init($('course-list')); S4.states.set($('course-states'), rows.length ? 'ready' : 'empty');
-  $('timeline').innerHTML = courses.filter(function (c) { return c.status !== 'done'; }).map(function (c) { return '<li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">' + esc(c.name) + '</span><span class="s4-list-supporting">' + c.items.length + ' items left</span></span><span class="s4-list-trailing s4-num">' + esc(c.due) + '</span></div></li>'; }).join('');
 }
-function all() { hero(); today(); list(); }
-all();
+function schedule() {
+  var marks = {};
+  function add(iso, m) { marks[iso] = marks[iso] ? marks[iso] + ' ' + m : m; }
+  road().forEach(function (c) { if (c.status === 'progress' || c.status === 'upcoming') add(c.to, 'dot'); });
+  busy.forEach(function (b) { for (var d = day(b.from), e = day(b.to); d <= e; d.setDate(d.getDate() + 1)) add(d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2), 'band'); });
+  add('2026-12-31', 'flag');
+  S4.month.set($('cal'), { marks: marks });
+  $('timeline').innerHTML = road().filter(function (c) { return c.status === 'progress' || c.status === 'upcoming'; }).map(function (c) { return '<li data-start="' + unit(c.from) + '" data-end="' + unit(c.to) + '"' + (c.status === 'progress' ? ' data-state="current"' : '') + '><span class="s4-timeline-label">' + esc(c.name) + '</span><span class="s4-timeline-meta">' + nice(c.from) + ' → ' + nice(c.to) + '</span></li>'; }).join('');
+  $('busy-list').innerHTML = busy.map(function (b) { return '<li><div class="s4-list-item"><span class="s4-icon" data-icon="schedule"></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(b.label || 'Busy') + '</span><span class="s4-list-supporting">' + nice(b.from) + (b.to !== b.from ? ' → ' + nice(b.to) : '') + '</span></span></div></li>'; }).join('');
+  S4.init($('busy-list'));
+}
+function all() { hero(); today(); list(); schedule(); if (open) course(); }
 
 /* checking an item off: it is done at once, and can be undone */
 function finish(cid, iid) {
-  var c = find(cid), i = c.items.filter(function (x) { return x.id === iid; })[0], at = c.items.indexOf(i);
-  c.items.splice(at, 1); c.done = (c.done || 0) + 1; all(); if (open === c) course();
-  S4.snackbar({ text: 'Done: ' + i.t, action: 'Undo', onAction: function () { c.items.splice(at, 0, i); c.done--; all(); if (open === c) course(); } });
+  var c = find(cid), i = c.items.filter(function (x) { return x.id === iid; })[0], at = c.items.indexOf(i); if (!i) return;
+  c.items.splice(at, 1); c.done++; all();
+  S4.snackbar({ text: 'Done: ' + i.t, action: 'Undo', onAction: function () { c.items.splice(at, 0, i); c.done--; all(); } });
 }
 document.addEventListener('change', function (e) { var k = e.target.dataset && e.target.dataset.check; if (k) { var p = k.split(':'); setTimeout(function () { finish(p[0], p[1]); }, 260); } });
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-later]'); if (!b) return;
+  var p = b.dataset.later.split(':'), i = find(p[0]).items.filter(function (x) { return x.id === p[1]; })[0], was = i.d, d = day(was); d.setDate(d.getDate() + 1);
+  i.d = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); all();
+  S4.snackbar({ text: i.t + ' moved to ' + when(i.d).toLowerCase(), action: 'Undo', onAction: function () { i.d = was; all(); } });
+});
 $('busy').addEventListener('click', function () { S4.snackbar({ text: 'Today is a busy day. The plan moved by one day.', action: 'Undo' }); });
+$('replan').addEventListener('click', function () { behind = false; $('behind').hidden = true; hero(); S4.snackbar({ text: 'Re-planned from today. You are on pace.', action: 'Undo', onAction: function () { behind = true; $('behind').hidden = false; hero(); } }); });
 $('filter').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (c) { filter = c.dataset.value; list(); } });
+$('edit-order').addEventListener('click', function () { var on = !$('course-list').hasAttribute('data-editing'); $('course-list').toggleAttribute('data-editing', on); this.setAttribute('aria-pressed', String(on)); this.lastChild.textContent = on ? 'Done' : 'Edit Order'; });
 $('course-list').addEventListener('s4-reorder', function () {
   var order = Array.prototype.map.call($('course-list').children, function (li) { return li.dataset.id; });
   courses.sort(function (a, b) { var x = order.indexOf(a.id), y = order.indexOf(b.id); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); });
   hero(); S4.snackbar('Order changed. Due dates updated.');
 });
+$('course-add').addEventListener('s4-submit', function (e) { e.preventDefault(); var v = e.detail.values; courses.push(C('k' + (++seq), v.name, v.maps || 'Elective', 'upcoming', '2026-12-30', '2026-12-31', [I('Final exam', '2026-12-31')])); S4.expand.close('course-form', 'add'); e.target.reset(); all(); S4.snackbar('Course added to the end of the road'); });
+
+/* the calendar: tapping a day says what is on it, right below */
+$('cal').addEventListener('s4-select', function (e) {
+  var d = e.detail.date, out = [];
+  if (d) { road().forEach(function (c) { if (c.to === d && c.status !== 'done') out.push(c.name + ' due'); }); busy.forEach(function (b) { if (d >= b.from && d <= b.to) out.push('Busy: ' + (b.label || 'busy day')); }); if (d === '2026-12-31') out.push('Transfer deadline'); }
+  $('cal-day').textContent = d ? nice(d) + ' · ' + (out.join(' · ') || 'Nothing planned') : 'Tap a day to see what is on it.';
+});
+$('busy-add').addEventListener('s4-submit', function (e) { e.preventDefault(); var v = e.detail.values; busy.push({ label: v.label, from: v.from, to: v.to < v.from ? v.from : v.to }); S4.expand.close('busy-form', 'add'); schedule(); S4.snackbar('Busy days added. The plan moved around them.'); });
 
 /* the course page */
 var page = document.querySelector('.s4-subpage[data-page="course"]'), open = null;
 function course() {
-  var c = open, t = total(c);
-  page.dataset.title = c.name; $('c-name').textContent = c.name; $('c-status').textContent = LABEL[c.status]; $('c-maps').textContent = c.maps; $('c-due').textContent = 'Course due ' + c.due;
-  $('c-count').textContent = (c.done || 0) + ' of ' + t + ' items'; $('c-next').textContent = c.items[0] ? 'Next: ' + c.items[0].t : '';
-  $('c-bar').style.setProperty('--w', (t ? Math.round((c.done || 0) / t * 100) : 100) + '%');
-  $('item-list').innerHTML = c.items.map(function (i) { return '<li data-id="' + i.id + '"><div class="s4-list-item"><span class="s4-checkbox"><input type="checkbox" data-check="' + c.id + ':' + i.id + '" aria-label="Done: ' + esc(i.t) + '"><span class="s4-checkbox-box"></span></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(i.t) + '</span><span class="s4-list-supporting">Due ' + esc(i.d) + '</span></span><button class="s4-drag-handle" type="button" aria-label="Move ' + esc(i.t) + '"></button></div></li>'; }).join('');
+  var c = open, t = total(c), all = road();
+  page.dataset.title = c.name; $('c-name').textContent = c.name; $('c-eyebrow').textContent = 'Course ' + (all.indexOf(c) + 1) + ' Of ' + all.length + ' · ' + c.cr + ' Credits';
+  $('c-maps').textContent = 'Transfers as University · ' + c.maps; $('c-due').textContent = nice(c.to); $('c-count').textContent = c.done + '/' + t; $('c-status').textContent = LABEL[c.status] || 'Upcoming';
+  $('c-bar').dataset.value = t ? c.done / t : 1; $('c-complete').hidden = c.status === 'done';
+  $('item-list').innerHTML = c.items.map(function (i) { return '<li data-id="' + i.id + '"><div class="s4-list-item"><span class="s4-checkbox"><input type="checkbox" data-check="' + c.id + ':' + i.id + '" aria-label="Done: ' + esc(i.t) + '"><span class="s4-checkbox-box"></span></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(i.t) + '</span><span class="s4-list-supporting">Due ' + when(i.d) + '</span></span><button class="s4-drag-handle" type="button" aria-label="Move ' + esc(i.t) + '"></button></div></li>'; }).join('');
   S4.init($('item-list')); S4.states.set($('item-states'), c.items.length ? 'ready' : 'empty');
 }
-page.addEventListener('s4-open', function (e) { open = find(e.detail.id) || courses[2]; course(); });
+page.addEventListener('s4-open', function (e) { open = find(e.detail.id) || courses[3]; course(); });
 page.addEventListener('s4-close', function () { open = null; });
 $('item-list').addEventListener('s4-reorder', function () { var order = Array.prototype.map.call($('item-list').children, function (li) { return li.dataset.id; }); open.items.sort(function (a, b) { return order.indexOf(a.id) - order.indexOf(b.id); }); today(); });
-$('item-add').addEventListener('s4-submit', function (e) { e.preventDefault(); open.items.push({ id: 'i' + (++seq), t: e.detail.values.title, d: open.due }); S4.expand.close('item-form', 'add'); e.target.reset(); course(); all(); });
+$('item-add').addEventListener('s4-submit', function (e) { e.preventDefault(); open.items.push(I(e.detail.values.title, open.to)); S4.expand.close('item-form', 'add'); e.target.reset(); all(); });
+function leave(c, to, text) { var was = c.status, next = was === 'progress' ? courses.filter(function (x) { return x.status === 'upcoming'; })[0] : null; c.status = to; if (next) next.status = 'progress'; S4.pages.back(app); all(); S4.snackbar({ text: text, action: 'Undo', onAction: function () { c.status = was; if (next) next.status = 'upcoming'; all(); } }); }
+$('c-complete').addEventListener('click', function () { leave(open, 'done', open.name + ' complete. Nice work.'); });
 $('c-push').addEventListener('click', function () { S4.snackbar({ text: open.name + ' pushed back a week', action: 'Undo' }); });
-$('c-defer').addEventListener('click', function () { var c = open, was = c.status; c.status = 'deferred'; all(); S4.pages.back(app); S4.snackbar({ text: c.name + ' deferred', action: 'Undo', onAction: function () { c.status = was; all(); } }); });
-$('busy-add').addEventListener('s4-submit', function (e) { e.preventDefault(); var v = e.detail.values, li = document.createElement('li'); li.innerHTML = '<div class="s4-list-item"><span class="s4-icon" data-icon="schedule"></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(v.label || 'Busy') + '</span><span class="s4-list-supporting">' + esc(v.from) + ' to ' + esc(v.to) + '</span></span></div>'; $('busy-list').appendChild(li); S4.expand.close('busy-form', 'add'); S4.snackbar('Busy days added. The plan moved around them.'); });
+$('c-defer').addEventListener('click', function () { leave(open, 'deferred', open.name + ' deferred'); });
+$('c-uni').addEventListener('click', function () { leave(open, 'uni', open.name + ' moved to the university stage'); });
 
 /* the stage colors the whole app (tinted mode, decision 0052) */
-function paint() { var s = STAGES[stage]; S4.theme({ seed: s.seed, surfaces: $('tinted').checked ? 'tinted' : 'neutral' }); $('road-name').textContent = s.road; $('road-goal').textContent = s.goal; $('days-label').textContent = s.label; S4.reward.count($('days'), s.days); }
-$('stage').addEventListener('s4-change', function (e) { stage = e.detail.value; paint(); S4.snackbar(stage === 'uni' ? 'Switched to the university stage' : 'Switched to the transfer stage'); });
+function paint() {
+  var s = STAGES[stage]; S4.theme({ seed: s.seed, surfaces: $('tinted').checked ? 'tinted' : 'neutral' });
+  $('stage-name').textContent = s.name; $('road-name').textContent = s.road; $('road-goal').textContent = s.goal; $('days-label').textContent = s.label; S4.reward.count($('days'), s.days);
+  $('stage-h').textContent = s.h; $('stage-p').textContent = s.p; $('stage-switch').textContent = s.go;
+}
+$('stage-switch').addEventListener('click', function () { stage = stage === 'uni' ? 'transfer' : 'uni'; paint(); S4.snackbar(stage === 'uni' ? 'Switched to the university stage' : 'Switched to the transfer stage'); });
 $('tinted').addEventListener('change', paint);
 $('mode').addEventListener('s4-change', function (e) { S4.theme({ mode: e.detail.value }); });
 $('backup').addEventListener('click', function () { S4.snackbar('Backup downloaded'); });
-S4.theme({ mode: 'light' }); paint();
-S4.palette.register([{ label: 'Busy Today, Shift My Plan', group: 'Plan', icon: 'schedule', run: function () { $('busy').click(); } }, { label: 'Switch Stage', group: 'Plan', icon: 'refresh', run: function () { stage = stage === 'uni' ? 'transfer' : 'uni'; paint(); } }]);
+S4.theme({ mode: 'light' }); all(); paint();
+S4.palette.register([{ label: 'Busy Today, Shift My Plan', group: 'Plan', icon: 'schedule', run: function () { $('busy').click(); } }, { label: 'Switch Stage', group: 'Plan', icon: 'transfer', run: function () { $('stage-switch').click(); } }]);
 </script>
 </body>
 </html>

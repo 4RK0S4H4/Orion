@@ -1572,8 +1572,8 @@ S4.register('accordion', function (scope) {
       Keyboard: on a handle, Space picks the item up, Arrow keys move it, Space drops it, Escape puts it back.
       Fires s4-reorder { item, from, to, fromList, toList } on the list it lands in. S4.reorder.move(item, toIndex, toList).
    2. Swipe.  <li data-swipe><div class="s4-list-item">…</div><div class="s4-swipe-actions"><button …>Archive</button></div></li>
-      On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe runs
-      the action marked data-swipe-primary. The same buttons are always reachable by keyboard and are in the row's menu.
+      On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe (past a little over half
+      the row) runs the action marked data-swipe-primary, which fills the uncovered strip to show it. The same buttons are always reachable by keyboard and are in the row's menu.
    3. Select several.  <ul data-selectable data-selection-bar="#bar"> and <div class="s4-selection-bar" id="bar" hidden>
       Hold a row (or Ctrl/⌘-click it, or Shift-click for a range) to start selecting; after that a tap adds or removes a
       row. The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
@@ -1773,6 +1773,7 @@ S4.register('accordion', function (scope) {
     var p = swipeParts(row); if (!p.face || !p.acts) return;
     var rtl = getComputedStyle(row).direction === 'rtl', sign = rtl ? 1 : -1, w = p.acts.getBoundingClientRect().width, full = row.getBoundingClientRect().width;
     var sx = e.clientX, sy = e.clientY, base = row.hasAttribute('data-swiped') ? sign * w : 0, dx = base, active = false, pid = e.pointerId;
+    var primary = p.acts.querySelector('[data-swipe-primary]');
     function move(ev) {
       if (ev.pointerId !== pid) return;
       var mx = ev.clientX - sx, my = ev.clientY - sy;
@@ -1780,7 +1781,12 @@ S4.register('accordion', function (scope) {
       ev.preventDefault();
       dx = base + mx;
       if (dx * sign < 0) dx = 0;                                           /* only toward the actions */
-      if (Math.abs(dx) > w) dx = sign * (w + (Math.abs(dx) - w) * 0.35);    /* past them, it resists */
+      if (Math.abs(dx) > full) dx = sign * full;
+      /* A long swipe: past a little over half the row, letting go runs the main action. The row follows the finger
+         all the way (no resistance: on a phone that made the long swipe impossible to reach) and the main action
+         takes over the uncovered strip, so you can see what letting go will do. */
+      var commit = !!primary && Math.abs(dx) > Math.max(w + 40, full * 0.55);
+      if (commit !== row.hasAttribute('data-swipe-commit')) { row.toggleAttribute('data-swipe-commit', commit); if (commit && navigator.vibrate) try { navigator.vibrate(8); } catch (x) {} }
       p.face.style.transform = 'translateX(' + dx + 'px)';
     }
     function end() {
@@ -1792,10 +1798,11 @@ S4.register('accordion', function (scope) {
     function hold(ev) { if (active && ev.cancelable) ev.preventDefault(); }
     function up(ev) {
       if (ev.pointerId !== pid) return; end(); if (!active) return;
-      if (ev.type === 'pointercancel') { swipeSet(row, row.hasAttribute('data-swiped')); return; }
-      var far = Math.abs(dx) > w + (full - w) * 0.3, primary = p.acts.querySelector('[data-swipe-primary]');
+      if (ev.type === 'pointercancel') { row.removeAttribute('data-swipe-commit'); swipeSet(row, row.hasAttribute('data-swiped')); return; }
+      var far = row.hasAttribute('data-swipe-commit');
       document.documentElement.setAttribute('data-s4-dragging', ''); setTimeout(function () { document.documentElement.removeAttribute('data-s4-dragging'); }, 0);
-      if (far && primary) { swipeSet(row, false); primary.click(); }
+      /* run it on the next tick, after the guard that swallows the stray click a drag leaves behind has lifted */
+      if (far && primary) { row.removeAttribute('data-swipe-commit'); swipeSet(row, false); setTimeout(function () { primary.click(); }, 0); }
       else swipeSet(row, Math.abs(dx) > w / 2);
     }
     window.addEventListener('pointermove', move, { capture: true, passive: false }); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);
@@ -2316,6 +2323,201 @@ S4.register('table', function (scope) {
     syncAll();
     /* rows added or removed later */
     new MutationObserver(function () { label(); syncAll(); }).observe(table, { childList: true, subtree: true });
+  });
+});
+
+/* ---- ring/ring.js ---- */
+/* Ring behaviour: <div class="s4-ring" data-value="0.36" aria-label="…"><span class="s4-ring-value">36%</span>…</div>
+   Draws the SVG, sets role="progressbar", aria-valuenow (0–100), aria-valuetext (the written value) and --_value from
+   data-value (0–1, clamped). Changing data-value later (el.dataset.value = 0.5) updates and animates the arc. */
+S4.register('ring', function (scope) {
+  var SVG = '<svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">' +
+    '<circle class="s4-ring-track" cx="50" cy="50" r="44" pathLength="100"></circle>' +
+    '<circle class="s4-ring-indicator" cx="50" cy="50" r="44" pathLength="100"></circle></svg>';
+  function sync(el) {
+    if (!el.querySelector(':scope > svg')) el.insertAdjacentHTML('afterbegin', SVG);
+    var v = Math.min(1, Math.max(0, +el.getAttribute('data-value') || 0));
+    el.style.setProperty('--_value', String(v));
+    el.setAttribute('role', 'progressbar');
+    el.setAttribute('aria-valuemin', '0');
+    el.setAttribute('aria-valuemax', '100');
+    el.setAttribute('aria-valuenow', String(Math.round(v * 100)));
+    var text = el.querySelector('.s4-ring-value');
+    if (text && text.textContent.trim()) el.setAttribute('aria-valuetext', text.textContent.trim()); else el.removeAttribute('aria-valuetext');
+  }
+  S4.util.all(scope, '.s4-ring').forEach(function (el) {
+    if (!S4.util.once(el, 'ring')) return;
+    sync(el);
+    new MutationObserver(function () { sync(el); }).observe(el, { attributes: true, attributeFilter: ['data-value'] });
+  });
+});
+
+/* ---- milestones/milestones.js ---- */
+/* Milestones behaviour: <ol class="s4-milestones"><li data-state="done|current" data-value="0.4" data-label="…">.
+   Adds the marker to the current step (at its data-value, 0–1), names each step for screen readers and tooltips from
+   data-label ("Algebra, you are here"), and keeps up when the list is redrawn or a step's state changes.
+   data-here on the list sets the words for the marker (default "you are here"), data-done those for a finished step. */
+S4.register('milestones', function (scope) {
+  function sync(list) {
+    var here = list.getAttribute('data-here') || 'you are here', done = list.getAttribute('data-done') || 'done';
+    if (!list.hasAttribute('role')) list.setAttribute('role', 'list');
+    Array.prototype.forEach.call(list.children, function (li) {
+      var state = li.getAttribute('data-state'), mark = li.querySelector(':scope > .s4-milestones-here'), label = li.getAttribute('data-label');
+      if (state === 'current') {
+        var v = Math.min(1, Math.max(0, +li.getAttribute('data-value') || 0));
+        li.style.setProperty('--_value', String(v));
+        if (v < 0.04) li.setAttribute('data-at', 'start'); else if (v > 0.96) li.setAttribute('data-at', 'end'); else li.removeAttribute('data-at');
+        if (!mark) li.insertAdjacentHTML('beforeend', '<span class="s4-milestones-here" aria-hidden="true"></span>');
+        li.setAttribute('aria-current', 'step');
+      } else {
+        if (mark) mark.remove();
+        li.removeAttribute('data-at'); li.removeAttribute('aria-current'); li.style.removeProperty('--_value');
+      }
+      if (label) {
+        var text = label + (state === 'current' ? ', ' + here : state === 'done' ? ', ' + done : '');
+        if (li.getAttribute('aria-label') !== text) { li.setAttribute('aria-label', text); li.title = text; }
+      }
+    });
+  }
+  S4.util.all(scope, '.s4-milestones').forEach(function (list) {
+    if (!S4.util.once(list, 'milestones')) return;
+    sync(list);
+    new MutationObserver(function () { sync(list); }).observe(list, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-state', 'data-value', 'data-label'] });
+  });
+});
+
+/* ---- timeline/timeline.js ---- */
+/* Timeline behaviour: <ol class="s4-timeline" data-now="0.2"><li data-start="0" data-end="0.25" data-state="…">.
+   Adds each row's track and places its bar from data-start to data-end (0–1 of the whole span); data-now on the list
+   places the marker. Keeps up when rows are redrawn or their numbers change. */
+S4.register('timeline', function (scope) {
+  function unit(v) { return String(Math.min(1, Math.max(0, +v || 0))); }
+  function sync(list) {
+    if (list.hasAttribute('data-now')) list.style.setProperty('--_now', unit(list.getAttribute('data-now')));
+    if (!list.hasAttribute('role')) list.setAttribute('role', 'list');
+    Array.prototype.forEach.call(list.children, function (li) {
+      if (!li.querySelector(':scope > .s4-timeline-track')) li.insertAdjacentHTML('beforeend', '<span class="s4-timeline-track" aria-hidden="true"></span>');
+      var a = unit(li.getAttribute('data-start')), b = unit(li.hasAttribute('data-end') ? li.getAttribute('data-end') : 1);
+      li.style.setProperty('--_start', a); li.style.setProperty('--_end', +b < +a ? a : b);
+    });
+  }
+  S4.util.all(scope, '.s4-timeline').forEach(function (list) {
+    if (!S4.util.once(list, 'timeline')) return;
+    sync(list);
+    new MutationObserver(function () { sync(list); }).observe(list, { childList: true, attributes: true, subtree: true, attributeFilter: ['data-start', 'data-end', 'data-now'] });
+  });
+});
+
+/* ---- month/month.js ---- */
+/* Month behaviour: <div class="s4-month" data-month="2026-11" data-marks='{"2026-11-20":"dot"}' …>.
+   Draws the title, the previous and next buttons, the weekday row, the days (buttons) and, with data-legend, the key.
+     data-month        "YYYY-MM" (default: this month)
+     data-marks        JSON: { "YYYY-MM-DD": "dot" | "band" | "flag" | "dot band" }
+     data-mark-labels  JSON: { dot: "Course Due", band: "Busy", flag: "Deadline", today: "Today" } (read out and in the key)
+     data-today        "YYYY-MM-DD" (default: the real today)        data-week-start  0 Sunday (default), 1 Monday
+     data-min / data-max  "YYYY-MM": the first and last month you can page to
+   Tapping a day presses it (one at a time) and fires s4-select { date, marks }; paging fires s4-month { month }.
+   S4.month.set(el, { month, marks, today }) changes any of them; S4.month.select(el, 'YYYY-MM-DD') presses a day. */
+S4.register('month', function (scope) {
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function iso(y, m, d) { return y + '-' + pad(m + 1) + '-' + pad(d); }
+  function json(el, name) { try { return JSON.parse(el.getAttribute(name) || '{}') || {}; } catch (e) { return {}; } }
+  function ym(el) {
+    var m = /^(\d{4})-(\d{1,2})/.exec(el.getAttribute('data-month') || ''), now = new Date();
+    return m ? { y: +m[1], m: +m[2] - 1 } : { y: now.getFullYear(), m: now.getMonth() };
+  }
+  function lang(el) { return (el.closest('[lang]') || document.documentElement).lang || undefined; }
+  function fmt(el, opts, date) { try { return new Intl.DateTimeFormat(lang(el), opts).format(date); } catch (e) { return new Intl.DateTimeFormat(undefined, opts).format(date); } }
+
+  function draw(el, dir) {
+    var at = ym(el), marks = json(el, 'data-marks'), labels = json(el, 'data-mark-labels'), start = +el.getAttribute('data-week-start') === 1 ? 1 : 0;
+    var now = new Date(), today = el.getAttribute('data-today') || iso(now.getFullYear(), now.getMonth(), now.getDate());
+    var first = new Date(at.y, at.m, 1), days = new Date(at.y, at.m + 1, 0).getDate(), lead = (first.getDay() - start + 7) % 7;
+    var picked = el.getAttribute('data-selected') || '', html = '', i;
+    if (!el.querySelector(':scope > .s4-month-head')) {
+      el.innerHTML = '<div class="s4-month-head"><h3 class="s4-month-title" aria-live="polite"></h3>' +
+        '<button class="s4-icon-button" type="button" data-month-step="-1"><span class="s4-icon" data-icon="chevron-left"></span></button>' +
+        '<button class="s4-icon-button" type="button" data-month-step="1"><span class="s4-icon" data-icon="chevron-right"></span></button></div>' +
+        '<div class="s4-month-body"><div class="s4-month-grid"></div></div>';
+      if (!el.hasAttribute('role')) el.setAttribute('role', 'group');
+    }
+    var prev = el.querySelector('[data-month-step="-1"]'), next = el.querySelector('[data-month-step="1"]'), key = at.y + '-' + pad(at.m + 1);
+    prev.setAttribute('aria-label', el.getAttribute('data-label-previous') || 'Previous Month');
+    next.setAttribute('aria-label', el.getAttribute('data-label-next') || 'Next Month');
+    prev.disabled = !!el.getAttribute('data-min') && key <= el.getAttribute('data-min');
+    next.disabled = !!el.getAttribute('data-max') && key >= el.getAttribute('data-max');
+    el.querySelector('.s4-month-title').textContent = fmt(el, { month: 'long', year: 'numeric' }, first);
+    for (i = 0; i < 7; i++) html += '<span class="s4-month-weekday" aria-hidden="true">' + fmt(el, { weekday: 'narrow' }, new Date(2023, 0, 1 + start + i)) + '</span>';   /* Jan 1 2023 was a Sunday */
+    for (i = 0; i < lead; i++) html += '<span></span>';
+    function has(d, mark) { return d >= 1 && d <= days && (' ' + (marks[iso(at.y, at.m, d)] || '') + ' ').indexOf(' ' + mark + ' ') >= 0; }
+    for (var d = 1; d <= days; d++) {
+      var date = iso(at.y, at.m, d), m = String(marks[date] || '').trim(), col = (lead + d - 1) % 7, run = '';
+      if (has(d, 'band')) {
+        var before = col > 0 && has(d - 1, 'band'), after = col < 6 && has(d + 1, 'band');   /* a band never wraps a week */
+        run = before && after ? 'mid' : before ? 'end' : after ? 'start' : 'single';
+      }
+      var words = [fmt(el, { weekday: 'long', month: 'long', day: 'numeric' }, new Date(at.y, at.m, d))];
+      if (date === today) words.push(labels.today || 'Today');
+      m.split(/\s+/).forEach(function (k) { if (k) words.push(labels[k] || k); });
+      html += '<button class="s4-month-day" type="button" data-date="' + date + '"' + (m ? ' data-marks="' + m + '"' : '') + (run ? ' data-run="' + run + '"' : '') +
+        (date === today ? ' data-today aria-current="date"' : '') + ' aria-pressed="' + (date === picked) + '" aria-label="' + words.join(', ').replace(/"/g, '&quot;') + '">' + d +
+        (has(d, 'dot') ? '<span class="s4-month-dot"></span>' : '') + '</button>';
+    }
+    var grid = el.querySelector('.s4-month-grid');
+    grid.innerHTML = html;
+    if (dir && S4.transition) S4.transition.enter(grid, dir);
+    var legend = el.querySelector(':scope > .s4-month-legend');
+    if (el.hasAttribute('data-legend')) {
+      var keys = ['today'].concat(Object.keys(labels).filter(function (k) { return k !== 'today'; }));
+      var items = keys.map(function (k) { var t = document.createElement('span'); t.textContent = labels[k] || 'Today'; return '<li><span class="s4-month-key" data-mark="' + k.replace(/[^a-z]/g, '') + '"></span>' + t.innerHTML + '</li>'; }).join('');
+      if (!legend) { legend = document.createElement('ul'); legend.className = 's4-month-legend'; el.appendChild(legend); }
+      if (legend.innerHTML !== items) legend.innerHTML = items;
+    } else if (legend) legend.remove();
+    S4.init(el.querySelector('.s4-month-head'));
+  }
+  function step(el, by) {
+    var at = ym(el), date = new Date(at.y, at.m + by, 1), month = date.getFullYear() + '-' + pad(date.getMonth() + 1);
+    el._s4dir = by;
+    el.setAttribute('data-month', month);
+    S4.util.emit(el, 's4-month', { month: month });
+  }
+  function select(el, date) {
+    if (date) el.setAttribute('data-selected', date); else el.removeAttribute('data-selected');
+    S4.util.all(el, '.s4-month-day').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-date') === date)); });
+  }
+
+  S4.month = S4.month || {
+    set: function (el, opts) {
+      opts = opts || {};
+      if (opts.marks) el.setAttribute('data-marks', JSON.stringify(opts.marks));
+      if (opts.labels) el.setAttribute('data-mark-labels', JSON.stringify(opts.labels));
+      if (opts.today) el.setAttribute('data-today', opts.today);
+      if (opts.month) el.setAttribute('data-month', opts.month);
+    },
+    select: select,
+    step: step
+  };
+
+  S4.util.all(scope, '.s4-month').forEach(function (el) {
+    if (!S4.util.once(el, 'month')) return;
+    draw(el);
+    el.addEventListener('click', function (e) {
+      var nav = e.target.closest('[data-month-step]'), day = e.target.closest('.s4-month-day');
+      if (nav && el.contains(nav)) { step(el, +nav.getAttribute('data-month-step')); return; }
+      if (!day || !el.contains(day)) return;
+      var date = day.getAttribute('data-date'), on = day.getAttribute('aria-pressed') !== 'true';
+      select(el, on ? date : '');
+      S4.util.emit(el, 's4-select', { date: on ? date : null, marks: on ? (day.getAttribute('data-marks') || '').split(/\s+/).filter(Boolean) : [] });
+    });
+    /* arrow keys move between days, as in any grid of dates */
+    el.addEventListener('keydown', function (e) {
+      var day = e.target.closest && e.target.closest('.s4-month-day'); if (!day) return;
+      var by = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]; if (!by) return;
+      var all = S4.util.all(el, '.s4-month-day'), to = all[all.indexOf(day) + by * (Math.abs(by) === 1 && getComputedStyle(el).direction === 'rtl' ? -1 : 1)];
+      if (to) { e.preventDefault(); to.focus(); }
+    });
+    new MutationObserver(function () { var dir = el._s4dir || 0; el._s4dir = 0; draw(el, dir); })
+      .observe(el, { attributes: true, attributeFilter: ['data-month', 'data-marks', 'data-mark-labels', 'data-today', 'data-week-start', 'data-legend'] });
   });
 });
 

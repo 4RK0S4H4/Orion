@@ -1,0 +1,134 @@
+/* Month: a month you read, with marks on its days. S4 addition (decision 0053).
+   <div class="s4-month" data-month="2026-11" data-legend aria-label="Schedule"
+        data-marks='{"2026-11-20":"dot","2026-11-26":"band","2026-11-27":"band","2026-12-31":"flag"}'
+        data-mark-labels='{"dot":"Course Due","band":"Busy","flag":"Deadline"}'></div>
+   month.js draws it. The date picker is for choosing a date; this is for seeing a plan. Four marks, all filled
+   (nothing outlined, nothing hatched):
+     today  the accent circle (set by itself, or data-today="2026-11-15")
+     dot    a small accent dot under the number: something happens that day
+     band   a tonal band; days in a row join into one capsule: a stretch of time (busy, away, booked)
+     flag   a filled error-tone circle: the day that must not be missed
+   Tapping a day selects it and fires s4-select ({ date, marks }); the app shows what is on that day below.
+   data-legend draws the key under the grid from data-mark-labels. data-week-start="1" starts weeks on Monday. */
+@layer s4.components {
+  .s4-month {
+    --_cell: var(--s4-space-10);   /* 40: the tap target */
+    --_disc: calc(var(--s4-space-10) - var(--s4-space-1));
+    display: grid;
+    gap: var(--s4-space-3);
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-month-head { display: flex; align-items: center; gap: var(--s4-space-1); }
+  .s4-month-title {
+    flex: 1;
+    margin: 0;
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  }
+  .s4-month-body { overflow-x: clip; }
+  .s4-month-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--s4-space-1); }
+  .s4-month-weekday {
+    display: grid;
+    place-items: center;
+    block-size: var(--s4-space-8);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+  }
+  .s4-month-day {
+    --_disc-bg: transparent;
+    --_fg: inherit;
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--_cell);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--_fg);
+    font: inherit;
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* the band: behind the whole cell, so days in a row join */
+  .s4-month-day::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset-block: calc((var(--_cell) - var(--_disc)) / 2);
+    inset-inline: 0;
+    background: transparent;
+  }
+  .s4-month-day[data-marks~="band"]::before { background: var(--md-sys-color-surface-container-highest); }
+  .s4-month-day[data-run="single"]::before { inset-inline: calc(50% - var(--_disc) / 2); border-radius: var(--md-sys-shape-corner-full); }
+  .s4-month-day[data-run="start"]::before { inset-inline-start: calc(50% - var(--_disc) / 2); border-start-start-radius: var(--md-sys-shape-corner-full); border-end-start-radius: var(--md-sys-shape-corner-full); }
+  .s4-month-day[data-run="end"]::before { inset-inline-end: calc(50% - var(--_disc) / 2); border-start-end-radius: var(--md-sys-shape-corner-full); border-end-end-radius: var(--md-sys-shape-corner-full); }
+  /* the disc: today, a flag, the selected day, hover */
+  .s4-month-day::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-block-start: calc((var(--_cell) - var(--_disc)) / 2);
+    inset-inline-start: calc(50% - var(--_disc) / 2);
+    inline-size: var(--_disc);
+    block-size: var(--_disc);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_disc-bg);
+    transition: background-color var(--s4-motion-state);
+  }
+  @media (hover: hover) {
+    .s4-month-day:hover { --_disc-bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent); }
+  }
+  .s4-month-day[aria-pressed="true"] { --_disc-bg: var(--md-sys-color-primary-container); --_fg: var(--md-sys-color-on-primary-container); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day[data-marks~="flag"] { --_disc-bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day[data-today] { --_disc-bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-month-day:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-space-1) * -1); border-radius: var(--md-sys-shape-corner-full); }
+  /* the dot */
+  .s4-month-dot {
+    position: absolute;
+    inset-block-end: calc(var(--s4-space-1) + var(--s4-space-1) / 2);
+    inset-inline-start: calc(50% - var(--s4-space-1) / 2);
+    inline-size: var(--s4-space-1);
+    block-size: var(--s4-space-1);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary);
+  }
+  .s4-month-day:is([data-today], [data-marks~="flag"], [aria-pressed="true"]) > .s4-month-dot { background: currentColor; }
+  /* the key */
+  .s4-month-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4-space-2) var(--s4-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+  }
+  .s4-month-legend > li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-month-key { flex: none; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .s4-month-key[data-mark="dot"] { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); margin-inline: var(--s4-space-1); }
+  .s4-month-key[data-mark="band"] { inline-size: var(--s4-space-5); background: var(--md-sys-color-surface-container-highest); }
+  .s4-month-key[data-mark="flag"] { background: var(--md-sys-color-error-container); }
+  @media (forced-colors: active) {
+    .s4-month-day[data-today]::after { background: Highlight; }
+    .s4-month-day[data-today] { color: HighlightText; forced-color-adjust: none; }
+    .s4-month-day[data-marks~="band"]::before, .s4-month-day[data-marks~="flag"]::after, .s4-month-day[aria-pressed="true"]::after { border: 1px solid CanvasText; background: none; }
+    .s4-month-dot { background: CanvasText; }
+  }
+}

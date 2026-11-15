@@ -6,8 +6,8 @@
       Keyboard: on a handle, Space picks the item up, Arrow keys move it, Space drops it, Escape puts it back.
       Fires s4-reorder { item, from, to, fromList, toList } on the list it lands in. S4.reorder.move(item, toIndex, toList).
    2. Swipe.  <li data-swipe><div class="s4-list-item">…</div><div class="s4-swipe-actions"><button …>Archive</button></div></li>
-      On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe runs
-      the action marked data-swipe-primary. The same buttons are always reachable by keyboard and are in the row's menu.
+      On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe (past a little over half
+      the row) runs the action marked data-swipe-primary, which fills the uncovered strip to show it. The same buttons are always reachable by keyboard and are in the row's menu.
    3. Select several.  <ul data-selectable data-selection-bar="#bar"> and <div class="s4-selection-bar" id="bar" hidden>
       Hold a row (or Ctrl/⌘-click it, or Shift-click for a range) to start selecting; after that a tap adds or removes a
       row. The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
@@ -207,6 +207,7 @@
     var p = swipeParts(row); if (!p.face || !p.acts) return;
     var rtl = getComputedStyle(row).direction === 'rtl', sign = rtl ? 1 : -1, w = p.acts.getBoundingClientRect().width, full = row.getBoundingClientRect().width;
     var sx = e.clientX, sy = e.clientY, base = row.hasAttribute('data-swiped') ? sign * w : 0, dx = base, active = false, pid = e.pointerId;
+    var primary = p.acts.querySelector('[data-swipe-primary]');
     function move(ev) {
       if (ev.pointerId !== pid) return;
       var mx = ev.clientX - sx, my = ev.clientY - sy;
@@ -214,7 +215,12 @@
       ev.preventDefault();
       dx = base + mx;
       if (dx * sign < 0) dx = 0;                                           /* only toward the actions */
-      if (Math.abs(dx) > w) dx = sign * (w + (Math.abs(dx) - w) * 0.35);    /* past them, it resists */
+      if (Math.abs(dx) > full) dx = sign * full;
+      /* A long swipe: past a little over half the row, letting go runs the main action. The row follows the finger
+         all the way (no resistance: on a phone that made the long swipe impossible to reach) and the main action
+         takes over the uncovered strip, so you can see what letting go will do. */
+      var commit = !!primary && Math.abs(dx) > Math.max(w + 40, full * 0.55);
+      if (commit !== row.hasAttribute('data-swipe-commit')) { row.toggleAttribute('data-swipe-commit', commit); if (commit && navigator.vibrate) try { navigator.vibrate(8); } catch (x) {} }
       p.face.style.transform = 'translateX(' + dx + 'px)';
     }
     function end() {
@@ -226,10 +232,11 @@
     function hold(ev) { if (active && ev.cancelable) ev.preventDefault(); }
     function up(ev) {
       if (ev.pointerId !== pid) return; end(); if (!active) return;
-      if (ev.type === 'pointercancel') { swipeSet(row, row.hasAttribute('data-swiped')); return; }
-      var far = Math.abs(dx) > w + (full - w) * 0.3, primary = p.acts.querySelector('[data-swipe-primary]');
+      if (ev.type === 'pointercancel') { row.removeAttribute('data-swipe-commit'); swipeSet(row, row.hasAttribute('data-swiped')); return; }
+      var far = row.hasAttribute('data-swipe-commit');
       document.documentElement.setAttribute('data-s4-dragging', ''); setTimeout(function () { document.documentElement.removeAttribute('data-s4-dragging'); }, 0);
-      if (far && primary) { swipeSet(row, false); primary.click(); }
+      /* run it on the next tick, after the guard that swallows the stray click a drag leaves behind has lifted */
+      if (far && primary) { row.removeAttribute('data-swipe-commit'); swipeSet(row, false); setTimeout(function () { primary.click(); }, 0); }
       else swipeSet(row, Math.abs(dx) > w / 2);
     }
     window.addEventListener('pointermove', move, { capture: true, passive: false }); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);

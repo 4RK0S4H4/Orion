@@ -1,0 +1,71 @@
+/* Milestones: a road made of steps, with a marker where you are. S4 addition (decision 0053).
+   <ol class="s4-milestones" aria-label="11 courses, 3 done">
+     <li data-state="done" data-label="Composition"></li>
+     <li data-state="current" data-value="0.4" data-label="Algebra"></li>
+     <li data-label="Statistics"></li>
+   </ol>
+   One pill per step, 4dp apart (the gap of the progress bar). Done steps are filled, the current one is filled up to
+   its data-value (0–1) and carries the marker: an upright pill, the M3 Expressive slider handle, never a ring or a
+   pin. milestones.js adds the marker and turns data-label into the step's name for screen readers and tooltips.
+   A stepper says which page of a task you are on; this says how far along a long road you are.
+   On a colored surface add data-ink="current". Nothing here animates. */
+@layer s4.components {
+  .s4-milestones {
+    --_done: var(--md-sys-color-primary);
+    --_rest: var(--md-sys-color-surface-container-highest);
+    --_marker: var(--md-sys-color-on-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: var(--s4-space-6);   /* room for the marker */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s4-milestones[data-ink="current"] {
+    --_done: currentColor;
+    --_rest: color-mix(in srgb, currentColor 24%, transparent);
+    --_marker: currentColor;
+  }
+  .s4-milestones > li {
+    --_value: 0;
+    flex: 1 1 0;
+    min-inline-size: 0;
+    block-size: var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_rest);
+  }
+  .s4-milestones > li[data-state="done"] { background: var(--_done); }
+  /* the current step: filled part, marker, the rest */
+  .s4-milestones > li[data-state="current"] {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    flex-grow: 2;   /* where you are gets room to show how far */
+    background: none;
+  }
+  .s4-milestones > li[data-state="current"]::before,
+  .s4-milestones > li[data-state="current"]::after {
+    content: "";
+    block-size: 100%;
+    min-inline-size: 0;
+    border-radius: var(--md-sys-shape-corner-full);
+  }
+  .s4-milestones > li[data-state="current"]::before { flex: var(--_value) 1 0; background: var(--_done); }
+  .s4-milestones > li[data-state="current"]::after { flex: calc(1 - var(--_value)) 1 0; background: var(--_rest); }
+  .s4-milestones > li[data-at="start"]::before, .s4-milestones > li[data-at="end"]::after { display: none; }
+  .s4-milestones-here {
+    flex: none;
+    inline-size: var(--s4-space-1);
+    block-size: var(--s4-space-6);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--_marker);
+  }
+  @media (forced-colors: active) {
+    .s4-milestones > li { border: 1px solid CanvasText; }
+    .s4-milestones > li[data-state="done"], .s4-milestones > li[data-state="current"]::before { background: Highlight; }
+    .s4-milestones-here { background: CanvasText; }
+  }
+}

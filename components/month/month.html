@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Month · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Month</h1></header>
+<main class="ex-main">
+  <p>A month you read, with marks on its days. The date picker is for choosing a date; this is for seeing a plan.</p>
+  <section class="ex-sec">
+    <h2>Marks And Key</h2>
+    <p>Today, a dot (something happens), a band (a stretch of days, joined) and a flag (the day not to miss). Tap a day.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="inline-size:min(100%, 26rem)" aria-label="Schedule">
+        <div class="s4-month" id="m1" data-month="2026-11" data-today="2026-11-15" data-legend aria-label="Schedule"
+          data-marks='{"2026-11-08":"band","2026-11-18":"dot","2026-11-22":"band","2026-11-25":"band","2026-11-26":"band dot","2026-11-27":"band","2026-11-30":"flag","2026-12-09":"dot","2026-12-24":"band","2026-12-25":"band"}'
+          data-mark-labels='{"dot":"Course Due","band":"Busy","flag":"Deadline"}'></div>
+        <p class="s4-body-medium" id="m1-out" style="margin:0" aria-live="polite">Tap a day to see what is on it.</p>
+      </section>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>Monday First</h2>
+    <p><code>data-week-start="1"</code>, no key.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="inline-size:min(100%, 26rem)" aria-label="Bookings"><div class="s4-month" data-month="2026-11" data-today="2026-11-15" data-week-start="1" data-marks='{"2026-11-03":"dot","2026-11-10":"dot"}' aria-label="Bookings"></div></section>
+    </div>
+  </section>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../icon-button/icon-button.js"></script>
+<script src="month.js"></script>
+<script>document.getElementById("m1").addEventListener("s4-select", function (e) { document.getElementById("m1-out").textContent = e.detail.date ? e.detail.date + (e.detail.marks.length ? ": " + e.detail.marks.join(", ") : ": nothing planned") : "Tap a day to see what is on it."; });</script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

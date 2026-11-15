@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ring · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Ring</h1></header>
+<main class="ex-main">
+  <p>One share of a whole, with what it means written in the middle. The big sibling of circular progress, drawn the same way: a thick round-capped arc, a gap, then the track.</p>
+  <section class="ex-sec">
+    <h2>Sizes</h2>
+    <p>Small (value only), default and large.</p>
+    <div class="ex-board">
+      <div class="s4-ring" data-size="s" data-value="0.72" aria-label="Storage Used"><span class="s4-ring-value">72%</span></div>
+      <div class="s4-ring" data-value="0.36" aria-label="Degree Progress"><span class="s4-ring-value">36%</span><span class="s4-ring-label">Complete</span></div>
+      <div class="s4-ring" data-size="l" data-value="0.6" aria-label="Steps Today"><span class="s4-ring-value">6,012</span><span class="s4-ring-label">Of 10,000 Steps</span></div>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>Empty And Full</h2>
+    <p>Nothing at 0, a closed ring at 100%.</p>
+    <div class="ex-board">
+      <div class="s4-ring" data-value="0" aria-label="Not Started"><span class="s4-ring-value">0%</span><span class="s4-ring-label">Complete</span></div>
+      <div class="s4-ring" data-value="1" aria-label="Finished"><span class="s4-ring-value">100%</span><span class="s4-ring-label">Complete</span></div>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>On A Colored Surface</h2>
+    <p><code>data-ink="current"</code>: the arc takes the text color. Tap to change the value.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="--_bg:var(--md-sys-color-primary);--_fg:var(--md-sys-color-on-primary);inline-size:100%" aria-label="Where You Stand">
+        <div class="s4-row"><div class="s4-ring" data-ink="current" data-value="0.36" id="ring-live" aria-label="Degree Progress"><span class="s4-ring-value">36%</span><span class="s4-ring-label">Complete</span></div>
+        <button class="s4-button" data-variant="tonal" type="button" id="ring-more">Finish A Course</button></div>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../button/button.js"></script>
+<script src="ring.js"></script>
+<script>document.getElementById("ring-more").addEventListener("click", function () { var r = document.getElementById("ring-live"), v = (+r.dataset.value + 0.16) % 1.12; if (v > 1) v = 1; r.querySelector(".s4-ring-value").textContent = Math.round(v * 100) + "%"; r.dataset.value = v; });</script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

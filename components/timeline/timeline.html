@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timeline · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Timeline</h1></header>
+<main class="ex-main">
+  <p>When each thing happens along one shared span of time: courses in a term, phases of a project, bookings in a week.</p>
+  <section class="ex-sec">
+    <h2>Default</h2>
+    <p>Done is quiet, current is the accent, the marker is now.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="inline-size:100%" aria-label="Course Timeline">
+        <h2 class="s4-pane-title">Course Timeline</h2>
+        <ol class="s4-timeline" data-now="0.34" aria-label="Course Timeline">
+          <li data-start="0" data-end="0.2" data-state="done"><span class="s4-timeline-label">Composition</span><span class="s4-timeline-meta">Oct 1 → Oct 19</span></li>
+          <li data-start="0.2" data-end="0.46" data-state="current"><span class="s4-timeline-label">Principles Of Accounting</span><span class="s4-timeline-meta">Oct 20 → Nov 12</span></li>
+          <li data-start="0.46" data-end="0.7"><span class="s4-timeline-label">Business Law</span><span class="s4-timeline-meta">Nov 13 → Dec 4</span></li>
+          <li data-start="0.7" data-end="1"><span class="s4-timeline-label">Statistics</span><span class="s4-timeline-meta">Dec 5 → Dec 31</span></li>
+        </ol>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="timeline.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

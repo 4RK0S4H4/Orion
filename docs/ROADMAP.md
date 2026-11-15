@@ -34,6 +34,7 @@ When two good ideas conflict, the earlier line wins.
 4. **One way to do each thing,** the same in every app. A new component must name the pattern it uses.
 5. **Proof over taste.** Contrast, glass, accents, motion and behaviour are checked by a machine on every push.
 6. **Any accent, any app.** Nothing may depend on black and white, on one kind of content, or on one screen size.
+7. **The app is the app** (0053). Orion is a language, not a kit of parts: an app keeps its own screens and elements, and Orion grows the component the app needs. The app is never bent to fit what is on the shelf.
 
 ## Where it stands (2026-11-15)
 
@@ -42,7 +43,7 @@ When two good ideas conflict, the earlier line wins.
 | Tokens, color, type, shape, glass | Settled (0003 to 0045). Open only: the owner's iPhone looks for 0037, 0040. |
 | Motion | Settled: ten patterns, enforced (0046). |
 | Places | Settled in principle: views, pages (0050), the placement ladder (0047). Open: non-modal panels. |
-| Components | 57. The app-level set is now there: palette, states, forms, direct manipulation, charts. |
+| Components | 61. The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
 | Templates | 15 app archetypes. |
 | Proof | `npm run check` (tokens, glass, accents, motion, stale output) and `npm test` (every page used like a person, Chromium and WebKit, in CI). |
 | Skill | Packaged; needs its evals re-run against the new components. |

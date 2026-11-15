@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Milestones · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Milestones</h1></header>
+<main class="ex-main">
+  <p>A road made of steps, with a marker where you are. A stepper says which page of a task you are on; this says how far along a long road you are.</p>
+  <section class="ex-sec">
+    <h2>Default</h2>
+    <p>Done steps are filled; the current step is filled as far as you are and carries the marker.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="inline-size:100%" aria-label="Road">
+        <div class="s4-row" style="justify-content:space-between"><span class="s4-label-large">Road To Graduation</span><span class="s4-body-small">Goal Jun 30</span></div>
+        <ol class="s4-milestones" aria-label="8 courses, 3 done">
+          <li data-state="done" data-label="Composition"></li><li data-state="done" data-label="Algebra"></li><li data-state="done" data-label="Biology"></li>
+          <li data-state="current" data-value="0.45" data-label="Accounting"></li>
+          <li data-label="Business Law"></li><li data-label="Statistics"></li><li data-label="Economics"></li><li data-label="Capstone"></li>
+        </ol>
+        <p class="s4-body-small" style="margin:0">3 of 8 courses done · you are in Accounting</p>
+      </section>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>Just Started, Nearly There</h2>
+    <div class="ex-board col">
+      <ol class="s4-milestones" aria-label="5 steps, none done"><li data-state="current" data-value="0" data-label="Step 1"></li><li data-label="Step 2"></li><li data-label="Step 3"></li><li data-label="Step 4"></li><li data-label="Step 5"></li></ol>
+      <ol class="s4-milestones" aria-label="5 steps, 4 done"><li data-state="done" data-label="Step 1"></li><li data-state="done" data-label="Step 2"></li><li data-state="done" data-label="Step 3"></li><li data-state="done" data-label="Step 4"></li><li data-state="current" data-value="0.8" data-label="Step 5"></li></ol>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>On A Colored Surface</h2>
+    <p><code>data-ink="current"</code>.</p>
+    <div class="ex-board col">
+      <section class="s4-pane" style="--_bg:var(--md-sys-color-primary);--_fg:var(--md-sys-color-on-primary);inline-size:100%" aria-label="Road On Color">
+        <ol class="s4-milestones" data-ink="current" aria-label="6 steps, 2 done"><li data-state="done" data-label="One"></li><li data-state="done" data-label="Two"></li><li data-state="current" data-value="0.3" data-label="Three"></li><li data-label="Four"></li><li data-label="Five"></li><li data-label="Six"></li></ol>
+      </section>
+    </div>
+  </section>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="milestones.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>
