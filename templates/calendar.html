@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendar · S4 Orion Template</title>
+<!-- Template: Calendar. For schedules, bookings, shifts, content plans and anything that lives on dates. A month grid
+     with the day's agenda beside it (under it on a phone); pick a day to see it, add an event in place under the
+     agenda's heading, open an event as a page. The grid is a real table of buttons, so the arrow keys work. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=8fac2ec">
+<style>
+  /* the app's own layout: tokens only */
+  .cal-head { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .cal-head h2 { margin: 0 auto 0 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .cal-grid { inline-size: 100%; border-collapse: separate; border-spacing: var(--s4-space-1); table-layout: fixed; }
+  .cal-grid th { padding-block: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); text-align: center; }
+  .cal-grid td { padding: 0; }
+  .cal-day { display: flex; flex-direction: column; align-items: stretch; gap: var(--s4-space-1); inline-size: 100%; min-block-size: var(--s4-space-12); padding: var(--s4-space-1); border: 0; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); font: inherit; text-align: start; cursor: pointer; overflow: hidden; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
+  @container s4-app (width >= 840px) { .cal-day { min-block-size: calc(var(--s4-space-16) + var(--s4-space-6)); padding: var(--s4-space-2); } }
+  @media (hover: hover) { .cal-day:hover { background: var(--md-sys-color-surface-container-high); } }
+  .cal-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
+  .cal-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .cal-num { align-self: flex-start; display: grid; place-items: center; min-inline-size: var(--s4-space-6); block-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); font-variant-numeric: tabular-nums; }
+  .cal-day[data-today] .cal-num { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  .cal-ev { display: none; padding-inline: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* a phone shows dots for events; a wide screen shows their names */
+  .cal-dots { display: flex; gap: var(--s4-space-1); padding-inline: var(--s4-space-1); min-block-size: var(--s4-space-2); }
+  .cal-dots > i { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: currentColor; opacity: 0.7; }
+  @container s4-app (width >= 840px) { .cal-ev { display: block; } .cal-dots { display: none; } }
+  .s4-subpage > article { max-inline-size: 40rem; margin-inline: auto; }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#month" data-view="month" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Month</span></a>
+      <a class="s4-nav-item" href="#upcoming" data-view="upcoming"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="list"></span></span><span class="s4-nav-label">Upcoming</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Month</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-button" data-variant="tonal" data-size="s" type="button" id="cal-today">Today</button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view" data-view="month" data-title="Month">
+        <div class="s4-split" data-layout="supporting" data-resizable data-resize-key="orion-template-calendar">
+          <section class="s4-split-pane s4-stack" aria-label="Month">
+            <div class="cal-head"><h2 id="cal-title" aria-live="polite">November 2026</h2><button class="s4-icon-button" type="button" aria-label="Previous Month" id="cal-prev"><span class="s4-icon" data-icon="chevron-left"></span></button><button class="s4-icon-button" type="button" aria-label="Next Month" id="cal-next"><span class="s4-icon" data-icon="chevron-right"></span></button></div>
+            <table class="cal-grid" id="cal-grid" aria-labelledby="cal-title"><thead><tr><th scope="col" abbr="Monday">Mon</th><th scope="col" abbr="Tuesday">Tue</th><th scope="col" abbr="Wednesday">Wed</th><th scope="col" abbr="Thursday">Thu</th><th scope="col" abbr="Friday">Fri</th><th scope="col" abbr="Saturday">Sat</th><th scope="col" abbr="Sunday">Sun</th></tr></thead><tbody></tbody></table>
+          </section>
+          <aside class="s4-split-pane" data-sticky aria-label="Day">
+            <section class="s4-pane">
+              <div class="s4-row" style="justify-content:space-between"><h2 class="s4-pane-title" id="day-title">Today</h2><button class="s4-button" data-variant="tonal" data-size="s" type="button" data-expand="new-event"><span class="s4-icon" data-icon="add"></span>New Event</button></div>
+              <!-- a new event is typed in place, under the day it belongs to (decision 0047) -->
+              <div class="s4-expand" id="new-event" data-variant="inset" hidden>
+                <form class="s4-form s4-expand-body" id="ev-form">
+                  <div class="s4-text-field"><input id="ev-title" name="title" autocomplete="off" required data-msg-required="Give the event a name."><label for="ev-title">Event</label></div>
+                  <div class="s4-text-field"><input id="ev-time" name="time" type="time" value="10:00" required><label for="ev-time">Starts</label></div>
+                  <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Add Event</button></div>
+                </form>
+              </div>
+              <div class="s4-states" id="day-states" data-state="empty">
+                <ul class="s4-list" data-when="ready" id="day-list" aria-labelledby="day-title"></ul>
+                <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="calendar"></span></span><h3 class="s4-empty-title">Nothing Planned</h3><p class="s4-empty-text">This day is free.</p></div>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+      <section class="s4-view" data-view="upcoming" data-title="Upcoming" hidden>
+        <ul class="s4-list" id="up-list" aria-label="Upcoming Events" data-dividers></ul>
+      </section>
+
+      <section class="s4-subpage" data-page="event" data-title="Event" hidden>
+        <article class="s4-stack">
+          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="e-title">Event</h2><div class="s4-subpage-meta"><span class="s4-icon" data-icon="schedule"></span><span id="e-when"></span></div></header>
+          <section class="s4-pane">
+            <dl class="s4-dl"><div class="s4-dl-row"><dt>Calendar</dt><dd>Work</dd></div><div class="s4-dl-row"><dt>Reminder</dt><dd>30 minutes before</dd></div></dl>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="e-remove">Remove Event</button></div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#month" data-view="month" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Month</span></a>
+    <a class="s4-nav-item" href="#upcoming" data-view="upcoming"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="list"></span></span><span class="s4-nav-label">Upcoming</span></a>
+  </nav>
+</div>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=1d678fa"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+/* the data (a real app loads and saves this). "Today" is fixed so the template always looks the same. */
+var TODAY = '2026-11-14', view = { y: 2026, m: 10 }, picked = TODAY, seq = 20;
+var events = [
+  { id: 'e1', date: '2026-11-03', time: '09:30', title: 'Planning' }, { id: 'e2', date: '2026-11-09', time: '14:00', title: 'Design review' },
+  { id: 'e3', date: '2026-11-14', time: '10:00', title: 'Standup' }, { id: 'e4', date: '2026-11-14', time: '13:00', title: 'Lunch with Maya' },
+  { id: 'e5', date: '2026-11-14', time: '16:30', title: 'Budget check' }, { id: 'e6', date: '2026-11-18', time: '11:00', title: 'Launch checklist' },
+  { id: 'e7', date: '2026-11-20', time: '09:00', title: 'Invoice due' }, { id: 'e8', date: '2026-11-26', time: '15:00', title: 'Offsite prep' },
+  { id: 'e9', date: '2026-12-02', time: '10:00', title: 'Quarter review' }
+];
+var app = document.querySelector('.s4-app'), body = document.querySelector('#cal-grid tbody');
+function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function parse(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
+function on(date) { return events.filter(function (e) { return e.date === date; }).sort(function (a, b) { return a.time < b.time ? -1 : 1; }); }
+function long(date) { return parse(date).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' }); }
+function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function grid(dir) {
+  var first = new Date(view.y, view.m, 1), start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
+  document.getElementById('cal-title').textContent = first.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  var html = '', d = new Date(start);
+  for (var w = 0; w < 6; w++) {
+    html += '<tr>';
+    for (var i = 0; i < 7; i++) {
+      var s = iso(d), ev = on(s), out = d.getMonth() !== view.m;
+      html += '<td><button class="cal-day" type="button" data-date="' + s + '"' + (out ? ' data-outside' : '') + (s === TODAY ? ' data-today' : '') + ' aria-pressed="' + (s === picked) + '" aria-label="' + long(s) + (ev.length ? ', ' + ev.length + (ev.length === 1 ? ' event' : ' events') : '') + '" tabindex="' + (s === picked ? 0 : -1) + '"><span class="cal-num">' + d.getDate() + '</span>' +
+        ev.slice(0, 2).map(function (e) { return '<span class="cal-ev">' + esc(e.title) + '</span>'; }).join('') + (ev.length ? '<span class="cal-dots">' + ev.slice(0, 3).map(function () { return '<i></i>'; }).join('') + '</span>' : '') + '</button></td>';
+      d.setDate(d.getDate() + 1);
+    }
+    html += '</tr>';
+    if (d.getMonth() !== view.m && w >= 3) break;
+  }
+  body.innerHTML = html;
+  if (!body.querySelector('[tabindex="0"]')) { var f = body.querySelector('.cal-day:not([data-outside])'); if (f) f.tabIndex = 0; }
+  if (dir) S4.transition.enter(body, dir, { distance: 16 });
+}
+function day() {
+  var list = on(picked);
+  document.getElementById('day-title').textContent = picked === TODAY ? 'Today' : long(picked);
+  document.getElementById('day-list').innerHTML = list.map(function (e) { return '<li><button class="s4-list-item" type="button" data-page-open="event" data-page-id="' + e.id + '"><span class="s4-list-content"><span class="s4-list-headline">' + esc(e.title) + '</span><span class="s4-list-supporting s4-num">' + e.time + '</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></button></li>'; }).join('');
+  S4.init(document.getElementById('day-list'));
+  S4.states.set(document.getElementById('day-states'), list.length ? 'ready' : 'empty');
+}
+function upcoming() {
+  var list = events.filter(function (e) { return e.date >= TODAY; }).sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; });
+  document.getElementById('up-list').innerHTML = list.map(function (e) { return '<li><button class="s4-list-item" type="button" data-page-open="event" data-page-id="' + e.id + '"><span class="s4-list-content"><span class="s4-list-overline">' + long(e.date) + '</span><span class="s4-list-headline">' + esc(e.title) + '</span></span><span class="s4-list-trailing s4-num">' + e.time + '</span></button></li>'; }).join('');
+  S4.init(document.getElementById('up-list'));
+}
+function pick(date, focus) {
+  picked = date; var d = parse(date), dir = 0;
+  if (d.getMonth() !== view.m || d.getFullYear() !== view.y) { dir = (d.getFullYear() * 12 + d.getMonth()) > (view.y * 12 + view.m) ? 1 : -1; view = { y: d.getFullYear(), m: d.getMonth() }; }
+  grid(dir); day();
+  if (focus) { var b = body.querySelector('[data-date="' + date + '"]'); if (b) b.focus(); }
+}
+function shift(n) { var d = new Date(view.y, view.m + n, 1); view = { y: d.getFullYear(), m: d.getMonth() }; grid(n); }
+body.addEventListener('click', function (e) { var b = e.target.closest('.cal-day'); if (b) pick(b.dataset.date, true); });
+/* arrow keys walk the days, like any date grid */
+body.addEventListener('keydown', function (e) {
+  var b = e.target.closest('.cal-day'); if (!b) return;
+  var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]; if (!step) return;
+  e.preventDefault(); var d = parse(b.dataset.date); d.setDate(d.getDate() + step); pick(iso(d), true);
+});
+document.getElementById('cal-prev').addEventListener('click', function () { shift(-1); });
+document.getElementById('cal-next').addEventListener('click', function () { shift(1); });
+document.getElementById('cal-today').addEventListener('click', function () { S4.app.go(app, 'month'); pick(TODAY); });
+document.getElementById('ev-form').addEventListener('s4-submit', function (e) {
+  e.preventDefault();
+  var ev = { id: 'e' + (++seq), date: picked, time: e.detail.values.time, title: e.detail.values.title }; events.push(ev);
+  S4.expand.close('new-event', 'add'); e.target.reset(); grid(); day(); upcoming();
+  S4.snackbar({ text: 'Event added', action: 'Undo', onAction: function () { events.splice(events.indexOf(ev), 1); grid(); day(); upcoming(); } });
+});
+var page = document.querySelector('.s4-subpage[data-page="event"]'), open = null;
+page.addEventListener('s4-open', function (e) {
+  open = events.filter(function (x) { return x.id === e.detail.id; })[0] || events[0];
+  page.dataset.title = open.title; document.getElementById('e-title').textContent = open.title; document.getElementById('e-when').textContent = long(open.date) + ' at ' + open.time;
+});
+document.getElementById('e-remove').addEventListener('click', function () {
+  var ev = open, i = events.indexOf(ev); events.splice(i, 1); grid(); day(); upcoming(); S4.pages.back(app);
+  S4.snackbar({ text: 'Event removed', action: 'Undo', onAction: function () { events.splice(i, 0, ev); grid(); day(); upcoming(); } });
+});
+grid(); day(); upcoming();
+</script>
+</body>
+</html>

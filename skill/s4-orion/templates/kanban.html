@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Board · S4 Orion Template</title>
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Board (kanban). For tasks, pipelines, hiring, orders and anything that moves through stages. Cards are
+     dragged between columns with a mouse or a finger (hold, then drag) or moved with the keyboard; a card opens as a
+     page; a new card is added in place at the foot of its column. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.css">
+<style>
+  /* the app's own layout: tokens only */
+  .kb-board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(min(85%, 17rem), 1fr); gap: var(--s4-space-3); align-items: start; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-block-end: var(--s4-space-4); }
+  .kb-lane { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); scroll-snap-align: start; min-inline-size: 0; }
+  .kb-lane-head { display: flex; align-items: center; gap: var(--s4-space-2); padding-inline: var(--s4-space-1); }
+  .kb-lane-head h2 { margin: 0 auto 0 0; font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-title-small-weight); }
+  .kb-count { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); font-variant-numeric: tabular-nums; }
+  .kb-cards { display: flex; flex-direction: column; gap: var(--s4-space-2); min-block-size: var(--s4-space-12); margin: 0; padding: 0; list-style: none; }
+  .kb-card { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); cursor: grab; touch-action: manipulation; }
+  .kb-card-title { border: 0; padding: 0; background: none; color: inherit; font: inherit; font-weight: var(--md-sys-typescale-label-large-weight); text-align: start; cursor: pointer; overflow-wrap: anywhere; border-radius: var(--md-sys-shape-corner-extra-small); }
+  .kb-card-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+  .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#board" data-view="board" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Board</span></a>
+      <a class="s4-nav-item" href="#progress" data-view="progress"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Progress</span></a>
+      <a class="s4-nav-item" href="#team" data-view="team"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">Team</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Board</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view" data-view="board" data-title="Board">
+        <div class="kb-board" id="board">
+          <section class="kb-lane" aria-labelledby="l-todo"><div class="kb-lane-head"><h2 id="l-todo">To Do</h2><span class="kb-count" data-count></span></div>
+            <ul class="kb-cards" data-reorder data-reorder-group="board" aria-label="To Do" data-lane="To Do"></ul>
+            <button class="s4-button" data-variant="text" data-size="s" type="button" data-add><span class="s4-icon" data-icon="add"></span>Add Card</button></section>
+          <section class="kb-lane" aria-labelledby="l-doing"><div class="kb-lane-head"><h2 id="l-doing">Doing</h2><span class="kb-count" data-count></span></div>
+            <ul class="kb-cards" data-reorder data-reorder-group="board" aria-label="Doing" data-lane="Doing"></ul>
+            <button class="s4-button" data-variant="text" data-size="s" type="button" data-add><span class="s4-icon" data-icon="add"></span>Add Card</button></section>
+          <section class="kb-lane" aria-labelledby="l-review"><div class="kb-lane-head"><h2 id="l-review">Review</h2><span class="kb-count" data-count></span></div>
+            <ul class="kb-cards" data-reorder data-reorder-group="board" aria-label="Review" data-lane="Review"></ul>
+            <button class="s4-button" data-variant="text" data-size="s" type="button" data-add><span class="s4-icon" data-icon="add"></span>Add Card</button></section>
+          <section class="kb-lane" aria-labelledby="l-done"><div class="kb-lane-head"><h2 id="l-done">Done</h2><span class="kb-count" data-count></span></div>
+            <ul class="kb-cards" data-reorder data-reorder-group="board" aria-label="Done" data-lane="Done"></ul>
+            <button class="s4-button" data-variant="text" data-size="s" type="button" data-add><span class="s4-icon" data-icon="add"></span>Add Card</button></section>
+        </div>
+      </section>
+
+      <section class="s4-view s4-stack" data-view="progress" data-title="Progress" hidden>
+        <div class="s4-grid">
+          <section class="s4-pane"><figure class="s4-chart" data-type="column" data-labels="Mon,Tue,Wed,Thu,Fri" data-values="3,5,2,6,4" data-name="Cards Done"><figcaption class="s4-chart-title">Cards Done This Week</figcaption></figure></section>
+          <section class="s4-pane"><figure class="s4-chart" data-type="donut" id="kb-donut" data-labels="To Do,Doing,Review,Done" data-values="3,2,1,2" data-total-label="Cards"><figcaption class="s4-chart-title">Where The Work Is</figcaption></figure></section>
+        </div>
+      </section>
+
+      <section class="s4-view" data-view="team" data-title="Team" hidden>
+        <div class="s4-states" data-state="empty"><div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="people"></span></span><h2 class="s4-empty-title">Just You So Far</h2><p class="s4-empty-text">Invite people to share this board.</p><button class="s4-button" data-variant="tonal" type="button" id="kb-invite">Invite Someone</button></div></div>
+      </section>
+
+      <!-- A card is a page you go into (decision 0050): its own URL, Back in the bar -->
+      <section class="s4-subpage" data-page="card" data-title="Card" hidden>
+        <article class="s4-stack">
+          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="c-title">Card</h2><div class="s4-subpage-meta"><span class="s4-status" id="c-lane">To Do</span><span id="c-who"></span><span id="c-due"></span></div></header>
+          <section class="s4-pane">
+            <form class="s4-form" id="c-form" data-autosave>
+              <div class="s4-text-field"><textarea id="c-notes" name="notes" rows="4"></textarea><label for="c-notes">Notes</label></div>
+              <div class="s4-form-actions"><span class="s4-form-status"></span></div>
+            </form>
+            <div class="s4-row"><button class="s4-button" type="button" id="c-next">Move To Next Stage</button><button class="s4-button" data-variant="tonal" type="button" id="c-remove">Remove Card</button></div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#board" data-view="board" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Board</span></a>
+    <a class="s4-nav-item" href="#progress" data-view="progress"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Progress</span></a>
+    <a class="s4-nav-item" href="#team" data-view="team"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">Team</span></a>
+  </nav>
+</div>
+<script src="icons.js"></script>
+<script src="orion.js"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+/* the data (a real app loads and saves this) */
+var cards = [
+  { id: 'c1', lane: 'To Do', title: 'Write the release notes', who: 'PN', due: 'Nov 20' },
+  { id: 'c2', lane: 'To Do', title: 'Book the venue', who: 'SO', due: 'Nov 22' },
+  { id: 'c3', lane: 'To Do', title: 'Order name badges', who: 'LF', due: 'Nov 25' },
+  { id: 'c4', lane: 'Doing', title: 'Design the invite', who: 'MC', due: 'Nov 18' },
+  { id: 'c5', lane: 'Doing', title: 'Draft the agenda', who: 'JW', due: 'Nov 19' },
+  { id: 'c6', lane: 'Review', title: 'Budget for catering', who: 'SO', due: 'Nov 17' },
+  { id: 'c7', lane: 'Done', title: 'Pick a date', who: 'MC', due: 'Nov 3' },
+  { id: 'c8', lane: 'Done', title: 'Agree the guest list', who: 'PN', due: 'Nov 8' }
+];
+var app = document.querySelector('.s4-app'), lanes = Array.prototype.slice.call(document.querySelectorAll('.kb-cards')), LANES = lanes.map(function (l) { return l.dataset.lane; });
+function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function cardEl(c) {
+  var li = document.createElement('li'); li.className = 'kb-card'; li.dataset.id = c.id; li.setAttribute('data-reorder-surface', '');
+  li.innerHTML = '<button class="kb-card-title" type="button" data-page-open="card" data-page-id="' + c.id + '" data-reorder-label>' + esc(c.title) + '</button><div class="kb-card-meta"><span>Due ' + esc(c.due) + '</span><span class="s4-avatar" data-size="s">' + esc(c.who) + '</span></div>';
+  return li;
+}
+function counts() {
+  lanes.forEach(function (l) { l.closest('.kb-lane').querySelector('[data-count]').textContent = l.children.length; });
+  S4.chart(document.getElementById('kb-donut'), { labels: LANES, series: [{ values: lanes.map(function (l) { return l.children.length; }) }] });
+}
+cards.forEach(function (c) { lanes[LANES.indexOf(c.lane)].appendChild(cardEl(c)); });
+counts();
+/* dropped somewhere new: remember the lane, say so, offer the way back */
+document.getElementById('board').addEventListener('s4-reorder', function (e) {
+  var d = e.detail, c = cards.filter(function (x) { return x.id === d.item.dataset.id; })[0];
+  if (c && d.toList !== d.fromList) { c.lane = d.toList.dataset.lane; S4.snackbar({ text: c.title + ' moved to ' + c.lane, action: 'Undo', onAction: function () { S4.reorder.move(d.item, d.from, d.fromList); c.lane = d.fromList.dataset.lane; counts(); } }); }
+  counts();
+});
+/* a new card is typed in place, at the foot of its column (decision 0047) */
+document.getElementById('board').addEventListener('click', function (e) {
+  var add = e.target.closest('[data-add]'); if (!add) return;
+  var lane = add.closest('.kb-lane'), list = lane.querySelector('.kb-cards'), li = document.createElement('li');
+  li.className = 'kb-card'; li.setAttribute('data-reorder-fixed', '');
+  li.innerHTML = '<form class="s4-stack" style="--s4-gap: var(--s4-space-2)"><div class="s4-text-field"><input aria-label="Card title" placeholder="What needs doing?" required></div><div class="s4-row" style="justify-content:flex-end"><button class="s4-button" data-variant="text" data-size="s" type="button" data-cancel>Cancel</button><button class="s4-button" data-size="s" type="submit">Add</button></div></form>';
+  list.appendChild(li); add.hidden = true;
+  var done = function () { li.remove(); add.hidden = false; };
+  li.querySelector('[data-cancel]').addEventListener('click', done);
+  li.querySelector('form').addEventListener('submit', function (ev) {
+    ev.preventDefault(); var v = li.querySelector('input').value.trim(); if (!v) return;
+    var c = { id: 'c' + Date.now(), lane: list.dataset.lane, title: v, who: 'ME', due: 'Soon' }; cards.push(c);
+    done(); list.appendChild(cardEl(c)); counts();
+  });
+});
+/* the card page fills itself from the id in the URL */
+var page = document.querySelector('.s4-subpage[data-page="card"]'), open = null;
+page.addEventListener('s4-open', function (e) {
+  open = cards.filter(function (x) { return x.id === e.detail.id; })[0] || cards[0];
+  page.dataset.title = open.title;
+  document.getElementById('c-title').textContent = open.title;
+  document.getElementById('c-lane').textContent = open.lane;
+  document.getElementById('c-who').textContent = 'Owner ' + open.who;
+  document.getElementById('c-due').textContent = 'Due ' + open.due;
+  document.getElementById('c-notes').value = open.notes || '';
+  document.getElementById('c-next').hidden = open.lane === 'Done';
+});
+document.getElementById('c-form').addEventListener('s4-save', function (e) { if (open) open.notes = e.detail.values.notes; });
+function el(c) { return document.querySelector('.kb-card[data-id="' + c.id + '"]'); }
+document.getElementById('c-next').addEventListener('click', function () {
+  var c = open, to = LANES[Math.min(LANES.length - 1, LANES.indexOf(c.lane) + 1)]; c.lane = to;
+  lanes[LANES.indexOf(to)].appendChild(el(c)); counts(); S4.pages.back(app); S4.snackbar(c.title + ' moved to ' + to);
+});
+document.getElementById('c-remove').addEventListener('click', function () {
+  var c = open, node = el(c), list = node.parentElement, next = node.nextElementSibling;
+  node.remove(); counts(); S4.pages.back(app);
+  S4.snackbar({ text: 'Card removed', action: 'Undo', onAction: function () { list.insertBefore(node, next); counts(); } });
+});
+document.getElementById('kb-invite').addEventListener('click', function () { S4.snackbar('Invite link copied'); });
+S4.palette.register([{ label: 'Add Card To To Do', group: 'Board', icon: 'add', run: function () { S4.app.go(app, 'board'); document.querySelector('[data-add]').click(); } }]);
+</script>
+</body>
+</html>

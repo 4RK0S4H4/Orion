@@ -1,6 +1,6 @@
 ---
 name: s4-orion
-description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 49 components (app shell, canonical layouts, nav bar/rail, top app bar, buttons, FAB, cards, lists, tables, stats, fields, chips, menus, dialogs, sheets, snackbars, prose, chat…), eight app templates (dashboard, list-detail, settings, sign-in, article, chat, tool, landing), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
+description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 57 components (app shell, canonical layouts, nav bar/rail, top app bar, buttons, FAB, cards, lists, tables, stats, fields, chips, menus, dialogs, sheets, snackbars, prose, chat…), fifteen app templates (dashboard, list-detail, board, calendar, editor, gallery, checkout, chat…), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
 ---
 
 # S4 Orion
@@ -46,6 +46,12 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 | `chat.html` | messaging, support, comments, AI assistants | thread + glass composer |
 | `tool.html` | calculators, converters, generators, editors | supporting-pane split: inputs + sticky result |
 | `landing.html` | a product or project home page | no shell navigation; hero, features, FAQ, CTA |
+| `kanban.html` | tasks, pipelines, hiring, orders, anything that moves through stages | columns with `data-reorder-group`, add in place, a card page, charts view |
+| `calendar.html` | schedules, bookings, shifts, content plans | month grid (a table of buttons) + day agenda in a resizable supporting split, event page |
+| `editor.html` | notes, docs, wikis, posts, anything people write | reorderable document list, document page, formatting toolbar, outline pane, autosave |
+| `gallery.html` | photos, files, products, designs, anything browsed as a grid | tile grid, filter chips, `data-selectable` with the bar in the top app bar, viewer page |
+| `checkout.html` | checkout, booking, sign-up, applications, any task in a few steps | stepper + `.s4-form` steps (Switch between them), summary in a supporting split, done mark |
+| `onboarding.html` | first-run welcome and setup | no shell; steps with dots, Skip, accent swatches, done mark |
 
 Mixed apps combine them: a dashboard app whose Clients view is the list-detail screen, with the settings screen as its
 last destination. Keep one shell (`.s4-app`) per page.
@@ -134,6 +140,17 @@ last destination. Keep one shell (`.s4-app`) per page.
   (`.s4-thread`, `.s4-message[data-from="me"]`) with a glass `.s4-composer`.
 - Charts: draw them in the app (SVG or divs) from role colors: past values `surface-container-highest`, the current or
   selected value `primary`, labels `on-surface-variant`, a text alternative (`role="img"` + `aria-label`).
+
+**Three kinds of place** (decision 0050): a **view** (`.s4-view`, a destination in the navigation); a **page** (`<section class="s4-subpage" data-page="order" hidden>`, opened with `data-page-open="order" data-page-id="42"`: going *into* one thing, with Back in the bar, its own title and URL `#view/page/id`; fill it in its `s4-open { id }` event); and acting **in place** (the ladder below). Reading or working on one item is a page, never a dialog.
+
+**App behaviours that are part of the language** (decision 0051; markup in `references/components.md`)
+- **States:** every list, table and pane sits in `.s4-states` with `data-when` parts for loading (skeleton rows), empty, error (Try Again) and offline. Never a blank box or a lone spinner. `S4.states.load(el, promise)`.
+- **Forms:** `<form class="s4-form">`: errors appear on leaving a field, never while typing; settings use `data-autosave` and a `.s4-form-status` ("Saved"), no Save button; reversible actions just happen and offer Undo.
+- **Direct manipulation:** `data-reorder` + `.s4-drag-handle` (works with a finger; always also a keyboard path), `data-swipe` rows on phones, `data-selectable` + `.s4-selection-bar` for acting on several.
+- **Command palette:** desktop apps register their actions with `S4.palette.register([...])` and mark buttons `data-command`; opens with mod+K or `data-palette`.
+- **Resizable panes:** `data-resizable data-resize-key="name"` on a `.s4-split`.
+- **Charts:** `<figure class="s4-chart" data-type="column|bar|line|area|donut|spark" data-labels data-values>`; one series wears the accent, several use `--s4-chart-1…6`; never two y-scales, never more than six series.
+- **Rewards:** `.s4-done-mark` when something is finished, `data-count-to` for a total that changed. Rare and small.
 
 **Where new content goes: the placement ladder** (decision 0047; use the first rung that fits)
 1. **In place:** the thing itself changes (a switch, an inline confirm: `data-confirm="id"` + `.s4-confirm`).

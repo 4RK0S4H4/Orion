@@ -7,7 +7,7 @@
 <!-- Template: Desktop App. For an app that lives in a desktop window: an installed web app, Electron or Tauri. The app fills the window and each pane scrolls on its own (data-window), controls are pointer-sized where the pointer is a mouse (data-density="auto"), a title bar drags the window, rows have a right-click menu and actions have keyboard shortcuts. On a phone the same page is the normal touch layout. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=9cd560f">
+<link rel="stylesheet" href="../components/orion.css?v=8fac2ec">
 <style>
   .ld-detail-head { display: flex; align-items: center; gap: var(--s4-space-3); }
   .ld-detail-head > :nth-child(2) { flex: 1; min-inline-size: 0; }
@@ -105,9 +105,9 @@
       <!-- The reader: a page you go into (decision 0050). Back in the top bar, its own URL (#inbox/reader/2), the phone's Back gesture. -->
       <section class="s4-subpage" data-page="reader" data-title="Message" hidden>
         <article class="s4-stack" data-width="reading">
-          <header class="s4-page-header">
-            <h2 class="s4-page-title" id="r-subject">Invoice for October</h2>
-            <div class="s4-page-meta"><span class="s4-avatar" data-size="s" id="r-avatar">MC</span><span id="r-from">Maya Chen</span><span id="r-time" class="s4-num">9:41</span></div>
+          <header class="s4-subpage-header">
+            <h2 class="s4-subpage-title" id="r-subject">Invoice for October</h2>
+            <div class="s4-subpage-meta"><span class="s4-avatar" data-size="s" id="r-avatar">MC</span><span id="r-from">Maya Chen</span><span id="r-time" class="s4-num">9:41</span></div>
           </header>
           <div class="s4-prose"><p id="r-body">Can you send the October invoice before Friday?</p><p>Let me know if anything is missing and I will send it over the same day.</p><p>Thanks,<br><span id="r-sign">Maya</span></p></div>
           <div class="s4-row"><button class="s4-button" type="button" data-expand="r-reply">Reply</button><button class="s4-button" data-variant="tonal" type="button" id="r-archive">Archive</button></div>

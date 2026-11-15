@@ -10,9 +10,9 @@ an order, a profile, a document, a step-by-step task.
     <button class="s4-list-item" data-page-open="message" data-page-id="42" data-page-title="Maya Chen">…</button>
   </section>
   <section class="s4-subpage" data-page="message" data-title="Message" hidden>
-    <header class="s4-page-header">
-      <h2 class="s4-page-title">Invoice for October</h2>
-      <div class="s4-page-meta"><span>Maya Chen</span><span>9:41</span></div>
+    <header class="s4-subpage-header">
+      <h2 class="s4-subpage-title">Invoice for October</h2>
+      <div class="s4-subpage-meta"><span>Maya Chen</span><span>9:41</span></div>
     </header>
     …
   </section>

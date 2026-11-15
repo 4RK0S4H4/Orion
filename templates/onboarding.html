@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onboarding · S4 Orion Template</title>
+<!-- Template: Onboarding. The first minute of an app: three short screens that say what it does, one that sets it up
+     (the things worth asking: a color, notifications), and a door into the app. Always skippable, never more than
+     four steps, and each step is one idea with one button. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=8fac2ec">
+<style>
+  /* the app's own layout: tokens only */
+  .ob { min-block-size: 100dvh; display: grid; grid-template-rows: auto 1fr auto; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+  .ob-top { display: flex; justify-content: flex-end; padding: var(--s4-space-3) var(--s4-space-4); padding-block-start: calc(var(--s4-space-3) + env(safe-area-inset-top, 0px)); }
+  .ob-stage { display: grid; place-items: center; padding: var(--s4-space-4) var(--s4-space-6); overflow-x: clip; }
+  .ob-step { display: grid; justify-items: center; gap: var(--s4-space-4); inline-size: min(100%, 28rem); text-align: center; }
+  .ob-step[hidden] { display: none; }
+  .ob-art { display: grid; place-items: center; inline-size: calc(var(--s4-space-16) * 2); block-size: calc(var(--s4-space-16) * 2); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-primary); --s4-icon-size: var(--s4-space-16); }
+  .ob-step h1 { margin: 0; font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
+  .ob-step p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .ob-setup { display: grid; gap: var(--s4-space-4); inline-size: 100%; text-align: start; }
+  .ob-foot { display: grid; justify-items: center; gap: var(--s4-space-4); padding: var(--s4-space-4) var(--s4-space-6); padding-block-end: calc(var(--s4-space-6) + env(safe-area-inset-bottom, 0px)); }
+  .ob-dots { display: flex; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .ob-dots > li { inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state); }
+  .ob-dots > li[aria-current] { background: var(--md-sys-color-primary); transform: scaleX(2.5); margin-inline: var(--s4-space-2); }
+  .ob-actions { display: flex; gap: var(--s4-space-2); inline-size: min(100%, 28rem); }
+  .ob-actions > .s4-button { flex: 1; }
+</style>
+</head>
+<body>
+<main class="ob">
+  <div class="ob-top"><button class="s4-button" data-variant="text" type="button" id="ob-skip">Skip</button></div>
+  <div class="ob-stage" aria-live="polite">
+    <section class="ob-step" data-step aria-labelledby="ob-h0">
+      <span class="ob-art"><span class="s4-icon" data-icon="inbox"></span></span>
+      <h1 id="ob-h0">Everything In One Place</h1>
+      <p>Bills, receipts and reminders arrive in one list, newest first.</p>
+    </section>
+    <section class="ob-step" data-step aria-labelledby="ob-h1" hidden>
+      <span class="ob-art"><span class="s4-icon" data-icon="schedule"></span></span>
+      <h1 id="ob-h1">Never Miss A Due Date</h1>
+      <p>We remind you three days before anything is due, and again on the day.</p>
+    </section>
+    <section class="ob-step" data-step aria-labelledby="ob-h2" hidden>
+      <span class="ob-art"><span class="s4-icon" data-icon="chart"></span></span>
+      <h1 id="ob-h2">See Where It Goes</h1>
+      <p>A simple monthly picture of what came in and what went out.</p>
+    </section>
+    <section class="ob-step" data-step aria-labelledby="ob-h3" hidden>
+      <h1 id="ob-h3">Make It Yours</h1>
+      <div class="ob-setup">
+        <section class="s4-pane">
+          <h2 class="s4-pane-title">Accent Color</h2>
+          <div class="s4-swatches" data-theme-seed aria-label="Accent Color"><button class="s4-swatch" type="button" data-seed="#000000" aria-label="Mono"></button><button class="s4-swatch" type="button" data-seed="#0b57d0" aria-label="Blue"></button><button class="s4-swatch" type="button" data-seed="#4f46e5" aria-label="Indigo"></button><button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button><button class="s4-swatch" type="button" data-seed="#2e7d32" aria-label="Green"></button><button class="s4-swatch" type="button" data-seed="#d9480f" aria-label="Orange"></button></div>
+        </section>
+        <section class="s4-pane">
+          <label class="s4-switch" style="justify-content:space-between"><span>Remind Me Before Due Dates</span><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label>
+        </section>
+      </div>
+    </section>
+    <section class="ob-step" data-step aria-labelledby="ob-h4" hidden>
+      <span class="s4-done-mark" data-size="l" id="ob-mark"></span>
+      <h1 id="ob-h4">You’re All Set</h1>
+      <p>You can change any of this later in Settings.</p>
+    </section>
+  </div>
+  <div class="ob-foot">
+    <ol class="ob-dots" aria-label="Step" id="ob-dots"><li aria-current="step"></li><li></li><li></li><li></li></ol>
+    <div class="ob-actions"><button class="s4-button" data-variant="tonal" data-size="m" type="button" id="ob-back" hidden>Back</button><button class="s4-button" data-size="m" type="button" id="ob-next">Next</button></div>
+  </div>
+</main>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=1d678fa"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]')), dots = Array.prototype.slice.call(document.querySelectorAll('#ob-dots li'));
+var at = 0, axis = {}, next = document.getElementById('ob-next'), back = document.getElementById('ob-back'), skip = document.getElementById('ob-skip'), LAST = steps.length - 1;
+function go(to) {
+  to = Math.max(0, Math.min(LAST, to)); if (to === at) return;
+  S4.transition.sharedAxis(steps[at], steps[to], to > at ? 1 : -1, axis);
+  at = to;
+  dots.forEach(function (d, i) { if (i === Math.min(to, dots.length - 1)) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); });
+  back.hidden = to === 0 || to === LAST; skip.hidden = to >= LAST - 1;
+  document.getElementById('ob-dots').hidden = to === LAST;
+  next.textContent = to === LAST ? 'Open The App' : to === LAST - 1 ? 'Finish' : 'Next';
+  if (to === LAST) setTimeout(function () { S4.reward.done(document.getElementById('ob-mark')); }, 300);
+}
+next.addEventListener('click', function () { if (at === LAST) location.href = 'dashboard.html'; else go(at + 1); });
+back.addEventListener('click', function () { go(at - 1); });
+skip.addEventListener('click', function () { go(LAST - 1); });
+document.addEventListener('keydown', function (e) { if (e.target.closest('input, .s4-swatches')) return; if (e.key === 'ArrowRight') go(at + 1); if (e.key === 'ArrowLeft' && at < LAST) go(at - 1); });
+</script>
+</body>
+</html>

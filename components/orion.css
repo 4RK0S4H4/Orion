@@ -2002,7 +2002,7 @@
 /* ---- page/page.css ---- */
 /* Pages (S4 addition, decision 0050): a full screen you push into, with Back in the top app bar.
    <section class="s4-subpage" data-page="message" data-title="Message" hidden> … </section>   a sibling of the .s4-views
-   .s4-page-header: an optional block at the top of a page (a big title, who and when, actions).
+   .s4-subpage-header: an optional block at the top of a page (a big title, who and when, actions).
    Behaviour, URLs and the Back gesture: page.js. */
 @layer s4.components {
   .s4-subpage { display: block; min-inline-size: 0; }
@@ -2012,14 +2012,14 @@
   .s4-content:has(> .s4-subpage) { overflow-x: clip; }
   .s4-app-bar-back[hidden] { display: none; }
 
-  .s4-page-header {
+  .s4-subpage-header {
     display: flex;
     flex-direction: column;
     gap: var(--s4-space-2);
     padding-block: var(--s4-space-2) var(--s4-space-4);
     min-inline-size: 0;
   }
-  .s4-page-title {
+  .s4-subpage-title {
     margin: 0;
     font-family: var(--md-sys-typescale-headline-medium-font);
     font-size: var(--md-sys-typescale-headline-medium-size);
@@ -2029,7 +2029,7 @@
     color: var(--md-sys-color-on-surface);
     overflow-wrap: anywhere;
   }
-  .s4-page-meta {
+  .s4-subpage-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;

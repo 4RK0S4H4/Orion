@@ -19,7 +19,7 @@ decision and show options in a motion lab with the scrubber before building.
 
 ## Open (2026-11-14)
 
-Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Issues 38 to 41 were built on 2026-11-14 (decisions 0046 to 0048, see Done); they wait for the owner's look. Open: idea A, and the owner's picks from idea list B ([quiz](../../explore/ideas.html)).
+Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Issues 38 to 41 were built on 2026-11-14 (decisions 0046 to 0048, see Done); they wait for the owner's look. Open: idea A. The owner's picks from idea list B (all of them) were built on 2026-11-15 (decision 0051).
 
 ### 24. ~~Banner on glass~~ (scrapped)
 Scrapped by the owner (2026-11-14): they meant snackbars, not banners. Banners stay solid content. See issue 28.
@@ -47,6 +47,7 @@ Published as one quiz in the new Orion quiz UI: [`explore/ideas.html`](../../exp
 
 ## Done
 
+- **B.** Idea list B, all eight picked by the owner ("For direct manipulation I wasn't able to move anything" on the quiz sketch): done 2026-11-15 (command palette, resizable panes, states, forms, rewards, direct manipulation that works with a finger, charts, six templates, decision 0051).
 - **43.** Reply focused its field and the keyboard came up ([image](img/2026-11-14-reply-focuses-field.jpg)); "I never want this to happen anywhere": done 2026-11-14 (nothing focuses a field by itself, decision 0049; the suite checks it).
 - **44.** "We never switch pages" (a message should open a reader view): done 2026-11-14 (pages with Back, title, URL and the Back gesture, decision 0050).
 - **40.** One motion philosophy (owner, 2026-11-14: audit every transition, one page, a small fixed set of named patterns, a check): done 2026-11-14 (ten patterns, pattern tokens, every component moved, `npm run check:motion`, [motion page](../../components/motion/motion.html) with the scrubber, decision 0046).

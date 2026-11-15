@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gallery · S4 Orion Template</title>
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Media Gallery. For photos, files, products, designs and anything browsed as a grid. Filter with chips,
+     open an item as a page (a viewer with next and previous), hold or Ctrl-click to select several and act on them
+     from the bar that takes the top app bar's place. The tiles here are drawn with tokens; put your images in them. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.css">
+<style>
+  /* the app's own layout: tokens only */
+  .gl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(46%, 11rem), 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .gl-tile { position: relative; display: block; inline-size: 100%; aspect-ratio: 1; padding: 0; border: 0; border-radius: var(--md-sys-shape-corner-large); overflow: hidden; background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface-variant); cursor: pointer; font: inherit; }
+  .gl-art { position: absolute; inset: 0; display: grid; place-items: center; --s4-icon-size: var(--s4-space-10); }
+  .gl-art[data-tone="1"] { background: var(--md-sys-color-surface-container-high); }
+  .gl-art[data-tone="2"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .gl-art[data-tone="3"] { background: var(--md-sys-color-surface-container-highest); }
+  .gl-name { position: absolute; inset-inline: var(--s4-space-2); inset-block-end: var(--s4-space-2); padding: var(--s4-space-1) var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: start; inline-size: fit-content; max-inline-size: calc(100% - var(--s4-space-4)); }
+  /* a picked tile: a ring inside its edge and a check in the corner */
+  .gl-grid > [data-picked] > .gl-tile { outline: var(--s4-focus-ring-width) solid var(--md-sys-color-primary); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .gl-grid > [data-picked] > .gl-tile::after { content: ""; position: absolute; inset-block-start: var(--s4-space-2); inset-inline-end: var(--s4-space-2); inline-size: var(--s4-space-6); block-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .gl-view { display: grid; place-items: center; aspect-ratio: 4 / 3; max-block-size: 60dvh; inline-size: 100%; border-radius: var(--md-sys-shape-corner-extra-large); overflow: hidden; position: relative; }
+  .gl-view .gl-art { --s4-icon-size: var(--s4-space-16); }
+  .s4-subpage > article { max-inline-size: 56rem; margin-inline: auto; }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#library" data-view="library" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="image"></span></span><span class="s4-nav-label">Library</span></a>
+      <a class="s4-nav-item" href="#albums" data-view="albums"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-nav-label">Albums</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Library</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Upload" data-tooltip="Upload" id="gl-upload"><span class="s4-icon" data-icon="upload"></span></button></div>
+      <!-- while tiles are selected this bar takes the top app bar's place -->
+      <div class="s4-selection-bar" id="gl-bar" hidden><button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button><span class="s4-selection-count" data-selection-count>0 Selected</span><button class="s4-icon-button" type="button" aria-label="Share Selected" id="gl-share"><span class="s4-icon" data-icon="share"></span></button><button class="s4-icon-button" type="button" aria-label="Delete Selected" id="gl-delete"><span class="s4-icon" data-icon="delete"></span></button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view s4-stack" data-view="library" data-title="Library">
+        <div class="s4-chip-set" data-select="single" data-scroll aria-label="Show" id="gl-filter">
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" data-value="all">All</button>
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Offsite">Offsite</button>
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Product">Product</button>
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Team">Team</button>
+        </div>
+        <div class="s4-states" id="gl-states" data-state="ready">
+          <ul class="gl-grid" data-when="ready" data-selectable data-selection-bar="#gl-bar" id="gl-grid" aria-label="Photos"></ul>
+          <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="image"></span></span><h2 class="s4-empty-title">Nothing Here</h2><p class="s4-empty-text">No photos in this album yet.</p></div>
+        </div>
+      </section>
+      <section class="s4-view" data-view="albums" data-title="Albums" hidden>
+        <ul class="s4-list" aria-label="Albums">
+          <li><div class="s4-list-item"><span class="s4-icon" data-icon="folder"></span><span class="s4-list-content"><span class="s4-list-headline">Offsite</span><span class="s4-list-supporting">5 photos</span></span></div></li>
+          <li><div class="s4-list-item"><span class="s4-icon" data-icon="folder"></span><span class="s4-list-content"><span class="s4-list-headline">Product</span><span class="s4-list-supporting">4 photos</span></span></div></li>
+          <li><div class="s4-list-item"><span class="s4-icon" data-icon="folder"></span><span class="s4-list-content"><span class="s4-list-headline">Team</span><span class="s4-list-supporting">3 photos</span></span></div></li>
+        </ul>
+      </section>
+
+      <!-- the viewer: a page with its own URL (#library/photo/7), next and previous -->
+      <section class="s4-subpage" data-page="photo" data-title="Photo" hidden>
+        <article class="s4-stack">
+          <div class="gl-view" id="v-art"></div>
+          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="v-name">Photo</h2><div class="s4-subpage-meta"><span class="s4-status" id="v-album"></span><span id="v-date"></span><span id="v-pos" class="s4-num"></span></div></header>
+          <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="v-prev"><span class="s4-icon" data-icon="chevron-left"></span>Previous</button><button class="s4-button" data-variant="tonal" type="button" id="v-next">Next<span class="s4-icon" data-icon="chevron-right"></span></button><button class="s4-button" data-variant="text" type="button" id="v-share"><span class="s4-icon" data-icon="share"></span>Share</button></div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#library" data-view="library" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="image"></span></span><span class="s4-nav-label">Library</span></a>
+    <a class="s4-nav-item" href="#albums" data-view="albums"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-nav-label">Albums</span></a>
+  </nav>
+</div>
+<script src="icons.js"></script>
+<script src="orion.js"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+var NAMES = ['Morning hike', 'Lake at noon', 'Team dinner', 'Workshop', 'Campfire', 'Packaging', 'Lamp, front', 'Lamp, detail', 'Notebook set', 'New joiners', 'Studio', 'Friday lunch'];
+var ALBUM = ['Offsite', 'Offsite', 'Offsite', 'Offsite', 'Offsite', 'Product', 'Product', 'Product', 'Product', 'Team', 'Team', 'Team'];
+var ICON = { Offsite: 'location', Product: 'tag', Team: 'people' };
+var photos = NAMES.map(function (n, i) { return { id: String(i + 1), name: n, album: ALBUM[i], date: 'Nov ' + (i + 2) }; });
+var app = document.querySelector('.s4-app'), grid = document.getElementById('gl-grid'), states = document.getElementById('gl-states'), filter = 'all';
+function art(p) { return '<span class="gl-art" data-tone="' + (+p.id % 3 + 1) + '"><span class="s4-icon" data-icon="' + ICON[p.album] + '"></span></span>'; }
+function shown() { return photos.filter(function (p) { return filter === 'all' || p.album === filter; }); }
+function render() {
+  var list = shown();
+  grid.innerHTML = list.map(function (p) { return '<li data-id="' + p.id + '"><button class="gl-tile" type="button" aria-label="' + p.name + ', ' + p.album + '">' + art(p) + '<span class="gl-name">' + p.name + '</span></button></li>'; }).join('');
+  S4.init(grid); S4.states.set(states, list.length ? 'ready' : 'empty');
+}
+render();
+document.getElementById('gl-filter').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; filter = c.dataset.value; S4.selection.clear(grid); render(); });
+/* a tap opens the viewer (while selecting, the tap picks instead: direct.js handles that first) */
+grid.addEventListener('click', function (e) { var li = e.target.closest('li[data-id]'); if (li) S4.pages.open(app, 'photo', { id: li.dataset.id }); });
+var page = document.querySelector('.s4-subpage[data-page="photo"]'), cur = null;
+page.addEventListener('s4-open', function (e) {
+  cur = photos.filter(function (p) { return p.id === e.detail.id; })[0] || photos[0];
+  var list = shown().indexOf(cur) >= 0 ? shown() : photos, i = list.indexOf(cur);
+  page.dataset.title = cur.name;
+  document.getElementById('v-art').innerHTML = art(cur); S4.init(document.getElementById('v-art'));
+  document.getElementById('v-name').textContent = cur.name;
+  document.getElementById('v-album').textContent = cur.album;
+  document.getElementById('v-date').textContent = cur.date;
+  document.getElementById('v-pos').textContent = (i + 1) + ' of ' + list.length;
+  document.getElementById('v-prev').disabled = i === 0; document.getElementById('v-next').disabled = i === list.length - 1;
+});
+function step(d) { var list = shown().indexOf(cur) >= 0 ? shown() : photos, n = list[list.indexOf(cur) + d]; if (n) { history.replaceState(history.state, '', '#library/photo/' + n.id); page.dispatchEvent(new CustomEvent('s4-open', { detail: { id: n.id } })); S4.transition.enter(document.getElementById('v-art'), d, { distance: 16 }); app.querySelector('.s4-app-bar-title').textContent = n.name; } }
+document.getElementById('v-prev').addEventListener('click', function () { step(-1); });
+document.getElementById('v-next').addEventListener('click', function () { step(1); });
+document.addEventListener('keydown', function (e) { if (page.hidden) return; if (e.key === 'ArrowRight') step(1); if (e.key === 'ArrowLeft') step(-1); });
+document.getElementById('v-share').addEventListener('click', function () { S4.snackbar('Link copied'); });
+document.getElementById('gl-upload').addEventListener('click', function () { S4.snackbar('Choose photos to upload'); });
+document.getElementById('gl-share').addEventListener('click', function () { var n = S4.selection.items(grid).length; S4.selection.clear(grid); S4.snackbar('Link to ' + n + ' photos copied'); });
+/* deleting several happens at once and can be undone */
+document.getElementById('gl-delete').addEventListener('click', function () {
+  var ids = S4.selection.items(grid).map(function (li) { return li.dataset.id; }), before = photos.slice();
+  photos = photos.filter(function (p) { return ids.indexOf(p.id) < 0; }); S4.selection.clear(grid); render();
+  S4.snackbar({ text: ids.length + ' deleted', action: 'Undo', onAction: function () { photos = before; render(); } });
+});
+</script>
+</body>
+</html>

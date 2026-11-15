@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Editor · S4 Orion Template</title>
+<!-- Template: Editor (a document app). For notes, docs, wikis, posts and anything people write. A list of documents;
+     a document opens as a page with a formatting toolbar, an outline beside it built from its headings, and a quiet
+     "Saved" mark: there is no Save button. The writing surface is plain .s4-prose made editable. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=8fac2ec">
+<style>
+  /* the app's own layout: tokens only */
+  .ed-tools { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2)); z-index: 2; align-self: flex-start; max-inline-size: 100%; overflow-x: auto; }
+  .ed-title { inline-size: 100%; border: 0; padding: 0; background: none; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); border-radius: var(--md-sys-shape-corner-small); }
+  .ed-title::placeholder { color: var(--md-sys-color-on-surface-variant); }
+  .ed-body { min-block-size: 50dvh; padding: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-small); }
+  .ed-body:focus-visible, .ed-title:focus-visible { outline: none; }
+  .ed-body:empty::before { content: attr(data-placeholder); color: var(--md-sys-color-on-surface-variant); }
+  .ed-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2) var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+  .ed-outline a { text-decoration: none; }
+  .ed-outline [data-level="3"] .s4-list-headline { padding-inline-start: var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
+      <button class="s4-fab" type="button" aria-label="New Document" id="ed-new"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Document</span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#documents" data-view="documents" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="document"></span></span><span class="s4-nav-label">Documents</span></a>
+      <a class="s4-nav-item" href="#starred" data-view="starred"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="star"></span></span><span class="s4-nav-label">Starred</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Documents</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view s4-stack" data-view="documents" data-title="Documents">
+        <ul class="s4-list" id="ed-list" aria-label="Documents" data-reorder data-dividers></ul>
+        <button class="s4-fab" data-fixed type="button" id="ed-new-2"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Document</span></button>
+      </section>
+      <section class="s4-view" data-view="starred" data-title="Starred" hidden>
+        <div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="star"></span></span><h2 class="s4-empty-title">No Starred Documents</h2><p class="s4-empty-text">Star a document to keep it here.</p></div>
+      </section>
+
+      <!-- the document: a page you go into (#documents/doc/d2) -->
+      <section class="s4-subpage" data-page="doc" data-title="Document" hidden>
+        <div class="s4-split" data-layout="supporting" data-resizable data-resize-key="orion-template-editor">
+          <article class="s4-split-pane s4-stack">
+            <div class="s4-toolbar ed-tools" role="toolbar" aria-label="Formatting" id="ed-tools">
+              <button class="s4-icon-button" type="button" aria-label="Heading" data-tooltip="Heading" data-block="h2"><span class="s4-icon" data-icon="tag"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Subheading" data-tooltip="Subheading" data-block="h3"><span class="s4-icon" data-icon="bookmark"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Paragraph" data-tooltip="Paragraph" data-block="p"><span class="s4-icon" data-icon="document"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Bold" data-tooltip="Bold" data-cmd="bold" aria-pressed="false"><span class="s4-icon" data-icon="edit"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Bulleted List" data-tooltip="Bulleted List" data-cmd="insertUnorderedList"><span class="s4-icon" data-icon="list"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Undo" data-tooltip="Undo" data-cmd="undo"><span class="s4-icon" data-icon="undo"></span></button>
+            </div>
+            <input class="ed-title" id="ed-title" aria-label="Title" placeholder="Untitled" autocomplete="off">
+            <div class="ed-meta"><span id="ed-words" aria-live="polite">0 words</span><span class="s4-form-status" id="ed-status" role="status"></span></div>
+            <div class="s4-prose ed-body" id="ed-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Document text" data-placeholder="Start writing…"></div>
+          </article>
+          <aside class="s4-split-pane" data-sticky aria-label="Outline">
+            <section class="s4-pane">
+              <h2 class="s4-pane-title">Outline</h2>
+              <div class="s4-states" id="ed-out-states" data-state="empty">
+                <ul class="s4-list ed-outline" data-when="ready" id="ed-outline" aria-label="Headings"></ul>
+                <p class="s4-body-medium s4-on-surface-variant" data-when="empty" style="margin:0">Headings you add show up here.</p>
+              </div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#documents" data-view="documents" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="document"></span></span><span class="s4-nav-label">Documents</span></a>
+    <a class="s4-nav-item" href="#starred" data-view="starred"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="star"></span></span><span class="s4-nav-label">Starred</span></a>
+  </nav>
+</div>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=1d678fa"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+/* the data (a real app loads and saves this) */
+var docs = [
+  { id: 'd1', title: 'Launch plan', when: 'Edited today', html: '<h2>Goal</h2><p>Ship the new billing page before the end of November.</p><h2>Steps</h2><h3>This week</h3><ul><li>Finish the design review</li><li>Write the release notes</li></ul><h3>Next week</h3><p>Roll out to a tenth of accounts, then everyone.</p>' },
+  { id: 'd2', title: 'Offsite notes', when: 'Edited Monday', html: '<h2>What went well</h2><p>The workshop format, and having one long dinner instead of two short ones.</p><h2>Next time</h2><p>Book the venue two months earlier.</p>' },
+  { id: 'd3', title: 'Hiring checklist', when: 'Edited Nov 2', html: '<p>A short list for every new role.</p><ul><li>Write the brief</li><li>Agree the panel</li></ul>' }
+];
+var app = document.querySelector('.s4-app'), list = document.getElementById('ed-list'), page = document.querySelector('.s4-subpage[data-page="doc"]');
+var title = document.getElementById('ed-title'), body = document.getElementById('ed-body'), savedMark = document.getElementById('ed-status'), cur = null, timer = null, seq = 3;
+function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function rows() {
+  list.innerHTML = docs.map(function (d) { return '<li data-id="' + d.id + '"><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move ' + esc(d.title || 'Untitled') + '"></button><a class="s4-list-content" href="#documents/doc/' + d.id + '" data-page-open="doc" data-page-id="' + d.id + '" style="text-decoration:none;color:inherit"><span class="s4-list-headline">' + esc(d.title || 'Untitled') + '</span><span class="s4-list-supporting">' + esc(d.when) + '</span></a><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></div></li>'; }).join('');
+  S4.init(list);
+}
+rows();
+list.addEventListener('s4-reorder', function () { var order = Array.prototype.map.call(list.children, function (li) { return li.dataset.id; }); docs.sort(function (a, b) { return order.indexOf(a.id) - order.indexOf(b.id); }); });
+/* the outline is built from the headings in the text */
+function outline() {
+  var hs = body.querySelectorAll('h2, h3'), out = document.getElementById('ed-outline');
+  out.innerHTML = Array.prototype.map.call(hs, function (h, i) { h.id = 'ed-h' + i; return '<li data-level="' + h.tagName.slice(1) + '"><a class="s4-list-item" href="#ed-h' + i + '" data-jump="ed-h' + i + '"><span class="s4-list-content"><span class="s4-list-headline">' + esc(h.textContent || 'Untitled') + '</span></span></a></li>'; }).join('');
+  S4.states.set(document.getElementById('ed-out-states'), hs.length ? 'ready' : 'empty');
+  var n = (body.innerText || '').trim().split(/\s+/).filter(Boolean).length;
+  document.getElementById('ed-words').textContent = n + (n === 1 ? ' word' : ' words');
+}
+document.getElementById('ed-outline').addEventListener('click', function (e) { var a = e.target.closest('[data-jump]'); if (!a) return; e.preventDefault(); var h = document.getElementById(a.dataset.jump); if (h) h.scrollIntoView({ block: 'center', behavior: S4.motion.reduced() ? 'auto' : 'smooth' }); });
+/* saves by itself a moment after you stop typing: a quiet "Saved", never a Save button */
+function mark(text, done) { savedMark.textContent = text; savedMark.toggleAttribute('data-on', !!text); savedMark.toggleAttribute('data-done', !!done); }
+function changed() {
+  outline(); mark('Saving…', false); clearTimeout(timer);
+  timer = setTimeout(function () { if (!cur) return; cur.title = title.value.trim(); cur.html = body.innerHTML; cur.when = 'Edited just now'; mark('Saved', true); rows(); var t = app.querySelector('.s4-app-bar-title'); if (t && !page.hidden) t.textContent = cur.title || 'Untitled'; }, 700);
+}
+title.addEventListener('input', changed); body.addEventListener('input', changed);
+page.addEventListener('s4-open', function (e) {
+  cur = docs.filter(function (d) { return d.id === e.detail.id; })[0] || docs[0];
+  page.dataset.title = cur.title || 'Untitled'; title.value = cur.title; body.innerHTML = cur.html; mark('', false); outline();
+});
+page.addEventListener('s4-close', function () { clearTimeout(timer); if (cur) { cur.title = title.value.trim(); cur.html = body.innerHTML; rows(); } });
+/* the toolbar formats what is selected in the text; it never takes the cursor out of it */
+document.getElementById('ed-tools').addEventListener('mousedown', function (e) { if (e.target.closest('button')) e.preventDefault(); });
+document.getElementById('ed-tools').addEventListener('click', function (e) {
+  var b = e.target.closest('button'); if (!b) return;
+  var sel = window.getSelection();
+  if (!sel.rangeCount || !body.contains(sel.anchorNode)) { S4.snackbar('Tap in the text first, then pick a format.'); return; }
+  if (b.dataset.block) document.execCommand('formatBlock', false, b.dataset.block); else document.execCommand(b.dataset.cmd, false, null);
+  changed();
+});
+document.addEventListener('selectionchange', function () { var b = document.querySelector('[data-cmd="bold"]'); try { b.setAttribute('aria-pressed', String(document.queryCommandState('bold'))); } catch (e) {} });
+function create() { var d = { id: 'd' + (++seq), title: '', when: 'New', html: '' }; docs.unshift(d); rows(); S4.app.go(app, 'documents'); S4.pages.open(app, 'doc', { id: d.id, title: 'Untitled' }); }
+document.getElementById('ed-new').addEventListener('click', create); document.getElementById('ed-new-2').addEventListener('click', create);
+S4.palette.register([{ label: 'New Document', group: 'Documents', icon: 'add', run: create }].concat(docs.map(function (d) { return { label: 'Open ' + d.title, group: 'Documents', icon: 'document', run: function () { S4.pages.open(app, 'doc', { id: d.id }); } }; })));
+</script>
+</body>
+</html>

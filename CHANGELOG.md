@@ -11,6 +11,10 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.
 
 ### Added
+- **Pages** (decision 0050): `.s4-subpage`, `data-page-open`, `S4.pages`: going into a thing with Back in the bar, a title, a URL and the Back gesture.
+- **Command palette** (`S4.palette`, mod+K, `data-palette`, `data-command`), **resizable panes** (`data-resizable` on `.s4-split`), **states** (`.s4-states`, `S4.states`), **forms** (`.s4-form`, `S4.form`, `data-autosave`), **small rewards** (`.s4-done-mark`, `data-count-to`), **direct manipulation** (`data-reorder`, `.s4-drag-handle`, `data-swipe`, `data-selectable`, `.s4-selection-bar`), **charts** (`.s4-chart`, `--s4-chart-1…6`) (decision 0051).
+- Templates: board, calendar, editor, media gallery, checkout, onboarding (15 in all).
+- `docs/ROADMAP.md`: the long view.
 - **Production suite** (`npm test`): every component page, template and the showcase in Chromium and WebKit, in CI.
 - **Motion patterns** (decision 0046): `--s4-motion-state|ink|ink-calm|morph|morph-calm|bend|reveal-content|loop`, `S4.transition.reveal|follow|scrim|enter|move`, the motion page (`components/motion/motion.html`) and the gate `npm run check:motion`.
 - **Expand in place** (decision 0047): `.s4-expand`, `data-expand`, `S4.expand`, and the inline confirm `.s4-confirm` / `data-confirm`.
@@ -21,6 +25,8 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - `S4.theme({ surfaces: 'neutral' | 'tinted' })`; rail group titles and footer; `data-autofocus`; `data-placement="center"` on panels; glass fill tokens.
 
 ### Changed
+- **Nothing puts the cursor in a text field by itself** (decision 0049): expands and dialogs focus themselves, `autofocus` on a field is ignored, a failed form does not jump the cursor.
+- The list-detail split on a phone goes one level in like a page (Back in the bar, the bottom navigation steps aside).
 - Review labs are built on the live Orion bundle (decision 0048); the scrubber also freezes CSS transitions.
 - Mail templates: Reply and Forward open a composer under the message; Compose is a floating panel (decision 0047).
 - Every component's transitions use a motion pattern token; the nav bar pill, tab indicator and switch handle move as Ink, the FAB morphs like buttons. `S4.transition.slide` now pops (nothing slides from an edge).

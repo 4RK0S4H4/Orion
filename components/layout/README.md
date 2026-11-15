@@ -42,6 +42,11 @@ context beside it). Works inside an [app shell](../app/); window classes are con
 | < 840 | one pane at a time; opening adds a history entry so the phone's Back returns to the list | supporting pane stacks under the main pane |
 | ≥ 840 | list 360 + detail | main + 400 supporting pane |
 
+**Resizable panes:** add `data-resizable` to a `.s4-split` (and `data-resize-key="name"` to remember the width). From
+840 a grip sits between the panes: drag it, or focus it and use the arrow keys (Home and End for the limits);
+double-click or Enter collapses the side pane and brings it back. `S4.split.resize(split, px)`,
+`S4.split.collapse(split)`, event `s4-resize { size, collapsed }`.
+
 **Behaviour (`layout.js`):** clicks on `[data-split-open]` / `[data-split-back]` toggle `data-open`, run the shared
 axis (spatial movement, effects fade) when one pane replaces the other, and fire `s4-toggle { open }` on the split.
 `S4.split.open(split, true|false)` does it from code, e.g. on a listbox's `s4-change`.

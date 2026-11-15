@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Checkout · S4 Orion Template</title>
+<!-- Template: Checkout (a multi-step form). For checkout, booking, sign-up, applications and any task done in a few
+     steps. One step on screen at a time, a stepper that shows where you are, the order summary beside it (above it on
+     a phone), errors only when you leave a field, and a small reward at the end. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=8fac2ec">
+<style>
+  /* the app's own layout: tokens only */
+  .co-steps { position: relative; }
+  .co-total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .co-done { display: grid; justify-items: center; gap: var(--s4-space-3); padding-block: var(--s4-space-8); text-align: center; }
+  .co-done h2 { margin: 0; }
+  .co-done p { margin: 0; max-inline-size: 36ch; color: var(--md-sys-color-on-surface-variant); }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <a class="s4-icon-button" href="index.html" aria-label="Back To The Shop"><span class="s4-icon" data-icon="back"></span></a>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Checkout</h1></div>
+    </header>
+    <main class="s4-content">
+      <div class="s4-stack">
+        <ol class="s4-stepper" aria-label="Checkout Progress" id="co-stepper">
+          <li data-state="current" aria-current="step"><span class="s4-step-dot">1</span><span class="s4-step-label">Shipping</span></li>
+          <li><span class="s4-step-dot">2</span><span class="s4-step-label">Payment</span></li>
+          <li><span class="s4-step-dot">3</span><span class="s4-step-label">Review</span></li>
+        </ol>
+        <div class="s4-split" data-layout="supporting">
+          <section class="s4-split-pane co-steps" aria-live="polite">
+            <!-- step 1 -->
+            <section class="s4-pane" data-step="0" aria-labelledby="s0-h">
+              <h2 class="s4-pane-title" id="s0-h">Where Should It Go?</h2>
+              <form class="s4-form" id="co-ship">
+                <div class="s4-text-field"><input id="co-name" name="name" autocomplete="name" required data-msg-required="Enter the name for the parcel."><label for="co-name">Full Name</label></div>
+                <div class="s4-text-field"><input id="co-street" name="street" autocomplete="street-address" required data-msg-required="Enter the street and number."><label for="co-street">Street Address</label></div>
+                <div class="s4-form-row">
+                  <div class="s4-text-field"><input id="co-city" name="city" autocomplete="address-level2" required data-msg-required="Enter the city."><label for="co-city">City</label></div>
+                  <div class="s4-text-field"><input id="co-zip" name="zip" inputmode="numeric" autocomplete="postal-code" required pattern="[0-9]{4,6}" data-msg-required="Enter the postal code." data-msg-pattern="A postal code is 4 to 6 digits."><label for="co-zip">Postal Code</label></div>
+                </div>
+                <fieldset class="s4-stack" style="border:0;margin:0;padding:0;--s4-gap:var(--s4-space-1)">
+                  <legend class="s4-label-large" style="padding:0;margin-block-end:var(--s4-space-2)">Delivery</legend>
+                  <label class="s4-radio"><input type="radio" name="speed" value="standard" checked><span class="s4-radio-ring"></span>Standard, 3 to 5 days · Free</label>
+                  <label class="s4-radio"><input type="radio" name="speed" value="express"><span class="s4-radio-ring"></span>Express, next day · $12.00</label>
+                </fieldset>
+                <div class="s4-form-actions"><button class="s4-button" type="submit">Continue To Payment</button></div>
+              </form>
+            </section>
+            <!-- step 2 -->
+            <section class="s4-pane" data-step="1" aria-labelledby="s1-h" hidden>
+              <h2 class="s4-pane-title" id="s1-h">How Will You Pay?</h2>
+              <form class="s4-form" id="co-pay">
+                <div class="s4-text-field"><input id="co-card" name="card" inputmode="numeric" autocomplete="cc-number" required pattern="[0-9 ]{13,19}" data-msg-required="Enter the card number." data-msg-pattern="A card number is 13 to 19 digits."><label for="co-card">Card Number</label></div>
+                <div class="s4-form-row">
+                  <div class="s4-text-field"><input id="co-exp" name="exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])/[0-9]{2}" data-msg-required="Enter the expiry date." data-msg-pattern="Use month and year, like 08/28."><label for="co-exp">Expires</label></div>
+                  <div class="s4-text-field"><input id="co-cvc" name="cvc" inputmode="numeric" autocomplete="cc-csc" required pattern="[0-9]{3,4}" data-msg-required="Enter the security code." data-msg-pattern="The code is 3 or 4 digits."><label for="co-cvc">Security Code</label></div>
+                </div>
+                <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="submit">Review Order</button></div>
+              </form>
+            </section>
+            <!-- step 3 -->
+            <section class="s4-pane" data-step="2" aria-labelledby="s2-h" hidden>
+              <h2 class="s4-pane-title" id="s2-h">Check And Place Your Order</h2>
+              <dl class="s4-dl">
+                <div class="s4-dl-row"><dt>Ship To</dt><dd id="r-ship"></dd></div>
+                <div class="s4-dl-row"><dt>Delivery</dt><dd id="r-speed"></dd></div>
+                <div class="s4-dl-row"><dt>Pay With</dt><dd id="r-card"></dd></div>
+              </dl>
+              <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="button" id="co-place">Place Order</button></div>
+            </section>
+            <!-- done -->
+            <section class="s4-pane" data-step="3" hidden>
+              <div class="co-done"><span class="s4-done-mark" data-size="l" id="co-mark"></span><h2 class="s4-headline-small">Order Placed</h2><p>We sent the receipt to your email. Your order number is <b class="s4-num">1043</b>.</p><a class="s4-button" data-variant="tonal" href="checkout.html">Start Again</a></div>
+            </section>
+          </section>
+
+          <aside class="s4-split-pane" data-sticky aria-label="Order Summary">
+            <section class="s4-pane">
+              <h2 class="s4-pane-title">Your Order</h2>
+              <ul class="s4-list" aria-label="Items">
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Desk Lamp</span><span class="s4-list-supporting">Qty 1</span></span><span class="s4-list-trailing s4-num">$64.00</span></div></li>
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Notebook, Set Of 3</span><span class="s4-list-supporting">Qty 2</span></span><span class="s4-list-trailing s4-num">$36.00</span></div></li>
+              </ul>
+              <dl class="s4-dl">
+                <div class="s4-dl-row"><dt>Subtotal</dt><dd class="s4-num">$100.00</dd></div>
+                <div class="s4-dl-row"><dt>Delivery</dt><dd class="s4-num" id="co-ship-cost">Free</dd></div>
+              </dl>
+              <div class="co-total"><span>Total</span><span class="s4-num" id="co-total" aria-live="polite">$100.00</span></div>
+            </section>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=1d678fa"></script>
+<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]')), dots = Array.prototype.slice.call(document.querySelectorAll('#co-stepper li')), at = 0, axis = {}, total = 100;
+/* one step at a time; the stepper follows; moving between steps is a view switch */
+function go(to) {
+  if (to === at) return;
+  S4.transition.sharedAxis(steps[at], steps[to], to > at ? 1 : -1, axis, function () { window.scrollTo({ top: 0, behavior: 'instant' }); });
+  dots.forEach(function (d, i) {
+    var state = i < to ? 'done' : i === to ? 'current' : '';
+    if (state) d.dataset.state = state; else delete d.dataset.state;
+    if (i === to) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    d.querySelector('.s4-step-dot').innerHTML = i < to ? '<span class="s4-icon" data-icon="check"></span>' : String(i + 1);
+  });
+  at = to;
+}
+document.getElementById('co-ship').addEventListener('s4-submit', function (e) { e.preventDefault(); go(1); });
+document.getElementById('co-pay').addEventListener('s4-submit', function (e) {
+  e.preventDefault();
+  var s = S4.form.values(document.getElementById('co-ship')), p = e.detail.values;
+  document.getElementById('r-ship').textContent = s.name + ', ' + s.street + ', ' + s.zip + ' ' + s.city;
+  document.getElementById('r-speed').textContent = s.speed === 'express' ? 'Express, next day' : 'Standard, 3 to 5 days';
+  document.getElementById('r-card').textContent = 'Card ending ' + String(p.card).replace(/\s/g, '').slice(-4);
+  go(2);
+});
+document.querySelectorAll('[data-prev]').forEach(function (b) { b.addEventListener('click', function () { go(at - 1); }); });
+/* the total counts to its new value when the delivery changes */
+document.getElementById('co-ship').addEventListener('change', function (e) {
+  if (e.target.name !== 'speed') return;
+  var express = e.target.value === 'express', from = total; total = express ? 112 : 100;
+  document.getElementById('co-ship-cost').textContent = express ? '$12.00' : 'Free';
+  S4.reward.count(document.getElementById('co-total'), total, { from: from, format: 'currency:USD', decimals: 2 });
+});
+document.getElementById('co-place').addEventListener('click', function () {
+  go(3); dots.forEach(function (d) { d.dataset.state = 'done'; d.removeAttribute('aria-current'); d.querySelector('.s4-step-dot').innerHTML = '<span class="s4-icon" data-icon="check"></span>'; });
+  setTimeout(function () { S4.reward.done(document.getElementById('co-mark')); }, 250);
+});
+</script>
+</body>
+</html>

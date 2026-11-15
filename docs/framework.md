@@ -11,7 +11,7 @@ Everything flows one way. A change at one layer is picked up by every layer afte
 |---|---|---|
 | 1. Tokens | `tokens/src/*.tokens.json` | Every value: color roles (from one seed), type, shape, spacing, sizes, layout widths, breakpoints, z-index, springs, glass. |
 | 2. Base | `components/base/` | Reset, focus ring, state layers, utilities (`.s4-stack`, `.s4-row`, `.s4-grid`, `.s4-num`, type classes), density. |
-| 3. Components | `components/<name>/` | 49 components, each with CSS, optional JS, a README and a reference page. |
+| 3. Components | `components/<name>/` | 57 components, each with CSS, optional JS, a README and a reference page. |
 | 4. Layout | `components/app/`, `components/layout/`, `components/desktop/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar, pane scrolling, shortcuts, context menus). |
 | 5. Glass and motion | `components/glass/`, `components/motion/` | The glass layer on chrome and overlays; the ten named motion patterns: pattern tokens in CSS and `S4.transition.*` in script (decision 0046; `npm run check:motion`). |
 | 6. Templates | `templates/` | Nine complete starter apps, one per kind of app. |

@@ -35,6 +35,7 @@ S4 Orion is being built phase by phase. Decisions are recorded in [`docs/decisio
 | 8 | Framework layer: templates, canonical layouts, content components, framework guide | Built 2026-11-13, awaiting the owner ([0041](docs/decisions/0041-framework-layer.md), [review](docs/reviews/2026-11-13-framework-review.md), [templates](https://4rk0s4h4.github.io/s4-orion/templates/)) |
 | 7 | Glass from the playground and simpler motion | Done 2026-11-11 ([0021](docs/decisions/0021-glass-from-the-playground.md), [0022](docs/decisions/0022-simpler-motion.md)); design review with proposals ([review](docs/reviews/2026-11-11-design-review.md)) awaiting the owner |
 | 9 | One motion philosophy, expand in place, Orion on every page, production suite | Built 2026-11-14, awaiting the owner ([0046](docs/decisions/0046-one-motion-philosophy.md), [0047](docs/decisions/0047-placement-ladder.md), [0048](docs/decisions/0048-quizzes-are-orion.md), [motion page](https://4rk0s4h4.github.io/s4-orion/components/motion/motion.html), [tests](tests/README.md)) |
+| 10 | Any app: pages, no auto-focus, palette, states, forms, direct manipulation, charts, six more templates | Built 2026-11-15, awaiting the owner ([0049](docs/decisions/0049-never-focus-a-field.md), [0050](docs/decisions/0050-pages.md), [0051](docs/decisions/0051-ideas-built.md); the long view: [ROADMAP](docs/ROADMAP.md)) |
 
 How it fits together, what apps can rely on and how to extend it: [`docs/framework.md`](docs/framework.md).
 

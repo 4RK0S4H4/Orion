@@ -3,34 +3,30 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-14, evening): waiting on the owner
+## Now (2026-11-15): waiting on the owner
 
-Issues 38 to 41 are built and published; decisions 0046 to 0048 are recorded. Nothing is half done.
+Everything the owner asked for on 2026-11-14 and 15 is built and published; decisions 0046 to 0051 are recorded.
+The long view is in [`ROADMAP.md`](ROADMAP.md): read it before choosing new work.
 
-**Needs the owner's look or answer:**
-1. [Motion page](https://4rk0s4h4.github.io/s4-orion/components/motion/motion.html): the ten named patterns, with
-   the scrubber (0046). Small visible changes are listed in the decision.
-2. Reply under the message: [list-detail](https://4rk0s4h4.github.io/s4-orion/templates/list-detail.html),
-   [desktop app](https://4rk0s4h4.github.io/s4-orion/templates/desktop-app.html),
-   [Expand In Place](https://4rk0s4h4.github.io/s4-orion/components/expand/expand.html) (0047). Open question in the
-   decision: should floating panels become non-modal?
-3. The new quiz look (0048) and the first quiz in it:
-   [What To Build Next](https://4rk0s4h4.github.io/s4-orion/explore/ideas.html) (idea list B). **Build what the owner
-   picks from it.**
-4. Approve the release (see Plan 4) once 1 to 3 look right.
+**Needs the owner's look (links in the last reply, all on Pages):**
+1. Nothing focuses a field any more (0049): Reply in the mail templates, the expand page.
+2. Pages (0050): the Pages reference page; "Open Full Page" in the mail templates; on a phone, a message opens with
+   Back in the bar.
+3. The seven new components (0051): palette, states, forms, rewards, direct manipulation, charts, resizable panes.
+4. The six new templates: board, calendar, editor, gallery, checkout, onboarding.
+5. Still open from before: the motion page (0046); should floating panels become non-modal (0047)?
 
-**Next session, without asking:** read the owner's quiz answers and build the picks, each on a motion pattern and the
-placement ladder, each with a reference page that the suite covers. Keep `npm run check` and `npm test` green.
+**Next session, without asking (Horizon 1 of the roadmap):**
+1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
+2. Build two real apps end to end with the skill (one phone-first, one desktop) and fix what the skill gets wrong.
+3. Re-run and extend the skill evals for the new pieces.
+4. Reach checks in the suite: right-to-left, long text, 200% text size, print.
+5. Icons for writing tools (the editor borrows unrelated icons).
 
-**How to verify WebKit:** this cloud environment cannot download WebKit (blocked by its network rules), so
-`npm test` runs Chromium here and warns. CI (`.github/workflows/check.yml`, job `pages`) runs both browsers on every
-push: read its result with the GitHub Actions tools after pushing and fix what it finds.
+**WebKit:** cannot be installed in this cloud environment (network rules); `npm test` runs Chromium here and CI runs
+both on every push. Read the CI result with the GitHub Actions tools after pushing.
 
-**Handoff gap to know about:** the previous session's notes said issues 38 to 41 were written in the issues file with
-two reference images; only the titles and one image (Reply opens a dialog) were there. They were built from the
-owner's instructions for this session. If the owner had a second screenshot, ask for it.
-
-Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 0048; a computer for the desktop template.
+Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 0051; a computer for the desktop template.
 
 ## Plan
 
@@ -53,6 +49,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 004
 
 ## Session log
 
+- 2026-11-15 (any-app round): never focus a field (0049), pages (0050), the eight ideas built (0051): palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates; ROADMAP written. Next: the owner's looks, then Horizon 1.
 - 2026-11-14 (production round): one motion philosophy (0046), placement ladder and expand in place (0047), quizzes on the live bundle (0048), production suite in Chromium and WebKit in CI, idea list B quiz. Next: the owner's looks and quiz picks.
 - 2026-11-14 (handoff): owner's next round recorded as issues 38 to 41 and idea list B; nothing built. Next session: start at "Now".
 - 2026-11-14 (palette): Crisper grays, named accents and the any-accent check, list dividers, checkbox square fix (0045). Next: the plan below.
