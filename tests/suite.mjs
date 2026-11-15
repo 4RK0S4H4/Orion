@@ -142,7 +142,7 @@ async function use(page, add, phone) {
   /* wait for motion to end rather than for a fixed time: a slow machine must not look like a bug */
   const settle = async (ms = 420) => {
     await page.waitForTimeout(Math.min(ms, 160));
-    await page.waitForFunction(() => !document.getAnimations().some((a) => { try { return a.playState === 'running' && a.effect.getComputedTiming().iterations !== Infinity; } catch (e) { return false; } }), null, { timeout: 4000 }).catch(() => {});
+    await page.waitForFunction(() => !document.getAnimations().some((a) => { try { return (a.playState === 'running' || a.pending) && a.effect.getComputedTiming().iterations !== Infinity; } catch (e) { return false; } }), null, { timeout: 4000 }).catch(() => {});
     await page.waitForTimeout(120);
   };
   const until = (fn, argv) => page.waitForFunction(fn, argv, { timeout: 3000 }).then(() => true, () => false);
@@ -223,9 +223,10 @@ async function use(page, add, phone) {
       const b = (await visible(`[data-page-open="${name}"]`))[0]; if (!b) continue;
       const depth0 = await page.evaluate(() => +(document.querySelector('.s4-app').dataset.sub || 0));
       if (!(await click(b, `opener of page "${name}"`))) continue;
+      await until((n) => { const p = document.querySelector(`.s4-subpage[data-page="${n}"]`); return !!p && !p.hidden; }, name);
       await settle(600);
       const st = await page.evaluate((n) => { const p = document.querySelector(`.s4-subpage[data-page="${n}"]`), k = document.querySelector('.s4-app-bar-back'), a = document.activeElement; return { shown: !!p && !p.hidden, back: !!k && !k.hidden, field: !!a && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select'), wide: document.documentElement.scrollWidth - innerWidth, hash: location.hash }; }, name);
-      if (!st.shown) { add(`page "${name}" did not open`); continue; }
+      if (!st.shown) { add(`page "${name}" did not open`); await page.evaluate(() => { const a = document.querySelector('.s4-app'); if (a && window.S4 && S4.pages) S4.pages.reset(a); }); continue; }
       if (!st.back) add(`page "${name}": the top app bar shows no Back button`);
       if (st.field) add(`page "${name}" put the cursor in a text field when it opened (decision 0049)`);
       if (st.wide > 1) add(`page "${name}": sideways scroll (${st.wide}px)`);

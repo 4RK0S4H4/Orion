@@ -2023,7 +2023,9 @@ S4.register('accordion', function (scope) {
   S4.chart = function (el, data) { draw(el, data); };
 
   var ro = window.ResizeObserver ? new ResizeObserver(function (list) {
-    list.forEach(function (x) { var el = x.target, w = Math.round(x.contentRect.width); if (el._s4w !== w) { el._s4w = w; draw(el); } });
+    /* redraw on the next frame, never inside the observer: drawing changes the figure's height, and doing that here
+       makes browsers report a resize loop */
+    list.forEach(function (x) { var el = x.target, w = Math.round(x.contentRect.width); if (el._s4w === w) return; el._s4w = w; cancelAnimationFrame(el._s4raf || 0); el._s4raf = requestAnimationFrame(function () { draw(el); }); });
   }) : null;
   S4.register('chart', function (scope) {
     S4.util.all(scope, '.s4-chart').forEach(function (el) {
