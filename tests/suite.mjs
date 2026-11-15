@@ -93,6 +93,41 @@ function audit(opts) {
   return out;
 }
 
+/* nested corners (decision 0052): a rounded thing that sits tight in the corner of a rounded container must be
+   concentric with it: its radius is the container's radius minus the gap (or it is a full pill). A squarer inner
+   corner inside a rounder outer one is the mismatch people see at once. */
+function nestAudit() {
+  const out = [];
+  const px = (v) => (/%/.test(v) ? 0 : parseFloat(v) || 0);
+  const solid = (cs) => { const c = cs.backgroundColor; return c && c !== 'transparent' && !/rgba?\([^)]*,\s*0\)$/.test(c) || cs.backgroundImage !== 'none' || cs.backdropFilter && cs.backdropFilter !== 'none'; };
+  const tag = (el) => { let s = el.tagName.toLowerCase(); if (el.id) s += '#' + el.id; else if (el.className && typeof el.className === 'string') s += '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.'); return s; };
+  const seen = new Set();
+  for (const el of document.querySelectorAll('body *')) {
+    const cs = getComputedStyle(el), r = el.getBoundingClientRect();
+    if (r.width < 24 || r.height < 24 || cs.visibility === 'hidden' || cs.display === 'none' || el.closest('[hidden], svg, iframe, .rv-preview, [data-s4-skip]')) continue;
+    if (!solid(cs)) continue;
+    const mine = { tl: px(cs.borderTopLeftRadius), tr: px(cs.borderTopRightRadius), bl: px(cs.borderBottomLeftRadius), br: px(cs.borderBottomRightRadius) };
+    const pill = Math.min(r.width, r.height) / 2 - 1;
+    /* the nearest rounded surface it sits in */
+    let p = el.parentElement, host = null, hcs = null;
+    for (; p && p !== document.body; p = p.parentElement) { const c = getComputedStyle(p); if (px(c.borderTopLeftRadius) >= 12 && (solid(c) || /hidden|clip/.test(c.overflow))) { host = p; hcs = c; break; } if (solid(c) && px(c.borderTopLeftRadius) < 12) break; }
+    if (!host) continue;
+    const h = host.getBoundingClientRect();
+    const corners = [['tl', r.left - h.left, r.top - h.top, px(hcs.borderTopLeftRadius)], ['tr', h.right - r.right, r.top - h.top, px(hcs.borderTopRightRadius)], ['bl', r.left - h.left, h.bottom - r.bottom, px(hcs.borderBottomLeftRadius)], ['br', h.right - r.right, h.bottom - r.bottom, px(hcs.borderBottomRightRadius)]];
+    for (const [k, gx, gy, R] of corners) {
+      if (R < 12 || gx < 0 || gy < 0 || gx > 14 || gy > 14 || Math.abs(gx - gy) > 6) continue;   /* only a corner tucked tight into a corner */
+      if (R >= Math.min(h.width, h.height) / 2 - 1) continue;                                   /* the container is a pill */
+      if ((gx + gy) / 2 < 3 && /hidden|clip|auto|scroll/.test(hcs.overflowX + hcs.overflowY)) continue;   /* flush against a container that clips it: the container's corner is the one you see */
+      const want = Math.max(0, R - (gx + gy) / 2), have = mine[k];
+      if (have >= pill || have >= want - 3) continue;
+      const key = tag(el) + ' in ' + tag(host);
+      if (seen.has(key)) continue; seen.add(key);
+      out.push(`corner mismatch: ${tag(el)} has a ${Math.round(have)}px corner ${Math.round((gx + gy) / 2)}px inside ${tag(host)}'s ${Math.round(R)}px corner (concentric would be ${Math.round(want)}px)`);
+    }
+  }
+  return out;
+}
+
 /* focus rings: focus each control the keyboard can reach and see whether its ring is cut off */
 function focusAudit() {
   const out = [];
@@ -178,6 +213,7 @@ async function use(page, add, phone) {
       const isOpen = await page.evaluate((id) => { const d = document.getElementById(id); return !!d && d.open; }, id);
       if (!isOpen) { add(`dialog "${id}" did not open`); continue; }
       const f = await fits(id); if (f) add(`dialog "${id}" ${f}`);
+      (await page.evaluate(nestAudit)).forEach(add);
       const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); }, id);
       if (fieldFocused) add(`dialog "${id}" put the cursor in a text field when it opened (decision 0049)`);
       await page.keyboard.press('Escape'); await settle(520);
@@ -193,6 +229,7 @@ async function use(page, add, phone) {
       if (!(await click(b, `menu button for "${id}"`))) continue;
       await settle(480);
       const f = await fits(id); if (f) add(`menu "${id}" ${f}`);
+      (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Escape'); await settle(380);
       const gone = await until((id) => { const m = document.getElementById(id); if (!m) return true; const r = m.getBoundingClientRect(); return !(r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'); }, id);
       if (!gone) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
@@ -234,6 +271,19 @@ async function use(page, add, phone) {
       await page.goBack(); await settle(600);
       const out = await until((a) => +(document.querySelector('.s4-app').dataset.sub || 0) === a[0] && document.querySelector(`.s4-subpage[data-page="${a[1]}"]`).hidden, [depth0, name]);
       if (!out) { add(`page "${name}" did not close with the browser's Back`); await page.evaluate(() => S4.pages.reset(document.querySelector('.s4-app'))); }
+    }
+    /* the command palette: opens from its button without focusing its box, corners nest, Escape closes */
+    const pal = (await visible('[data-palette]'))[0];
+    if (pal && await click(pal, 'command palette button')) {
+      await settle(520);
+      const ps = await page.evaluate(() => { const d = document.querySelector('.s4-palette'); return { open: !!d && d.open, field: !!document.activeElement && document.activeElement.matches('input, textarea'), rows: d ? d.querySelectorAll('[data-i]').length : 0 }; });
+      if (!ps.open) add('the command palette did not open'); else {
+        if (ps.field) add('the command palette put the cursor in its box when opened by a click (decision 0049)');
+        if (!ps.rows) add('the command palette has no commands');
+        (await page.evaluate(nestAudit)).forEach(add);
+        await page.keyboard.press('Escape'); await settle(420);
+        if (!(await until(() => !document.querySelector('.s4-palette').open))) add('the command palette did not close with Escape');
+      }
     }
     /* inline confirm */
     for (const b of await visible('[data-confirm]')) {
@@ -313,6 +363,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
     await page.waitForTimeout(450);
     if (!reduced) {
       (await page.evaluate(audit, { phone: mode.phone })).forEach(add);
+      (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });

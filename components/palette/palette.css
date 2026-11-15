@@ -12,7 +12,10 @@
     gap: var(--s4-space-1);
     overflow: hidden;
   }
-  .s4-palette-search { flex: none; }
+  /* nested corners are concentric (decision 0052): what sits 8 inside the palette's corner is rounded 8 less */
+  .s4-palette { --_nest: calc(var(--s4-shape-dialog) - var(--s4-space-2)); }
+  .s4-palette-search { flex: none; border-radius: var(--_nest); }
+  .s4-palette-list .s4-list-item { --_radius: var(--_nest); border-radius: var(--_nest); }
   .s4-palette-list { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; }
   .s4-palette-list[hidden] { display: none; }
   .s4-palette-list .s4-list-item { cursor: pointer; }

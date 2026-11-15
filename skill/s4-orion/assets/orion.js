@@ -206,6 +206,7 @@
      Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
               S4.transition.enter(view, dir)                   one view arriving on its own (a pane, a month)
      Morph    S4.transition.move(el, dx, dy)                   a thing lands in a new place (rows after a sort)
+              S4.transition.shift(el, from, to)                a dragged thing settles at an offset (a swiped row)
      State    S4.transition.fade(el, open)                     a plain fade, when nothing moves
    Rules that keep it robust in every browser:
      - surfaces that appear only move (transform) and fade (opacity); reveal is the one pattern that sizes a box, and
@@ -377,11 +378,19 @@
     if (source) source.style.visibility = '';
   }
 
+  /* ---------- shift: something you were dragging settles at an offset that is its new resting place (a swiped row) ----------
+     The caller has already set the element's own transform to `to`; this plays the way there from `from`. */
+  function shift(el, from, to) {
+    begin(el);
+    var a = track(el, M.animate(el, [{ transform: from }, { transform: to }], 'settle'));
+    return settle(el, [a], false);
+  }
+
   /* how long a named spring runs, for things that are timed but are not a transition (a number counting up) */
   function duration(name) { return M.spring(name || 'reveal').duration; }
 
   S4.transition = {
-    duration: duration,
+    duration: duration, shift: shift,
     reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
     restore: restore,
     /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */
@@ -1573,7 +1582,7 @@ S4.register('accordion', function (scope) {
     if (!live) { live = document.createElement('div'); live.className = 's4-visually-hidden'; live.setAttribute('aria-live', 'assertive'); document.body.appendChild(live); }
     live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30);
   }
-  function kids(list) { return Array.prototype.filter.call(list.children, function (c) { return !c.hidden && !c.matches('.s4-list-subheader, [data-reorder-fixed]'); }); }
+  function kids(list) { return Array.prototype.filter.call(list.children, function (c) { return !c.hidden && !c.matches('.s4-list-subheader, [data-reorder-fixed], .s4-reorder-gap'); }); }
   function label(item) { var h = item.querySelector('.s4-list-headline, .s4-card-title, [data-reorder-label]'); return (h ? h.textContent : item.textContent).replace(/\s+/g, ' ').trim().slice(0, 60); }
 
   /* ---------- 1. reorder ---------- */
@@ -1582,56 +1591,83 @@ S4.register('accordion', function (scope) {
     var movers = kids(item.parentElement).concat(list !== item.parentElement ? kids(list) : []).filter(function (x) { return x !== skip; });
     var was = movers.map(function (x) { return x.getBoundingClientRect(); });
     list.insertBefore(item, before || null);
-    movers.forEach(function (x, i) { var r = x.getBoundingClientRect(); if (r.top !== was[i].top || r.left !== was[i].left) S4.transition.move(x, was[i].left - r.left, was[i].top - r.top); });
+    /* from where each one is showing right now (even mid-glide) to where it now belongs */
+    movers.forEach(function (x, i) { var r = resting(x), dx = was[i].left - r.left, dy = was[i].top - r.top; if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) S4.transition.move(x, dx, dy); });
   }
   function groupLists(list) {
     var g = list.getAttribute('data-reorder-group');
     return g ? Array.prototype.slice.call(document.querySelectorAll('[data-reorder][data-reorder-group="' + g + '"]')) : [list];
   }
+  /* where an element sits in the layout, ignoring a glide it may be in the middle of (so rows that are still making
+     room are judged by where they are going, and the slot never flickers between two places) */
+  function resting(k) {
+    var r = k.getBoundingClientRect(), t = getComputedStyle(k).transform;
+    if (!t || t === 'none') return r;
+    var m = new DOMMatrixReadOnly(t);
+    return { left: r.left - m.m41, top: r.top - m.m42, width: r.width, height: r.height, right: r.right - m.m41, bottom: r.bottom - m.m42 };
+  }
   function drag(list, item, e) {
-    var lists = groupLists(list), fromList = list, fromIndex = kids(list).indexOf(item), fromNext = item.nextElementSibling;
+    var lists = groupLists(list), fromList = list, fromIndex = kids(list).indexOf(item);
     var r0 = item.getBoundingClientRect(), grabX = e.clientX - r0.left, grabY = e.clientY - r0.top, pid = e.pointerId, x = e.clientX, y = e.clientY, raf = 0, ended = false;
-    item.setAttribute('data-dragging', ''); document.documentElement.setAttribute('data-s4-dragging', '');
     item.getAnimations().forEach(function (a) { a.cancel(); });
+    /* The item is lifted out of the flow where it is: it is NOT moved in the page while your finger is down (on an
+       iPhone a touch ends the moment its element is re-inserted). An empty stand-in keeps its place, and it is the
+       stand-in that travels through the lists; the item joins it when you let go. */
+    var gap = document.createElement(item.tagName === 'LI' ? 'li' : 'div');
+    gap.className = 's4-reorder-gap'; gap.setAttribute('aria-hidden', 'true');
+    gap.style.blockSize = r0.height + 'px'; gap.style.inlineSize = list.getAttribute('data-reorder') === 'horizontal' ? r0.width + 'px' : '';
+    item.parentElement.insertBefore(gap, item.nextSibling);
+    var keep = item.getAttribute('style');
+    item.style.position = 'fixed'; item.style.left = '0'; item.style.top = '0'; item.style.margin = '0'; item.style.boxSizing = 'border-box';
+    item.style.inlineSize = r0.width + 'px'; item.style.blockSize = r0.height + 'px';
+    item.setAttribute('data-dragging', ''); document.documentElement.setAttribute('data-s4-dragging', '');
     function follow() {
       item.style.transform = 'none';
       var r = item.getBoundingClientRect();
       item.style.transform = 'translate(' + (x - grabX - r.left) + 'px, ' + (y - grabY - r.top) + 'px)';
     }
+    function others(l) { return kids(l).filter(function (k) { return k !== item && k !== gap; }); }
     function target() {
       /* the list under the pointer (or the nearest one sideways), then the slot by the middles of its items */
       var best = null, bd = Infinity;
       lists.forEach(function (l) { var r = l.getBoundingClientRect(), dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0, dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0, d = dx * 3 + dy; if (d < bd) { bd = d; best = l; } });
       var horizontal = best.getAttribute('data-reorder') === 'horizontal', before = null;
-      kids(best).some(function (k) {
-        if (k === item) return false;
-        var r = k.getBoundingClientRect();
-        if (horizontal ? x < r.left + r.width / 2 : y < r.top + r.height / 2) { before = k; return true; }
+      /* the item's own middle decides, so it trades places when it is half way over a neighbour */
+      var cx = x - grabX + r0.width / 2, cy = y - grabY + r0.height / 2;
+      others(best).some(function (k) {
+        var r = resting(k);
+        if (horizontal ? cx < r.left + r.width / 2 : cy < r.top + r.height / 2) { before = k; return true; }
         return false;
       });
       return { list: best, before: before };
     }
+    function settleGap() {
+      var t = target(), after = null, n = gap.nextElementSibling;
+      while (n && (n === item || kids(gap.parentElement).indexOf(n) < 0)) n = n.nextElementSibling;
+      after = n || null;
+      if (!(t.list === gap.parentElement && t.before === after)) place(gap, t.list, t.before, item);
+    }
     function step() {
       raf = 0; if (ended) return;
-      var t = target();
-      var sameSpot = t.list === item.parentElement && (t.before === item.nextElementSibling || (t.before === null && kids(t.list).slice(-1)[0] === item));
-      if (!sameSpot) place(item, t.list, t.before, item);
-      follow();
+      settleGap(); follow();
       /* near the top or bottom of the window: scroll, so long lists can be crossed in one drag */
       var edge = 56, sc = y < edge ? -(edge - y) / 4 : y > window.innerHeight - edge ? (y - (window.innerHeight - edge)) / 4 : 0;
       if (sc) { window.scrollBy(0, sc); raf = requestAnimationFrame(step); }
     }
     function move(ev) { if (ev.pointerId !== pid) return; ev.preventDefault(); x = ev.clientX; y = ev.clientY; if (!raf) raf = requestAnimationFrame(step); }
+    /* once a drag has begun the page must not scroll under the finger (touch-action cannot be changed mid-touch) */
+    function noScroll(ev) { if (ev.cancelable) ev.preventDefault(); }
     function finish(cancel) {
       if (ended) return;
-      /* the last movement may not have been drawn yet: settle on where the pointer really is */
-      if (!cancel) { var t = target(); if (!(t.list === item.parentElement && (t.before === item.nextElementSibling || (t.before === null && kids(t.list).slice(-1)[0] === item)))) place(item, t.list, t.before, item); follow(); }
+      if (!cancel) { settleGap(); follow(); }   /* the last movement may not have been drawn yet */
       ended = true;
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); window.removeEventListener('pointercancel', stop, true); window.removeEventListener('keydown', key, true);
+      window.removeEventListener('touchmove', noScroll, { capture: true });
       var shown = item.getBoundingClientRect();
-      if (cancel) fromList.insertBefore(item, fromNext && fromNext.parentElement === fromList ? fromNext : null);
-      item.style.transform = '';
+      if (!cancel) gap.parentElement.insertBefore(item, gap);   /* the touch is over: now the item really moves */
+      gap.remove();
+      if (keep === null) item.removeAttribute('style'); else item.setAttribute('style', keep);
       var rest = item.getBoundingClientRect();
       item.removeAttribute('data-dragging'); document.documentElement.removeAttribute('data-s4-dragging');
       S4.transition.move(item, shown.left - rest.left, shown.top - rest.top);   /* it settles where it belongs */
@@ -1645,6 +1681,7 @@ S4.register('accordion', function (scope) {
     function stop(ev) { if (ev.pointerId === pid) finish(true); }
     function key(ev) { if (ev.key === 'Escape') { ev.preventDefault(); finish(true); } }
     window.addEventListener('pointermove', move, true); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', stop, true); window.addEventListener('keydown', key, true);
+    window.addEventListener('touchmove', noScroll, { capture: true, passive: false });
     follow();
   }
   function moveTo(item, toIndex, toList) {
@@ -1717,7 +1754,9 @@ S4.register('accordion', function (scope) {
     var rtl = getComputedStyle(row).direction === 'rtl', w = p.acts.getBoundingClientRect().width, now = new DOMMatrixReadOnly(getComputedStyle(p.face).transform).m41;
     var to = on ? (rtl ? w : -w) : 0;
     p.face.style.transform = to ? 'translateX(' + to + 'px)' : '';
-    S4.transition.move(p.face, now - to, 0);
+    /* the actions stay uncovered until the row has finished closing over them */
+    row.setAttribute('data-swiping', '');
+    S4.transition.shift(p.face, 'translateX(' + now + 'px)', to ? 'translateX(' + to + 'px)' : 'none').then(function (done) { if (done) row.removeAttribute('data-swiping'); });
     row.toggleAttribute('data-swiped', !!on);
     if (on) { if (openRow && openRow !== row) swipeSet(openRow, false); openRow = row; } else if (openRow === row) openRow = null;
   }
@@ -1742,16 +1781,21 @@ S4.register('accordion', function (scope) {
     }
     function end() {
       window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); window.removeEventListener('pointercancel', up, true);
-      row.removeAttribute('data-swiping');
+      window.removeEventListener('touchmove', hold, { capture: true });
+      if (!active) row.removeAttribute('data-swiping');
     }
+    /* once the row is following the finger, the page must not also scroll or go back a page */
+    function hold(ev) { if (active && ev.cancelable) ev.preventDefault(); }
     function up(ev) {
       if (ev.pointerId !== pid) return; end(); if (!active) return;
+      if (ev.type === 'pointercancel') { swipeSet(row, row.hasAttribute('data-swiped')); return; }
       var far = Math.abs(dx) > w + (full - w) * 0.3, primary = p.acts.querySelector('[data-swipe-primary]');
       document.documentElement.setAttribute('data-s4-dragging', ''); setTimeout(function () { document.documentElement.removeAttribute('data-s4-dragging'); }, 0);
       if (far && primary) { swipeSet(row, false); primary.click(); }
       else swipeSet(row, Math.abs(dx) > w / 2);
     }
     window.addEventListener('pointermove', move, { capture: true, passive: false }); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);
+    window.addEventListener('touchmove', hold, { capture: true, passive: false });
   });
   document.addEventListener('focusin', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && !a.parentElement.hasAttribute('data-swiped')) swipeSet(a.parentElement, true); });
   document.addEventListener('click', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && a.parentElement.hasAttribute('data-swiped')) setTimeout(function () { swipeSet(a.parentElement, false); }, 0); });

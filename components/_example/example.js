@@ -23,4 +23,5 @@
   group('Theme', 'mode', [['Device', 'system'], ['Light', 'light'], ['Dark', 'dark']]);
   group('Contrast', 'contrast', [['Standard', 0], ['Medium', 0.5], ['High', 1]]);
   group('Color', 'seed', [['Mono', null], ['Indigo', '#4f46e5'], ['Teal', '#00796b']]);
+  group('Surfaces', 'surfaces', [['Neutral', 'neutral'], ['Tinted', 'tinted']]);
 })();

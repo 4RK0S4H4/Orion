@@ -25,6 +25,8 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - `S4.theme({ surfaces: 'neutral' | 'tinted' })`; rail group titles and footer; `data-autofocus`; `data-placement="center"` on panels; glass fill tokens.
 
 ### Changed
+- Tinted surfaces (`surfaces: 'tinted'`) are a first-class second color mode; reference pages have a Surfaces control, the showcase has "Color The Whole App".
+- The editor template's formatting bar is a solid joined button group (glass only on what floats).
 - **Nothing puts the cursor in a text field by itself** (decision 0049): expands and dialogs focus themselves, `autofocus` on a field is ignored, a failed form does not jump the cursor.
 - The list-detail split on a phone goes one level in like a page (Back in the bar, the bottom navigation steps aside).
 - Review labs are built on the live Orion bundle (decision 0048); the scrubber also freezes CSS transitions.
@@ -41,6 +43,8 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- Dragging on a real phone: the dragged element is no longer re-inserted mid-touch (reorder kept cancelling on iOS); a swiped row settles from where the finger left it instead of snapping (decision 0052).
+- The command palette's search box and rows are concentric with its corners; the suite now checks nested corners on every page.
 - Focus rings were cut off in the accordion, in scrolling chip rows and in the desktop title bar.
 - Switching views no longer makes the page wider than the screen for a moment.
 - The search bar's focus ring is no longer cut off at the top of a pane.

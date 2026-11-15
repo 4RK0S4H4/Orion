@@ -141,6 +141,8 @@ last destination. Keep one shell (`.s4-app`) per page.
 - Charts: draw them in the app (SVG or divs) from role colors: past values `surface-container-highest`, the current or
   selected value `primary`, labels `on-surface-variant`, a text alternative (`role="img"` + `aria-label`).
 
+**Two color modes** (decision 0052): neutral (default: white or near-black surfaces, the seed is an accent) and tinted (`S4.theme({ seed, surfaces: 'tinted' })`: every surface takes the color, the M3 Expressive look). Use tinted when the user asks for a color-themed app or the app already is one; never mix. **Nested corners are concentric:** something rounded sitting tight in a rounded container's corner has radius = outer radius minus the gap (`calc(var(--s4-shape-dialog) - var(--s4-space-2))`), or is a pill. **Glass is only for what floats over content;** a toolbar in the page flow is a solid joined button group.
+
 **Three kinds of place** (decision 0050): a **view** (`.s4-view`, a destination in the navigation); a **page** (`<section class="s4-subpage" data-page="order" hidden>`, opened with `data-page-open="order" data-page-id="42"`: going *into* one thing, with Back in the bar, its own title and URL `#view/page/id`; fill it in its `s4-open { id }` event); and acting **in place** (the ladder below). Reading or working on one item is a page, never a dialog.
 
 **App behaviours that are part of the language** (decision 0051; markup in `references/components.md`)

@@ -9,6 +9,7 @@
      Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
               S4.transition.enter(view, dir)                   one view arriving on its own (a pane, a month)
      Morph    S4.transition.move(el, dx, dy)                   a thing lands in a new place (rows after a sort)
+              S4.transition.shift(el, from, to)                a dragged thing settles at an offset (a swiped row)
      State    S4.transition.fade(el, open)                     a plain fade, when nothing moves
    Rules that keep it robust in every browser:
      - surfaces that appear only move (transform) and fade (opacity); reveal is the one pattern that sizes a box, and
@@ -180,11 +181,19 @@
     if (source) source.style.visibility = '';
   }
 
+  /* ---------- shift: something you were dragging settles at an offset that is its new resting place (a swiped row) ----------
+     The caller has already set the element's own transform to `to`; this plays the way there from `from`. */
+  function shift(el, from, to) {
+    begin(el);
+    var a = track(el, M.animate(el, [{ transform: from }, { transform: to }], 'settle'));
+    return settle(el, [a], false);
+  }
+
   /* how long a named spring runs, for things that are timed but are not a transition (a number counting up) */
   function duration(name) { return M.spring(name || 'reveal').duration; }
 
   S4.transition = {
-    duration: duration,
+    duration: duration, shift: shift,
     reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
     restore: restore,
     /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */

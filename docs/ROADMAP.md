@@ -7,7 +7,7 @@ and what Orion will not become**. Change it only with the owner.
 
 **A framework for any app, in one recognisable language.** Three things together:
 
-1. **A look:** any accent color on a neutral base, filled and round, glass only on what floats, one motion philosophy.
+1. **A look:** any accent color on a neutral base (or, when an app asks for it, the fully tinted M3 Expressive mode), filled and round, concentric corners, glass only on what floats, one motion philosophy.
 2. **A set of behaviours:** where new things open (the placement ladder), how you go into a thing and back (pages),
    how lists, forms, charts and loading behave. The behaviours are as much "Orion" as the colors are.
 3. **A skill** that applies both the same way every time, plus checks that fail when something drifts.
@@ -52,7 +52,7 @@ When two good ideas conflict, the earlier line wins.
 ### Horizon 1: 1.2, "ready to build real apps with" (now)
 The goal is that the owner can ask for any app and get something they would ship.
 1. **The owner's looks** on a real iPhone and a real desktop for everything since 0037. Device-only bugs get fixed first.
-2. **Build two real apps end to end with the skill** (one phone-first, one desktop) and fix everything the skill gets
+2. **Build real apps end to end with the skill.** First: a mockup of the owner's WGU degree tracker (tinted mode), then one desktop app, and fix everything the skill gets
    wrong or has to invent. This is the real test of "any app"; the templates are not.
 3. **Skill evals** re-run and extended to the new pieces (pages, expand, states, forms, charts, direct manipulation).
 4. **Reach:** right-to-left, long text, 200% text size and print, as suite checks rather than promises.

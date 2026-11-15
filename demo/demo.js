@@ -38,7 +38,10 @@
   /* Settings: theme controls (patterns.md) */
   $('#mode').addEventListener('s4-change', function (e) { S4.theme({ mode: e.detail.value }); });
   $('#contrast').addEventListener('s4-change', function (e) { S4.theme({ contrast: +e.detail.value }); });
+  /* decision 0052: off = neutral surfaces with the color as an accent; on = every surface takes the color (M3 Expressive) */
+  $('#tinted').addEventListener('change', function () { S4.theme({ surfaces: this.checked ? 'tinted' : 'neutral' }); });
   var t = S4.theme();
+  $('#tinted').checked = t.surfaces === 'tinted';
   $$('#mode [value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === t.mode); });
   $$('#contrast [value]').forEach(function (b) { b.setAttribute('aria-pressed', +b.value === t.contrast); });
 })();

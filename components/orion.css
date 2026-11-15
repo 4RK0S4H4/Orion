@@ -3712,7 +3712,13 @@
   }
   [data-reorder] > * { -webkit-touch-callout: none; }
   /* the item in your hand: lifted above its neighbours by a stronger fill (no shadows, decision 0017) and by being on top */
-  [data-reorder] > [data-dragging] { position: relative; z-index: var(--s4-z-fab, 20); cursor: grabbing; pointer-events: none; }
+  /* direct.js lifts the item out of the flow (position: fixed) and leaves this stand-in where it will land */
+  [data-reorder] > [data-dragging] { z-index: var(--s4-z-fab, 20); cursor: grabbing; pointer-events: none; list-style: none; }
+  .s4-reorder-gap { display: block; flex: none; margin: 0; padding: 0; list-style: none; border-radius: var(--md-sys-shape-corner-medium); background: color-mix(in srgb, var(--md-sys-color-on-surface) 6%, transparent); pointer-events: none; }
+  .s4-list > .s4-reorder-gap { border-radius: var(--s4-shape-list-item, var(--md-sys-shape-corner-large)); }
+  .s4-list > .s4-reorder-gap::before { content: none; }
+  /* things you can pick up do not select their text or open the phone's link menu while you hold them */
+  [data-reorder] > * { user-select: none; -webkit-user-select: none; }
   [data-reorder] > [data-dragging] > .s4-list-item,
   [data-reorder] > [data-dragging].s4-card,
   [data-reorder] > [data-dragging][data-reorder-surface] { background: var(--md-sys-color-surface-container-highest); outline: var(--s4-focus-ring-width) solid var(--md-sys-color-primary); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
@@ -6529,7 +6535,10 @@
     gap: var(--s4-space-1);
     overflow: hidden;
   }
-  .s4-palette-search { flex: none; }
+  /* nested corners are concentric (decision 0052): what sits 8 inside the palette's corner is rounded 8 less */
+  .s4-palette { --_nest: calc(var(--s4-shape-dialog) - var(--s4-space-2)); }
+  .s4-palette-search { flex: none; border-radius: var(--_nest); }
+  .s4-palette-list .s4-list-item { --_radius: var(--_nest); border-radius: var(--_nest); }
   .s4-palette-list { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; }
   .s4-palette-list[hidden] { display: none; }
   .s4-palette-list .s4-list-item { cursor: pointer; }

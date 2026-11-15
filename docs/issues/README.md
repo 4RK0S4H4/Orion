@@ -47,6 +47,9 @@ Published as one quiz in the new Orion quiz UI: [`explore/ideas.html`](../../exp
 
 ## Done
 
+- **45.** The command palette's search box was squarer than the palette's corners; "make sure similar visual issues don't occur throughout the design language" (owner, 2026-11-15, no screenshot): done (concentric corners as a rule and a suite check on every page, decision 0052).
+- **46.** Swipe a row and reorder were "very glitchy" on the owner's iPhone (no screenshot): reworked 2026-11-15 (the dragged element is never re-inserted mid-touch; swipe settles from where the finger left it, decision 0052). **Needs the owner's iPhone look to close.**
+- **47.** The editor's formatting toolbar should not be glass: done 2026-11-15 (a solid joined button group; glass only on what floats, decision 0052).
 - **B.** Idea list B, all eight picked by the owner ("For direct manipulation I wasn't able to move anything" on the quiz sketch): done 2026-11-15 (command palette, resizable panes, states, forms, rewards, direct manipulation that works with a finger, charts, six templates, decision 0051).
 - **43.** Reply focused its field and the keyboard came up ([image](img/2026-11-14-reply-focuses-field.jpg)); "I never want this to happen anywhere": done 2026-11-14 (nothing focuses a field by itself, decision 0049; the suite checks it).
 - **44.** "We never switch pages" (a message should open a reader view): done 2026-11-14 (pages with Back, title, URL and the Back gesture, decision 0050).

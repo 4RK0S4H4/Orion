@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=95fafd6">
+<link rel="stylesheet" href="orion.css?v=8a92f27">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -312,6 +312,7 @@
                 <button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button>
                 <button class="s4-swatch" type="button" data-seed="#c2185b" aria-label="Rose"></button>
               </div>
+              <label class="s4-switch" style="justify-content:space-between"><span>Color The Whole App</span><input type="checkbox" role="switch" id="tinted"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label>
               <div class="s4-button-group" data-connected data-select="single" aria-label="Contrast" id="contrast">
                 <button class="s4-button" type="button" value="0" aria-pressed="true">Standard</button>
                 <button class="s4-button" type="button" value="0.5" aria-pressed="false">Medium</button>
@@ -437,7 +438,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=6a37b84"></script>
+<script src="orion.js?v=970576f"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

@@ -12,7 +12,9 @@
 <link rel="stylesheet" href="orion.css">
 <style>
   /* the app's own layout: tokens only */
-  .ed-tools { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2)); z-index: 2; align-self: flex-start; max-inline-size: 100%; overflow-x: auto; }
+  .ed-tools { position: sticky; inset-block-start: var(--s4-size-top-app-bar); z-index: 2; margin-inline: calc(var(--s4-space-2) * -1); padding: var(--s4-space-2); background: var(--md-sys-color-surface); overflow-x: auto; scrollbar-width: none; }
+  .ed-tools::-webkit-scrollbar { display: none; }
+  .ed-tools > .s4-button-group { flex-wrap: nowrap; inline-size: max-content; }
   .ed-title { inline-size: 100%; border: 0; padding: 0; background: none; color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); border-radius: var(--md-sys-shape-corner-small); }
   .ed-title::placeholder { color: var(--md-sys-color-on-surface-variant); }
   .ed-body { min-block-size: 50dvh; padding: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-small); }
@@ -51,14 +53,16 @@
       <section class="s4-subpage" data-page="doc" data-title="Document" hidden>
         <div class="s4-split" data-layout="supporting" data-resizable data-resize-key="orion-template-editor">
           <article class="s4-split-pane s4-stack">
-            <div class="s4-toolbar ed-tools" role="toolbar" aria-label="Formatting" id="ed-tools">
-              <button class="s4-icon-button" type="button" aria-label="Heading" data-tooltip="Heading" data-block="h2"><span class="s4-icon" data-icon="tag"></span></button>
-              <button class="s4-icon-button" type="button" aria-label="Subheading" data-tooltip="Subheading" data-block="h3"><span class="s4-icon" data-icon="bookmark"></span></button>
-              <button class="s4-icon-button" type="button" aria-label="Paragraph" data-tooltip="Paragraph" data-block="p"><span class="s4-icon" data-icon="document"></span></button>
-              <button class="s4-icon-button" type="button" aria-label="Bold" data-tooltip="Bold" data-cmd="bold" aria-pressed="false"><span class="s4-icon" data-icon="edit"></span></button>
-              <button class="s4-icon-button" type="button" aria-label="Bulleted List" data-tooltip="Bulleted List" data-cmd="insertUnorderedList"><span class="s4-icon" data-icon="list"></span></button>
-              <button class="s4-icon-button" type="button" aria-label="Undo" data-tooltip="Undo" data-cmd="undo"><span class="s4-icon" data-icon="undo"></span></button>
-            </div>
+            <!-- formatting sits in the page with the text, so it is solid like the rest of the content: a joined group of
+                 buttons with words on them (glass is for what floats over content, decision 0052) -->
+            <div class="ed-tools" id="ed-tools"><div class="s4-button-group" data-connected role="toolbar" aria-label="Formatting">
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-block="h2">Heading</button>
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-block="h3">Subheading</button>
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-block="p">Text</button>
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-cmd="bold" aria-pressed="false">Bold</button>
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-cmd="insertUnorderedList">List</button>
+              <button class="s4-button" data-variant="tonal" data-size="s" type="button" data-cmd="undo">Undo</button>
+            </div></div>
             <input class="ed-title" id="ed-title" aria-label="Title" placeholder="Untitled" autocomplete="off">
             <div class="ed-meta"><span id="ed-words" aria-live="polite">0 words</span><span class="s4-form-status" id="ed-status" role="status"></span></div>
             <div class="s4-prose ed-body" id="ed-body" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Document text" data-placeholder="Start writing…"></div>
