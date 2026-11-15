@@ -122,8 +122,12 @@
   var ACCENT = ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary', 'surface-tint',
     'primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant'];
   function schemeFor(dark, c) {
-    var M = window.M3Color, s = M.scheme(state.seed, state.variant, dark, c);
-    if (state.surfaces === 'tinted') return s;
+    /* Tinted (decision 0052): every role from the seed. Unless the app asked for a variant, tinted uses M3's calm
+       "tonal" scheme (surfaces carry a little of the color, like stock Material You), not the vivid accent variant:
+       a whole screen in a vivid tint is tiring. Controls that are a fixed neutral gray take the scheme's outline. */
+    var M = window.M3Color, tinted = state.surfaces === 'tinted';
+    var s = M.scheme(state.seed, tinted && !state.variantSet ? 'tonal' : state.variant, dark, c);
+    if (tinted) { s['--s4-color-control'] = s.outline; return s; }
     var pal = M.palettes(state.seed, state.variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
     var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
     o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
@@ -167,7 +171,7 @@
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
       state.seed = seed && String(seed).toLowerCase() !== '#000000' ? seed : null; colorChanged = true;
     }
-    if (opts.variant) { state.variant = opts.variant; colorChanged = true; }
+    if (opts.variant) { state.variant = opts.variant; state.variantSet = true; colorChanged = true; }
     if (opts.surfaces) { state.surfaces = opts.surfaces === 'tinted' ? 'tinted' : 'neutral'; colorChanged = true; }
     if (opts.mode) { state.mode = opts.mode; if (opts.mode === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', opts.mode); }
     if ('contrast' in opts) {

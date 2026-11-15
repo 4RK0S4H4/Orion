@@ -16,6 +16,14 @@ The long view is in [`ROADMAP.md`](ROADMAP.md): read it before choosing new work
 4. The six new templates: board, calendar, editor, gallery, checkout, onboarding.
 5. Still open from before: the motion page (0046); should floating panels become non-modal (0047)?
 
+**Added 2026-11-15 (later):** decision 0052 (concentric corners with a suite check, tinted color mode as a first-class
+second mode, solid editor toolbar, dragging reworked for a real iPhone) and the first real-app test,
+`explore/degree-tracker.html` (the owner's degree tracker in Orion, tinted, invented data; the real repo
+`4RK0S4H4/wgu-degree-tracker` is private and was only read). Waiting on the owner: does dragging and swiping now work
+on the iPhone, and what do they think of the tracker mockup (it could become a redesign proposal for that app; its own
+CLAUDE.md asks for before/after screenshots and approval first). Candidates it surfaced: a progress ring component, a
+segmented road/track component.
+
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
 2. Build two real apps end to end with the skill (one phone-first, one desktop) and fix what the skill gets wrong.

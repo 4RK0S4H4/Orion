@@ -22,6 +22,10 @@ it compatible with both. Keep what we have, but if I say so we can do the M3E wa
 | **Neutral** (the default, 0043 and 0045) | white or near-black surfaces; the color is an accent | `S4.theme({ seed })` |
 | **Tinted** (M3 Expressive dynamic color) | every surface, container and text role takes the color | `S4.theme({ seed, surfaces: 'tinted' })` |
 
+Tinted uses M3's calm "tonal" scheme unless the app names a variant (a whole screen in the vivid accent variant
+is tiring; found by building the degree tracker mockup), and fixed neutral grays such as the empty checkbox take the
+scheme's outline color.
+
 Neither replaces the other. An app says which it is; an app that is already color themed (the WGU degree tracker)
 stays tinted. Everything must work in both: `check-glass` already proves glass contrast with tinted surfaces, the
 reference pages have a Surfaces control, and the showcase has "Color The Whole App" in Settings.
@@ -48,3 +52,11 @@ Two real causes, neither visible in desktop testing:
 settle with a Morph when the finger lifts.
 **Honest limit:** this is tested with simulated touches in Chromium and by WebKit page loads in CI. Only the owner's
 iPhone proves it; ask for that look.
+
+## 5. First real-app test: the degree tracker mockup
+[`explore/degree-tracker.html`](../../explore/degree-tracker.html): the owner's degree tracker rebuilt in Orion, tinted,
+with the stage switching the whole app's color (teal, then navy). Invented sample data only: the real app's repo is
+private and this site is public. Built only from Orion components plus about 30 lines of its own layout. What it
+found and fixed in the system: tinted mode was far too vivid; empty controls stayed gray in tinted mode.
+What it shows is still missing: a progress ring and a segmented "road" track had to be hand-drawn (candidates for
+components), and there is no status pill tone for "on pace / at risk".
