@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Small Rewards · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  @layer s4.components {
+    .rw-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-4); }
+    .rw-num { font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
+  }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Small Rewards</h1></header>
+<main class="ex-main">
+  <p>The small moments that make finishing something feel good. Each one is an existing motion pattern, so fun never looks like a different app. Under reduced motion they simply show their end state.</p>
+
+  <section class="ex-sec">
+    <h2>A Check That Draws Itself</h2>
+    <p>For a thing that is done: paid, sent, saved, complete.</p>
+    <div class="ex-board"><div class="rw-row"><button class="s4-button" type="button" id="rw-pay">Mark As Paid</button><span class="s4-done-mark" id="rw-mark"></span><span class="s4-done-mark" data-size="s" id="rw-mark-s"></span><span class="s4-on-surface-variant" id="rw-say" aria-live="polite"></span></div></div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>A Number That Counts To Its Value</h2>
+    <p>For a total that just changed or a stat arriving on screen. It counts once; the real value is what a screen reader hears.</p>
+    <div class="ex-board"><div class="rw-row"><span class="rw-num s4-num" id="rw-total" data-count-to="6240" data-count-format="currency:USD" data-count-decimals="2"></span><button class="s4-button" data-variant="tonal" type="button" id="rw-add">Add $212.48</button><span class="rw-num s4-num" data-count-to="0.62" data-count-format="percent"></span></div></div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>A Row That Settles</h2>
+    <p>After a drag, the row lands where it belongs on the calm morph. See <a href="../direct/direct.html">Direct Manipulation</a>.</p>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/reward/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+var paid = false, total = 6240;
+document.getElementById('rw-pay').addEventListener('click', function () {
+  paid = !paid; S4.reward.done(document.getElementById('rw-mark'), paid); S4.reward.done(document.getElementById('rw-mark-s'), paid);
+  this.textContent = paid ? 'Undo' : 'Mark As Paid'; document.getElementById('rw-say').textContent = paid ? 'Paid' : '';
+});
+document.getElementById('rw-add').addEventListener('click', function () { var from = total; total += 212.48; S4.reward.count(document.getElementById('rw-total'), total, { from: from }); });
+</script>
+</body>
+</html>

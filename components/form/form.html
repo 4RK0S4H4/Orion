@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forms · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>@layer s4.components { .fm-col { inline-size: min(100%, 34rem); } }</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Forms</h1></header>
+<main class="ex-main">
+  <p>Forms that behave: an error appears when you leave a field, never while you are still typing; fixing it shows a quiet check; settings save by themselves; and nothing asks “Are you sure?” when Undo will do.</p>
+
+  <section class="ex-sec">
+    <h2>A Form You Send</h2>
+    <p>Type half an email address and move on: the message appears. Go back and finish it: the message goes as soon as it is right. Send with something missing and every problem is shown at once.</p>
+    <div class="ex-board col">
+      <section class="s4-pane fm-col">
+        <form class="s4-form" id="fm-send">
+          <div class="s4-form-row">
+            <div class="s4-text-field"><input id="fm-first" name="first" autocomplete="off" required data-msg-required="Enter your first name."><label for="fm-first">First Name</label></div>
+            <div class="s4-text-field"><input id="fm-last" name="last" autocomplete="off" required data-msg-required="Enter your last name."><label for="fm-last">Last Name</label></div>
+          </div>
+          <div class="s4-text-field"><input id="fm-email" name="email" type="email" autocomplete="off" required data-msg-required="Enter your email address." data-msg-type="That doesn’t look like an email address."><label for="fm-email">Email</label><div class="s4-text-field-supporting">We only use it for receipts.</div></div>
+          <div class="s4-text-field"><input id="fm-seats" name="seats" type="number" min="1" max="50" value="1" required data-msg-min="At least one seat." data-msg-max="Fifty seats at most; write to us for more."><label for="fm-seats">Seats</label></div>
+          <label class="s4-checkbox"><input type="checkbox" name="terms" required data-msg-required="Accept the terms to continue."><span class="s4-checkbox-box"></span>I accept the terms</label>
+          <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="reset">Clear</button><button class="s4-button" type="submit">Create Account</button></div>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Settings That Save Themselves</h2>
+    <p>No Save button. Change something: it reads “Saving…” and then “Saved”.</p>
+    <div class="ex-board col">
+      <section class="s4-pane fm-col">
+        <form class="s4-form" id="fm-auto" data-autosave>
+          <div class="s4-text-field"><input id="fm-name" name="name" autocomplete="off" value="Ledger Mail" required data-msg-required="The workspace needs a name."><label for="fm-name">Workspace Name</label></div>
+          <label class="s4-switch"><input type="checkbox" role="switch" name="digest" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span>Weekly Summary Email</label>
+          <div class="s4-form-actions"><span class="s4-form-status"></span></div>
+        </form>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Undo Instead Of “Are You Sure?”</h2>
+    <p>The action happens at once and the snackbar offers the way back. Keep a confirm for what is serious and cannot be undone.</p>
+    <div class="ex-board"><button class="s4-button" data-variant="tonal" type="button" id="fm-remove">Remove Card</button></div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/form/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+document.getElementById('fm-send').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.snackbar('Account created for ' + e.detail.values.first); });
+document.getElementById('fm-auto').addEventListener('s4-save', function (e) { e.detail.wait(); setTimeout(function () { e.detail.done(true); }, 700); });
+document.getElementById('fm-remove').addEventListener('click', function () { var b = this; b.hidden = true; S4.snackbar({ text: 'Card removed', action: 'Undo', onAction: function () { b.hidden = false; } }); });
+</script>
+</body>
+</html>

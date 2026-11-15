@@ -1,0 +1,158 @@
+{
+  "$description": "Chart colors (decision 0051): a fixed categorical order for charts with several series. A chart with one series uses the accent (primary). Text in a chart never wears these colors.",
+  "s4": {
+    "chart": {
+      "1": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1647,
+            0.4706,
+            0.8392
+          ],
+          "hex": "#2a78d6"
+        },
+        "$description": "Chart series 1 (blue). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.2235,
+                0.5294,
+                0.898
+              ],
+              "hex": "#3987e5"
+            }
+          }
+        }
+      },
+      "2": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9216,
+            0.4078,
+            0.2039
+          ],
+          "hex": "#eb6834"
+        },
+        "$description": "Chart series 2 (orange). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.851,
+                0.349,
+                0.149
+              ],
+              "hex": "#d95926"
+            }
+          }
+        }
+      },
+      "3": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.1059,
+            0.6863,
+            0.4784
+          ],
+          "hex": "#1baf7a"
+        },
+        "$description": "Chart series 3 (aqua). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.098,
+                0.6196,
+                0.4392
+              ],
+              "hex": "#199e70"
+            }
+          }
+        }
+      },
+      "4": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9294,
+            0.6314,
+            0
+          ],
+          "hex": "#eda100"
+        },
+        "$description": "Chart series 4 (yellow). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.7882,
+                0.5216,
+                0
+              ],
+              "hex": "#c98500"
+            }
+          }
+        }
+      },
+      "5": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9098,
+            0.4824,
+            0.6431
+          ],
+          "hex": "#e87ba4"
+        },
+        "$description": "Chart series 5 (magenta). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.8353,
+                0.3176,
+                0.5059
+              ],
+              "hex": "#d55181"
+            }
+          }
+        }
+      },
+      "6": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0,
+            0.5137,
+            0
+          ],
+          "hex": "#008300"
+        },
+        "$description": "Chart series 6 (green). Fixed order, never cycled; validated for color-blind separation on Orion surfaces.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.0471,
+                0.6392,
+                0.0471
+              ],
+              "hex": "#0ca30c"
+            }
+          }
+        }
+      },
+      "$type": "color"
+    }
+  }
+}

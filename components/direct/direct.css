@@ -1,0 +1,110 @@
+/* Direct manipulation (S4 addition, decision 0051): reorder, swipe actions, select several. Behaviour: direct.js.
+   .s4-drag-handle        the grip you drag an item by (a real button: it is also how the keyboard moves the item)
+   [data-reorder]         a list, grid or column whose children can be reordered
+   [data-swipe]           a row whose actions (.s4-swipe-actions) are uncovered by dragging it sideways
+   [data-selectable]      a list where several rows can be picked; .s4-selection-bar shows the count and their actions */
+@layer s4.components {
+  /* ---------- reorder ---------- */
+  .s4-drag-handle {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--s4-size-touch-target);
+    block-size: var(--s4-size-touch-target);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: none;
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: grab;
+    touch-action: none;                 /* a finger on the handle moves the item, never the page */
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-list-item > .s4-drag-handle:first-child { margin-inline: calc(var(--s4-space-3) * -1) calc(var(--s4-space-2) * -1); }
+  .s4-list-item > .s4-drag-handle:last-child { margin-inline: calc(var(--s4-space-2) * -1) calc(var(--s4-space-3) * -1); }
+  @media (hover: hover) { .s4-drag-handle:hover { color: var(--md-sys-color-on-surface); } }
+  .s4-drag-handle[aria-pressed="true"] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); cursor: grabbing; }
+  /* six dots when the handle has no icon of its own */
+  .s4-drag-handle:empty::before {
+    content: "";
+    inline-size: var(--s4-space-3);
+    block-size: var(--s4-space-5);
+    background: radial-gradient(circle, currentColor 1.5px, transparent 2px) 0 0 / 50% 33.4%;
+  }
+  [data-reorder] > * { -webkit-touch-callout: none; }
+  /* the item in your hand: lifted above its neighbours by a stronger fill (no shadows, decision 0017) and by being on top */
+  [data-reorder] > [data-dragging] { position: relative; z-index: var(--s4-z-fab, 20); cursor: grabbing; pointer-events: none; }
+  [data-reorder] > [data-dragging] > .s4-list-item,
+  [data-reorder] > [data-dragging].s4-card,
+  [data-reorder] > [data-dragging][data-reorder-surface] { background: var(--md-sys-color-surface-container-highest); outline: var(--s4-focus-ring-width) solid var(--md-sys-color-primary); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  :root[data-s4-dragging], :root[data-s4-dragging] * { cursor: grabbing; user-select: none; -webkit-user-select: none; }
+
+  /* ---------- swipe ---------- */
+  [data-swipe] { position: relative; overflow: hidden; border-radius: var(--s4-shape-list-item, var(--md-sys-shape-corner-large)); touch-action: pan-y; }
+  [data-swipe] > :is(.s4-list-item, [data-swipe-face]) { position: relative; z-index: 1; touch-action: pan-y; background: var(--_swipe-bg, var(--md-sys-color-surface)); }
+  .s4-pane [data-swipe] > :is(.s4-list-item, [data-swipe-face]) { --_swipe-bg: var(--md-sys-color-surface-container-low); }
+  [data-swipe] > .s4-list-item[aria-selected="true"], [data-swipe][data-picked] > .s4-list-item { --_swipe-bg: var(--md-sys-color-secondary-container); }
+  .s4-swipe-actions {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    padding-inline: var(--s4-space-2);
+    visibility: hidden;
+  }
+  /* uncovered only while the row is dragged or open (or the keyboard is on one of them) */
+  [data-swipe]:is([data-swiping], [data-swiped]) > .s4-swipe-actions, .s4-swipe-actions:focus-within { visibility: visible; }
+
+  /* ---------- select several ---------- */
+  [data-selectable] > [data-picked] > .s4-list-item,
+  [data-selectable] > [data-picked].s4-card,
+  [data-selectable] > tr[data-picked] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  /* a picked row's avatar turns into a check */
+  [data-selectable] > [data-picked] .s4-list-leading > .s4-avatar { --_bg: var(--md-sys-color-primary); color: transparent; }
+  [data-selectable] > [data-picked] .s4-list-leading > .s4-avatar::after {
+    content: "";
+    position: absolute;
+    inset: 25%;
+    background: var(--md-sys-color-on-primary);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.4l3.2 3.2L13 4.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.4l3.2 3.2L13 4.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  [data-selectable] > * { -webkit-touch-callout: none; }
+  [data-selectable][data-selecting] > * { user-select: none; -webkit-user-select: none; }
+
+  .s4-selection-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-block-size: var(--s4-size-top-app-bar, var(--s4-space-16));
+    padding-inline: var(--s4-space-2) var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    min-inline-size: 0;
+  }
+  .s4-selection-bar[hidden] { display: none; }
+  .s4-selection-count {
+    flex: 1;
+    min-inline-size: 0;
+    margin-inline: var(--s4-space-2);
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    font-weight: var(--md-sys-typescale-title-medium-weight);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  /* inside the top app bar it takes the bar's place while anything is selected */
+  .s4-top-app-bar > .s4-selection-bar { flex: 1; min-block-size: 0; align-self: center; margin-inline: calc(var(--s4-space-2) * -1); }
+  .s4-top-app-bar[data-selecting] > :not(.s4-selection-bar) { display: none; }
+  @media (forced-colors: active) { .s4-selection-bar, [data-selectable] > [data-picked] > .s4-list-item { outline: 1px solid Highlight; } }
+}

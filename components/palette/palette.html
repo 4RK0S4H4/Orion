@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Command Palette · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Command Palette</h1></header>
+<main class="ex-main">
+  <p>Search everything and run any action from one box. Press <kbd class="s4-kbd" data-for="pl-open"></kbd> anywhere on this page, or use the button. Type to filter, use the arrow keys, press Enter.</p>
+
+  <section class="ex-sec">
+    <h2>Open It</h2>
+    <p>The palette collects its commands by itself: the ones the app registers, every button marked as a command, and the app's destinations.</p>
+    <div class="ex-board">
+      <button class="s4-button" type="button" data-palette id="pl-open"><span class="s4-icon" data-icon="search"></span>Search And Commands</button>
+      <span class="s4-on-surface-variant" id="pl-out" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Buttons That Are Commands</h2>
+    <p>These buttons carry <code>data-command</code>, so they are in the palette with their shortcuts. Running one from the palette clicks it.</p>
+    <div class="ex-board">
+      <button class="s4-button" data-variant="tonal" type="button" data-command="Archive Message" data-shortcut="mod+e"><span class="s4-icon" data-icon="archive"></span>Archive</button>
+      <button class="s4-button" data-variant="tonal" type="button" data-command="Flag Message" data-command-keywords="star important"><span class="s4-icon" data-icon="star"></span>Flag</button>
+      <button class="s4-button" data-variant="tonal" type="button" data-command="Print" data-shortcut="mod+p"><span class="s4-icon" data-icon="document"></span>Print</button>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/palette/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+var out = document.getElementById('pl-out');
+document.querySelector('.s4-kbd[data-for="pl-open"]').textContent = S4.desktop.format('mod+k');
+S4.palette.register([
+  { label: 'New Message', group: 'Mail', icon: 'edit', shortcut: 'mod+n', run: function () { out.textContent = 'New Message'; } },
+  { label: 'Export As CSV', group: 'Data', icon: 'export', keywords: 'download spreadsheet', run: function () { out.textContent = 'Export As CSV'; } },
+  { label: 'Invite A Teammate', group: 'People', icon: 'people', keywords: 'add user share', run: function () { out.textContent = 'Invite A Teammate'; } }
+]);
+document.querySelectorAll('[data-command]').forEach(function (b) { b.addEventListener('click', function (e) { if (b.dataset.command === 'Print') e.preventDefault(); out.textContent = b.dataset.command; }); });
+</script>
+</body>
+</html>

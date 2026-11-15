@@ -180,7 +180,11 @@
     if (source) source.style.visibility = '';
   }
 
+  /* how long a named spring runs, for things that are timed but are not a transition (a number counting up) */
+  function duration(name) { return M.spring(name || 'reveal').duration; }
+
   S4.transition = {
+    duration: duration,
     reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
     restore: restore,
     /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */

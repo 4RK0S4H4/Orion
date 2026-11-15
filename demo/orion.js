@@ -377,7 +377,11 @@
     if (source) source.style.visibility = '';
   }
 
+  /* how long a named spring runs, for things that are timed but are not a transition (a number counting up) */
+  function duration(name) { return M.spring(name || 'reveal').duration; }
+
   S4.transition = {
+    duration: duration,
     reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
     restore: restore,
     /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */
@@ -632,7 +636,11 @@ S4.register('fab', function (scope) {
      list). [data-split-back] clears it. Both fire s4-toggle { open } on the split.
    - Under 840 opening goes one level in like a page (decision 0050): the top app bar shows Back and the split's
      data-detail-title, the bottom navigation steps aside, and the phone's Back gesture returns to the list.
-   - S4.split.open(split, true|false) does the same from code (e.g. after a listbox s4-change). */
+   - S4.split.open(split, true|false) does the same from code (e.g. after a listbox s4-change).
+   - data-resizable on a split (decision 0051): from 840 a grip sits between the panes. Drag it, or focus it and use the
+     arrow keys (Home and End for the limits); double-click or Enter collapses the side pane and brings it back.
+     data-resize-key="name" remembers the width and the collapsed state in this browser. Fires s4-resize { size, collapsed }.
+     S4.split.resize(split, px) and S4.split.collapse(split, true|false) do it from code. */
 (function () {
   function narrow(split) {
     var app = split.closest('.s4-app');
@@ -646,7 +654,7 @@ S4.register('fab', function (scope) {
     split.toggleAttribute('data-open', !!on);
     if (narrow(split)) {
       window.scrollTo({ top: 0, behavior: 'instant' });
-      var pane = split.querySelector(on ? '.s4-split-pane + .s4-split-pane' : '.s4-split-pane');
+      var pane = split.querySelector(on ? '.s4-split-pane ~ .s4-split-pane' : '.s4-split-pane');
       /* a view switch: in from the side you're heading */
       if (pane) S4.transition.enter(pane, on ? 1 : -1);
       if (app && S4.pages) {
@@ -659,7 +667,72 @@ S4.register('fab', function (scope) {
     }
     S4.util.emit(split, 's4-toggle', { open: !!on });
   }
-  S4.split = { open: function (split, on) { set(split, on !== false); } };
+  /* ---------- resizable panes ---------- */
+  var MIN = 200;
+  function side(split) { return split.getAttribute('data-layout') === 'supporting' ? '--s4-split-support' : '--s4-split-list'; }
+  function limits(split) { var w = split.getBoundingClientRect().width; return { min: Math.min(MIN, w / 3), max: Math.max(MIN, w * 0.6) }; }
+  function store(split, v) { var k = split.getAttribute('data-resize-key'); if (!k) return; try { if (v === undefined) return JSON.parse(localStorage.getItem('s4-split:' + k) || 'null'); localStorage.setItem('s4-split:' + k, JSON.stringify(v)); } catch (e) {} return null; }
+  function current(split) { var p = split.getAttribute('data-layout') === 'supporting' ? split.querySelector(':scope > .s4-split-pane:last-child') : split.querySelector(':scope > .s4-split-pane'); return p ? p.getBoundingClientRect().width : 0; }
+  function sync(split) {
+    var g = split.querySelector(':scope > .s4-split-grip'); if (!g) return;
+    var l = limits(split), collapsed = split.hasAttribute('data-collapsed');
+    g.setAttribute('aria-valuemin', Math.round(l.min)); g.setAttribute('aria-valuemax', Math.round(l.max));
+    g.setAttribute('aria-valuenow', collapsed ? 0 : Math.round(current(split)));
+    g.setAttribute('aria-valuetext', collapsed ? 'Collapsed' : Math.round(current(split)) + ' pixels');
+  }
+  function resize(split, px, quiet) {
+    var l = limits(split), v = Math.round(Math.max(l.min, Math.min(l.max, px)));
+    split.removeAttribute('data-collapsed');
+    split.style.setProperty(side(split), v + 'px');
+    sync(split);
+    if (!quiet) { store(split, { size: v, collapsed: false }); S4.util.emit(split, 's4-resize', { size: v, collapsed: false }); }
+  }
+  function collapse(split, on) {
+    on = on === undefined ? !split.hasAttribute('data-collapsed') : !!on;
+    var size = on ? current(split) : null;
+    if (on) split._s4size = size;
+    split.toggleAttribute('data-collapsed', on);
+    sync(split);
+    store(split, { size: Math.round(split._s4size || current(split)), collapsed: on });
+    S4.util.emit(split, 's4-resize', { size: on ? 0 : Math.round(current(split)), collapsed: on });
+  }
+  function resizable(split) {
+    var panes = split.querySelectorAll(':scope > .s4-split-pane'); if (panes.length < 2) return;
+    var g = document.createElement('div'); g.className = 's4-split-grip'; g.tabIndex = 0;
+    g.setAttribute('role', 'separator'); g.setAttribute('aria-orientation', 'vertical'); g.setAttribute('aria-label', split.getAttribute('data-resize-label') || 'Resize panes');
+    split.insertBefore(g, panes[1]);
+    var saved = store(split);
+    if (saved && saved.size) { split.style.setProperty(side(split), saved.size + 'px'); split._s4size = saved.size; if (saved.collapsed) split.setAttribute('data-collapsed', ''); }
+    var supporting = split.getAttribute('data-layout') === 'supporting';
+    g.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      e.preventDefault(); g.setPointerCapture(e.pointerId); g.setAttribute('data-dragging', '');
+      var rtl = getComputedStyle(split).direction === 'rtl';
+      var move = function (ev) {
+        var r = split.getBoundingClientRect(), fromStart = rtl ? r.right - ev.clientX : ev.clientX - r.left;
+        resize(split, supporting ? r.width - fromStart : fromStart, true);
+      };
+      var up = function () {
+        g.removeEventListener('pointermove', move); g.removeEventListener('pointerup', up); g.removeEventListener('pointercancel', up);
+        g.removeAttribute('data-dragging');
+        if (!split.hasAttribute('data-collapsed')) { var v = Math.round(current(split)); store(split, { size: v, collapsed: false }); S4.util.emit(split, 's4-resize', { size: v, collapsed: false }); }
+      };
+      g.addEventListener('pointermove', move); g.addEventListener('pointerup', up); g.addEventListener('pointercancel', up);
+    });
+    g.addEventListener('dblclick', function () { collapse(split); });
+    g.addEventListener('keydown', function (e) {
+      var rtl = getComputedStyle(split).direction === 'rtl', grow = (supporting ? -1 : 1) * (rtl ? -1 : 1), step = e.shiftKey ? 64 : 16, l = limits(split);
+      if (e.key === 'ArrowRight') { e.preventDefault(); resize(split, current(split) + grow * step); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); resize(split, current(split) - grow * step); }
+      else if (e.key === 'Home') { e.preventDefault(); resize(split, l.min); }
+      else if (e.key === 'End') { e.preventDefault(); resize(split, l.max); }
+      else if (e.key === 'Enter') { e.preventDefault(); collapse(split); }
+    });
+    sync(split);
+    if (window.ResizeObserver) new ResizeObserver(function () { sync(split); }).observe(split);
+  }
+
+  S4.split = { open: function (split, on) { set(split, on !== false); }, resize: function (split, px) { resize(split, px); }, collapse: collapse };
 
   window.addEventListener('popstate', function () {
     document.querySelectorAll('.s4-split[data-open]').forEach(function (s) { if (narrow(s) && !(s.closest('.s4-app') && S4.pages)) set(s, false, true); });
@@ -668,6 +741,7 @@ S4.register('fab', function (scope) {
   S4.register('layout', function (scope) {
     S4.util.all(scope, '.s4-split').forEach(function (split) {
       if (!S4.util.once(split, 'split')) return;
+      if (split.hasAttribute('data-resizable')) resizable(split);
       split.addEventListener('click', function (e) {
         var t = e.target.closest('[data-split-open], [data-split-back]');
         if (!t || t.closest('.s4-split') !== split) return;
@@ -1410,6 +1484,556 @@ S4.register('accordion', function (scope) {
   });
 });
 
+/* ---- states/states.js ---- */
+/* States (decision 0051): every list, table and pane has a designed loading, empty, error and offline state.
+     <div class="s4-states" data-state="loading">
+       <div data-when="loading" data-rows="4"></div>                skeleton rows are drawn for you
+       <div data-when="empty" class="s4-empty">…</div>
+       <div data-when="error" class="s4-empty">… <button data-retry>Try Again</button></div>
+       <div data-when="offline" class="s4-banner">…</div>           a part may belong to several states:
+       <ul data-when="ready offline" class="s4-list">…</ul>         data-when="ready offline" shows the list under the banner
+     </div>
+   - S4.states.set(el, 'ready') switches; the part that arrives fades in. S4.states.get(el).
+   - S4.states.load(el, promise): loading while it runs, then ready, or empty when it resolves to an empty list (or
+     { empty: true }), or error when it rejects. Fires s4-state { state, previous } on the container.
+   - [data-retry] inside fires s4-retry on the container (load again there).
+   - data-offline="auto": when the device goes offline the container shows its offline parts, and returns when it is back.
+   aria-busy is set while loading and changes are announced politely. Motion: State (a plain fade). */
+(function () {
+  var S4 = window.S4;
+  function parts(el) { return Array.prototype.slice.call(el.querySelectorAll(':scope > [data-when]')); }
+  function skeleton(part) {
+    if (part.children.length || !part.hasAttribute('data-rows')) return;
+    var n = Math.max(1, +part.getAttribute('data-rows') || 3), html = '';
+    for (var i = 0; i < n; i++) html += '<div class="s4-states-row"><div class="s4-skeleton" data-shape="circle"></div><div class="s4-states-lines"><div class="s4-skeleton" data-shape="text"></div><div class="s4-skeleton" data-shape="text"></div></div></div>';
+    part.innerHTML = html; part.setAttribute('aria-hidden', 'true');
+  }
+  function apply(el, state, animate) {
+    var prev = el._s4state;
+    el._s4state = state; el.setAttribute('data-state', state);
+    if (state === 'loading') el.setAttribute('aria-busy', 'true'); else el.removeAttribute('aria-busy');
+    parts(el).forEach(function (p) {
+      var on = (' ' + p.getAttribute('data-when') + ' ').indexOf(' ' + state + ' ') >= 0, was = !p.hidden;
+      if (on) skeleton(p);
+      p.hidden = !on;
+      if (on && !was && animate) S4.transition.fade(p, true);
+    });
+    if (prev !== state && animate) S4.util.emit(el, 's4-state', { state: state, previous: prev || null });
+  }
+  function set(el, state) { if (!el || el._s4state === state) return; el._s4base = state === 'offline' ? el._s4base : state; apply(el, state, true); }
+  function load(el, promise) {
+    set(el, 'loading');
+    return Promise.resolve(promise).then(function (r) {
+      var none = r && (r.empty === true || (Array.isArray(r) && !r.length));
+      set(el, none ? 'empty' : 'ready'); return r;
+    }, function (err) { set(el, 'error'); throw err; });
+  }
+  S4.states = { set: set, load: load, get: function (el) { return el._s4state || el.getAttribute('data-state'); } };
+
+  function connection() {
+    document.querySelectorAll('.s4-states[data-offline="auto"]').forEach(function (el) {
+      if (navigator.onLine === false) apply(el, 'offline', true);
+      else if (el._s4state === 'offline') apply(el, el._s4base || 'ready', true);
+    });
+  }
+  window.addEventListener('offline', connection); window.addEventListener('online', connection);
+
+  S4.register('states', function (scope) {
+    S4.util.all(scope, '.s4-states').forEach(function (el) {
+      if (!S4.util.once(el, 'states')) return;
+      if (!el.hasAttribute('aria-live')) el.setAttribute('aria-live', 'polite');
+      el._s4base = el.getAttribute('data-state') || 'ready';
+      apply(el, el._s4base, false);
+      el.addEventListener('click', function (e) { var r = e.target.closest('[data-retry]'); if (r && el.contains(r)) S4.util.emit(el, 's4-retry', {}); });
+      if (el.getAttribute('data-offline') === 'auto' && navigator.onLine === false) apply(el, 'offline', false);
+    });
+  });
+})();
+
+/* ---- direct/direct.js ---- */
+/* Direct manipulation (decision 0051): move things with your hand instead of through a menu.
+   1. Reorder.  <ul class="s4-list" data-reorder> … <li><div class="s4-list-item"><button class="s4-drag-handle" aria-label="Move Launch checklist">…</button>…</div></li>
+      Drag an item by its .s4-drag-handle (mouse, pen or finger; the handle never scrolls the page). With no handle the
+      whole item drags: at once with a mouse, after a short hold with a finger. Items make room as you go and the one you
+      dropped settles into place. Containers that share data-reorder-group="name" pass items between them (boards).
+      Keyboard: on a handle, Space picks the item up, Arrow keys move it, Space drops it, Escape puts it back.
+      Fires s4-reorder { item, from, to, fromList, toList } on the list it lands in. S4.reorder.move(item, toIndex, toList).
+   2. Swipe.  <li data-swipe><div class="s4-list-item">…</div><div class="s4-swipe-actions"><button …>Archive</button></div></li>
+      On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe runs
+      the action marked data-swipe-primary. The same buttons are always reachable by keyboard and are in the row's menu.
+   3. Select several.  <ul data-selectable data-selection-bar="#bar"> and <div class="s4-selection-bar" id="bar" hidden>
+      Hold a row (or Ctrl/⌘-click it, or Shift-click for a range) to start selecting; after that a tap adds or removes a
+      row. The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
+      Escape or [data-selection-clear] ends it. Fires s4-selection { items, count }. S4.selection.items(el) / clear(el) / all(el).
+   Motion: Morph calm (rows making room and settling); nothing else animates while your finger is down. */
+(function () {
+  var S4 = window.S4;
+  var live;
+  function say(text) {
+    if (!live) { live = document.createElement('div'); live.className = 's4-visually-hidden'; live.setAttribute('aria-live', 'assertive'); document.body.appendChild(live); }
+    live.textContent = ''; setTimeout(function () { live.textContent = text; }, 30);
+  }
+  function kids(list) { return Array.prototype.filter.call(list.children, function (c) { return !c.hidden && !c.matches('.s4-list-subheader, [data-reorder-fixed]'); }); }
+  function label(item) { var h = item.querySelector('.s4-list-headline, .s4-card-title, [data-reorder-label]'); return (h ? h.textContent : item.textContent).replace(/\s+/g, ' ').trim().slice(0, 60); }
+
+  /* ---------- 1. reorder ---------- */
+  /* move a node and let everything that shifted glide from where it was (FLIP) */
+  function place(item, list, before, skip) {
+    var movers = kids(item.parentElement).concat(list !== item.parentElement ? kids(list) : []).filter(function (x) { return x !== skip; });
+    var was = movers.map(function (x) { return x.getBoundingClientRect(); });
+    list.insertBefore(item, before || null);
+    movers.forEach(function (x, i) { var r = x.getBoundingClientRect(); if (r.top !== was[i].top || r.left !== was[i].left) S4.transition.move(x, was[i].left - r.left, was[i].top - r.top); });
+  }
+  function groupLists(list) {
+    var g = list.getAttribute('data-reorder-group');
+    return g ? Array.prototype.slice.call(document.querySelectorAll('[data-reorder][data-reorder-group="' + g + '"]')) : [list];
+  }
+  function drag(list, item, e) {
+    var lists = groupLists(list), fromList = list, fromIndex = kids(list).indexOf(item), fromNext = item.nextElementSibling;
+    var r0 = item.getBoundingClientRect(), grabX = e.clientX - r0.left, grabY = e.clientY - r0.top, pid = e.pointerId, x = e.clientX, y = e.clientY, raf = 0, ended = false;
+    item.setAttribute('data-dragging', ''); document.documentElement.setAttribute('data-s4-dragging', '');
+    item.getAnimations().forEach(function (a) { a.cancel(); });
+    function follow() {
+      item.style.transform = 'none';
+      var r = item.getBoundingClientRect();
+      item.style.transform = 'translate(' + (x - grabX - r.left) + 'px, ' + (y - grabY - r.top) + 'px)';
+    }
+    function target() {
+      /* the list under the pointer (or the nearest one sideways), then the slot by the middles of its items */
+      var best = null, bd = Infinity;
+      lists.forEach(function (l) { var r = l.getBoundingClientRect(), dx = x < r.left ? r.left - x : x > r.right ? x - r.right : 0, dy = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0, d = dx * 3 + dy; if (d < bd) { bd = d; best = l; } });
+      var horizontal = best.getAttribute('data-reorder') === 'horizontal', before = null;
+      kids(best).some(function (k) {
+        if (k === item) return false;
+        var r = k.getBoundingClientRect();
+        if (horizontal ? x < r.left + r.width / 2 : y < r.top + r.height / 2) { before = k; return true; }
+        return false;
+      });
+      return { list: best, before: before };
+    }
+    function step() {
+      raf = 0; if (ended) return;
+      var t = target();
+      var sameSpot = t.list === item.parentElement && (t.before === item.nextElementSibling || (t.before === null && kids(t.list).slice(-1)[0] === item));
+      if (!sameSpot) place(item, t.list, t.before, item);
+      follow();
+      /* near the top or bottom of the window: scroll, so long lists can be crossed in one drag */
+      var edge = 56, sc = y < edge ? -(edge - y) / 4 : y > window.innerHeight - edge ? (y - (window.innerHeight - edge)) / 4 : 0;
+      if (sc) { window.scrollBy(0, sc); raf = requestAnimationFrame(step); }
+    }
+    function move(ev) { if (ev.pointerId !== pid) return; ev.preventDefault(); x = ev.clientX; y = ev.clientY; if (!raf) raf = requestAnimationFrame(step); }
+    function finish(cancel) {
+      if (ended) return;
+      /* the last movement may not have been drawn yet: settle on where the pointer really is */
+      if (!cancel) { var t = target(); if (!(t.list === item.parentElement && (t.before === item.nextElementSibling || (t.before === null && kids(t.list).slice(-1)[0] === item)))) place(item, t.list, t.before, item); follow(); }
+      ended = true;
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); window.removeEventListener('pointercancel', stop, true); window.removeEventListener('keydown', key, true);
+      var shown = item.getBoundingClientRect();
+      if (cancel) fromList.insertBefore(item, fromNext && fromNext.parentElement === fromList ? fromNext : null);
+      item.style.transform = '';
+      var rest = item.getBoundingClientRect();
+      item.removeAttribute('data-dragging'); document.documentElement.removeAttribute('data-s4-dragging');
+      S4.transition.move(item, shown.left - rest.left, shown.top - rest.top);   /* it settles where it belongs */
+      var toList = item.parentElement, to = kids(toList).indexOf(item);
+      if (!cancel && (toList !== fromList || to !== fromIndex)) {
+        S4.util.emit(toList, 's4-reorder', { item: item, from: fromIndex, to: to, fromList: fromList, toList: toList });
+        say(label(item) + ' moved to position ' + (to + 1) + ' of ' + kids(toList).length);
+      }
+    }
+    function up(ev) { if (ev.pointerId === pid) finish(false); }
+    function stop(ev) { if (ev.pointerId === pid) finish(true); }
+    function key(ev) { if (ev.key === 'Escape') { ev.preventDefault(); finish(true); } }
+    window.addEventListener('pointermove', move, true); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', stop, true); window.addEventListener('keydown', key, true);
+    follow();
+  }
+  function moveTo(item, toIndex, toList) {
+    var from = item.parentElement, list = toList || from, fromIndex = kids(from).indexOf(item);
+    var others = kids(list).filter(function (k) { return k !== item; });
+    place(item, list, others[Math.max(0, toIndex)] || null);
+    var to = kids(list).indexOf(item);
+    if (list !== from || to !== fromIndex) S4.util.emit(list, 's4-reorder', { item: item, from: fromIndex, to: to, fromList: from, toList: list });
+    return to;
+  }
+  S4.reorder = { move: moveTo };
+
+  document.addEventListener('pointerdown', function (e) {
+    if (e.button || !e.target.closest) return;
+    var list = e.target.closest('[data-reorder]'); if (!list) return;
+    var item = e.target; while (item && item.parentElement !== list) item = item.parentElement;
+    if (!item || item.matches('.s4-list-subheader, [data-reorder-fixed]')) return;
+    var handle = e.target.closest('.s4-drag-handle'), hasHandle = !!item.querySelector('.s4-drag-handle');
+    if (hasHandle && !handle) return;
+    if (!hasHandle && e.target.closest('input, textarea, select, [contenteditable], .s4-swipe-actions')) return;
+    var sx = e.clientX, sy = e.clientY, started = false, timer = null;
+    var begin = function (ev) { if (started) return; started = true; cleanup(); drag(list, item, ev || e); };
+    var cleanup = function () { clearTimeout(timer); window.removeEventListener('pointermove', pre, true); window.removeEventListener('pointerup', cleanup, true); window.removeEventListener('pointercancel', cleanup, true); };
+    var pre = function (ev) {
+      var far = Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 6;
+      if (handle || e.pointerType === 'mouse') { if (far) { ev.preventDefault(); begin(ev); } }
+      else if (far) cleanup();   /* a finger that moves before the hold ends is scrolling */
+    };
+    if (handle) e.preventDefault();   /* the handle never selects text or scrolls */
+    window.addEventListener('pointermove', pre, true); window.addEventListener('pointerup', cleanup, true); window.addEventListener('pointercancel', cleanup, true);
+    if (!handle && e.pointerType !== 'mouse') timer = setTimeout(function () { if (navigator.vibrate) try { navigator.vibrate(8); } catch (x) {} begin(e); }, 350);
+  }, true);
+  /* a drag must not end as a click on what was dragged */
+  document.addEventListener('click', function (e) { if (document.documentElement.hasAttribute('data-s4-dragging')) { e.preventDefault(); e.stopPropagation(); } }, true);
+
+  /* keyboard: Space on a handle picks up, arrows move, Space drops, Escape puts it back */
+  document.addEventListener('keydown', function (e) {
+    var h = e.target.closest ? e.target.closest('.s4-drag-handle') : null; if (!h) return;
+    var list = h.closest('[data-reorder]'); if (!list) return;
+    var item = h; while (item && item.parentElement !== list && !(item.parentElement && item.parentElement.hasAttribute('data-reorder'))) item = item.parentElement;
+    if (!item) return;
+    var held = h.getAttribute('aria-pressed') === 'true';
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (!held) { h.setAttribute('aria-pressed', 'true'); h._s4home = { list: item.parentElement, next: item.nextElementSibling }; say(label(item) + ' picked up. Use the arrow keys to move it, Space to drop it, Escape to cancel.'); }
+      else { h.setAttribute('aria-pressed', 'false'); say(label(item) + ' dropped at position ' + (kids(item.parentElement).indexOf(item) + 1)); }
+      return;
+    }
+    if (!held) return;
+    var cur = item.parentElement, all = kids(cur), i = all.indexOf(item), lists = groupLists(cur), li = lists.indexOf(cur);
+    var horizontal = cur.getAttribute('data-reorder') === 'horizontal', prevKey = horizontal ? 'ArrowLeft' : 'ArrowUp', nextKey = horizontal ? 'ArrowRight' : 'ArrowDown';
+    if (e.key === 'Escape') { e.preventDefault(); h.setAttribute('aria-pressed', 'false'); if (h._s4home) place(item, h._s4home.list, h._s4home.next && h._s4home.next.parentElement === h._s4home.list ? h._s4home.next : null); h.focus(); say('Move cancelled'); return; }
+    var to = null, toList = cur;
+    if (e.key === prevKey && i > 0) to = i - 1;
+    else if (e.key === nextKey && i < all.length - 1) to = i + 1;
+    else if (!horizontal && e.key === 'ArrowLeft' && li > 0) { toList = lists[li - 1]; to = Math.min(i, kids(toList).length); }
+    else if (!horizontal && e.key === 'ArrowRight' && li < lists.length - 1) { toList = lists[li + 1]; to = Math.min(i, kids(toList).length); }
+    else if (/^Arrow/.test(e.key)) { e.preventDefault(); return; }
+    else return;
+    e.preventDefault();
+    var at = moveTo(item, to, toList); h.focus();
+    say(label(item) + ', position ' + (at + 1) + ' of ' + kids(toList).length + (toList !== cur && toList.getAttribute('aria-label') ? ', ' + toList.getAttribute('aria-label') : ''));
+  });
+
+  /* ---------- 2. swipe ---------- */
+  var openRow = null;
+  function swipeParts(row) { return { face: row.querySelector(':scope > .s4-list-item, :scope > [data-swipe-face]'), acts: row.querySelector(':scope > .s4-swipe-actions') }; }
+  function swipeSet(row, on) {
+    var p = swipeParts(row); if (!p.face || !p.acts) return;
+    var rtl = getComputedStyle(row).direction === 'rtl', w = p.acts.getBoundingClientRect().width, now = new DOMMatrixReadOnly(getComputedStyle(p.face).transform).m41;
+    var to = on ? (rtl ? w : -w) : 0;
+    p.face.style.transform = to ? 'translateX(' + to + 'px)' : '';
+    S4.transition.move(p.face, now - to, 0);
+    row.toggleAttribute('data-swiped', !!on);
+    if (on) { if (openRow && openRow !== row) swipeSet(openRow, false); openRow = row; } else if (openRow === row) openRow = null;
+  }
+  S4.swipe = { open: function (row) { swipeSet(row, true); }, close: function (row) { swipeSet(row || openRow, false); } };
+  document.addEventListener('pointerdown', function (e) {
+    if (!e.target.closest) return;
+    var row = e.target.closest('[data-swipe]');
+    if (openRow && openRow !== row) swipeSet(openRow, false);
+    if (!row || e.pointerType === 'mouse' || e.target.closest('.s4-swipe-actions, .s4-drag-handle')) return;
+    var p = swipeParts(row); if (!p.face || !p.acts) return;
+    var rtl = getComputedStyle(row).direction === 'rtl', sign = rtl ? 1 : -1, w = p.acts.getBoundingClientRect().width, full = row.getBoundingClientRect().width;
+    var sx = e.clientX, sy = e.clientY, base = row.hasAttribute('data-swiped') ? sign * w : 0, dx = base, active = false, pid = e.pointerId;
+    function move(ev) {
+      if (ev.pointerId !== pid) return;
+      var mx = ev.clientX - sx, my = ev.clientY - sy;
+      if (!active) { if (Math.abs(mx) < 8 || Math.abs(mx) < Math.abs(my) * 1.2) { if (Math.abs(my) > 10) end(); return; } active = true; p.face.getAnimations().forEach(function (a) { a.cancel(); }); row.setAttribute('data-swiping', ''); }
+      ev.preventDefault();
+      dx = base + mx;
+      if (dx * sign < 0) dx = 0;                                           /* only toward the actions */
+      if (Math.abs(dx) > w) dx = sign * (w + (Math.abs(dx) - w) * 0.35);    /* past them, it resists */
+      p.face.style.transform = 'translateX(' + dx + 'px)';
+    }
+    function end() {
+      window.removeEventListener('pointermove', move, true); window.removeEventListener('pointerup', up, true); window.removeEventListener('pointercancel', up, true);
+      row.removeAttribute('data-swiping');
+    }
+    function up(ev) {
+      if (ev.pointerId !== pid) return; end(); if (!active) return;
+      var far = Math.abs(dx) > w + (full - w) * 0.3, primary = p.acts.querySelector('[data-swipe-primary]');
+      document.documentElement.setAttribute('data-s4-dragging', ''); setTimeout(function () { document.documentElement.removeAttribute('data-s4-dragging'); }, 0);
+      if (far && primary) { swipeSet(row, false); primary.click(); }
+      else swipeSet(row, Math.abs(dx) > w / 2);
+    }
+    window.addEventListener('pointermove', move, { capture: true, passive: false }); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);
+  });
+  document.addEventListener('focusin', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && !a.parentElement.hasAttribute('data-swiped')) swipeSet(a.parentElement, true); });
+  document.addEventListener('click', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && a.parentElement.hasAttribute('data-swiped')) setTimeout(function () { swipeSet(a.parentElement, false); }, 0); });
+
+  /* ---------- 3. select several ---------- */
+  function sItems(el) { return Array.prototype.filter.call(el.querySelectorAll(':scope > li, :scope > [data-select-item], :scope > tr'), function (x) { return !x.matches('.s4-list-subheader'); }); }
+  function picked(el) { return sItems(el).filter(function (x) { return x.hasAttribute('data-picked'); }); }
+  function bar(el) { var s = el.getAttribute('data-selection-bar'); return s ? document.querySelector(s) : null; }
+  function sync(el) {
+    var items = picked(el), n = items.length, b = bar(el);
+    el.toggleAttribute('data-selecting', n > 0);
+    sItems(el).forEach(function (x) { if (el.hasAttribute('data-selecting')) x.setAttribute('aria-checked', String(x.hasAttribute('data-picked'))); else x.removeAttribute('aria-checked'); });
+    if (b) {
+      var c = b.querySelector('[data-selection-count]'); if (c) c.textContent = n + ' Selected';
+      var was = !b.hidden; b.hidden = !n;
+      var top = b.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', n > 0);
+      if (n && !was) S4.transition.fade(b, true);
+    }
+    S4.util.emit(el, 's4-selection', { items: items, count: n });
+  }
+  function toggle(el, item, on) { item.toggleAttribute('data-picked', on === undefined ? !item.hasAttribute('data-picked') : on); el._s4anchor = item; sync(el); }
+  function clear(el) { picked(el).forEach(function (x) { x.removeAttribute('data-picked'); }); sync(el); }
+  S4.selection = {
+    items: picked, clear: clear,
+    all: function (el) { sItems(el).forEach(function (x) { if (!x.hidden) x.setAttribute('data-picked', ''); }); sync(el); },
+    toggle: function (el, item, on) { toggle(el, item, on); }
+  };
+  function itemOf(el, t) { var x = t; while (x && x.parentElement !== el) x = x.parentElement; return x && sItems(el).indexOf(x) >= 0 ? x : null; }
+  var holdDone = false;
+  document.addEventListener('pointerdown', function (e) {
+    holdDone = false;
+    if (!e.target.closest || e.pointerType === 'mouse') return;
+    var el = e.target.closest('[data-selectable]'); if (!el || el.hasAttribute('data-selecting') || e.target.closest('.s4-drag-handle, .s4-swipe-actions, input, textarea')) return;
+    var item = itemOf(el, e.target); if (!item) return;
+    var sx = e.clientX, sy = e.clientY;
+    var t = setTimeout(function () { off(); holdDone = true; if (navigator.vibrate) try { navigator.vibrate(8); } catch (x) {} toggle(el, item, true); }, 450);
+    function mv(ev) { if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 8) off(); }
+    function off() { clearTimeout(t); window.removeEventListener('pointermove', mv, true); window.removeEventListener('pointerup', off, true); window.removeEventListener('pointercancel', off, true); }
+    window.addEventListener('pointermove', mv, true); window.addEventListener('pointerup', off, true); window.addEventListener('pointercancel', off, true);
+  }, true);
+  document.addEventListener('contextmenu', function (e) { if (holdDone) e.preventDefault(); }, true);
+  /* while selecting, a tap on a row adds or removes it instead of opening it */
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest) return;
+    var c = e.target.closest('[data-selection-clear]');
+    if (c) { var b = c.closest('.s4-selection-bar'); document.querySelectorAll('[data-selectable]').forEach(function (el) { if (!b || bar(el) === b) clear(el); }); return; }
+    var el = e.target.closest('[data-selectable]'); if (!el) return;
+    var item = itemOf(el, e.target); if (!item) return;
+    if (holdDone) { holdDone = false; e.preventDefault(); e.stopPropagation(); return; }   /* the tap that ended the hold */
+    var pick = e.target.closest('[data-select-toggle]');
+    if (!(el.hasAttribute('data-selecting') || e.ctrlKey || e.metaKey || e.shiftKey || pick)) return;
+    if (e.target.closest('.s4-swipe-actions, .s4-drag-handle')) return;
+    e.preventDefault(); e.stopPropagation();
+    if (e.shiftKey && el._s4anchor) {
+      var all = sItems(el), a = all.indexOf(el._s4anchor), z = all.indexOf(item);
+      all.slice(Math.min(a, z), Math.max(a, z) + 1).forEach(function (x) { x.setAttribute('data-picked', ''); });
+      sync(el);
+    } else toggle(el, item);
+  }, true);
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    var any = false;
+    document.querySelectorAll('[data-selectable][data-selecting]').forEach(function (el) { any = true; clear(el); });
+    if (any) e.preventDefault();
+  });
+  S4.register('direct', function (scope) {
+    S4.util.all(scope, '[data-selectable]').forEach(function (el) { if (S4.util.once(el, 'selectable')) { var b = bar(el); if (b) b.hidden = true; } });
+    S4.util.all(scope, '.s4-drag-handle').forEach(function (h) { if (!h.hasAttribute('aria-pressed')) h.setAttribute('aria-pressed', 'false'); });
+  });
+})();
+
+/* ---- chart/chart.js ---- */
+/* Charts (decision 0051): a small set of chart styles drawn from the tokens.
+     <figure class="s4-chart" data-type="column" data-labels="Jun,Jul,Aug" data-values="820,640,910" data-format="currency:USD" data-name="Spending">
+       <figcaption class="s4-chart-title">Spending By Month</figcaption>
+     </figure>
+   Several series: data-series='[{"name":"Income","values":[…]},{"name":"Spending","values":[…]}]' (or S4.chart(el, { labels, series })).
+   Types: column, bar (sideways, for long labels and ranking), line, area, donut (parts of one whole, five at most),
+   spark (a small line with no axes, for a stat).
+   What every chart gets: clean axis ticks, hairline gridlines, thin marks, a legend when there are two or more series
+   (never for one: the title names it), the value at the tip of what the story is about, a tooltip on hover, tap or
+   arrow keys, and a "Table" button that shows the same numbers as a table.
+   Color: one series wears the accent (primary); several wear --s4-chart-1 … 6 in fixed order (never more than six:
+   group the rest as "Other"). Text is never colored like its series.
+   S4.chart(el, data?) draws or redraws; charts redraw themselves when their box changes size. */
+(function () {
+  var S4 = window.S4, NS = 'http://www.w3.org/2000/svg', uid = 0;
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function formatter(spec, compact) {
+    var p = String(spec || 'number').split(':'), o = p[0] === 'currency' ? { style: 'currency', currency: p[1] || 'USD', maximumFractionDigits: compact ? 0 : 2 } : p[0] === 'percent' ? { style: 'percent', maximumFractionDigits: 1 } : { maximumFractionDigits: 2 };
+    if (compact && p[0] !== 'percent') { o.notation = 'compact'; o.maximumFractionDigits = 1; }
+    var nf; try { nf = new Intl.NumberFormat(document.documentElement.lang || undefined, o); } catch (e) { nf = new Intl.NumberFormat(); }
+    return function (v) { return nf.format(v); };
+  }
+  /* round axis: 0 and three or four clean steps above the largest value */
+  function ticks(max) {
+    if (!(max > 0)) return [0, 1];
+    var raw = max / 4, pow = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / pow, step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * pow, out = [];
+    for (var v = 0; v < max + step * 0.999; v += step) out.push(+v.toPrecision(12));
+    return out;
+  }
+  function read(el) {
+    var d = el._s4data;
+    if (!d) {
+      d = { labels: (el.getAttribute('data-labels') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean) };
+      if (el.hasAttribute('data-series')) { try { d.series = JSON.parse(el.getAttribute('data-series')); } catch (e) { d.series = []; } }
+      else d.series = [{ name: el.getAttribute('data-name') || '', values: (el.getAttribute('data-values') || '').split(',').map(Number) }];
+    }
+    d.series = (d.series || []).slice(0, 6).map(function (s) { return { name: s.name || '', values: (s.values || []).map(function (v) { return +v || 0; }) }; });
+    return d;
+  }
+  function color(i, n) { return n === 1 ? 'var(--md-sys-color-primary)' : 'var(--s4-chart-' + (i + 1) + ')'; }
+  function svgEl(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  /* a column with a rounded data end and a square foot */
+  function column(x, y, w, h, r) { r = Math.min(r, w / 2, h); return 'M' + x + ' ' + (y + h) + 'V' + (y + r) + 'q0 ' + (-r) + ' ' + r + ' ' + (-r) + 'h' + (w - 2 * r) + 'q' + r + ' 0 ' + r + ' ' + r + 'V' + (y + h) + 'Z'; }
+  function barH(x, y, w, h, r) { r = Math.min(r, h / 2, w); return 'M' + x + ' ' + y + 'h' + (w - r) + 'q' + r + ' 0 ' + r + ' ' + r + 'v' + (h - 2 * r) + 'q0 ' + r + ' ' + (-r) + ' ' + r + 'H' + x + 'Z'; }
+
+  function draw(el, data) {
+    if (data) el._s4data = data;
+    var d = read(el), type = el.getAttribute('data-type') || 'column', n = d.series.length;
+    var fmt = formatter(el.getAttribute('data-format')), short = formatter(el.getAttribute('data-format'), true);
+    var plot = el.querySelector(':scope > .s4-chart-plot');
+    if (!plot) {
+      plot = document.createElement('div'); plot.className = 's4-chart-plot'; el.appendChild(plot);
+      var tip = document.createElement('div'); tip.className = 's4-chart-tip'; tip.hidden = true; tip.setAttribute('role', 'status'); el.appendChild(tip);
+    }
+    var tipEl = el.querySelector(':scope > .s4-chart-tip');
+    var title = el.querySelector('.s4-chart-title'), name = el.getAttribute('aria-label') || (title ? title.textContent.trim() : 'Chart');
+    var W = Math.max(120, Math.round(plot.clientWidth || el.clientWidth || 320)), spark = type === 'spark';
+    var H = spark ? Math.max(24, Math.round(plot.clientHeight || 32)) : type === 'donut' ? Math.min(W, 200) : type === 'bar' ? Math.max(60, d.labels.length * 36 + 28) : Math.round(Math.max(160, Math.min(260, W * 0.5)));
+    plot.textContent = '';
+    var svg = svgEl('svg', { viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, role: 'img', 'aria-label': name + '. ' + summary(d, fmt), tabindex: spark ? '-1' : '0' }, plot);
+    var max = Math.max.apply(null, [0].concat.apply([0], d.series.map(function (s) { return s.values; })));
+    var hits = [];   /* { x, y, w, h, i (label index), s (series index or -1 for all) } */
+
+    if (type === 'donut') {
+      var vals = d.series[0].values.slice(0, 5), total = vals.reduce(function (a, b) { return a + b; }, 0) || 1, r = H / 2 - 12, cx = W / 2, cy = H / 2, at = -90, gap = vals.length > 1 ? 2 : 0;
+      svgEl('circle', { cx: cx, cy: cy, r: r, class: 's4-chart-track' }, svg);
+      vals.forEach(function (v, i) {
+        var sweep = v / total * 360, a0 = at + gap / 2, a1 = at + sweep - gap / 2; at += sweep;
+        if (a1 <= a0) return;
+        var p = function (a) { var t = a * Math.PI / 180; return (cx + r * Math.cos(t)).toFixed(2) + ' ' + (cy + r * Math.sin(t)).toFixed(2); };
+        var seg = svgEl('path', { d: 'M' + p(a0) + 'A' + r + ' ' + r + ' 0 ' + (a1 - a0 > 180 ? 1 : 0) + ' 1 ' + p(a1), class: 's4-chart-arc', style: 'stroke:' + color(i, Math.max(2, vals.length)) }, svg);
+        seg.dataset.i = i;
+      });
+      var c1 = svgEl('text', { x: cx, y: cy - 2, class: 's4-chart-total', 'text-anchor': 'middle' }, svg); c1.textContent = short(total);
+      var c2 = svgEl('text', { x: cx, y: cy + 16, class: 's4-chart-axis', 'text-anchor': 'middle' }, svg); c2.textContent = el.getAttribute('data-total-label') || 'Total';
+      legend(el, d.labels.slice(0, 5).map(function (l, i) { return { name: l + ' · ' + fmt(vals[i]), color: color(i, Math.max(2, vals.length)) }; }));
+      svg.addEventListener('pointermove', function (e) { var t = e.target.closest('.s4-chart-arc'); if (t) show(el, tipEl, d.labels[t.dataset.i], [{ name: '', value: fmt(vals[t.dataset.i]) + ' · ' + Math.round(vals[t.dataset.i] / total * 100) + '%', color: color(+t.dataset.i, Math.max(2, vals.length)) }], e); else hide(tipEl); });
+      svg.addEventListener('pointerleave', function () { hide(tipEl); });
+      table(el, d, fmt, name);
+      return;
+    }
+
+    var tk = ticks(max), top = tk[tk.length - 1];
+    var padL = spark ? 2 : type === 'bar' ? Math.min(W * 0.4, Math.max.apply(null, d.labels.map(function (l) { return l.length; }).concat(4)) * 7 + 12) : Math.max.apply(null, tk.map(function (t) { return short(t).length; })) * 7 + 10;
+    var padR = spark ? 6 : 14, padT = spark ? 4 : 18, padB = spark ? 4 : type === 'bar' ? 22 : 24;
+    var pw = W - padL - padR, ph = H - padT - padB, count = d.labels.length || d.series[0].values.length;
+
+    if (type === 'bar') {
+      var band = ph / count, bh = Math.min(24, band - 8);
+      tk.forEach(function (t) { var x = padL + t / top * pw; svgEl('line', { x1: x, x2: x, y1: padT, y2: padT + ph, class: 's4-chart-grid' }, svg); var tx = svgEl('text', { x: x, y: H - 6, class: 's4-chart-axis', 'text-anchor': 'middle' }, svg); tx.textContent = short(t); });
+      d.series[0].values.forEach(function (v, i) {
+        var y = padT + i * band + (band - bh) / 2, w = Math.max(1, v / top * pw);
+        svgEl('path', { d: barH(padL, y, w, bh, 4), class: 's4-chart-mark', style: 'fill:' + color(0, 1), 'data-i': i }, svg);
+        var lx = svgEl('text', { x: padL - 8, y: y + bh / 2 + 4, class: 's4-chart-axis', 'text-anchor': 'end' }, svg); lx.textContent = d.labels[i] || '';
+        var room = pw - w > short(v).length * 7 + 10;
+        var vx = svgEl('text', { x: room ? padL + w + 6 : padL + w - 6, y: y + bh / 2 + 4, class: room ? 's4-chart-value' : 's4-chart-value s4-chart-value-in', 'text-anchor': room ? 'start' : 'end' }, svg); vx.textContent = short(v);
+        hits.push({ x: padL, y: padT + i * band, w: pw, h: band, i: i, ax: padL + w, ay: y + bh / 2 });
+      });
+    } else {
+      /* gridlines and the y axis */
+      if (!spark) tk.forEach(function (t) {
+        var y = padT + ph - t / top * ph;
+        svgEl('line', { x1: padL, x2: W - padR, y1: y, y2: y, class: 's4-chart-grid' }, svg);
+        var tx = svgEl('text', { x: padL - 8, y: y + 4, class: 's4-chart-axis', 'text-anchor': 'end' }, svg); tx.textContent = short(t);
+      });
+      var lineLike = type !== 'column', band2 = pw / (lineLike ? Math.max(1, count - 1) : count);
+      var X = function (i) { return lineLike ? padL + (count > 1 ? i * band2 : pw / 2) : padL + i * band2 + band2 / 2; };
+      /* a spark shows direction, not size: it uses the full height between its lowest and highest value */
+      var lo = spark ? Math.min.apply(null, d.series[0].values) : 0, span = spark ? (max - lo) || 1 : top;
+      var Y = function (v) { return padT + ph - (span ? (v - lo) / span : 0) * ph; };
+      /* x labels: as many as fit */
+      if (!spark) { var every = Math.max(1, Math.ceil(count / Math.max(1, Math.floor(pw / 56)))); d.labels.forEach(function (l, i) { if (i % every) return; var tx = svgEl('text', { x: X(i), y: H - 6, class: 's4-chart-axis', 'text-anchor': lineLike && i === 0 ? 'start' : lineLike && i === count - 1 ? 'end' : 'middle' }, svg); tx.textContent = l; }); }
+      if (!lineLike) {
+        var gw = Math.min(24 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
+        d.series.forEach(function (s, si) { s.values.forEach(function (v, i) {
+          var h = Math.max(1, (top ? v / top : 0) * ph), x = X(i) - gw / 2 + si * (bw + 2);
+          svgEl('path', { d: column(x, padT + ph - h, bw, h, 4), class: 's4-chart-mark', style: 'fill:' + color(si, n), 'data-i': i }, svg);
+        }); });
+        /* one value on the cap: the tallest column of a single series */
+        if (n === 1) { var vs = d.series[0].values, hi = vs.indexOf(Math.max.apply(null, vs)); var vt = svgEl('text', { x: X(hi), y: Y(vs[hi]) - 6, class: 's4-chart-value', 'text-anchor': 'middle' }, svg); vt.textContent = short(vs[hi]); }
+        for (var i = 0; i < count; i++) hits.push({ x: padL + i * band2, y: padT, w: band2, h: ph, i: i, ax: X(i), ay: Y(Math.max.apply(null, d.series.map(function (s) { return s.values[i] || 0; }))) });
+      } else {
+        d.series.forEach(function (s, si) {
+          var pts = s.values.map(function (v, i) { return X(i).toFixed(1) + ' ' + Y(v).toFixed(1); });
+          if (type === 'area' && n === 1) svgEl('path', { d: 'M' + pts.join('L') + 'L' + X(s.values.length - 1) + ' ' + (padT + ph) + 'L' + X(0) + ' ' + (padT + ph) + 'Z', class: 's4-chart-area', style: 'fill:' + color(si, n) }, svg);
+          svgEl('path', { d: 'M' + pts.join('L'), class: 's4-chart-line', style: 'stroke:' + color(si, n) }, svg);
+          var last = s.values.length - 1;
+          svgEl('circle', { cx: X(last), cy: Y(s.values[last]), r: spark ? 3 : 4, class: 's4-chart-dot', style: 'fill:' + color(si, n) }, svg);
+          if (!spark && n === 1) { var et = svgEl('text', { x: X(last) - 8, y: Y(s.values[last]) - 10, class: 's4-chart-value', 'text-anchor': 'end' }, svg); et.textContent = short(s.values[last]); }
+        });
+        for (var j = 0; j < count; j++) hits.push({ x: X(j) - band2 / 2, y: padT, w: band2, h: ph, i: j, ax: X(j), ay: Y(Math.max.apply(null, d.series.map(function (s) { return s.values[j] || 0; }))) });
+      }
+    }
+    if (spark) return;
+    /* hover, tap and arrow keys share one "current point" */
+    var cross = svgEl('line', { class: 's4-chart-cross', y1: padT, y2: padT + ph, x1: 0, x2: 0 }, svg); cross.style.display = 'none';
+    var cur = -1;
+    function point(i, ev) {
+      cur = i; var h = hits[i]; if (!h) return leave();
+      if (type !== 'bar') { cross.setAttribute('x1', h.ax); cross.setAttribute('x2', h.ax); cross.style.display = type === 'column' ? 'none' : ''; }
+      svg.querySelectorAll('.s4-chart-mark').forEach(function (m) { m.toggleAttribute('data-dim', +m.dataset.i !== h.i); });
+      var r = svg.getBoundingClientRect(), at = ev || { clientX: r.left + h.ax, clientY: r.top + h.ay };
+      show(el, tipEl, d.labels[h.i] || '', d.series.map(function (s, si) { return { name: n > 1 ? s.name : '', value: fmt(s.values[h.i] || 0), color: color(si, n) }; }), at);
+    }
+    function leave() { cur = -1; cross.style.display = 'none'; svg.querySelectorAll('[data-dim]').forEach(function (m) { m.removeAttribute('data-dim'); }); hide(tipEl); }
+    svg.addEventListener('pointermove', function (e) {
+      var r = svg.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, hit = -1;
+      hits.forEach(function (h, i) { if (x >= h.x && x <= h.x + h.w && y >= h.y - 8 && y <= h.y + h.h + 8) hit = i; });
+      if (hit < 0) leave(); else point(hit, e);
+    });
+    svg.addEventListener('pointerleave', leave);
+    svg.addEventListener('blur', leave);
+    svg.addEventListener('keydown', function (e) {
+      var prev = type === 'bar' ? 'ArrowUp' : 'ArrowLeft', next = type === 'bar' ? 'ArrowDown' : 'ArrowRight';
+      if (e.key === next) { e.preventDefault(); point(Math.min(hits.length - 1, cur + 1)); }
+      else if (e.key === prev) { e.preventDefault(); point(Math.max(0, cur < 0 ? 0 : cur - 1)); }
+      else if (e.key === 'Home') { e.preventDefault(); point(0); } else if (e.key === 'End') { e.preventDefault(); point(hits.length - 1); }
+      else if (e.key === 'Escape') leave();
+    });
+    legend(el, n > 1 ? d.series.map(function (s, si) { return { name: s.name, color: color(si, n) }; }) : []);
+    table(el, d, fmt, name);
+  }
+  function summary(d, fmt) {
+    return d.series.map(function (s) { var v = s.values; if (!v.length) return ''; return (s.name ? s.name + ': ' : '') + 'from ' + fmt(v[0]) + ' to ' + fmt(v[v.length - 1]) + ', highest ' + fmt(Math.max.apply(null, v)); }).join('; ');
+  }
+  function legend(el, items) {
+    var lg = el.querySelector(':scope > .s4-chart-legend');
+    if (!items.length) { if (lg) lg.remove(); return; }
+    if (!lg) { lg = document.createElement('ul'); lg.className = 's4-chart-legend'; el.appendChild(lg); }
+    lg.innerHTML = items.map(function (it) { return '<li><span class="s4-chart-key" style="background:' + it.color + '"></span>' + esc(it.name) + '</li>'; }).join('');
+  }
+  function show(el, tip, head, rows, ev) {
+    tip.innerHTML = (head ? '<b>' + esc(head) + '</b>' : '') + rows.map(function (r) { return '<span><i style="background:' + r.color + '"></i>' + (r.name ? esc(r.name) + ' ' : '') + '<em>' + esc(r.value) + '</em></span>'; }).join('');
+    tip.hidden = false;
+    var box = el.getBoundingClientRect(), t = tip.getBoundingClientRect();
+    var x = ev.clientX - box.left + 12, y = ev.clientY - box.top - t.height - 12;
+    if (x + t.width > box.width) x = Math.max(0, ev.clientX - box.left - t.width - 12);
+    if (y < 0) y = ev.clientY - box.top + 16;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function hide(tip) { tip.hidden = true; }
+  /* the same numbers as a table, one tap away: for screen readers, for copying, for anyone who prefers rows */
+  function table(el, d, fmt, name) {
+    if (el.hasAttribute('data-no-table')) return;
+    var wrap = el.querySelector(':scope > .s4-chart-table'), btn = el.querySelector(':scope > .s4-chart-toggle');
+    if (!wrap) {
+      var id = 's4-chart-t' + (++uid);
+      btn = document.createElement('button'); btn.type = 'button'; btn.className = 's4-button s4-chart-toggle'; btn.dataset.variant = 'text'; btn.dataset.size = 'xs'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', id); btn.textContent = 'Table';
+      wrap = document.createElement('div'); wrap.className = 's4-chart-table'; wrap.id = id; wrap.hidden = true;
+      el.appendChild(btn); el.appendChild(wrap);
+      btn.addEventListener('click', function () { var on = wrap.hidden; wrap.hidden = !on; btn.setAttribute('aria-expanded', String(on)); btn.textContent = on ? 'Chart' : 'Table'; el.toggleAttribute('data-table', on); });
+    }
+    var heads = d.series.length > 1 || d.series[0].name ? d.series.map(function (s) { return s.name || 'Value'; }) : ['Value'];
+    wrap.innerHTML = '<table class="s4-table"><caption class="s4-visually-hidden">' + esc(name) + '</caption><thead><tr><th scope="col"></th>' + heads.map(function (h) { return '<th scope="col" class="num">' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      d.labels.map(function (l, i) { return '<tr><th scope="row">' + esc(l) + '</th>' + d.series.map(function (s) { return '<td class="num">' + esc(fmt(s.values[i] || 0)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+  }
+  S4.chart = function (el, data) { draw(el, data); };
+
+  var ro = window.ResizeObserver ? new ResizeObserver(function (list) {
+    list.forEach(function (x) { var el = x.target, w = Math.round(x.contentRect.width); if (el._s4w !== w) { el._s4w = w; draw(el); } });
+  }) : null;
+  S4.register('chart', function (scope) {
+    S4.util.all(scope, '.s4-chart').forEach(function (el) {
+      if (!S4.util.once(el, 'chart')) return;
+      draw(el); el._s4w = Math.round(el.clientWidth);
+      if (ro) ro.observe(el);
+    });
+  });
+})();
+
 /* ---- expand/expand.js ---- */
 /* Expand: content that opens in place (decision 0047, the first rung of the placement ladder).
    - [data-expand="id"] toggles <div class="s4-expand" id hidden>. [data-expand-close="value"] inside it, or Escape,
@@ -1760,6 +2384,109 @@ S4.register('text-field', function (scope) {
     syncError();
   });
 });
+
+/* ---- form/form.js ---- */
+/* Forms that behave (decision 0051).
+     <form class="s4-form" novalidate data-autosave>
+       <div class="s4-text-field"><input id="e" type="email" required data-msg-required="Enter your email." data-msg-type="That doesn’t look like an email address."><label for="e">Email</label></div>
+       <span class="s4-form-status"></span>
+     </form>
+   - Errors appear when you leave a field, never while you type. Typing in a field with an error clears it at once.
+   - A field that was wrong and is now right shows a quiet check (data-valid) until you move on.
+   - Submit with something wrong: every problem is shown, the first one is scrolled into view (never focused, decision
+     0049), s4-invalid { fields } fires and nothing is sent. Otherwise s4-submit { values } fires (cancel it to stop the
+     browser sending the form).
+   - Messages: data-msg-required, data-msg-type, data-msg-pattern, data-msg-min, data-msg-max, data-msg-length on the
+     control, or data-msg for any problem; the browser's own text if none is given.
+   - data-autosave: after a change settles (and the form is valid) s4-save { values, done(ok) } fires and
+     .s4-form-status reads "Saving…", then "Saved" when done() is called (at once if the handler does not call
+     detail.wait()). No Save button, no "Are you sure?": offer Undo in a snackbar instead.
+   - S4.form.validate(form) -> true | false, S4.form.values(form), S4.form.saved(form, text). */
+(function () {
+  var S4 = window.S4;
+  var CONTROL = 'input:not([type="hidden"]):not([type="button"]):not([type="submit"]), select, textarea';
+  function wrap(c) { return c.closest('.s4-text-field, .s4-checkbox, .s4-radio, .s4-switch') || c; }
+  function message(c) {
+    var v = c.validity, d = c.dataset;
+    if (v.valid) return '';
+    var m = v.valueMissing ? d.msgRequired : v.typeMismatch ? d.msgType : v.patternMismatch ? d.msgPattern
+      : (v.rangeUnderflow || v.tooShort) ? (d.msgMin || d.msgLength) : (v.rangeOverflow || v.tooLong) ? (d.msgMax || d.msgLength) : '';
+    return m || d.msg || c.validationMessage || 'Check this field.';
+  }
+  function check(c, show) {
+    if (c.disabled || !c.willValidate) return true;
+    var w = wrap(c), msg = message(c);
+    if (msg) { if (show) { w.removeAttribute('data-valid'); w.setAttribute('data-error', msg); if (!w.matches('.s4-text-field')) c.setAttribute('aria-invalid', 'true'); } return false; }
+    var had = w.hasAttribute('data-error');
+    w.removeAttribute('data-error'); if (!w.matches('.s4-text-field')) c.removeAttribute('aria-invalid');
+    if (had && show) w.setAttribute('data-valid', '');   /* it was wrong and now it is right: a quiet check */
+    return true;
+  }
+  function controls(form) { return Array.prototype.slice.call(form.querySelectorAll(CONTROL)); }
+  function validate(form, show) {
+    var bad = controls(form).filter(function (c) { return !check(c, show !== false); });
+    return bad;
+  }
+  function values(form) { var o = {}; new FormData(form).forEach(function (v, k) { if (k in o) o[k] = [].concat(o[k], v); else o[k] = v; }); return o; }
+  function status(form, text, done) {
+    var s = form.querySelector('.s4-form-status'); if (!s) return;
+    s.textContent = text; s.toggleAttribute('data-done', !!done); s.toggleAttribute('data-on', !!text);
+    if (!s.hasAttribute('role')) s.setAttribute('role', 'status');
+  }
+  function save(form) {
+    if (validate(form, false).length) return;
+    var waited = false, finished = false;
+    var done = function (ok) { finished = true; status(form, ok === false ? 'Couldn’t save' : (form.getAttribute('data-saved-text') || 'Saved'), ok !== false); };
+    status(form, form.getAttribute('data-saving-text') || 'Saving…', false);
+    S4.util.emit(form, 's4-save', { values: values(form), done: done, wait: function () { waited = true; } });
+    if (!waited && !finished) done(true);
+  }
+  S4.form = {
+    validate: function (form) { return !validate(form, true).length; },
+    values: values,
+    saved: function (form, text) { status(form, text || 'Saved', true); }
+  };
+
+  S4.register('form', function (scope) {
+    S4.util.all(scope, 'form.s4-form').forEach(function (form) {
+      if (!S4.util.once(form, 'form')) return;
+      form.setAttribute('novalidate', '');
+      var timer = null, auto = form.hasAttribute('data-autosave');
+      var later = function (ms) { clearTimeout(timer); timer = setTimeout(function () { save(form); }, ms); };
+      /* leaving a field is when it is checked */
+      form.addEventListener('focusout', function (e) {
+        var c = e.target; if (!c.matches || !c.matches(CONTROL)) return;
+        if (c.dataset.s4Touched || c.value) { c.dataset.s4Touched = '1'; check(c, true); }
+      });
+      /* typing never shows an error; it only removes one */
+      form.addEventListener('input', function (e) {
+        var c = e.target; if (!c.matches || !c.matches(CONTROL)) return;
+        c.dataset.s4Touched = '1';
+        var w = wrap(c);
+        if (w.hasAttribute('data-error') && c.validity.valid) { w.removeAttribute('data-error'); if (!w.matches('.s4-text-field')) c.removeAttribute('aria-invalid'); w.setAttribute('data-valid', ''); }
+        else if (!w.hasAttribute('data-error')) w.removeAttribute('data-valid');
+        if (auto) { status(form, '', false); later(900); }
+      });
+      form.addEventListener('change', function (e) {
+        var c = e.target; if (!c.matches || !c.matches(CONTROL)) return;
+        if (/^(checkbox|radio|range|date|color|file)$/.test(c.type) || c.tagName === 'SELECT') check(c, true);
+        if (auto) later(250);
+      });
+      form.addEventListener('submit', function (e) {
+        var bad = validate(form, true);
+        if (bad.length) {
+          e.preventDefault();
+          var first = wrap(bad[0]);
+          if (first.scrollIntoView) first.scrollIntoView({ block: 'center', behavior: S4.motion.reduced() ? 'auto' : 'smooth' });
+          S4.util.emit(form, 's4-invalid', { fields: bad });
+          return;
+        }
+        var ev = new CustomEvent('s4-submit', { bubbles: true, cancelable: true, detail: { values: values(form) } });
+        if (!form.dispatchEvent(ev)) e.preventDefault();
+      });
+    });
+  });
+})();
 
 /* ---- date-picker/date-picker.js ---- */
 /* Date picker: upgrades every .s4-text-field > input[type="date"]. The native input stays in the DOM (form value, min, max,
@@ -2468,6 +3195,64 @@ S4.register('skeleton', function (scope) {
   });
 });
 
+/* ---- reward/reward.js ---- */
+/* Small rewards (decision 0051): the moments that make finishing something feel good. Each one is an existing motion
+   pattern, so they never look like a different app.
+   - A check that draws itself:   <span class="s4-done-mark"></span>, then set data-done on it (or S4.reward.done(el)).
+     The disc arrives as Ink, the check is drawn on Ink calm. Remove data-done to take it back.
+   - A number that counts to its value:   <span data-count-to="212.48" data-count-format="currency:USD">$0.00</span>
+     counts once when it comes into view; S4.reward.count(el, to, { from, format, decimals, locale }) from code.
+     Formats: number (default), currency:USD, percent, compact. The real value is in aria-label the whole time.
+   - A row that settles after a drag comes with reorderable lists (components/reorder).
+   Under reduced motion numbers show their value at once and the check simply appears. */
+(function () {
+  var S4 = window.S4;
+  var CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1"></path></svg>';
+  function fmt(el, opts) {
+    var spec = String(opts.format || el.getAttribute('data-count-format') || 'number').split(':'), kind = spec[0];
+    var dec = opts.decimals != null ? opts.decimals : (el.hasAttribute('data-count-decimals') ? +el.getAttribute('data-count-decimals') : null);
+    var o = kind === 'currency' ? { style: 'currency', currency: spec[1] || 'USD' } : kind === 'percent' ? { style: 'percent' } : kind === 'compact' ? { notation: 'compact' } : {};
+    if (dec != null) { o.minimumFractionDigits = dec; o.maximumFractionDigits = dec; }
+    var nf; try { nf = new Intl.NumberFormat(opts.locale || document.documentElement.lang || undefined, o); } catch (e) { nf = new Intl.NumberFormat(); }
+    return function (v) { return nf.format(v); };
+  }
+  function count(el, to, opts) {
+    opts = opts || {}; to = +to;
+    var f = fmt(el, opts), from = opts.from != null ? +opts.from : 0;
+    el.setAttribute('aria-label', f(to));
+    if (el._s4count) cancelAnimationFrame(el._s4count);
+    /* long enough to read as counting, short enough to never wait for: four reveals */
+    var ms = S4.motion.reduced() ? 0 : (opts.duration || S4.transition.duration('reveal') * 2.5);
+    if (!ms || from === to) { el.textContent = f(to); return; }
+    var t0 = performance.now();
+    (function tick(now) {
+      var k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = f(from + (to - from) * e);
+      if (k < 1) el._s4count = requestAnimationFrame(tick); else { el.textContent = f(to); el._s4count = 0; }
+    })(t0);
+  }
+  function done(el, on) { el.toggleAttribute('data-done', on !== false); }
+  S4.reward = { count: count, done: done };
+
+  var io = window.IntersectionObserver ? new IntersectionObserver(function (list) {
+    list.forEach(function (x) { if (x.isIntersecting) { io.unobserve(x.target); count(x.target, x.target.getAttribute('data-count-to')); } });
+  }, { threshold: 0.4 }) : null;
+
+  S4.register('reward', function (scope) {
+    S4.util.all(scope, '.s4-done-mark').forEach(function (m) {
+      if (!S4.util.once(m, 'done')) return;
+      if (!m.querySelector('svg')) m.insertAdjacentHTML('beforeend', CHECK);
+      if (!m.hasAttribute('aria-label')) m.setAttribute('aria-hidden', 'true');
+    });
+    S4.util.all(scope, '[data-count-to]').forEach(function (el) {
+      if (!S4.util.once(el, 'count')) return;
+      var f = fmt(el, {}), to = +el.getAttribute('data-count-to');
+      el.setAttribute('aria-label', f(to));
+      if (io && !S4.motion.reduced()) { el.textContent = f(0); io.observe(el); } else el.textContent = f(to);
+    });
+  });
+})();
+
 /* ---- menu/menu.js ---- */
 /* Menus: [data-menu="id"] opens <div class="s4-menu" id popover role="menu">. Unfold motion (decision 0001), positioning
    against the anchor (flips above when there's no room), keyboard (arrows, Home/End, Escape, typeahead), radio/checkbox
@@ -2657,6 +3442,118 @@ S4.register('skeleton', function (scope) {
         }
       });
     });
+  });
+})();
+
+/* ---- palette/palette.js ---- */
+/* Command palette (decision 0051): search everything and run any action from one box. The desktop counterpart of the
+   navigation bar; on a phone it is a full-width panel.
+   - Opens with mod+K anywhere, or from any [data-palette] button. No markup needed: the palette builds itself.
+   - Commands come from three places, in this order:
+       S4.palette.register([{ label, group?, icon?, shortcut?, keywords?, run() }])        the app's own
+       [data-command="Label"] on any button or link                                        runs by clicking it (its data-shortcut is shown)
+       the app's navigation                                                                 "Go To Inbox", one per destination
+     plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
+   - Type to filter (every word must match), Arrow keys move, Enter runs, Escape closes.
+   - S4.palette.open() / close(). Fires s4-open and s4-close on the dialog and s4-command { command } on document.
+   Focus (decision 0049): opened with the keyboard, the cursor is in the box (you are already typing). Opened by tap or
+   click it is not, so no keyboard jumps up on a phone; the first key you press goes into the box anyway.
+   Motion: Pop. */
+(function () {
+  var S4 = window.S4, own = [], dlg, input, list, empty, shown = [], active = -1;
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function text(el) { return (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim(); }
+  function build() {
+    if (dlg) return;
+    dlg = document.createElement('dialog'); dlg.className = 's4-dialog s4-palette'; dlg.setAttribute('aria-label', 'Command palette');
+    dlg.innerHTML = '<div class="s4-search s4-palette-search" role="search"><span class="s4-icon" data-icon="search"></span>' +
+      '<input class="s4-search-input" type="search" placeholder="Search Or Run A Command" aria-label="Search or run a command" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="s4-palette-list"></div>' +
+      '<ul class="s4-list s4-palette-list" id="s4-palette-list" role="listbox" aria-label="Commands"></ul>' +
+      '<p class="s4-palette-empty" hidden>No matches. Try another word.</p>';
+    document.body.appendChild(dlg);
+    input = dlg.querySelector('input'); list = dlg.querySelector('ul'); empty = dlg.querySelector('.s4-palette-empty');
+    input.addEventListener('input', function () { render(input.value); });
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (shown[active]) run(shown[active]); }
+      else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement !== input) input.focus({ preventScroll: true });   /* your own key press starts the typing */
+    });
+    list.addEventListener('click', function (e) { var li = e.target.closest('[data-i]'); if (li) run(shown[+li.dataset.i]); });
+    list.addEventListener('pointermove', function (e) { var li = e.target.closest('[data-i]'); if (li && +li.dataset.i !== active) mark(+li.dataset.i, false); });
+    dlg.addEventListener('s4-close', function () { input.value = ''; });
+  }
+  /* everything that can be run right now */
+  function commands() {
+    var out = own.slice();
+    document.querySelectorAll('[data-command]').forEach(function (el) {
+      if (el.disabled || el.closest('.s4-palette')) return;
+      var icon = el.querySelector('.s4-icon[data-icon]');
+      out.push({ label: el.dataset.command || text(el), group: el.dataset.commandGroup || 'Actions', icon: icon ? icon.dataset.icon : '', shortcut: el.dataset.shortcut || '', keywords: el.dataset.commandKeywords || '', el: el });
+    });
+    var nav = document.querySelector('.s4-app .s4-nav-rail, .s4-app .s4-nav-bar');
+    if (nav) nav.querySelectorAll('.s4-nav-item').forEach(function (a) {
+      var icon = a.querySelector('.s4-icon[data-icon]'), label = a.querySelector('.s4-nav-label');
+      out.push({ label: 'Go To ' + (label ? label.textContent.trim() : text(a)), group: 'Go To', icon: icon ? icon.dataset.icon : '', el: a });
+    });
+    if (S4.palette.theme !== false && S4.theme) {
+      var dark = (S4.theme() || {}).mode === 'dark' || ((S4.theme() || {}).mode !== 'light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+      out.push({ label: dark ? 'Switch To Light Mode' : 'Switch To Dark Mode', group: 'Appearance', icon: dark ? 'light-mode' : 'dark-mode', keywords: 'theme appearance', run: function () { S4.theme({ mode: dark ? 'light' : 'dark' }); } });
+    }
+    return out;
+  }
+  function render(q) {
+    var words = String(q || '').toLowerCase().split(/\s+/).filter(Boolean), all = commands();
+    shown = all.filter(function (c) { var hay = (c.label + ' ' + (c.group || '') + ' ' + (c.keywords || '')).toLowerCase(); return words.every(function (w) { return hay.indexOf(w) >= 0; }); });
+    if (words.length) shown.sort(function (a, b) { return (a.label.toLowerCase().indexOf(words[0]) === 0 ? 0 : 1) - (b.label.toLowerCase().indexOf(words[0]) === 0 ? 0 : 1); });
+    var html = '', group = null;
+    shown.forEach(function (c, i) {
+      var g = words.length ? '' : (c.group || '');
+      if (g && g !== group) { html += '<li class="s4-list-subheader" role="presentation">' + esc(g) + '</li>'; group = g; }
+      html += '<li role="none"><div class="s4-list-item" role="option" id="s4-palette-o' + i + '" data-i="' + i + '" aria-selected="false">' +
+        (c.icon ? '<span class="s4-icon" data-icon="' + esc(c.icon) + '"></span>' : '<span class="s4-palette-noicon"></span>') +
+        '<span class="s4-list-content"><span class="s4-list-headline">' + esc(c.label) + '</span></span>' +
+        (c.shortcut ? '<span class="s4-list-trailing"><kbd class="s4-kbd">' + esc(S4.desktop ? S4.desktop.format(c.shortcut) : c.shortcut) + '</kbd></span>' : '') + '</div></li>';
+    });
+    list.innerHTML = html; list.hidden = !shown.length; empty.hidden = !!shown.length;
+    if (S4.init) S4.init(list);
+    mark(shown.length ? 0 : -1, false);
+  }
+  function mark(i, scroll) {
+    active = i;
+    list.querySelectorAll('[data-i]').forEach(function (o) { o.setAttribute('aria-selected', String(+o.dataset.i === i)); });
+    var cur = i >= 0 ? list.querySelector('[data-i="' + i + '"]') : null;
+    if (cur) { input.setAttribute('aria-activedescendant', cur.id); if (scroll !== false) cur.scrollIntoView({ block: 'nearest' }); } else input.removeAttribute('aria-activedescendant');
+  }
+  function move(d) { if (shown.length) mark((active + d + shown.length) % shown.length); }
+  function run(c) {
+    close().then(function () {
+      S4.util.emit(document, 's4-command', { command: c });
+      if (c.run) c.run(); else if (c.el) c.el.click();
+    });
+  }
+  function open(opts) {
+    build(); if (dlg.open) return;
+    render('');
+    S4.dialog.open(dlg, { from: opts && opts.from });
+    if (opts && opts.keyboard) input.focus({ preventScroll: true });   /* you opened it by typing: keep typing */
+  }
+  function close() { return dlg && dlg.open ? Promise.resolve(S4.dialog.close(dlg, '')) : Promise.resolve(); }
+  S4.palette = {
+    open: open, close: close, commands: commands,
+    register: function (cmds) { own = own.concat(cmds || []); },
+    clear: function () { own = []; }
+  };
+
+  document.addEventListener('keydown', function (e) {
+    if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k' && S4.palette.shortcut !== false) {
+      e.preventDefault();
+      if (dlg && dlg.open) close(); else open({ keyboard: true });
+    }
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-palette]');
+    if (b) { e.preventDefault(); open({ from: b }); }
   });
 })();
 

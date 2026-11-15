@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Charts · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  @layer s4.components {
+    .ch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--s4-space-4); inline-size: 100%; }
+    .ch-stat { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-4); }
+    .ch-stat b { display: block; font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); font-variant-numeric: tabular-nums; }
+    .ch-stat small { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); }
+  }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Charts</h1></header>
+<main class="ex-main">
+  <p>A small set of chart styles drawn from the tokens. Hover or tap a chart for its values, or focus it and use the arrow keys. Every chart has a Table button that shows the same numbers as rows. Try the Color control above: a chart with one series wears the accent.</p>
+
+  <section class="ex-sec">
+    <h2>One Series</h2>
+    <p>Columns for amounts over time, a line or an area for a trend, bars for ranking things with long names.</p>
+    <div class="ch-grid">
+      <section class="s4-pane"><figure class="s4-chart" data-type="column" data-labels="Jun,Jul,Aug,Sep,Oct,Nov" data-values="820,640,910,760,1180,1240" data-format="currency:USD" data-name="Spending"><figcaption class="s4-chart-title">Spending By Month</figcaption></figure></section>
+      <section class="s4-pane"><figure class="s4-chart" data-type="area" data-labels="Jun,Jul,Aug,Sep,Oct,Nov" data-values="4200,4650,4380,5120,5560,6240" data-format="currency:USD" data-name="Balance"><figcaption class="s4-chart-title">Balance</figcaption></figure></section>
+      <section class="s4-pane"><figure class="s4-chart" data-type="bar" data-labels="Iron Mountain,Comcast,Uline,Staples,Adobe" data-values="1240,389,218,72,60" data-format="currency:USD" data-name="Amount"><figcaption class="s4-chart-title">Largest Bills This Month</figcaption></figure></section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Several Series</h2>
+    <p>Up to six, in a fixed order of colors that stay apart for color-blind readers. A legend names them; the text itself is never colored.</p>
+    <div class="ch-grid">
+      <section class="s4-pane"><figure class="s4-chart" data-type="line" data-labels="Jun,Jul,Aug,Sep,Oct,Nov" data-format="currency:USD" data-series='[{"name":"Income","values":[5200,5200,5600,5600,6100,6100]},{"name":"Spending","values":[3820,3640,3910,3760,4180,4240]},{"name":"Saved","values":[1380,1560,1690,1840,1920,1860]}]'><figcaption class="s4-chart-title">Income, Spending And Savings</figcaption></figure></section>
+      <section class="s4-pane"><figure class="s4-chart" data-type="column" data-labels="Q1,Q2,Q3,Q4" data-series='[{"name":"2025","values":[42,51,48,63]},{"name":"2026","values":[55,58,67,74]}]'><figcaption class="s4-chart-title">Orders Per Quarter</figcaption></figure></section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Parts Of A Whole</h2>
+    <p>A ring, for five parts at most. The total sits in the middle and the parts are named beside it.</p>
+    <div class="ch-grid">
+      <section class="s4-pane"><figure class="s4-chart" data-type="donut" data-labels="Rent,Food,Travel,Software" data-values="1400,620,310,180" data-format="currency:USD" data-total-label="This Month"><figcaption class="s4-chart-title">Where The Money Went</figcaption></figure></section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Spark</h2>
+    <p>A small line beside a number. No axes: the number says the value, the line says which way it is going.</p>
+    <div class="ch-grid">
+      <section class="s4-pane"><div class="ch-stat"><div><small>Balance</small><b>$6,240.00</b></div><figure class="s4-chart" data-type="spark" data-values="4200,4650,4380,5120,5560,6240" aria-label="Balance, last six months"></figure></div></section>
+      <section class="s4-pane"><div class="ch-stat"><div><small>Open Orders</small><b>74</b></div><figure class="s4-chart" data-type="spark" data-values="55,58,52,67,70,74" aria-label="Open orders, last six weeks"></figure></div></section>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/chart/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

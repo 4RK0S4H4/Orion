@@ -12,7 +12,9 @@
        column and the detail fills the rest. [data-split-open] / [data-split-back] are wired by layout.js.
      supporting:  the main pane plus a 400 supporting pane; under 840 the supporting pane stacks below.
      data-sticky on a pane keeps it in view beside a long neighbour from 840 (it scrolls inside itself if taller).
-   Public knobs: --s4-split-list (list column), --s4-split-support (supporting column). */
+   data-resizable on a split: drag the edge between the panes (or use the arrow keys on it), double-click to collapse;
+   data-resize-key="name" remembers the width. Public knobs: --s4-split-list (list column), --s4-split-support
+   (supporting column). */
 @layer s4.components {
   /* ---------- page widths ---------- */
   .s4-content[data-width="reading"] { --s4-content-max: var(--s4-layout-content-reading); }
@@ -29,6 +31,7 @@
     align-items: start;
   }
   .s4-split > .s4-split-pane { min-inline-size: 0; }
+  .s4-split-grip { display: none; }
 
   /* expanded and up: side by side */
   @container s4-app (width >= 840px) {
@@ -45,6 +48,49 @@
       overflow: auto;
       overscroll-behavior: contain;
     }
+    /* resizable (decision 0051): layout.js puts a grip between the panes; it takes the place of the gap */
+    .s4-split[data-resizable] { gap: 0; }
+    .s4-split[data-resizable]:not([data-layout="supporting"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) var(--s4-layout-pane-gap) minmax(0, 1fr);
+    }
+    .s4-split[data-resizable][data-layout="supporting"] {
+      grid-template-columns: minmax(0, 1fr) var(--s4-layout-pane-gap) minmax(0, var(--s4-split-support, var(--s4-layout-inspector-width)));
+    }
+    .s4-split[data-resizable][data-collapsed]:not([data-layout="supporting"]) { grid-template-columns: 0 var(--s4-layout-pane-gap) minmax(0, 1fr); }
+    .s4-split[data-resizable][data-collapsed][data-layout="supporting"] { grid-template-columns: minmax(0, 1fr) var(--s4-layout-pane-gap) 0; }
+    .s4-split[data-resizable][data-collapsed]:not([data-layout="supporting"]) > .s4-split-pane:first-child,
+    .s4-split[data-resizable][data-collapsed][data-layout="supporting"] > .s4-split-pane:last-child { visibility: hidden; overflow: hidden; block-size: 0; }
+    .s4-split-grip {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-self: stretch;
+      min-block-size: var(--s4-space-16);
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: none;
+      cursor: col-resize;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* a wider place to grab than the gap itself */
+    .s4-split-grip::after { content: ""; position: absolute; inset-block: 0; inset-inline: calc(var(--s4-space-2) * -1); }
+    /* the mark stays in view however tall the panes are */
+    .s4-split-grip::before {
+      content: "";
+      position: sticky;
+      inset-block-start: calc(50dvh - var(--s4-space-5));
+      inline-size: var(--s4-space-1);
+      block-size: var(--s4-space-10);
+      margin-block: var(--s4-space-4);
+      border-radius: var(--md-sys-shape-corner-full);
+      background: var(--md-sys-color-outline-variant);
+      transition: background-color var(--s4-motion-state), transform var(--s4-motion-ink);
+    }
+    @media (hover: hover) { .s4-split-grip:hover::before { background: var(--md-sys-color-on-surface-variant); } }
+    .s4-split-grip:focus-visible { outline: none; }
+    .s4-split-grip:is(:focus-visible, [data-dragging])::before { background: var(--md-sys-color-primary); transform: scaleY(1.4); }
     /* the back button only makes sense when one pane is shown at a time */
     .s4-split:not([data-layout="supporting"]) [data-split-back],
     .s4-split:not([data-layout="supporting"]) :has(> [data-split-back]:only-child) { display: none; }
@@ -54,7 +100,7 @@
    (.s4-stack, .s4-row) can't show a pane that should be hidden. */
 @layer s4.utilities {
   @container s4-app (width < 840px) {
-    .s4-split:not([data-layout="supporting"]):not([data-open]) > .s4-split-pane + .s4-split-pane { display: none; }
+    .s4-split:not([data-layout="supporting"]):not([data-open]) > .s4-split-pane ~ .s4-split-pane { display: none; }
     .s4-split:not([data-layout="supporting"])[data-open] > .s4-split-pane:first-child { display: none; }
   }
 }

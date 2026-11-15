@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>States · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>@layer s4.components { .st-col { inline-size: min(100%, 32rem); } }</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / States</h1></header>
+<main class="ex-main">
+  <p>Every list, table and pane has a designed loading, empty, error and offline state, so an app never shows a blank box or a spinner on a white page.</p>
+
+  <section class="ex-sec">
+    <h2>One Container, Every State</h2>
+    <p>Switch the state. The part that arrives fades in; the container keeps its place.</p>
+    <div class="ex-board col">
+      <div class="s4-chip-set" data-select="single" aria-label="State" id="st-pick">
+        <button class="s4-chip" data-type="filter" type="button" data-value="loading" aria-pressed="true">Loading</button>
+        <button class="s4-chip" data-type="filter" type="button" data-value="ready" aria-pressed="false">Ready</button>
+        <button class="s4-chip" data-type="filter" type="button" data-value="empty" aria-pressed="false">Empty</button>
+        <button class="s4-chip" data-type="filter" type="button" data-value="error" aria-pressed="false">Error</button>
+        <button class="s4-chip" data-type="filter" type="button" data-value="offline" aria-pressed="false">Offline</button>
+      </div>
+      <section class="s4-pane st-col">
+        <h3 class="s4-pane-title">Inbox</h3>
+        <div class="s4-states" id="st-demo" data-state="loading">
+          <div data-when="loading" data-rows="3"></div>
+          <div data-when="offline" class="s4-banner" role="status"><span class="s4-icon" data-icon="info"></span><p class="s4-banner-text">You’re offline. Showing what was loaded earlier; changes are sent when you are back.</p></div>
+          <ul data-when="ready offline" class="s4-list" aria-label="Messages">
+            <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">MC</span></span><span class="s4-list-content"><span class="s4-list-headline">Invoice for October</span><span class="s4-list-supporting">Maya Chen</span></span></div></li>
+            <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">JW</span></span><span class="s4-list-content"><span class="s4-list-headline">Contract renewal</span><span class="s4-list-supporting">Jonas Weber</span></span></div></li>
+            <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">PN</span></span><span class="s4-list-content"><span class="s4-list-headline">Launch checklist</span><span class="s4-list-supporting">Priya Nair</span></span></div></li>
+          </ul>
+          <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="inbox"></span></span><h3 class="s4-empty-title">All Caught Up</h3><p class="s4-empty-text">New messages show up here.</p></div>
+          <div data-when="error" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="warning"></span></span><h3 class="s4-empty-title">Couldn’t Load Messages</h3><p class="s4-empty-text">Check your connection and try again.</p><button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Loading From Real Work</h2>
+    <p><code>S4.states.load(el, promise)</code> shows loading while the work runs, then the content, the empty state if nothing came back, or the error state if it failed. Try Again runs it again.</p>
+    <div class="ex-board col">
+      <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" data-st="ok">Load Three</button><button class="s4-button" data-variant="tonal" type="button" data-st="none">Load Nothing</button><button class="s4-button" data-variant="tonal" type="button" data-st="fail">Fail</button></div>
+      <section class="s4-pane st-col">
+        <div class="s4-states" id="st-load" data-state="empty">
+          <div data-when="loading" data-rows="3"></div>
+          <ul data-when="ready" class="s4-list" id="st-list" aria-label="Results"></ul>
+          <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span><h3 class="s4-empty-title">Nothing Here Yet</h3><p class="s4-empty-text">Load something to see it.</p></div>
+          <div data-when="error" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="warning"></span></span><h3 class="s4-empty-title">That Didn’t Work</h3><p class="s4-empty-text">The server didn’t answer.</p><button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/states/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+var demo = document.getElementById('st-demo');
+document.getElementById('st-pick').addEventListener('click', function (e) { var b = e.target.closest('.s4-chip'); if (b) S4.states.set(demo, b.dataset.value); });
+demo.addEventListener('s4-retry', function () { S4.states.load(demo, new Promise(function (ok) { setTimeout(function () { ok([1]); }, 900); })); });
+var box = document.getElementById('st-load'), last = 'ok';
+function run(kind) {
+  last = kind;
+  S4.states.load(box, new Promise(function (ok, fail) {
+    setTimeout(function () {
+      if (kind === 'fail') return fail(new Error('no answer'));
+      var rows = kind === 'none' ? [] : ['Iron Mountain', 'Comcast', 'Staples'];
+      document.getElementById('st-list').innerHTML = rows.map(function (r) { return '<li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">' + r + '</span></span></div></li>'; }).join('');
+      ok(rows);
+    }, 900);
+  })).catch(function () {});
+}
+document.querySelectorAll('[data-st]').forEach(function (b) { b.addEventListener('click', function () { run(b.dataset.st); }); });
+box.addEventListener('s4-retry', function () { run(last === 'fail' ? 'ok' : last); });
+</script>
+</body>
+</html>

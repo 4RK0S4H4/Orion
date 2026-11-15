@@ -1,0 +1,85 @@
+/* Charts (S4 addition, decision 0051). chart.js draws the SVG; everything visual is here, from tokens.
+   <figure class="s4-chart" data-type="column|bar|line|area|donut|spark" data-labels="…" data-values="…">
+     <figcaption class="s4-chart-title">Spending By Month</figcaption>
+   </figure>
+   Marks are thin and the only loud thing; grid and axes are hairlines in the outline color; text is always a text
+   color, never the series color. One series is the accent; several use --s4-chart-1 … 6 in fixed order. */
+@layer s4.components {
+  .s4-chart {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-2);
+    margin: 0;
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-chart-title {
+    padding-inline-end: var(--s4-space-16);   /* room for the Table button */
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-chart-subtitle { display: block; color: var(--md-sys-color-on-surface-variant); font-weight: var(--md-sys-typescale-body-small-weight); font-size: var(--md-sys-typescale-body-small-size); }
+  .s4-chart-plot { min-inline-size: 0; line-height: 0; }
+  .s4-chart-plot > svg { display: block; max-inline-size: 100%; overflow: visible; border-radius: var(--md-sys-shape-corner-small); }
+  .s4-chart-plot > svg:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  .s4-chart[data-table] > .s4-chart-plot, .s4-chart[data-table] > .s4-chart-legend { display: none; }
+
+  .s4-chart-grid { stroke: var(--md-sys-color-outline-variant); stroke-width: 1; shape-rendering: crispEdges; }
+  .s4-chart-cross { stroke: var(--md-sys-color-outline); stroke-width: 1; pointer-events: none; }
+  .s4-chart-axis, .s4-chart-value, .s4-chart-total {
+    font-family: var(--md-sys-typescale-label-small-font);
+    font-size: var(--md-sys-typescale-label-small-size);
+    font-variant-numeric: tabular-nums;
+    fill: var(--md-sys-color-on-surface-variant);
+  }
+  .s4-chart-value { fill: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .s4-chart-value-in { fill: var(--md-sys-color-on-primary); }
+  .s4-chart-total { fill: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-title-large-size); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .s4-chart-mark { transition: opacity var(--s4-motion-state); }
+  .s4-chart-mark[data-dim] { opacity: 0.45; }
+  .s4-chart-line { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .s4-chart-area { opacity: 0.1; }
+  /* a ring in the surface color keeps the end dot clear of its line */
+  .s4-chart-dot { stroke: var(--s4-chart-surface, var(--md-sys-color-surface)); stroke-width: 2; }
+  .s4-pane .s4-chart, .s4-card .s4-chart { --s4-chart-surface: var(--md-sys-color-surface-container-low); }
+  .s4-chart-track { fill: none; stroke: var(--md-sys-color-surface-container-highest); stroke-width: 14; }
+  .s4-chart-arc { fill: none; stroke-width: 14; }
+
+  .s4-chart-legend { display: flex; flex-wrap: wrap; gap: var(--s4-space-1) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-medium-font); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .s4-chart-legend > li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-chart-key { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); flex: none; }
+
+  .s4-chart-toggle { position: absolute; inset-block-start: calc(var(--s4-space-1) * -1); inset-inline-end: 0; }
+  .s4-chart-table { overflow-x: auto; }
+  .s4-chart-table[hidden] { display: none; }
+
+  .s4-chart-tip {
+    position: absolute;
+    z-index: 2;
+    display: grid;
+    gap: var(--s4-space-1);
+    padding: var(--s4-space-2) var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .s4-chart-tip[hidden] { display: none; }
+  .s4-chart-tip b { font-weight: var(--md-sys-typescale-label-large-weight); }
+  .s4-chart-tip span { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-chart-tip i { inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); flex: none; }
+  .s4-chart-tip em { font-style: normal; margin-inline-start: auto; padding-inline-start: var(--s4-space-3); }
+
+  /* spark: a small line beside a number; no axes, no table */
+  .s4-chart[data-type="spark"] { display: inline-flex; inline-size: var(--s4-chart-spark-width, 6rem); }
+  .s4-chart[data-type="spark"] > .s4-chart-plot { block-size: var(--s4-space-8); }
+  @media (forced-colors: active) { .s4-chart-mark, .s4-chart-arc, .s4-chart-line { forced-color-adjust: none; } }
+}

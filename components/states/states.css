@@ -1,0 +1,17 @@
+/* States (S4 addition, decision 0051): one container, one part per state, so nothing ever shows a blank box.
+   <div class="s4-states" data-state="loading|empty|error|offline|ready"> <div data-when="loading" data-rows="4"></div> … </div>
+   states.js shows the part (or parts) whose data-when names the current state. The parts themselves are ordinary
+   components: skeleton rows, .s4-empty, .s4-banner, and your content. */
+@layer s4.components {
+  .s4-states { display: flex; flex-direction: column; gap: var(--s4-space-3); min-inline-size: 0; }
+  .s4-states > [hidden] { display: none; }
+  /* skeleton rows drawn for data-rows: an avatar and two lines, like a list row */
+  .s4-states-row { display: flex; align-items: center; gap: var(--s4-space-4); padding: var(--s4-space-3) var(--s4-space-4); }
+  .s4-states-row > .s4-skeleton { flex: none; inline-size: var(--s4-space-10); }
+  .s4-states-lines { flex: 1; display: grid; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-states-lines > .s4-skeleton:first-child { inline-size: 45%; }
+  .s4-states-lines > .s4-skeleton:last-child { inline-size: 80%; }
+  /* an error is an empty state that says what went wrong: its icon takes the error color */
+  .s4-states > [data-when~="error"] .s4-empty-icon { color: var(--md-sys-color-error); }
+  .s4-states > .s4-empty { padding-block: var(--s4-space-8); }
+}

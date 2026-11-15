@@ -1,0 +1,51 @@
+/* Form (S4 addition, decision 0051): layout and the quiet marks of a form that behaves.
+   <form class="s4-form" novalidate>
+     <div class="s4-form-row"> two fields side by side from 600 </div>
+     <div class="s4-form-actions"> <span class="s4-form-status"></span> <button class="s4-button">Save</button> </div>
+   </form>
+   form.js does the timing: errors on leaving a field, never while typing; a check when a wrong field becomes right;
+   "Saving…" then "Saved" for forms that save by themselves. */
+@layer s4.components {
+  .s4-form { display: flex; flex-direction: column; gap: var(--s4-space-4); min-inline-size: 0; container-type: inline-size; }
+  .s4-form-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-4); }
+  @container (width >= 600px) { .s4-form-row { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); } }
+  .s4-form-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--s4-space-2) var(--s4-space-3); }
+  .s4-form-actions > .s4-form-status { margin-inline-end: auto; }
+
+  /* a field that was wrong and is now right: a small check beside its label, in the success color */
+  .s4-text-field[data-valid] > label::after {
+    content: "";
+    display: inline-block;
+    inline-size: 1em;
+    block-size: 1em;
+    margin-inline-start: var(--s4-space-1);
+    vertical-align: -0.125em;
+    background: var(--s4-color-success);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+
+  /* "Saving…" / "Saved": quiet, beside the actions or under the form */
+  .s4-form-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-block-size: var(--md-sys-typescale-label-large-line-height);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state);
+  }
+  .s4-form-status[data-on] { opacity: 1; }
+  .s4-form-status[data-done]::before {
+    content: "";
+    inline-size: 1em;
+    block-size: 1em;
+    background: var(--s4-color-success);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 8.4l3 3 6-6.6' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+}

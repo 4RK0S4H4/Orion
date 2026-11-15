@@ -81,3 +81,4 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0048 | Orion on every page, quizzes included (reverses "review blue") | Active (built; owner to look) |
 | 0049 | Nothing puts the cursor in a text field by itself | Active (owner's rule) |
 | 0050 | Pages: going into a thing, with Back, a title and a URL | Active (built; owner to look) |
+| 0051 | The eight ideas the owner picked: palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates | Active (built; owner to look) |

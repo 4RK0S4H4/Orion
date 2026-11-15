@@ -7,11 +7,11 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 
 - **Actions:** [button](#button), [icon-button](#icon-button), [button-group](#button-group), [fab](#fab)
 - **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
-- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state)
+- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart)
 - **Content:** [prose](#prose), [message](#message)
-- **Inputs:** [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
-- **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [snackbar](#snackbar), [tooltip](#tooltip)
-- **Overlays:** [menu](#menu), [dialog](#dialog), [sheet](#sheet)
+- **Inputs:** [form](#form), [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
+- **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [reward](#reward), [snackbar](#snackbar), [tooltip](#tooltip)
+- **Overlays:** [menu](#menu), [dialog](#dialog), [sheet](#sheet), [palette](#palette)
 
 <a id="button"></a>
 
@@ -1427,6 +1427,166 @@ What a list, table or search shows when there is nothing to show yet.
 
 ---
 
+<a id="states"></a>
+
+## States
+
+Every list, table and pane has a designed **loading, empty, error and offline** state, so an app never shows a blank
+box. One container holds a part per state; the script shows the right one.
+
+```html
+<div class="s4-states" data-state="loading">
+  <div data-when="loading" data-rows="4"></div>
+  <div data-when="offline" class="s4-banner" role="status">…You’re offline…</div>
+  <ul data-when="ready offline" class="s4-list">…</ul>
+  <div data-when="empty" class="s4-empty">…All Caught Up…</div>
+  <div data-when="error" class="s4-empty">…Couldn’t Load… <button class="s4-button" data-variant="tonal" data-retry>Try Again</button></div>
+</div>
+```
+
+| Attribute | On | What |
+|---|---|---|
+| `data-state` | `.s4-states` | `loading`, `ready`, `empty`, `error`, `offline` (or any name of your own) |
+| `data-when="a b"` | a direct child | the state or states this part belongs to |
+| `data-rows="4"` | the loading part, left empty | draws that many skeleton rows |
+| `data-retry` | a button | fires `s4-retry` on the container |
+| `data-offline="auto"` | `.s4-states` | shows the offline parts while the device is offline |
+
+Script: `S4.states.set(el, 'ready')`, `S4.states.get(el)`, and `S4.states.load(el, promise)`: loading while the
+promise runs, then `ready`, `empty` when it resolves to `[]` or `{ empty: true }`, `error` when it rejects.
+Event: `s4-state { state, previous }`.
+
+**When to use what**
+- **Loading:** skeleton rows shaped like the content (never a spinner on an empty page). Under about 300ms show nothing.
+- **Empty:** say what will appear here and offer the action that fills it.
+- **Error:** say what failed in plain words and offer Try Again. Never a dialog for an error you can retry.
+- **Offline:** keep showing what was loaded, with a banner that says changes are kept and sent later.
+
+**Do** keep the container the same size across states where you can, so the page does not jump.
+**Don't** blank the content while refreshing something already shown: keep it and show a small progress bar.
+
+**Accessibility:** `aria-busy` while loading; the container is a polite live region, so the new state is announced.
+**Motion:** State (the arriving part fades in). **Tokens:** skeleton, empty state and banner tokens; `--s4-space-*`.
+
+---
+
+<a id="direct"></a>
+
+## Direct manipulation
+
+Move things with your hand instead of through a menu: **reorder** by dragging, **swipe** a row for its actions,
+**select several** and act on all of them. All three work with mouse, finger and keyboard.
+
+```html
+<!-- reorder -->
+<ul class="s4-list" data-reorder>
+  <li><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move Budget draft"></button>…</div></li>
+</ul>
+
+<!-- swipe -->
+<li data-swipe>
+  <div class="s4-list-item">…</div>
+  <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" aria-label="Archive" data-swipe-primary>…</button></div>
+</li>
+
+<!-- select several -->
+<div class="s4-selection-bar" id="bar" hidden>
+  <button class="s4-icon-button" aria-label="Clear Selection" data-selection-clear>…</button>
+  <span class="s4-selection-count" data-selection-count></span>
+  <button class="s4-icon-button" aria-label="Archive Selected">…</button>
+</div>
+<ul class="s4-list" data-selectable data-selection-bar="#bar">…</ul>
+```
+
+| Attribute | What |
+|---|---|
+| `data-reorder` (`="horizontal"` for a row of things) | its children can be reordered; fires `s4-reorder { item, from, to, fromList, toList }` |
+| `data-reorder-group="name"` | lists that share it pass items between them (board columns) |
+| `.s4-drag-handle` | the grip (a button). With one, only the grip drags; without, the whole item drags (a short hold on touch) |
+| `data-reorder-fixed` | a child that stays where it is |
+| `data-swipe` + `.s4-swipe-actions` | a row whose actions are uncovered by dragging it sideways; `data-swipe-primary` runs on a long swipe |
+| `data-selectable` + `data-selection-bar="#id"` | rows can be picked; the bar shows the count and the actions |
+| `data-select-toggle` | a part of a row (its picture) that starts selecting when tapped |
+
+Script: `S4.reorder.move(item, toIndex, toList)`, `S4.swipe.open(row)` / `close(row)`, `S4.selection.items(el)`,
+`clear(el)`, `all(el)`; event `s4-selection { items, count }`.
+
+How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, or tap a
+`data-select-toggle`. After that a tap adds or removes a row instead of opening it. Escape ends it. Put the
+`.s4-selection-bar` inside the `.s4-top-app-bar` and it takes the bar's place while anything is selected.
+
+**When to use what**
+- Reorder: anything whose order is the person's own (priorities, playlists, columns, steps, a board).
+- Swipe: the one or two most common actions on a row, on phones. They must also be in the row's menu or on its page.
+- Select several: lists where people clean up in bulk (mail, files, tasks).
+
+**Do** give every handle an `aria-label` that names its item; act at once and offer Undo.
+**Don't** make dragging the only way to do something; don't swipe to do something that cannot be undone.
+
+**Accessibility:** a handle is a button: Space picks up, Arrow keys move (Left and Right cross between grouped
+lists), Space drops, Escape puts it back, and each step is announced. Swipe actions are real buttons reachable with
+Tab. Picked rows carry `aria-checked`.
+**Motion:** Morph calm for rows making room and settling; nothing animates while your finger is down.
+**Tokens:** `secondary-container`, `primary`, `surface-container-highest`, `--s4-size-touch-target`, `--s4-space-*`.
+
+---
+
+<a id="chart"></a>
+
+## Charts
+
+A small set of chart styles drawn from the tokens, with the reading aids built in.
+
+```html
+<figure class="s4-chart" data-type="column" data-labels="Jun,Jul,Aug" data-values="820,640,910" data-format="currency:USD" data-name="Spending">
+  <figcaption class="s4-chart-title">Spending By Month</figcaption>
+</figure>
+
+<figure class="s4-chart" data-type="line" data-labels="Jun,Jul,Aug"
+        data-series='[{"name":"Income","values":[5200,5200,5600]},{"name":"Spending","values":[3820,3640,3910]}]'>…</figure>
+```
+
+| Attribute | Values |
+|---|---|
+| `data-type` | `column` (default), `bar`, `line`, `area`, `donut`, `spark` |
+| `data-labels` | comma-separated category names |
+| `data-values` / `data-name` | one series and what it is called |
+| `data-series` | JSON: `[{ "name": "…", "values": […] }]`, six series at most |
+| `data-format` | `number` (default), `currency:USD`, `percent` |
+| `data-total-label` | the word under a donut's total |
+| `data-no-table` | drops the Table button (only when the numbers are shown elsewhere on the page) |
+
+Script: `S4.chart(el, { labels, series })` draws or redraws. Charts redraw when their box changes size.
+
+**Which chart**
+| The data's job | Use |
+|---|---|
+| Amounts over time, a few periods | `column` |
+| A trend over many points | `line`, or `area` for one series |
+| Ranking things with long names | `bar` |
+| Parts of one whole, five at most | `donut` |
+| Which way a stat is going | `spark` beside the number |
+| One number | not a chart: a [stat](#stat) |
+
+**What every chart gets:** round axis ticks, hairline gridlines, thin marks with rounded data ends, a legend when
+there are two or more series (none for one: the title names it), one value label on what matters, a tooltip on hover,
+tap or arrow keys, and a **Table** button with the same numbers as rows.
+
+**Color:** one series wears the accent (`primary`), so the chart follows the app. Several wear `--s4-chart-1 … 6` in
+that fixed order: a set checked for color-blind separation on Orion's light and dark surfaces. Text never wears a
+series color.
+
+**Do** title the chart with what it shows, in Title Case; give money and percent a `data-format`.
+**Don't** use two different y-scales in one chart (make two charts); don't use more than six series (group the rest
+as "Other"); don't use a donut for more than five parts; don't use the status colors for series.
+
+**Accessibility:** the SVG is an image with a spoken summary; it takes focus and the arrow keys walk its points,
+announcing each; the Table button gives the full data.
+**Tokens:** `primary`, `--s4-chart-1…6`, `outline-variant`, `on-surface`, `on-surface-variant`, `inverse-surface`,
+label type scale. **Motion:** State (marks dim on hover).
+
+---
+
 <a id="prose"></a>
 
 ## Prose
@@ -1514,6 +1674,49 @@ they arrive while the person reads. Sender names are text, not only avatars.
 
 **Tokens:** `--md-sys-color-primary`, `--md-sys-color-surface-container-high`, `--md-sys-shape-corner-large`,
 `--md-sys-shape-corner-small`, `--md-sys-shape-corner-extra-large`, `--s4-app-inset-bottom`, `--s4-z-sticky`.
+
+---
+
+<a id="form"></a>
+
+## Forms
+
+Forms that behave. Layout classes plus a script that gets the timing right.
+
+```html
+<form class="s4-form">
+  <div class="s4-form-row">
+    <div class="s4-text-field"><input id="f" required data-msg-required="Enter your first name."><label for="f">First Name</label></div>
+    <div class="s4-text-field"><input id="l" required><label for="l">Last Name</label></div>
+  </div>
+  <div class="s4-text-field"><input id="e" type="email" required data-msg-type="That doesn’t look like an email address."><label for="e">Email</label></div>
+  <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" type="submit">Create Account</button></div>
+</form>
+```
+
+| Rule | What happens |
+|---|---|
+| Errors on leaving a field | never while typing; typing in a field with an error clears it the moment it is right |
+| Inline success | a field that was wrong and is now right shows a small check by its label |
+| Submit with problems | every problem is shown, the first is scrolled into view, nothing is sent; `s4-invalid { fields }` |
+| Submit when fine | `s4-submit { values }` (call `preventDefault()` to handle it yourself) |
+| `data-autosave` on the form | `s4-save { values, done(ok), wait() }` after a change settles; `.s4-form-status` reads "Saving…" then "Saved" |
+| Messages | `data-msg-required`, `-type`, `-pattern`, `-min`, `-max`, `-length`, or `data-msg` on the control |
+
+Script: `S4.form.validate(form)`, `S4.form.values(form)`, `S4.form.saved(form, 'Saved')`.
+
+**When to use what**
+- A form you send (sign up, checkout, a new record): a submit button, errors on blur.
+- Settings and anything edited in place: `data-autosave`, no Save button, a quiet "Saved".
+- Something reversible (remove, archive, move): do it and offer **Undo** in a snackbar. Keep "Are you sure?" for what
+  is serious and cannot be undone (the placement ladder, decision 0047).
+
+**Do** write messages that say how to fix it ("Enter the email you signed up with."), in sentence case.
+**Don't** disable the submit button until the form is valid (people cannot tell why); don't validate on every key.
+
+**Accessibility:** errors set `aria-invalid` and are tied to the field with `aria-describedby`; the cursor is never
+moved into a field for you (decision 0049); the saved mark is a status region.
+**Tokens:** `--s4-color-success`, label type scale, `--s4-space-*`. **Motion:** State.
 
 ---
 
@@ -2067,6 +2270,36 @@ A quiet placeholder while content loads. Same shape and size as what will replac
 
 ---
 
+<a id="reward"></a>
+
+## Small rewards
+
+The small moments that make finishing something feel good. Each is an existing motion pattern, so fun never breaks
+consistency.
+
+```html
+<span class="s4-done-mark"></span>                       <!-- set data-done (or S4.reward.done(el)) and the check draws itself -->
+<span class="s4-num" data-count-to="6240" data-count-format="currency:USD"></span>   <!-- counts to its value when it comes into view -->
+```
+
+| Thing | How | Pattern |
+|---|---|---|
+| A check that draws itself | `.s4-done-mark` (`data-size="s|l"`), `data-done` | Ink (the disc), Ink calm (the stroke) |
+| A number that counts | `data-count-to`, `data-count-format="number|currency:USD|percent|compact"`, `data-count-decimals`; `S4.reward.count(el, to, { from })` | a count of under a second |
+| A row that settles after a drag | reorderable lists ([direct](#direct)) | Morph calm |
+
+**When to use what:** once, at the moment something is finished or a figure changes because of what the person did.
+A check for done; a count for a total that moved.
+
+**Do** keep it under a second and let the result be readable the whole time.
+**Don't** celebrate routine things (every save, every click), loop a reward, or add confetti: Orion's fun is small.
+
+**Accessibility:** the number's real value is its `aria-label` from the start; the mark is decorative unless you give
+it an `aria-label`. Under reduced motion both show their end state at once.
+**Tokens:** `--s4-color-success-container`, `--s4-color-on-success-container`, `--s4-space-*`.
+
+---
+
 <a id="snackbar"></a>
 
 ## Snackbar
@@ -2237,3 +2470,58 @@ wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dial
 `aria-labelledby`.
 
 **Tokens:** `--s4-shape-sheet`, `--s4-space-4` (inset), `--s4-scrim-opacity`, glass tokens.
+
+---
+
+<a id="palette"></a>
+
+## Command palette
+
+Search everything and run any action from one box. Opens with **mod+K** (⌘K or Ctrl K) anywhere, or from a button.
+The desktop counterpart of the navigation bar; it works on a phone too.
+
+The palette builds itself: there is no markup to write.
+
+```html
+<!-- a button that opens it -->
+<button class="s4-icon-button" type="button" data-palette aria-label="Search And Commands"><span class="s4-icon" data-icon="search"></span></button>
+
+<!-- any button or link becomes a command -->
+<button class="s4-button" type="button" data-command="Archive Message" data-shortcut="mod+e">Archive</button>
+```
+
+```js
+S4.palette.register([
+  { label: 'New Message', group: 'Mail', icon: 'edit', shortcut: 'mod+n', run: function () { S4.sheet.open('compose'); } },
+  { label: 'Export As CSV', group: 'Data', icon: 'export', keywords: 'download spreadsheet', run: exportCsv }
+]);
+```
+
+| Where commands come from | How |
+|---|---|
+| The app's own | `S4.palette.register([{ label, group, icon, shortcut, keywords, run }])` |
+| Buttons and links on the page | `data-command="Label"` (optional `data-command-group`, `data-command-keywords`); running it clicks the element; its `data-shortcut` is shown |
+| The navigation | every destination appears as "Go To …" |
+| Appearance | "Switch To Dark Mode" / "Light Mode" (turn off with `S4.palette.theme = false`) |
+
+Script: `S4.palette.open()`, `S4.palette.close()`, `S4.palette.commands()`, `S4.palette.clear()`;
+`S4.palette.shortcut = false` frees mod+K. `document` gets `s4-command { command }` when one runs.
+
+**When to use what:** give every desktop app a palette: it is how people who know what they want skip the menus.
+Put the app's ten or twenty real actions in it, named the way the buttons are. It does not replace visible
+navigation or buttons; everything in it must also be reachable on screen.
+
+**Do**
+- Name commands as verbs in Title Case: "Archive Message", "Go To Settings".
+- Group them (`group`) and add `keywords` for the words people actually type.
+- Show the same shortcut in the palette, the menu and the tooltip.
+
+**Don't**
+- Don't put a destructive action that cannot be undone in the palette without its confirm.
+- Don't open the palette by itself, and don't use mod+K for anything else.
+
+**Accessibility:** a modal dialog with a combobox and a listbox; Arrow keys move, Enter runs, Escape closes, focus
+returns to where it was. Opened with the keyboard, the cursor is in the box; opened by tap or click it is not, so no
+keyboard jumps up on a phone (decision 0049), and the first key you press goes into the box.
+
+**Motion:** Pop. **Tokens:** the dialog's glass, list and search tokens; `--s4-space-*`.

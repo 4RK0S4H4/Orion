@@ -96,11 +96,11 @@ const refs = {};
 const GROUPS = [
   ['Actions', ['button', 'icon-button', 'button-group', 'fab']],
   ['Navigation and shell', ['app', 'layout', 'page', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'breadcrumbs', 'pagination', 'stepper']],
-  ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state']],
+  ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state', 'states', 'direct', 'chart']],
   ['Content', ['prose', 'message']],
-  ['Inputs', ['text-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],
-  ['Feedback', ['badge', 'status', 'progress', 'banner', 'skeleton', 'snackbar', 'tooltip']],
-  ['Overlays', ['menu', 'dialog', 'sheet']],
+  ['Inputs', ['form', 'text-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],
+  ['Feedback', ['badge', 'status', 'progress', 'banner', 'skeleton', 'reward', 'snackbar', 'tooltip']],
+  ['Overlays', ['menu', 'dialog', 'sheet', 'palette']],
 ];
 {
   const toc = [], body = [];

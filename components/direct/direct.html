@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Direct Manipulation · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  @layer s4.components {
+    .dm-col { inline-size: min(100%, 30rem); }
+    .dm-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4-space-3); inline-size: 100%; }
+    .dm-lane { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); min-inline-size: 0; }
+    .dm-lane > h3 { margin: 0; font-size: var(--md-sys-typescale-title-small-size); font-weight: var(--md-sys-typescale-title-small-weight); }
+    .dm-cards { display: flex; flex-direction: column; gap: var(--s4-space-2); min-block-size: var(--s4-space-12); margin: 0; padding: 0; list-style: none; }
+    .dm-cards > li { padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); cursor: grab; touch-action: manipulation; overflow-wrap: anywhere; }
+    @media (max-width: 599.98px) { .dm-board { grid-template-columns: minmax(0, 1fr); } }
+  }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Direct Manipulation</h1></header>
+<main class="ex-main">
+  <p>Move things with your hand instead of through a menu: drag to reorder, swipe a row for its actions, select several rows and act on all of them. Everything here also works with the keyboard.</p>
+
+  <section class="ex-sec">
+    <h2>Drag To Reorder</h2>
+    <p>Drag a row by its grip, with a mouse or a finger. The other rows make room and the row settles where you drop it. Keyboard: focus a grip, press Space, move with the arrow keys, press Space again.</p>
+    <div class="ex-board col">
+      <ul class="s4-list dm-col" data-reorder id="dm-list" aria-label="Priorities">
+        <li><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move Launch checklist"></button><span class="s4-list-content"><span class="s4-list-headline">Launch checklist</span><span class="s4-list-supporting">Priya Nair</span></span></div></li>
+        <li><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move Budget draft"></button><span class="s4-list-content"><span class="s4-list-headline">Budget draft</span><span class="s4-list-supporting">Sam Ortiz</span></span></div></li>
+        <li><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move Contract renewal"></button><span class="s4-list-content"><span class="s4-list-headline">Contract renewal</span><span class="s4-list-supporting">Jonas Weber</span></span></div></li>
+        <li><div class="s4-list-item"><button class="s4-drag-handle" type="button" aria-label="Move Photos from the offsite"></button><span class="s4-list-content"><span class="s4-list-headline">Photos from the offsite</span><span class="s4-list-supporting">Lena Fischer</span></span></div></li>
+      </ul>
+      <p class="s4-on-surface-variant s4-body-medium" id="dm-out" aria-live="polite" style="margin:0">Order: Launch checklist, Budget draft, Contract renewal, Photos from the offsite</p>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Between Lists</h2>
+    <p>Lists that share a group pass items to each other. With no grip the whole card drags: at once with a mouse, after a short hold with a finger.</p>
+    <div class="ex-board">
+      <div class="dm-board">
+        <section class="dm-lane"><h3>To Do</h3><ul class="dm-cards" data-reorder data-reorder-group="dm" aria-label="To Do"><li>Write the release notes</li><li>Book the venue</li></ul></section>
+        <section class="dm-lane"><h3>Doing</h3><ul class="dm-cards" data-reorder data-reorder-group="dm" aria-label="Doing"><li>Design the invite</li></ul></section>
+        <section class="dm-lane"><h3>Done</h3><ul class="dm-cards" data-reorder data-reorder-group="dm" aria-label="Done"><li>Pick a date</li></ul></section>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Swipe A Row</h2>
+    <p>On a touch screen, drag a row to the left to uncover its actions. A long swipe archives. With a keyboard, Tab reaches the same buttons.</p>
+    <div class="ex-board col">
+      <ul class="s4-list dm-col" id="dm-swipe" aria-label="Messages">
+        <li data-swipe><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">MC</span></span><span class="s4-list-content"><span class="s4-list-headline">Invoice for October</span><span class="s4-list-supporting">Maya Chen</span></span></div><div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Invoice for October" data-swipe-primary><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" data-variant="tonal" data-color="error" type="button" aria-label="Delete Invoice for October"><span class="s4-icon" data-icon="delete"></span></button></div></li>
+        <li data-swipe><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">JW</span></span><span class="s4-list-content"><span class="s4-list-headline">Contract renewal</span><span class="s4-list-supporting">Jonas Weber</span></span></div><div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Contract renewal" data-swipe-primary><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" data-variant="tonal" data-color="error" type="button" aria-label="Delete Contract renewal"><span class="s4-icon" data-icon="delete"></span></button></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Select Several</h2>
+    <p>Hold a row (or Ctrl-click it, or tap its picture) to start selecting; then tap rows to add or remove them. The bar shows how many and what you can do with them. Escape ends it.</p>
+    <div class="ex-board col">
+      <div class="s4-selection-bar dm-col" id="dm-bar" hidden><button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button><span class="s4-selection-count" data-selection-count>0 Selected</span><button class="s4-icon-button" type="button" aria-label="Archive Selected" id="dm-archive"><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" type="button" aria-label="Delete Selected" id="dm-delete"><span class="s4-icon" data-icon="delete"></span></button></div>
+      <ul class="s4-list dm-col" data-selectable data-selection-bar="#dm-bar" id="dm-select" aria-label="Files">
+        <li><button class="s4-list-item" type="button"><span class="s4-list-leading" data-select-toggle><span class="s4-avatar">Q4</span></span><span class="s4-list-content"><span class="s4-list-headline">Q4 budget.xlsx</span><span class="s4-list-supporting">Edited today</span></span></button></li>
+        <li><button class="s4-list-item" type="button"><span class="s4-list-leading" data-select-toggle><span class="s4-avatar">PK</span></span><span class="s4-list-content"><span class="s4-list-headline">Press kit.zip</span><span class="s4-list-supporting">Edited Monday</span></span></button></li>
+        <li><button class="s4-list-item" type="button"><span class="s4-list-leading" data-select-toggle><span class="s4-avatar">RN</span></span><span class="s4-list-content"><span class="s4-list-headline">Release notes.md</span><span class="s4-list-supporting">Edited Nov 2</span></span></button></li>
+        <li><button class="s4-list-item" type="button"><span class="s4-list-leading" data-select-toggle><span class="s4-avatar">OP</span></span><span class="s4-list-content"><span class="s4-list-headline">Offsite photos</span><span class="s4-list-supporting">48 items</span></span></button></li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/direct/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+document.getElementById('dm-list').addEventListener('s4-reorder', function () {
+  document.getElementById('dm-out').textContent = 'Order: ' + Array.prototype.map.call(this.querySelectorAll('.s4-list-headline'), function (h) { return h.textContent; }).join(', ');
+});
+document.getElementById('dm-swipe').addEventListener('click', function (e) {
+  var b = e.target.closest('.s4-swipe-actions button'); if (!b) return;
+  var row = b.closest('li'), name = row.querySelector('.s4-list-headline').textContent, next = row.nextElementSibling, list = row.parentElement;
+  row.remove();
+  S4.snackbar({ text: (b.hasAttribute('data-swipe-primary') ? 'Archived: ' : 'Deleted: ') + name, action: 'Undo', onAction: function () { list.insertBefore(row, next); S4.swipe.close(row); } });
+});
+['dm-archive', 'dm-delete'].forEach(function (id) {
+  document.getElementById(id).addEventListener('click', function () {
+    var list = document.getElementById('dm-select'), n = S4.selection.items(list).length;
+    S4.selection.clear(list);
+    S4.snackbar({ text: n + (id === 'dm-archive' ? ' archived' : ' deleted'), action: 'Undo' });
+  });
+});
+</script>
+</body>
+</html>

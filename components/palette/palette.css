@@ -1,0 +1,30 @@
+/* Command palette (S4 addition, decision 0051). Built by palette.js: a glass dialog near the top of the window with
+   a search box and a list of commands. It has no markup of its own to write:
+     <button class="s4-icon-button" data-palette aria-label="Search And Commands">…</button>     opens it (so does mod+K)
+     <button data-command="Archive Message" data-shortcut="mod+e">…</button>                    appears in it
+   Solid here; glass.css makes .s4-dialog glass. */
+@layer s4.components {
+  .s4-palette {
+    inline-size: min(36rem, calc(100vw - 2 * var(--s4-space-4)));
+    max-block-size: min(32rem, calc(100dvh - 2 * var(--s4-space-12)));
+    margin-block-start: max(var(--s4-space-12), 12dvh);
+    padding: var(--s4-space-2);
+    gap: var(--s4-space-1);
+    overflow: hidden;
+  }
+  .s4-palette-search { flex: none; }
+  .s4-palette-list { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0; }
+  .s4-palette-list[hidden] { display: none; }
+  .s4-palette-list .s4-list-item { cursor: pointer; }
+  .s4-palette-noicon { inline-size: var(--s4-size-icon); flex: none; }
+  .s4-palette-empty {
+    margin: 0;
+    padding: var(--s4-space-6) var(--s4-space-4);
+    text-align: center;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+  .s4-palette-empty[hidden] { display: none; }
+}

@@ -1,0 +1,35 @@
+/* Small rewards (S4 addition, decision 0051).
+   <span class="s4-done-mark" data-size="s|m|l"></span>      a check that draws itself when data-done is set (reward.js)
+   Numbers that count (data-count-to) need no styles: give them tabular figures with .s4-num. */
+@layer s4.components {
+  .s4-done-mark {
+    --_size: var(--s4-space-10);
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    inline-size: var(--_size);
+    block-size: var(--_size);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--s4-color-success-container);
+    color: var(--s4-color-on-success-container);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform var(--s4-motion-ink), opacity var(--s4-motion-state);
+  }
+  .s4-done-mark[data-size="s"] { --_size: var(--s4-space-6); }
+  .s4-done-mark[data-size="l"] { --_size: var(--s4-space-16); }
+  .s4-done-mark > svg { inline-size: 60%; block-size: 60%; }
+  .s4-done-mark path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset var(--s4-motion-ink-calm);
+  }
+  .s4-done-mark[data-done] { transform: none; opacity: 1; }
+  .s4-done-mark[data-done] path { stroke-dashoffset: 0; }
+  @media (forced-colors: active) { .s4-done-mark { border: 1px solid CanvasText; } }
+}
