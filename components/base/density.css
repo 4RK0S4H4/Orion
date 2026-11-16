@@ -74,6 +74,9 @@
     --s4-layout-gap: var(--s4-density-roomy-layout-gap);
     --s4-layout-pane-gap: var(--s4-density-roomy-layout-pane-gap);
     --s4-layout-content-reading: var(--s4-density-roomy-layout-content-reading);
+    --s4-site-section-space: var(--s4-site-section-space-roomy);   /* a site's section rhythm grows with roomy too (0057) */
+    --s4-site-section-gap: var(--s4-site-section-gap-roomy);
+    --s4-site-margin: var(--s4-site-margin-roomy);
     --md-sys-typescale-body-large-size: var(--s4-density-roomy-body-large-size);
     --md-sys-typescale-body-large-line-height: var(--s4-density-roomy-body-large-line-height);
     font-size: var(--md-sys-typescale-body-large-size);

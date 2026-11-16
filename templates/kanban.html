@@ -9,7 +9,7 @@
      page; a new card is added in place at the foot of its column. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=dee4735">
+<link rel="stylesheet" href="../components/orion.css?v=289624b">
 <style>
   /* the app's own layout: tokens only */
   .kb-board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(min(85%, 17rem), 1fr); gap: var(--s4-space-3); align-items: start; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding-block-end: var(--s4-space-4); }
@@ -27,7 +27,7 @@
 </head>
 <body>
 <div class="s4-app">
-  <nav class="s4-nav-rail" aria-label="Main" data-expand="auto">
+  <nav class="s4-nav-rail" aria-label="Main">
     <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#board" data-view="board" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Board</span></a>

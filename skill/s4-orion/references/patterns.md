@@ -171,6 +171,17 @@ document.addEventListener('s4-theme', (e) => redrawCharts(e.detail))   // after 
 S4.util.css('--md-sys-color-primary')          // read a token's current value (for canvas, charts)
 ```
 
+A region can carry its own theme (decision 0056): any dial works on any element and nests.
+
+```html
+<nav class="s4-nav-rail" data-theme="dark">…</nav>                       <!-- a dark rail in a light app -->
+<section class="s4-site-section" data-accent="#0b6e4f" data-surfaces="tinted">…</section>   <!-- a branded band -->
+```
+```js
+S4.theme({ mode: 'dark', corners: 'firm' }, el)    // the same at runtime on one element; nothing is saved
+S4.theme({ energy: 'calm' })                       // motion energy: calm | standard | lively
+```
+
 Set the seed once at start-up for an app with a brand color: `S4.theme.restore('app-theme', { seed: '#2e7d32', mode: 'system' })`.
 Color is generated with Material Color Utilities (`m3color.js`, loaded on demand from next to `orion.js`); it writes
 the same zero-specificity blocks as the token file, so dark mode, high contrast and glass keep working.

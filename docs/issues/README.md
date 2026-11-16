@@ -23,27 +23,34 @@ Found by the end-to-end review ([`explore/design-review.html`](../../explore/des
 reference images (the review page shows each one). The big ones wait on the owner's answers to the review's eight
 questions; the small ones can be fixed without asking.
 
-- **51.** (Built 2026-11-16, decision 0055; left: motion energy, per-app defaults, a suite pass over every preset.) An app can only change its color: corners follow tokens halfway (54 height-computed pills, 56 direct uses of
+- **51.** Done 2026-11-16 (decision 0055; motion energy and per-app defaults in 0056, every preset proven by the suite in 0058; needs the owner's iPhone look). An app can only change its color: corners follow tokens halfway (54 height-computed pills, 56 direct uses of
   the full corner), `--s4-shape-button`, `--s4-shape-icon-button` and `--s4-shape-snackbar` are read by nothing, no
   type, gray-temperature or motion-energy dial. Waits on review questions 1 to 3.
 - **52.** Themes only work on the whole page (every token block is on `:root`, aliases resolve there): no dark sidebar
-  in a light app, no branded band. Part of the brand dials work.
+  in a light app, no branded band. Done 2026-11-16 (decision 0056: every dial on any element, `check:scopes`; needs the
+  owner's iPhone look, `@scope` needs Safari 17.5+).
 - **53.** Websites: one thin landing template; no site header, footer, pricing, testimonials, media hero, feature rows,
-  article index, docs layout, fluid display type or section rhythm. The owner said build it (0055); not started.
+  article index, docs layout, fluid display type or section rhythm. Done 2026-11-16 (decision 0057: `components/site/`,
+  five site templates, lighter files; needs the owner's iPhone and desktop look).
 - **54.** Done 2026-11-16 (decision 0055: headings at 600, `page: 'soft'`). Neutral mode read flat.
 - **55.** Done 2026-11-16 (decision 0055). Letter spacing was Material's (tuned for Roboto) on Inter.
 - **56.** Wide windows are left-anchored: showcase home cards 236 wide beside 500px of nothing at 1280; landing feature
-  cards stop at 936 of 1200. Card grids should fill their row.
+  cards stop at 936 of 1200. Card grids should fill their row. Partly done 2026-11-16: the landing grid fills its row
+  (0057); the showcase and app templates are wave 2 (with 54's hierarchy).
 - **57.** Done 2026-11-16 (the list below was corrected). Documents had drifted from the decisions: `framework.md` ("Nine complete starter apps"), `philosophy.md`
   section 4 (menus drop out of their button, sheets slide from the edge), `foundations/shape.md` (full to small,
   square sheet edge, extra-small segments), `foundations/color.md` and `accessibility.md` ("42 pairs"; 78 are checked),
   the skill description ("46 components", "eight app templates") and its opening ("It **is** Material 3 Expressive").
 - **58.** Small things: the Elevated button looks like the Text button on a card (no shadow to elevate with); avatar
-  stacks cover each other's initials; breadcrumb chevrons sit unevenly between pills and the current page.
+  stacks cover each other's initials; breadcrumb chevrons sit unevenly between pills and the current page. Done
+  2026-11-16 (decision 0058; look on an iPhone at Elevated vs Tonal on a dark card and the stack at xs).
 - **59.** Rich inputs and data at scale (combobox, tag input, upload, time, number, one-time code, tree, table resize /
   pinning / virtual rows): already Horizon 2; the review argues for pulling rich inputs forward.
 - **60.** Desktop anatomy beyond the title bar: menu bar, status bar, document tabs, sidebar tree, settings window, a
   real shell example.
+- **Reach** (Horizon 1 item 4): right-to-left, print, 200% text, long text, forced colors, keyboard. Done 2026-11-16
+  (decision 0058, `tests/reach.mjs`). Left: WebKit and Firefox runs, print pagination, the exemptions listed in 0058
+  (date fields in the keys pass, sliders in forced colors, desktop windows at 390 in long text).
 
 ## Open (2026-11-14)
 

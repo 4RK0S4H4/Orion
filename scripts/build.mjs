@@ -131,7 +131,9 @@ for (const page of htmlIn('templates')) {
   const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   outputs['skill/s4-orion/templates/' + name] = src
     .replace(/(?:\.\.\/components\/(?:assets\/)?)([\w.-]+)\?v=[\w.-]*/g, '$1')
-    .replace(/<!-- Template: /, '<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). ');
+    .replace(/<!-- Template: /, /orion\.min\.css/.test(src)
+      ? '<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). '
+      : '<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). ');
 }
 /* ---------- skill references (generated, so they can't drift from the repo) ---------- */
 const refs = {};

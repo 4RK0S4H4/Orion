@@ -1,6 +1,6 @@
 ---
 name: s4-orion
-description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 61 components (app shell, canonical layouts, nav bar/rail, top app bar, buttons, FAB, cards, lists, tables, stats, fields, chips, menus, dialogs, sheets, snackbars, prose, chat…), fifteen app templates (dashboard, list-detail, board, calendar, editor, gallery, checkout, chat…), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
+description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 62 components (app shell, canonical layouts, nav bar/rail, top app bar, buttons, FAB, cards, lists, tables, stats, fields, chips, menus, dialogs, sheets, snackbars, prose, chat…), fourteen app templates (dashboard, list-detail, board, calendar, editor, gallery, checkout, chat…), five site templates (landing, pricing, blog, docs, site), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
 ---
 
 # S4 Orion
@@ -45,7 +45,11 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 | `article.html` | help, docs, blog, release notes, legal | reading width, breadcrumbs, `.s4-prose` |
 | `chat.html` | messaging, support, comments, AI assistants | thread + glass composer |
 | `tool.html` | calculators, converters, generators, editors | supporting-pane split: inputs + sticky result |
-| `landing.html` | a product or project home page | no shell navigation; hero, features, FAQ, CTA |
+| `landing.html` | a product or app home page | site: split hero with the real product, logos, feature rows, bento, quote, numbers, FAQ, one accent band, footer |
+| `pricing.html` | plans and prices | site: period switch, plans with one featured, comparison table, FAQ |
+| `blog.html` | a blog, news or changelog index (each post is an `article.html`) | site: featured post, post list |
+| `docs.html` | product documentation | site: sidebar, prose at reading width, On This Page, previous and next |
+| `site.html` | a studio, portfolio or personal site | site: hero, work, quotes, contact |
 | `kanban.html` | tasks, pipelines, hiring, orders, anything that moves through stages | columns with `data-reorder-group`, add in place, a card page, charts view |
 | `calendar.html` | schedules, bookings, shifts, content plans | month grid (a table of buttons) + day agenda in a resizable supporting split, event page |
 | `editor.html` | notes, docs, wikis, posts, anything people write | reorderable document list, document page, formatting toolbar, outline pane, autosave |
@@ -55,6 +59,26 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 
 Mixed apps combine them: a dashboard app whose Clients view is the list-detail screen, with the settings screen as its
 last destination. Keep one shell (`.s4-app`) per page.
+
+## Websites
+
+A marketing page, product home, portfolio, pricing, blog or docs is a **site**, not an app (decision 0057): start
+from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` per post) or `docs.html` and read
+`references/components.md#site`. `body.s4-site`, no app shell, no nav bar or rail; the window scrolls.
+
+- **Order for a product home:** split hero with the real product, logos, how it works (two or three feature rows),
+  bento for the rest, one quote and numbers, FAQ beside its heading, one accent call-to-action band, footer.
+- **Type:** one `h1` (`.s4-hero-title`), section titles `.s4-site-title` (h2), `.s4-site-lead` under them; site type
+  is fluid, app type is not. Start-aligned; center only short blocks (a short hero, the pricing heading, a closing band).
+- **One accent a page:** the featured plan, the call-to-action band, one bento cell or a cover. Toned bands are inset
+  rounded blocks, never full-bleed stripes. Bento spans add up to 12 per row; equal grids use `data-columns`.
+- **Pictures:** no network fetches, no gray boxes, no gradients. Show real Orion components in a phone or browser frame
+  (`inert`, `role="img"`, an `aria-label`), covers set in type on a tone, or the media empty state. Real images get
+  `width`, `height`, `loading="lazy"` below the first screen, inside a `.s4-media-box` with a ratio.
+- **Glass** only on the site header (once content scrolls under it) and the phone menu panel. No shadows or outlines.
+- **Files:** sites load the lighter `orion.min.css`, `orion.min.js` and `icons-solar.js` (all scripts `defer`; keep
+  the font preload). Every page has the skip link, landmarks, a meta description, Open Graph tags and `theme-color`
+  for light and dark. `data-density="roomy"` widens margins, gaps and section rhythm for content-heavy sites.
 
 ## Make it this app's own (brand dials)
 
@@ -81,6 +105,18 @@ editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mon
 consumer = tinted + rounded display + round. What an app can never change: filled (no outlines), no shadows, glass only
 on floating chrome, the motion patterns, the behaviours. Elements only this app has are drawn from Orion's rules in the
 app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on `:root`, 10px or more.
+
+**More dials (decision 0056):**
+- **Energy:** `S4.theme({ energy: 'calm' | 'standard' | 'lively' })` (`data-energy`). Calm for tools and dense data,
+  lively for playful consumer apps. Same ten motion patterns; never per component.
+- **Themes on any container:** every dial also works on any element and nests: `data-theme="dark"` on a sidebar of a
+  light app, `data-accent="#0b6e4f"` (+ `data-surfaces="tinted"`) on a branded band, `data-corners`, `data-gray`,
+  `data-type-display` on a region. At runtime `S4.theme(options, element)` (nothing saved; `null` follows the page).
+  For regions only, never to restyle one component. Contrast and reduced motion stay page-wide.
+- **App defaults**, once on `<html>`, only when the app's character calls for it: `data-buttons="tonal"` (calm tools;
+  still write `data-variant="filled"` on the one main action), `data-cards="filled"`, `data-lists="segmented"`
+  (settings-like apps), `data-rail="expanded|collapsed|auto"` (a rail's own `data-expand` still wins).
+- **Roomy density:** `data-density="roomy"` for content sites (articles, docs, landing pages), never app screens.
 
 ## Page shape
 

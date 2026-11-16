@@ -17,7 +17,7 @@
 <link rel="canonical" href="https://example.com/">
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.min.css?v=4f6c85e">
+<link rel="stylesheet" href="../components/orion.min.css?v=996ebb8">
 <style>
   /* pictures for this page, composed from Orion components (no image files) */
   .lp-screen { inline-size: 100%; padding: var(--s4-space-8) var(--s4-space-3) var(--s4-space-3); gap: var(--s4-space-3); }
@@ -25,7 +25,7 @@
   .lp-screen-head h2 { margin: 0; }
   .lp-screen .s4-stat { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
   .lp-screen .s4-list { margin: 0; }
-  .lp-screen .s4-button { margin-block-start: auto; }
+  .lp-screen .s4-button { margin-block-start: auto; --_radius: min(calc(var(--_h) / 2), calc(var(--md-sys-shape-corner-extra-extra-large) - var(--s4-space-2) - var(--s4-space-3))); }   /* sits in the screen's bottom corners: concentric with them (or a pill), whatever the corner dial */
   .lp-stack { display: grid; gap: var(--s4-space-3); inline-size: min(100%, calc(var(--s4-space-16) * 7)); }
   .lp-note { display: flex; gap: var(--s4-space-3); align-items: flex-start; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); }
   .lp-note > div { display: grid; gap: var(--s4-space-1); min-inline-size: 0; flex: 1; }

@@ -144,6 +144,9 @@
     --s4-site-section-space-wide: 112px;
     --s4-site-section-gap: clamp(32px, 22.61px + 2.609vw, 56px);
     --s4-site-margin: clamp(16px, 9.74px + 1.739vw, 32px);
+    --s4-site-section-space-roomy: clamp(80px, 54.96px + 6.957vw, 144px);
+    --s4-site-section-gap-roomy: clamp(40px, 27.48px + 3.478vw, 72px);
+    --s4-site-margin-roomy: clamp(20px, 12.17px + 2.174vw, 40px);
     --s4-site-width: var(--s4-layout-content-max);
     --s4-site-measure: 600px;
     --s4-site-measure-wide: 800px;
@@ -1631,6 +1634,9 @@
     --s4-layout-gap: var(--s4-density-roomy-layout-gap);
     --s4-layout-pane-gap: var(--s4-density-roomy-layout-pane-gap);
     --s4-layout-content-reading: var(--s4-density-roomy-layout-content-reading);
+    --s4-site-section-space: var(--s4-site-section-space-roomy);   /* a site's section rhythm grows with roomy too (0057) */
+    --s4-site-section-gap: var(--s4-site-section-gap-roomy);
+    --s4-site-margin: var(--s4-site-margin-roomy);
     --md-sys-typescale-body-large-size: var(--s4-density-roomy-body-large-size);
     --md-sys-typescale-body-large-line-height: var(--s4-density-roomy-body-large-line-height);
     font-size: var(--md-sys-typescale-body-large-size);
@@ -2334,7 +2340,7 @@
 
   /* ---------- toggle buttons (aria-pressed): unselected uses a quieter fill, selected the full color and a square shape ---------- */
   /* unselected: a step above the surface it sits on (a fixed container role went faint on a dark card, issue 58) */
-  .s4-button[aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
+  .s4-button[aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface); }   /* text: on-surface-variant fell to 4.43:1 on the step in tinted light mode */
   .s4-button[aria-pressed="false"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[aria-pressed="true"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-button[aria-pressed="false"]:where([data-variant="outlined"]) { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface-variant); }

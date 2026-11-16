@@ -296,6 +296,9 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-site-section-space-wide` | 112px |  | The desktop end of section-space. |
 | `--s4-site-section-gap` | clamp(32px, 22.61px + 2.609vw, 56px) |  | Inside a section: between its heading block and its content. 32 on a phone to 56 from 1280. |
 | `--s4-site-margin` | clamp(16px, 9.74px + 1.739vw, 32px) |  | Side margin of a site page: 16 on a phone (as apps) to 32 from 1280. |
+| `--s4-site-section-space-roomy` | clamp(80px, 54.96px + 6.957vw, 144px) |  | section-space under data-density="roomy": 80 on a phone to 144 from 1280. |
+| `--s4-site-section-gap-roomy` | clamp(40px, 27.48px + 3.478vw, 72px) |  | section-gap under data-density="roomy": 40 on a phone to 72 from 1280. |
+| `--s4-site-margin-roomy` | clamp(20px, 12.17px + 2.174vw, 40px) |  | margin under data-density="roomy": 20 on a phone to 40 from 1280 (the roomy layout margins). |
 | `--s4-site-width` | var(--s4-layout-content-max) |  | Site content width (1200): sections, header and footer line up on it. |
 | `--s4-site-measure` | 600px |  | Line length of a lead or section intro (about 60 characters at lead size). |
 | `--s4-site-measure-wide` | 800px |  | Wide measure: a centered hero or section heading block. |

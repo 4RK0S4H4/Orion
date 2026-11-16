@@ -8,6 +8,26 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+Round 0056: themes on any container, the website kit, reach (decisions 0056 to 0058):
+
+- Added: themes on any container: `data-theme`, `data-gray`, `data-page`, `data-corners`, `data-type-*`, `data-accent` (+ `data-accent-variant`, `data-surfaces`) on any element, nesting; `S4.theme(options, element)`; reference page `components/base/themes.html`; `npm run check:scopes` (scopes match the page-wide modes token for token, and dark scopes print light).
+- Added: motion energy (`data-energy="calm|standard|lively"`, `S4.theme({ energy })`, `S4.transition.energy(el)`), eight spring tokens, checked by `check:motion`.
+- Added: app defaults `data-buttons="tonal"`, `data-cards="filled"`, `data-lists="segmented"`, `data-rail`; `data-variant="filled"` on buttons and `data-variant="elevated"` on cards as explicit names.
+- Added: `data-density="roomy"` for content sites (site section rhythm grows with it).
+- Added: the website kit `components/site/` (site header with phone menu panel, hero, feature rows, bento, icon list, logos, quotes, numbers, pricing with period switch and comparison table, call to action, media figures, blog index, docs layout with contents, footer); site tokens (`--s4-site-hero|title|lead-*`, section rhythm, site width and measures).
+- Added: templates `pricing.html`, `blog.html`, `docs.html`, `site.html` (19 in all); `landing.html` rebuilt as a complete product home page.
+- Added: `orion.min.css`, `orion.min.js` and one icon file per set (`icons-solar.js`, …), checked for staleness; site templates load them.
+- Added: print stylesheet (`components/base/print.css`, `data-s4-print="hide"`); right-to-left mirroring of directional icons (`data-mirror`); `tests/reach.mjs` in `npm test` (rtl, print, 200% text, 320 reflow, long text, forced colors, reduced motion, keyboard).
+- Added: a dial-presets pass in the suite (corners, gray, page tone, typefaces, combined and seeded tinted presets).
+- Added: the showcase's Make It Yours gets Motion (energy) and Dark Navigation (a scoped theme on the rail and nav bar).
+- Changed: dark color blocks apply to screens only (print is light), including scoped themes and a seed's colors.
+- Changed: buttons, chips, FABs, status, nav items grow with text; list headlines and nav labels wrap; button groups wrap; tabs scroll.
+- Changed: Elevated button is a fill one step above its surface (no shadow); unselected filled toggles likewise; avatar stacks overlap less, with a ring in the surrounding surface color.
+- Changed: dials written in `<html>` markup are `S4.theme()`'s starting state; the site header and site panels are glass.
+- Changed: app templates no longer write `data-expand="auto"` on their rails (it is the default), so an app's `data-rail` applies.
+- Fixed: right-to-left slider, progress, stepper, switch, menu alignment, FAB and rail safe areas; invisible checkbox and radio in forced colors; missing focus ring on date fields; 1.19:1 focus ring in vibrant toolbars; text field counter overlap.
+- Fixed: the corner dial reaches the tabs tray, the nav pill and the chip remove button; pressed icon buttons are never rounder than at rest; error and text buttons on glass reach 4.5:1; vibrant toolbar tonal buttons readable; breadcrumb chevron spacing; the landing feature grid no longer leaves a hole at 1280.
+
 Brand dials (decision 0055):
 
 - Added: `S4.theme({ corners, gray, page, display, text })` and the matching attributes on `<html>` (`data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`); `--s4-shape-control`; warm and cool grays (`components/base/gray.css`, generated and checked by `npm run check:gray`); a "Make It Yours" pane in the showcase.

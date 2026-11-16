@@ -40,6 +40,9 @@
         "$value": "clamp(16px, 9.74px + 1.739vw, 32px)",
         "$description": "Side margin of a site page: 16 on a phone (as apps) to 32 from 1280."
       },
+      "section-space-roomy": { "$type": "dimension", "$value": "clamp(80px, 54.96px + 6.957vw, 144px)", "$description": "section-space under data-density=\"roomy\": 80 on a phone to 144 from 1280." },
+      "section-gap-roomy": { "$type": "dimension", "$value": "clamp(40px, 27.48px + 3.478vw, 72px)", "$description": "section-gap under data-density=\"roomy\": 40 on a phone to 72 from 1280." },
+      "margin-roomy": { "$type": "dimension", "$value": "clamp(20px, 12.17px + 2.174vw, 40px)", "$description": "margin under data-density=\"roomy\": 20 on a phone to 40 from 1280 (the roomy layout margins)." },
       "width": { "$type": "dimension", "$value": "{s4.layout.content-max}", "$description": "Site content width (1200): sections, header and footer line up on it." },
       "measure": { "$type": "dimension", "$value": { "value": 600, "unit": "px" }, "$description": "Line length of a lead or section intro (about 60 characters at lead size)." },
       "measure-wide": { "$type": "dimension", "$value": { "value": 800, "unit": "px" }, "$description": "Wide measure: a centered hero or section heading block." }

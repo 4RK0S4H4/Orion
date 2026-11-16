@@ -36,16 +36,16 @@ When two good ideas conflict, the earlier line wins.
 6. **Any accent, any app.** Nothing may depend on black and white, on one kind of content, or on one screen size.
 7. **The app is the app** (0053). Orion is a language, not a kit of parts: an app keeps its own screens and elements, and Orion grows the component the app needs. The app is never bent to fit what is on the shelf.
 
-## Where it stands (2026-11-15)
+## Where it stands (2026-11-16)
 
 | Layer | State |
 |---|---|
 | Tokens, color, type, shape, glass | Settled (0003 to 0045). Open only: the owner's iPhone looks for 0037, 0040. |
 | Motion | Settled: ten patterns, enforced (0046). |
 | Places | Settled in principle: views, pages (0050), the placement ladder (0047). Tool panels (0054) settle modal versus live. |
-| Components | 61. The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
-| Templates | 15 app archetypes. |
-| Proof | `npm run check` (tokens, glass, accents, motion, stale output) and `npm test` (every page used like a person, Chromium and WebKit, in CI). |
+| Components | 62. The website kit (0057); themes on any container (0056). The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
+| Templates | 19: 14 app archetypes and five site templates (landing, pricing, blog, docs, site). |
+| Proof | `npm run check` (tokens, glass, accents, scopes, motion, stale output) and `npm test` (every page used like a person, every dial preset, and reach: rtl, print, 200% text, long text, forced colors, keyboard; Chromium and WebKit in CI). |
 | Skill | Packaged; needs its evals re-run against the new components. |
 
 ## The next three horizons
@@ -56,7 +56,7 @@ The goal is that the owner can ask for any app and get something they would ship
 2. **Build real apps end to end with the skill.** First: a mockup of the owner's WGU degree tracker (tinted mode), then one desktop app, and fix everything the skill gets
    wrong or has to invent. This is the real test of "any app"; the templates are not.
 3. **Skill evals** re-run and extended to the new pieces (pages, expand, states, forms, charts, direct manipulation).
-4. **Reach:** right-to-left, long text, 200% text size and print, as suite checks rather than promises.
+4. **Reach:** right-to-left, long text, 200% text size and print, as suite checks rather than promises. Done in round 0056 (0058).
 5. **Icons for writing tools** (bold, italic, headings, lists, link): the editor borrows unrelated icons today.
 6. **Release 1.2:** changelog date, tag, the skill re-packaged, the owner re-downloads it.
 

@@ -141,6 +141,9 @@
     --s4-site-section-space-wide: 112px;
     --s4-site-section-gap: clamp(32px, 22.61px + 2.609vw, 56px);
     --s4-site-margin: clamp(16px, 9.74px + 1.739vw, 32px);
+    --s4-site-section-space-roomy: clamp(80px, 54.96px + 6.957vw, 144px);
+    --s4-site-section-gap-roomy: clamp(40px, 27.48px + 3.478vw, 72px);
+    --s4-site-margin-roomy: clamp(20px, 12.17px + 2.174vw, 40px);
     --s4-site-width: var(--s4-layout-content-max);
     --s4-site-measure: 600px;
     --s4-site-measure-wide: 800px;

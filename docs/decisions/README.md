@@ -86,3 +86,6 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0053 | The app is the app: adapt an app by keeping its screens and elements and drawing them in Orion; make the component the app needs. Ring, milestones, month, timeline. Long swipe | Active (approved by the owner 2026-11-16) |
 | 0054 | Tool panels: `data-modeless` floating panels leave the page live from 600 wide (filters, inspectors); task panels and dialogs stay modal; phones always modal | Active (owner's call; built) |
 | 0055 | Brand dials: corners (soft range), typefaces, gray temperature, page tone; letter spacing tuned for Inter; stronger type; a website kit to come | Active (owner's quiz answers; first dials built) |
+| 0056 | Themes on any container (every dial on any element, nesting), motion energy, four app defaults, roomy density | Active (our call, owner can overrule; built in round 0056) |
+| 0057 | The website kit: site type, rhythm, sections, five site templates; lighter files for pages | Active (our call, owner can overrule; built in round 0056) |
+| 0058 | Reach: right-to-left, print, text size, forced colors, keyboard, the reach suite; the dial presets proven in the suite | Active (our call, owner can overrule; built in round 0056) |

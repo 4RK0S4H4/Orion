@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Ledgerly · Every Bill Paid on Time</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Landing Page. A product home page from the website kit (components/site): announcement bar, glass site header with a phone menu, split hero with a real app screen, logo row, alternating feature rows, bento grid, a large quote, big numbers, FAQ beside its heading, a call-to-action band and a footer. Swap the content; keep the order of sections and one accent band. -->
+<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). Landing Page. A product home page from the website kit (components/site): announcement bar, glass site header with a phone menu, split hero with a real app screen, logo row, alternating feature rows, bento grid, a large quote, big numbers, FAQ beside its heading, a call-to-action band and a footer. Swap the content; keep the order of sections and one accent band. -->
 <meta name="description" content="Ledgerly reads your bills, reminds you before they’re due and pays them in one tap from the bank you already use. Free for ten bills a month.">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
@@ -25,7 +25,7 @@
   .lp-screen-head h2 { margin: 0; }
   .lp-screen .s4-stat { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
   .lp-screen .s4-list { margin: 0; }
-  .lp-screen .s4-button { margin-block-start: auto; }
+  .lp-screen .s4-button { margin-block-start: auto; --_radius: min(calc(var(--_h) / 2), calc(var(--md-sys-shape-corner-extra-extra-large) - var(--s4-space-2) - var(--s4-space-3))); }   /* sits in the screen's bottom corners: concentric with them (or a pill), whatever the corner dial */
   .lp-stack { display: grid; gap: var(--s4-space-3); inline-size: min(100%, calc(var(--s4-space-16) * 7)); }
   .lp-note { display: flex; gap: var(--s4-space-3); align-items: flex-start; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); }
   .lp-note > div { display: grid; gap: var(--s4-space-1); min-inline-size: 0; flex: 1; }

@@ -3,7 +3,41 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-15): waiting on the owner
+## Now (2026-11-16, round 0056): wave 1 built, needs the owner's look
+
+The owner asked for every area of the design review taken to a 10 and left the order and the calls to us ("I trust
+your judgement"). Wave 1 was built by four workstreams and merged (notes in [`history/round-0056/`](history/round-0056/)):
+- **Themes on any container, motion energy, app defaults, roomy density** (0056, issue 52): every dial on any element,
+  nesting; `data-energy`; `data-buttons|cards|lists|rail`; `data-density="roomy"`; `check:scopes`; themes page
+  `components/base/themes.html`.
+- **The website kit** (0057, issue 53): `components/site/`, site tokens, five site templates (landing rebuilt, pricing,
+  blog, docs, site), `orion.min.*` and per-set icon files. 62 components, 19 templates.
+- **Reach** (0058): right-to-left, print (light), 200% text and long text, forced colors, keyboard; `tests/reach.mjs` in `npm test`.
+- **Dial presets proven** (0058, issue 58): a dial pass in the suite; Elevated button, avatar stack, breadcrumb fixes.
+
+**Needs the owner's look on an iPhone:**
+1. The site templates: the glass header while scrolling, the phone menu panel (tap outside or a link closes it), the docs
+   "Browse Docs" panel, the hero phone cut by its stage, scrolling under the sticky header.
+2. The themes page and the showcase's Dark Navigation (Settings, Make It Yours): `@scope` and `light-dark()` need Safari 17.5+.
+3. Motion energy: `demo/index.html?scrub` with Motion set to Lively (the overshoot amounts are our call).
+4. Larger Text on the showcase; `dir=rtl` in Safari (slider, switch); print preview from Safari.
+5. Elevated vs Tonal on a dark card; the avatar stack at xs; firm corners on the docked nav bar; serif and rounded
+   faces (only Linux fallbacks were seen here).
+
+**Needs a look on a desktop:** the site templates at 1280 and 1600 (landing and docs were seen at 1600, the others at
+1280 only), `corners: firm` and `page: soft` on the sites, the themes page.
+
+**Not verified here:** WebKit and Firefox (not installable; CI runs WebKit); print pagination (screenshots only); accent
+text on glass for all 210 schemes (one seed tested); the reach suite's exemptions listed in 0058.
+
+**Order from here (left to us):**
+1. Wave 2: hierarchy and wide-window layout across the showcase and app templates (issues 54, 56).
+2. Rich inputs (combobox, tag input, upload, time, number, one-time code, rating) and data at scale (table at scale,
+   filters and saved views, code block) (issue 59).
+3. Desktop anatomy: menu bar, status bar, document tabs, tree, settings window (issue 60).
+Horizon 1's "two real apps" runs alongside as the test of each step.
+
+## Earlier (2026-11-15 to 16)
 
 Everything the owner asked for on 2026-11-14 and 15 is built and published; decisions 0046 to 0051 are recorded.
 The long view is in [`ROADMAP.md`](ROADMAP.md): read it before choosing new work.
@@ -92,6 +126,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-16 (round 0056, wave 1): themes on any container, energy, app defaults, roomy (0056); website kit (0057); reach and proven dial presets (0058); four workstreams merged, check and test green. Next: the owner's looks, then wave 2 (issues 54, 56), 59, 60.
 - 2026-11-16 (brand dials): the owner's answers recorded as 0055; type retuned, first dials built, drift fixed. Next: the order above.
 - 2026-11-16 (design review): end-to-end review, comparison and brand dials proposal published as a quiz; issues 51 to 60 logged. Next: the owner's eight answers, then a numbered decision.
 - 2026-11-15 (any-app round): never focus a field (0049), pages (0050), the eight ideas built (0051): palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates; ROADMAP written. Next: the owner's looks, then Horizon 1.
