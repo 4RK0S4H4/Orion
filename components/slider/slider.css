@@ -22,7 +22,9 @@
     --_handle: var(--md-sys-color-primary);
     --_stop-on-active: var(--md-sys-color-secondary-container);   /* M3 Expressive stop indicator colors */
     --_stop-on-inactive: var(--md-sys-color-primary);
-    --_x: calc(var(--_inset) + var(--_value) * (100% - 2 * var(--_inset)));   /* handle centre */
+    --_x: calc(var(--_inset) + var(--_value) * (100% - 2 * var(--_inset)));   /* handle centre, measured from the inline start */
+    --_dir: 1;                                                /* -1 in right-to-left: the slider fills from the inline start */
+    --_to: right;
 
     position: relative;
     display: block;
@@ -31,6 +33,7 @@
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
   }
+  .s4-slider:dir(rtl) { --_dir: -1; --_to: left; }
   /* tracks */
   .s4-slider::before,
   .s4-slider::after {
@@ -42,15 +45,21 @@
     pointer-events: none;
   }
   .s4-slider::before {
-    left: 0;
-    width: max(0px, calc(var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
-    border-radius: var(--_round) var(--_inner) var(--_inner) var(--_round);
+    inset-inline-start: 0;
+    inline-size: max(0px, calc(var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
+    border-start-start-radius: var(--_round);
+    border-start-end-radius: var(--_inner);
+    border-end-end-radius: var(--_inner);
+    border-end-start-radius: var(--_round);
     background: var(--_active);
   }
   .s4-slider::after {
-    right: 0;
-    width: max(0px, calc(100% - var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
-    border-radius: var(--_inner) var(--_round) var(--_round) var(--_inner);
+    inset-inline-end: 0;
+    inline-size: max(0px, calc(100% - var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
+    border-start-start-radius: var(--_inner);
+    border-start-end-radius: var(--_round);
+    border-end-end-radius: var(--_round);
+    border-end-start-radius: var(--_inner);
     background: var(--_inactive);
   }
   /* stop indicators: the end stop always; every step with data-stops. Dots take the color of the track they sit on. */
@@ -63,7 +72,7 @@
     height: var(--s4-space-1);
     transform: translateY(-50%);
     pointer-events: none;
-    background: linear-gradient(to right, var(--_stop-on-active) var(--_x), var(--_stop-on-inactive) var(--_x));
+    background: linear-gradient(to var(--_to), var(--_stop-on-active) var(--_x), var(--_stop-on-inactive) var(--_x));
     --_dot: radial-gradient(circle closest-side, var(--_handle) 100%, transparent 100%);   /* mask: only alpha matters */
     display: none;   /* only with data-stops: a dot at the end of the track looks odd, most of all with the handle on it */
   }
@@ -71,30 +80,30 @@
   .s4-slider[data-stops] .s4-slider-stops {
     display: block;
     --_p: calc(100% / (var(--_steps, 10) + 1));   /* one tile, in this layer's own width */
-    left: calc(var(--_inset) - (100% - 2 * var(--_inset)) / var(--_steps, 10) / 2);
-    right: auto;
+    inset-inline-start: calc(var(--_inset) - (100% - 2 * var(--_inset)) / var(--_steps, 10) / 2);
+    inset-inline-end: auto;
     width: calc((100% - 2 * var(--_inset)) * (var(--_steps, 10) + 1) / var(--_steps, 10));
     /* dots, minus a window around the handle: a dot the handle covers or sits beside is hidden, never half shown */
     --_hx: calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p)));
     --_cut: calc(var(--_handle-w) / 2 + var(--_gap) + var(--s4-space-1));
     mask:
       var(--_dot) 0 50% / var(--_p) var(--s4-space-1) repeat-x,
-      linear-gradient(to right, var(--_handle) calc(var(--_hx) - var(--_cut)), transparent 0, transparent calc(var(--_hx) + var(--_cut)), var(--_handle) 0),
-      linear-gradient(to right, transparent var(--_p), var(--_handle) 0, var(--_handle) calc(100% - var(--_p)), transparent 0);   /* the two ends need no dot */
+      linear-gradient(to var(--_to), var(--_handle) calc(var(--_hx) - var(--_cut)), transparent 0, transparent calc(var(--_hx) + var(--_cut)), var(--_handle) 0),
+      linear-gradient(to var(--_to), transparent var(--_p), var(--_handle) 0, var(--_handle) calc(100% - var(--_p)), transparent 0);   /* the two ends need no dot */
     mask-composite: intersect;
     -webkit-mask-composite: source-in;
-    background: linear-gradient(to right, var(--_stop-on-active) calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p))), var(--_stop-on-inactive) 0);
+    background: linear-gradient(to var(--_to), var(--_stop-on-active) calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p))), var(--_stop-on-inactive) 0);
   }
   .s4-slider-handle {
     position: absolute;
-    left: var(--_x);
+    inset-inline-start: var(--_x);
     top: 50%;
     z-index: 1;
     width: var(--_handle-w);
     height: var(--_handle-h);
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_handle);
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% * var(--_dir)), -50%);
     pointer-events: none;
     transition: width var(--s4-motion-morph);
   }

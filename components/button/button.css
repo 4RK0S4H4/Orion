@@ -32,8 +32,9 @@
     justify-content: center;
     gap: var(--_gap);
     min-width: 0;
-    height: var(--_h);
-    padding: 0 var(--_pad);
+    block-size: max-content;                    /* grows with larger text and long labels, never clips them; max-content (not auto) so a flex row never stretches it */
+    min-block-size: var(--_h);
+    padding: max(0px, calc((var(--_h) - var(--_line)) / 2)) var(--_pad);
     border: 0;
     border-radius: var(--_radius);
     background: var(--_bg);
@@ -44,7 +45,8 @@
     line-height: var(--_line);
     letter-spacing: var(--_track);
     font-weight: var(--_weight);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    text-align: center;
     text-decoration: none;
     cursor: pointer;
     user-select: none;

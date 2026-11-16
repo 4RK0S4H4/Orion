@@ -201,8 +201,9 @@ const HC_ON = ':root[data-contrast="high"]';
 const baseOf = new Map(base);
 /* a light scope (inside a dark page) gets back the light value of every token dark mode changes */
 const lightReset = byMode.dark.map(([n]) => [n, baseOf.get(n)]);
-css += media('(prefers-color-scheme: dark)', block(W(DARK_AUTO), byMode.dark, SCHEME('dark')));
-css += block(W('[data-theme="dark"]'), byMode.dark, SCHEME('dark'));
+/* dark is a screen scheme: print stays light, on paper (components/base/print.css); that holds for scoped dark elements too */
+css += media('screen and (prefers-color-scheme: dark)', block(W(DARK_AUTO), byMode.dark, SCHEME('dark')));
+css += media('screen', block(W('[data-theme="dark"]'), byMode.dark, SCHEME('dark')));
 css += block(W('[data-theme="light"]:not(:root)'), lightReset, SCHEME('light'));
 /* aliases resolve where they are declared, so a scoped dial re-declares the ones that depend on it */
 const pathIs = (re) => (t) => re.test(t.path.join('.'));
@@ -213,7 +214,7 @@ const isAlias = (t) => typeof t.value === 'string' && ALIAS.test(t.value);
 const glassAliases = [...tokens.values()].filter((t) => isAlias(t) && t.type === 'color' && pathIs(/^s4\.glass\./)(t));
 const modeMap = (mode) => new Map([...base, ...(mode === 'light' ? [] : byMode[mode])]);
 const literal = (mode) => { const m = modeMap(mode); const val = (n, seen = 0) => { const v = m.get(n); const r = v && v.match(/^var\((--[\w-]+)\)$/); return r && seen < 9 ? val(r[1], seen + 1) : v; }; return glassAliases.map((t) => [cssName(t.path), val(cssName(t.path))]); };
-css += block(W('[data-theme="dark"]:not(:root)'), literal('dark'));
+css += media('screen', block(W('[data-theme="dark"]:not(:root)'), literal('dark')));
 css += block(W('[data-theme="light"]:not(:root)'), literal('light'));
 const pick = (pred) => [...tokens.values()].filter(pred).map((t) => [cssName(t.path), baseOf.get(cssName(t.path))]);
 const DISPLAY_ROLES = /^md\.sys\.typescale\.(display|headline)-|^md\.sys\.typescale\.title-large\./;
@@ -230,12 +231,12 @@ css += block(W(`${HC_ON}, ${HC_ON} [data-theme="light"]`), byMode['high-contrast
 css += media('(prefers-contrast: more)', block(W(`${HC_AUTO} [data-theme="light"]`), literal('high-contrast')));
 css += block(W(`${HC_ON} [data-theme="light"]`), literal('high-contrast'));
 const dhc = byMode['dark-high-contrast'];
-css += media('(prefers-color-scheme: dark) and (prefers-contrast: more)', block(W(`${DARK_AUTO}${HC_AUTO.slice(5)}`), dhc));
-css += media('(prefers-color-scheme: dark)', block(W(`${DARK_AUTO}[data-contrast="high"]`), dhc));
-css += media('(prefers-contrast: more)', block(W(`:root[data-theme="dark"]${HC_AUTO.slice(5)}, ${HC_AUTO} [data-theme="dark"]`), dhc));
-css += block(W(`:root[data-theme="dark"][data-contrast="high"], ${HC_ON} [data-theme="dark"]`), dhc);
-css += media('(prefers-contrast: more)', block(W(`${HC_AUTO} [data-theme="dark"]`), literal('dark-high-contrast')));
-css += block(W(`${HC_ON} [data-theme="dark"]`), literal('dark-high-contrast'));
+css += media('screen and (prefers-color-scheme: dark) and (prefers-contrast: more)', block(W(`${DARK_AUTO}${HC_AUTO.slice(5)}`), dhc));
+css += media('screen and (prefers-color-scheme: dark)', block(W(`${DARK_AUTO}[data-contrast="high"]`), dhc));
+css += media('screen and (prefers-contrast: more)', block(W(`:root[data-theme="dark"]${HC_AUTO.slice(5)}, ${HC_AUTO} [data-theme="dark"]`), dhc));
+css += media('screen', block(W(`:root[data-theme="dark"][data-contrast="high"], ${HC_ON} [data-theme="dark"]`), dhc));
+css += media('screen and (prefers-contrast: more)', block(W(`${HC_AUTO} [data-theme="dark"]`), literal('dark-high-contrast')));
+css += media('screen', block(W(`${HC_ON} [data-theme="dark"]`), literal('dark-high-contrast')));
 /* reduced motion and reduced transparency are page-wide too: they win inside any element that re-declares their tokens */
 const RM = ':root, [data-theme]', RT = ':root, [data-theme]';
 css += media('(prefers-reduced-motion: reduce)', block(W(RM), byMode['reduced-motion']));

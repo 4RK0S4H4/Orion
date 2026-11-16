@@ -162,14 +162,15 @@
       var W = function (s) { return ':where(' + s + ')'; };
       var css = '@layer s4.tokens{' +
         W(':root') + '{' + rolesCss(L) + '}' +
-        '@media (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])') + '{' + rolesCss(D) + '}}' +
-        W(':root[data-theme="dark"]') + '{' + rolesCss(D) + '}' +
+        '@media screen and (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])') + '{' + rolesCss(D) + '}}' +
+        '@media screen{' + W(':root[data-theme="dark"]') + '{' + rolesCss(D) + '}}' +
         '@media (prefers-contrast: more){' + W(':root:not([data-contrast])') + '{' + rolesCss(LH) + '}}' +
         W(':root[data-contrast="high"]') + '{' + rolesCss(LH) + '}' +
-        '@media (prefers-color-scheme: dark) and (prefers-contrast: more){' + W(':root:not([data-theme="light"]):not([data-contrast])') + '{' + rolesCss(DH) + '}}' +
-        '@media (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])[data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
-        W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}' +
-        /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one */
+        '@media screen and (prefers-color-scheme: dark) and (prefers-contrast: more){' + W(':root:not([data-theme="light"]):not([data-contrast])') + '{' + rolesCss(DH) + '}}' +
+        '@media screen and (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])[data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
+        '@media screen{' + W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
+        /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one
+           (scoped roles use light-dark(), so they follow color-scheme, which is light in print) */
         scopedCss(':not(:root):is([data-theme], [data-gray]):not([data-accent], [data-accent] *)', [':scope'], L, D, LH, DH) + '}';
       if (!el) { el = document.createElement('style'); el.id = 's4-dynamic-color'; document.head.appendChild(el); }
       el.textContent = css;
@@ -682,6 +683,7 @@ S4.register('fab', function (scope) {
     measure();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     new MutationObserver(measure).observe(label, { childList: true, characterData: true, subtree: true });
+    var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { var f = label.closest('.s4-fab'); if (!f || !f.hasAttribute('data-collapsed')) measure(); }, 100); });   /* text size or window changed */
     if (window.ResizeObserver) new ResizeObserver(function () { if (!label.style.getPropertyValue('--_label-w')) measure(); }).observe(label);   /* first shown (it was in a hidden view) */
   });
 });
@@ -3662,8 +3664,10 @@ S4.register('skeleton', function (scope) {
     var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
     var below = a.bottom + gap + p.height <= vh - m || a.top - gap - p.height < m;
     var top = below ? a.bottom + gap : a.top - gap - p.height;
-    var end = opts.align === 'end' || (opts.align !== 'start' && a.left + p.width > vw - m);
-    var left = end ? a.right - p.width : a.left;
+    /* start and end are inline: in right-to-left the start edge is the right one */
+    var rtl = getComputedStyle(anchor && anchor.nodeType === 1 ? anchor : document.documentElement).direction === 'rtl';   /* the anchor may be a plain rectangle (date picker) */
+    var end = opts.align === 'end' || (opts.align !== 'start' && (rtl ? a.right - p.width < m : a.left + p.width > vw - m));
+    var left = end !== rtl ? a.right - p.width : a.left;
     left = Math.max(m, Math.min(left, vw - m - p.width));
     top = Math.max(m, Math.min(top, vh - m - p.height));
     popup.style.left = left + 'px'; popup.style.top = top + 'px';

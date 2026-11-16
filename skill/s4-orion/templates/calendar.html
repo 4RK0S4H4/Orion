@@ -22,7 +22,7 @@
   @media (hover: hover) { .cal-day:hover { background: var(--md-sys-color-surface-container-high); } }
   .cal-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
   .cal-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-  .cal-num { align-self: flex-start; display: grid; place-items: center; min-inline-size: var(--s4-space-6); block-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); font-variant-numeric: tabular-nums; }
+  .cal-num { align-self: flex-start; display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); font-variant-numeric: tabular-nums; }
   .cal-day[data-today] .cal-num { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
   .cal-ev { display: none; padding-inline: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* a phone shows dots for events; a wide screen shows their names */
@@ -30,6 +30,7 @@
   .cal-dots > i { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: currentColor; opacity: 0.7; }
   @container s4-app (width >= 840px) { .cal-ev { display: block; } .cal-dots { display: none; } }
   .s4-subpage > article { max-inline-size: 40rem; margin-inline: auto; }
+  @media (forced-colors: active) { .cal-day { border: 1px solid ButtonText; } }
 </style>
 </head>
 <body>

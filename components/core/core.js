@@ -159,14 +159,15 @@
       var W = function (s) { return ':where(' + s + ')'; };
       var css = '@layer s4.tokens{' +
         W(':root') + '{' + rolesCss(L) + '}' +
-        '@media (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])') + '{' + rolesCss(D) + '}}' +
-        W(':root[data-theme="dark"]') + '{' + rolesCss(D) + '}' +
+        '@media screen and (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])') + '{' + rolesCss(D) + '}}' +
+        '@media screen{' + W(':root[data-theme="dark"]') + '{' + rolesCss(D) + '}}' +
         '@media (prefers-contrast: more){' + W(':root:not([data-contrast])') + '{' + rolesCss(LH) + '}}' +
         W(':root[data-contrast="high"]') + '{' + rolesCss(LH) + '}' +
-        '@media (prefers-color-scheme: dark) and (prefers-contrast: more){' + W(':root:not([data-theme="light"]):not([data-contrast])') + '{' + rolesCss(DH) + '}}' +
-        '@media (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])[data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
-        W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}' +
-        /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one */
+        '@media screen and (prefers-color-scheme: dark) and (prefers-contrast: more){' + W(':root:not([data-theme="light"]):not([data-contrast])') + '{' + rolesCss(DH) + '}}' +
+        '@media screen and (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])[data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
+        '@media screen{' + W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
+        /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one
+           (scoped roles use light-dark(), so they follow color-scheme, which is light in print) */
         scopedCss(':not(:root):is([data-theme], [data-gray]):not([data-accent], [data-accent] *)', [':scope'], L, D, LH, DH) + '}';
       if (!el) { el = document.createElement('style'); el.id = 's4-dynamic-color'; document.head.appendChild(el); }
       el.textContent = css;

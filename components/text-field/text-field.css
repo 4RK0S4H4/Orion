@@ -160,7 +160,7 @@
     cursor: default;
   }
   .s4-text-field-counter { justify-self: end; color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; }
-  .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: var(--s4-space-16); }
+  .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: calc(var(--s4-space-4) + 7ch); }   /* room for the counter at any text size */
 
   /* ---------- states ----------
      One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus, so focusing only
@@ -169,7 +169,7 @@
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select):focus-visible),
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
   .s4-text-field:has(> :is(input, select, textarea):focus) {
     --_outline: var(--_ring-color);
     --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */

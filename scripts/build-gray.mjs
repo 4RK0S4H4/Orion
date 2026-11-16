@@ -73,13 +73,15 @@ for (const [name, t] of Object.entries(TEMPS)) {
     :where(${sel}) {
 ${body(L, '      ')}
     }
-    @media (prefers-color-scheme: dark) {
+    @media screen and (prefers-color-scheme: dark) {
       :where(${sel}:not([data-theme="light"])) {
 ${body(D, '        ')}
       }
     }
-    :where(${sel}[data-theme="dark"]) {
-${body(D, '      ')}
+    @media screen {
+      :where(${sel}[data-theme="dark"]) {
+${body(D, '        ')}
+      }
     }
   }
 `;

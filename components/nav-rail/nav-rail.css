@@ -21,17 +21,19 @@
    Shares .s4-nav-item with the nav bar (nav-bar.css).
    Public knob: --s4-nav-rail-expanded-width (default 240). */
 @layer s4.components {
+  .s4-nav-rail:dir(rtl) { --_notch: env(safe-area-inset-right, 0px); }
   .s4-nav-rail {
     --_row: var(--s4-size-nav-row);
     --_pad: calc((var(--s4-size-nav-rail) - var(--_row)) / 2);              /* 12: the row's inset from the rail's edges */
     --_w: var(--s4-size-nav-rail);
+    --_notch: env(safe-area-inset-left, 0px);   /* the rail's own edge is the inline start: the right edge in rtl */
     display: flex;
     flex-direction: column;
     flex: none;
     gap: var(--s4-space-4);
-    inline-size: calc(var(--_w) + env(safe-area-inset-left, 0px));
+    inline-size: calc(var(--_w) + var(--_notch));
     padding-block: max(var(--s4-space-3), env(safe-area-inset-top, 0px)) max(var(--s4-space-3), env(safe-area-inset-bottom, 0px));
-    padding-inline-start: env(safe-area-inset-left, 0px);
+    padding-inline-start: var(--_notch);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -65,6 +67,8 @@
     gap: var(--s4-space-3);
     inline-size: 100%;
     min-inline-size: 0;
+    block-size: max-content;
+    min-block-size: var(--_row);
     padding-inline: calc((var(--_row) - var(--s4-size-icon)) / 2);
     border-radius: min(calc(var(--_row) / 2), var(--s4-shape-nav-indicator));
     overflow: hidden;
@@ -75,6 +79,7 @@
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
   .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {

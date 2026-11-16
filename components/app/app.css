@@ -58,7 +58,8 @@
     max-inline-size: var(--s4-content-max, var(--s4-layout-content-max));
     margin-inline: auto;
     padding-block: 0 calc(var(--s4-space-6) + var(--s4-app-inset-bottom, env(safe-area-inset-bottom, 0px)));
-    padding-inline: max(var(--_margin), env(safe-area-inset-left, 0px)) max(var(--_margin), env(safe-area-inset-right, 0px));
+    padding-left: max(var(--_margin), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--_margin), env(safe-area-inset-right, 0px));   /* the notch is physical: left and right, not start and end */
   }
   /* in the flex column, auto margins would shrink the content to fit: give it the full width minus its margins */
   .s4-app-body > .s4-content { inline-size: calc(100% - 2 * var(--_margin)); }
@@ -81,7 +82,8 @@
     .s4-content { --_margin: var(--s4-layout-margin); }
     /* the bar's title and icons line up with the 24dp content margin (the bar's own inset is 8 + the slot's 8) */
     .s4-app-body > .s4-top-app-bar {
-      padding-inline: max(var(--s4-space-4), env(safe-area-inset-left, 0px)) max(var(--s4-space-4), env(safe-area-inset-right, 0px));
+      padding-left: max(var(--s4-space-4), env(safe-area-inset-left, 0px));
+      padding-right: max(var(--s4-space-4), env(safe-area-inset-right, 0px));
     }
   }
   /* expanded (>= 840): rail at the left, nav bar hidden; the rail takes the left safe area */

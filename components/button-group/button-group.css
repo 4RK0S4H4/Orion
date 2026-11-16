@@ -9,12 +9,13 @@
 @layer s4.components {
   .s4-button-group {
     display: flex;
+    flex-wrap: wrap;                      /* larger text or a narrow window wraps the group onto a second row instead of overflowing */
     align-items: center;
     gap: var(--s4-space-2);
     min-width: 0;
   }
   .s4-button-group[data-fit="content"] { display: inline-flex; vertical-align: middle; }
-  .s4-button-group > :is(.s4-button, .s4-icon-button) { flex: none; }
+  .s4-button-group > :is(.s4-button, .s4-icon-button) { flex: none; max-inline-size: 100%; }
 
   /* ---------- standard group: the pressed button widens and its neighbours give way ---------- */
   .s4-button-group:not([data-connected]) > .s4-button {
@@ -46,7 +47,7 @@
     --_bg: var(--md-sys-color-surface-container-highest);
     --_fg: var(--md-sys-color-on-surface-variant);
     flex: 1 1 0;
-    min-width: max-content;
+    min-width: min(max-content, 100%);
     border-radius: var(--_r);
   }
   .s4-button-group[data-connected]:has(> [data-size="l"], > [data-size="xl"]) > :is(.s4-button, .s4-icon-button) { --_r: var(--md-sys-shape-corner-medium); }

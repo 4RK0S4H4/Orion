@@ -18,6 +18,7 @@
     place-items: center;
     width: var(--_size);
     height: var(--_size);
+    overflow: hidden;                   /* initials stay inside the disc at any text size; the name sits beside it */
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_bg);
     color: var(--_fg);
@@ -45,7 +46,7 @@
   .s4-avatar[data-status]::after {
     content: "";
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: max(var(--s4-space-2), calc(var(--_size) * 0.28));
     height: max(var(--s4-space-2), calc(var(--_size) * 0.28));

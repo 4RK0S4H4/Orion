@@ -40,7 +40,8 @@ function mediaOk(q, env) {
   return q.split(/\s+and\s+/).every((part) => {
     const neg = part.startsWith('not ');
     const f = part.replace(/^not\s+/, '').trim();
-    const v = f === '(prefers-color-scheme: dark)' ? env.dark : f === '(prefers-contrast: more)' ? env.more
+    const v = f === 'screen' ? !env.print : f === 'print' ? env.print
+      : f === '(prefers-color-scheme: dark)' ? env.dark : f === '(prefers-contrast: more)' ? env.more
       : f === '(prefers-reduced-motion: reduce)' ? env.motion : f === '(prefers-reduced-transparency: reduce)' ? env.transparency
       : (() => { throw new Error('check-scopes: unknown media feature ' + f); })();
     return neg ? !v : v;
@@ -100,7 +101,7 @@ function compute(chainAttrs, env) {
 }
 
 /* ---------- scenarios ---------- */
-const ENV = { dark: false, more: false, motion: false, transparency: false };
+const ENV = { dark: false, more: false, motion: false, transparency: false, print: false };
 const env = (o) => ({ ...ENV, ...o });
 const page = (rootAttrs, e) => compute([rootAttrs], e);
 let failures = 0, compared = 0, scenarios = 0;
@@ -133,6 +134,12 @@ for (const [label, rootExtra, e] of [
   same(label + 'device dark: dark > light > dark, innermost', compute([{ ...rootExtra }, L, D], { ...e, dark: true }), page({ ...rootExtra }, { ...e, dark: true }));
 }
 
+/* print is light (reach, round 0056): a dark page or a dark container prints with the light values, also on a dark device */
+const printLight = page({}, env({ print: true }));
+same('print: data-theme=dark page', page(D, env({ print: true, dark: true })), printLight);
+same('print: dark container on a light page', compute([{}, {}, D], env({ print: true })), printLight);
+same('print: device dark, light > dark > light > dark', compute([{}, L, D, L, D], env({ print: true, dark: true })), printLight);
+
 /* ---------- scoped gray temperatures equal the page-wide ones ---------- */
 const gray = readFileSync(join(root, 'components/base/gray.css'), 'utf8');
 const block = (open) => { const i = gray.indexOf(open); return Object.fromEntries([...gray.slice(i + open.length, gray.indexOf('}', i)).matchAll(/(--[-\w]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()])); };
@@ -154,4 +161,4 @@ for (const t of ['warm', 'cool', 'pure']) {
 }
 
 if (failures) { console.error(`${failures} scoped value(s) differ from the page-wide mode.`); process.exit(1); }
-console.log(`Scopes: ${scenarios} scoped scenarios (dark in light, light in dark, three deep; with high contrast, reduced transparency and reduced motion) match the page-wide modes token for token (${compared} values), so the 83 proven pairs hold in every scope; scoped gray: ${grayPairs} light-dark() values match the page-wide warm, cool and pure grays.`);
+console.log(`Scopes: ${scenarios} scoped scenarios (dark in light, light in dark, three deep; with high contrast, reduced transparency and reduced motion) match the page-wide modes token for token (${compared} values), dark scopes print light, so the 83 proven pairs hold in every scope; scoped gray: ${grayPairs} light-dark() values match the page-wide warm, cool and pure grays.`);

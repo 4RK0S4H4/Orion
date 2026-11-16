@@ -6,6 +6,7 @@
 @import url("base/gray.css");
 @import url("base/brand.css");
 @import url("base/defaults.css");
+@import url("base/print.css");
 /* actions */
 @import url("button/button.css");
 @import url("icon-button/icon-button.css");
