@@ -421,6 +421,238 @@
               }
             }
           }
+        },
+        "bend-calm": {
+          "$description": "Motion energy (round 0056 candidate): Bend at calm energy: critically damped and a little quicker than bend.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1100
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 1
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 170,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "rise-calm": {
+          "$description": "Motion energy (round 0056 candidate): Rise at calm energy: critically damped and a little quicker than rise.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1300
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 1
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 150,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "pop-calm": {
+          "$description": "Motion energy (round 0056 candidate): Pop and Switch at calm energy: critically damped and a little quicker than spatial.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1100
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 1
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 220,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "ink-lively": {
+          "$description": "Motion energy (round 0056 candidate): Ink at lively energy: the same liquid spring with a little more overshoot.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1060
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 0.7
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 300,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "fast-spatial-lively": {
+          "$description": "Motion energy (round 0056 candidate): Morph at lively energy: fast-spatial with a little more overshoot.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1400
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 0.66
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 280,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "bend-lively": {
+          "$description": "Motion energy (round 0056 candidate): Bend at lively energy: an icon turning over overshoots a little.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 860
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 0.76
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 260,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "spatial-lively": {
+          "$description": "Motion energy (round 0056 candidate): Pop at lively energy: floating glass rises with a small overshoot.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 900
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 0.76
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 320,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
+        },
+        "rise-lively": {
+          "$description": "Motion energy (round 0056 candidate): Rise at lively energy: notices rise with a small overshoot.",
+          "$extensions": {
+            "com.s4.spring": true
+          },
+          "stiffness": {
+            "$type": "number",
+            "$value": 1060
+          },
+          "damping": {
+            "$type": "number",
+            "$value": 0.76
+          },
+          "duration": {
+            "$type": "duration",
+            "$value": {
+              "value": 240,
+              "unit": "ms"
+            },
+            "$extensions": {
+              "com.s4.modes": {
+                "reduced-motion": {
+                  "value": 0,
+                  "unit": "ms"
+                }
+              }
+            }
+          }
         }
       },
       "pattern": {

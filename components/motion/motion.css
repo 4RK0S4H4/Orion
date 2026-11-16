@@ -23,4 +23,24 @@
     /* Loop: waiting. The only motion that repeats; the easing inside one cycle. */
     --s4-motion-loop: var(--md-sys-motion-spring-slow-effects);
   }
+
+  /* Motion energy: data-energy="calm | standard | lively" on <html> or any container (or S4.theme({ energy })).
+     The same patterns, only their amounts change. Calm: no overshoot, a little quicker, shorter travel. Lively: a little
+     more overshoot on Ink, Morph and Bend here (Pop and Rise in motion.js). Reduced motion still wins: these springs
+     take 0ms under it like every other spatial spring. State, Reveal, Loop and the -calm patterns never change. */
+  :where([data-energy="calm"]) {
+    --s4-motion-ink: var(--s4-motion-spring-fast-spatial-calm-duration) var(--s4-motion-spring-fast-spatial-calm);
+    --s4-motion-morph: var(--s4-motion-spring-fast-spatial-calm-duration) var(--s4-motion-spring-fast-spatial-calm);
+    --s4-motion-bend: var(--s4-motion-spring-bend-calm-duration) var(--s4-motion-spring-bend-calm);
+  }
+  :where([data-energy="lively"]) {
+    --s4-motion-ink: var(--s4-motion-spring-ink-lively-duration) var(--s4-motion-spring-ink-lively);
+    --s4-motion-morph: var(--s4-motion-spring-fast-spatial-lively-duration) var(--s4-motion-spring-fast-spatial-lively);
+    --s4-motion-bend: var(--s4-motion-spring-bend-lively-duration) var(--s4-motion-spring-bend-lively);
+  }
+  :where([data-energy="standard"]:not(:root)) {
+    --s4-motion-ink: var(--s4-motion-spring-ink-duration) var(--s4-motion-spring-ink);
+    --s4-motion-morph: var(--md-sys-motion-spring-fast-spatial-duration) var(--md-sys-motion-spring-fast-spatial);
+    --s4-motion-bend: var(--s4-motion-spring-bend-duration) var(--s4-motion-spring-bend);
+  }
 }

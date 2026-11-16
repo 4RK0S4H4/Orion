@@ -22,6 +22,31 @@
 (function () {
   var S4 = window.S4, M = S4.motion;
 
+  /* Motion energy: data-energy="calm | lively" on <html> or the nearest container (S4.theme({ energy })). The same
+     patterns; only the amounts change. travel scales how far a surface moves; spring swaps a pattern's spring for its
+     calm (no overshoot, a little quicker) or lively (a little more overshoot) twin. Lively touches only Pop and Rise
+     here (Ink, Morph and Bend are in motion.css). Reduced motion still wins: travel is 0 and spatial springs take 0ms. */
+  var ENERGY = {
+    calm: { travel: 0.6, spring: { spatial: 'pop-calm', rise: 'rise-calm', tip: 'tip' } },
+    lively: { travel: 1.25, spring: { spatial: 'spatial-lively', rise: 'rise-lively' } }
+  };
+  function energy(el) {
+    var host = el && el.closest ? el.closest('[data-energy]') : null;
+    return ENERGY[(host || document.documentElement).getAttribute('data-energy')] || null;
+  }
+  /* how far a pattern moves: px at standard energy, scaled by the element's energy (calm also on Follow, Switch, Reveal, tip) */
+  function travel(el, px, pattern) {
+    if (M.reduced()) return 0;
+    var e = energy(el);
+    if (!e || (e.travel > 1 && pattern !== 'pop' && pattern !== 'rise')) return px;
+    return Math.round(px * e.travel * 10) / 10;
+  }
+  function spring(el, name, pattern) {
+    var e = energy(el);
+    if (!e || (e === ENERGY.lively && pattern !== 'pop' && pattern !== 'rise')) return name;
+    return e.spring[name] || name;
+  }
+
   /* end what an element is running and report what it shows right now, so the next transition starts from there */
   function begin(el) {
     var running = (el._s4anims || []).filter(function (a) { return a.playState === 'running'; });
@@ -50,10 +75,10 @@
 
   /* ---------- pop: dialogs and the phone sheet card ---------- */
   function pop(el, opts) {
-    var open = !opts || opts.open !== false, d = M.reduced() ? 0 : 16;
+    var open = !opts || opts.open !== false, d = travel(el, 16, 'pop');
     /* axis 'x': a floating panel at the side arrives from its side (decision 0043); sign follows the writing direction */
     var x = opts && opts.axis === 'x', sign = x && getComputedStyle(el).direction === 'rtl' ? -1 : 1;
-    return moveFade(el, open, (x ? 'translateX(' : 'translateY(') + (sign * (open ? d : d / 2)) + 'px)', open ? ['spatial', 'effects'] : ['fast-effects', 'fast-effects']);
+    return moveFade(el, open, (x ? 'translateX(' : 'translateY(') + (sign * (open ? d : d / 2)) + 'px)', open ? [spring(el, 'spatial', 'pop'), 'effects'] : ['fast-effects', 'fast-effects']);
   }
 
   /* ---------- drop: menus (0042: not out of the button; the glass fades in place, the items follow) ---------- */
@@ -65,7 +90,7 @@
     var o = track(el, M.animate(el, [{ opacity: now ? now.opacity : (open ? 0 : 1) }, { opacity: open ? 1 : 0 }], open ? 'slow-effects' : 'fast-effects'));
     var anims = [o];
     if (open && !now) {
-      var d = M.reduced() ? 0 : 4;
+      var d = travel(el, 4, 'follow');
       items.forEach(function (it, i) {
         anims.push(track(el, M.animate(it, [{ opacity: 0, transform: 'translateY(' + d + 'px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 30 + i * 25 })));
       });
@@ -75,14 +100,14 @@
 
   /* ---------- rise: snackbars (0042) ---------- */
   function rise(el, opts) {
-    var open = !opts || opts.open !== false, d = M.reduced() ? 0 : (open ? 14 : 10);
-    return moveFade(el, open, 'translateY(' + d + 'px)', open ? ['rise', 'effects'] : ['fast-effects', 'fast-effects']);
+    var open = !opts || opts.open !== false, d = travel(el, open ? 14 : 10, 'rise');
+    return moveFade(el, open, 'translateY(' + d + 'px)', open ? [spring(el, 'rise', 'rise'), 'effects'] : ['fast-effects', 'fast-effects']);
   }
 
   /* ---------- tip: tooltips (0042) ---------- */
   function tip(el, opts) {
-    var open = !opts || opts.open !== false, d = M.reduced() ? 0 : 4;
-    return moveFade(el, open, 'translateY(' + (opts && opts.from === 'bottom' ? -d : d) + 'px)', open ? ['tip', 'fast-effects'] : ['fast-effects', 'fast-effects']);
+    var open = !opts || opts.open !== false, d = travel(el, 4, 'tip');
+    return moveFade(el, open, 'translateY(' + (opts && opts.from === 'bottom' ? -d : d) + 'px)', open ? [spring(el, 'tip', 'tip'), 'fast-effects'] : ['fast-effects', 'fast-effects']);
   }
 
   /* ---------- fade ---------- */
@@ -118,7 +143,7 @@
       var start = open ? (running ? { height: from + 'px', paddingTop: vs.paddingTop, paddingBottom: vs.paddingBottom } : shut) : { height: from + 'px', paddingTop: vs.paddingTop, paddingBottom: vs.paddingBottom };
       anims.push(track(el, M.animate(el, [start, open ? full : shut], 'reveal')));
       if (open && !running) kids.forEach(function (c) {
-        anims.push(track(el, M.animate(c, [{ opacity: 0, transform: 'translateY(' + (M.reduced() ? 0 : -4) + 'px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 40 })));
+        anims.push(track(el, M.animate(c, [{ opacity: 0, transform: 'translateY(' + -travel(el, 4, 'reveal') + 'px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 40 })));
       });
     }
     return settle(el, anims, !open).then(function (done) { if (done && open) el.style.overflow = ''; return done; });
@@ -134,9 +159,9 @@
   /* ---------- enter: one view arriving on its own (the second half of a switch) ---------- */
   function enter(el, dir, opts) {
     var now = begin(el);
-    var dist = M.reduced() || !dir ? 0 : ((opts && opts.distance) || parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 30);
+    var dist = !dir ? 0 : travel(el, (opts && opts.distance) || parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 30, 'switch');
     var d = dist * (dir < 0 ? -1 : 1) * (getComputedStyle(el).direction === 'rtl' ? -1 : 1);
-    var t = track(el, M.animate(el, [{ transform: now ? now.transform : 'translateX(' + d + 'px)' }, { transform: 'none' }], 'spatial'));
+    var t = track(el, M.animate(el, [{ transform: now ? now.transform : 'translateX(' + d + 'px)' }, { transform: 'none' }], spring(el, 'spatial', 'switch')));
     var o = track(el, M.animate(el, [{ opacity: now ? now.opacity : 0 }, { opacity: 1 }], 'effects'));
     return settle(el, [t, o], false);
   }
@@ -157,7 +182,7 @@
     state = state || {};
     (state.anims || []).forEach(function (a) { a.cancel(); });
     state.anims = [];
-    var dist = M.reduced() ? 0 : (parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 0);
+    var dist = travel(to || from, parseFloat(S4.util.css('--s4-motion-pattern-shared-axis-distance')) || 0, 'switch');
     var d = dist * (dir < 0 ? -1 : 1) * (to && getComputedStyle(to).direction === 'rtl' ? -1 : 1);
     return new Promise(function (resolve) {
       var enter = function () {
@@ -165,7 +190,7 @@
         if (onSwap) onSwap();
         if (!to) return resolve();
         to.hidden = false;
-        var move = M.animate(to, [{ transform: 'translateX(' + d + 'px)' }, { transform: 'none' }], 'spatial');
+        var move = M.animate(to, [{ transform: 'translateX(' + d + 'px)' }, { transform: 'none' }], spring(to, 'spatial', 'switch'));
         var show = M.animate(to, [{ opacity: 0 }, { opacity: 1 }], 'effects');
         state.anims = [move, show];
         Promise.all([move.finished, show.finished]).then(function () { move.cancel(); show.cancel(); resolve(); }, resolve);
@@ -197,7 +222,7 @@
   function duration(name) { return M.spring(name || 'reveal').duration; }
 
   S4.transition = {
-    duration: duration, shift: shift,
+    duration: duration, shift: shift, energy: function (el) { var e = energy(el); return e === ENERGY.calm ? 'calm' : e === ENERGY.lively ? 'lively' : 'standard'; },
     reveal: reveal, follow: drop, pop: pop, scrim: scrim, rise: rise, tip: tip, sharedAxis: sharedAxis, enter: enter, move: move, fade: fade,
     restore: restore,
     /* old names, same behavior as the patterns that replaced them (sheets no longer slide from an edge, decision 0043) */

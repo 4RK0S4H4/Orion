@@ -41,7 +41,7 @@
   var reduce = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
   /* M3 springs live under --md-sys-motion-spring-*; Orion's own (the -calm ones and decision 0042's ink, rise, settle, tip,
      reveal, bend) under --s4-motion-spring-* */
-  var S4_SPRINGS = /-calm$|^(ink|rise|settle|tip|reveal|bend)$/;
+  var S4_SPRINGS = /-calm$|-lively$|^(ink|rise|settle|tip|reveal|bend)$/;
   var SPRING_TOKEN = function (name) { return S4_SPRINGS.test(name) ? '--s4-motion-spring-' + name : '--md-sys-motion-spring-' + name; };
   S4.motion = {
     /* { duration (ms), easing } for a spring name: fast-spatial, spatial, slow-spatial, fast-effects, effects, slow-effects, *-calm */
@@ -212,7 +212,8 @@
     { key: 'gray', attr: 'data-gray', base: 'pure' },
     { key: 'page', attr: 'data-page', base: 'plain' },
     { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
-    { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' }
+    { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' },
+    { key: 'energy', attr: 'data-energy', base: 'standard' }   /* motion energy: calm, standard, lively (motion.css, motion.js) */
   ];
   /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
      A key set to null or '' removes the attribute (the container follows the page again); a default value ('round',
@@ -242,7 +243,7 @@
   S4.theme = function (opts, el) {
     if (el && el !== root) return themeElement(el, opts);
     if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
-      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter' };
+      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard' };
     var colorChanged = false;
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;

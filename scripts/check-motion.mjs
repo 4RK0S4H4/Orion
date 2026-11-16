@@ -122,5 +122,41 @@ for (const fn of ['reveal', 'follow', 'pop', 'scrim', 'rise', 'tip', 'sharedAxis
   if (!doc.includes('S4.transition.' + fn)) bad('docs/foundations/motion.md', 1, `S4.transition.${fn} is not described`);
 }
 
+/* Motion energy (data-energy, S4.theme({ energy })): the same patterns with other amounts, never a new pattern.
+   - motion.css energy blocks re-declare only Ink, Morph and Bend, and only with springs of their own energy;
+   - calm springs never overshoot, lively ones overshoot a little (at most 7%), and every one is 0ms under reduced motion;
+   - in motion.js lively touches only Pop and Rise. */
+const T = JSON.parse(readFileSync(join(root, 'tokens/tokens.json'), 'utf8')).tokens;
+const overshoot = (name) => { const m = (T[name]?.description || '').match(/overshoot ([\d.]+)%/); return m ? +m[1] : null; };
+let energySprings = 0;
+for (const m of tokenCss.matchAll(/:where\(\[data-energy="(\w+)"\][^)]*\)\s*\{([^}]*)\}/g)) {
+  const [, level, body] = m;
+  for (const d of body.matchAll(/--s4-motion-([a-z-]+):\s*var\((--[\w-]+)-duration\) var\((--[\w-]+)\)/g)) {
+    const [, pat, durOf, spring] = d;
+    if (!['ink', 'morph', 'bend'].includes(pat)) bad('components/motion/motion.css', 1, `energy ${level} may not change --s4-motion-${pat} (only ink, morph, bend)`);
+    if (durOf !== spring) bad('components/motion/motion.css', 1, `energy ${level}: --s4-motion-${pat} mixes ${durOf} with ${spring}`);
+    const o = overshoot(spring);
+    if (o === null) { bad('components/motion/motion.css', 1, `energy ${level}: ${spring} is not a spring token`); continue; }
+    energySprings++;
+    if (level === 'calm' && (o > 0 || !/-calm$/.test(spring))) bad('components/motion/motion.css', 1, `energy calm: ${spring} must be a -calm spring with no overshoot (${o}%)`);
+    if (level === 'lively' && (!/-lively$/.test(spring) || o > 7)) bad('components/motion/motion.css', 1, `energy lively: ${spring} must be a -lively spring with at most 7% overshoot (${o}%)`);
+  }
+}
+for (const [name, t] of Object.entries(T)) {
+  if (!/^--s4-motion-spring-[a-z-]+-(calm|lively)-duration$/.test(name)) continue;
+  if (t.modes?.['reduced-motion'] !== '0ms') bad('tokens/src/motion.tokens.json', 1, `${name} must be 0ms under reduced motion`);
+  const o = overshoot(name.replace(/-duration$/, ''));
+  if (/-calm-/.test(name) && o > 0) bad('tokens/src/motion.tokens.json', 1, `${name.replace(/-duration$/, '')} is calm but overshoots ${o}%`);
+  if (/-lively-/.test(name) && o > 7) bad('tokens/src/motion.tokens.json', 1, `${name.replace(/-duration$/, '')} overshoots ${o}% (7% at most)`);
+}
+const table = api.match(/var ENERGY = \{([\s\S]*?)\n  \};/);
+if (!table) bad('components/motion/motion.js', 1, 'the ENERGY table is missing');
+else {
+  const lively = table[1].match(/lively:[^\n]*spring: \{([^}]*)\}/);
+  for (const k of [...(lively ? lively[1] : '').matchAll(/(\w+):/g)].map((x) => x[1])) if (!['spatial', 'rise'].includes(k)) bad('components/motion/motion.js', 1, `lively energy may only change Pop and Rise springs, not ${k}`);
+  for (const sp of [...table[1].matchAll(/'([a-z-]+)'/g)].map((x) => x[1])) if (!/^(tip|rise|spatial)$/.test(sp) && overshoot(SPRING(sp)) === null) bad('components/motion/motion.js', 1, `energy spring ${sp} is not a token`);
+}
+function SPRING(n) { return /-calm$|-lively$|^(ink|rise|settle|tip|reveal|bend)$/.test(n) ? '--s4-motion-spring-' + n : '--md-sys-motion-spring-' + n; }
+
 if (problems.length) { console.error('Motion check failed:\n' + problems.map((p) => '  x ' + p).join('\n')); process.exit(1); }
-console.log(`Motion on pattern: ${n} files, ${defined.length} pattern tokens (${defined.join(', ')}), every transition and animation named.`);
+console.log(`Motion on pattern: ${n} files, ${new Set(defined).size} pattern tokens (${[...new Set(defined)].join(', ')}), every transition and animation named; energy: ${energySprings} remapped pattern springs within bounds.`);
