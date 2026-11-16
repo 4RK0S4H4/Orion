@@ -67,6 +67,8 @@
     gap: var(--s4-space-3);
     inline-size: 100%;
     min-inline-size: 0;
+    block-size: max-content;
+    min-block-size: var(--_row);
     padding-inline: calc((var(--_row) - var(--s4-size-icon)) / 2);
     border-radius: min(calc(var(--_row) / 2), var(--s4-shape-nav-indicator));
     overflow: hidden;
@@ -77,6 +79,7 @@
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
   .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {

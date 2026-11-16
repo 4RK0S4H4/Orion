@@ -6,6 +6,7 @@
      print     print media (dark scheme requested, to prove light is forced): main content shown, no glass, tables
                are tables, chrome gone, white page
      zoom      200% text (root font size doubled, see below): no sideways scroll, no clipped or overlapping text
+     reflow    320 CSS px wide (400% zoom of a 1280 window): no sideways scroll
      longtext  very long words and sentences injected into labels, headlines, chips, buttons, cells, titles, values:
                nothing spills out of its container, nothing overlaps
      forced    forced-colors: active: every interactive control keeps a visible boundary (border or outline)
@@ -13,9 +14,11 @@
      keys      Tab through the page: everything reachable, a focus ring of at least 3:1 against what is behind it,
                focus order follows the visual order
    Usage: node tests/reach.mjs [--pass=rtl,print,...] [--only=text] [--workers=4] [--shots=dir]
-   Zoom method: browsers have no scripting API for text-only zoom, so the pass sets the root font size to 200%
-   (html { font-size: 200% }), exactly what a user's default font size setting does. Everything sized in rem or em
-   doubles; sizes in px (the M3 dp scale) stay fixed by design, so this finds the containers that clip text. */
+   Zoom method: browsers have no scripting API for text-only zoom, and the type scale is in px (the M3 dp scale,
+   deliberately), so a root font-size of 200% would change nothing. The pass instead doubles the computed font size
+   and line height of every element (what Android's font scale, iOS Larger Text and Firefox's text-only zoom do),
+   while boxes keep their own sizes: that finds every container that clips or overlaps text. The reflow pass loads
+   every page at 320 CSS px wide (WCAG 1.4.10: a 1280 window at 400% zoom) and checks for sideways scroll. */
 import { readFileSync, readdirSync, existsSync, statSync, mkdirSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
@@ -25,7 +28,7 @@ import { dirname, join, extname, resolve } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
 const ONLY = arg('only', ''), WORKERS = +arg('workers', 4), SHOTS = arg('shots', '');
-const PASSES = arg('pass', 'rtl,print,zoom,longtext,forced,motion,keys').split(',');
+const PASSES = arg('pass', 'rtl,print,zoom,reflow,longtext,forced,motion,keys').split(',');
 
 let pw;
 try { pw = await import('playwright'); } catch { try { pw = createRequire(resolve('x.js'))('playwright'); } catch { try { pw = createRequire(import.meta.url)('playwright'); } catch {} } }
@@ -57,7 +60,7 @@ function installHelpers() {
     vis(el) { if (!el.isConnected) return false; const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none' && !el.closest('[hidden], [inert], [data-s4-skip], iframe'); },
     tag(el) { let s = el.tagName.toLowerCase(); if (el.id) s += '#' + el.id; else if (el.className && typeof el.className === 'string') s += '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.'); const t = (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24); return t ? s + ' "' + t + '"' : s; },
     /* the rectangle of an element's own text */
-    textRect(el) { const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let rect = null; for (let t = tw.nextNode(); t; t = tw.nextNode()) { if (!t.textContent.trim() || t.parentElement.closest('.s4-icon, svg, [hidden]')) continue; const rg = document.createRange(); rg.selectNodeContents(t); for (const r of rg.getClientRects()) { if (!r.width) continue; rect = rect ? { left: Math.min(rect.left, r.left), right: Math.max(rect.right, r.right), top: Math.min(rect.top, r.top), bottom: Math.max(rect.bottom, r.bottom) } : { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; } } return rect; },
+    textRect(el) { const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); let rect = null; const lines = []; for (let t = tw.nextNode(); t; t = tw.nextNode()) { if (!t.textContent.trim() || t.parentElement.closest('.s4-icon, svg, [hidden]')) continue; const rg = document.createRange(); rg.selectNodeContents(t); for (const r of rg.getClientRects()) { if (!r.width) continue; let hidden = false; for (let p = t.parentElement; p && p !== document.body; p = p.parentElement) { const pc = getComputedStyle(p); if (/hidden|clip/.test(pc.overflowY)) { const b = p.getBoundingClientRect(); if (r.top >= b.bottom - 1 || r.bottom <= b.top + 1) { hidden = true; break; } } if (/hidden|clip/.test(pc.overflowX)) { const b = p.getBoundingClientRect(); if (r.left >= b.right - 1 || r.right <= b.left + 1) { hidden = true; break; } } } if (hidden) continue; lines.push(r); rect = rect ? { left: Math.min(rect.left, r.left), right: Math.max(rect.right, r.right), top: Math.min(rect.top, r.top), bottom: Math.max(rect.bottom, r.bottom) } : { left: r.left, right: r.right, top: r.top, bottom: r.bottom }; } } if (rect) rect.lines = lines; return rect; },
     parse(c) { const m = /rgba?\(([^)]+)\)/.exec(c); if (!m) { const k = /color\(srgb ([\d. ]+)(?:\/ ([\d.]+))?\)/.exec(c); if (k) { const v = k[1].trim().split(/\s+/).map((x) => +x * 255); return [v[0], v[1], v[2], k[2] === undefined ? 1 : +k[2]]; } return [0, 0, 0, 0]; } const p = m[1].split(/[ ,\/]+/).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; },
     lum(c) { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); },
     contrast(a, b) { const x = this.lum(a), y = this.lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); },
@@ -189,19 +192,21 @@ function clipAudit(opts) {
     const wide = [...document.querySelectorAll('body *')].filter((e) => h.vis(e) && e.getBoundingClientRect().right > innerWidth + 1 && !e.closest('[data-scroll], .s4-table-wrap, .s4-tabs, [style*="overflow"]')).slice(0, 3).map(h.tag);
     out.push(`sideways scroll: ${ov}px (${wide.join(', ')})`);
   }
-  const leaves = [...document.querySelectorAll('body *')].filter((e) => h.vis(e) && !e.closest('svg, .s4-icon, script, style') && [...e.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim()));
+  const leaves = [...document.querySelectorAll('body *')].filter((e) => h.vis(e) && !e.closest('svg, .s4-icon, script, style, .s4-visually-hidden') && [...e.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim()));
   const seen = new Set();
   const note = (m) => { if (!seen.has(m)) { seen.add(m); out.push(m); } };
   for (const el of leaves) {
     const cs = getComputedStyle(el), tr = h.textRect(el); if (!tr) continue;
+    if (el.closest('[data-collapsed] > .s4-fab-label, .s4-fab[data-collapsed] *')) continue;
+    if (el.closest('.s4-avatar, .s4-chip-avatar')) continue;   /* initials in a fixed disc: clipped by design (README) */
     /* text hard-clipped by its own box or by an ancestor that clips */
     for (let p = el; p && p !== document.body; p = p.parentElement) {
       const pc = getComputedStyle(p);
       const clipsX = /hidden|clip/.test(pc.overflowX), clipsY = /hidden|clip/.test(pc.overflowY);
       if (!clipsX && !clipsY) continue;
       const b = p.getBoundingClientRect(), pad = 1.5;
-      const ellipsis = pc.textOverflow === 'ellipsis' || cs.textOverflow === 'ellipsis' || /-webkit-box/.test(pc.display + cs.display);
-      if (ellipsis && p === el) continue;
+      const ellipsis = pc.textOverflow === 'ellipsis' || cs.textOverflow === 'ellipsis' || /-webkit-box/.test(pc.display + cs.display) || (pc.webkitLineClamp && pc.webkitLineClamp !== 'none');
+      if (ellipsis) break;
       if (clipsX && (tr.left < b.left - pad || tr.right > b.right + pad) && p.scrollWidth > p.clientWidth + 1) note(`text is clipped sideways by ${h.tag(p)}: ${h.tag(el)}`);
       if (clipsY && (tr.top < b.top - pad || tr.bottom > b.bottom + pad) && p.scrollHeight > p.clientHeight + 1 && !/auto|scroll/.test(pc.overflowY) && !p.matches('.s4-expand, .s4-accordion-body, [data-s4-collapsed]')) note(`text is clipped vertically by ${h.tag(p)}: ${h.tag(el)}`);
       break;
@@ -221,16 +226,24 @@ function clipAudit(opts) {
   const boxes = [];
   for (const el of leaves) {
     let fixed = false; for (let p = el; p && p !== document.body; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.position === 'fixed' || cs.position === 'sticky' || cs.position === 'absolute') fixed = true; }
-    const r = h.textRect(el); if (!r || r.right - r.left < 4 || r.bottom - r.top < 6) continue;
+    const r = h.textRect(el); if (!r || r.right - r.left < 4 || r.bottom - r.top < 6 || el.closest('.s4-avatar')) continue;
     boxes.push({ el, r, fixed, scroller: (() => { for (let p = el.parentElement; p; p = p.parentElement) { if (/auto|scroll|hidden/.test(getComputedStyle(p).overflowY) && p.scrollHeight > p.clientHeight + 1) return p; } return document.documentElement; })() });
   }
   for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
     const a = boxes[i], b = boxes[j];
     if (a.fixed || b.fixed || a.scroller !== b.scroller || a.el.contains(b.el) || b.el.contains(a.el)) continue;
-    const ox = Math.min(a.r.right, b.r.right) - Math.max(a.r.left, b.r.left), oy = Math.min(a.r.bottom, b.r.bottom) - Math.max(a.r.top, b.r.top);
-    if (ox > 3 && oy > 5) note(`text overlaps text: ${h.tag(a.el)} and ${h.tag(b.el)}`);
+    let hit = false;
+    for (const x of a.r.lines) { for (const y of b.r.lines) { const ox = Math.min(x.right, y.right) - Math.max(x.left, y.left), oy = Math.min(x.bottom, y.bottom) - Math.max(x.top, y.top); if (ox > 3 && oy > 5) { hit = true; break; } } if (hit) break; }
+    if (hit) note(`text overlaps text: ${h.tag(a.el)} and ${h.tag(b.el)}`);
   }
   return out;
+}
+
+/* text-only zoom: every element's text grows, boxes keep their authored sizes */
+function textZoom(f) {
+  const els = [...document.querySelectorAll('body, body *')].filter((e) => !(e instanceof SVGElement));
+  const sizes = els.map((e) => { const cs = getComputedStyle(e); return [parseFloat(cs.fontSize), cs.lineHeight === 'normal' ? null : parseFloat(cs.lineHeight)]; });
+  els.forEach((e, i) => { e.style.setProperty('font-size', sizes[i][0] * f + 'px', 'important'); if (sizes[i][1] != null) e.style.setProperty('line-height', sizes[i][1] * f + 'px', 'important'); });
 }
 
 const LONG_WORD = 'Supercalifragilisticexpialidocious'.repeat(4);
@@ -385,6 +398,7 @@ async function runOne(browser, pass, rel, mode) {
   if (pass === 'rtl') opts.locale = 'ar';
   if (pass === 'forced') opts.forcedColors = 'active';
   if (pass === 'motion') opts.reducedMotion = 'reduce';
+  if (pass === 'reflow') opts.viewport = { width: 320, height: 640 };
   if (pass === 'print') { opts.viewport = { width: 794, height: 1123 }; opts.colorScheme = 'dark'; }
   const ctx = await browser.newContext(opts);
   const page = await ctx.newPage();
@@ -397,7 +411,9 @@ async function runOne(browser, pass, rel, mode) {
     if (pass === 'print') await page.emulateMedia({ media: 'print' });
     await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 });
     await page.waitForTimeout(500);
-    const shot = async (tag) => { if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: join(SHOTS, `${pass}-${mode.key}-${rel.replace(/[^\w.-]+/g, '_')}${tag || ''}.png`), fullPage: pass === 'print' }).catch(() => {}); } };
+    /* the reference pages' own toolbar (theme, contrast, color) is not part of the system */
+    if (['zoom', 'reflow', 'longtext'].includes(pass)) await page.addStyleTag({ content: '.ex-bar, .ex-ctl { display: none !important; }' });
+    const shot = async (tag) => { if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: join(SHOTS, `${pass}-${mode.key}-${rel.replace(/[^\w.-]+/g, '_')}${tag || ''}.png`), fullPage: ['print', 'zoom', 'longtext'].includes(pass) }).catch(() => {}); } };
     if (pass === 'rtl') {
       if ((await page.evaluate(() => document.documentElement.dir)) !== 'rtl') add('rtl: the page replaced dir="rtl"');
       await shot();
@@ -408,11 +424,15 @@ async function runOne(browser, pass, rel, mode) {
       await shot();
       (await page.evaluate(printAudit)).forEach(add);
     } else if (pass === 'zoom') {
-      await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+      await page.evaluate(textZoom, 2);
+      await page.evaluate(() => window.dispatchEvent(new Event('resize')));
       await page.waitForTimeout(400);
       await shot();
       if (isApp(rel)) await eachView(page, async (v) => { (await page.evaluate(clipAudit, { container: false })).forEach((m) => add((v ? `[${v}] ` : '') + m)); });
       else (await page.evaluate(clipAudit, { container: false })).forEach(add);
+    } else if (pass === 'reflow') {
+      const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+      if (ov > 1) add(`reflow: sideways scroll at 320px (${ov}px)`);
     } else if (pass === 'longtext') {
       const run = async (v) => { const n = await page.evaluate(injectLong, { word: LONG_WORD, text: LONG_TEXT }); if (!n) return; await page.waitForTimeout(250); (await page.evaluate(clipAudit, { container: true })).concat(await page.evaluate(longAudit)).forEach((m) => add((v ? `[${v}] ` : '') + m)); };
       if (isApp(rel)) await eachView(page, run); else await run(null);
@@ -436,7 +456,7 @@ let browser;
 try { browser = await pw.chromium.launch(); } catch (e) { console.error('chromium is not installed'); process.exit(2); }
 const jobs = [];
 for (const pass of PASSES) for (const rel of targets) {
-  if (pass === 'print') { jobs.push([pass, rel, MODES[1]]); continue; }
+  if (pass === 'print' || pass === 'reflow') { jobs.push([pass, rel, MODES[0]]); continue; }
   if (pass === 'forced' || pass === 'motion') { jobs.push([pass, rel, MODES[isApp(rel) ? 0 : 1]]); continue; }
   for (const mode of MODES) { if (pass === 'keys' && !isApp(rel) && mode.phone) continue; jobs.push([pass, rel, mode]); }
 }

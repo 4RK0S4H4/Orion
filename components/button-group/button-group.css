@@ -9,6 +9,7 @@
 @layer s4.components {
   .s4-button-group {
     display: flex;
+    flex-wrap: wrap;                      /* larger text or a narrow window wraps the group onto a second row instead of overflowing */
     align-items: center;
     gap: var(--s4-space-2);
     min-width: 0;

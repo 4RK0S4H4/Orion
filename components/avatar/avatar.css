@@ -18,6 +18,7 @@
     place-items: center;
     width: var(--_size);
     height: var(--_size);
+    overflow: hidden;                   /* initials stay inside the disc at any text size; the name sits beside it */
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_bg);
     color: var(--_fg);

@@ -571,6 +571,7 @@ S4.register('fab', function (scope) {
     measure();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
     new MutationObserver(measure).observe(label, { childList: true, characterData: true, subtree: true });
+    var t; window.addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { var f = label.closest('.s4-fab'); if (!f || !f.hasAttribute('data-collapsed')) measure(); }, 100); });   /* text size or window changed */
     if (window.ResizeObserver) new ResizeObserver(function () { if (!label.style.getPropertyValue('--_label-w')) measure(); }).observe(label);   /* first shown (it was in a hidden view) */
   });
 });

@@ -1773,8 +1773,9 @@
     justify-content: center;
     gap: var(--_gap);
     min-width: 0;
-    height: var(--_h);
-    padding: 0 var(--_pad);
+    block-size: max-content;                    /* grows with larger text and long labels, never clips them; max-content (not auto) so a flex row never stretches it */
+    min-block-size: var(--_h);
+    padding: max(0px, calc((var(--_h) - var(--_line)) / 2)) var(--_pad);
     border: 0;
     border-radius: var(--_radius);
     background: var(--_bg);
@@ -1785,7 +1786,8 @@
     line-height: var(--_line);
     letter-spacing: var(--_track);
     font-weight: var(--_weight);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    text-align: center;
     text-decoration: none;
     cursor: pointer;
     user-select: none;
@@ -2001,6 +2003,7 @@
 @layer s4.components {
   .s4-button-group {
     display: flex;
+    flex-wrap: wrap;                      /* larger text or a narrow window wraps the group onto a second row instead of overflowing */
     align-items: center;
     gap: var(--s4-space-2);
     min-width: 0;
@@ -2100,7 +2103,8 @@
     justify-content: center;
     flex: none;
     min-width: var(--_h);
-    height: var(--_h);
+    block-size: max-content;
+    min-block-size: var(--_h);
     padding: 0 calc((var(--_h) - var(--_icon)) / 2);
     border: 0;
     border-radius: var(--_radius);
@@ -2128,10 +2132,12 @@
   .s4-fab:active:not(:disabled) { --_elevation: var(--md-sys-elevation-level3); }
 
   /* ---------- extended FAB: icon + label ---------- */
-  .s4-fab:has(> .s4-fab-label) { padding-inline: var(--_pad); }
+  .s4-fab:has(> .s4-fab-label) { max-inline-size: 100%; padding-inline: var(--_pad); }
   .s4-fab-label {
     display: inline-block;
     overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;                 /* a long label or larger text wraps and the button grows; while it folds it stays on one line */
     max-width: var(--_label-w, 20em);   /* fab.js measures the label so the fold starts at once */
     margin-inline-start: var(--_gap);
     transition:
@@ -2140,7 +2146,7 @@
       opacity var(--s4-motion-state);
   }
   .s4-fab[data-collapsed] { padding-inline: calc((var(--_h) - var(--_icon)) / 2); }
-  .s4-fab[data-collapsed] > .s4-fab-label { max-width: 0; margin-inline-start: 0; opacity: 0; }
+  .s4-fab[data-collapsed] > .s4-fab-label { white-space: nowrap; max-width: 0; margin-inline-start: 0; opacity: 0; }
 
   /* ---------- sizes (M3 Expressive: 56 / medium 80 / large 96) ---------- */
   .s4-fab[data-size="m"] {
@@ -2772,9 +2778,8 @@
   }
   .s4-nav-label {
     max-inline-size: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;   /* a destination's name is never cut: the label wraps and the bar grows */
+    text-align: center;
   }
   /* badge slot: top-end of the icon */
   .s4-nav-indicator > .s4-badge {
@@ -2898,6 +2903,8 @@
     gap: var(--s4-space-3);
     inline-size: 100%;
     min-inline-size: 0;
+    block-size: max-content;
+    min-block-size: var(--_row);
     padding-inline: calc((var(--_row) - var(--s4-size-icon)) / 2);
     border-radius: min(calc(var(--_row) / 2), var(--s4-shape-nav-indicator));
     overflow: hidden;
@@ -2908,6 +2915,7 @@
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
   .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {
@@ -3760,12 +3768,13 @@
     font-weight: var(--md-sys-typescale-label-small-weight);
   }
   .s4-list-headline {
-    overflow: hidden;
+    min-width: 0;
     color: var(--_fg);
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;   /* wraps, never truncates: a row grows with larger text and long names */
   }
   .s4-list-supporting {
+    min-width: 0;
+    overflow-wrap: anywhere;
     color: var(--_fg-variant);
     font-family: var(--md-sys-typescale-body-medium-font);
     font-size: var(--md-sys-typescale-body-medium-size);
@@ -3961,6 +3970,7 @@
     place-items: center;
     width: var(--_size);
     height: var(--_size);
+    overflow: hidden;                   /* initials stay inside the disc at any text size; the name sits beside it */
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_bg);
     color: var(--_fg);

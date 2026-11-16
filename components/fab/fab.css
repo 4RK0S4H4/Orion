@@ -27,7 +27,8 @@
     justify-content: center;
     flex: none;
     min-width: var(--_h);
-    height: var(--_h);
+    block-size: max-content;
+    min-block-size: var(--_h);
     padding: 0 calc((var(--_h) - var(--_icon)) / 2);
     border: 0;
     border-radius: var(--_radius);
@@ -55,10 +56,12 @@
   .s4-fab:active:not(:disabled) { --_elevation: var(--md-sys-elevation-level3); }
 
   /* ---------- extended FAB: icon + label ---------- */
-  .s4-fab:has(> .s4-fab-label) { padding-inline: var(--_pad); }
+  .s4-fab:has(> .s4-fab-label) { max-inline-size: 100%; padding-inline: var(--_pad); }
   .s4-fab-label {
     display: inline-block;
     overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;                 /* a long label or larger text wraps and the button grows; while it folds it stays on one line */
     max-width: var(--_label-w, 20em);   /* fab.js measures the label so the fold starts at once */
     margin-inline-start: var(--_gap);
     transition:
@@ -67,7 +70,7 @@
       opacity var(--s4-motion-state);
   }
   .s4-fab[data-collapsed] { padding-inline: calc((var(--_h) - var(--_icon)) / 2); }
-  .s4-fab[data-collapsed] > .s4-fab-label { max-width: 0; margin-inline-start: 0; opacity: 0; }
+  .s4-fab[data-collapsed] > .s4-fab-label { white-space: nowrap; max-width: 0; margin-inline-start: 0; opacity: 0; }
 
   /* ---------- sizes (M3 Expressive: 56 / medium 80 / large 96) ---------- */
   .s4-fab[data-size="m"] {
