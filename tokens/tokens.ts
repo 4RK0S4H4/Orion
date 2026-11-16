@@ -1001,6 +1001,34 @@ export const tokens = {
     "type": "dimension",
     "value": "12px"
   },
+  "--s4-density-roomy-layout-margin": {
+    "type": "dimension",
+    "value": "40px"
+  },
+  "--s4-density-roomy-layout-margin-compact": {
+    "type": "dimension",
+    "value": "20px"
+  },
+  "--s4-density-roomy-layout-gap": {
+    "type": "dimension",
+    "value": "24px"
+  },
+  "--s4-density-roomy-layout-pane-gap": {
+    "type": "dimension",
+    "value": "40px"
+  },
+  "--s4-density-roomy-layout-content-reading": {
+    "type": "dimension",
+    "value": "760px"
+  },
+  "--s4-density-roomy-body-large-size": {
+    "type": "dimension",
+    "value": "18px"
+  },
+  "--s4-density-roomy-body-large-line-height": {
+    "type": "dimension",
+    "value": "28px"
+  },
   "--s4-focus-ring-width": {
     "type": "dimension",
     "value": "3px"

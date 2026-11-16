@@ -211,6 +211,13 @@
     --s4-density-compact-icon: 20px;
     --s4-density-compact-layout-margin: 20px;
     --s4-density-compact-layout-gap: 12px;
+    --s4-density-roomy-layout-margin: 40px;
+    --s4-density-roomy-layout-margin-compact: 20px;
+    --s4-density-roomy-layout-gap: 24px;
+    --s4-density-roomy-layout-pane-gap: 40px;
+    --s4-density-roomy-layout-content-reading: 760px;
+    --s4-density-roomy-body-large-size: 18px;
+    --s4-density-roomy-body-large-line-height: 28px;
     --s4-focus-ring-width: 3px;
     --s4-focus-ring-offset: 2px;
     --s4-focus-ring-color: var(--md-sys-color-secondary);
@@ -1468,6 +1475,8 @@
      compact      pointer-first sizes for desktop windows and desktop apps (32px targets, 14px body text)
    Set data-density on <html>, .s4-app or any container:
      data-density="compact"   always compact inside
+     data-density="roomy"     content sites (round 0056 candidate): wider margins, gaps and reading column, larger
+                              body text. Only --s4-layout-* and body type change; controls keep their comfortable sizes.
      data-density="auto"      compact only where the main pointer is a mouse or trackpad (pointer: fine); touch stays comfortable
    Only tokens change, so every component follows without its own rules. Apps never restyle components for density. */
 @layer s4.tokens {
@@ -1530,6 +1539,17 @@
       font-size: var(--md-sys-typescale-body-large-size);
       line-height: var(--md-sys-typescale-body-large-line-height);
     }
+  }
+  :where([data-density="roomy"]) {
+    --s4-layout-margin: var(--s4-density-roomy-layout-margin);
+    --s4-layout-margin-compact: var(--s4-density-roomy-layout-margin-compact);
+    --s4-layout-gap: var(--s4-density-roomy-layout-gap);
+    --s4-layout-pane-gap: var(--s4-density-roomy-layout-pane-gap);
+    --s4-layout-content-reading: var(--s4-density-roomy-layout-content-reading);
+    --md-sys-typescale-body-large-size: var(--s4-density-roomy-body-large-size);
+    --md-sys-typescale-body-large-line-height: var(--s4-density-roomy-body-large-line-height);
+    font-size: var(--md-sys-typescale-body-large-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
   }
 }
 

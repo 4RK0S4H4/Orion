@@ -208,6 +208,13 @@
     --s4-density-compact-icon: 20px;
     --s4-density-compact-layout-margin: 20px;
     --s4-density-compact-layout-gap: 12px;
+    --s4-density-roomy-layout-margin: 40px;
+    --s4-density-roomy-layout-margin-compact: 20px;
+    --s4-density-roomy-layout-gap: 24px;
+    --s4-density-roomy-layout-pane-gap: 40px;
+    --s4-density-roomy-layout-content-reading: 760px;
+    --s4-density-roomy-body-large-size: 18px;
+    --s4-density-roomy-body-large-line-height: 28px;
     --s4-focus-ring-width: 3px;
     --s4-focus-ring-offset: 2px;
     --s4-focus-ring-color: var(--md-sys-color-secondary);
