@@ -36,7 +36,8 @@ for (const d of readdirSync(join(root, 'components'))) {
 pages.push('components/base/themes.html');   /* themes on any container (issue 52) */
 for (const f of readdirSync(join(root, 'templates'))) if (f.endsWith('.html')) pages.push('templates/' + f);
 pages.push('explore/ideas.html', 'explore/degree-tracker.html');   /* the current quiz, in the Orion quiz UI (decision 0048) */
-const targets = pages.filter((p) => !ONLY || p.includes(ONLY));
+const DIALS_ONLY = process.argv.includes('--dials-only');
+const targets = DIALS_ONLY ? [] : pages.filter((p) => !ONLY || p.includes(ONLY));
 
 /* ---------- static server ---------- */
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
@@ -97,8 +98,9 @@ function audit(opts) {
 /* nested corners (decision 0052): a rounded thing that sits tight in the corner of a rounded container must be
    concentric with it: its radius is the container's radius minus the gap (or it is a full pill). A squarer inner
    corner inside a rounder outer one is the mismatch people see at once. */
-function nestAudit() {
+function nestAudit(minR) {
   const out = [];
+  minR = typeof minR === 'number' ? minR : 12;      /* the dial presets pass 8: a firm container's corner is 10 */
   const px = (v) => (/%/.test(v) ? 0 : parseFloat(v) || 0);
   const solid = (cs) => { const c = cs.backgroundColor; return c && c !== 'transparent' && !/rgba?\([^)]*,\s*0\)$/.test(c) || cs.backgroundImage !== 'none' || cs.backdropFilter && cs.backdropFilter !== 'none'; };
   const tag = (el) => { let s = el.tagName.toLowerCase(); if (el.id) s += '#' + el.id; else if (el.className && typeof el.className === 'string') s += '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.'); return s; };
@@ -111,12 +113,12 @@ function nestAudit() {
     const pill = Math.min(r.width, r.height) / 2 - 1;
     /* the nearest rounded surface it sits in */
     let p = el.parentElement, host = null, hcs = null;
-    for (; p && p !== document.body; p = p.parentElement) { const c = getComputedStyle(p); if (px(c.borderTopLeftRadius) >= 12 && (solid(c) || /hidden|clip/.test(c.overflow))) { host = p; hcs = c; break; } if (solid(c) && px(c.borderTopLeftRadius) < 12) break; }
+    for (; p && p !== document.body; p = p.parentElement) { const c = getComputedStyle(p); if (px(c.borderTopLeftRadius) >= minR && (solid(c) || /hidden|clip/.test(c.overflow))) { host = p; hcs = c; break; } if (solid(c) && px(c.borderTopLeftRadius) < minR) break; }
     if (!host) continue;
     const h = host.getBoundingClientRect();
     const corners = [['tl', r.left - h.left, r.top - h.top, px(hcs.borderTopLeftRadius)], ['tr', h.right - r.right, r.top - h.top, px(hcs.borderTopRightRadius)], ['bl', r.left - h.left, h.bottom - r.bottom, px(hcs.borderBottomLeftRadius)], ['br', h.right - r.right, h.bottom - r.bottom, px(hcs.borderBottomRightRadius)]];
     for (const [k, gx, gy, R] of corners) {
-      if (R < 12 || gx < 0 || gy < 0 || gx > 14 || gy > 14 || Math.abs(gx - gy) > 6) continue;   /* only a corner tucked tight into a corner */
+      if (R < minR || gx < 0 || gy < 0 || gx > 14 || gy > 14 || Math.abs(gx - gy) > 6) continue;   /* only a corner tucked tight into a corner */
       if (R >= Math.min(h.width, h.height) / 2 - 1) continue;                                   /* the container is a pill */
       if ((gx + gy) / 2 < 3 && /hidden|clip|auto|scroll/.test(hcs.overflowX + hcs.overflowY)) continue;   /* flush against a container that clips it: the container's corner is the one you see */
       const want = Math.max(0, R - (gx + gy) / 2), have = mine[k];
@@ -171,6 +173,92 @@ function focusAudit() {
   if (before && before.focus) try { before.focus({ preventScroll: true }); } catch (e) {} else if (document.activeElement) document.activeElement.blur();
   window.scrollTo(sx, sy);
   return [...new Set(out)];
+}
+
+/* ---------- brand dial presets (decision 0055, round 0056) ---------- */
+/* what the corner dial must reach, what must stay round under every dial (switches, radios, checkbox layers, sliders,
+   progress, avatars, badges, date-picker discs, status dots) is listed in EXEMPT */
+function dialAudit(opts) {
+  const out = [];
+  const tag = (el) => { let s = el.tagName.toLowerCase(); if (el.className && typeof el.className === 'string') s += '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.'); const t = (el.getAttribute('aria-label') || el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 22); return t ? `${s} "${t}"` : s; };
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;left:0;top:0;width:400px;height:400px;visibility:hidden;border-radius:var(--s4-shape-control)';
+  document.body.appendChild(probe);
+  const dial = Math.min(200, parseFloat(getComputedStyle(probe).borderTopLeftRadius) || 0);
+  probe.remove();
+  const rad = (cs) => Math.min(...['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight'].map((k) => parseFloat(cs['border' + k + 'Radius']) || 0));
+  const shown = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width >= 8 && r.height >= 8 && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0 && !el.closest('[hidden], [inert], [data-s4-skip], svg'); };
+  /* (a) corners: everything you click that is meant to follow the dial must not be a pill when the dial is not round */
+  if (opts.dial) {
+    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > *, .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option';
+    const EXEMPT = '.s4-badge, .s4-avatar, .s4-chip-avatar, .s4-switch *, .s4-radio *, .s4-checkbox *, .s4-slider *, .s4-progress *, .s4-date-picker-day, .s4-status-dot, .s4-chip-remove, [data-shape="circle"]';
+    const seen = new Set();
+    for (const el of document.querySelectorAll(FOLLOW)) {
+      if (!shown(el) || el.matches(EXEMPT)) continue;
+      const r = el.getBoundingClientRect(), cs = getComputedStyle(el), have = rad(cs);
+      const sq = Math.abs(r.width - r.height) < 2;           /* a round icon button is allowed to be a circle only when the dial is round */
+      if (have > dial + 0.5 && have >= Math.min(r.width, r.height) / 2 - 1) { const k = tag(el).replace(/ ".*/, ''); if (!seen.has(k)) { seen.add(k); out.push(`corners ${dial}px: ${tag(el)} is still a pill (${Math.round(have)}px${sq ? ', square box' : ''}); route its radius through --s4-shape-control`); } }
+    }
+  }
+  /* (d) a label must not be clipped or run past its control */
+  const LABELS = '.s4-button, .s4-chip, .s4-tab, .s4-nav-label, .s4-menu-item, .s4-segment, .s4-pagination a, .s4-breadcrumbs a, .s4-app-bar-title, .s4-card-title, .s4-dialog-title, .s4-stat-value';
+  const seenL = new Set();
+  for (const el of document.querySelectorAll(LABELS)) {
+    if (!shown(el)) continue;
+    const cs = getComputedStyle(el);
+    if (cs.textOverflow === 'ellipsis' || /auto|scroll/.test(cs.overflowX)) continue;
+    const clipX = /hidden|clip/.test(cs.overflowX) && el.scrollWidth > el.clientWidth + 1;
+    const clipY = /hidden|clip/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 2;
+    if (clipX || clipY) { const k = tag(el).replace(/ ".*/, '') + (clipX ? 'x' : 'y'); if (!seenL.has(k)) { seenL.add(k); out.push(`clipped label (${clipX ? 'sideways' : 'height'}): ${tag(el)}`); } }
+  }
+  return out;
+}
+
+/* (c) text contrast as rendered, AA: 4.5, or 3 for large text; text on glass is checked against the worst backdrop
+   after the glass's own filter and tint (the same method as skill/s4-orion/scripts/check.mjs) */
+function contrastAudit(seeded) {
+  const out = [];      /* seeded: colored FABs and the vibrant toolbar are glass in the accent's own color: the recorded exception (decisions 0028 and 0032) */
+  const cv = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  const parse = (c) => {
+    let m = c.match(/^rgba?\(([^)]+)\)/);
+    if (m) { const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p[3] == null ? 1 : p[3]]; }
+    m = c.match(/^color\(srgb ([^)]+)\)/);
+    if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(Number); return [p[0] * 255, p[1] * 255, p[2] * 255, p[3] == null ? 1 : p[3]]; }
+    if (!c || c === 'transparent') return null;
+    cv.clearRect(0, 0, 1, 1); cv.fillStyle = '#000'; cv.fillStyle = c; cv.fillRect(0, 0, 1, 1);
+    const d = cv.getImageData(0, 0, 1, 1).data; return [d[0], d[1], d[2], d[3] / 255];
+  };
+  const over = (top, bot) => { const a = top[3]; return [0, 1, 2].map((i) => top[i] * a + bot[i] * (1 - a)).concat(1); };
+  const lum = (c) => { const v = c.slice(0, 3).map((x) => { x /= 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  const filterOf = (f) => { const c = /contrast\(([\d.]+)\)/.exec(f), b = /brightness\(([\d.]+)\)/.exec(f); return (v) => Math.min(255, Math.max(0, ((v - 127.5) * (c ? +c[1] : 1) + 127.5) * (b ? +b[1] : 1))); };
+  const off = (e) => e.closest('[hidden],[inert],[aria-hidden="true"],.s4-visually-hidden,[disabled],[aria-disabled="true"],:disabled,[data-s4-skip]') || ['label', '.s4-text-field', '.s4-list-item'].some((q) => { const c = e.closest(q); return c && c.querySelector('input:disabled, select:disabled, textarea:disabled'); });
+  const path = (e) => { const b = []; for (let n = e; n && n !== document.body && b.length < 3; n = n.parentElement) { let s = n.tagName.toLowerCase(); if (n.id) s += '#' + n.id; else if (n.classList.length) s += '.' + [...n.classList].slice(0, 2).join('.'); b.unshift(s); } return b.join(' > '); };
+  const seen = new Set();
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.nodeValue.trim() ? 1 : 2 });
+  for (let t; (t = walker.nextNode());) {
+    const el = t.parentElement; if (!el || seen.has(el) || off(el) || (seeded && el.closest('.s4-fab, .s4-toolbar[data-color="vibrant"]')) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(el.tagName)) continue;
+    seen.add(el);
+    const cs = getComputedStyle(el), r = el.getBoundingClientRect();
+    if (!r.width || !r.height || cs.visibility !== 'visible' || +cs.opacity === 0) continue;
+    const fg = parse(cs.color); if (!fg) continue;
+    const layers = []; let glass = null, opacity = 1, unknown = false;
+    for (let n = el; n; n = n.parentElement) {
+      const s = getComputedStyle(n); opacity *= +s.opacity;
+      const bg = parse(s.backgroundColor), bf = s.backdropFilter || s.webkitBackdropFilter;
+      if (bf && bf !== 'none' && bg && bg[3] < 1) { glass = { tint: bg, f: filterOf(bf) }; break; }
+      if (s.backgroundImage !== 'none') unknown = true;
+      if (bg && bg[3] > 0) { layers.push(bg); if (bg[3] >= 1) break; }
+      if (n.matches('.s4-tab[aria-selected="true"], .s4-nav-item[aria-current]:not([aria-current="false"])')) { const pill = n.parentElement && n.parentElement.querySelector(':scope > .s4-tabs-indicator, :scope > .s4-nav-pill'); const pb = pill && parse(getComputedStyle(pill).backgroundColor); if (pb && pb[3] > 0) layers.push(pb); }
+    }
+    if (unknown || opacity < 0.99) continue;
+    const size = parseFloat(cs.fontSize), bold = +cs.fontWeight >= 700, large = size >= 24 || (bold && size >= 18.66), need = large ? 3 : 4.5;
+    const bases = glass ? [0, 255].map((v) => { const x = glass.f(v); return over(glass.tint, [x, x, x, 1]); }) : [[255, 255, 255, 1]];
+    let worst = Infinity;
+    for (let base of bases) { for (let i = layers.length - 1; i >= 0; i--) base = over(layers[i], base); worst = Math.min(worst, ratio(over(fg, base), base)); }
+    if (worst < need) out.push(`contrast ${worst.toFixed(2)}:1 (needs ${need}) ${glass ? 'on glass ' : ''}"${t.nodeValue.trim().slice(0, 30)}" in ${path(el)}`);
+  }
+  return out;
 }
 
 /* ---------- using the page ---------- */
@@ -393,6 +481,113 @@ for (const bname of want) {
   await Promise.all(Array.from({ length: WORKERS }, async () => { while (i < jobs.length) { const [rel, mode, reduced] = jobs[i++]; await runPage(browser, bname, rel, mode, reduced); } }));
   await browser.close();
 }
+
+/* ---------- dial presets pass ---------- */
+const PRESETS = [
+  ...(arg('preset', '') === 'baseline' ? [{ key: 'baseline', theme: {}, dial: true }] : []),
+  { key: 'corners-soft', theme: { corners: 'soft' }, dial: true },
+  { key: 'corners-firm', theme: { corners: 'firm' }, dial: true },
+  { key: 'gray-warm', theme: { gray: 'warm' } },
+  { key: 'gray-cool', theme: { gray: 'cool' } },
+  { key: 'page-soft', theme: { page: 'soft' }, modes: ['desktop-light'] },   /* the soft page is a light-mode tone */
+  { key: 'type-serif-rounded', theme: { display: 'serif', text: 'rounded' }, modes: ['phone-dark'] },   /* faces change widths, not colors: the phone is the tight case */
+  { key: 'type-mono', theme: { display: 'mono', text: 'mono' }, modes: ['phone-dark'] },
+  { key: 'combo-firm-cool-soft-mono', theme: { corners: 'firm', gray: 'cool', page: 'soft', display: 'mono' }, dial: true },
+  { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
+];
+/* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker'.split(' ');
+const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
+
+/* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */
+async function pressAudit(page, add) {
+  const picks = await page.evaluate(() => {
+    const seen = new Set(), out = [];
+    document.querySelectorAll('.s4-button, .s4-icon-button, .s4-chip, .s4-fab, .s4-segment, .s4-button-group > *').forEach((b, i) => {
+      const r = b.getBoundingClientRect(); if (!r.width || b.disabled || b.closest('[hidden], dialog:not([open]), [data-s4-skip]')) return;
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      const k = b.className + '|' + (b.dataset.variant || ''); if (seen.has(k) || out.length >= 5) return; seen.add(k);
+      b.setAttribute('data-press-probe', String(i)); out.push(String(i));
+    });
+    return out;
+  });
+  const rad = (sel) => page.evaluate((sel) => { const cs = getComputedStyle(document.querySelector(sel)); return Math.min(...['TopLeft', 'TopRight', 'BottomLeft', 'BottomRight'].map((k) => parseFloat(cs['border' + k + 'Radius']) || 0)); }, sel);
+  for (const i of picks) {
+    const sel = `[data-press-probe="${i}"]`, loc = page.locator(sel);
+    try {
+      await page.mouse.move(1, 1); await page.waitForTimeout(200);
+      const rest = await rad(sel), box = await loc.boundingBox(); if (!box) continue;
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.mouse.down(); await page.waitForTimeout(300);
+      const pressed = await rad(sel), name = await loc.evaluate((e) => e.tagName.toLowerCase() + '.' + [...e.classList].slice(0, 2).join('.') + (e.dataset.variant ? '[' + e.dataset.variant + ']' : ''));
+      await page.mouse.up(); await page.mouse.move(1, 1);
+      if (pressed > rest + 0.5) add(`pressed shape is rounder than at rest (${rest.toFixed(1)}px -> ${pressed.toFixed(1)}px): ${name}`);
+    } catch (e) { try { await page.mouse.up(); } catch (x) {} }
+  }
+}
+
+async function runDialPage(browser, preset, rel, mode) {
+  const label = `chromium dials ${preset.key} ${mode.key}  ${rel}`;
+  const ctx = await browser.newContext({ viewport: mode.viewport, colorScheme: mode.colorScheme, hasTouch: false, deviceScaleFactor: 1 });
+  const page = await ctx.newPage();
+  const found = new Set(), add = (m) => found.add(m);
+  page.on('pageerror', (e) => add('script error: ' + String(e.message).split('\n')[0]));
+  page.on('console', (m) => { if (m.type() === 'error' && !QUIET.some((q) => q.test(m.text()))) add('console error: ' + m.text().slice(0, 160)); });
+  try {
+    await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(300);
+    const ok = await page.evaluate((t) => { if (!window.S4 || !S4.theme) return false; S4.theme.key = null; S4.theme(t); return true; }, preset.theme);
+    if (!ok) add('S4.theme is not available on this page');
+    await page.waitForTimeout(350);
+    /* colors transition when a dial changes: measure after they have arrived */
+    await page.waitForFunction(() => !document.getAnimations().some((a) => { try { return (a.playState === 'running' || a.pending) && a.effect.getComputedTiming().iterations !== Infinity; } catch (e) { return false; } }), null, { timeout: 4000 }).catch(() => {});
+    const views = await page.evaluate(() => [...new Set([...document.querySelectorAll('.s4-nav-item[data-view]')].map((a) => a.dataset.view))]);
+    const checks = async (where) => {
+      const tagw = (m) => (where ? `[${where}] ` : '') + m;
+      (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn/.test(m)).forEach((m) => add(tagw(m)));
+      (await page.evaluate(dialAudit, { dial: !!preset.dial })).forEach((m) => add(tagw(m)));
+      (await page.evaluate(contrastAudit, !!preset.theme.seed)).forEach((m) => add(tagw(m)));
+      if (preset.dial) (await page.evaluate(nestAudit, 8)).forEach((m) => add(tagw(m)));
+    };
+    if (views.length) {
+      for (const v of views) {
+        await page.evaluate((v) => { const a = document.querySelector('.s4-app'); if (window.S4 && S4.app && a) S4.app.go(a, v); }, v);
+        await page.waitForTimeout(450);
+        await checks(`view ${v}`);
+        if (preset.dial && (v === 'controls' || v === 'home')) await pressAudit(page, add);
+      }
+    } else { await checks(''); if (preset.dial) await pressAudit(page, add); }
+    /* open each menu and dialog once: the containers of controls are where concentric corners show */
+    if (preset.dial) {
+      for (const sel of ['[data-menu]', '[data-dialog]', '[data-sheet]']) {
+        const b = (await page.locator(sel).all()).slice(0, 3);
+        for (const l of b) {
+          if (!(await l.isVisible().catch(() => false))) continue;
+          try { await l.scrollIntoViewIfNeeded({ timeout: 1000 }); await l.click({ timeout: 1500 }); await page.waitForTimeout(380); } catch (e) { continue; }
+          (await page.evaluate(nestAudit, 8)).forEach((m) => add('open overlay: ' + m));
+          (await page.evaluate(dialAudit, { dial: true })).forEach((m) => add('open overlay: ' + m));
+          (await page.evaluate(contrastAudit, !!preset.theme.seed)).forEach((m) => add('open overlay: ' + m));
+          await page.keyboard.press('Escape'); await page.waitForTimeout(320);
+          await page.mouse.click(2, 2).catch(() => {});
+        }
+      }
+    }
+  } catch (e) { add('suite could not finish: ' + String(e.message).split('\n')[0].slice(0, 160)); }
+  if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', label.replace(/[^\w.-]+/g, '_') + '.png') }).catch(() => {}); }
+  await ctx.close();
+  ran++;
+  if (found.size) failures.push({ label, list: [...found] });
+}
+if (!process.argv.includes('--no-dials') && want.includes('chromium')) {
+  let b2;
+  try { b2 = await pw.chromium.launch(); } catch (e) { b2 = null; }
+  if (b2) {
+    const jobs = [];
+    for (const preset of PRESETS) if (!arg('preset', '') || preset.key.includes(arg('preset', ''))) for (const rel of dialPages) for (const mode of MODES) if (!preset.modes || preset.modes.includes(mode.key)) jobs.push([preset, rel, mode]);
+    let i = 0;
+    await Promise.all(Array.from({ length: WORKERS }, async () => { while (i < jobs.length) { const [pr, rel, mode] = jobs[i++]; await runDialPage(b2, pr, rel, mode); } }));
+    await b2.close();
+  }
+}
 server.close();
 
 skipped.forEach((s) => console.warn('! skipped: ' + s));
@@ -402,4 +597,4 @@ if (failures.length) {
   for (const f of failures.sort((a, b) => a.label.localeCompare(b.label))) console.error(f.label + '\n' + f.list.map((m) => '  x ' + m).join('\n'));
   process.exit(1);
 }
-console.log(`Production suite passed: ${targets.length} pages, ${ran} page runs (${want.filter((b) => !skipped.some((s) => s.startsWith(b))).join(' + ')}; 390 dark, 1280 light, reduced motion), nothing wrong.`);
+console.log(`Production suite passed: ${targets.length} pages, ${ran} page runs (${want.filter((b) => !skipped.some((s) => s.startsWith(b))).join(' + ')}; 390 dark, 1280 light, reduced motion), nothing wrong. Dial presets: ${PRESETS.length} presets x ${dialPages.length} pages (showcase in every view, every template, ${DIAL_COMPONENTS.length} component pages) x 390 dark and 1280 light, Chromium.`);

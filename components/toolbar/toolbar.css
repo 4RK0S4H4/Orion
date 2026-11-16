@@ -33,7 +33,7 @@
     --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the default ring is too close to a tinted fill */
   }
   /* standard icon buttons and text buttons take the toolbar's content color (on vibrant they'd otherwise vanish) */
-  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-button[data-variant="text"]):not(:disabled, [aria-disabled="true"]) {
+  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-icon-button[data-variant="tonal"], .s4-button[data-variant="text"], .s4-button[data-variant="tonal"]):not(:disabled, [aria-disabled="true"]) {
     color: var(--md-sys-color-on-primary-container);
   }
 

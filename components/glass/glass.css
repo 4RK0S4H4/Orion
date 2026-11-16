@@ -189,7 +189,7 @@
   }
 
   /* a toolbar in vibrant color keeps its role as the tint */
-  :where(.s4-toolbar[data-color="vibrant"]) { --_surface: var(--md-sys-color-primary-container); background-color: color-mix(in srgb, var(--md-sys-color-primary-container) calc(var(--_glass-tint) * 100%), transparent); }
+  :where(.s4-toolbar[data-color="vibrant"]) { --_glass-tint: var(--s4-glass-tint-opacity-fab-color); --_surface: var(--md-sys-color-primary-container); background-color: color-mix(in srgb, var(--md-sys-color-primary-container) calc(var(--_glass-tint) * 100%), transparent); }
 
   /* medium contrast: firmer glass (high contrast is already solid through the tokens) */
   :where(:root[data-contrast="medium"]) :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-nav-bar, .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-tooltip, .s4-snackbar) {
@@ -204,6 +204,20 @@
     box-shadow: revert-layer;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+
+  /* Text on glass is proven for on-surface only (decision 0043). Accent or error colored text is not, so a text button
+     or error item on a glass panel mixes its color toward on-surface until it clears 4.5:1 against the worst backdrop
+     (found by the dial presets pass with a seeded accent, round 0056). Colored FABs are the recorded exception (0028, 0032). */
+  :where(.s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-toolbar, .s4-snackbar, .s4-glass)
+  :is(.s4-menu-item[data-color="error"], .s4-button[data-variant="text"][data-color="error"]):not([data-glass="off"]) {
+    --_fg: color-mix(in srgb, var(--md-sys-color-error) 35%, var(--md-sys-color-on-surface));
+    color: var(--_fg);
+  }
+  :where(.s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-snackbar, .s4-glass)
+  :is(.s4-button[data-variant="text"]:not([data-color])):not([data-glass="off"]) {
+    --_fg: color-mix(in srgb, var(--md-sys-color-primary) 35%, var(--md-sys-color-on-surface));
+    color: var(--_fg);
   }
 
   /* opt out per element: solid again */

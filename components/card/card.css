@@ -26,6 +26,7 @@
     border: 1px solid var(--_outline);
     border-radius: var(--_radius);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);   /* what an Elevated button reads against */
     color: var(--_fg);
     box-shadow: var(--_elevation);
     font-family: var(--md-sys-typescale-body-medium-font);

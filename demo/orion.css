@@ -2026,6 +2026,7 @@
   /* ---------- corners ---------- */
   :where([data-corners="soft"]) {
     --s4-shape-control: calc(var(--md-sys-shape-corner-large) - 2px);
+    --md-sys-shape-corner-extra-large: var(--md-sys-shape-corner-large-increased);   /* menus, dialogs and panels come down with the controls inside them */
   }
   :where([data-corners="firm"]) {
     --s4-shape-control: calc(var(--md-sys-shape-corner-medium) - 2px);
@@ -2277,8 +2278,10 @@
   .s4-button[data-variant="filled"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }   /* filled by name, whatever the app's default */
   .s4-button[data-variant="tonal"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[data-variant="outlined"] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }   /* decision 0023: no outlined elements, the old name now draws a filled button */
-  .s4-button[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); --_fg: var(--md-sys-color-primary); --_elevation: var(--md-sys-elevation-level1); }
-  @media (hover: hover) { .s4-button[data-variant="elevated"]:hover:not(:disabled) { --_elevation: var(--md-sys-elevation-level2); } }
+  /* Elevated (issue 58): Orion has no shadows, so "raised" is a fill one step above whatever the button sits on: the
+     surface it is on (--s4-surface-here, set by card, pane, list, menu, dialog and sheet; the page otherwise) with a
+     tenth of the text color mixed in. That is darker in light mode and lighter in dark mode, on a page and on a card. */
+  .s4-button[data-variant="elevated"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-primary); }
   .s4-button[data-variant="text"] { --_bg: transparent; --_fg: var(--md-sys-color-primary); --_pad: var(--s4-space-3); }
 
   /* destructive: the confirm button of a destructive dialog, or the action in a danger zone */
@@ -2304,7 +2307,8 @@
   .s4-button[data-shape="square"] { --_radius: var(--_radius-selected); }
 
   /* ---------- toggle buttons (aria-pressed): unselected uses a quieter fill, selected the full color and a square shape ---------- */
-  .s4-button[aria-pressed="false"] { --_bg: var(--md-sys-color-surface-container); --_fg: var(--md-sys-color-on-surface-variant); }
+  /* unselected: a step above the surface it sits on (a fixed container role went faint on a dark card, issue 58) */
+  .s4-button[aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
   .s4-button[aria-pressed="false"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[aria-pressed="true"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-button[aria-pressed="false"]:where([data-variant="outlined"]) { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface-variant); }
@@ -2385,7 +2389,7 @@
     height: max(100%, var(--s4-size-touch-target));
     transform: translate(-50%, -50%);
   }
-  .s4-icon-button:active:not(:disabled) { border-radius: var(--_radius-pressed); }
+  .s4-icon-button:active:not(:disabled) { border-radius: min(var(--_radius-pressed), var(--_radius)); }   /* pressing never makes it rounder than at rest (corner dial) */
   /* press-to-square only where it fits (decision 0043): inside a rounded container (a field, the search bar, a pill
      toolbar, a chip) a squared button would cut across the container's curve, so there it stays round */
   :is(.s4-text-field, .s4-search, .s4-toolbar, .s4-chip, .s4-snackbar) .s4-icon-button { --_radius-pressed: var(--_radius-round); }
@@ -2433,7 +2437,7 @@
      tonal unselected = secondary-container, selected = secondary; outlined selected = inverse-surface.
      Selected swaps the shape: round -> square, square -> round. */
   .s4-icon-button[aria-pressed="true"] { --_fg: var(--md-sys-color-primary); }
-  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: var(--md-sys-color-surface-container); --_fg: var(--md-sys-color-on-surface-variant); }
+  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
   .s4-icon-button[data-variant="filled"][aria-pressed="true"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
   .s4-icon-button[data-variant="tonal"][aria-pressed="true"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-icon-button[data-variant="outlined"][aria-pressed="true"] { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }
@@ -3208,7 +3212,7 @@
     z-index: 0;
     inline-size: var(--_w, 0);
     block-size: var(--_h, 0);
-    border-radius: var(--md-sys-shape-corner-extra-large);
+    border-radius: min(calc(var(--_h, 0px) / 2), var(--s4-shape-nav-indicator));   /* a pill at the default, the corner dial otherwise */
     background: var(--md-sys-color-secondary-container);
     transform: translate(var(--_x, 0), var(--_y, 0));
     pointer-events: none;
@@ -3470,7 +3474,7 @@
     gap: calc(var(--s4-space-1) / 2);
     padding: var(--_pad);
     background: var(--_tray);
-    border-radius: var(--s4-shape-toolbar);
+    border-radius: calc(var(--s4-shape-control) + var(--_pad));   /* concentric with the tabs inside it (decision 0052) */
     isolation: isolate;
     overflow-x: auto;                 /* larger text or many tabs: the strip scrolls, labels never overlap */
     overflow-y: hidden;
@@ -3602,7 +3606,7 @@
     --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the default ring is too close to a tinted fill */
   }
   /* standard icon buttons and text buttons take the toolbar's content color (on vibrant they'd otherwise vanish) */
-  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-button[data-variant="text"]):not(:disabled, [aria-disabled="true"]) {
+  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-icon-button[data-variant="tonal"], .s4-button[data-variant="text"], .s4-button[data-variant="tonal"]):not(:disabled, [aria-disabled="true"]) {
     color: var(--md-sys-color-on-primary-container);
   }
 
@@ -3910,6 +3914,7 @@
     border: 1px solid var(--_outline);
     border-radius: var(--_radius);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);   /* what an Elevated button reads against */
     color: var(--_fg);
     box-shadow: var(--_elevation);
     font-family: var(--md-sys-typescale-body-medium-font);
@@ -4055,6 +4060,7 @@
     padding: var(--s4-pane-padding, var(--_pad));
     border-radius: var(--s4-shape-pane);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);
     color: var(--_fg);
     container-type: inline-size;   /* lists, tables and grids inside can adapt to the pane */
   }
@@ -4148,6 +4154,7 @@
     border: 0;
     border-radius: var(--_radius);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);
     color: var(--_fg);
     font-family: var(--md-sys-typescale-body-large-font);
     font-size: var(--md-sys-typescale-body-large-size);
@@ -4479,9 +4486,13 @@
   .s4-avatar[data-status="busy"]::after { background: var(--md-sys-color-error); }
 
   /* overlapping group */
-  .s4-avatar-group { display: inline-flex; align-items: center; padding-inline-start: var(--s4-space-2); }
-  .s4-avatar-group > .s4-avatar { margin-inline-start: calc(var(--s4-space-2) * -1); box-shadow: 0 0 0 2px var(--md-sys-color-surface); }
-  .s4-avatar[data-more] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); --_type: var(--md-sys-typescale-label-large-size); text-transform: none; }
+  /* overlapping group (issue 58): each avatar is cut out of its neighbour by a ring in the color of the surface the group
+     sits on, and overlaps by an eighth of its width, so every initial stays readable at every size */
+  .s4-avatar-group { --_overlap: 0.12; display: inline-flex; align-items: center; padding-inline-start: calc(var(--s4-space-1) * 2); }
+  .s4-avatar-group > .s4-avatar { margin-inline-start: calc(var(--_size) * var(--_overlap) * -1); box-shadow: 0 0 0 calc(var(--s4-space-1) / 2) var(--s4-surface-here, var(--md-sys-color-surface)); }
+  .s4-avatar-group > .s4-avatar:first-child { margin-inline-start: 0; }
+  /* "+4": a step above the surface it is on (a fixed container role was faint on a dark card) */
+  .s4-avatar[data-more] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 18%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface); --_type: var(--md-sys-typescale-label-large-size); text-transform: none; }
 
   @media (forced-colors: active) { .s4-avatar { border: 1px solid CanvasText; } }
 }
@@ -4872,6 +4883,9 @@
   .s4-breadcrumbs li { display: inline-flex; align-items: center; gap: var(--s4-space-1); min-width: 0; font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); color: var(--md-sys-color-on-surface); }
   .s4-breadcrumbs li + li::before { content: "\203A" / ""; color: var(--md-sys-color-on-surface-variant); }
   .s4-breadcrumb-link, .s4-breadcrumbs li[aria-current] { display: inline-flex; align-items: center; min-height: var(--s4-space-8); padding: 0 var(--s4-space-3); border-radius: var(--s4-shape-chip); }
+  /* the current page has no pill, so its chevron sits the same 4px from the previous pill as the others and its text starts
+     8px after it (a text edge needs a little more air than a pill edge) (issue 58: the chevron used to sit inside the current page's padding) */
+  .s4-breadcrumbs li[aria-current] { padding-inline: 0 var(--s4-space-3); gap: var(--s4-space-2); }
   .s4-breadcrumb-link { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); text-decoration: none; }
   .s4-breadcrumb-link::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: var(--s4-size-touch-target); transform: translateY(-50%); }
   @media (forced-colors: active) { .s4-breadcrumb-link { border: 1px solid LinkText; } }
@@ -6966,7 +6980,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: min(calc(var(--_icon) / 2), max(var(--s4-space-1), calc(var(--s4-shape-chip) - var(--s4-space-2))));   /* concentric with the chip (a circle when the chip is a pill) */
     background: transparent;
     color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;
@@ -7726,6 +7740,7 @@
     border: 0;
     border-radius: var(--s4-shape-menu);
     background: var(--md-sys-color-surface-container);
+    --s4-surface-here: var(--md-sys-color-surface-container);
     color: var(--md-sys-color-on-surface);
     box-shadow: var(--md-sys-elevation-level2);
     font-family: var(--md-sys-typescale-label-large-font);
@@ -7805,6 +7820,7 @@
     border: 0;
     border-radius: var(--s4-shape-dialog);
     background: var(--md-sys-color-surface-container-high);
+    --s4-surface-here: var(--md-sys-color-surface-container-high);
     color: var(--md-sys-color-on-surface);
     box-shadow: var(--md-sys-elevation-level3);
     overflow: auto;
@@ -7907,6 +7923,7 @@
     border: 0;
     border-radius: var(--s4-shape-sheet);
     background: var(--md-sys-color-surface-container-low);
+    --s4-surface-here: var(--md-sys-color-surface-container-low);
     color: var(--md-sys-color-on-surface);
     box-shadow: var(--md-sys-elevation-level1);
     overflow: auto;
@@ -8253,7 +8270,7 @@
   }
 
   /* a toolbar in vibrant color keeps its role as the tint */
-  :where(.s4-toolbar[data-color="vibrant"]) { --_surface: var(--md-sys-color-primary-container); background-color: color-mix(in srgb, var(--md-sys-color-primary-container) calc(var(--_glass-tint) * 100%), transparent); }
+  :where(.s4-toolbar[data-color="vibrant"]) { --_glass-tint: var(--s4-glass-tint-opacity-fab-color); --_surface: var(--md-sys-color-primary-container); background-color: color-mix(in srgb, var(--md-sys-color-primary-container) calc(var(--_glass-tint) * 100%), transparent); }
 
   /* medium contrast: firmer glass (high contrast is already solid through the tokens) */
   :where(:root[data-contrast="medium"]) :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-nav-bar, .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-tooltip, .s4-snackbar) {
@@ -8268,6 +8285,20 @@
     box-shadow: revert-layer;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
+  }
+
+  /* Text on glass is proven for on-surface only (decision 0043). Accent or error colored text is not, so a text button
+     or error item on a glass panel mixes its color toward on-surface until it clears 4.5:1 against the worst backdrop
+     (found by the dial presets pass with a seeded accent, round 0056). Colored FABs are the recorded exception (0028, 0032). */
+  :where(.s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-toolbar, .s4-snackbar, .s4-glass)
+  :is(.s4-menu-item[data-color="error"], .s4-button[data-variant="text"][data-color="error"]):not([data-glass="off"]) {
+    --_fg: color-mix(in srgb, var(--md-sys-color-error) 35%, var(--md-sys-color-on-surface));
+    color: var(--_fg);
+  }
+  :where(.s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-snackbar, .s4-glass)
+  :is(.s4-button[data-variant="text"]:not([data-color])):not([data-glass="off"]) {
+    --_fg: color-mix(in srgb, var(--md-sys-color-primary) 35%, var(--md-sys-color-on-surface));
+    color: var(--_fg);
   }
 
   /* opt out per element: solid again */

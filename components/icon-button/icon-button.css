@@ -56,7 +56,7 @@
     height: max(100%, var(--s4-size-touch-target));
     transform: translate(-50%, -50%);
   }
-  .s4-icon-button:active:not(:disabled) { border-radius: var(--_radius-pressed); }
+  .s4-icon-button:active:not(:disabled) { border-radius: min(var(--_radius-pressed), var(--_radius)); }   /* pressing never makes it rounder than at rest (corner dial) */
   /* press-to-square only where it fits (decision 0043): inside a rounded container (a field, the search bar, a pill
      toolbar, a chip) a squared button would cut across the container's curve, so there it stays round */
   :is(.s4-text-field, .s4-search, .s4-toolbar, .s4-chip, .s4-snackbar) .s4-icon-button { --_radius-pressed: var(--_radius-round); }
@@ -104,7 +104,7 @@
      tonal unselected = secondary-container, selected = secondary; outlined selected = inverse-surface.
      Selected swaps the shape: round -> square, square -> round. */
   .s4-icon-button[aria-pressed="true"] { --_fg: var(--md-sys-color-primary); }
-  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: var(--md-sys-color-surface-container); --_fg: var(--md-sys-color-on-surface-variant); }
+  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
   .s4-icon-button[data-variant="filled"][aria-pressed="true"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
   .s4-icon-button[data-variant="tonal"][aria-pressed="true"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-icon-button[data-variant="outlined"][aria-pressed="true"] { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }

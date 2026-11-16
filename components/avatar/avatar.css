@@ -58,9 +58,13 @@
   .s4-avatar[data-status="busy"]::after { background: var(--md-sys-color-error); }
 
   /* overlapping group */
-  .s4-avatar-group { display: inline-flex; align-items: center; padding-inline-start: var(--s4-space-2); }
-  .s4-avatar-group > .s4-avatar { margin-inline-start: calc(var(--s4-space-2) * -1); box-shadow: 0 0 0 2px var(--md-sys-color-surface); }
-  .s4-avatar[data-more] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); --_type: var(--md-sys-typescale-label-large-size); text-transform: none; }
+  /* overlapping group (issue 58): each avatar is cut out of its neighbour by a ring in the color of the surface the group
+     sits on, and overlaps by an eighth of its width, so every initial stays readable at every size */
+  .s4-avatar-group { --_overlap: 0.12; display: inline-flex; align-items: center; padding-inline-start: calc(var(--s4-space-1) * 2); }
+  .s4-avatar-group > .s4-avatar { margin-inline-start: calc(var(--_size) * var(--_overlap) * -1); box-shadow: 0 0 0 calc(var(--s4-space-1) / 2) var(--s4-surface-here, var(--md-sys-color-surface)); }
+  .s4-avatar-group > .s4-avatar:first-child { margin-inline-start: 0; }
+  /* "+4": a step above the surface it is on (a fixed container role was faint on a dark card) */
+  .s4-avatar[data-more] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 18%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface); --_type: var(--md-sys-typescale-label-large-size); text-transform: none; }
 
   @media (forced-colors: active) { .s4-avatar { border: 1px solid CanvasText; } }
 }

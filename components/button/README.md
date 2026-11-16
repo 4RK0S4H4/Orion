@@ -19,7 +19,8 @@ Starts an action. M3 Expressive buttons: five variants, five sizes, round or squ
 | `data-toggle` + `aria-pressed` | toggle button; `data-label-on/off`, `data-icon-on/off` swap label and icon | — |
 
 **When to use what:** one **filled** button for the most important action in an area; **tonal** for a strong secondary
-action; **outlined** and **text** for the rest; **elevated** only when a button sits on a busy or colored background.
+action; **outlined** and **text** for the rest; **elevated** when a button needs to read as raised: its fill is one step above whatever it sits on (the page, a card, a
+pane, a menu), a tenth of the text color mixed into that surface, so it works in light and dark and on both a page and a card (Orion has no shadows).
 
 **Do**
 - Use Title Case labels that say what happens: "Save Changes", "Export to Excel".

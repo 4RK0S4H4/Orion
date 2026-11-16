@@ -21,6 +21,7 @@
     border: 0;
     border-radius: var(--s4-shape-menu);
     background: var(--md-sys-color-surface-container);
+    --s4-surface-here: var(--md-sys-color-surface-container);
     color: var(--md-sys-color-on-surface);
     box-shadow: var(--md-sys-elevation-level2);
     font-family: var(--md-sys-typescale-label-large-font);
