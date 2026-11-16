@@ -98,6 +98,7 @@ const GROUPS = [
   ['Navigation and shell', ['app', 'layout', 'page', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'breadcrumbs', 'pagination', 'stepper']],
   ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state', 'states', 'direct', 'chart', 'ring', 'milestones', 'timeline', 'month']],
   ['Content', ['prose', 'message']],
+  ['Websites', ['site']],
   ['Inputs', ['form', 'text-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],
   ['Feedback', ['badge', 'status', 'progress', 'banner', 'skeleton', 'reward', 'snackbar', 'tooltip']],
   ['Overlays', ['menu', 'dialog', 'sheet', 'palette']],
@@ -120,7 +121,7 @@ const GROUPS = [
   const groups = [
     ['Color roles', /^--md-sys-color-/], ['Type scale', /^--md-sys-typescale-/], ['Typefaces', /^--md-ref-typeface-/],
     ['Shape scale', /^--md-sys-shape-corner-/], ['Component shapes', /^--s4-shape-/], ['Spacing', /^--s4-space-/], ['Sizes', /^--s4-size-/],
-    ['Layout', /^--s4-layout-/], ['Breakpoints', /^--s4-breakpoint-/], ['Stacking (z-index)', /^--s4-z-/], ['Elevation', /^--md-sys-elevation-/],
+    ['Layout', /^--s4-layout-/], ['Websites (fluid type, section rhythm, widths)', /^--s4-site-/], ['Breakpoints', /^--s4-breakpoint-/], ['Stacking (z-index)', /^--s4-z-/], ['Elevation', /^--md-sys-elevation-/],
     ['State', /^--md-sys-state-/], ['Focus and scrim', /^--s4-(focus|scrim)-/], ['Motion: springs', /^--(md-sys|s4)-motion-spring-/],
     ['Motion: patterns', /^--s4-motion-pattern-/], ['Glass', /^--s4-glass-/], ['Icons', /^--s4-icon-/]];
   const short = (v) => (v.startsWith('linear(') ? 'linear(…) spring easing' : v);

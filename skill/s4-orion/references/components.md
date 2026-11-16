@@ -9,6 +9,7 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 - **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
 - **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
 - **Content:** [prose](#prose), [message](#message)
+- **Websites:** [site](#site)
 - **Inputs:** [form](#form), [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
 - **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [reward](#reward), [snackbar](#snackbar), [tooltip](#tooltip)
 - **Overlays:** [menu](#menu), [dialog](#dialog), [sheet](#sheet), [palette](#palette)
@@ -1833,6 +1834,14 @@ they arrive while the person reads. Sender names are text, not only avatars.
 
 **Tokens:** `--md-sys-color-primary`, `--md-sys-color-surface-container-high`, `--md-sys-shape-corner-large`,
 `--md-sys-shape-corner-small`, `--md-sys-shape-corner-extra-large`, `--s4-app-inset-bottom`, `--s4-z-sticky`.
+
+---
+
+<a id="site"></a>
+
+## Site
+
+Stub.
 
 ---
 

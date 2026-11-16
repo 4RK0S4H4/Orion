@@ -1,0 +1,48 @@
+{
+  "$description": "Websites (issue 53): a fluid display scale for site headings, section rhythm and site widths. Sizes grow with the window between a 360 phone and a 1280 desktop, from the phone size of an M3 role to the desktop size of the next one up. App type is not touched: apps keep the fixed M3 roles.",
+  "s4": {
+    "site": {
+      "hero": {
+        "font": { "$type": "fontFamily", "$value": "{md.sys.typescale.display-large.font}", "$description": "The display face (follows the display dial)." },
+        "size": { "$type": "dimension", "$value": "clamp(36px, 27.78px + 2.283vw, 57px)", "$description": "One h1 per page: display-small (36) on a phone to display-large (57) from 1280." },
+        "line-height": { "$type": "dimension", "$value": "clamp(44px, 36.17px + 2.174vw, 64px)", "$description": "44 on a phone to 64 from 1280." },
+        "tracking": { "$type": "dimension", "$value": "{md.sys.typescale.display-large.tracking}", "$description": "Follows display-large, so another display face drops Inter's tracking." },
+        "weight": { "$type": "fontWeight", "$value": "{md.sys.typescale.display-large.weight}" }
+      },
+      "title": {
+        "font": { "$type": "fontFamily", "$value": "{md.sys.typescale.display-medium.font}" },
+        "size": { "$type": "dimension", "$value": "clamp(28px, 21.35px + 1.848vw, 45px)", "$description": "Section titles (h2): headline-medium (28) on a phone to display-medium (45) from 1280." },
+        "line-height": { "$type": "dimension", "$value": "clamp(36px, 29.74px + 1.739vw, 52px)", "$description": "36 on a phone to 52 from 1280." },
+        "tracking": { "$type": "dimension", "$value": "{md.sys.typescale.display-medium.tracking}" },
+        "weight": { "$type": "fontWeight", "$value": "{md.sys.typescale.display-medium.weight}" }
+      },
+      "lead": {
+        "font": { "$type": "fontFamily", "$value": "{md.sys.typescale.body-large.font}" },
+        "size": { "$type": "dimension", "$value": "clamp(17px, 15.04px + 0.543vw, 22px)", "$description": "The paragraph under a hero or section title: 17 on a phone to title-large (22) from 1280." },
+        "line-height": { "$type": "dimension", "$value": "clamp(26px, 24.04px + 0.543vw, 31px)" },
+        "tracking": { "$type": "dimension", "$value": "{md.sys.typescale.body-large.tracking}" },
+        "weight": { "$type": "fontWeight", "$value": "{md.sys.typescale.body-large.weight}" }
+      },
+      "section-space": {
+        "$type": "dimension",
+        "$value": "clamp(64px, 45.22px + 5.217vw, 112px)",
+        "$description": "Space between two sections (padding at the top and bottom of each): 64 on a phone to 112 from 1280."
+      },
+      "section-space-compact": { "$type": "dimension", "$value": "{s4.space.16}", "$description": "The phone end of section-space; for a tight band (an announcement, a logo row)." },
+      "section-space-wide": { "$type": "dimension", "$value": { "value": 112, "unit": "px" }, "$description": "The desktop end of section-space." },
+      "section-gap": {
+        "$type": "dimension",
+        "$value": "clamp(32px, 22.61px + 2.609vw, 56px)",
+        "$description": "Inside a section: between its heading block and its content. 32 on a phone to 56 from 1280."
+      },
+      "margin": {
+        "$type": "dimension",
+        "$value": "clamp(16px, 9.74px + 1.739vw, 32px)",
+        "$description": "Side margin of a site page: 16 on a phone (as apps) to 32 from 1280."
+      },
+      "width": { "$type": "dimension", "$value": "{s4.layout.content-max}", "$description": "Site content width (1200): sections, header and footer line up on it." },
+      "measure": { "$type": "dimension", "$value": { "value": 600, "unit": "px" }, "$description": "Line length of a lead or section intro (about 60 characters at lead size)." },
+      "measure-wide": { "$type": "dimension", "$value": { "value": 800, "unit": "px" }, "$description": "Wide measure: a centered hero or section heading block." }
+    }
+  }
+}

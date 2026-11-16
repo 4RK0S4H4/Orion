@@ -3,66 +3,317 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Landing Page · S4 Orion Template</title>
-<!-- Template: Landing Page. For a product, app or project home page: a hero, features, a short FAQ and a call to action. No app shell; a top bar with links. -->
+<title>Ledgerly · Every Bill Paid on Time</title>
+<!-- Template: Landing Page. A product home page from the website kit (components/site): announcement bar, glass site header with a phone menu, split hero with a real app screen, logo row, alternating feature rows, bento grid, a large quote, big numbers, FAQ beside its heading, a call-to-action band and a footer. Swap the content; keep the order of sections and one accent band. -->
+<meta name="description" content="Ledgerly reads your bills, reminds you before they’re due and pays them in one tap from the bank you already use. Free for ten bills a month.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ledgerly">
+<meta property="og:title" content="Ledgerly · Every Bill Paid on Time">
+<meta property="og:description" content="Ledgerly reads your bills, reminds you before they’re due and pays them in one tap. Free for ten bills a month.">
+<meta property="og:image" content="https://example.com/og/ledgerly-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/">
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=23cff31">
+<link rel="stylesheet" href="../components/orion.css?v=68d1006">
 <style>
-  .lp { display: grid; gap: var(--s4-space-16); padding-block: var(--s4-space-8) var(--s4-space-16); }
-  .lp-hero { display: grid; justify-items: start; gap: var(--s4-space-4); padding-block: var(--s4-space-8); }
-  .lp-hero h1 { margin: 0; max-inline-size: 16ch; font-family: var(--md-sys-typescale-display-large-font); font-size: clamp(var(--md-sys-typescale-display-small-size), 8vw, var(--md-sys-typescale-display-large-size)); line-height: 1.08; letter-spacing: var(--md-sys-typescale-display-large-tracking); font-weight: var(--md-sys-typescale-emphasized-display-large-weight); text-wrap: balance; }
-  .lp-hero p { margin: 0; max-inline-size: 48ch; }
-  .lp-h2 { margin: 0 0 var(--s4-space-6); }
-  .lp-feature .s4-icon { --s4-icon-size: var(--s4-size-icon-large); }
-  .lp-cta { display: grid; justify-items: center; gap: var(--s4-space-4); text-align: center; }
-  .lp-foot { text-align: center; }
+  /* pictures for this page, composed from Orion components (no image files) */
+  .lp-screen { inline-size: 100%; padding: var(--s4-space-8) var(--s4-space-3) var(--s4-space-3); gap: var(--s4-space-3); }
+  .lp-screen-head { display: flex; align-items: center; justify-content: space-between; padding-inline: var(--s4-space-2); }
+  .lp-screen-head h2 { margin: 0; }
+  .lp-screen .s4-stat { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .lp-screen .s4-list { margin: 0; }
+  .lp-screen .s4-button { margin-block-start: auto; }
+  .lp-stack { display: grid; gap: var(--s4-space-3); inline-size: min(100%, calc(var(--s4-space-16) * 7)); }
+  .lp-note { display: flex; gap: var(--s4-space-3); align-items: flex-start; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); }
+  .lp-note > div { display: grid; gap: var(--s4-space-1); min-inline-size: 0; flex: 1; }
+  .lp-note p { margin: 0; }
+  .lp-note[data-later] { margin-inline-start: var(--s4-space-8); }
+  .lp-card { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-lowest); }
+  .lp-card > * { margin: 0; }
+  .lp-chips { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .lp-shield { display: grid; place-items: center; inline-size: calc(var(--s4-space-16) * 2); block-size: calc(var(--s4-space-16) * 2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-high); --s4-icon-size: var(--s4-space-16); }
 </style>
 </head>
-<body>
-<div class="s4-app">
-  <div class="s4-app-body">
-    <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><span class="s4-app-bar-title">Ledgerly</span></div>
-      <div class="s4-app-bar-actions">
-        <a class="s4-button" data-variant="text" href="#features">Features</a>
-        <a class="s4-button" href="#start">Get Started</a>
-      </div>
-    </header>
-    <main class="s4-content lp">
-      <section class="lp-hero">
-        <span class="s4-status" data-tone="primary">New: Bank Sync</span>
-        <h1>Bills Paid on Time, Without Thinking</h1>
-        <p class="s4-title-large s4-on-surface-variant">Ledgerly collects your bills, reminds you before they’re due and pays them in one tap.</p>
-        <div class="s4-row"><a class="s4-button" data-size="m" href="#start">Try It Free</a><a class="s4-button" data-variant="tonal" data-size="m" href="#features">See How It Works</a></div>
-      </section>
-      <section id="features" aria-labelledby="f-h">
-        <h2 class="lp-h2 s4-headline-medium s4-emphasized" id="f-h">Everything in One Place</h2>
-        <div class="s4-grid" style="--s4-min: 240px">
-          <article class="s4-card lp-feature"><div class="s4-card-body"><span class="s4-icon" data-icon="bills"></span><h3 class="s4-card-title">All Your Bills</h3><p class="s4-card-supporting">Forward an email or snap a photo; we read the amount and due date.</p></div></article>
-          <article class="s4-card lp-feature"><div class="s4-card-body"><span class="s4-icon" data-icon="notifications"></span><h3 class="s4-card-title">Gentle Reminders</h3><p class="s4-card-supporting">A nudge three days before, and one on the day. Never a late fee again.</p></div></article>
-          <article class="s4-card lp-feature"><div class="s4-card-body"><span class="s4-icon" data-icon="security"></span><h3 class="s4-card-title">Bank-Grade Security</h3><p class="s4-card-supporting">Read-only access, encrypted at rest, and you can disconnect any time.</p></div></article>
-        </div>
-      </section>
-      <section aria-labelledby="faq-h">
-        <h2 class="lp-h2 s4-headline-medium s4-emphasized" id="faq-h">Questions</h2>
-        <div class="s4-accordion">
-          <details class="s4-accordion-item" name="faq" open><summary>Is there a free plan?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes. Up to ten bills a month are free, forever.</div></details>
-          <details class="s4-accordion-item" name="faq"><summary>Which banks work?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Over 10,000 banks in the US, UK and EU.</div></details>
-          <details class="s4-accordion-item" name="faq"><summary>Can I cancel any time?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes, from Settings, in two taps.</div></details>
-        </div>
-      </section>
-      <section class="s4-pane lp-cta" id="start" data-color="high" aria-labelledby="cta-h">
-        <h2 class="s4-headline-small s4-emphasized" id="cta-h" style="margin:0">Start Paying Bills the Easy Way</h2>
-        <p class="s4-body-large s4-on-surface-variant" style="margin:0">Free for your first ten bills. No card needed.</p>
-        <a class="s4-button" data-size="m" href="#signup">Create an Account</a>
-      </section>
-      <footer class="lp-foot s4-body-small s4-on-surface-variant">© 2026 Ledgerly · Icons by 480 Design (CC BY 4.0)</footer>
-    </main>
-  </div>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+
+<div class="s4-announce">
+  <span class="s4-status" data-tone="primary">New</span>
+  <span>Bank Sync now works with 2,400 banks across Europe.</span>
+  <a href="#news">Read the Announcement<span class="s4-icon" data-icon="forward"></span></a>
 </div>
-<script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=45fdf47"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });</script>
+
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="#top" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Product</a></li>
+        <li><a class="s4-button" data-variant="text" href="pricing.html">Pricing</a></li>
+        <li><a class="s4-button" data-variant="text" href="#customers">Customers</a></li>
+        <li><a class="s4-button" data-variant="text" href="blog.html">Blog</a></li>
+        <li><a class="s4-button" data-variant="text" href="docs.html">Docs</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" data-variant="text" href="#sign-in">Sign In</a>
+      <a class="s4-button" href="#start" data-keep>Start Free</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- hero: text beside the product -->
+  <section class="s4-site-section" id="top" aria-labelledby="hero-h">
+    <div class="s4-hero" data-layout="split">
+      <div class="s4-hero-text">
+        <p class="s4-eyebrow">Bill Pay for Households and Small Teams</p>
+        <h1 class="s4-hero-title" id="hero-h">Every Bill Paid on Time, Without a Second Thought</h1>
+        <p class="s4-site-lead">Ledgerly reads your bills, reminds you before they’re due and pays them in one tap, from the bank you already use.</p>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="#start">Start Free</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="#how"><span class="s4-icon" data-icon="play"></span>See How It Works</a>
+        </div>
+        <p class="s4-hero-trust">
+          <span class="s4-avatar-group" aria-hidden="true"><span class="s4-avatar">PR</span><span class="s4-avatar" data-tone="secondary">JM</span><span class="s4-avatar" data-tone="tertiary">AK</span></span>
+          <span>Trusted by 40,000 households · rated 4.9 on the App Store</span>
+        </p>
+      </div>
+      <div class="s4-hero-media s4-site-stage" data-bleed>
+        <div class="s4-frame" data-device="phone" role="img" aria-label="The Ledgerly bills screen: $1,284.50 due this week across four bills, two of them on autopay.">
+          <div class="s4-frame-screen lp-screen" inert>
+            <div class="lp-screen-head"><h2 class="s4-headline-small">Bills</h2><span class="s4-avatar" data-size="s">PR</span></div>
+            <div class="s4-stat"><span class="s4-stat-label">Due This Week</span><span class="s4-stat-value">$1,284.50</span></div>
+            <ul class="s4-list">
+              <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Northwind Energy</span><span class="s4-list-supporting">Thu · Autopay</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$142.20</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">City Water</span><span class="s4-list-supporting">Fri</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$38.90</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Oak Street Rent</span><span class="s4-list-supporting">Sat · Autopay</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,050.00</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Harbor Internet</span><span class="s4-list-supporting">Sun</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$53.40</span></span></div></li>
+            </ul>
+            <span class="s4-button" data-size="m">Pay All Four</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- logo row -->
+  <section class="s4-site-section" id="customers" data-space="compact" aria-label="Customers">
+    <div class="s4-logos">
+      <p>Paying the bills at 40,000 homes and at teams like these</p>
+      <ul>
+        <li class="s4-logo"><span class="s4-icon" data-icon="globe"></span>Northwind</li>
+        <li class="s4-logo"><span class="s4-icon" data-icon="book"></span>Fieldnote</li>
+        <li class="s4-logo"><span class="s4-icon" data-icon="link"></span>Copperline</li>
+        <li class="s4-logo"><span class="s4-icon" data-icon="sparkle"></span>Halcyon</li>
+        <li class="s4-logo"><span class="s4-icon" data-icon="home"></span>Oak &amp; Ash</li>
+        <li class="s4-logo"><span class="s4-icon" data-icon="star"></span>Brightwater</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- how it works: text beside a picture, alternating -->
+  <section class="s4-site-section" id="how" aria-labelledby="how-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">How It Works</p>
+      <h2 class="s4-site-title" id="how-h">Three Steps, Then It Runs Itself</h2>
+      <p class="s4-site-lead">Set it up once in about five minutes. After that Ledgerly only asks you something when a bill looks unusual.</p>
+    </div>
+    <div class="s4-feature-rows">
+      <article class="s4-feature-row">
+        <div class="s4-feature-text">
+          <p class="s4-eyebrow">1 · Collect</p>
+          <h3 class="s4-site-subtitle" data-size="l">Forward It, and It’s Filed</h3>
+          <p>Send a bill to your Ledgerly address or take a photo. We read the payee, the amount and the due date, and file it under the right account.</p>
+          <ul class="s4-checks">
+            <li><span class="s4-icon" data-icon="check"></span>PDFs, photos and e-mails</li>
+            <li><span class="s4-icon" data-icon="check"></span>Spots duplicates and price rises</li>
+            <li><span class="s4-icon" data-icon="check"></span>Works with 10,000 billers</li>
+          </ul>
+        </div>
+        <div class="s4-feature-media">
+          <div class="s4-site-stage" data-ratio="3:2" role="img" aria-label="A forwarded e-mail from Northwind Energy, read into a payee, an amount and a due date.">
+            <div class="lp-stack" inert>
+              <div class="lp-note"><span class="s4-avatar" data-tone="neutral"><span class="s4-icon" data-icon="mail"></span></span><div><span class="s4-title-small">Fwd: Your November statement</span><span class="s4-body-small s4-on-surface-variant">billing@northwind.example · PDF attached</span></div></div>
+              <div class="lp-card">
+                <div class="s4-row"><span class="s4-status" data-tone="success"><span class="s4-icon" data-icon="check"></span>Read</span><span class="s4-body-small s4-on-surface-variant">in 2 seconds</span></div>
+                <dl class="s4-dl">
+                  <div class="s4-dl-row"><dt>Payee</dt><dd>Northwind Energy</dd></div>
+                  <div class="s4-dl-row"><dt>Amount</dt><dd>$142.20</dd></div>
+                  <div class="s4-dl-row"><dt>Due</dt><dd>Thu, Nov 20</dd></div>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="s4-feature-row">
+        <div class="s4-feature-text">
+          <p class="s4-eyebrow">2 · Remind</p>
+          <h3 class="s4-site-subtitle" data-size="l">Reminders That Know When to Stop</h3>
+          <p>One nudge three days before, one on the day, and silence once it’s paid. Bills on autopay only tell you when something changed.</p>
+          <ul class="s4-checks">
+            <li><span class="s4-icon" data-icon="check"></span>Quiet hours and a weekly digest</li>
+            <li><span class="s4-icon" data-icon="check"></span>Share reminders with your household</li>
+          </ul>
+        </div>
+        <div class="s4-feature-media">
+          <div class="s4-site-stage" data-ratio="3:2" role="img" aria-label="Two reminders: the water bill is due Friday, and the energy bill went up by $18 this month.">
+            <div class="lp-stack" inert>
+              <div class="lp-note"><span class="s4-avatar"><span class="s4-icon" data-icon="notifications"></span></span><div><span class="s4-title-small">City Water is due Friday</span><span class="s4-body-small s4-on-surface-variant">$38.90 from Everyday Checking</span></div><span class="s4-body-small s4-on-surface-variant">9:00</span></div>
+              <div class="lp-note" data-later><span class="s4-avatar" data-tone="tertiary"><span class="s4-icon" data-icon="info"></span></span><div><span class="s4-title-small">Northwind went up $18</span><span class="s4-body-small s4-on-surface-variant">Still on autopay. Tap to review.</span></div><span class="s4-body-small s4-on-surface-variant">Mon</span></div>
+              <div class="lp-note"><span class="s4-avatar" data-tone="secondary"><span class="s4-icon" data-icon="check"></span></span><div><span class="s4-title-small">Oak Street Rent was paid</span><span class="s4-body-small s4-on-surface-variant">$1,050.00 · Jamie can see it too</span></div><span class="s4-body-small s4-on-surface-variant">Sat</span></div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <article class="s4-feature-row">
+        <div class="s4-feature-text">
+          <p class="s4-eyebrow">3 · Pay</p>
+          <h3 class="s4-site-subtitle" data-size="l">One Tap, From Your Own Bank</h3>
+          <p>Ledgerly pays from the account you choose, on the day you choose. Nothing sits in a wallet of ours, and you can undo a payment until it leaves.</p>
+          <a class="s4-site-more" href="#security">How We Keep Your Money Safe<span class="s4-icon" data-icon="forward"></span></a>
+        </div>
+        <div class="s4-feature-media">
+          <div class="s4-site-stage" data-ratio="3:2" role="img" aria-label="Paying Northwind Energy $142.20 from Everyday Checking ending 4821.">
+            <div class="lp-stack" inert>
+              <div class="lp-card">
+                <span class="s4-title-medium">Pay Northwind Energy</span>
+                <span class="s4-display-small s4-num">$142.20</span>
+                <dl class="s4-dl">
+                  <div class="s4-dl-row"><dt>From</dt><dd>Everyday Checking ··4821</dd></div>
+                  <div class="s4-dl-row"><dt>On</dt><dd>Thu, Nov 20</dd></div>
+                </dl>
+                <span class="s4-button" data-size="m">Pay $142.20</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- everything else: bento -->
+  <section class="s4-site-section" id="security" aria-labelledby="more-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">And the Rest</p>
+      <h2 class="s4-site-title" id="more-h">Everything You’d Expect, Done Properly</h2>
+    </div>
+    <div class="s4-bento">
+      <article class="s4-bento-cell" data-span="7">
+        <h3 class="s4-bento-title">Shared Households</h3>
+        <p>Invite a partner or a bookkeeper. Everyone sees what’s due; only the people you choose can pay.</p>
+        <div class="s4-bento-visual" aria-hidden="true">
+          <div class="lp-card" style="inline-size: min(100%, calc(var(--s4-space-16) * 6))">
+            <div class="s4-row" style="justify-content: space-between"><span class="s4-title-small">Oak Street Home</span><span class="s4-avatar-group"><span class="s4-avatar">PR</span><span class="s4-avatar" data-tone="secondary">JM</span><span class="s4-avatar" data-more>+1</span></span></div>
+            <div class="s4-progress" data-value="0.78" aria-label="7 of 9 Bills Paid"></div>
+            <span class="s4-body-small s4-on-surface-variant">7 of 9 bills paid this month</span>
+          </div>
+        </div>
+      </article>
+      <article class="s4-bento-cell" data-span="5" data-tone="accent">
+        <div class="s4-bento-visual"><span class="s4-bento-figure">$0</span></div>
+        <h3 class="s4-bento-title">In Late Fees</h3>
+        <p>for 92% of members last year. The rest paid one, and we refunded it.</p>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">Bank-Grade Security</h3>
+        <p>Read-only bank access, encryption at rest and two-step sign-in. Disconnect any time.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><span class="lp-shield"><span class="s4-icon" data-icon="security"></span></span></div>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">Any Currency</h3>
+        <p>Pay a landlord in euros and a dentist in dollars from one list.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><div class="lp-chips"><span class="s4-status">USD</span><span class="s4-status">EUR</span><span class="s4-status">GBP</span><span class="s4-status">CAD</span><span class="s4-status">AUD</span><span class="s4-status">CHF</span></div></div>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">Ready for Tax Time</h3>
+        <p>A tidy export for your accountant: every bill, receipt and payment, by category.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><div class="lp-chips"><span class="s4-status" data-tone="secondary"><span class="s4-icon" data-icon="document"></span>CSV</span><span class="s4-status" data-tone="secondary"><span class="s4-icon" data-icon="document"></span>PDF</span><span class="s4-status" data-tone="secondary"><span class="s4-icon" data-icon="export"></span>QuickBooks</span></div></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- social proof: one large quote, then the numbers -->
+  <section class="s4-site-section" aria-label="What Members Say">
+    <figure class="s4-quote">
+      <blockquote><p>“We used to pay one late fee a month without noticing. Ledgerly paid for itself in the first six weeks, and I haven’t opened a paper bill since.”</p></blockquote>
+      <figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="tertiary">PR</span><span><span class="s4-quote-name">Priya Raman</span><span class="s4-quote-role">Runs a three-person design studio in Leeds</span></span></figcaption>
+    </figure>
+  </section>
+  <section class="s4-site-section" aria-label="Ledgerly in Numbers">
+    <dl class="s4-numbers">
+      <div class="s4-number"><dt>paid on time since 2023</dt><dd>$2.1B</dd></div>
+      <div class="s4-number"><dt>households and small teams</dt><dd>40,000</dd></div>
+      <div class="s4-number"><dt>sooner than paying by hand, on average</dt><dd>9 days</dd></div>
+      <div class="s4-number"><dt>on the App Store, from 12,000 ratings</dt><dd>4.9</dd></div>
+    </dl>
+  </section>
+
+  <!-- FAQ beside its heading -->
+  <section class="s4-site-section" aria-labelledby="faq-h">
+    <div class="s4-site-split">
+      <div class="s4-site-section-head">
+        <h2 class="s4-site-title" id="faq-h">Questions, Answered</h2>
+        <p class="s4-site-lead">Can’t find yours? The help center has the rest, and a person answers within a day.</p>
+        <a class="s4-site-more" href="docs.html">Visit the Help Center<span class="s4-icon" data-icon="forward"></span></a>
+      </div>
+      <div class="s4-accordion">
+        <details class="s4-accordion-item" name="faq" open><summary>Is there a free plan?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes. Up to ten bills a month are free for as long as you like, with reminders and one connected bank.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>Which banks work?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Over 12,000 banks and credit unions in the US, the UK and the EU. You can also pay by card.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>Do you ever hold my money?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">No. Payments go straight from your account to the biller on the day you choose.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>Can I cancel any time?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes, from Settings, in two taps. Your history stays yours to export.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- the one accent band -->
+  <section class="s4-site-section" data-tone="accent" id="start" aria-labelledby="cta-h">
+    <div class="s4-cta">
+      <div>
+        <h2 class="s4-site-title" id="cta-h">Start With Ten Bills, Free</h2>
+        <p class="s4-site-lead">No card needed. Bring the rest of your bills when you’re ready.</p>
+      </div>
+      <div class="s4-site-actions-row">
+        <a class="s4-button" data-size="m" href="#signup">Create an Account</a>
+        <a class="s4-button" data-variant="tonal" data-size="m" href="pricing.html">See Pricing</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="#top" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+      <p>Bills paid on time, from the bank you already use. Made in Bristol and Lisbon.</p>
+      <form class="s4-site-footer-signup" action="#subscribed" aria-label="Newsletter">
+        <div class="s4-text-field"><input id="news-email" type="email" autocomplete="email" required><label for="news-email">Email for Monthly Tips</label></div>
+        <button class="s4-button" data-variant="tonal" type="submit">Subscribe</button>
+      </form>
+    </div>
+    <nav class="s4-site-footer-links" aria-label="Footer">
+      <div><h2>Product</h2><ul><li><a href="#how">How It Works</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="#security">Security</a></li><li><a href="blog.html">Changelog</a></li></ul></div>
+      <div><h2>Company</h2><ul><li><a href="site.html">About</a></li><li><a href="#customers">Customers</a></li><li><a href="#careers">Careers</a></li><li><a href="#press">Press</a></li></ul></div>
+      <div><h2>Resources</h2><ul><li><a href="blog.html">Blog</a></li><li><a href="docs.html">Docs</a></li><li><a href="#help">Help Center</a></li><li><a href="#status">Status</a></li></ul></div>
+      <div><h2>Legal</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#terms">Terms</a></li><li><a href="#cookies">Cookies</a></li><li><a href="#licenses">Licenses</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 Ledgerly Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="../components/assets/icons.js?v=27d8ac2" defer></script>
+<script src="../components/orion.js?v=18f7b53" defer></script>
+<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
 </body>
 </html>
