@@ -3149,6 +3149,7 @@
   .s4-toolbar[data-color="vibrant"] {
     --_bg: var(--md-sys-color-primary-container);
     --_fg: var(--md-sys-color-on-primary-container);
+    --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the default ring is too close to a tinted fill */
   }
   /* standard icon buttons and text buttons take the toolbar's content color (on vibrant they'd otherwise vanish) */
   .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-button[data-variant="text"]):not(:disabled, [aria-disabled="true"]) {
@@ -5658,7 +5659,7 @@
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select):focus-visible),
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
   .s4-text-field:has(> :is(input, select, textarea):focus) {
     --_outline: var(--_ring-color);
     --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */

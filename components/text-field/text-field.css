@@ -169,7 +169,7 @@
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select):focus-visible),
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
   .s4-text-field:has(> :is(input, select, textarea):focus) {
     --_outline: var(--_ring-color);
     --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */
