@@ -10,7 +10,7 @@
 @layer s4.components {
   .s4-stepper { display: flex; align-items: flex-start; margin: 0; padding: 0; list-style: none; gap: 0; }
   .s4-stepper > li { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; gap: var(--s4-space-2); min-width: 0; text-align: center; }
-  .s4-stepper > li + li::before { content: ""; position: absolute; top: calc(var(--s4-space-4) - var(--s4-space-1) / 2); right: 50%; width: 100%; height: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); z-index: 0; }
+  .s4-stepper > li + li::before { content: ""; position: absolute; top: calc(var(--s4-space-4) - var(--s4-space-1) / 2); inset-inline-end: 50%; width: 100%; height: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); z-index: 0; }
   .s4-stepper > li[data-state="done"] + li::before, .s4-stepper > li[data-state="current"]::before { background: var(--md-sys-color-inverse-surface); }
   .s4-stepper > li[data-state="current"]:first-child::before { display: none; }
   .s4-step-dot {

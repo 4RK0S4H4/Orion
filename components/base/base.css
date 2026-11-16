@@ -48,6 +48,12 @@
   }
   .s4-icon > svg { width: 100%; height: 100%; }
   .s4-icon > svg [opacity] { opacity: var(--s4-icon-duo-opacity); }
+  /* icons that point along the reading direction (back, next, send, undo) mirror in right-to-left; the rest never do.
+     Add data-mirror to any other icon that points a way, data-mirror="off" to keep one as drawn. */
+  .s4-icon:where([data-icon="back"], [data-icon="forward"], [data-icon="chevron-left"], [data-icon="chevron-right"],
+                 [data-icon="send"], [data-icon="undo"], [data-icon="redo"], [data-icon="login"], [data-icon="logout"],
+                 [data-icon="sidebar"], [data-icon="reply"], [data-icon="arrow-left"], [data-icon="arrow-right"],
+                 [data-icon="skip-back"], [data-icon="skip-forward"], [data-mirror]:not([data-mirror="off"])):dir(rtl) > svg { transform: scaleX(-1); }
 
   /* ---------- the shared state layer (M3): a content-colored overlay at the state-layer opacity ----------
      Every interactive S4 component is listed here once, so hover, focus and press look identical everywhere.

@@ -45,7 +45,7 @@
   .s4-avatar[data-status]::after {
     content: "";
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: max(var(--s4-space-2), calc(var(--_size) * 0.28));
     height: max(var(--s4-space-2), calc(var(--_size) * 0.28));

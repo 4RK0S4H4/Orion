@@ -109,6 +109,7 @@
     inset-inline-end: calc(var(--s4-space-4) + env(safe-area-inset-right, 0px));
     z-index: var(--s4-z-fab);
   }
+  .s4-fab[data-fixed]:dir(rtl) { inset-inline-end: calc(var(--s4-space-4) + env(safe-area-inset-left, 0px)); }
 
   .s4-fab:is(:disabled, [aria-disabled="true"]) {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);

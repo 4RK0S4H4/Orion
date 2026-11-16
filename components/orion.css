@@ -1161,6 +1161,12 @@
   }
   .s4-icon > svg { width: 100%; height: 100%; }
   .s4-icon > svg [opacity] { opacity: var(--s4-icon-duo-opacity); }
+  /* icons that point along the reading direction (back, next, send, undo) mirror in right-to-left; the rest never do.
+     Add data-mirror to any other icon that points a way, data-mirror="off" to keep one as drawn. */
+  .s4-icon:where([data-icon="back"], [data-icon="forward"], [data-icon="chevron-left"], [data-icon="chevron-right"],
+                 [data-icon="send"], [data-icon="undo"], [data-icon="redo"], [data-icon="login"], [data-icon="logout"],
+                 [data-icon="sidebar"], [data-icon="reply"], [data-icon="arrow-left"], [data-icon="arrow-right"],
+                 [data-icon="skip-back"], [data-icon="skip-forward"], [data-mirror]:not([data-mirror="off"])):dir(rtl) > svg { transform: scaleX(-1); }
 
   /* ---------- the shared state layer (M3): a content-colored overlay at the state-layer opacity ----------
      Every interactive S4 component is listed here once, so hover, focus and press look identical everywhere.
@@ -2089,6 +2095,7 @@
     inset-inline-end: calc(var(--s4-space-4) + env(safe-area-inset-right, 0px));
     z-index: var(--s4-z-fab);
   }
+  .s4-fab[data-fixed]:dir(rtl) { inset-inline-end: calc(var(--s4-space-4) + env(safe-area-inset-left, 0px)); }
 
   .s4-fab:is(:disabled, [aria-disabled="true"]) {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
@@ -2162,7 +2169,8 @@
     max-inline-size: var(--s4-content-max, var(--s4-layout-content-max));
     margin-inline: auto;
     padding-block: 0 calc(var(--s4-space-6) + var(--s4-app-inset-bottom, env(safe-area-inset-bottom, 0px)));
-    padding-inline: max(var(--_margin), env(safe-area-inset-left, 0px)) max(var(--_margin), env(safe-area-inset-right, 0px));
+    padding-left: max(var(--_margin), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--_margin), env(safe-area-inset-right, 0px));   /* the notch is physical: left and right, not start and end */
   }
   /* in the flex column, auto margins would shrink the content to fit: give it the full width minus its margins */
   .s4-app-body > .s4-content { inline-size: calc(100% - 2 * var(--_margin)); }
@@ -2185,7 +2193,8 @@
     .s4-content { --_margin: var(--s4-layout-margin); }
     /* the bar's title and icons line up with the 24dp content margin (the bar's own inset is 8 + the slot's 8) */
     .s4-app-body > .s4-top-app-bar {
-      padding-inline: max(var(--s4-space-4), env(safe-area-inset-left, 0px)) max(var(--s4-space-4), env(safe-area-inset-right, 0px));
+      padding-left: max(var(--s4-space-4), env(safe-area-inset-left, 0px));
+      padding-right: max(var(--s4-space-4), env(safe-area-inset-right, 0px));
     }
   }
   /* expanded (>= 840): rail at the left, nav bar hidden; the rail takes the left safe area */
@@ -2756,17 +2765,19 @@
    Shares .s4-nav-item with the nav bar (nav-bar.css).
    Public knob: --s4-nav-rail-expanded-width (default 240). */
 @layer s4.components {
+  .s4-nav-rail:dir(rtl) { --_notch: env(safe-area-inset-right, 0px); }
   .s4-nav-rail {
     --_row: var(--s4-size-nav-row);
     --_pad: calc((var(--s4-size-nav-rail) - var(--_row)) / 2);              /* 12: the row's inset from the rail's edges */
     --_w: var(--s4-size-nav-rail);
+    --_notch: env(safe-area-inset-left, 0px);   /* the rail's own edge is the inline start: the right edge in rtl */
     display: flex;
     flex-direction: column;
     flex: none;
     gap: var(--s4-space-4);
-    inline-size: calc(var(--_w) + env(safe-area-inset-left, 0px));
+    inline-size: calc(var(--_w) + var(--_notch));
     padding-block: max(var(--s4-space-3), env(safe-area-inset-top, 0px)) max(var(--s4-space-3), env(safe-area-inset-bottom, 0px));
-    padding-inline-start: env(safe-area-inset-left, 0px);
+    padding-inline-start: var(--_notch);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -3890,7 +3901,7 @@
   .s4-avatar[data-status]::after {
     content: "";
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     width: max(var(--s4-space-2), calc(var(--_size) * 0.28));
     height: max(var(--s4-space-2), calc(var(--_size) * 0.28));
@@ -4354,7 +4365,7 @@
 @layer s4.components {
   .s4-stepper { display: flex; align-items: flex-start; margin: 0; padding: 0; list-style: none; gap: 0; }
   .s4-stepper > li { position: relative; display: flex; flex: 1 1 0; flex-direction: column; align-items: center; gap: var(--s4-space-2); min-width: 0; text-align: center; }
-  .s4-stepper > li + li::before { content: ""; position: absolute; top: calc(var(--s4-space-4) - var(--s4-space-1) / 2); right: 50%; width: 100%; height: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); z-index: 0; }
+  .s4-stepper > li + li::before { content: ""; position: absolute; top: calc(var(--s4-space-4) - var(--s4-space-1) / 2); inset-inline-end: 50%; width: 100%; height: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); z-index: 0; }
   .s4-stepper > li[data-state="done"] + li::before, .s4-stepper > li[data-state="current"]::before { background: var(--md-sys-color-inverse-surface); }
   .s4-stepper > li[data-state="current"]:first-child::before { display: none; }
   .s4-step-dot {
@@ -5884,6 +5895,7 @@
    On: primary track, 24dp on-primary handle. Pressed: 28dp handle. The handle slides on the fast-spatial spring.
    No state-layer halo: the handle grows a little on hover and more on press (decision 0043). */
 @layer s4.components {
+  .s4-switch:dir(rtl) { --_dir: -1; }   /* the handle travels from the inline start */
   .s4-switch {
     position: relative;
     --_track: var(--md-sys-color-surface-container-highest);
@@ -5932,15 +5944,14 @@
   .s4-switch-track::after {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     top: 50%;
     height: var(--s4-size-touch-target);
     transform: translateY(-50%);
   }
   .s4-switch-handle {
     position: absolute;
-    left: var(--_x);
+    inset-inline-start: var(--_x);
     top: 50%;
     display: grid;
     place-items: center;
@@ -5949,9 +5960,9 @@
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_handle);
     color: var(--_icon-color);
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% * var(--_dir, 1)), -50%);
     transition: 
-      left var(--s4-motion-ink),
+      inset-inline-start var(--s4-motion-ink),
       width var(--s4-motion-ink),
       height var(--s4-motion-ink),
       background-color var(--s4-motion-state);
@@ -6160,8 +6171,8 @@
     border-radius: var(--md-sys-shape-corner-extra-large);
   }
   /* the legend is a heading inside the box (a normal legend would straddle the top edge) */
-  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend { float: left; width: 100%; padding: var(--s4-space-2) 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
-  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend + * { clear: left; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend { float: inline-start; width: 100%; padding: var(--s4-space-2) 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend + * { clear: inline-start; }
   .s4-radio {
     --_ring: var(--md-sys-color-on-surface-variant);
     --_state: var(--md-sys-color-on-surface);
@@ -6450,7 +6461,9 @@
     --_handle: var(--md-sys-color-primary);
     --_stop-on-active: var(--md-sys-color-secondary-container);   /* M3 Expressive stop indicator colors */
     --_stop-on-inactive: var(--md-sys-color-primary);
-    --_x: calc(var(--_inset) + var(--_value) * (100% - 2 * var(--_inset)));   /* handle centre */
+    --_x: calc(var(--_inset) + var(--_value) * (100% - 2 * var(--_inset)));   /* handle centre, measured from the inline start */
+    --_dir: 1;                                                /* -1 in right-to-left: the slider fills from the inline start */
+    --_to: right;
 
     position: relative;
     display: block;
@@ -6459,6 +6472,7 @@
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
   }
+  .s4-slider:dir(rtl) { --_dir: -1; --_to: left; }
   /* tracks */
   .s4-slider::before,
   .s4-slider::after {
@@ -6470,15 +6484,21 @@
     pointer-events: none;
   }
   .s4-slider::before {
-    left: 0;
-    width: max(0px, calc(var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
-    border-radius: var(--_round) var(--_inner) var(--_inner) var(--_round);
+    inset-inline-start: 0;
+    inline-size: max(0px, calc(var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
+    border-start-start-radius: var(--_round);
+    border-start-end-radius: var(--_inner);
+    border-end-end-radius: var(--_inner);
+    border-end-start-radius: var(--_round);
     background: var(--_active);
   }
   .s4-slider::after {
-    right: 0;
-    width: max(0px, calc(100% - var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
-    border-radius: var(--_inner) var(--_round) var(--_round) var(--_inner);
+    inset-inline-end: 0;
+    inline-size: max(0px, calc(100% - var(--_x) - var(--_handle-w) / 2 - var(--_gap)));
+    border-start-start-radius: var(--_inner);
+    border-start-end-radius: var(--_round);
+    border-end-end-radius: var(--_round);
+    border-end-start-radius: var(--_inner);
     background: var(--_inactive);
   }
   /* stop indicators: the end stop always; every step with data-stops. Dots take the color of the track they sit on. */
@@ -6491,7 +6511,7 @@
     height: var(--s4-space-1);
     transform: translateY(-50%);
     pointer-events: none;
-    background: linear-gradient(to right, var(--_stop-on-active) var(--_x), var(--_stop-on-inactive) var(--_x));
+    background: linear-gradient(to var(--_to), var(--_stop-on-active) var(--_x), var(--_stop-on-inactive) var(--_x));
     --_dot: radial-gradient(circle closest-side, var(--_handle) 100%, transparent 100%);   /* mask: only alpha matters */
     display: none;   /* only with data-stops: a dot at the end of the track looks odd, most of all with the handle on it */
   }
@@ -6499,30 +6519,30 @@
   .s4-slider[data-stops] .s4-slider-stops {
     display: block;
     --_p: calc(100% / (var(--_steps, 10) + 1));   /* one tile, in this layer's own width */
-    left: calc(var(--_inset) - (100% - 2 * var(--_inset)) / var(--_steps, 10) / 2);
-    right: auto;
+    inset-inline-start: calc(var(--_inset) - (100% - 2 * var(--_inset)) / var(--_steps, 10) / 2);
+    inset-inline-end: auto;
     width: calc((100% - 2 * var(--_inset)) * (var(--_steps, 10) + 1) / var(--_steps, 10));
     /* dots, minus a window around the handle: a dot the handle covers or sits beside is hidden, never half shown */
     --_hx: calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p)));
     --_cut: calc(var(--_handle-w) / 2 + var(--_gap) + var(--s4-space-1));
     mask:
       var(--_dot) 0 50% / var(--_p) var(--s4-space-1) repeat-x,
-      linear-gradient(to right, var(--_handle) calc(var(--_hx) - var(--_cut)), transparent 0, transparent calc(var(--_hx) + var(--_cut)), var(--_handle) 0),
-      linear-gradient(to right, transparent var(--_p), var(--_handle) 0, var(--_handle) calc(100% - var(--_p)), transparent 0);   /* the two ends need no dot */
+      linear-gradient(to var(--_to), var(--_handle) calc(var(--_hx) - var(--_cut)), transparent 0, transparent calc(var(--_hx) + var(--_cut)), var(--_handle) 0),
+      linear-gradient(to var(--_to), transparent var(--_p), var(--_handle) 0, var(--_handle) calc(100% - var(--_p)), transparent 0);   /* the two ends need no dot */
     mask-composite: intersect;
     -webkit-mask-composite: source-in;
-    background: linear-gradient(to right, var(--_stop-on-active) calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p))), var(--_stop-on-inactive) 0);
+    background: linear-gradient(to var(--_to), var(--_stop-on-active) calc(var(--_p) / 2 + var(--_value) * (100% - var(--_p))), var(--_stop-on-inactive) 0);
   }
   .s4-slider-handle {
     position: absolute;
-    left: var(--_x);
+    inset-inline-start: var(--_x);
     top: 50%;
     z-index: 1;
     width: var(--_handle-w);
     height: var(--_handle-h);
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_handle);
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% * var(--_dir)), -50%);
     pointer-events: none;
     transition: width var(--s4-motion-morph);
   }
@@ -6859,25 +6879,27 @@
     transition: width var(--s4-motion-ink-calm);
   }
 
+  .s4-progress { --_to: right; }
+  .s4-progress:dir(rtl) { --_to: left; }
   /* ---------- linear, indeterminate: two indicators sweep across; the track is drawn around them with gaps ---------- */
   .s4-progress:not([data-type="circular"]):not([data-value]) {
     --_t1: 0%; --_h1: 0%; --_t2: 0%; --_h2: 0%;
     overflow: hidden;
-    background: linear-gradient(to right,
+    background: linear-gradient(to var(--_to),
       var(--_track) calc(var(--_t2) - var(--_gap)), transparent 0 calc(var(--_h2) + var(--_gap)),
       var(--_track) 0 calc(var(--_t1) - var(--_gap)), transparent 0 calc(var(--_h1) + var(--_gap)),
       var(--_track) 0);
     animation: s4-progress-linear var(--s4-progress-cycle) linear infinite;
   }
-  /* physical left/right to match the gradient: the sweep runs left to right */
+  /* the sweep runs from the inline start: left to right, right to left in rtl (the gradient direction follows --_to) */
   .s4-progress:not([data-type="circular"]):not([data-value])::before {
-    left: var(--_t1);
-    width: calc(var(--_h1) - var(--_t1));
+    inset-inline-start: var(--_t1);
+    inline-size: calc(var(--_h1) - var(--_t1));
     background: var(--_indicator);
   }
   .s4-progress:not([data-type="circular"]):not([data-value])::after {
-    left: var(--_t2);
-    width: calc(var(--_h2) - var(--_t2));
+    inset-inline-start: var(--_t2);
+    inline-size: calc(var(--_h2) - var(--_t2));
     background: var(--_indicator);
   }
   /* Decision 0042: one indicator slides through like a drop: the front edge runs ahead to 55%, then the back edge

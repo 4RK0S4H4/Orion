@@ -13,8 +13,10 @@
     var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
     var below = a.bottom + gap + p.height <= vh - m || a.top - gap - p.height < m;
     var top = below ? a.bottom + gap : a.top - gap - p.height;
-    var end = opts.align === 'end' || (opts.align !== 'start' && a.left + p.width > vw - m);
-    var left = end ? a.right - p.width : a.left;
+    /* start and end are inline: in right-to-left the start edge is the right one */
+    var rtl = getComputedStyle(anchor).direction === 'rtl';
+    var end = opts.align === 'end' || (opts.align !== 'start' && (rtl ? a.right - p.width < m : a.left + p.width > vw - m));
+    var left = end !== rtl ? a.right - p.width : a.left;
     left = Math.max(m, Math.min(left, vw - m - p.width));
     top = Math.max(m, Math.min(top, vh - m - p.height));
     popup.style.left = left + 'px'; popup.style.top = top + 'px';

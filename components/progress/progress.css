@@ -60,25 +60,27 @@
     transition: width var(--s4-motion-ink-calm);
   }
 
+  .s4-progress { --_to: right; }
+  .s4-progress:dir(rtl) { --_to: left; }
   /* ---------- linear, indeterminate: two indicators sweep across; the track is drawn around them with gaps ---------- */
   .s4-progress:not([data-type="circular"]):not([data-value]) {
     --_t1: 0%; --_h1: 0%; --_t2: 0%; --_h2: 0%;
     overflow: hidden;
-    background: linear-gradient(to right,
+    background: linear-gradient(to var(--_to),
       var(--_track) calc(var(--_t2) - var(--_gap)), transparent 0 calc(var(--_h2) + var(--_gap)),
       var(--_track) 0 calc(var(--_t1) - var(--_gap)), transparent 0 calc(var(--_h1) + var(--_gap)),
       var(--_track) 0);
     animation: s4-progress-linear var(--s4-progress-cycle) linear infinite;
   }
-  /* physical left/right to match the gradient: the sweep runs left to right */
+  /* the sweep runs from the inline start: left to right, right to left in rtl (the gradient direction follows --_to) */
   .s4-progress:not([data-type="circular"]):not([data-value])::before {
-    left: var(--_t1);
-    width: calc(var(--_h1) - var(--_t1));
+    inset-inline-start: var(--_t1);
+    inline-size: calc(var(--_h1) - var(--_t1));
     background: var(--_indicator);
   }
   .s4-progress:not([data-type="circular"]):not([data-value])::after {
-    left: var(--_t2);
-    width: calc(var(--_h2) - var(--_t2));
+    inset-inline-start: var(--_t2);
+    inline-size: calc(var(--_h2) - var(--_t2));
     background: var(--_indicator);
   }
   /* Decision 0042: one indicator slides through like a drop: the front edge runs ahead to 55%, then the back edge

@@ -7,6 +7,7 @@
    On: primary track, 24dp on-primary handle. Pressed: 28dp handle. The handle slides on the fast-spatial spring.
    No state-layer halo: the handle grows a little on hover and more on press (decision 0043). */
 @layer s4.components {
+  .s4-switch:dir(rtl) { --_dir: -1; }   /* the handle travels from the inline start */
   .s4-switch {
     position: relative;
     --_track: var(--md-sys-color-surface-container-highest);
@@ -55,15 +56,14 @@
   .s4-switch-track::after {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
+    inset-inline: 0;
     top: 50%;
     height: var(--s4-size-touch-target);
     transform: translateY(-50%);
   }
   .s4-switch-handle {
     position: absolute;
-    left: var(--_x);
+    inset-inline-start: var(--_x);
     top: 50%;
     display: grid;
     place-items: center;
@@ -72,9 +72,9 @@
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--_handle);
     color: var(--_icon-color);
-    transform: translate(-50%, -50%);
+    transform: translate(calc(-50% * var(--_dir, 1)), -50%);
     transition: 
-      left var(--s4-motion-ink),
+      inset-inline-start var(--s4-motion-ink),
       width var(--s4-motion-ink),
       height var(--s4-motion-ink),
       background-color var(--s4-motion-state);
