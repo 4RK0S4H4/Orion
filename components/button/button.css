@@ -73,8 +73,10 @@
   /* ---------- variants ---------- */
   .s4-button[data-variant="tonal"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[data-variant="outlined"] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }   /* decision 0023: no outlined elements, the old name now draws a filled button */
-  .s4-button[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); --_fg: var(--md-sys-color-primary); --_elevation: var(--md-sys-elevation-level1); }
-  @media (hover: hover) { .s4-button[data-variant="elevated"]:hover:not(:disabled) { --_elevation: var(--md-sys-elevation-level2); } }
+  /* Elevated (issue 58): Orion has no shadows, so "raised" is a fill one step above whatever the button sits on: the
+     surface it is on (--s4-surface-here, set by card, pane, list, menu, dialog and sheet; the page otherwise) with a
+     tenth of the text color mixed in. That is darker in light mode and lighter in dark mode, on a page and on a card. */
+  .s4-button[data-variant="elevated"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-primary); }
   .s4-button[data-variant="text"] { --_bg: transparent; --_fg: var(--md-sys-color-primary); --_pad: var(--s4-space-3); }
 
   /* destructive: the confirm button of a destructive dialog, or the action in a danger zone */

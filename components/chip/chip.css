@@ -131,7 +131,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: min(calc(var(--_icon) / 2), max(var(--s4-space-1), calc(var(--s4-shape-chip) - var(--s4-space-2))));   /* concentric with the chip (a circle when the chip is a pill) */
     background: transparent;
     color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;

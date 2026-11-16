@@ -23,6 +23,7 @@
     padding: var(--s4-pane-padding, var(--_pad));
     border-radius: var(--s4-shape-pane);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);
     color: var(--_fg);
     container-type: inline-size;   /* lists, tables and grids inside can adapt to the pane */
   }

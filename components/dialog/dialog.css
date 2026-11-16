@@ -21,6 +21,7 @@
     border: 0;
     border-radius: var(--s4-shape-dialog);
     background: var(--md-sys-color-surface-container-high);
+    --s4-surface-here: var(--md-sys-color-surface-container-high);
     color: var(--md-sys-color-on-surface);
     box-shadow: var(--md-sys-elevation-level3);
     overflow: auto;

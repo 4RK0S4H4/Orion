@@ -49,6 +49,7 @@
     border: 0;
     border-radius: var(--_radius);
     background: var(--_bg);
+    --s4-surface-here: var(--_bg);
     color: var(--_fg);
     font-family: var(--md-sys-typescale-body-large-font);
     font-size: var(--md-sys-typescale-body-large-size);
