@@ -104,12 +104,14 @@ const ENV = { dark: false, more: false, motion: false, transparency: false };
 const env = (o) => ({ ...ENV, ...o });
 const page = (rootAttrs, e) => compute([rootAttrs], e);
 let failures = 0, compared = 0, scenarios = 0;
+/* an alias and the plain value it stands for are the same value (scoped glass tints are written plainly) */
+function deref(map, v, n = 0) { const m = v && v.match(/^var\((--[\w-]+)\)$/); return m && n < 9 ? deref(map, map[m[1]], n + 1) : v; }
 function same(name, got, want) {
   scenarios++;
   for (const k of Object.keys(want)) {
     if (!k.startsWith('--') && k !== 'color-scheme') continue;
     compared++;
-    if (got[k] !== want[k]) { failures++; if (failures < 25) console.error(`  x ${name}: ${k} is ${got[k]}, page-wide it is ${want[k]}`); }
+    if (deref(got, got[k]) !== deref(want, want[k])) { failures++; if (failures < 25) console.error(`  x ${name}: ${k} is ${got[k]}, page-wide it is ${want[k]}`); }
   }
 }
 const D = { 'data-theme': 'dark' }, L = { 'data-theme': 'light' };
@@ -145,7 +147,8 @@ for (const t of ['warm', 'cool', 'pure']) {
   const rootD = t === 'pure' ? {} : block(`:where(:root[data-gray="${t}"]:not([data-contrast="high"])[data-theme="dark"]) {`);
   for (const m of body.matchAll(/(--[-\w]+):\s*light-dark\((#[0-9a-f]{6}),\s*(#[0-9a-f]{6})\);/g)) {
     grayPairs++;
-    const [, n, l, d] = m, wl = rootL[n] || pureL[n], wd = rootD[n] || pureD[n];
+    const look = (rootM, pureM, name, k = 0) => { const v = rootM[name] || pureM[name]; const r = v && v.match(/^var\((--[\w-]+)\)$/); return r && k < 9 ? look(rootM, pureM, r[1], k + 1) : v; };
+    const [, n, l, d] = m, wl = look(rootL, pureL, n), wd = look(rootD, pureD, n);
     if (l !== wl || d !== wd) { failures++; console.error(`  x scoped gray ${t}: ${n} is light-dark(${l}, ${d}), page-wide ${wl} / ${wd}`); }
   }
 }

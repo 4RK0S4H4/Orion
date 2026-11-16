@@ -100,7 +100,10 @@ o += '  @media not (prefers-contrast: more) {\n';
 for (const [name, { L, D }] of [...Object.entries(tinted), ['pure', { L: {}, D: {} }]]) {
   const names = name === 'pure' ? allNames : [...new Set([...Object.keys(L), ...Object.keys(D)])];
   o += `    @scope ([data-gray="${name}"]) {\n      ${scopedSel} {\n`;
-  o += names.map((n) => `        ${n}: light-dark(${L[n] || PL[n]}, ${D[n] || PD[n]});`).join('\n') + '\n      }\n    }\n';
+  const ld = (n) => `light-dark(${L[n] || PL[n]}, ${D[n] || PD[n]})`;
+  o += names.map((n) => `        ${n}: ${ld(n)};`).join('\n') + '\n';
+  /* the glass tints are written plainly in a light or dark scope (tokens.css), so the gray scope gives them its own */
+  o += `        --s4-glass-tint-float: ${ld('--md-sys-color-surface-container')};\n        --s4-glass-tint-fill: ${ld('--md-sys-color-surface-container-highest')};\n      }\n    }\n`;
 }
 o += '  }\n';
 o += '}\n';

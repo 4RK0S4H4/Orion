@@ -685,10 +685,20 @@
     --md-sys-color-on-tertiary-fixed: #ffffff;
     --md-sys-color-on-tertiary-fixed-variant: #e2e2e2;
   }
+  :where([data-theme="dark"]:not(:root)) {
+    --s4-glass-tint-float: #1e1e1e;
+    --s4-glass-tint-fill: #333333;
+  }
+  :where([data-theme="light"]:not(:root)) {
+    --s4-glass-tint-float: #efefef;
+    --s4-glass-tint-fill: #e2e2e2;
+  }
   :where([data-theme]:not(:root), [data-gray]:not(:root), [data-accent]:not(:root)) {
+    --s4-focus-ring-color: var(--md-sys-color-secondary);
+  }
+  :where([data-gray]:not(:root), [data-accent]:not(:root)) {
     --s4-glass-tint-float: var(--md-sys-color-surface-container);
     --s4-glass-tint-fill: var(--md-sys-color-surface-container-highest);
-    --s4-focus-ring-color: var(--md-sys-color-secondary);
   }
   :where([data-corners]:not(:root)) {
     --s4-shape-control: var(--md-sys-shape-corner-full);
@@ -894,6 +904,16 @@
     --md-sys-color-tertiary-fixed-dim: #333333;
     --md-sys-color-on-tertiary-fixed: #ffffff;
     --md-sys-color-on-tertiary-fixed-variant: #ffffff;
+  }
+  @media (prefers-contrast: more) {
+    :where(:root:not([data-contrast]) [data-theme="light"]) {
+      --s4-glass-tint-float: #e2e2e2;
+      --s4-glass-tint-fill: #c6c6c6;
+    }
+    }
+  :where(:root[data-contrast="high"] [data-theme="light"]) {
+    --s4-glass-tint-float: #e2e2e2;
+    --s4-glass-tint-fill: #c6c6c6;
   }
   @media (prefers-color-scheme: dark) and (prefers-contrast: more) {
     :where(:root:not([data-theme="light"]):not([data-contrast])) {
@@ -1236,6 +1256,16 @@
     --md-sys-color-tertiary-fixed-dim: #c2c2c2;
     --md-sys-color-on-tertiary-fixed: #000000;
     --md-sys-color-on-tertiary-fixed-variant: #0b0b0b;
+  }
+  @media (prefers-contrast: more) {
+    :where(:root:not([data-contrast]) [data-theme="dark"]) {
+      --s4-glass-tint-float: #303030;
+      --s4-glass-tint-fill: #474747;
+    }
+    }
+  :where(:root[data-contrast="high"] [data-theme="dark"]) {
+    --s4-glass-tint-float: #303030;
+    --s4-glass-tint-fill: #474747;
   }
   @media (prefers-reduced-motion: reduce) {
     :where(:root, [data-theme]) {

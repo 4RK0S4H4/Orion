@@ -205,11 +205,20 @@ css += media('(prefers-color-scheme: dark)', block(W(DARK_AUTO), byMode.dark, SC
 css += block(W('[data-theme="dark"]'), byMode.dark, SCHEME('dark'));
 css += block(W('[data-theme="light"]:not(:root)'), lightReset, SCHEME('light'));
 /* aliases resolve where they are declared, so a scoped dial re-declares the ones that depend on it */
-const isAlias = (t) => typeof t.value === 'string' && ALIAS.test(t.value);
-const pick = (pred) => [...tokens.values()].filter(pred).map((t) => [cssName(t.path), baseOf.get(cssName(t.path))]);
 const pathIs = (re) => (t) => re.test(t.path.join('.'));
+const isAlias = (t) => typeof t.value === 'string' && ALIAS.test(t.value);
+/* The glass tints are aliases of surface roles, but a glass element re-maps those roles for the items on it, so a light
+   or dark scope that is itself glass (a dark nav bar) could not re-resolve them there. A scoped light or dark element
+   gets them as plain values of its mode instead. */
+const glassAliases = [...tokens.values()].filter((t) => isAlias(t) && t.type === 'color' && pathIs(/^s4\.glass\./)(t));
+const modeMap = (mode) => new Map([...base, ...(mode === 'light' ? [] : byMode[mode])]);
+const literal = (mode) => { const m = modeMap(mode); const val = (n, seen = 0) => { const v = m.get(n); const r = v && v.match(/^var\((--[\w-]+)\)$/); return r && seen < 9 ? val(r[1], seen + 1) : v; }; return glassAliases.map((t) => [cssName(t.path), val(cssName(t.path))]); };
+css += block(W('[data-theme="dark"]:not(:root)'), literal('dark'));
+css += block(W('[data-theme="light"]:not(:root)'), literal('light'));
+const pick = (pred) => [...tokens.values()].filter(pred).map((t) => [cssName(t.path), baseOf.get(cssName(t.path))]);
 const DISPLAY_ROLES = /^md\.sys\.typescale\.(display|headline)-|^md\.sys\.typescale\.title-large\./;
-css += block(W('[data-theme]:not(:root), [data-gray]:not(:root), [data-accent]:not(:root)'), pick((t) => isAlias(t) && t.type === 'color'));
+css += block(W('[data-theme]:not(:root), [data-gray]:not(:root), [data-accent]:not(:root)'), pick((t) => isAlias(t) && t.type === 'color' && !glassAliases.includes(t)));
+css += block(W('[data-gray]:not(:root), [data-accent]:not(:root)'), pick((t) => glassAliases.includes(t)));
 css += block(W('[data-corners]:not(:root)'), pick((t) => isAlias(t) && pathIs(/^(md\.sys|s4)\.shape\./)(t)));
 css += block(W('[data-corners="round"]:not(:root)'), pick((t) => !isAlias(t) && pathIs(/^(md\.sys|s4)\.shape\./)(t)));
 css += block(W('[data-type-display]:not(:root), [data-type-text]:not(:root)'), pick((t) => isAlias(t) && t.type === 'fontFamily'));
@@ -218,11 +227,15 @@ css += block(W('[data-type-text="inter"]:not(:root)'), pick((t) => pathIs(/^md\.
 /* contrast is page-wide: it reaches every scoped light or dark element */
 css += media('(prefers-contrast: more)', block(W(`${HC_AUTO}, ${HC_AUTO} [data-theme="light"]`), byMode['high-contrast']));
 css += block(W(`${HC_ON}, ${HC_ON} [data-theme="light"]`), byMode['high-contrast']);
+css += media('(prefers-contrast: more)', block(W(`${HC_AUTO} [data-theme="light"]`), literal('high-contrast')));
+css += block(W(`${HC_ON} [data-theme="light"]`), literal('high-contrast'));
 const dhc = byMode['dark-high-contrast'];
 css += media('(prefers-color-scheme: dark) and (prefers-contrast: more)', block(W(`${DARK_AUTO}${HC_AUTO.slice(5)}`), dhc));
 css += media('(prefers-color-scheme: dark)', block(W(`${DARK_AUTO}[data-contrast="high"]`), dhc));
 css += media('(prefers-contrast: more)', block(W(`:root[data-theme="dark"]${HC_AUTO.slice(5)}, ${HC_AUTO} [data-theme="dark"]`), dhc));
 css += block(W(`:root[data-theme="dark"][data-contrast="high"], ${HC_ON} [data-theme="dark"]`), dhc);
+css += media('(prefers-contrast: more)', block(W(`${HC_AUTO} [data-theme="dark"]`), literal('dark-high-contrast')));
+css += block(W(`${HC_ON} [data-theme="dark"]`), literal('dark-high-contrast'));
 /* reduced motion and reduced transparency are page-wide too: they win inside any element that re-declares their tokens */
 const RM = ':root, [data-theme]', RT = ':root, [data-theme]';
 css += media('(prefers-reduced-motion: reduce)', block(W(RM), byMode['reduced-motion']));

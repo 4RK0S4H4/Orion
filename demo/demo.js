@@ -46,6 +46,14 @@
     g.querySelectorAll('[value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === now); });
     g.addEventListener('s4-change', function (e) { var o = {}; o[key] = e.detail.value; S4.theme(o); });
   });
+  /* themes on any container (issue 52): the navigation alone in dark mode, whatever the page is in */
+  function darkNav(on) {
+    $$('.s4-nav-rail, .s4-nav-bar').forEach(function (n) { S4.theme({ mode: on ? 'dark' : null }, n); });
+    try { localStorage.setItem('orion-showcase-dark-nav', on ? '1' : ''); } catch (e) {}
+  }
+  var navOn = false; try { navOn = localStorage.getItem('orion-showcase-dark-nav') === '1'; } catch (e) {}
+  $('#dark-nav').checked = navOn; if (navOn) darkNav(true);
+  $('#dark-nav').addEventListener('change', function () { darkNav(this.checked); });
   var t = S4.theme();
   $('#tinted').checked = t.surfaces === 'tinted';
   $$('#mode [value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === t.mode); });

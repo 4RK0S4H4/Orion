@@ -135,7 +135,13 @@
   }
   /* one role list as light-dark(light, dark): the element's own color-scheme (set by the token blocks for every light
      or dark scope) picks the value, so a scoped scheme follows whatever mode the element is in */
-  function rolesLD(L, D) { return Object.keys(L).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')'; }).join(';'); }
+  function rolesLD(L, D) {
+    var css = Object.keys(L).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')'; }).join(';');
+    /* tinted: the glass tints follow the tinted surfaces (a light or dark scope gets them as plain values in tokens.css) */
+    if (L['surface-container']) css += ';--s4-glass-tint-float:light-dark(' + L['surface-container'] + ',' + D['surface-container'] + ')' +
+      ';--s4-glass-tint-fill:light-dark(' + L['surface-container-highest'] + ',' + D['surface-container-highest'] + ')';
+    return css;
+  }
   /* Scoped rules (issue 52) inside @scope: the nearest scope root wins, whatever the order. sel lists the subjects
      relative to :scope; the high-contrast copies put the page-wide contrast in front of each. */
   function scopedCss(scopeSel, subjects, L, D, LH, DH) {
@@ -275,6 +281,12 @@
     if (key) { S4.theme.key = key; try { localStorage.setItem(key, JSON.stringify(S4.theme())); } catch (e) {} }
     return S4.theme();
   };
+  /* the dials written in the page's own markup (<html data-energy="calm">) are the starting state, so a saved theme
+     and S4.theme() report them instead of the default */
+  BRAND.forEach(function (d) {
+    var v = root.getAttribute(d.attr); if (!v || v === d.base) return;
+    state[d.key] = v === 'custom' && d.prop ? (root.style.getPropertyValue(d.prop).trim() || null) : v;
+  });
   S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
   S4.theme.restore = function (key, defaults) {

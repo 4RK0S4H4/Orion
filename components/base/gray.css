@@ -288,6 +288,8 @@
         --md-sys-color-surface: light-dark(#ffffff, #110e09);
         --md-sys-color-surface-bright: light-dark(#ffffff, #3a3530);
         --md-sys-color-surface-container-lowest: light-dark(#ffffff, #0c0905);
+        --s4-glass-tint-float: light-dark(#f2efea, #211d18);
+        --s4-glass-tint-fill: light-dark(#e7e1da, #37322d);
       }
     }
     @scope ([data-gray="cool"]) {
@@ -331,6 +333,8 @@
         --md-sys-color-surface: light-dark(#ffffff, #0b0e13);
         --md-sys-color-surface-bright: light-dark(#ffffff, #32363c);
         --md-sys-color-surface-container-lowest: light-dark(#ffffff, #06090e);
+        --s4-glass-tint-float: light-dark(#eceff4, #1b1e23);
+        --s4-glass-tint-fill: light-dark(#dde3ea, #2f3339);
       }
     }
     @scope ([data-gray="pure"]) {
@@ -374,6 +378,8 @@
         --md-sys-color-surface: light-dark(#ffffff, #0e0e0e);
         --md-sys-color-surface-bright: light-dark(#ffffff, #363636);
         --md-sys-color-surface-container-lowest: light-dark(#ffffff, #090909);
+        --s4-glass-tint-float: light-dark(#efefef, #1e1e1e);
+        --s4-glass-tint-fill: light-dark(#e2e2e2, #333333);
       }
     }
   }
