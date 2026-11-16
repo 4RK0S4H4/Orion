@@ -54,7 +54,7 @@ it. Letting go before that leaves the actions open, as before.
   Complete; Life Happened), tinted, invented data only.
 - `components/direct/`: long swipe.
 
-## Open
-- The owner's iPhone: does the long swipe work now?
-- Is the mockup the right mixture? If yes it can become the redesign proposal for the tracker (that repo asks for
-  before/after screenshots and approval first).
+## Closed (2026-11-16)
+- The owner confirmed the long swipe works on the iPhone.
+- The owner approved the mockup ("Looks great") and will do the tracker's redesign in that repo themselves; the
+  mockup stays here as the example of the rule.

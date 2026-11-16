@@ -32,8 +32,9 @@ mixture (then it can become the redesign proposal for the tracker, with before/a
 
 **Added 2026-11-16:** the owner approved the tracker mockup ("Looks great") and settled the last open question from
 0047: decision 0054, tool panels (`data-modeless`; filters and inspectors leave the page live on wide windows; task
-panels, dialogs and phones stay modal). Nothing is waiting on the owner except the iPhone check of the long swipe and
-whether the tracker mockup should become a redesign proposal in the tracker's own repo.
+panels, dialogs and phones stay modal). The owner then confirmed the long swipe works on the iPhone (issue 48 closed) and said the tracker redesign is theirs
+to do in that repo: the mockup stays a mockup here, do not propose or start work in the tracker repo. Nothing is
+waiting on the owner.
 
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
