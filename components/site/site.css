@@ -90,7 +90,7 @@
     display: flex;
     align-items: center;
     gap: var(--s4-space-2);
-    block-size: var(--s4-size-top-app-bar);
+    min-block-size: var(--s4-size-top-app-bar);   /* grows with larger text, never cuts it (0058) */
     padding-inline: max(var(--_wrap), env(safe-area-inset-left, 0px));
   }
   .s4-site-logo {
@@ -98,6 +98,7 @@
     align-items: center;
     gap: var(--s4-space-2);
     min-block-size: var(--s4-size-touch-target);
+    min-inline-size: 0;                  /* a long name or larger text wraps instead of pushing the bar sideways */
     margin-inline-end: auto;
     color: var(--md-sys-color-on-surface);
     font-family: var(--md-sys-typescale-title-large-font);
@@ -106,8 +107,9 @@
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
     text-decoration: none;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
+  .s4-site-logo-mark { flex: none; }
   .s4-site-logo :where(img, svg) { block-size: var(--s4-size-icon-large); inline-size: auto; }
   /* a mark drawn from Orion's own vocabulary when the brand has no logo file yet */
   .s4-site-logo-mark {
@@ -138,7 +140,7 @@
     --_bg: var(--md-sys-color-secondary-container);
     --_fg: var(--md-sys-color-on-secondary-container);
   }
-  .s4-site-actions { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-site-actions { display: flex; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
   .s4-site-menu-button { display: none; }
 
   /* the phone menu: a floating glass panel under the header (decision 0043: nothing slides in from an edge) */
@@ -203,6 +205,7 @@
     --md-sys-color-on-surface-variant: var(--md-sys-color-on-primary-container);
     --md-sys-color-primary: var(--md-sys-color-on-primary-container);
     --md-sys-color-on-primary: var(--md-sys-color-primary-container);
+    --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the ring stays 3:1 on the accent */
     background: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
   }
@@ -337,7 +340,7 @@
     line-height: var(--md-sys-typescale-body-medium-line-height);
     letter-spacing: var(--md-sys-typescale-body-medium-tracking);
   }
-  .s4-hero-media { min-inline-size: 0; display: grid; justify-items: center; }
+  .s4-hero-media { min-inline-size: 0; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; }   /* a frame never pushes the page sideways (320 wide, 200% text) */
   /* split: text beside the media from 840 */
   @container s4-site-section (width >= 840px) {
     .s4-hero[data-layout="split"] { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: var(--s4-site-section-gap); }
@@ -620,7 +623,7 @@
     list-style: none;
   }
   @container s4-site-section (width >= 600px) { .s4-logos > ul { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @container s4-site-section (width >= 840px) { .s4-logos > ul { display: flex; justify-content: space-between; } }
+  @container s4-site-section (width >= 840px) { .s4-logos > ul { display: flex; flex-wrap: wrap; justify-content: space-between; } }
   .s4-logo {
     display: inline-flex;
     align-items: center;
@@ -631,7 +634,8 @@
     line-height: var(--md-sys-typescale-title-large-line-height);
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
-    white-space: nowrap;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;             /* larger text wraps a name instead of running into the next one */
   }
   .s4-logo :where(img, svg) { block-size: var(--s4-space-8); inline-size: auto; }
 
