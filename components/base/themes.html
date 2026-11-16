@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Themes On Any Container · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  /* page-only: small app frames built from tokens */
+  .th-window { display: flex; min-height: calc(var(--s4-size-nav-rail) * 6); overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .th-window > .s4-nav-rail { height: auto; }
+  .th-page { flex: 1; min-width: 0; padding: var(--s4-space-6); display: flex; flex-direction: column; gap: var(--s4-space-4); }
+  .th-band { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-8) var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); }
+  .th-band h3 { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-display-small-weight); letter-spacing: var(--md-sys-typescale-display-small-tracking); }
+  .th-band p { margin: 0; max-width: 56ch; color: var(--md-sys-color-on-surface-variant); }
+  .th-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--s4-space-6); }
+  .th-brand { background: var(--md-sys-color-surface-container-low); display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); }
+  .th-brand h3 { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); letter-spacing: var(--md-sys-typescale-headline-small-tracking); }
+  .th-brand p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  .th-stage { position: relative; display: grid; gap: var(--s4-space-2); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); }
+  .th-stage .s4-glass { display: flex; align-items: center; gap: var(--s4-space-2); padding: var(--s4-space-2); border-radius: calc(var(--s4-shape-control) + var(--s4-space-2)); }
+  .th-swatch-row { display: flex; gap: var(--s4-space-2); }
+  .th-swatch-row > span { flex: 1; height: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-small); }
+  .th-nest { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); }
+  .th-nest .th-nest { padding: var(--s4-space-5); border-radius: calc(var(--md-sys-shape-corner-extra-large) - var(--s4-space-6) + var(--s4-space-5)); }
+  .th-nest .th-nest .th-nest { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); }
+  .th-label { margin: 0; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); color: var(--md-sys-color-on-surface-variant); }
+  .th-code { margin: 0; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); overflow-x: auto; white-space: pre; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Themes On Any Container</h1></header>
+<main class="ex-main">
+  <p>Every brand dial and the light or dark mode can sit on any element, not only on <code>&lt;html&gt;</code>. The nearest one wins, so themes nest: a dark sidebar in a light app, a light card in a dark app, a branded band, two brands side by side. Contrast, reduced motion and reduced transparency stay page-wide and reach inside. Try the Theme and Contrast controls above: every example follows.</p>
+
+  <section class="ex-sec">
+    <h2>A Dark Rail in a Light App</h2>
+    <p><code>data-theme="dark"</code> on the rail. It takes the dark surfaces, text, glass and native controls (<code>color-scheme</code>); the page beside it stays in the app's mode. With the page in dark mode, the rail stays dark.</p>
+    <div class="th-window">
+      <nav class="s4-nav-rail" aria-label="Main" data-theme="dark">
+        <div class="s4-nav-rail-header">
+          <button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
+          <button class="s4-fab" type="button" aria-label="Add Bill"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Add Bill</span></button>
+        </div>
+        <div class="s4-nav-rail-items">
+          <a class="s4-nav-item" href="#home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+          <a class="s4-nav-item" href="#bills"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="bills"></span></span><span class="s4-nav-label">Bills</span></a>
+          <a class="s4-nav-item" href="#budget"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="wallet"></span></span><span class="s4-nav-label">Budget</span></a>
+        </div>
+      </nav>
+      <div class="th-page">
+        <article class="s4-card" aria-labelledby="r1">
+          <div class="s4-card-body">
+            <h3 class="s4-card-title" id="r1">Electric Co.</h3>
+            <p class="s4-card-subhead">Utilities · Due Nov 28</p>
+          </div>
+          <div class="s4-card-actions">
+            <button class="s4-button" data-variant="text" type="button">Details</button>
+            <button class="s4-button" type="button">Pay Now</button>
+          </div>
+        </article>
+        <label class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span>Autopay</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>A Branded Band</h2>
+    <p>One section of a page in its own brand: <code>data-accent="teal" data-surfaces="tinted" data-type-display="serif" data-corners="soft"</code>. The band paints its own surface; the rest of the page is untouched.</p>
+    <div class="th-band" data-accent="teal" data-surfaces="tinted" data-type-display="serif" data-corners="soft">
+      <h3>Spring Pricing</h3>
+      <p>Every plan includes unlimited bills, shared budgets and exports. Switch any time; nothing is lost.</p>
+      <div class="s4-row">
+        <button class="s4-button" type="button">Start Free Trial</button>
+        <button class="s4-button" data-variant="tonal" type="button">Compare Plans</button>
+      </div>
+      <div class="s4-row">
+        <button class="s4-chip" data-type="filter" type="button" aria-pressed="true">Monthly</button>
+        <button class="s4-chip" data-type="filter" type="button">Yearly</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Two Brands Side by Side</h2>
+    <p>Each panel sets its own accent, gray temperature, corners and display face. Glass inside a panel is made from that panel's surfaces.</p>
+    <div class="th-pair">
+      <div class="th-brand" data-accent="violet" data-gray="cool" data-corners="firm" data-type-display="rounded">
+        <h3>Northwind</h3>
+        <p>Cool grays, violet, firm corners, a rounded display face.</p>
+        <div class="s4-text-field"><input id="nw-name" autocomplete="off" value="Q4 Budget"><label for="nw-name">Name</label></div>
+        <div class="s4-row">
+          <button class="s4-button" type="button">Save</button>
+          <button class="s4-button" data-variant="tonal" type="button">Share</button>
+        </div>
+        <div class="th-stage">
+          <div class="th-swatch-row" aria-hidden="true"><span style="background: var(--md-sys-color-primary)"></span><span style="background: var(--md-sys-color-secondary-container)"></span><span style="background: var(--md-sys-color-surface-container-highest)"></span></div>
+          <div class="s4-glass"><button class="s4-chip" data-type="filter" type="button" aria-pressed="true">All</button><button class="s4-chip" data-type="filter" type="button">Open</button></div>
+        </div>
+      </div>
+      <div class="th-brand" data-accent="orange" data-gray="warm" data-corners="soft" data-type-display="serif">
+        <h3>Harbor &amp; Co.</h3>
+        <p>Warm grays, orange, soft corners, a serif display face.</p>
+        <div class="s4-text-field"><input id="hb-name" autocomplete="off" value="Kitchen Remodel"><label for="hb-name">Name</label></div>
+        <div class="s4-row">
+          <button class="s4-button" type="button">Save</button>
+          <button class="s4-button" data-variant="tonal" type="button">Share</button>
+        </div>
+        <div class="th-stage">
+          <div class="th-swatch-row" aria-hidden="true"><span style="background: var(--md-sys-color-primary)"></span><span style="background: var(--md-sys-color-secondary-container)"></span><span style="background: var(--md-sys-color-surface-container-highest)"></span></div>
+          <div class="s4-glass"><button class="s4-chip" data-type="filter" type="button" aria-pressed="true">All</button><button class="s4-chip" data-type="filter" type="button">Open</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Nesting Three Deep</h2>
+    <p>Dark inside the page, light inside that, dark again inside that. Each level re-declares only what its mode changes, so the accent and corners from the page still reach the innermost level.</p>
+    <div class="th-nest" data-theme="dark" id="nest-1">
+      <p class="th-label">Dark</p>
+      <div class="s4-row"><button class="s4-button" type="button">Primary</button><button class="s4-button" data-variant="tonal" type="button">Tonal</button></div>
+      <div class="th-nest" data-theme="light">
+        <p class="th-label">Light</p>
+        <div class="s4-row"><button class="s4-button" type="button">Primary</button><button class="s4-button" data-variant="tonal" type="button">Tonal</button></div>
+        <div class="th-nest" data-theme="dark">
+          <p class="th-label">Dark</p>
+          <div class="s4-row"><button class="s4-button" type="button">Primary</button><button class="s4-button" data-variant="tonal" type="button">Tonal</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>From Script</h2>
+    <p><code>S4.theme(options, element)</code> takes the same keys as the page-wide call (<code>mode</code>, <code>seed</code>, <code>variant</code>, <code>surfaces</code>, <code>gray</code>, <code>page</code>, <code>corners</code>, <code>display</code>, <code>text</code>) and writes them as attributes on that element. Nothing is saved. <code>null</code> lets the element follow the page again; a default value (<code>'round'</code>, <code>'pure'</code>, <code>'inter'</code>) brings stock Orion back inside a branded page.</p>
+    <div class="ex-board col" id="script-card">
+      <div class="s4-button-group" data-connected aria-label="Card Mode" id="card-mode" style="align-self: flex-start">
+        <button class="s4-button" data-size="s" data-variant="tonal" type="button" data-v="" aria-pressed="true">Follow Page</button>
+        <button class="s4-button" data-size="s" data-variant="tonal" type="button" data-v="light" aria-pressed="false">Light</button>
+        <button class="s4-button" data-size="s" data-variant="tonal" type="button" data-v="dark" aria-pressed="false">Dark</button>
+      </div>
+      <pre class="th-code" id="card-code">S4.theme({ mode: null }, card)</pre>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Attributes</h2>
+    <pre class="th-code">data-theme="light | dark"              the mode inside (sets color-scheme too)
+data-accent="blue | #0b57d0"           a scoped accent (data-accent-variant, data-surfaces="tinted")
+data-gray="warm | cool | pure"         gray temperature inside
+data-page="soft"                       a soft page inside (light mode only)
+data-corners="round | soft | firm"     corners inside
+data-type-display="inter | serif | rounded | mono | system"
+data-type-text="inter | serif | rounded | mono | system"
+data-density="comfortable | compact | auto"</pre>
+  </section>
+  <p class="ex-foot">Source: <code>components/base/</code>, <code>tokens/tokens.css</code>, <code>components/core/core.js</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../nav-bar/nav-bar.js"></script>
+<script src="../icon-button/icon-button.js"></script>
+<script src="../fab/fab.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../nav-rail/nav-rail.js"></script>
+<script src="../chip/chip.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  (function () {
+    var card = document.getElementById('script-card'), code = document.getElementById('card-code'), group = document.getElementById('card-mode');
+    group.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-v]'); if (!b) return;
+      var v = b.getAttribute('data-v') || null;
+      S4.theme({ mode: v }, card);
+      Array.prototype.forEach.call(group.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      code.textContent = 'S4.theme({ mode: ' + (v ? "'" + v + "'" : 'null') + ' }, card)';
+    });
+  })();
+</script>
+</body>
+</html>

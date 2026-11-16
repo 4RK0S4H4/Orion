@@ -33,6 +33,7 @@ for (const d of readdirSync(join(root, 'components'))) {
   const f = `components/${d}/${d}.html`;
   if (existsSync(join(root, f))) pages.push(f);
 }
+pages.push('components/base/themes.html');   /* themes on any container (issue 52) */
 for (const f of readdirSync(join(root, 'templates'))) if (f.endsWith('.html')) pages.push('templates/' + f);
 pages.push('explore/ideas.html', 'explore/degree-tracker.html');   /* the current quiz, in the Orion quiz UI (decision 0048) */
 const targets = pages.filter((p) => !ONLY || p.includes(ONLY));
