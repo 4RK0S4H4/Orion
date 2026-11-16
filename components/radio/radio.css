@@ -100,7 +100,7 @@
   .s4-radio:has(> input:disabled) .s4-radio-ring { background: color-mix(in srgb, var(--s4-color-control) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
 
   @media (forced-colors: active) {
-    .s4-radio-ring { forced-color-adjust: none; border-color: CanvasText; }
+    .s4-radio-ring { forced-color-adjust: none; border: 2px solid CanvasText; }
     .s4-radio-ring::after { background: Highlight; }
     .s4-radio:has(> input:checked) .s4-radio-ring { border-color: Highlight; }
     .s4-radio:has(> input:disabled) .s4-radio-ring { border-color: GrayText; }

@@ -9,7 +9,7 @@
      agenda's heading, open an event as a page. The grid is a real table of buttons, so the arrow keys work. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=23d0ee6">
+<link rel="stylesheet" href="../components/orion.css?v=f2ae176">
 <style>
   /* the app's own layout: tokens only */
   .cal-head { display: flex; align-items: center; gap: var(--s4-space-2); }
@@ -30,6 +30,7 @@
   .cal-dots > i { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: currentColor; opacity: 0.7; }
   @container s4-app (width >= 840px) { .cal-ev { display: block; } .cal-dots { display: none; } }
   .s4-subpage > article { max-inline-size: 40rem; margin-inline: auto; }
+  @media (forced-colors: active) { .cal-day { border: 1px solid ButtonText; } }
 </style>
 </head>
 <body>

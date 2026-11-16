@@ -1253,6 +1253,19 @@
   .s4-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
 }
 
+/* Forced colors (Windows High Contrast): backgrounds and shadows are removed, so every control needs a real edge.
+   Buttons, icon buttons, chips' remove buttons, window controls, fields and anything with role="button" get a 1px
+   ButtonText border; components that draw their own state in system colors (checkbox, radio, switch, slider) say so in
+   their own file. Lives in s4.utilities so it beats the components' border: 0. */
+@layer s4.utilities {
+  @media (forced-colors: active) {
+    :where(button, a.s4-icon-button, a.s4-button, a.s4-fab, [role="button"], summary, select, textarea, input:not([type="checkbox"], [type="radio"], [type="range"], [type="hidden"], [type="file"])):where(:not(.s4-tab, .s4-nav-item, .s4-menu-item, .s4-list-item, .s4-card, .s4-page, .s4-segment, .s4-breadcrumb-link, .s4-swatch, .s4-text-field *, .s4-search *, .s4-palette *, .s4-accordion-item *)) {
+      border: 1px solid ButtonText;
+    }
+    :where(.s4-text-field, .s4-date-picker-field) { border: 1px solid ButtonText; }
+  }
+}
+
 /* ---- base/density.css ---- */
 /* Density (decision 0043). Orion has two densities:
      comfortable  the default: touch-first sizes (48dp targets), right for phones, tablets and touch laptops
@@ -6246,7 +6259,7 @@
   }
 
   @media (forced-colors: active) {
-    .s4-checkbox-box { forced-color-adjust: none; border-color: CanvasText; background: Canvas; }
+    .s4-checkbox-box { forced-color-adjust: none; border: 2px solid CanvasText; border-radius: var(--md-sys-shape-corner-extra-small); background: Canvas; }
     .s4-checkbox:has(> input:is(:checked, :indeterminate)) .s4-checkbox-box { background: Highlight; border-color: Highlight; }
     .s4-checkbox:has(> input:is(:checked, :indeterminate)) .s4-checkbox-box::after { background: HighlightText; }
     .s4-checkbox:has(> input:disabled) .s4-checkbox-box { border-color: GrayText; }
@@ -6356,7 +6369,7 @@
   .s4-radio:has(> input:disabled) .s4-radio-ring { background: color-mix(in srgb, var(--s4-color-control) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
 
   @media (forced-colors: active) {
-    .s4-radio-ring { forced-color-adjust: none; border-color: CanvasText; }
+    .s4-radio-ring { forced-color-adjust: none; border: 2px solid CanvasText; }
     .s4-radio-ring::after { background: Highlight; }
     .s4-radio:has(> input:checked) .s4-radio-ring { border-color: Highlight; }
     .s4-radio:has(> input:disabled) .s4-radio-ring { border-color: GrayText; }

@@ -287,12 +287,15 @@ function forcedAudit() {
   for (const el of controls) {
     if (!h.vis(el) || el.disabled) continue;
     if (el.closest('.s4-prose, p, .s4-list-item, .s4-menu-item, .s4-nav-item, .s4-breadcrumb-link, .s4-nav-rail, .s4-nav-bar, .s4-tab, .s4-tabs, .s4-accordion-item, .s4-month, .s4-timeline, .s4-table, .s4-palette, .s4-card-link, .s4-page')) continue;   /* text rows: a row, a text link or a tab is its own label; their state shows as text or an underline */
-    const box = el.matches('input[type="checkbox"], input[type="radio"], input[type="range"], input[type="file"]') || el.getAttribute('aria-hidden') === 'true' ? (el.closest('label, .s4-switch, .s4-checkbox, .s4-radio, .s4-slider') || el) : el;
+    const fieldBox = el.closest('.s4-text-field, .s4-date-picker-field, .s4-search');
+    if (fieldBox && el.matches('button, a')) continue;   /* a button inside a field sits on the field's boundary */
+    const box = fieldBox || (el.matches('input[type="checkbox"], input[type="radio"], input[type="range"], input[type="file"]') || el.getAttribute('aria-hidden') === 'true' ? (el.closest('label, .s4-switch, .s4-checkbox, .s4-radio, .s4-slider') || el) : el);
     const key = h.tag(box); if (seen.has(key)) continue; seen.add(key);
     /* the control or the box that draws it, or any piece inside it, has a border or an outline */
     const pieces = [box, ...box.querySelectorAll('*')].slice(0, 12);
     const has = pieces.some((p) => { const cs = getComputedStyle(p); const bw = ['Top', 'Right', 'Bottom', 'Left'].some((s) => parseFloat(cs['border' + s + 'Width']) >= 1 && cs['border' + s + 'Style'] !== 'none'); const ow = parseFloat(cs.outlineWidth) >= 1 && cs.outlineStyle !== 'none'; return bw || ow; });
-    const textual = box.matches('a[href]') && !h.textRect(box) === false && getComputedStyle(box).textDecorationLine.includes('underline');
+    /* a plain text link is drawn by the system in LinkText; a slider paints its track and handle in Highlight with pseudo-elements, which this audit cannot see */
+    const textual = (box.matches('a[href]') && !/button|fab|chip|card|icon/.test(box.className)) || box.matches('.s4-slider');
     if (!has && !textual) out.push('forced colors: no visible boundary: ' + h.tag(box));
   }
   return out;

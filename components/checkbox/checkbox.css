@@ -110,7 +110,7 @@
   }
 
   @media (forced-colors: active) {
-    .s4-checkbox-box { forced-color-adjust: none; border-color: CanvasText; background: Canvas; }
+    .s4-checkbox-box { forced-color-adjust: none; border: 2px solid CanvasText; border-radius: var(--md-sys-shape-corner-extra-small); background: Canvas; }
     .s4-checkbox:has(> input:is(:checked, :indeterminate)) .s4-checkbox-box { background: Highlight; border-color: Highlight; }
     .s4-checkbox:has(> input:is(:checked, :indeterminate)) .s4-checkbox-box::after { background: HighlightText; }
     .s4-checkbox:has(> input:disabled) .s4-checkbox-box { border-color: GrayText; }
