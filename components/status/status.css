@@ -14,7 +14,8 @@
     align-items: center;
     gap: var(--s4-space-1);
     box-sizing: border-box;
-    height: var(--s4-space-6);
+    block-size: max-content;
+    min-block-size: var(--s4-space-6);
     max-width: 100%;
     padding: 0 var(--s4-space-2);
     border-radius: var(--s4-shape-chip);
@@ -26,7 +27,7 @@
     letter-spacing: var(--md-sys-typescale-label-medium-tracking);
     font-weight: var(--md-sys-typescale-label-medium-weight);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
     vertical-align: middle;
     --s4-icon-size: var(--s4-space-4);
   }

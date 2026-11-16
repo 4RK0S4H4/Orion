@@ -155,7 +155,8 @@
   /* ---------- items in the bar ---------- */
   .s4-nav-bar > .s4-nav-item {
     flex: 1 1 0;
-    block-size: var(--s4-size-nav-bar);
+    block-size: max-content;                 /* a long label wraps and the bar grows */
+    min-block-size: var(--s4-size-nav-bar);
     padding: var(--s4-space-3) var(--s4-space-1) var(--s4-space-4);
   }
 
@@ -167,7 +168,8 @@
       align-self: center;
       justify-content: center;
       gap: var(--s4-space-2);
-      block-size: var(--s4-size-touch-target);
+      block-size: max-content;
+      min-block-size: var(--s4-size-touch-target);
       margin-inline: var(--s4-space-4);
       padding: 0 var(--s4-space-4);
       border-radius: var(--s4-shape-nav-indicator);

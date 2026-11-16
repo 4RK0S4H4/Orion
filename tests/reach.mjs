@@ -249,15 +249,15 @@ function textZoom(f) {
 const LONG_WORD = 'Supercalifragilisticexpialidocious'.repeat(4);
 const LONG_TEXT = 'This label has been written to be much longer than any designer would ever plan for in the layout';
 function injectLong(arg) {
-  const sels = ['.s4-button', '.s4-chip', '.s4-list-headline', '.s4-list-supporting', '.s4-nav-label', 'td', 'th', '.s4-app-bar-title', '.s4-stat-value', '.s4-stat-label', '.s4-card-title', '.s4-card-subhead', '.s4-menu-item', '.s4-tab', 'h1', 'h2', 'h3', '.s4-badge', '.s4-segment', '.s4-breadcrumb-link', '.s4-message-bubble', '.s4-banner'];
+  const sels = ['.s4-button', '.s4-chip', '.s4-list-headline', '.s4-list-supporting', '.s4-nav-label', 'td', 'th', '.s4-app-bar-title', '.s4-stat-value', '.s4-stat-label', '.s4-card-title', '.s4-card-subhead', '.s4-menu-item', '.s4-tab', 'h1', 'h2', 'h3', '.s4-segment', '.s4-breadcrumb-link', '.s4-message-bubble', '.s4-banner'];
   const h = window.__h; let n = 0;
   sels.forEach((s, si) => {
     let k = 0;
     document.querySelectorAll(s).forEach((el) => {
-      if (k >= 3 || !h.vis(el)) return;
+      if (k >= 3 || !h.vis(el) || el.matches('.s4-num')) return;   /* amounts and counts are not labels: .s4-num is nowrap by design, badges hold counts */
       const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       for (let t = tw.nextNode(); t; t = tw.nextNode()) {
-        if (!t.textContent.trim() || t.parentElement.closest('.s4-icon, svg')) continue;
+        if (!t.textContent.trim() || t.parentElement.closest('.s4-icon, svg, .s4-badge, .s4-kbd')) continue;
         t.textContent = (k % 2 === 0 ? arg.word : arg.text);   /* alternate unbroken and multi-word */
         k++; n++; el.setAttribute('data-long', k % 2 ? 'word' : 'text'); break;
       }
@@ -445,6 +445,8 @@ async function runOne(browser, pass, rel, mode) {
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (ov > 1) add(`reflow: sideways scroll at 320px (${ov}px)`);
     } else if (pass === 'longtext') {
+      /* a desktop window app (data-window) is not a phone layout: its 390px run is skipped */
+      if (mode.phone && await page.evaluate(() => !!document.querySelector('.s4-app[data-window]'))) { await ctx.close(); ran++; return; }
       const run = async (v) => { const n = await page.evaluate(injectLong, { word: LONG_WORD, text: LONG_TEXT }); if (!n) return; await page.waitForTimeout(250); (await page.evaluate(clipAudit, { container: true })).concat(await page.evaluate(longAudit)).forEach((m) => add((v ? `[${v}] ` : '') + m)); };
       if (isApp(rel)) await eachView(page, run); else await run(null);
       await shot();

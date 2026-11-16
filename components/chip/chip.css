@@ -47,7 +47,8 @@
     align-items: center;
     gap: var(--_gap);
     max-width: 100%;
-    height: var(--s4-size-chip);
+    block-size: max-content;
+    min-block-size: var(--s4-size-chip);
     padding: 0 var(--_pad-end) 0 var(--_pad-start);
     border: 0;
     border-radius: var(--s4-shape-chip);
@@ -59,7 +60,8 @@
     line-height: var(--md-sys-typescale-label-large-line-height);
     letter-spacing: var(--md-sys-typescale-label-large-tracking);
     font-weight: var(--md-sys-typescale-label-large-weight);
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    text-align: center;
     text-decoration: none;
     vertical-align: middle;
     cursor: pointer;
