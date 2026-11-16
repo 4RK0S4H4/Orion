@@ -1967,6 +1967,24 @@ Skip link first; landmarks (`header`, `nav` with labels, `main`, `footer`); one 
 `aria-current="location"`. Frames are pictures (`role="img"` with a label, `inert` inside). Comparison cells use
 icons with labels ("Included", "Not included"). Prices that change with the period are plain text in place.
 
+### Performance (pages that count every kilobyte)
+
+The site templates load the lighter files the build also writes (same code, comments and spare whitespace out;
+`npm run check:bundle` fails if they are stale). Gzipped: `orion.min.css` 42 KB (orion.css 80), `orion.min.js` 48 KB
+(orion.js 71), `icons-solar.js` 28 KB (icons.js, all three sets, 79). The font (165 KB) is the biggest file left.
+
+```html
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>   <!-- first, so text never waits -->
+<link rel="stylesheet" href="orion.min.css">                                               <!-- @font-face uses font-display: swap -->
+…
+<script src="icons-solar.js" defer></script>   <!-- one icon set; load icons.js instead only if the page switches sets -->
+<script src="orion.min.js" defer></script>
+<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('app-key', { mode: 'system' }); });</script>
+```
+
+Give every `img` and `video` a `width` and `height` (or put it in a `.s4-media-box` with a ratio) and `loading="lazy"`
+below the first screen.
+
 ### Tokens
 
 `--s4-site-hero-*`, `--s4-site-title-*`, `--s4-site-lead-*`, `--s4-site-section-space(-compact|-wide)`,
