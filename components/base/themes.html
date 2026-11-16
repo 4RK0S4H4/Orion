@@ -25,6 +25,7 @@
   .th-nest { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); }
   .th-nest .th-nest { padding: var(--s4-space-5); border-radius: calc(var(--md-sys-shape-corner-extra-large) - var(--s4-space-6) + var(--s4-space-5)); }
   .th-nest .th-nest .th-nest { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); }
+  .th-defaults { display: flex; flex-direction: column; gap: var(--s4-space-3); }
   .th-label { margin: 0; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); color: var(--md-sys-color-on-surface-variant); }
   .th-code { margin: 0; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); overflow-x: auto; white-space: pre; }
 </style>
@@ -133,6 +134,37 @@
   </section>
 
   <section class="ex-sec">
+    <h2>App Defaults</h2>
+    <p>An app may say once which variant is unmarked, for the few components where that changes its character: <code>data-buttons="tonal"</code>, <code>data-cards="filled"</code>, <code>data-lists="segmented"</code> and <code>data-rail="expanded | collapsed | auto"</code>, on <code>&lt;html&gt;</code>, <code>.s4-app</code> or a container. The markup below is the same in both columns; a variant written on the element still wins, so the card's main action names <code>data-variant="filled"</code> and stays filled in both.</p>
+    <div class="th-pair">
+      <div class="th-defaults">
+        <p class="th-label">Stock</p>
+        <article class="s4-card" aria-label="Stock: Electric Co.">
+          <div class="s4-card-body"><h3 class="s4-card-title">Electric Co.</h3><p class="s4-card-subhead">Utilities · Due Nov 28</p></div>
+          <div class="s4-card-actions"><button class="s4-button" data-variant="filled" type="button">Pay Now</button></div>
+        </article>
+        <ul class="s4-list" aria-label="Stock: Bills">
+          <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="bills"></span></span><span class="s4-list-content"><span class="s4-list-headline">All Bills</span></span><span class="s4-list-trailing">48</span></div></li>
+          <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="wallet"></span></span><span class="s4-list-content"><span class="s4-list-headline">Budgets</span></span><span class="s4-list-trailing">6</span></div></li>
+        </ul>
+        <div class="s4-row"><button class="s4-button" type="button"><span class="s4-icon" data-icon="add"></span>Add Bill</button><button class="s4-button" type="button">Export</button></div>
+      </div>
+      <div class="th-defaults" data-buttons="tonal" data-cards="filled" data-lists="segmented">
+        <p class="th-label">Tonal, Filled, Segmented</p>
+        <article class="s4-card" aria-label="Tonal, Filled, Segmented: Electric Co.">
+          <div class="s4-card-body"><h3 class="s4-card-title">Electric Co.</h3><p class="s4-card-subhead">Utilities · Due Nov 28</p></div>
+          <div class="s4-card-actions"><button class="s4-button" data-variant="filled" type="button">Pay Now</button></div>
+        </article>
+        <ul class="s4-list" aria-label="Tonal, Filled, Segmented: Bills">
+          <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="bills"></span></span><span class="s4-list-content"><span class="s4-list-headline">All Bills</span></span><span class="s4-list-trailing">48</span></div></li>
+          <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="wallet"></span></span><span class="s4-list-content"><span class="s4-list-headline">Budgets</span></span><span class="s4-list-trailing">6</span></div></li>
+        </ul>
+        <div class="s4-row"><button class="s4-button" type="button"><span class="s4-icon" data-icon="add"></span>Add Bill</button><button class="s4-button" type="button">Export</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
     <h2>From Script</h2>
     <p><code>S4.theme(options, element)</code> takes the same keys as the page-wide call (<code>mode</code>, <code>seed</code>, <code>variant</code>, <code>surfaces</code>, <code>gray</code>, <code>page</code>, <code>corners</code>, <code>display</code>, <code>text</code>) and writes them as attributes on that element. Nothing is saved. <code>null</code> lets the element follow the page again; a default value (<code>'round'</code>, <code>'pure'</code>, <code>'inter'</code>) brings stock Orion back inside a branded page.</p>
     <div class="ex-board col" id="script-card">
@@ -154,7 +186,12 @@ data-page="soft"                       a soft page inside (light mode only)
 data-corners="round | soft | firm"     corners inside
 data-type-display="inter | serif | rounded | mono | system"
 data-type-text="inter | serif | rounded | mono | system"
-data-density="comfortable | compact | auto"</pre>
+data-density="comfortable | compact | auto"
+data-energy="calm | standard | lively"   motion energy inside
+
+App defaults (base/defaults.css)
+data-buttons="filled | tonal"    data-cards="elevated | filled"
+data-lists="segmented"           data-rail="auto | expanded | collapsed"</pre>
   </section>
   <p class="ex-foot">Source: <code>components/base/</code>, <code>tokens/tokens.css</code>, <code>components/core/core.js</code> · Solar icons by 480 Design (CC BY 4.0)</p>
 </main>

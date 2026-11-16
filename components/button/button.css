@@ -21,9 +21,9 @@
     --_line: var(--md-sys-typescale-label-large-line-height);
     --_track: var(--md-sys-typescale-label-large-tracking);
     --_weight: var(--md-sys-typescale-label-large-weight);
-    /* filled (default) */
-    --_bg: var(--md-sys-color-primary);
-    --_fg: var(--md-sys-color-on-primary);
+    /* filled (default; an app may make tonal its default: data-buttons, base/defaults.css) */
+    --_bg: var(--_app-button-bg, var(--md-sys-color-primary));
+    --_fg: var(--_app-button-fg, var(--md-sys-color-on-primary));
     --_outline: transparent;
     --_elevation: var(--md-sys-elevation-level0);
 
@@ -71,6 +71,7 @@
   :is(.s4-toolbar, .s4-snackbar, .s4-search, .s4-composer) .s4-button:active:not(:disabled) { border-radius: var(--_radius); }
 
   /* ---------- variants ---------- */
+  .s4-button[data-variant="filled"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }   /* filled by name, whatever the app's default */
   .s4-button[data-variant="tonal"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[data-variant="outlined"] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }   /* decision 0023: no outlined elements, the old name now draws a filled button */
   .s4-button[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); --_fg: var(--md-sys-color-primary); --_elevation: var(--md-sys-elevation-level1); }

@@ -2004,6 +2004,32 @@
   }
 }
 
+/* ---- base/defaults.css ---- */
+/* App defaults (round 0056 candidate): an app says once which variant is its default for the few components where the
+   choice changes its whole character. Attributes on <html>, .s4-app or any container, like density and the brand dials:
+
+     data-buttons="tonal"        a button with no data-variant is tonal (default: filled). data-variant="filled" names the
+                                 filled one, so the main action of a screen can still stand out.
+     data-cards="filled"         a card with no data-variant is filled (default: elevated, the low container).
+                                 data-variant="elevated" names the low one.
+     data-lists="segmented"      a list with no data-style is segmented (default: plain). Any data-style opts a list out.
+                                 Built in list.css: its segmented selectors also match an unstyled list inside this
+                                 attribute, with no added specificity (one place for the look).
+     data-rail="expanded | collapsed | auto"   where a rail with no data-expand / data-expanded of its own starts
+                                 (default: auto, expanded from 1200 wide). Read by nav-rail.js.
+
+   Each one only picks between variants the component already has; nothing here draws anything new, and a variant
+   written on the element always wins. To go back inside a container, set the default value there (data-buttons="filled",
+   data-cards="elevated"). The rule stays "one way to do each thing": these choose which of the existing ways is unmarked. */
+@layer s4.components {
+  /* the remap is declared on the component itself, so the colors resolve there (a scoped light or dark theme inside the
+     container keeps working) */
+  :where([data-buttons="tonal"]) .s4-button:not([aria-pressed]) { --_app-button-bg: var(--md-sys-color-secondary-container); --_app-button-fg: var(--md-sys-color-on-secondary-container); }
+  :where([data-buttons="filled"]) .s4-button { --_app-button-bg: var(--md-sys-color-primary); --_app-button-fg: var(--md-sys-color-on-primary); }
+  :where([data-cards="filled"]) .s4-card { --_app-card-bg: var(--md-sys-color-surface-container-highest); }
+  :where([data-cards="elevated"]) .s4-card { --_app-card-bg: var(--md-sys-color-surface-container-low); }
+}
+
 /* ---- button/button.css ---- */
 /* Button (M3 Expressive)
    <button class="s4-button" data-variant="filled|tonal|outlined|elevated|text" data-size="xs|s|m|l|xl"
@@ -2028,9 +2054,9 @@
     --_line: var(--md-sys-typescale-label-large-line-height);
     --_track: var(--md-sys-typescale-label-large-tracking);
     --_weight: var(--md-sys-typescale-label-large-weight);
-    /* filled (default) */
-    --_bg: var(--md-sys-color-primary);
-    --_fg: var(--md-sys-color-on-primary);
+    /* filled (default; an app may make tonal its default: data-buttons, base/defaults.css) */
+    --_bg: var(--_app-button-bg, var(--md-sys-color-primary));
+    --_fg: var(--_app-button-fg, var(--md-sys-color-on-primary));
     --_outline: transparent;
     --_elevation: var(--md-sys-elevation-level0);
 
@@ -2078,6 +2104,7 @@
   :is(.s4-toolbar, .s4-snackbar, .s4-search, .s4-composer) .s4-button:active:not(:disabled) { border-radius: var(--_radius); }
 
   /* ---------- variants ---------- */
+  .s4-button[data-variant="filled"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }   /* filled by name, whatever the app's default */
   .s4-button[data-variant="tonal"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[data-variant="outlined"] { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }   /* decision 0023: no outlined elements, the old name now draws a filled button */
   .s4-button[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); --_fg: var(--md-sys-color-primary); --_elevation: var(--md-sys-elevation-level1); }
@@ -3677,8 +3704,8 @@
    surface: always solid, never glass. Every value comes from tokens. */
 @layer s4.components {
   .s4-card {
-    /* elevated (default) */
-    --_bg: var(--md-sys-color-surface-container-low);
+    /* elevated (default; an app may make filled its default: data-cards, base/defaults.css) */
+    --_bg: var(--_app-card-bg, var(--md-sys-color-surface-container-low));
     --_fg: var(--md-sys-color-on-surface);
     --_fg-variant: var(--md-sys-color-on-surface-variant);
     --_outline: transparent;
@@ -3710,6 +3737,7 @@
   }
 
   /* ---------- variants ---------- */
+  .s4-card[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); }   /* elevated by name, whatever the app's default */
   .s4-card[data-variant="filled"] {
     --_bg: var(--md-sys-color-surface-container-highest);
     --_elevation: var(--md-sys-elevation-level0);
@@ -4107,27 +4135,27 @@
   }
 
   /* ---------- M3 Expressive segmented list: items 2 apart, small inner corners, large outer group corners ---------- */
-  .s4-list[data-style="segmented"] {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) {
     gap: calc(var(--s4-space-1) / 2);
     padding: 0;
   }
-  .s4-list[data-style="segmented"] .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) .s4-list-item {
     --_bg: var(--s4-list-segment-color, var(--md-sys-color-surface-container-low));
     --_radius: var(--s4-shape-list-segment);
     padding-inline: var(--s4-space-4);
   }
   /* each run of items between subheaders is one group with outer corners */
-  .s4-list[data-style="segmented"] > li:is(:first-child, .s4-list-subheader + li) > .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > li:is(:first-child, .s4-list-subheader + li) > .s4-list-item {
     border-start-start-radius: var(--s4-shape-list-group);
     border-start-end-radius: var(--s4-shape-list-group);
   }
-  .s4-list[data-style="segmented"] > li:is(:last-child, :has(+ .s4-list-subheader)) > .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > li:is(:last-child, :has(+ .s4-list-subheader)) > .s4-list-item {
     border-end-start-radius: var(--s4-shape-list-group);
     border-end-end-radius: var(--s4-shape-list-group);
   }
-  .s4-list[data-style="segmented"] > .s4-list-subheader { padding-inline: var(--s4-space-4); }
-  .s4-list[data-style="segmented"] > .s4-list-subheader:not(:first-child) { margin-block-start: var(--s4-space-4); }
-  .s4-list[data-style="segmented"][data-dividers] > li + li { border-block-start: 0; }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > .s4-list-subheader { padding-inline: var(--s4-space-4); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > .s4-list-subheader:not(:first-child) { margin-block-start: var(--s4-space-4); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style])))[data-dividers] > li + li { border-block-start: 0; }
 
   /* ---------- selected / current (after the segmented colors, so they win) ---------- */
   .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])),
@@ -4159,7 +4187,7 @@
       outline: var(--s4-focus-ring-width) solid Highlight;
       outline-offset: calc(var(--s4-focus-ring-width) * -1);
     }
-    .s4-list[data-style="segmented"] .s4-list-item { border: 1px solid CanvasText; }
+    .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) .s4-list-item { border: 1px solid CanvasText; }
     .s4-avatar { border: 1px solid CanvasText; }
   }
 }

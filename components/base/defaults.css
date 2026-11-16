@@ -1,0 +1,24 @@
+/* App defaults (round 0056 candidate): an app says once which variant is its default for the few components where the
+   choice changes its whole character. Attributes on <html>, .s4-app or any container, like density and the brand dials:
+
+     data-buttons="tonal"        a button with no data-variant is tonal (default: filled). data-variant="filled" names the
+                                 filled one, so the main action of a screen can still stand out.
+     data-cards="filled"         a card with no data-variant is filled (default: elevated, the low container).
+                                 data-variant="elevated" names the low one.
+     data-lists="segmented"      a list with no data-style is segmented (default: plain). Any data-style opts a list out.
+                                 Built in list.css: its segmented selectors also match an unstyled list inside this
+                                 attribute, with no added specificity (one place for the look).
+     data-rail="expanded | collapsed | auto"   where a rail with no data-expand / data-expanded of its own starts
+                                 (default: auto, expanded from 1200 wide). Read by nav-rail.js.
+
+   Each one only picks between variants the component already has; nothing here draws anything new, and a variant
+   written on the element always wins. To go back inside a container, set the default value there (data-buttons="filled",
+   data-cards="elevated"). The rule stays "one way to do each thing": these choose which of the existing ways is unmarked. */
+@layer s4.components {
+  /* the remap is declared on the component itself, so the colors resolve there (a scoped light or dark theme inside the
+     container keeps working) */
+  :where([data-buttons="tonal"]) .s4-button:not([aria-pressed]) { --_app-button-bg: var(--md-sys-color-secondary-container); --_app-button-fg: var(--md-sys-color-on-secondary-container); }
+  :where([data-buttons="filled"]) .s4-button { --_app-button-bg: var(--md-sys-color-primary); --_app-button-fg: var(--md-sys-color-on-primary); }
+  :where([data-cards="filled"]) .s4-card { --_app-card-bg: var(--md-sys-color-surface-container-highest); }
+  :where([data-cards="elevated"]) .s4-card { --_app-card-bg: var(--md-sys-color-surface-container-low); }
+}

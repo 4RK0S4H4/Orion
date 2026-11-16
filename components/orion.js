@@ -1176,7 +1176,12 @@ S4.register('nav-rail', function (scope) {
     var chosen = false;
     /* decision 0043: auto is the default, so labels show beside the icons whenever there is room. data-expand="off"
        (or a rail that starts with data-expanded and no data-expand) keeps the rail as the page wrote it. */
-    var auto = rail.dataset.expand === 'auto' || (!rail.dataset.expand && !rail.hasAttribute('data-expanded'));
+    /* an app may set its rail's default once (base/defaults.css): data-rail="expanded | collapsed | auto" on <html>,
+       .s4-app or a container. A rail's own data-expand or data-expanded still wins. */
+    var host = rail.dataset.expand || rail.hasAttribute('data-expanded') ? null : rail.closest('[data-rail]');
+    var appRail = host ? host.getAttribute('data-rail') : null;
+    if (appRail === 'expanded') { rail.setAttribute('data-expanded', ''); sync(); }
+    var auto = rail.dataset.expand === 'auto' || (!rail.dataset.expand && !rail.hasAttribute('data-expanded') && appRail !== 'collapsed');
     if (auto && window.ResizeObserver) {
       var host = rail.closest('.s4-app') || document.documentElement;
       new ResizeObserver(function () {
