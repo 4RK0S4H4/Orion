@@ -102,7 +102,8 @@
   .s4-button[data-shape="square"] { --_radius: var(--_radius-selected); }
 
   /* ---------- toggle buttons (aria-pressed): unselected uses a quieter fill, selected the full color and a square shape ---------- */
-  .s4-button[aria-pressed="false"] { --_bg: var(--md-sys-color-surface-container); --_fg: var(--md-sys-color-on-surface-variant); }
+  /* unselected: a step above the surface it sits on (a fixed container role went faint on a dark card, issue 58) */
+  .s4-button[aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
   .s4-button[aria-pressed="false"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
   .s4-button[aria-pressed="true"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-button[aria-pressed="false"]:where([data-variant="outlined"]) { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface-variant); }

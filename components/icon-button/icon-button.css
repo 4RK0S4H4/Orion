@@ -104,7 +104,7 @@
      tonal unselected = secondary-container, selected = secondary; outlined selected = inverse-surface.
      Selected swaps the shape: round -> square, square -> round. */
   .s4-icon-button[aria-pressed="true"] { --_fg: var(--md-sys-color-primary); }
-  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: var(--md-sys-color-surface-container); --_fg: var(--md-sys-color-on-surface-variant); }
+  .s4-icon-button[data-variant="filled"][aria-pressed="false"] { --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, var(--s4-surface-here, var(--md-sys-color-surface))); --_fg: var(--md-sys-color-on-surface-variant); }
   .s4-icon-button[data-variant="filled"][aria-pressed="true"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
   .s4-icon-button[data-variant="tonal"][aria-pressed="true"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
   .s4-icon-button[data-variant="outlined"][aria-pressed="true"] { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }
