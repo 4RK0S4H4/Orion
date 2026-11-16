@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Website Kit · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  /* each demo is a small site of its own, with a soft frame around it on this page */
+  .ex-site { overflow: clip; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-lowest); }
+  .ex-site .s4-site-header { position: relative; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Website Kit</h1></header>
+<main class="ex-main">
+  <p>Sections for marketing pages, blogs and documentation, on the fluid display scale and section rhythm (<code>--s4-site-*</code>). Whole pages: <a href="../../templates/landing.html">landing</a>, <a href="../../templates/pricing.html">pricing</a>, <a href="../../templates/blog.html">blog</a>, <a href="../../templates/docs.html">docs</a>, <a href="../../templates/site.html">studio site</a>. Every demo below sits in its own <code>.s4-site</code>; resize the window to see each section change at 600 and 840.</p>
+
+  <section class="ex-sec"><h2>Announcement Bar and Site Header</h2><p>The header is solid at the top of the page and turns into glass once content scrolls under it. Under 840 the links move into a floating glass panel behind the menu button; <code>data-keep</code> keeps the main action in the bar. The current page is the selection fill.</p></section>
+  <div class="s4-site ex-site">
+    <div class="s4-announce"><span class="s4-status" data-tone="primary">New</span><span>Bank Sync now works with 2,400 banks across Europe.</span><a href="#news">Read the Announcement<span class="s4-icon" data-icon="forward"></span></a></div>
+    <header class="s4-site-header">
+      <div class="s4-site-bar">
+        <a class="s4-site-logo" href="#top" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+        <nav class="s4-site-nav" aria-label="Main"><ul>
+          <li><a class="s4-button" data-variant="text" href="#product" aria-current="page">Product</a></li>
+          <li><a class="s4-button" data-variant="text" href="#pricing">Pricing</a></li>
+          <li><a class="s4-button" data-variant="text" href="#blog">Blog</a></li>
+          <li><a class="s4-button" data-variant="text" href="#docs">Docs</a></li>
+        </ul></nav>
+        <div class="s4-site-actions">
+          <a class="s4-button" data-variant="text" href="#sign-in">Sign In</a>
+          <a class="s4-button" href="#start" data-keep>Start Free</a>
+          <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <section class="ex-sec"><h2>Hero</h2><p>Three layouts: text only (default), <code>data-layout="split"</code> (media beside the text from 840) and <code>data-layout="stack"</code> (centered, media below). An eyebrow, the one <code>h1</code>, a lead, one or two actions and a trust line.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Text-Only Hero">
+      <div class="s4-hero">
+        <div class="s4-hero-text">
+          <p class="s4-eyebrow">Release 4.2</p>
+          <p class="s4-hero-title">Pay Every Bill From One Calm List</p>
+          <p class="s4-site-lead">Ledgerly reads your bills, reminds you before they’re due and pays them in one tap.</p>
+          <div class="s4-site-actions-row"><a class="s4-button" data-size="m" href="#start">Start Free</a><a class="s4-button" data-variant="tonal" data-size="m" href="#how">See How It Works</a></div>
+          <p class="s4-hero-trust"><span class="s4-icon" data-icon="star"></span>Rated 4.9 on the App Store · No card needed</p>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Split Hero">
+      <div class="s4-hero" data-layout="split">
+        <div class="s4-hero-text">
+          <p class="s4-eyebrow">For Households</p>
+          <p class="s4-hero-title">Bills Paid on Time, Without Thinking</p>
+          <p class="s4-site-lead">A picture beside the words: a real screen in a phone frame, hanging from the top of a stage (<code>data-bleed</code>).</p>
+          <div class="s4-site-actions-row"><a class="s4-button" data-size="m" href="#start">Start Free</a></div>
+        </div>
+        <div class="s4-hero-media s4-site-stage" data-bleed>
+          <div class="s4-frame" data-device="phone" role="img" aria-label="The bills screen">
+            <div class="s4-frame-screen" inert style="padding: var(--s4-space-8) var(--s4-space-3); gap: var(--s4-space-3)">
+              <span class="s4-headline-small" style="padding-inline: var(--s4-space-2)">Bills</span>
+              <ul class="s4-list">
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Northwind Energy</span><span class="s4-list-supporting">Thu · Autopay</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$142.20</span></span></div></li>
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">City Water</span><span class="s4-list-supporting">Fri</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$38.90</span></span></div></li>
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Oak Street Rent</span><span class="s4-list-supporting">Sat</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,050.00</span></span></div></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Stacked Hero">
+      <div class="s4-hero" data-layout="stack">
+        <div class="s4-hero-text">
+          <p class="s4-eyebrow">Design Studio</p>
+          <p class="s4-hero-title">We Build Calm Software</p>
+          <p class="s4-site-lead">Centered words, the work below them in a browser frame.</p>
+        </div>
+        <div class="s4-hero-media">
+          <div class="s4-frame" data-device="browser" role="img" aria-label="An empty app window">
+            <div class="s4-frame-bar"><span class="s4-frame-address">app.example</span></div>
+            <div class="s4-frame-screen" inert><div class="s4-media-empty" style="margin: auto"><span class="s4-icon" data-icon="image"></span>Put a screenshot here (img or video, object-fit cover)</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Section Heading, Feature Rows and Checks</h2><p>A section is <code>.s4-site-section</code>; its heading block is start-aligned by default, <code>data-align="center"</code> or <code>data-layout="split"</code> (title left, lead right from 840). Feature rows alternate on their own.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Feature Rows">
+      <div class="s4-site-section-head" data-layout="split">
+        <p class="s4-eyebrow">How It Works</p>
+        <p class="s4-site-title">Three Steps, Then It Runs Itself</p>
+        <p class="s4-site-lead">Set it up once. After that it only asks when something looks unusual.</p>
+      </div>
+      <div class="s4-feature-rows">
+        <article class="s4-feature-row">
+          <div class="s4-feature-text"><p class="s4-eyebrow">1 · Collect</p><h3 class="s4-site-subtitle" data-size="l">Forward It, and It’s Filed</h3><p>Send a bill or take a photo; we read the payee, amount and due date.</p><ul class="s4-checks"><li><span class="s4-icon" data-icon="check"></span>PDFs, photos and emails</li><li><span class="s4-icon" data-icon="check"></span>Spots duplicates</li></ul></div>
+          <div class="s4-feature-media"><div class="s4-site-stage" data-ratio="3:2"><span class="s4-media-empty"><span class="s4-icon" data-icon="mail"></span>A composition of real components goes here</span></div></div>
+        </article>
+        <article class="s4-feature-row">
+          <div class="s4-feature-text"><p class="s4-eyebrow">2 · Pay</p><h3 class="s4-site-subtitle" data-size="l">One Tap, From Your Bank</h3><p>Pays from the account you choose, on the day you choose.</p><a class="s4-site-more" href="#security">How We Keep Money Safe<span class="s4-icon" data-icon="forward"></span></a></div>
+          <div class="s4-feature-media"><div class="s4-site-stage" data-ratio="3:2"><span class="s4-media-empty"><span class="s4-icon" data-icon="wallet"></span>Second row: the picture comes first from 840</span></div></div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Bento</h2><p><code>data-span</code> out of 12 from 840 (each row adds up to 12), <code>data-rows="2"</code> for a tall cell, at most one <code>data-tone="accent"</code>. 600 to 839: two columns, wide cells full, and a last cell that would stand alone fills the row. It never leaves a hole.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Bento">
+      <div class="s4-bento">
+        <article class="s4-bento-cell" data-span="8"><h3 class="s4-bento-title">Shared Households</h3><p>Everyone sees what’s due; only the people you choose can pay.</p></article>
+        <article class="s4-bento-cell" data-span="4" data-tone="accent"><div class="s4-bento-visual"><span class="s4-bento-figure">$0</span></div><h3 class="s4-bento-title">In Late Fees</h3><p>for 92% of members last year.</p></article>
+        <article class="s4-bento-cell" data-span="4"><h3 class="s4-bento-title">Security</h3><p>Read-only bank access.</p></article>
+        <article class="s4-bento-cell" data-span="4"><h3 class="s4-bento-title">Any Currency</h3><p>Euros and dollars in one list.</p></article>
+        <article class="s4-bento-cell" data-span="4"><h3 class="s4-bento-title">Tax Time</h3><p>A tidy export for your accountant.</p></article>
+      </div>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Icon List, Logos, Quotes and Numbers</h2><p>Proof without boxes: wordmarks in the content color, one large quote with hanging punctuation, short quotes as filled cards, big numbers on the title scale.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Icon List">
+      <ul class="s4-features">
+        <li class="s4-feature"><span class="s4-icon" data-icon="search"></span><h3 class="s4-feature-name">Research</h3><p>We sit with the people who will use it first.</p></li>
+        <li class="s4-feature"><span class="s4-icon" data-icon="edit"></span><h3 class="s4-feature-name">Design</h3><p>Screens, flows and a system your team keeps.</p></li>
+        <li class="s4-feature"><span class="s4-icon" data-icon="code"></span><h3 class="s4-feature-name">Engineering</h3><p>Fast on an old phone.</p></li>
+      </ul>
+    </section>
+    <section class="s4-site-section" data-space="compact" aria-label="Logos">
+      <div class="s4-logos"><p>Trusted by teams like these</p><ul>
+        <li class="s4-logo"><span class="s4-icon" data-icon="globe"></span>Northwind</li><li class="s4-logo"><span class="s4-icon" data-icon="book"></span>Fieldnote</li><li class="s4-logo"><span class="s4-icon" data-icon="link"></span>Copperline</li><li class="s4-logo"><span class="s4-icon" data-icon="sparkle"></span>Halcyon</li>
+      </ul></div>
+    </section>
+    <section class="s4-site-section" aria-label="Quote">
+      <figure class="s4-quote"><blockquote><p>“Ledgerly paid for itself in the first six weeks.”</p></blockquote><figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="tertiary">PR</span><span><span class="s4-quote-name">Priya Raman</span><span class="s4-quote-role">Design studio owner</span></span></figcaption></figure>
+    </section>
+    <section class="s4-site-section" aria-label="Short Quotes">
+      <ul class="s4-quotes">
+        <li><blockquote><p>“Approvals saved us from paying a supplier twice.”</p></blockquote><span class="s4-quote-cite"><span class="s4-avatar">DO</span><span><span class="s4-quote-name">Dana Okafor</span><span class="s4-quote-role">Operations</span></span></span></li>
+        <li><blockquote><p>“We finally see the same list.”</p></blockquote><span class="s4-quote-cite"><span class="s4-avatar" data-tone="secondary">JM</span><span><span class="s4-quote-name">Jamie Moreau</span><span class="s4-quote-role">Plus member</span></span></span></li>
+        <li><blockquote><p>“The export our accountant didn’t redo.”</p></blockquote><span class="s4-quote-cite"><span class="s4-avatar" data-tone="tertiary">AK</span><span><span class="s4-quote-name">Arun Kapoor</span><span class="s4-quote-role">Founder</span></span></span></li>
+      </ul>
+    </section>
+    <section class="s4-site-section" aria-label="Numbers">
+      <dl class="s4-numbers"><div class="s4-number"><dt>paid on time</dt><dd>$2.1B</dd></div><div class="s4-number"><dt>households</dt><dd>40,000</dd></div><div class="s4-number"><dt>sooner, on average</dt><dd>9 days</dd></div><div class="s4-number"><dt>App Store rating</dt><dd>4.9</dd></div></dl>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Media</h2><p><code>.s4-media</code> is a figure; <code>.s4-media-box</code> holds an img, video or iframe at a fixed ratio (<code>data-ratio</code>: 16:9 default, 4:3, 3:2, 1:1, 4:5, 21:9), so nothing jumps while it loads. Without media it shows its empty state; a play control floats over a poster. Tones: default, <code>low</code>, <code>secondary</code>, <code>tertiary</code>, <code>accent</code>.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Media">
+      <ul class="s4-site-grid">
+        <li><figure class="s4-media"><div class="s4-media-box" data-ratio="4:3"><span class="s4-media-empty"><span class="s4-icon" data-icon="image"></span>No picture yet</span></div><figcaption class="s4-media-caption">Empty state, 4:3.</figcaption></figure></li>
+        <li><figure class="s4-media"><div class="s4-media-box" data-ratio="4:3" data-tone="secondary"><span class="s4-media-empty"><span class="s4-icon" data-icon="camera"></span>Studio tour, 2 min</span><a class="s4-button s4-media-play" href="#video"><span class="s4-icon" data-icon="play"></span>Watch</a></div><figcaption class="s4-media-caption">Poster with a play control.</figcaption></figure></li>
+        <li><figure class="s4-media"><div class="s4-media-box" data-ratio="4:3" data-tone="accent"><span class="s4-media-empty"><span class="s4-icon" data-icon="sparkle"></span>A cover set in type</span></div><figcaption class="s4-media-caption">The accent tone.</figcaption></figure></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Pricing</h2><p>The period switch is a Joined Capsule group with <code>data-period</code>; each <code>data-period-&lt;value&gt;</code> in the same section shows its text. The featured plan is the accent fill (no outline, no shadow). The comparison table shows one plan at a time under 600, picked with its own group.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Plans">
+      <div class="s4-plans-period" style="margin-block-start: 0">
+        <div class="s4-button-group" data-connected data-select="single" data-period data-fit="content" aria-label="Billing Period">
+          <button class="s4-button" data-variant="tonal" type="button" value="monthly" aria-pressed="true">Monthly</button>
+          <button class="s4-button" data-variant="tonal" type="button" value="yearly">Yearly · Save 20%</button>
+        </div>
+      </div>
+      <ul class="s4-plans">
+        <li class="s4-plan"><div class="s4-plan-head"><h3 class="s4-plan-name">Free</h3><p>Ten bills a month.</p></div><p class="s4-plan-price"><span class="s4-plan-amount">$0</span><span class="s4-plan-per">forever</span></p><a class="s4-button" data-variant="tonal" data-size="m" href="#free">Start Free</a></li>
+        <li class="s4-plan" data-featured><div class="s4-plan-head"><h3 class="s4-plan-name">Plus <span class="s4-status">Most Popular</span></h3><p>Every bill in one place.</p></div><p class="s4-plan-price"><span class="s4-plan-amount" data-period-monthly="$6" data-period-yearly="$5">$6</span><span class="s4-plan-per" data-period-monthly="a month" data-period-yearly="a month, yearly">a month</span></p><a class="s4-button" data-size="m" href="#plus">Try Plus</a><ul class="s4-checks"><li><span class="s4-icon" data-icon="check"></span>Unlimited bills</li></ul></li>
+        <li class="s4-plan"><div class="s4-plan-head"><h3 class="s4-plan-name">Team</h3><p>For small businesses.</p></div><p class="s4-plan-price"><span class="s4-plan-amount" data-period-monthly="$15" data-period-yearly="$12">$15</span><span class="s4-plan-per">per member a month</span></p><a class="s4-button" data-variant="tonal" data-size="m" href="#team">Start a Team</a></li>
+      </ul>
+    </section>
+    <section class="s4-site-section" aria-label="Comparison">
+      <div class="s4-compare">
+        <div class="s4-button-group" data-connected data-select="single" aria-label="Plan to Show">
+          <button class="s4-button" data-variant="tonal" type="button" value="1">Free</button>
+          <button class="s4-button" data-variant="tonal" type="button" value="2" aria-pressed="true">Plus</button>
+          <button class="s4-button" data-variant="tonal" type="button" value="3">Team</button>
+        </div>
+        <table>
+          <thead><tr><th scope="col"><span class="s4-visually-hidden">Feature</span></th><th scope="col">Free</th><th scope="col">Plus</th><th scope="col">Team</th></tr></thead>
+          <tbody><tr><th scope="row">Bills a Month</th><td>10</td><td>Unlimited</td><td>Unlimited</td></tr>
+          <tr><th scope="row">Approvals</th><td><span class="s4-icon" data-icon="close" data-no role="img" aria-label="Not included"></span></td><td><span class="s4-icon" data-icon="close" data-no role="img" aria-label="Not included"></span></td><td><span class="s4-icon" data-icon="check" role="img" aria-label="Included"></span></td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Call to Action and FAQ</h2><p><code>.s4-cta</code> in a toned band: words left and actions right from 840, or <code>data-align="center"</code>. <code>.s4-site-split</code> puts a heading beside its content (an FAQ with the existing accordion).</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="FAQ">
+      <div class="s4-site-split">
+        <div class="s4-site-section-head"><p class="s4-site-title">Questions, Answered</p><p class="s4-site-lead">A person answers within a day.</p></div>
+        <div class="s4-accordion">
+          <details class="s4-accordion-item" name="ref-faq" open><summary>Is there a free plan?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes, ten bills a month.</div></details>
+          <details class="s4-accordion-item" name="ref-faq"><summary>Can I cancel any time?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes, in two taps.</div></details>
+        </div>
+      </div>
+    </section>
+    <section class="s4-site-section" data-tone="accent" aria-label="Call to Action">
+      <div class="s4-cta"><div><p class="s4-site-title">Start With Ten Bills, Free</p><p class="s4-site-lead">No card needed.</p></div><div class="s4-site-actions-row"><a class="s4-button" data-size="m" href="#signup">Create an Account</a><a class="s4-button" data-variant="tonal" data-size="m" href="#pricing">See Pricing</a></div></div>
+    </section>
+    <section class="s4-site-section" data-tone="low" aria-label="Centered Call to Action">
+      <div class="s4-cta" data-align="center"><div><p class="s4-site-title">Tell Us What You’re Making</p><p class="s4-site-lead">We reply within two working days.</p></div><div class="s4-site-actions-row"><a class="s4-button" data-size="m" href="#mail">Write to Us</a></div></div>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Blog Index</h2><p>One featured post, then a dated list: the date column sits beside the title from 840. Posts open a page (the article template), never a dialog.</p></section>
+  <div class="s4-site ex-site">
+    <section class="s4-site-section" aria-label="Posts">
+      <ul class="s4-posts">
+        <li><article class="s4-post"><p class="s4-post-meta"><time datetime="2026-11-05">Nov 5, 2026</time><span>Changelog</span></p><h3><a href="#p1">Ledgerly 4.2: Bank Sync for Europe</a></h3><p>Connect a bank in under a minute and pay bills in euros.</p></article></li>
+        <li><article class="s4-post"><p class="s4-post-meta"><time datetime="2026-10-29">Oct 29, 2026</time><span>6 min read</span></p><h3><a href="#p2">The Household Bill Meeting</a></h3><p>A fifteen-minute agenda for two people who share bills.</p></article></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="ex-sec"><h2>Docs Layout and Footer</h2><p>The docs layout (<code>.s4-docs</code>: sidebar, page, <code>.s4-toc</code>) is a whole page: see the <a href="../../templates/docs.html">docs template</a>. The footer: brand, a newsletter field, link columns, small print and a theme switch.</p></section>
+  <div class="s4-site ex-site">
+    <footer class="s4-site-footer" style="margin-block-start: 0">
+      <div class="s4-site-footer-top">
+        <div class="s4-site-footer-brand">
+          <a class="s4-site-logo" href="#top" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+          <p>Bills paid on time, from the bank you already use.</p>
+          <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter"><div class="s4-text-field"><input id="ref-email" type="email" autocomplete="email"><label for="ref-email">Email</label></div><button class="s4-button" data-variant="tonal" type="submit">Subscribe</button></form>
+        </div>
+        <nav class="s4-site-footer-links" data-columns="3" aria-label="Footer">
+          <div><h3 class="s4-title-small">Product</h3><ul><li><a href="#how">How It Works</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
+          <div><h3 class="s4-title-small">Company</h3><ul><li><a href="#about">About</a></li><li><a href="#careers">Careers</a></li></ul></div>
+          <div><h3 class="s4-title-small">Resources</h3><ul><li><a href="#blog">Blog</a></li><li><a href="#docs">Docs</a></li></ul></div>
+        </nav>
+      </div>
+      <div class="s4-site-footer-base">
+        <p>© 2026 Ledgerly Ltd</p>
+        <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+          <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+          <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+          <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../swatches/swatches.js"></script>
+<script src="site.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

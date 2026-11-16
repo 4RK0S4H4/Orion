@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Northbound · Design and Engineering Studio</title>
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Site. A small company or personal site from the website kit (components/site): a centered hero with the work below it in a browser frame, selected work as figures with captions, a video slot with a poster, services as an icon list, a centered quote, three numbers and a contact band. Use it for a studio, a portfolio or an about page. -->
+<meta name="description" content="Northbound is a six-person studio that designs and builds calm, fast software for small businesses and public services. Based in Edinburgh, working everywhere.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Northbound">
+<meta property="og:title" content="Northbound · Design and Engineering Studio">
+<meta property="og:description" content="We design and build calm, fast software for small businesses and public services.">
+<meta property="og:image" content="https://example.com/og/northbound-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.css">
+<style>
+  /* pictures for this page, composed from Orion components (no image files) */
+  .nb-app { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1; min-block-size: 0; }
+  .nb-app-side { display: none; }
+  .nb-app-main { display: grid; align-content: start; gap: var(--s4-space-4); padding: var(--s4-space-5); min-inline-size: 0; }
+  .nb-app-main > h2 { margin: 0; }
+  .nb-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3); }
+  .nb-stats .s4-stat { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .nb-stats .s4-stat:nth-child(3) { display: none; }
+  @container s4-site-section (width >= 840px) {
+    .nb-app { grid-template-columns: calc(var(--s4-space-16) * 3.5) minmax(0, 1fr); }
+    .nb-app-side { display: grid; align-content: start; gap: var(--s4-space-1); padding: var(--s4-space-4) var(--s4-space-3); background: var(--md-sys-color-surface-container-low); }
+    .nb-app-main { padding: var(--s4-space-8); gap: var(--s4-space-6); }
+    .nb-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .nb-stats .s4-stat:nth-child(3) { display: grid; }
+  }
+  .nb-side-item { display: flex; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-3); border-radius: min(var(--s4-space-5), var(--s4-shape-control)); }
+  .nb-side-item[data-on] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .nb-work { display: grid; align-content: space-between; justify-items: start; inline-size: 100%; block-size: 100%; padding: var(--s4-space-6); }
+  .nb-work .s4-icon { --s4-icon-size: var(--s4-space-10); }
+  .nb-work-name { font-family: var(--s4-site-title-font); font-size: var(--s4-site-title-size); line-height: var(--s4-site-title-line-height); letter-spacing: var(--s4-site-title-tracking); font-weight: var(--s4-site-title-weight); text-wrap: balance; }
+  .nb-media-caption { display: grid; gap: var(--s4-space-1); }
+  .nb-media-caption > strong { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
+</style>
+</head>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="#top" aria-label="Northbound Home"><span class="s4-site-logo-mark" aria-hidden="true">N</span>Northbound</a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#work">Work</a></li>
+        <li><a class="s4-button" data-variant="text" href="#services">Services</a></li>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Studio</a></li>
+        <li><a class="s4-button" data-variant="text" href="blog.html">Journal</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" href="#contact" data-keep>Start a Project</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="s4-site-section" id="top" aria-labelledby="hero-h">
+    <div class="s4-hero" data-layout="stack">
+      <div class="s4-hero-text">
+        <p class="s4-eyebrow">Design and Engineering Studio</p>
+        <h1 class="s4-hero-title" id="hero-h">We Build Calm Software for Busy People</h1>
+        <p class="s4-site-lead">Six of us, in Edinburgh and online. We design and build the tools small businesses and public services use every day, and we stay to look after them.</p>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="#contact">Start a Project</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="#work">See Our Work</a>
+        </div>
+      </div>
+      <div class="s4-hero-media">
+        <div class="s4-frame" data-device="browser" role="img" aria-label="The clinic booking tool we built for Lothian Physio: today’s 14 appointments, three open slots and 96% attendance.">
+          <div class="s4-frame-bar"><span class="s4-frame-address">book.lothianphysio.example</span></div>
+          <div class="s4-frame-screen" inert>
+            <div class="nb-app">
+              <div class="nb-app-side">
+                <span class="nb-side-item s4-title-small" data-on><span class="s4-icon" data-icon="calendar"></span>Today</span>
+                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="people"></span>Patients</span>
+                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="chart"></span>Reports</span>
+                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="settings"></span>Settings</span>
+              </div>
+              <div class="nb-app-main">
+                <h2 class="s4-headline-small">Tuesday, 18 November</h2>
+                <div class="nb-stats">
+                  <div class="s4-stat"><span class="s4-stat-label">Appointments</span><span class="s4-stat-value">14</span></div>
+                  <div class="s4-stat"><span class="s4-stat-label">Open Slots</span><span class="s4-stat-value">3</span></div>
+                  <div class="s4-stat"><span class="s4-stat-label">Attendance</span><span class="s4-stat-value">96%</span></div>
+                </div>
+                <ul class="s4-list">
+                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s">EC</span></span><span class="s4-list-content"><span class="s4-list-headline">Eilidh Campbell</span><span class="s4-list-supporting">09:00 · Knee, follow-up</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="success">Arrived</span></span></div></li>
+                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s" data-tone="secondary">TS</span></span><span class="s4-list-content"><span class="s4-list-headline">Tomasz Szymański</span><span class="s4-list-supporting">09:45 · Shoulder, first visit</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
+                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s" data-tone="tertiary">AR</span></span><span class="s4-list-content"><span class="s4-list-headline">Amira Rahman</span><span class="s4-list-supporting">10:30 · Back, review</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
+                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s">JB</span></span><span class="s4-list-content"><span class="s4-list-headline">James Brodie</span><span class="s4-list-supporting">11:15 · Ankle, first visit</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s4-site-section" id="work" aria-labelledby="work-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">Selected Work</p>
+      <h2 class="s4-site-title" id="work-h">Tools People Open Every Morning</h2>
+      <p class="s4-site-lead">We take on four projects a year, so each one gets the whole studio.</p>
+    </div>
+    <ul class="s4-site-grid">
+      <li><figure class="s4-media">
+        <div class="s4-media-box" data-ratio="4:3"><span class="nb-work"><span class="s4-icon" data-icon="calendar" aria-hidden="true"></span><span class="nb-work-name">Lothian Physio</span></span></div>
+        <figcaption class="s4-media-caption nb-media-caption"><strong>Booking for a Clinic Group</strong>Missed appointments down from 11% to 4% in a year.</figcaption>
+      </figure></li>
+      <li><figure class="s4-media">
+        <div class="s4-media-box" data-ratio="4:3" data-tone="secondary"><span class="nb-work"><span class="s4-icon" data-icon="cart" aria-hidden="true"></span><span class="nb-work-name">Harbour Grocers</span></span></div>
+        <figcaption class="s4-media-caption nb-media-caption"><strong>Orders for a Village Shop</strong>Click and collect, built in six weeks, run by two people.</figcaption>
+      </figure></li>
+      <li><figure class="s4-media">
+        <div class="s4-media-box" data-ratio="4:3" data-tone="low"><span class="nb-work"><span class="s4-icon" data-icon="location" aria-hidden="true"></span><span class="nb-work-name">Fife Council</span></span></div>
+        <figcaption class="s4-media-caption nb-media-caption"><strong>Report a Road Problem</strong>One form instead of four, used 40,000 times last winter.</figcaption>
+      </figure></li>
+    </ul>
+  </section>
+
+  <section class="s4-site-section" aria-labelledby="tour-h">
+    <h2 class="s4-visually-hidden" id="tour-h">Studio Tour</h2>
+    <figure class="s4-media">
+      <div class="s4-media-box" data-ratio="21:9">
+        <span class="s4-media-empty"><span class="s4-icon" data-icon="camera" aria-hidden="true"></span>A two-minute tour of the studio and how we work</span>
+        <a class="s4-button s4-media-play" data-size="m" href="#tour-video"><span class="s4-icon" data-icon="play"></span>Watch the Tour</a>
+      </div>
+      <figcaption class="s4-media-caption">Filmed at the studio on Leith Walk, October 2026. Captions in English and Gaelic.</figcaption>
+    </figure>
+  </section>
+
+  <section class="s4-site-section" id="services" aria-labelledby="svc-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">Services</p>
+      <h2 class="s4-site-title" id="svc-h">From the First Sketch to Year Five</h2>
+    </div>
+    <ul class="s4-features">
+      <li class="s4-feature"><span class="s4-icon" data-icon="search"></span><h3 class="s4-feature-name">Research</h3><p>We sit with the people who will use it before we draw anything.</p></li>
+      <li class="s4-feature"><span class="s4-icon" data-icon="edit"></span><h3 class="s4-feature-name">Product Design</h3><p>Screens, flows and a design system your team can keep using.</p></li>
+      <li class="s4-feature"><span class="s4-icon" data-icon="code"></span><h3 class="s4-feature-name">Engineering</h3><p>Web and mobile apps, built to be fast on an old phone.</p></li>
+      <li class="s4-feature"><span class="s4-icon" data-icon="visible"></span><h3 class="s4-feature-name">Accessibility</h3><p>Every release is checked with screen readers and keyboards.</p></li>
+      <li class="s4-feature"><span class="s4-icon" data-icon="security"></span><h3 class="s4-feature-name">Hosting and Care</h3><p>We run what we build, and answer the phone when it matters.</p></li>
+      <li class="s4-feature"><span class="s4-icon" data-icon="people"></span><h3 class="s4-feature-name">Training</h3><p>We hand over properly: your team learns to change it themselves.</p></li>
+    </ul>
+  </section>
+
+  <section class="s4-site-section" aria-label="What Clients Say">
+    <figure class="s4-quote" data-align="center">
+      <blockquote><p>“They asked better questions in the first week than we had in a year. The booking tool just works, and our front desk finally goes home on time.”</p></blockquote>
+      <figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="secondary">FM</span><span><span class="s4-quote-name">Fiona MacLeod</span><span class="s4-quote-role">Practice Manager, Lothian Physio</span></span></figcaption>
+    </figure>
+  </section>
+
+  <section class="s4-site-section" aria-label="The Studio in Numbers">
+    <dl class="s4-numbers" data-columns="3">
+      <div class="s4-number"><dt>years building for small teams</dt><dd>11</dd></div>
+      <div class="s4-number"><dt>of our clients have stayed more than three years</dt><dd>9 in 10</dd></div>
+      <div class="s4-number"><dt>projects a year, so each one gets all of us</dt><dd>4</dd></div>
+    </dl>
+  </section>
+
+  <section class="s4-site-section" data-tone="accent" id="contact" aria-labelledby="contact-h">
+    <div class="s4-cta" data-align="center">
+      <div>
+        <h2 class="s4-site-title" id="contact-h">Tell Us What You’re Making</h2>
+        <p class="s4-site-lead">A short note is plenty. We reply within two working days, even when the answer is no.</p>
+      </div>
+      <div class="s4-site-actions-row">
+        <a class="s4-button" data-size="m" href="mailto:hello@northbound.example"><span class="s4-icon" data-icon="mail"></span>hello@northbound.example</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="#top" aria-label="Northbound Home"><span class="s4-site-logo-mark" aria-hidden="true">N</span>Northbound</a>
+      <p>12 Leith Walk, Edinburgh EH6 5AA. Open Monday to Thursday; on Fridays we read and tidy up.</p>
+    </div>
+    <nav class="s4-site-footer-links" data-columns="3" aria-label="Footer">
+      <div><h2>Studio</h2><ul><li><a href="#work">Work</a></li><li><a href="#services">Services</a></li><li><a href="blog.html">Journal</a></li></ul></div>
+      <div><h2>Elsewhere</h2><ul><li><a href="#newsletter">Newsletter</a></li><li><a href="#mastodon">Mastodon</a></li><li><a href="#github">GitHub</a></li></ul></div>
+      <div><h2>Small Print</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#company">Company Details</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 Northbound Studio Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="icons.js" defer></script>
+<script src="orion.js" defer></script>
+<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
+</body>
+</html>
