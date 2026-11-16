@@ -20,7 +20,7 @@
     height: var(--s4-space-10);
     padding: 0 var(--s4-space-2);
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: var(--s4-shape-control);
     background: var(--_bg);
     color: var(--_fg);
     font-family: var(--md-sys-typescale-label-large-font);

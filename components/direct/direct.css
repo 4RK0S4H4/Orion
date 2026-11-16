@@ -14,7 +14,7 @@
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: var(--s4-shape-toolbar);
     background: none;
     color: var(--md-sys-color-on-surface-variant);
     cursor: grab;
@@ -94,7 +94,7 @@
     gap: var(--s4-space-1);
     min-block-size: var(--s4-size-top-app-bar, var(--s4-space-16));
     padding-inline: var(--s4-space-2) var(--s4-space-2);
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: var(--s4-shape-control);
     background: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-on-secondary-container);
     min-inline-size: 0;

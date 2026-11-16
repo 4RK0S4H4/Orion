@@ -85,3 +85,4 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0052 | Concentric nested corners (checked), neutral and tinted color modes both first class, glass only on what floats, dragging that survives a real phone | Active (owner's notes; needs the owner's iPhone look for dragging) |
 | 0053 | The app is the app: adapt an app by keeping its screens and elements and drawing them in Orion; make the component the app needs. Ring, milestones, month, timeline. Long swipe | Active (approved by the owner 2026-11-16) |
 | 0054 | Tool panels: `data-modeless` floating panels leave the page live from 600 wide (filters, inspectors); task panels and dialogs stay modal; phones always modal | Active (owner's call; built) |
+| 0055 | Brand dials: corners (soft range), typefaces, gray temperature, page tone; letter spacing tuned for Inter; stronger type; a website kit to come | Active (owner's quiz answers; first dials built) |

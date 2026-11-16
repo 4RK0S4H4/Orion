@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=b09149a">
+<link rel="stylesheet" href="orion.css?v=07750e7">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -321,6 +321,54 @@
             </div>
           </section>
 
+          <section class="s4-pane" aria-labelledby="brand-h">
+            <h2 class="s4-pane-title" id="brand-h">Make It Yours</h2>
+            <p class="s4-pane-supporting">The brand dials: how one app looks like itself and still like Orion.</p>
+            <div class="s4-stack">
+              <div>
+                <p class="s4-label-large" id="dial-corners-l">Corners</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-corners-l" id="dial-corners" data-brand-dial="corners">
+                <button class="s4-button" type="button" value="round" aria-pressed="true">Round</button>
+                <button class="s4-button" type="button" value="soft" aria-pressed="false">Soft</button>
+                <button class="s4-button" type="button" value="firm" aria-pressed="false">Firm</button>
+                </div>
+              </div>
+              <div>
+                <p class="s4-label-large" id="dial-gray-l">Grays</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-gray-l" id="dial-gray" data-brand-dial="gray">
+                <button class="s4-button" type="button" value="pure" aria-pressed="true">Pure</button>
+                <button class="s4-button" type="button" value="warm" aria-pressed="false">Warm</button>
+                <button class="s4-button" type="button" value="cool" aria-pressed="false">Cool</button>
+                </div>
+              </div>
+              <div>
+                <p class="s4-label-large" id="dial-page-l">Page</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-page-l" id="dial-page" data-brand-dial="page">
+                <button class="s4-button" type="button" value="plain" aria-pressed="true">Plain</button>
+                <button class="s4-button" type="button" value="soft" aria-pressed="false">Soft Tone</button>
+                </div>
+              </div>
+              <div>
+                <p class="s4-label-large" id="dial-display-l">Headings</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-display-l" id="dial-display" data-brand-dial="display">
+                <button class="s4-button" type="button" value="inter" aria-pressed="true">Inter</button>
+                <button class="s4-button" type="button" value="serif" aria-pressed="false">Serif</button>
+                <button class="s4-button" type="button" value="rounded" aria-pressed="false">Rounded</button>
+                <button class="s4-button" type="button" value="mono" aria-pressed="false">Mono</button>
+                </div>
+              </div>
+              <div>
+                <p class="s4-label-large" id="dial-text-l">Text</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-text-l" id="dial-text" data-brand-dial="text">
+                <button class="s4-button" type="button" value="inter" aria-pressed="true">Inter</button>
+                <button class="s4-button" type="button" value="system" aria-pressed="false">System</button>
+                <button class="s4-button" type="button" value="rounded" aria-pressed="false">Rounded</button>
+                <button class="s4-button" type="button" value="serif" aria-pressed="false">Serif</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section class="s4-pane" aria-labelledby="icons-h">
             <h2 class="s4-pane-title" id="icons-h">Icon Style</h2>
             <p class="s4-pane-supporting">Switches every icon in the app.</p>
@@ -438,7 +486,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=bfae2bf"></script>
+<script src="orion.js?v=45fdf47"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

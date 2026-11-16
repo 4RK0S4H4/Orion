@@ -40,6 +40,12 @@
   $('#contrast').addEventListener('s4-change', function (e) { S4.theme({ contrast: +e.detail.value }); });
   /* decision 0052: off = neutral surfaces with the color as an accent; on = every surface takes the color (M3 Expressive) */
   $('#tinted').addEventListener('change', function () { S4.theme({ surfaces: this.checked ? 'tinted' : 'neutral' }); });
+  /* the brand dials (decision 0055): each group sets one key of S4.theme and shows the saved choice */
+  document.querySelectorAll('[data-brand-dial]').forEach(function (g) {
+    var key = g.dataset.brandDial, now = S4.theme()[key];
+    g.querySelectorAll('[value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === now); });
+    g.addEventListener('s4-change', function (e) { var o = {}; o[key] = e.detail.value; S4.theme(o); });
+  });
   var t = S4.theme();
   $('#tinted').checked = t.surfaces === 'tinted';
   $$('#mode [value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === t.mode); });

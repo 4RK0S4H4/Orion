@@ -7,7 +7,7 @@ the few things an app still has to do.
 
 | Area | What S4 Orion does | Where |
 |---|---|---|
-| Color contrast | 42 role pairs pass WCAG AA in light, dark and both high-contrast modes; the build fails otherwise | `scripts/build-tokens.mjs` |
+| Color contrast | 83 pairs pass WCAG AA in light, dark and both high-contrast modes; the build fails otherwise | `scripts/build-tokens.mjs` |
 | Contrast on glass | Text on glass is ≥ 4.5:1 over any backdrop for every seed (backdrop compression + `on-surface` only) | `glass.css`, `scripts/check-glass.mjs` |
 | Contrast levels | Standard, medium, high; device "more contrast" picks high unless the app chose a level | tokens, `S4.theme({ contrast })` |
 | Focus | 3dp `secondary` ring, 2dp outside, on every interactive element (`:focus-visible`) | `base.css` |

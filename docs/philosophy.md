@@ -12,13 +12,14 @@ exceptions that drift over time.
 
 The personal layer is short and deliberate:
 
-- **Inter** as the typeface, with its full OpenType features.
+- **Inter** as the default typeface, with its full OpenType features and letter spacing tuned for it.
 - **Solar icons**: Bold Duotone where the icon carries the screen, Linear at small sizes.
 - **Title Case** for labels; sentences stay sentence case.
 - **Any accent on a neutral base.** Surfaces stay neutral gray; one accent color, any color, marks actions and selection (decisions 0043, 0045). Black and white is the owner's favorite accent and what the stylesheet ships with, but it is a choice, not the language.
 - **Glass on floating chrome** and nowhere else.
 - **Simple, sturdy motion**: dialogs and floating panels pop, menus fade in place, shared axis between views; controls answer where they are (decisions 0022, 0042, 0043).
 - **Normal before expressive** (decision 0043): where Material decorates (tinted surfaces, halos, sheets that slide up the screen), Orion does the plain thing.
+- **Brand dials** (decision 0055): an app makes Orion its own with a short list of checked settings (accent, gray temperature, page tone, corners, typefaces), never by restyling components.
 - **One language, three places**: phones, desktop windows and desktop apps share the components; density and the window layer adapt them.
 
 ## 2. One source of color
@@ -37,8 +38,8 @@ reduced transparency, or a browser without backdrop blur all turn it solid.
 
 ## 4. Motion that never gets in the way
 
-Motion says where something came from and keeps out of the way. Dialogs pop (rise 16px and fade), menus drop 8px out of
-their button, sheets slide from the edge they live on, snackbars rise, and sibling views move along a shared axis. Only
+Motion says where something came from and keeps out of the way. Dialogs and floating panels pop (rise 16px and fade), menus fade in
+place with their items following, nothing slides in from a screen edge, snackbars rise, and sibling views move along a shared axis. Only
 transform and opacity animate, one transition per element at a time, so fast taps can never leave anything half-open.
 Movement uses M3 Expressive springs; fades use effects springs that never overshoot. Reduced motion makes movement
 instant. (Decision 0022 replaced the earlier container transform and menu emerge.)

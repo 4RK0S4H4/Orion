@@ -41,7 +41,7 @@
      full pill filled with the inverse color. Tabs are a tray with a sliding pill; a group has no tray and nothing slides. */
   .s4-button-group[data-connected] { gap: 2px; }
   .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button) {
-    --_full: calc(var(--_h) / 2);   /* a finite "full": with 9999px the browser scales every corner down to nothing */
+    --_full: min(calc(var(--_h) / 2), var(--s4-shape-button));   /* a finite "full": with 9999px the browser scales every corner down to nothing */
     --_r: var(--md-sys-shape-corner-small);
     --_bg: var(--md-sys-color-surface-container-highest);
     --_fg: var(--md-sys-color-on-surface-variant);

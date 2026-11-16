@@ -75,13 +75,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": -0.2,
+              "value": -1.2,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "display-medium": {
@@ -106,13 +106,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -1,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "display-small": {
@@ -137,13 +137,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -0.8,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "headline-large": {
@@ -168,13 +168,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -0.7,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "headline-medium": {
@@ -199,13 +199,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -0.6,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "headline-small": {
@@ -230,19 +230,19 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -0.5,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "title-large": {
           "font": {
             "$type": "fontFamily",
-            "$value": "{md.ref.typeface.plain}"
+            "$value": "{md.ref.typeface.brand}"
           },
           "size": {
             "$type": "dimension",
@@ -261,13 +261,13 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0,
+              "value": -0.4,
               "unit": "px"
             }
           },
           "weight": {
             "$type": "fontWeight",
-            "$value": 400
+            "$value": 600
           }
         },
         "title-medium": {
@@ -292,7 +292,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.2,
+              "value": -0.2,
               "unit": "px"
             }
           },
@@ -323,7 +323,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.1,
+              "value": -0.1,
               "unit": "px"
             }
           },
@@ -354,7 +354,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.5,
+              "value": -0.2,
               "unit": "px"
             }
           },
@@ -385,7 +385,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.2,
+              "value": -0.1,
               "unit": "px"
             }
           },
@@ -416,7 +416,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.4,
+              "value": 0,
               "unit": "px"
             }
           },
@@ -447,7 +447,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.1,
+              "value": -0.1,
               "unit": "px"
             }
           },
@@ -478,7 +478,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.5,
+              "value": 0,
               "unit": "px"
             }
           },
@@ -509,7 +509,7 @@
           "tracking": {
             "$type": "dimension",
             "$value": {
-              "value": 0.5,
+              "value": 0.1,
               "unit": "px"
             }
           },
@@ -522,43 +522,43 @@
           "display-large": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "display-medium": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "display-small": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "headline-large": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "headline-medium": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "headline-small": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "title-large": {
             "weight": {
               "$type": "fontWeight",
-              "$value": 500
+              "$value": 700
             }
           },
           "title-medium": {

@@ -73,8 +73,12 @@
   "s4": {
     "shape": {
       "$type": "dimension",
-      "button": {
+      "control": {
         "$value": "{md.sys.shape.corner.full}",
+        "$description": "The corner of everything you click (buttons, chips, navigation rows, menu items, FABs). A pill by default; the corners dial (data-corners, decision 0055) lowers it. Components clamp it to half their height."
+      },
+      "button": {
+        "$value": "{s4.shape.control}",
         "$description": "All button sizes at rest (M3 Expressive round buttons)."
       },
       "button-pressed": {
@@ -82,16 +86,16 @@
         "$description": "Buttons square off while pressed (M3 Expressive shape morph)."
       },
       "icon-button": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "fab": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "fab-large": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "chip": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "card": {
         "$value": "{md.sys.shape.corner.medium}"
@@ -115,7 +119,7 @@
         "$value": "{md.sys.shape.corner.extra-large}"
       },
       "menu-item": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "dialog": {
         "$value": "{md.sys.shape.corner.extra-large}"
@@ -128,10 +132,10 @@
         "$value": "{md.sys.shape.corner.full}"
       },
       "tooltip": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "nav-indicator": {
-        "$value": "{md.sys.shape.corner.full}"
+        "$value": "{s4.shape.control}"
       },
       "toolbar": {
         "$value": "{md.sys.shape.corner.full}",

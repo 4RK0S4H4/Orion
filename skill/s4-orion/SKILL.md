@@ -5,7 +5,7 @@ description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 
 
 # S4 Orion
 
-S4 Orion is the user's design system for web apps and pages. It **is** Material 3 Expressive: the same color roles,
+S4 Orion is the user's design system for web apps and pages. It is built on Material 3 Expressive: the same color roles,
 type scale, shape scale, state layers, springs and components, under M3's own names. The personal layer on top is short
 and deliberate:
 
@@ -55,6 +55,32 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 
 Mixed apps combine them: a dashboard app whose Clients view is the list-detail screen, with the settings screen as its
 last destination. Keep one shell (`.s4-app`) per page.
+
+## Make it this app's own (brand dials)
+
+Orion looks finished with no settings. When an app has a character of its own, give it one with the brand dials, in
+one call before first paint, and never by restyling components (decision 0055):
+
+```js
+S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft', display: 'serif' });
+```
+
+| Dial | Values | Reach for it when |
+|---|---|---|
+| `seed` (+ `variant`) | any color, or a named accent | the app has a brand color |
+| `surfaces` | `neutral` (default), `tinted` | the app should be colored all over, Material You style |
+| `gray` | `pure` (default), `warm`, `cool` | warm: editorial, food, craft, personal. cool: technical, data, developer tools |
+| `page` | `plain` (default), `soft` | dashboards and card-heavy screens: white cards on a soft gray page |
+| `corners` | `round` (default), `soft`, `firm` | soft: friendly but less playful. firm: dense professional tools. Never sharper |
+| `display` | `inter` (default), `serif`, `rounded`, `mono`, `system`, or a font-family | headings and big numbers carry the brand |
+| `text` | the same | only when the brand truly has a text face; otherwise keep Inter |
+| `data-density` | comfortable, `compact`, `auto` | desktop tools |
+
+Pick at most three dials beyond the accent; an app that turns every dial stops looking designed. Pair them with intent:
+editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mono display for numbers); friendly
+consumer = tinted + rounded display + round. What an app can never change: filled (no outlines), no shadows, glass only
+on floating chrome, the motion patterns, the behaviours. Elements only this app has are drawn from Orion's rules in the
+app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on `:root`, 10px or more.
 
 ## Page shape
 

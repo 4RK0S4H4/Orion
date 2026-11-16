@@ -429,9 +429,14 @@ export const tokens = {
     "value": "0",
     "description": "Legacy: the quiet unfold menu style (data-motion=\"quiet\"). Menus emerge from their button by default (decision 0018)."
   },
-  "--s4-shape-button": {
+  "--s4-shape-control": {
     "type": "dimension",
     "value": "var(--md-sys-shape-corner-full)",
+    "description": "The corner of everything you click (buttons, chips, navigation rows, menu items, FABs). A pill by default; the corners dial (data-corners, decision 0055) lowers it. Components clamp it to half their height."
+  },
+  "--s4-shape-button": {
+    "type": "dimension",
+    "value": "var(--s4-shape-control)",
     "description": "All button sizes at rest (M3 Expressive round buttons)."
   },
   "--s4-shape-button-pressed": {
@@ -441,19 +446,19 @@ export const tokens = {
   },
   "--s4-shape-icon-button": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-fab": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-fab-large": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-chip": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-card": {
     "type": "dimension",
@@ -484,7 +489,7 @@ export const tokens = {
   },
   "--s4-shape-menu-item": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-dialog": {
     "type": "dimension",
@@ -501,11 +506,11 @@ export const tokens = {
   },
   "--s4-shape-tooltip": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-nav-indicator": {
     "type": "dimension",
-    "value": "var(--md-sys-shape-corner-full)"
+    "value": "var(--s4-shape-control)"
   },
   "--s4-shape-toolbar": {
     "type": "dimension",
@@ -1654,11 +1659,11 @@ export const tokens = {
   },
   "--md-sys-typescale-display-large-tracking": {
     "type": "dimension",
-    "value": "-0.2px"
+    "value": "-1.2px"
   },
   "--md-sys-typescale-display-large-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-display-medium-font": {
     "type": "fontFamily",
@@ -1674,11 +1679,11 @@ export const tokens = {
   },
   "--md-sys-typescale-display-medium-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-1px"
   },
   "--md-sys-typescale-display-medium-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-display-small-font": {
     "type": "fontFamily",
@@ -1694,11 +1699,11 @@ export const tokens = {
   },
   "--md-sys-typescale-display-small-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-0.8px"
   },
   "--md-sys-typescale-display-small-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-headline-large-font": {
     "type": "fontFamily",
@@ -1714,11 +1719,11 @@ export const tokens = {
   },
   "--md-sys-typescale-headline-large-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-0.7px"
   },
   "--md-sys-typescale-headline-large-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-headline-medium-font": {
     "type": "fontFamily",
@@ -1734,11 +1739,11 @@ export const tokens = {
   },
   "--md-sys-typescale-headline-medium-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-0.6px"
   },
   "--md-sys-typescale-headline-medium-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-headline-small-font": {
     "type": "fontFamily",
@@ -1754,15 +1759,15 @@ export const tokens = {
   },
   "--md-sys-typescale-headline-small-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-0.5px"
   },
   "--md-sys-typescale-headline-small-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-title-large-font": {
     "type": "fontFamily",
-    "value": "var(--md-ref-typeface-plain)"
+    "value": "var(--md-ref-typeface-brand)"
   },
   "--md-sys-typescale-title-large-size": {
     "type": "dimension",
@@ -1774,11 +1779,11 @@ export const tokens = {
   },
   "--md-sys-typescale-title-large-tracking": {
     "type": "dimension",
-    "value": "0px"
+    "value": "-0.4px"
   },
   "--md-sys-typescale-title-large-weight": {
     "type": "fontWeight",
-    "value": "400"
+    "value": "600"
   },
   "--md-sys-typescale-title-medium-font": {
     "type": "fontFamily",
@@ -1794,7 +1799,7 @@ export const tokens = {
   },
   "--md-sys-typescale-title-medium-tracking": {
     "type": "dimension",
-    "value": "0.2px"
+    "value": "-0.2px"
   },
   "--md-sys-typescale-title-medium-weight": {
     "type": "fontWeight",
@@ -1814,7 +1819,7 @@ export const tokens = {
   },
   "--md-sys-typescale-title-small-tracking": {
     "type": "dimension",
-    "value": "0.1px"
+    "value": "-0.1px"
   },
   "--md-sys-typescale-title-small-weight": {
     "type": "fontWeight",
@@ -1834,7 +1839,7 @@ export const tokens = {
   },
   "--md-sys-typescale-body-large-tracking": {
     "type": "dimension",
-    "value": "0.5px"
+    "value": "-0.2px"
   },
   "--md-sys-typescale-body-large-weight": {
     "type": "fontWeight",
@@ -1854,7 +1859,7 @@ export const tokens = {
   },
   "--md-sys-typescale-body-medium-tracking": {
     "type": "dimension",
-    "value": "0.2px"
+    "value": "-0.1px"
   },
   "--md-sys-typescale-body-medium-weight": {
     "type": "fontWeight",
@@ -1874,7 +1879,7 @@ export const tokens = {
   },
   "--md-sys-typescale-body-small-tracking": {
     "type": "dimension",
-    "value": "0.4px"
+    "value": "0px"
   },
   "--md-sys-typescale-body-small-weight": {
     "type": "fontWeight",
@@ -1894,7 +1899,7 @@ export const tokens = {
   },
   "--md-sys-typescale-label-large-tracking": {
     "type": "dimension",
-    "value": "0.1px"
+    "value": "-0.1px"
   },
   "--md-sys-typescale-label-large-weight": {
     "type": "fontWeight",
@@ -1914,7 +1919,7 @@ export const tokens = {
   },
   "--md-sys-typescale-label-medium-tracking": {
     "type": "dimension",
-    "value": "0.5px"
+    "value": "0px"
   },
   "--md-sys-typescale-label-medium-weight": {
     "type": "fontWeight",
@@ -1934,7 +1939,7 @@ export const tokens = {
   },
   "--md-sys-typescale-label-small-tracking": {
     "type": "dimension",
-    "value": "0.5px"
+    "value": "0.1px"
   },
   "--md-sys-typescale-label-small-weight": {
     "type": "fontWeight",
@@ -1942,31 +1947,31 @@ export const tokens = {
   },
   "--md-sys-typescale-emphasized-display-large-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-display-medium-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-display-small-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-headline-large-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-headline-medium-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-headline-small-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-title-large-weight": {
     "type": "fontWeight",
-    "value": "500"
+    "value": "700"
   },
   "--md-sys-typescale-emphasized-title-medium-weight": {
     "type": "fontWeight",

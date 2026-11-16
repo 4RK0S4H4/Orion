@@ -8,6 +8,12 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+Brand dials (decision 0055):
+
+- Added: `S4.theme({ corners, gray, page, display, text })` and the matching attributes on `<html>` (`data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`); `--s4-shape-control`; warm and cool grays (`components/base/gray.css`, generated and checked by `npm run check:gray`); a "Make It Yours" pane in the showcase.
+- Changed (visible in every app): letter spacing is tuned for Inter instead of Material's Roboto values; display, headline and title-large are weight 600 (emphasized 700).
+- Changed: buttons, icon buttons, chips, status pills, tabs, pagination, breadcrumbs, navigation rows, menu items, FABs, snackbars and tooltips take their corner from `--s4-shape-control`. No change at the default.
+
 - Fixed: the dashboard template shows a rise in revenue in the success tone, not the accent (an orange or red accent made good news look like a warning).
 
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.

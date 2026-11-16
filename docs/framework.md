@@ -14,7 +14,7 @@ Everything flows one way. A change at one layer is picked up by every layer afte
 | 3. Components | `components/<name>/` | 61 components, each with CSS, optional JS, a README and a reference page. |
 | 4. Layout | `components/app/`, `components/layout/`, `components/desktop/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar, pane scrolling, shortcuts, context menus). |
 | 5. Glass and motion | `components/glass/`, `components/motion/` | The glass layer on chrome and overlays; the ten named motion patterns: pattern tokens in CSS and `S4.transition.*` in script (decision 0046; `npm run check:motion`). |
-| 6. Templates | `templates/` | Nine complete starter apps, one per kind of app. |
+| 6. Templates | `templates/` | Fifteen complete starter apps, one per kind of app. |
 | 7. Skill | `skill/s4-orion/` | Decision rules for Claude, generated references, the bundled assets and templates, the page checker. |
 
 CSS cascade layers mirror this: `s4.tokens, s4.base, s4.components, s4.glass, s4.motion, s4.utilities`. An app's own
@@ -56,7 +56,7 @@ inside of `orion.js`) can change at any time.
 - **Classes** prefixed `s4-` that are documented in a component README.
 - **Attributes** documented in READMEs: `data-variant`, `data-size`, `data-color`, `data-tone`, `data-width`,
   `data-layout`, `data-open`, `data-sticky`, `data-expand`, `data-menu`, `data-dialog`, `data-sheet`, `data-close`,
-  `data-split-open`, `data-split-back`, `data-theme-mode`, `data-theme-contrast`, `data-theme-seed`, `data-glass`,
+  `data-split-open`, `data-split-back`, `data-theme-mode`, `data-theme-contrast`, `data-theme-seed`, `data-glass`, `data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`,
   `data-density`, `data-window`, `data-shortcut`, `data-context-menu`, `data-autofocus`, `data-placement`, `data-range-end`, …
 - **ARIA state** as the styling hook: `aria-pressed`, `aria-selected`, `aria-current`, `aria-expanded`, `aria-checked`.
 - **Tokens**: every `--md-sys-*` and `--s4-*` custom property in `tokens/tokens.css` (not `--_*`).
@@ -86,6 +86,7 @@ with. Re-package the skill (`skill/dist/s4-orion.skill`) on every release.
    opt-in for something that floats). Never restyle components by class from the app.
 2. **Override by token:** set a token on `:root` or on a container (`--s4-content-max: none`). Color only through
    `S4.theme({ seed, variant, contrast })`.
+   The look beyond color only through the brand dials (decision 0055): `S4.theme({ gray, page, corners, display, text })`.
 3. **Propose to the system:** when two apps need the same thing, it becomes a component: a folder in `components/`
    following `components/CONVENTIONS.md`, a README, a reference page, an entry in `components/index.css` and in the
    README groups in `scripts/build.mjs`, and a numbered decision record. New icons: `scripts/add-icons.mjs` adds a name

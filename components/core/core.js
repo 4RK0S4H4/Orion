@@ -161,8 +161,17 @@
       m.content = S4.util.css('--md-sys-color-surface');
     });
   }
+  var FACES = ['serif', 'rounded', 'mono', 'system'];
+  var BRAND = [
+    { key: 'corners', attr: 'data-corners', base: 'round' },
+    { key: 'gray', attr: 'data-gray', base: 'pure' },
+    { key: 'page', attr: 'data-page', base: 'plain' },
+    { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
+    { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' }
+  ];
   S4.theme = function (opts) {
-    if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces };
+    if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
+      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter' };
     var colorChanged = false;
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
@@ -177,6 +186,18 @@
       else if (state.contrast >= 0.5) root.setAttribute('data-contrast', 'medium');
       else root.setAttribute('data-contrast', 'standard');
     }
+    /* Brand dials (decision 0055): corners, gray temperature, page tone and typefaces are attributes on <html>
+       (base/brand.css, base/gray.css). A typeface is a preset name (serif, rounded, mono, system) or a font-family
+       value; null or 'inter' / 'round' / 'pure' / 'plain' goes back to the default. */
+    BRAND.forEach(function (d) {
+      if (!(d.key in opts)) return;
+      var v = opts[d.key]; if (v === d.base || !v) v = null;
+      state[d.key] = v;
+      if (!d.prop) { if (v) root.setAttribute(d.attr, v); else root.removeAttribute(d.attr); return; }
+      var preset = !v || FACES.indexOf(v) >= 0;
+      if (v) root.setAttribute(d.attr, preset ? v : 'custom'); else root.removeAttribute(d.attr);
+      if (preset) root.style.removeProperty(d.prop); else root.style.setProperty(d.prop, v);
+    });
     if (colorChanged) writeColor(); else { metaThemeColor(); S4.util.emit(document, 's4-theme', S4.theme()); }
     var key = opts.save || S4.theme.key;
     if (key) { S4.theme.key = key; try { localStorage.setItem(key, JSON.stringify(S4.theme())); } catch (e) {} }

@@ -45,6 +45,20 @@ would amend 0023 to 0025 and the Inter rule), letter spacing, hierarchy in neutr
 first. Until then nothing from the review is built except one fix (the dashboard's revenue rise uses the success tone,
 not the accent). Without asking, a next session may do issue 57 (document drift), 56 (card grids fill) and 58.
 
+**Added 2026-11-16 (answers):** the owner answered the review's eight questions and left the order to us: decision
+0055. Built: letter spacing tuned for Inter, headings at 600, and the first brand dials (`corners`, `gray`, `page`,
+`display`, `text` on `S4.theme`; `components/base/brand.css` and the generated `gray.css`; "Make It Yours" in the
+showcase Settings; a skill section). Document drift (issue 57) fixed. **Needs the owner's look:** the new type on
+every page (it changes every app), and the dials in the showcase Settings on the iPhone.
+
+**Order from here (the owner left it to us; 0055):**
+1. A suite pass over every dial preset (concentric corners, contrast, overflow), so the dials are proven like accents are.
+2. Issues 56 (card grids fill wide windows) and 58 (Elevated button, avatar stacks, breadcrumb chevrons).
+3. Motion energy and per-app component defaults; themes on any container (issue 52).
+4. The website kit (issue 53): site header and footer, hero with media, feature rows, pricing, testimonials, logo row,
+   article index, docs layout, fluid display type, section rhythm, four site templates. Show the direction in a quiz first.
+5. Rich inputs (59), then desktop anatomy (60). Horizon 1's "two real apps" runs alongside as the test of each step.
+
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
 2. Build two real apps end to end with the skill (one phone-first, one desktop) and fix what the skill gets wrong.
@@ -78,6 +92,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-16 (brand dials): the owner's answers recorded as 0055; type retuned, first dials built, drift fixed. Next: the order above.
 - 2026-11-16 (design review): end-to-end review, comparison and brand dials proposal published as a quiz; issues 51 to 60 logged. Next: the owner's eight answers, then a numbered decision.
 - 2026-11-15 (any-app round): never focus a field (0049), pages (0050), the eight ideas built (0051): palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates; ROADMAP written. Next: the owner's looks, then Horizon 1.
 - 2026-11-14 (production round): one motion philosophy (0046), placement ladder and expand in place (0047), quizzes on the live bundle (0048), production suite in Chromium and WebKit in CI, idea list B quiz. Next: the owner's looks and quiz picks.
