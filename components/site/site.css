@@ -70,6 +70,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--s4-space-1);
+    padding-block: var(--s4-space-1);
     color: inherit;
     font-weight: var(--md-sys-typescale-label-large-weight);
     text-underline-offset: 0.2em;
@@ -950,7 +951,7 @@
   @media (width >= 840px) {
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr); }
     .s4-docs-bar { display: none; }
-    .s4-docs-nav { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-12)); overflow: auto; margin-inline-start: calc(var(--s4-space-3) * -1); }
+    .s4-docs-nav { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-12)); overflow: auto; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1) 0 0 calc((var(--s4-space-3) + var(--s4-space-2)) * -1); }
   }
   @media (width >= 1200px) {
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr) calc(var(--s4-space-16) * 3.5); }

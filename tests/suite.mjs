@@ -234,6 +234,44 @@ async function use(page, add, phone) {
       const gone = await until((id) => { const m = document.getElementById(id); if (!m) return true; const r = m.getBoundingClientRect(); return !(r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'); }, id);
       if (!gone) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
     }
+    /* website kit: the phone menu and other site panels open as floating glass, close with Escape and give focus back */
+    const sitePanels = await visible('.s4-site-menu-button, [data-site-panel]');
+    for (const b of sitePanels) {
+      const what = await b.evaluate((x) => x.getAttribute('aria-label') || x.textContent.trim());
+      if (!(await click(b, `site panel button "${what}"`))) continue;
+      await settle(480);
+      const st = await b.evaluate((x) => { const p = document.getElementById(x.getAttribute('aria-controls') || ''); if (!p) return { missing: true }; const r = p.getBoundingClientRect(), a = document.activeElement; return { exp: x.getAttribute('aria-expanded'), shown: p.hasAttribute('data-open') && r.width > 0 && r.height > 0, id: p.id, field: !!a && p.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]), textarea, select'), glass: getComputedStyle(p).backdropFilter !== 'none' || getComputedStyle(p).webkitBackdropFilter !== 'none' }; });
+      if (st.missing) { add(`site panel "${what}" has no panel (aria-controls)`); continue; }
+      if (st.exp !== 'true' || !st.shown) { add(`site panel "${what}" did not open`); continue; }
+      const f = await fits(st.id); if (f) add(`site panel "${what}" ${f}`);
+      if (st.field) add(`site panel "${what}" put the cursor in a text field (decision 0049)`);
+      if (!st.glass) add(`site panel "${what}" is not glass`);
+      await page.keyboard.press('Escape'); await settle(420);
+      const closed = await until((id) => !document.getElementById(id).hasAttribute('data-open'), st.id);
+      if (!closed) { add(`site panel "${what}" did not close with Escape`); continue; }
+      if (!(await b.evaluate((x) => document.activeElement === x))) add(`site panel "${what}" did not give focus back to its button`);
+    }
+    /* website kit: the pricing period switch changes the prices; the comparison picker changes the column */
+    for (const g of await visible('[data-period]')) {
+      const off = g.locator('button[value]:not([aria-pressed="true"])').first();
+      const before = await page.evaluate(() => [...document.querySelectorAll('[data-period-monthly], [data-period-yearly]')].map((e) => e.textContent).join('|'));
+      if (!(await click(off, 'pricing period switch'))) continue;
+      await settle(300);
+      const after = await page.evaluate(() => [...document.querySelectorAll('[data-period-monthly], [data-period-yearly]')].map((e) => e.textContent).join('|'));
+      if (before === after) add('pricing period switch did not change the prices');
+    }
+    for (const c of await visible('.s4-compare > .s4-button-group')) {
+      const off = c.locator('button[value]:not([aria-pressed="true"])').first();
+      const v = await off.getAttribute('value');
+      if (!(await click(off, 'comparison plan picker'))) continue;
+      await settle(200);
+      if ((await c.evaluate((x) => x.parentElement.dataset.show)) !== v) add('comparison plan picker did not change the column shown');
+    }
+    if (await page.locator('.s4-toc').isVisible().catch(() => false)) {
+      const ok = await page.evaluate(async () => { const links = [...document.querySelectorAll('.s4-toc a[href^="#"]')]; const last = document.getElementById(links.at(-1).hash.slice(1)); window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }); await new Promise((r) => setTimeout(r, 300)); const on = links.filter((a) => a.getAttribute('aria-current') === 'location'); window.scrollTo({ top: 0, behavior: 'instant' }); return !!last && on.length === 1 && on[0] === links.at(-1); });
+      if (!ok) add('on-this-page contents did not mark the last section when scrolled to the end');
+      await settle(200);
+    }
     /* expand in place */
     const expands = await page.evaluate(() => [...new Set([...document.querySelectorAll('[data-expand]:not(.s4-nav-rail)')].filter((b) => b.getBoundingClientRect().width && !b.closest('[hidden]')).map((b) => b.dataset.expand))]);
     for (const id of expands) {
