@@ -5,7 +5,10 @@
      { value } (value is "" for Escape or a click on the scrim).
    - Focus: the dialog itself, never a text field (decisions 0043 and 0049: there is no opt-in for fields any more);
      [data-autofocus] on a button picks that button.
-     Focus returns to the opener. Bottom and side sheets are floating panels and open the same way. */
+     Focus returns to the opener. Bottom and side sheets are floating panels and open the same way.
+   - Tool panels (decision 0054): data-modeless on a floating panel opens it without a scrim and leaves the page behind
+     it live (scroll it, tap it), from 600 wide. It closes with its Close button, Escape while focus is inside it, or
+     its opener (a second tap). On a phone it is modal like any other panel. Dialogs are always modal. */
 (function () {
   var S4 = window.S4;
   var FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -21,15 +24,18 @@
     return d;
   }
   function narrow() { return window.matchMedia && window.matchMedia('(max-width: 599.98px)').matches; }
+  function modeless(d) { return d.hasAttribute('data-modeless') && !d.classList.contains('s4-dialog') && !narrow(); }
   function open(id, opts) {
     var d = el(id); if (!d || d.open) return;
     opts = opts || {};
     var from = opts.from || null;
     d._s4from = from; d.style.visibility = '';
-    d.showModal();
+    d._s4modeless = modeless(d);
+    /* the attribute, not show(): show() would put the cursor in the panel's first field (decision 0049) */
+    if (d._s4modeless) { d.setAttribute('open', ''); d.setAttribute('aria-modal', 'false'); } else { d.removeAttribute('aria-modal'); d.showModal(); }
     initialFocus(d).focus({ preventScroll: true });
     S4.transition.restore(d);
-    S4.transition.scrim(d, true);
+    if (!d._s4modeless) S4.transition.scrim(d, true);
     var p = motion(d, true);
     S4.util.emit(d, 's4-open', { from: from });
     return p;
@@ -43,7 +49,7 @@
     var d = el(id); if (!d || !d.open || d._s4closing) return Promise.resolve();
     d._s4closing = true;
     var from = d._s4from;
-    S4.transition.scrim(d, false);
+    if (!d._s4modeless) S4.transition.scrim(d, false);
     var p = motion(d, false);
     return p.then(function () {
       d.close(value || '');
@@ -62,11 +68,16 @@
     S4.util.all(scope, '[data-dialog], [data-sheet]').forEach(function (opener) {
       if (!S4.util.once(opener, 'opener')) return;
       opener.setAttribute('aria-haspopup', 'dialog');
-      opener.addEventListener('click', function (e) { e.preventDefault(); open(opener.dataset.dialog || opener.dataset.sheet, { from: opener }); });
+      opener.addEventListener('click', function (e) {
+        e.preventDefault();
+        var d = el(opener.dataset.dialog || opener.dataset.sheet);
+        if (d && d.open && d._s4modeless) close(d, ''); else open(d, { from: opener });   /* a tool panel's button also puts it away */
+      });
     });
     S4.util.all(scope, 'dialog.s4-dialog, dialog.s4-bottom-sheet, dialog.s4-side-sheet').forEach(function (d) {
       if (!S4.util.once(d, 'dialog')) return;
       d.addEventListener('cancel', function (e) { e.preventDefault(); close(d, ''); });   /* Escape: animate out */
+      d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && d._s4modeless && d.open && !e.defaultPrevented) { e.preventDefault(); close(d, ''); } });
       d.addEventListener('click', function (e) {
         var c = e.target.closest('[data-close]');
         if (c && d.contains(c)) { e.preventDefault(); close(d, c.getAttribute('data-close')); return; }

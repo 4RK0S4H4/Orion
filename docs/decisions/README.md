@@ -84,3 +84,4 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0051 | The eight ideas the owner picked: palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates | Active (built; owner to look) |
 | 0052 | Concentric nested corners (checked), neutral and tinted color modes both first class, glass only on what floats, dragging that survives a real phone | Active (owner's notes; needs the owner's iPhone look for dragging) |
 | 0053 | The app is the app: adapt an app by keeping its screens and elements and drawing them in Orion; make the component the app needs. Ring, milestones, month, timeline. Long swipe | Active (built; owner to look) |
+| 0054 | Tool panels: `data-modeless` floating panels leave the page live from 600 wide (filters, inspectors); task panels and dialogs stay modal; phones always modal | Active (owner's call; built) |

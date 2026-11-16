@@ -25,6 +25,20 @@
     </div>
     <div class="ex-backdrop" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </section>
+  <section class="ex-sec"><h2>Tool Panel</h2><p><code>data-modeless</code>: on a wide window the panel opens with no dimming and the list behind stays live. Tick a filter and the list changes at once; scroll or tap the list with the panel still open. On a phone it is modal like the others.</p>
+    <div class="ex-board col">
+      <div class="s4-row"><button class="s4-button" data-variant="tonal" data-sheet="s-tool" type="button"><span class="s4-icon" data-icon="filter"></span>Filters</button><span class="s4-body-medium" id="s-tool-count" aria-live="polite"></span></div>
+      <ul class="s4-list" id="s-tool-list" aria-label="Bills" style="inline-size:100%"></ul>
+    </div>
+  </section>
+  <dialog class="s4-side-sheet" id="s-tool" data-modeless aria-labelledby="s-tool-h">
+    <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="s-tool-h">Filters</h2><button class="s4-icon-button" data-close="" aria-label="Close" type="button"><span class="s4-icon" data-icon="close"></span></button></div>
+    <div class="s4-sheet-content" id="s-tool-form">
+      <label class="s4-checkbox"><input type="checkbox" value="due" checked><span class="s4-checkbox-box"></span>Due</label>
+      <label class="s4-checkbox"><input type="checkbox" value="overdue" checked><span class="s4-checkbox-box"></span>Overdue</label>
+      <label class="s4-checkbox"><input type="checkbox" value="paid" checked><span class="s4-checkbox-box"></span>Paid</label>
+    </div>
+  </dialog>
   <dialog class="s4-bottom-sheet" id="s-add" aria-labelledby="s-add-h">
     <span class="s4-sheet-handle" aria-hidden="true"></span>
     <h2 class="s4-sheet-title" id="s-add-h">Add Expense</h2>
@@ -55,7 +69,22 @@
 <script src="../text-field/text-field.js"></script>
 <script src="../icon-button/icon-button.js"></script>
 <script src="../checkbox/checkbox.js"></script>
+<script src="../list/list.js"></script>
 <script src="../_example/example.js"></script>
+<script>
+(function () {
+  var bills = [['Rent', 'due', 'Dec 1'], ['Electricity', 'overdue', 'Nov 10'], ['Internet', 'paid', 'Nov 3'], ['Water', 'due', 'Nov 28'], ['Phone', 'paid', 'Nov 5'], ['Insurance', 'overdue', 'Nov 12'], ['Gym', 'due', 'Nov 30'], ['Streaming', 'paid', 'Nov 1']];
+  var WORD = { due: 'Due', overdue: 'Overdue', paid: 'Paid' }, TONE = { due: 'primary', overdue: 'error', paid: 'success' };
+  var list = document.getElementById('s-tool-list'), form = document.getElementById('s-tool-form'), count = document.getElementById('s-tool-count');
+  function draw() {
+    var on = Array.prototype.filter.call(form.querySelectorAll('input'), function (i) { return i.checked; }).map(function (i) { return i.value; });
+    var rows = bills.filter(function (b) { return on.indexOf(b[1]) >= 0; });
+    list.innerHTML = rows.map(function (b) { return '<li><button class="s4-list-item" type="button"><span class="s4-list-content"><span class="s4-list-headline">' + b[0] + '</span><span class="s4-list-supporting">' + b[2] + '</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="' + TONE[b[1]] + '">' + WORD[b[1]] + '</span></span></button></li>'; }).join('');
+    count.textContent = rows.length + ' of ' + bills.length + ' bills';
+  }
+  form.addEventListener('change', draw); draw();
+})();
+</script>
 
 </body>
 </html>

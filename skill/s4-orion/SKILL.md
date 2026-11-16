@@ -196,6 +196,8 @@ last destination. Keep one shell (`.s4-app`) per page.
 - Need another Solar icon: `S4.icon.add({ name: '<svg body>' })`. Credit "Solar icons by 480 Design (CC BY 4.0)" in the
   page footer or about screen.
 
+**Task panel or tool panel** (decision 0054): a floating panel for a short task you save or cancel is modal (the default). A panel that is a tool for the page behind it (filters, an inspector, formatting) gets `data-modeless`: from 600 wide the page stays bright and live, its controls act at once and there is no Apply button. Phones and dialogs are always modal.
+
 ## Common mistakes
 
 | Mistake | Why it's wrong | Instead |

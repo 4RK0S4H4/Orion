@@ -23,10 +23,15 @@ pops in like a dialog. Nothing slides up the screen and nothing docks to an edge
 | `.s4-side-sheet` | From 600 wide: floats at the end side, as tall as the window minus the inset. On a phone: same as the bottom panel. |
 | `data-placement="center"` | Centers the panel like a dialog. |
 | `data-persistent` | A click outside doesn't close it. |
+| `data-modeless` | A **tool panel** (decision 0054): from 600 wide it opens with no scrim and the page behind stays live. Closes with Close, Escape (focus inside), or a second tap on its opener. On a phone it is modal as usual. |
 
 Opening, closing, `[data-close]`, focus and events work exactly like the [dialog](../dialog/) (`S4.sheet.open/close`
 are the same functions). Opening never focuses a text field (decision 0049); `data-autofocus` on a button picks that button.
 `.s4-sheet-handle` in older markup draws nothing, and panels are not dragged.
+
+**Modal or tool panel?** A panel that is a short task you finish or cancel (Add Expense) is modal: the default. A
+panel that is a tool for the page behind it (filters, an inspector, formatting) is `data-modeless`: its controls act at
+once, there is no Apply button, and you keep working in the page while it is open. Dialogs are always modal.
 
 **Do:** use a bottom panel for a quick add or a set of choices; a side panel for filters or details beside content on
 wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dialog, or a second panel on a panel.

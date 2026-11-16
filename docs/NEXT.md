@@ -14,7 +14,7 @@ The long view is in [`ROADMAP.md`](ROADMAP.md): read it before choosing new work
    Back in the bar.
 3. The seven new components (0051): palette, states, forms, rewards, direct manipulation, charts, resizable panes.
 4. The six new templates: board, calendar, editor, gallery, checkout, onboarding.
-5. Still open from before: the motion page (0046); should floating panels become non-modal (0047)?
+5. Still open from before: the motion page (0046). (Panels: settled by 0054.)
 
 **Added 2026-11-15 (later):** decision 0052 (concentric corners with a suite check, tinted color mode as a first-class
 second mode, solid editor toolbar, dragging reworked for a real iPhone) and the first real-app test,
@@ -29,6 +29,11 @@ elements, drawn in Orion; make the component the app needs instead of bending th
 components came out of it (ring, milestones, month, timeline; 61 now), the tracker mockup was rebuilt as that mixture,
 and the long swipe was fixed (issue 48). Waiting on the owner: the long swipe on the iPhone; is the mockup the right
 mixture (then it can become the redesign proposal for the tracker, with before/after screenshots first).
+
+**Added 2026-11-16:** the owner approved the tracker mockup ("Looks great") and settled the last open question from
+0047: decision 0054, tool panels (`data-modeless`; filters and inspectors leave the page live on wide windows; task
+panels, dialogs and phones stay modal). Nothing is waiting on the owner except the iPhone check of the long swipe and
+whether the tracker mockup should become a redesign proposal in the tracker's own repo.
 
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.

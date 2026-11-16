@@ -42,7 +42,7 @@ When two good ideas conflict, the earlier line wins.
 |---|---|
 | Tokens, color, type, shape, glass | Settled (0003 to 0045). Open only: the owner's iPhone looks for 0037, 0040. |
 | Motion | Settled: ten patterns, enforced (0046). |
-| Places | Settled in principle: views, pages (0050), the placement ladder (0047). Open: non-modal panels. |
+| Places | Settled in principle: views, pages (0050), the placement ladder (0047). Tool panels (0054) settle modal versus live. |
 | Components | 61. The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
 | Templates | 15 app archetypes. |
 | Proof | `npm run check` (tokens, glass, accents, motion, stale output) and `npm test` (every page used like a person, Chromium and WebKit, in CI). |

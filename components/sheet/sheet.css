@@ -11,6 +11,7 @@
      .s4-bottom-sheet  floats at the bottom center (phones: the full width minus the inset, above the home indicator)
      .s4-side-sheet    floats at the end side, as tall as the window minus the inset (phones: same as the bottom panel)
    data-placement="center" on either centers it like a dialog. A .s4-sheet-handle in older markup draws nothing.
+   data-modeless (decision 0054) makes it a tool panel from 600 wide: no scrim, the page behind stays live.
    Solid here; glass.css makes both glass. */
 @layer s4.components {
   .s4-bottom-sheet, .s4-side-sheet {
@@ -32,6 +33,8 @@
   .s4-bottom-sheet[open], .s4-side-sheet[open] { display: flex; }
   .s4-bottom-sheet::backdrop, .s4-side-sheet::backdrop { background: color-mix(in srgb, var(--md-sys-color-scrim) calc(var(--s4-scrim-opacity) * 100%), transparent); }
   .s4-sheet-handle { display: none; }
+  /* a tool panel is not in the top layer, so it needs its place in the stack */
+  :is(.s4-bottom-sheet, .s4-side-sheet)[data-modeless]:not(:modal) { z-index: var(--s4-z-sheet); }
 
   /* bottom panel (and the side panel on a phone) */
   .s4-bottom-sheet, .s4-side-sheet {
