@@ -56,13 +56,14 @@ inside of `orion.js`) can change at any time.
 - **Classes** prefixed `s4-` that are documented in a component README.
 - **Attributes** documented in READMEs: `data-variant`, `data-size`, `data-color`, `data-tone`, `data-width`,
   `data-layout`, `data-open`, `data-sticky`, `data-expand`, `data-menu`, `data-dialog`, `data-sheet`, `data-close`,
-  `data-split-open`, `data-split-back`, `data-theme-mode`, `data-theme-contrast`, `data-theme-seed`, `data-glass`, `data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`,
+  `data-split-open`, `data-split-back`, `data-theme-mode`, `data-theme-contrast`, `data-theme-seed`, `data-glass`, `data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`, `data-energy`, `data-accent`,
+  `data-accent-variant`, `data-surfaces`, `data-buttons`, `data-cards`, `data-lists`, `data-rail`, `data-density="roomy"`,
   `data-density`, `data-window`, `data-shortcut`, `data-context-menu`, `data-autofocus`, `data-placement`, `data-range-end`, …
 - **ARIA state** as the styling hook: `aria-pressed`, `aria-selected`, `aria-current`, `aria-expanded`, `aria-checked`.
 - **Tokens**: every `--md-sys-*` and `--s4-*` custom property in `tokens/tokens.css` (not `--_*`).
 - **Public knobs**: `--s4-content-max`, `--s4-gap`, `--s4-min`, `--s4-split-list`, `--s4-split-support`, `--s4-stat-min`,
   `--s4-pane-padding`, `--s4-app-inset-bottom` (read only).
-- **JavaScript**: `S4.theme(…)`, `S4.theme.restore(key, defaults)`, `S4.snackbar(…)`, `S4.app.go(app, view)`,
+- **JavaScript**: `S4.theme(…)`, `S4.theme(options, element)` (a scoped theme), `S4.theme.restore(key, defaults)`, `S4.transition.energy(el)`, `S4.snackbar(…)`, `S4.app.go(app, view)`,
   `S4.split.open(split, on)`, `S4.transition.*`, `S4.motion.animate/spring/reduced`, `S4.icon.add/use/names`,
   `S4.init(scope)`, `S4.register(name, fn)`, `S4.util.css/emit`, `S4.desktop.platform/format`.
 - **Events** (bubbling `CustomEvent`s): `s4-change`, `s4-select`, `s4-toggle`, `s4-open`, `s4-close`, `s4-theme`, `s4-context`, `s4-window`.
@@ -86,7 +87,10 @@ with. Re-package the skill (`skill/dist/s4-orion.skill`) on every release.
    opt-in for something that floats). Never restyle components by class from the app.
 2. **Override by token:** set a token on `:root` or on a container (`--s4-content-max: none`). Color only through
    `S4.theme({ seed, variant, contrast })`.
-   The look beyond color only through the brand dials (decision 0055): `S4.theme({ gray, page, corners, display, text })`.
+   The look beyond color only through the brand dials (decision 0055): `S4.theme({ gray, page, corners, display, text, energy })`.
+   Every dial and the light or dark mode also work on any container (`data-theme="dark"` on a sidebar, `data-accent` on a band,
+   or `S4.theme({ … }, element)`); the nearest one wins. App defaults (`data-buttons`, `data-cards`, `data-lists`, `data-rail`)
+   pick which existing variant is unmarked. See `components/base/themes.html`.
 3. **Propose to the system:** when two apps need the same thing, it becomes a component: a folder in `components/`
    following `components/CONVENTIONS.md`, a README, a reference page, an entry in `components/index.css` and in the
    README groups in `scripts/build.mjs`, and a numbered decision record. New icons: `scripts/add-icons.mjs` adds a name
@@ -107,5 +111,5 @@ CI runs the first four on every push. Run the page checker on every template, th
 ## Browser support
 
 Current Safari (iOS and macOS), Chrome, Edge and Firefox. The system leans on container queries, `:has()`, cascade
-layers, `color-mix()`, `<dialog>` and `backdrop-filter`; without blur support glass turns solid. Safari on iPhone is the
+layers, `color-mix()`, `light-dark()` and `@scope` (scoped gray, page tone and accents), `<dialog>` and `backdrop-filter`; without blur support glass turns solid. Safari on iPhone is the
 owner's main device: anything visual is checked there before it's called done.

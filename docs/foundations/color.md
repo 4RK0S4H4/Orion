@@ -52,3 +52,11 @@ accessible scheme and no component changes.
 ## Guarantees
 The token build checks 83 pairs (every `on-*` pair, text on every surface, outlines at 3:1) in light, dark,
 high-contrast and dark high-contrast, and fails if any drops below WCAG AA.
+
+## Color on a container
+Light or dark mode, the gray temperature, the page tone and the accent can be set on any element, not only `<html>`:
+`data-theme="light|dark"`, `data-gray="warm|cool|pure"`, `data-page="soft"`, `data-accent="blue|#0b57d0"` (with
+`data-accent-variant` and `data-surfaces="tinted"`), or `S4.theme({ mode, seed, gray, … }, element)`. They nest and the
+nearest one wins. A scoped element paints its own surface and text, sets `color-scheme`, and its glass is made from its
+own surfaces. Contrast, reduced transparency and reduced motion stay page-wide. `npm run check:scopes` proves that a
+scoped light or dark element gets exactly the page-wide values of its mode, so the 83 proven pairs hold inside it.

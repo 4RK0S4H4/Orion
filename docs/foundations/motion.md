@@ -76,3 +76,12 @@ its function in `motion.js`: every component follows.
 - Animate clip-path, blur or backdrop-filter; clone an element to animate it.
 - Use liquid motion (overshoot, leading and trailing edges) on glass: it is for ink only (decision 0042).
 - Run two transitions on one element, or a transition longer than 300ms outside Loop.
+
+## Energy
+`data-energy="calm|standard|lively"` on `<html>` or any container (or `S4.theme({ energy })`) changes the amounts of
+the patterns, never the patterns. **Calm**: Ink, Morph, Bend, Pop, Rise and Switch take critically damped springs that
+are a little quicker (`*-calm`, no overshoot) and surfaces travel 60% as far. **Lively**: Ink, Morph, Bend, Pop and Rise
+only take `*-lively` springs with a little more overshoot (7% at most) and Pop and Rise travel 25% further. State,
+Reveal, Loop and the `-calm` patterns never change. Reduced motion still wins: every energy spring is 0ms under it.
+CSS gets the energy through the pattern tokens (`motion.css`), script through `S4.transition.*` (`S4.transition.energy(el)`
+reports it); `npm run check:motion` checks the bounds.
