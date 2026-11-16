@@ -7,7 +7,7 @@
 
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=381d2cc">
+<link rel="stylesheet" href="../components/orion.css?v=dee4735">
 <style>
   .tg-frame { position: relative; aspect-ratio: 390 / 720; overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
   .tg-frame iframe { position: absolute; inset: 0 auto auto 0; inline-size: 390px; block-size: 720px; border: 0; transform-origin: 0 0; transform: scale(var(--k, 0.5)); pointer-events: none; }
@@ -102,9 +102,45 @@
           <div class="s4-card-body">
             <h2 class="s4-card-title"><span class="s4-icon" data-icon="globe"></span> Landing Page</h2>
             <p class="s4-card-subhead">A product or project home page</p>
-            <p class="s4-card-supporting">Hero, features, FAQ and a call to action.</p>
+            <p class="s4-card-supporting">From the website kit: glass header with a phone menu, hero beside the product, feature rows, bento, proof, FAQ and one accent band.</p>
           </div>
           <div class="s4-card-actions"><a class="s4-button" data-variant="tonal" href="landing.html">Open</a><a class="s4-button" data-variant="text" href="https://github.com/4rk0s4h4/s4-orion/blob/main/templates/landing.html">Source</a></div>
+        </article>
+        <article class="s4-card tg-card">
+          <div class="tg-frame"><iframe src="pricing.html" title="Pricing preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+          <div class="s4-card-body">
+            <h2 class="s4-card-title"><span class="s4-icon" data-icon="wallet"></span> Pricing</h2>
+            <p class="s4-card-subhead">Plans, a monthly or yearly switch and a comparison</p>
+            <p class="s4-card-supporting">Featured plan by fill, a table that shows one plan at a time on a phone, FAQ.</p>
+          </div>
+          <div class="s4-card-actions"><a class="s4-button" data-variant="tonal" href="pricing.html">Open</a><a class="s4-button" data-variant="text" href="https://github.com/4rk0s4h4/s4-orion/blob/main/templates/pricing.html">Source</a></div>
+        </article>
+        <article class="s4-card tg-card">
+          <div class="tg-frame"><iframe src="blog.html" title="Blog preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+          <div class="s4-card-body">
+            <h2 class="s4-card-title"><span class="s4-icon" data-icon="book"></span> Blog</h2>
+            <p class="s4-card-subhead">A blog or changelog index</p>
+            <p class="s4-card-supporting">A featured post, dated posts with tags and pagination; posts open the Article template.</p>
+          </div>
+          <div class="s4-card-actions"><a class="s4-button" data-variant="tonal" href="blog.html">Open</a><a class="s4-button" data-variant="text" href="https://github.com/4rk0s4h4/s4-orion/blob/main/templates/blog.html">Source</a></div>
+        </article>
+        <article class="s4-card tg-card">
+          <div class="tg-frame"><iframe src="docs.html" title="Docs preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+          <div class="s4-card-body">
+            <h2 class="s4-card-title"><span class="s4-icon" data-icon="document"></span> Docs</h2>
+            <p class="s4-card-subhead">A documentation page</p>
+            <p class="s4-card-supporting">Sidebar (a glass panel on a phone), prose, contents that follow the reader, previous and next.</p>
+          </div>
+          <div class="s4-card-actions"><a class="s4-button" data-variant="tonal" href="docs.html">Open</a><a class="s4-button" data-variant="text" href="https://github.com/4rk0s4h4/s4-orion/blob/main/templates/docs.html">Source</a></div>
+        </article>
+        <article class="s4-card tg-card">
+          <div class="tg-frame"><iframe src="site.html" title="Studio Site preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
+          <div class="s4-card-body">
+            <h2 class="s4-card-title"><span class="s4-icon" data-icon="people"></span> Studio Site</h2>
+            <p class="s4-card-subhead">A small company, studio or portfolio site</p>
+            <p class="s4-card-supporting">Centered hero with the work below, figures with captions, a video slot, services, a quote, contact.</p>
+          </div>
+          <div class="s4-card-actions"><a class="s4-button" data-variant="tonal" href="site.html">Open</a><a class="s4-button" data-variant="text" href="https://github.com/4rk0s4h4/s4-orion/blob/main/templates/site.html">Source</a></div>
         </article>
         <article class="s4-card tg-card">
           <div class="tg-frame"><iframe src="kanban.html" title="Board preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe></div>
@@ -166,7 +202,7 @@
   </div>
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=1403e2e"></script>
+<script src="../components/orion.js?v=60f9639"></script>
 <script>S4.theme.restore('orion-template-theme', { mode: 'system' });
 /* scale each live preview to its frame */
 var ro = new ResizeObserver(function (es) { es.forEach(function (e) { e.target.style.setProperty('--k', e.contentRect.width / 390); }); });

@@ -121,6 +121,29 @@
     --s4-shape-nav-indicator: var(--s4-shape-control);
     --s4-shape-toolbar: var(--md-sys-shape-corner-full);
     --s4-shape-search: var(--md-sys-shape-corner-large);
+    --s4-site-hero-font: var(--md-sys-typescale-display-large-font);
+    --s4-site-hero-size: clamp(36px, 27.78px + 2.283vw, 57px);
+    --s4-site-hero-line-height: clamp(44px, 36.17px + 2.174vw, 64px);
+    --s4-site-hero-tracking: var(--md-sys-typescale-display-large-tracking);
+    --s4-site-hero-weight: var(--md-sys-typescale-display-large-weight);
+    --s4-site-title-font: var(--md-sys-typescale-display-medium-font);
+    --s4-site-title-size: clamp(28px, 21.35px + 1.848vw, 45px);
+    --s4-site-title-line-height: clamp(36px, 29.74px + 1.739vw, 52px);
+    --s4-site-title-tracking: var(--md-sys-typescale-display-medium-tracking);
+    --s4-site-title-weight: var(--md-sys-typescale-display-medium-weight);
+    --s4-site-lead-font: var(--md-sys-typescale-body-large-font);
+    --s4-site-lead-size: clamp(17px, 15.04px + 0.543vw, 22px);
+    --s4-site-lead-line-height: clamp(26px, 24.04px + 0.543vw, 31px);
+    --s4-site-lead-tracking: var(--md-sys-typescale-body-large-tracking);
+    --s4-site-lead-weight: var(--md-sys-typescale-body-large-weight);
+    --s4-site-section-space: clamp(64px, 45.22px + 5.217vw, 112px);
+    --s4-site-section-space-compact: var(--s4-space-16);
+    --s4-site-section-space-wide: 112px;
+    --s4-site-section-gap: clamp(32px, 22.61px + 2.609vw, 56px);
+    --s4-site-margin: clamp(16px, 9.74px + 1.739vw, 32px);
+    --s4-site-width: var(--s4-layout-content-max);
+    --s4-site-measure: 600px;
+    --s4-site-measure-wide: 800px;
     --s4-space-0: 0px;
     --s4-space-1: 4px;
     --s4-space-2: 8px;
@@ -740,6 +763,9 @@
     --md-sys-shape-corner-full: 9999px;
   }
   :where([data-type-display]:not(:root), [data-type-text]:not(:root)) {
+    --s4-site-hero-font: var(--md-sys-typescale-display-large-font);
+    --s4-site-title-font: var(--md-sys-typescale-display-medium-font);
+    --s4-site-lead-font: var(--md-sys-typescale-body-large-font);
     --md-sys-typescale-display-large-font: var(--md-ref-typeface-brand);
     --md-sys-typescale-display-medium-font: var(--md-ref-typeface-brand);
     --md-sys-typescale-display-small-font: var(--md-ref-typeface-brand);

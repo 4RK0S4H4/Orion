@@ -12,9 +12,9 @@ Everything flows one way. A change at one layer is picked up by every layer afte
 | 1. Tokens | `tokens/src/*.tokens.json` | Every value: color roles (from one seed), type, shape, spacing, sizes, layout widths, breakpoints, z-index, springs, glass. |
 | 2. Base | `components/base/` | Reset, focus ring, state layers, utilities (`.s4-stack`, `.s4-row`, `.s4-grid`, `.s4-num`, type classes), density. |
 | 3. Components | `components/<name>/` | 61 components, each with CSS, optional JS, a README and a reference page. |
-| 4. Layout | `components/app/`, `components/layout/`, `components/desktop/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar, pane scrolling, shortcuts, context menus). |
+| 4. Layout | `components/app/`, `components/layout/`, `components/desktop/`, `components/site/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar, pane scrolling, shortcuts, context menus); for websites, the site shell and sections (a page that scrolls as a document, no app shell). |
 | 5. Glass and motion | `components/glass/`, `components/motion/` | The glass layer on chrome and overlays; the ten named motion patterns: pattern tokens in CSS and `S4.transition.*` in script (decision 0046; `npm run check:motion`). |
-| 6. Templates | `templates/` | Fifteen complete starter apps, one per kind of app. |
+| 6. Templates | `templates/` | Nineteen complete starters: one per kind of app, and four site pages (landing, pricing, blog, docs) plus a studio site. |
 | 7. Skill | `skill/s4-orion/` | Decision rules for Claude, generated references, the bundled assets and templates, the page checker. |
 
 CSS cascade layers mirror this: `s4.tokens, s4.base, s4.components, s4.glass, s4.motion, s4.utilities`. An app's own
@@ -40,7 +40,8 @@ touch laptop keeps touch sizes in a wide layout, a narrow desktop window keeps p
 | One calculation or transformation | `tool.html` | nothing; keep it one screen |
 | Reading | `article.html` | a list of articles (list-detail) for a help center |
 | Talking | `chat.html` | a list-detail of conversations on wide screens |
-| A front door | `landing.html`, `sign-in.html` | — |
+| A front door | `landing.html`, `sign-in.html` | `pricing.html`, `blog.html`, `docs.html` from the website kit |
+| A website (marketing, studio, portfolio, docs) | `landing.html` or `site.html` | sections from `components/site/`; posts open `article.html` |
 | Settings for any of the above | `settings.html` | — |
 | A desktop app | `desktop-app.html` | the views of whichever template fits its content |
 

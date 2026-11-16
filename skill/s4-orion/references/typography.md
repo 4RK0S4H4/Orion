@@ -37,3 +37,20 @@ inside a branded page). An element with `data-type-text` sets its own font, sinc
 ## Roomy density
 `data-density="roomy"` is for content sites: wider margins, gaps and reading column (`--s4-layout-*`) and body text at
 18/28. Control sizes do not change.
+
+## Websites: the fluid display scale (issue 53)
+
+**Tokens:** `--s4-site-{hero,title,lead}-{font,size,line-height,tracking,weight}` (`tokens/src/site.tokens.json`).
+
+Apps keep the fixed M3 roles. A website's big type grows with the window instead, from the phone size of an M3 role
+to the desktop size of the next one up (between a 360 and a 1280 window, then it stops):
+
+| Token | Phone → desktop | Use |
+|---|---|---|
+| `--s4-site-hero-*` | display-small 36/44 → display-large 57/64 | The page's one `h1` (`.s4-hero-title`) |
+| `--s4-site-title-*` | headline-medium 28/36 → display-medium 45/52 | Section titles (`.s4-site-title`), big numbers, prices |
+| `--s4-site-lead-*` | 17/26 → title-large 22/31 | The paragraph under a hero or section title (`.s4-site-lead`) |
+
+Faces, weights and tracking follow the display and body roles, so the brand dials (`display: serif`, any face) apply
+to sites with no extra rules. Headings are 600 with Inter's tight tracking; a lead is the body face at 400. Smaller
+headings inside a section use the fixed roles (headline-small, title-large). One `h1` per page.

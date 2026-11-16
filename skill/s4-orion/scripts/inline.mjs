@@ -45,7 +45,7 @@ html = html.replace(/<script\b([^>]*)\bsrc=["']?([^"'\s>]+)["']?([^>]*)><\/scrip
   const f = find(href); if (!f) { missing.push(href); return tag; }
   let js = readFileSync(f, 'utf8').replace(/<\/script/gi, '<\\/script');
   let pre = '';
-  if (/(^|\/)orion\.js$/.test(href.split(/[?#]/)[0]) && usesSeed) {
+  if (/(^|\/)orion(\.min)?\.js$/.test(href.split(/[?#]/)[0]) && usesSeed) {
     const m3 = find('m3color.js');
     if (m3) { pre = `<script>\n${readFileSync(m3, 'utf8').replace(/<\/script/gi, '<\\/script')}\n</script>\n`; m3inlined = true; }
     else missing.push('m3color.js');

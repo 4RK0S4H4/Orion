@@ -272,6 +272,34 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-layout-list-width` | 360px |  |  |
 | `--s4-layout-inspector-width` | 400px |  |  |
 
+## Websites (fluid type, section rhythm, widths)
+
+| Token | Value | Dark | Notes |
+|---|---|---|---|
+| `--s4-site-hero-font` | var(--md-sys-typescale-display-large-font) |  | The display face (follows the display dial). |
+| `--s4-site-hero-size` | clamp(36px, 27.78px + 2.283vw, 57px) |  | One h1 per page: display-small (36) on a phone to display-large (57) from 1280. |
+| `--s4-site-hero-line-height` | clamp(44px, 36.17px + 2.174vw, 64px) |  | 44 on a phone to 64 from 1280. |
+| `--s4-site-hero-tracking` | var(--md-sys-typescale-display-large-tracking) |  | Follows display-large, so another display face drops Inter's tracking. |
+| `--s4-site-hero-weight` | var(--md-sys-typescale-display-large-weight) |  |  |
+| `--s4-site-title-font` | var(--md-sys-typescale-display-medium-font) |  |  |
+| `--s4-site-title-size` | clamp(28px, 21.35px + 1.848vw, 45px) |  | Section titles (h2): headline-medium (28) on a phone to display-medium (45) from 1280. |
+| `--s4-site-title-line-height` | clamp(36px, 29.74px + 1.739vw, 52px) |  | 36 on a phone to 52 from 1280. |
+| `--s4-site-title-tracking` | var(--md-sys-typescale-display-medium-tracking) |  |  |
+| `--s4-site-title-weight` | var(--md-sys-typescale-display-medium-weight) |  |  |
+| `--s4-site-lead-font` | var(--md-sys-typescale-body-large-font) |  |  |
+| `--s4-site-lead-size` | clamp(17px, 15.04px + 0.543vw, 22px) |  | The paragraph under a hero or section title: 17 on a phone to title-large (22) from 1280. |
+| `--s4-site-lead-line-height` | clamp(26px, 24.04px + 0.543vw, 31px) |  |  |
+| `--s4-site-lead-tracking` | var(--md-sys-typescale-body-large-tracking) |  |  |
+| `--s4-site-lead-weight` | var(--md-sys-typescale-body-large-weight) |  |  |
+| `--s4-site-section-space` | clamp(64px, 45.22px + 5.217vw, 112px) |  | Space between two sections (padding at the top and bottom of each): 64 on a phone to 112 from 1280. |
+| `--s4-site-section-space-compact` | var(--s4-space-16) |  | The phone end of section-space; for a tight band (an announcement, a logo row). |
+| `--s4-site-section-space-wide` | 112px |  | The desktop end of section-space. |
+| `--s4-site-section-gap` | clamp(32px, 22.61px + 2.609vw, 56px) |  | Inside a section: between its heading block and its content. 32 on a phone to 56 from 1280. |
+| `--s4-site-margin` | clamp(16px, 9.74px + 1.739vw, 32px) |  | Side margin of a site page: 16 on a phone (as apps) to 32 from 1280. |
+| `--s4-site-width` | var(--s4-layout-content-max) |  | Site content width (1200): sections, header and footer line up on it. |
+| `--s4-site-measure` | 600px |  | Line length of a lead or section intro (about 60 characters at lead size). |
+| `--s4-site-measure-wide` | 800px |  | Wide measure: a centered hero or section heading block. |
+
 ## Breakpoints
 
 | Token | Value | Dark | Notes |

@@ -14,3 +14,22 @@
   Under 840 the nav bar sits at the bottom; from 840 a nav rail sits at the side.
 - **Stacking:** use the `--s4-z-*` names (app-bar, navigation, fab, scrim, sheet, dialog, menu, snackbar, tooltip) instead
   of raw numbers.
+
+## Websites: section rhythm and widths (issue 53)
+
+**Tokens:** `--s4-site-section-space`, `--s4-site-section-space-compact`, `--s4-site-section-space-wide`,
+`--s4-site-section-gap`, `--s4-site-margin`, `--s4-site-width`, `--s4-site-measure`, `--s4-site-measure-wide`.
+
+| Token | Value | Use |
+|---|---|---|
+| `--s4-site-section-space` | 64 on a phone → 112 from 1280 (fluid) | Between two sections (each `.s4-site-section` pads half of it top and bottom) |
+| `--s4-site-section-space-compact` / `-wide` | 64 / 112 | The two ends, for a tight band (`data-space="compact"`, a logo row) |
+| `--s4-site-section-gap` | 32 → 56 (fluid) | Inside a section: heading block to content, column gaps, the padding of a toned band |
+| `--s4-site-margin` | 16 → 32 (fluid) | Side margin of a site page |
+| `--s4-site-width` | 1200 (= `--s4-layout-content-max`) | Header, sections and footer line up on it |
+| `--s4-site-measure` | 600 | Line length of a lead or a section intro |
+| `--s4-site-measure-wide` | 800 | A centered hero or heading block |
+
+Rhythm, in one sentence: big gaps between sections, a medium gap between a section's heading and its content, the
+4dp grid inside components. Toned bands (`data-tone`) are inset rounded blocks on the site width, never full-bleed
+stripes, so the page stays calm and the corners stay round.
