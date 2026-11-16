@@ -152,7 +152,7 @@ function printAudit() {
   const paper = bg[3] >= 1 ? bg : page[3] >= 1 ? page : [255, 255, 255, 1];
   if (h.lum(paper) < 0.8) out.push('print: the page is not white (' + body.backgroundColor + ')');
   if (h.contrast(h.parse(body.color), paper) < 7) out.push('print: body text is not dark on white');
-  const glass = [...document.querySelectorAll('body *')].filter((e) => { const cs = getComputedStyle(e); return (cs.backdropFilter && cs.backdropFilter !== 'none') || (cs.webkitBackdropFilter && cs.webkitBackdropFilter !== 'none'); });
+  const glass = [...document.querySelectorAll('body *')].filter((e) => { if (!h.vis(e)) return false; const cs = getComputedStyle(e); return (cs.backdropFilter && cs.backdropFilter !== 'none') || (cs.webkitBackdropFilter && cs.webkitBackdropFilter !== 'none'); });
   if (glass.length) out.push('print: glass is still on (' + glass.slice(0, 3).map(h.tag).join(', ') + ')');
   /* main content is not hidden */
   const main = document.querySelector('main, .s4-main, [role="main"], .s4-view:not([hidden]), body > .s4-prose, .s4-prose') || document.body;
@@ -164,7 +164,7 @@ function printAudit() {
   document.querySelectorAll('table.s4-table, .s4-table table').forEach((t) => {
     if (!h.vis(t)) return;
     const tr = t.querySelector('tr'); if (!tr) return;
-    const d = getComputedStyle(tr).display, td = t.querySelector('td, th');
+    const d = getComputedStyle(tr).display, td = t.querySelector('td:not([data-check]), th:not([data-check])');
     if (d !== 'table-row' || (td && getComputedStyle(td).display !== 'table-cell')) out.push('print: a table is not drawn as a table (' + d + ')');
   });
   /* sideways overflow */

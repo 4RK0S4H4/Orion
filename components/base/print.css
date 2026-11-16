@@ -1,0 +1,77 @@
+/* S4 Orion print (round 0056): what a page looks like on paper. No attributes, no opt-in: it applies to every page.
+   Paper is white with dark text, so the dark scheme never prints (tokens.css draws dark on screens only). Chrome that
+   only makes sense on a screen is gone (navigation bars and rails, FABs, toolbars, snackbars, tooltips, scrims, window
+   controls, swipe actions, drag handles); the page's own title and content stay. Glass is solid. Cards, panes, rows and
+   figures never split across two sheets, a table keeps its header on each sheet and is a table at any width, prose
+   uses the full sheet, and links in prose print their address after them (links anywhere else do not).
+   Mark anything else that is screen-only with data-s4-print="hide". Lives in s4.utilities so it beats every component. */
+@layer s4.utilities {
+  @page { margin: 16mm; }
+  @media print {
+    :root { color-scheme: light; }
+    html, body { background: Canvas; color: CanvasText; }
+
+    /* ---------- the page is one flow ---------- */
+    .s4-app, .s4-app-body { display: block; min-block-size: 0; background: Canvas; color: CanvasText; }
+    .s4-content, .s4-content:has(> .s4-view) { max-inline-size: none; inline-size: auto; overflow: visible; padding-block-end: 0; }
+    .s4-app-body > .s4-content { inline-size: auto; }
+    .s4-top-app-bar { position: static; }
+    [data-scroll], .s4-table-wrap { overflow: visible; max-block-size: none; block-size: auto; }
+    .s4-prose { max-inline-size: none; }
+
+    /* ---------- chrome stays on the screen ---------- */
+    .s4-nav-bar, .s4-nav-rail, .s4-fab, .s4-toolbar, .s4-snackbar-host, .s4-snackbar, .s4-tooltip, .s4-rich-tooltip,
+    .s4-titlebar, .s4-window-controls, .s4-swipe-actions, .s4-drag-handle, .s4-app-bar-back, .s4-app-bar-actions,
+    .s4-skeleton, .s4-reward, .s4-states[data-state="loading"] .s4-skeleton, dialog:not([open]), [data-s4-print="hide"] { display: none; }
+    dialog::backdrop { background: none; }
+
+    /* ---------- glass is solid ---------- */
+    .s4-glass, .s4-top-app-bar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-fab, .s4-banner {
+      background-color: Canvas;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+
+    /* ---------- breaks ---------- */
+    .s4-card, .s4-pane, .s4-list-item, .s4-stat, .s4-message, .s4-banner, .s4-description-list > *, .s4-step-dot, .s4-chart,
+    .s4-milestones > *, .s4-timeline > *, .s4-month, .s4-ring, figure, blockquote, pre, tr, img, svg { break-inside: avoid; page-break-inside: avoid; }
+    h1, h2, h3, h4, .s4-section-title, caption { break-after: avoid; page-break-after: avoid; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+
+    /* ---------- tables are tables, whatever the width ---------- */
+    .s4-table { display: table; inline-size: 100%; }
+    .s4-table caption { display: table-caption; }
+    .s4-table thead { display: table-header-group; }
+    .s4-table tbody { display: table-row-group; }
+    .s4-table tfoot { display: table-footer-group; }
+    .s4-table tr { display: table-row; position: static; padding: 0; border: 0; }
+    .s4-table thead tr { display: table-row; padding: 0; border: 0; }
+    .s4-table th, .s4-table td, .s4-table thead th, .s4-table :is(tbody, tfoot) :is(td, th) {
+      display: table-cell;
+      height: auto;
+      padding: var(--s4-space-2) var(--s4-space-3);
+      border: 0;
+      border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant);
+      text-align: start;
+      white-space: normal;
+    }
+    .s4-table :is(td, th).num { text-align: end; }
+    .s4-table :is(tbody, tfoot) :is(td, th)[data-label]::before { content: none; }
+    .s4-table thead th:not([aria-sort]):not([data-check]) { display: table-cell; }
+    .s4-table tbody td[data-check], .s4-table thead th[data-check] { display: none; }
+    .s4-table-sort .s4-icon { display: none; }
+    .s4-table tr[tabindex]::before { display: none; }
+    .s4-table tr[tabindex] > :is(td, th) { background-color: transparent; }
+
+    /* ---------- links: the address is printed after a link in prose, and only there ---------- */
+    .s4-prose a { color: inherit; text-decoration: underline; }
+    .s4-prose a[href]:not([href^="#"]):not([href^="javascript:"]):not([href^="mailto:"])::after {
+      content: " (" attr(href) ")";
+      overflow-wrap: anywhere;
+      font-size: 0.85em;
+      font-weight: 400;
+    }
+  }
+}
