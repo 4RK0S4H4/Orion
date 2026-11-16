@@ -26,6 +26,10 @@
     background: var(--_tray);
     border-radius: var(--s4-shape-toolbar);
     isolation: isolate;
+    overflow-x: auto;                 /* larger text or many tabs: the strip scrolls, labels never overlap */
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
   }
 
   .s4-tab {
@@ -38,7 +42,7 @@
     align-items: center;
     justify-content: center;
     gap: calc(var(--s4-space-1) / 2);
-    min-inline-size: 0;
+    min-inline-size: max-content;     /* equal shares when there is room; when text is larger the strip scrolls instead of the labels overlapping */
     min-block-size: calc(var(--s4-size-touch-target) - 2 * var(--_pad));
     margin: 0;
     padding: 0 var(--s4-space-4);

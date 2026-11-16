@@ -160,7 +160,7 @@
     cursor: default;
   }
   .s4-text-field-counter { justify-self: end; color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; }
-  .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: var(--s4-space-16); }
+  .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: calc(var(--s4-space-4) + 7ch); }   /* room for the counter at any text size */
 
   /* ---------- states ----------
      One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus, so focusing only
