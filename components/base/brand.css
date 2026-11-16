@@ -17,32 +17,32 @@
    things you click are rounder than things you type into. */
 @layer s4.tokens {
   /* ---------- corners ---------- */
-  :where(:root[data-corners="soft"]) {
+  :where([data-corners="soft"]) {
     --s4-shape-control: calc(var(--md-sys-shape-corner-large) - 2px);
   }
-  :where(:root[data-corners="firm"]) {
+  :where([data-corners="firm"]) {
     --s4-shape-control: calc(var(--md-sys-shape-corner-medium) - 2px);
     --s4-shape-text-field: var(--md-sys-shape-corner-small);          /* what you type into stays less round than what you click */
     --s4-shape-button-pressed: var(--md-sys-shape-corner-small);
     --md-sys-shape-corner-extra-large: var(--md-sys-shape-corner-large-increased);   /* dialogs, menus and panels come down with the controls inside them */
   }
   /* a container that holds controls is the control's corner plus the gap around it (concentric, decision 0052) */
-  :where(:root:is([data-corners="soft"], [data-corners="firm"])) {
+  :where(:is([data-corners="soft"], [data-corners="firm"])) {
     --s4-shape-toolbar: calc(var(--s4-shape-control) + var(--s4-space-2));
     --s4-shape-snackbar: calc(var(--s4-shape-control) + var(--s4-space-1));
   }
 
   /* ---------- typefaces ---------- */
-  :where(:root[data-type-display="serif"]) { --md-ref-typeface-brand: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where(:root[data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
-  :where(:root[data-type-display="mono"]) { --md-ref-typeface-brand: var(--md-ref-typeface-mono); }
-  :where(:root[data-type-display="system"]) { --md-ref-typeface-brand: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  :where(:root[data-type-text="serif"]) { --md-ref-typeface-plain: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where(:root[data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
-  :where(:root[data-type-text="mono"]) { --md-ref-typeface-plain: var(--md-ref-typeface-mono); }
-  :where(:root[data-type-text="system"]) { --md-ref-typeface-plain: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-display="serif"]) { --md-ref-typeface-brand: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
+  :where([data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-display="mono"]) { --md-ref-typeface-brand: var(--md-ref-typeface-mono); }
+  :where([data-type-display="system"]) { --md-ref-typeface-brand: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-text="serif"]) { --md-ref-typeface-plain: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
+  :where([data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-text="mono"]) { --md-ref-typeface-plain: var(--md-ref-typeface-mono); }
+  :where([data-type-text="system"]) { --md-ref-typeface-plain: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   /* the letter spacing in the tokens is tuned for Inter (and suits the system face); any other face starts from its own */
-  :where(:root:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="custom"])) {
+  :where(:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="custom"])) {
     --md-sys-typescale-display-large-tracking: 0px;
     --md-sys-typescale-display-medium-tracking: 0px;
     --md-sys-typescale-display-small-tracking: 0px;
@@ -51,7 +51,7 @@
     --md-sys-typescale-headline-small-tracking: 0px;
     --md-sys-typescale-title-large-tracking: 0px;
   }
-  :where(:root:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="custom"])) {
+  :where(:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="custom"])) {
     --md-sys-typescale-title-medium-tracking: 0px;
     --md-sys-typescale-title-small-tracking: 0px;
     --md-sys-typescale-body-large-tracking: 0px;
@@ -62,17 +62,26 @@
     --md-sys-typescale-label-small-tracking: 0px;
   }
 
-  /* ---------- page tone ---------- */
+  /* ---------- page tone ----------
+     Light mode only. On a container it makes that container's own region a soft page; a light scope inside it keeps
+     the soft page (the scope's light reset would otherwise bring the white page back). @scope ... to ([data-theme="dark"])
+     is the light region: everything up to the nearest dark scope. */
   @media (prefers-color-scheme: light) {
-    :where(:root[data-page="soft"]:not([data-theme="dark"])) {
-      --md-sys-color-surface: var(--md-sys-color-surface-container);
-      --md-sys-color-background: var(--md-sys-color-surface-container);
-      --md-sys-color-surface-container-low: var(--md-sys-color-surface-container-lowest);
+    @scope (:root:not([data-theme]), [data-theme="light"]) to ([data-theme="dark"]) {
+      :where([data-page="soft"]:scope, :scope [data-page="soft"], :scope[data-theme="light"]:is([data-page="soft"] *), :scope [data-page="soft"] [data-theme="light"]) {
+        --md-sys-color-surface: var(--md-sys-color-surface-container);
+        --md-sys-color-background: var(--md-sys-color-surface-container);
+        --md-sys-color-surface-container-low: var(--md-sys-color-surface-container-lowest);
+      }
     }
   }
-  :where(:root[data-page="soft"][data-theme="light"]) {
-    --md-sys-color-surface: var(--md-sys-color-surface-container);
-    --md-sys-color-background: var(--md-sys-color-surface-container);
-    --md-sys-color-surface-container-low: var(--md-sys-color-surface-container-lowest);
+  @media not (prefers-color-scheme: light) {
+    @scope ([data-theme="light"]) to ([data-theme="dark"]) {
+      :where([data-page="soft"]:scope, :scope [data-page="soft"], :scope:is([data-page="soft"] *), :scope [data-page="soft"] [data-theme="light"]) {
+        --md-sys-color-surface: var(--md-sys-color-surface-container);
+        --md-sys-color-background: var(--md-sys-color-surface-container);
+        --md-sys-color-surface-container-low: var(--md-sys-color-surface-container-lowest);
+      }
+    }
   }
 }

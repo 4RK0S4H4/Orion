@@ -224,27 +224,27 @@
   }
 
   /* ---------- M3 Expressive segmented list: items 2 apart, small inner corners, large outer group corners ---------- */
-  .s4-list[data-style="segmented"] {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) {
     gap: calc(var(--s4-space-1) / 2);
     padding: 0;
   }
-  .s4-list[data-style="segmented"] .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) .s4-list-item {
     --_bg: var(--s4-list-segment-color, var(--md-sys-color-surface-container-low));
     --_radius: var(--s4-shape-list-segment);
     padding-inline: var(--s4-space-4);
   }
   /* each run of items between subheaders is one group with outer corners */
-  .s4-list[data-style="segmented"] > li:is(:first-child, .s4-list-subheader + li) > .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > li:is(:first-child, .s4-list-subheader + li) > .s4-list-item {
     border-start-start-radius: var(--s4-shape-list-group);
     border-start-end-radius: var(--s4-shape-list-group);
   }
-  .s4-list[data-style="segmented"] > li:is(:last-child, :has(+ .s4-list-subheader)) > .s4-list-item {
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > li:is(:last-child, :has(+ .s4-list-subheader)) > .s4-list-item {
     border-end-start-radius: var(--s4-shape-list-group);
     border-end-end-radius: var(--s4-shape-list-group);
   }
-  .s4-list[data-style="segmented"] > .s4-list-subheader { padding-inline: var(--s4-space-4); }
-  .s4-list[data-style="segmented"] > .s4-list-subheader:not(:first-child) { margin-block-start: var(--s4-space-4); }
-  .s4-list[data-style="segmented"][data-dividers] > li + li { border-block-start: 0; }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > .s4-list-subheader { padding-inline: var(--s4-space-4); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > .s4-list-subheader:not(:first-child) { margin-block-start: var(--s4-space-4); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style])))[data-dividers] > li + li { border-block-start: 0; }
 
   /* ---------- selected / current (after the segmented colors, so they win) ---------- */
   .s4-list-item:is([aria-selected="true"], [aria-current]:not([aria-current="false"])),
@@ -276,7 +276,7 @@
       outline: var(--s4-focus-ring-width) solid Highlight;
       outline-offset: calc(var(--s4-focus-ring-width) * -1);
     }
-    .s4-list[data-style="segmented"] .s4-list-item { border: 1px solid CanvasText; }
+    .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) .s4-list-item { border: 1px solid CanvasText; }
     .s4-avatar { border: 1px solid CanvasText; }
   }
 }

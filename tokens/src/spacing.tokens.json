@@ -229,7 +229,7 @@
           "value": 240,
           "unit": "px"
         },
-        "$description": "Expanded navigation rail (M3 Expressive allows 220–360)."
+        "$description": "Expanded navigation rail (M3 Expressive allows 220\u2013360)."
       },
       "toolbar": {
         "$value": {
@@ -286,7 +286,7 @@
       },
       "margin": {
         "$value": "{s4.space.6}",
-        "$description": "Side margin from medium windows (≥ 600)."
+        "$description": "Side margin from medium windows (\u2265 600)."
       },
       "pane-gap": {
         "$value": "{s4.space.6}"
@@ -508,6 +508,51 @@
         "layout-gap": {
           "$value": {
             "value": 12,
+            "unit": "px"
+          }
+        }
+      },
+      "roomy": {
+        "$description": "Roomy density for content sites (round 0056 candidate): data-density=\"roomy\" swaps in wider margins and gaps, a wider reading column and larger body text. Control sizes never change, so every touch target and control stays comfortable.",
+        "layout-margin": {
+          "$value": {
+            "value": 40,
+            "unit": "px"
+          }
+        },
+        "layout-margin-compact": {
+          "$value": {
+            "value": 20,
+            "unit": "px"
+          }
+        },
+        "layout-gap": {
+          "$value": {
+            "value": 24,
+            "unit": "px"
+          }
+        },
+        "layout-pane-gap": {
+          "$value": {
+            "value": 40,
+            "unit": "px"
+          }
+        },
+        "layout-content-reading": {
+          "$value": {
+            "value": 760,
+            "unit": "px"
+          }
+        },
+        "body-large-size": {
+          "$value": {
+            "value": 18,
+            "unit": "px"
+          }
+        },
+        "body-large-line-height": {
+          "$value": {
+            "value": 28,
             "unit": "px"
           }
         }

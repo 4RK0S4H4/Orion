@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=07750e7">
+<link rel="stylesheet" href="orion.css?v=08926d2">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -366,6 +366,15 @@
                 <button class="s4-button" type="button" value="serif" aria-pressed="false">Serif</button>
                 </div>
               </div>
+              <div>
+                <p class="s4-label-large" id="dial-energy-l">Motion</p>
+                <div class="s4-button-group" data-connected data-select="single" aria-labelledby="dial-energy-l" id="dial-energy" data-brand-dial="energy">
+                <button class="s4-button" type="button" value="calm" aria-pressed="false">Calm</button>
+                <button class="s4-button" type="button" value="standard" aria-pressed="true">Standard</button>
+                <button class="s4-button" type="button" value="lively" aria-pressed="false">Lively</button>
+                </div>
+              </div>
+              <label class="s4-switch" style="justify-content:space-between"><span>Dark Navigation</span><input type="checkbox" role="switch" id="dark-nav"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label>
             </div>
           </section>
 
@@ -486,7 +495,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=45fdf47"></script>
+<script src="orion.js?v=13c2ff0"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

@@ -26,6 +26,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  /* Themes on any container (issue 52): an element that changes the mode, the grays, the page tone or the accent paints
+     its own page color and text, the way <body> does for the page; a component's own background still wins (it is in a
+     later layer). An element that changes the text face sets it, since the font is inherited as a value from <body>. */
+  :where([data-theme]:not(:root), [data-gray]:not(:root), [data-page="soft"]:not(:root), [data-accent]:not(:root)) {
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
+  }
+  :where([data-type-text]:not(:root)) { font-family: var(--md-sys-typescale-body-large-font); letter-spacing: var(--md-sys-typescale-body-large-tracking); }
   :where(button, input, select, textarea) { font: inherit; color: inherit; letter-spacing: inherit; }
   :where(img, svg, video) { display: block; max-width: 100%; }
   :where(table, input, select, output, time) { font-variant-numeric: tabular-nums; }

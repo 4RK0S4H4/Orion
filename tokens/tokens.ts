@@ -409,6 +409,126 @@ export const tokens = {
       "reduced-motion": "0ms"
     }
   },
+  "--s4-motion-spring-bend-calm-stiffness": {
+    "type": "number",
+    "value": "1100"
+  },
+  "--s4-motion-spring-bend-calm-damping": {
+    "type": "number",
+    "value": "1"
+  },
+  "--s4-motion-spring-bend-calm-duration": {
+    "type": "duration",
+    "value": "170ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-rise-calm-stiffness": {
+    "type": "number",
+    "value": "1300"
+  },
+  "--s4-motion-spring-rise-calm-damping": {
+    "type": "number",
+    "value": "1"
+  },
+  "--s4-motion-spring-rise-calm-duration": {
+    "type": "duration",
+    "value": "150ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-pop-calm-stiffness": {
+    "type": "number",
+    "value": "1100"
+  },
+  "--s4-motion-spring-pop-calm-damping": {
+    "type": "number",
+    "value": "1"
+  },
+  "--s4-motion-spring-pop-calm-duration": {
+    "type": "duration",
+    "value": "220ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-ink-lively-stiffness": {
+    "type": "number",
+    "value": "1060"
+  },
+  "--s4-motion-spring-ink-lively-damping": {
+    "type": "number",
+    "value": "0.7"
+  },
+  "--s4-motion-spring-ink-lively-duration": {
+    "type": "duration",
+    "value": "300ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-fast-spatial-lively-stiffness": {
+    "type": "number",
+    "value": "1400"
+  },
+  "--s4-motion-spring-fast-spatial-lively-damping": {
+    "type": "number",
+    "value": "0.66"
+  },
+  "--s4-motion-spring-fast-spatial-lively-duration": {
+    "type": "duration",
+    "value": "280ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-bend-lively-stiffness": {
+    "type": "number",
+    "value": "860"
+  },
+  "--s4-motion-spring-bend-lively-damping": {
+    "type": "number",
+    "value": "0.76"
+  },
+  "--s4-motion-spring-bend-lively-duration": {
+    "type": "duration",
+    "value": "260ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-spatial-lively-stiffness": {
+    "type": "number",
+    "value": "900"
+  },
+  "--s4-motion-spring-spatial-lively-damping": {
+    "type": "number",
+    "value": "0.76"
+  },
+  "--s4-motion-spring-spatial-lively-duration": {
+    "type": "duration",
+    "value": "320ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
+  "--s4-motion-spring-rise-lively-stiffness": {
+    "type": "number",
+    "value": "1060"
+  },
+  "--s4-motion-spring-rise-lively-damping": {
+    "type": "number",
+    "value": "0.76"
+  },
+  "--s4-motion-spring-rise-lively-duration": {
+    "type": "duration",
+    "value": "240ms",
+    "modes": {
+      "reduced-motion": "0ms"
+    }
+  },
   "--s4-motion-pattern-container-transform-content-fade-start": {
     "type": "number",
     "value": "0.35",
@@ -880,6 +1000,34 @@ export const tokens = {
   "--s4-density-compact-layout-gap": {
     "type": "dimension",
     "value": "12px"
+  },
+  "--s4-density-roomy-layout-margin": {
+    "type": "dimension",
+    "value": "40px"
+  },
+  "--s4-density-roomy-layout-margin-compact": {
+    "type": "dimension",
+    "value": "20px"
+  },
+  "--s4-density-roomy-layout-gap": {
+    "type": "dimension",
+    "value": "24px"
+  },
+  "--s4-density-roomy-layout-pane-gap": {
+    "type": "dimension",
+    "value": "40px"
+  },
+  "--s4-density-roomy-layout-content-reading": {
+    "type": "dimension",
+    "value": "760px"
+  },
+  "--s4-density-roomy-body-large-size": {
+    "type": "dimension",
+    "value": "18px"
+  },
+  "--s4-density-roomy-body-large-line-height": {
+    "type": "dimension",
+    "value": "28px"
   },
   "--s4-focus-ring-width": {
     "type": "dimension",
@@ -2076,6 +2224,46 @@ export const tokens = {
     "type": "easing",
     "value": "linear(0, 0.01 2.5%, 0.036 5%, 0.074 7.5%, 0.121 10%, 0.174 12.5%, 0.23 15%, 0.287 17.5%, 0.345 20%, 0.402 22.5%, 0.456 25%, 0.509 27.5%, 0.558 30%, 0.604 32.5%, 0.647 35%, 0.687 37.5%, 0.724 40%, 0.757 42.5%, 0.787 45%, 0.814 47.5%, 0.838 50%, 0.86 52.5%, 0.879 55%, 0.896 57.5%, 0.912 60%, 0.925 62.5%, 0.936 65%, 0.947 67.5%, 0.955 70%, 0.963 72.5%, 0.969 75%, 0.975 77.5%, 0.98 80%, 0.984 82.5%, 0.987 85%, 0.99 87.5%, 0.992 90%, 0.994 92.5%, 0.996 95%, 0.997 97.5%, 1)",
     "description": "Spring: stiffness 860, damping 0.9, 200ms, overshoot 0%."
+  },
+  "--s4-motion-spring-bend-calm": {
+    "type": "easing",
+    "value": "linear(0, 0.009 2.5%, 0.033 5%, 0.068 7.5%, 0.11 10%, 0.157 12.5%, 0.208 15%, 0.259 17.5%, 0.311 20%, 0.362 22.5%, 0.411 25%, 0.459 27.5%, 0.504 30%, 0.547 32.5%, 0.587 35%, 0.624 37.5%, 0.659 40%, 0.691 42.5%, 0.72 45%, 0.747 47.5%, 0.772 50%, 0.795 52.5%, 0.815 55%, 0.834 57.5%, 0.851 60%, 0.867 62.5%, 0.881 65%, 0.893 67.5%, 0.904 70%, 0.915 72.5%, 0.924 75%, 0.932 77.5%, 0.939 80%, 0.946 82.5%, 0.952 85%, 0.957 87.5%, 0.962 90%, 0.966 92.5%, 0.97 95%, 0.973 97.5%, 1)",
+    "description": "Spring: stiffness 1100, damping 1, 170ms, overshoot 0%."
+  },
+  "--s4-motion-spring-rise-calm": {
+    "type": "easing",
+    "value": "linear(0, 0.008 2.5%, 0.031 5%, 0.063 7.5%, 0.103 10%, 0.148 12.5%, 0.195 15%, 0.245 17.5%, 0.294 20%, 0.343 22.5%, 0.392 25%, 0.438 27.5%, 0.482 30%, 0.524 32.5%, 0.564 35%, 0.602 37.5%, 0.636 40%, 0.669 42.5%, 0.699 45%, 0.727 47.5%, 0.752 50%, 0.776 52.5%, 0.797 55%, 0.817 57.5%, 0.835 60%, 0.851 62.5%, 0.866 65%, 0.879 67.5%, 0.891 70%, 0.902 72.5%, 0.912 75%, 0.921 77.5%, 0.93 80%, 0.937 82.5%, 0.944 85%, 0.95 87.5%, 0.955 90%, 0.96 92.5%, 0.964 95%, 0.968 97.5%, 1)",
+    "description": "Spring: stiffness 1300, damping 1, 150ms, overshoot 0%."
+  },
+  "--s4-motion-spring-pop-calm": {
+    "type": "easing",
+    "value": "linear(0, 0.015 2.5%, 0.052 5%, 0.105 7.5%, 0.166 10%, 0.232 12.5%, 0.299 15%, 0.365 17.5%, 0.428 20%, 0.488 22.5%, 0.544 25%, 0.596 27.5%, 0.643 30%, 0.685 32.5%, 0.724 35%, 0.758 37.5%, 0.788 40%, 0.815 42.5%, 0.839 45%, 0.86 47.5%, 0.879 50%, 0.895 52.5%, 0.909 55%, 0.922 57.5%, 0.933 60%, 0.942 62.5%, 0.95 65%, 0.957 67.5%, 0.963 70%, 0.968 72.5%, 0.973 75%, 0.977 77.5%, 0.98 80%, 0.983 82.5%, 0.985 85%, 0.988 87.5%, 0.989 90%, 0.991 92.5%, 0.992 95%, 0.993 97.5%, 1)",
+    "description": "Spring: stiffness 1100, damping 1, 220ms, overshoot 0%."
+  },
+  "--s4-motion-spring-ink-lively": {
+    "type": "easing",
+    "value": "linear(0, 0.027 2.5%, 0.094 5%, 0.188 7.5%, 0.295 10%, 0.407 12.5%, 0.516 15%, 0.618 17.5%, 0.71 20%, 0.789 22.5%, 0.856 25%, 0.911 27.5%, 0.955 30%, 0.988 32.5%, 1.012 35%, 1.029 37.5%, 1.039 40%, 1.044 42.5%, 1.046 45%, 1.045 47.5%, 1.042 50%, 1.037 52.5%, 1.032 55%, 1.027 57.5%, 1.022 60%, 1.018 62.5%, 1.013 65%, 1.01 67.5%, 1.007 70%, 1.004 72.5%, 1.002 75%, 1.001 77.5%, 0.999 80%, 0.999 82.5%, 0.998 85%, 0.998 87.5%, 0.998 90%, 0.998 92.5%, 0.998 95%, 0.998 97.5%, 1)",
+    "description": "Spring: stiffness 1060, damping 0.7, 300ms, overshoot 4.6%."
+  },
+  "--s4-motion-spring-fast-spatial-lively": {
+    "type": "easing",
+    "value": "linear(0, 0.03 2.5%, 0.108 5%, 0.214 7.5%, 0.335 10%, 0.458 12.5%, 0.577 15%, 0.686 17.5%, 0.78 20%, 0.86 22.5%, 0.925 25%, 0.975 27.5%, 1.012 30%, 1.037 32.5%, 1.053 35%, 1.061 37.5%, 1.063 40%, 1.061 42.5%, 1.056 45%, 1.049 47.5%, 1.042 50%, 1.034 52.5%, 1.027 55%, 1.02 57.5%, 1.014 60%, 1.009 62.5%, 1.005 65%, 1.002 67.5%, 0.999 70%, 0.998 72.5%, 0.997 75%, 0.996 77.5%, 0.996 80%, 0.996 82.5%, 0.996 85%, 0.997 87.5%, 0.997 90%, 0.998 92.5%, 0.998 95%, 0.999 97.5%, 1)",
+    "description": "Spring: stiffness 1400, damping 0.66, 280ms, overshoot 6.3%."
+  },
+  "--s4-motion-spring-bend-lively": {
+    "type": "easing",
+    "value": "linear(0, 0.016 2.5%, 0.06 5%, 0.122 7.5%, 0.196 10%, 0.276 12.5%, 0.36 15%, 0.442 17.5%, 0.521 20%, 0.595 22.5%, 0.664 25%, 0.726 27.5%, 0.78 30%, 0.828 32.5%, 0.87 35%, 0.905 37.5%, 0.934 40%, 0.958 42.5%, 0.977 45%, 0.992 47.5%, 1.004 50%, 1.012 52.5%, 1.018 55%, 1.022 57.5%, 1.024 60%, 1.025 62.5%, 1.025 65%, 1.024 67.5%, 1.023 70%, 1.021 72.5%, 1.019 75%, 1.017 77.5%, 1.015 80%, 1.013 82.5%, 1.011 85%, 1.009 87.5%, 1.008 90%, 1.006 92.5%, 1.005 95%, 1.004 97.5%, 1)",
+    "description": "Spring: stiffness 860, damping 0.76, 260ms, overshoot 2.5%."
+  },
+  "--s4-motion-spring-spatial-lively": {
+    "type": "easing",
+    "value": "linear(0, 0.025 2.5%, 0.09 5%, 0.178 7.5%, 0.279 10%, 0.384 12.5%, 0.486 15%, 0.582 17.5%, 0.669 20%, 0.744 22.5%, 0.81 25%, 0.864 27.5%, 0.908 30%, 0.943 32.5%, 0.97 35%, 0.991 37.5%, 1.005 40%, 1.015 42.5%, 1.021 45%, 1.024 47.5%, 1.025 50%, 1.025 52.5%, 1.023 55%, 1.021 57.5%, 1.019 60%, 1.016 62.5%, 1.013 65%, 1.011 67.5%, 1.009 70%, 1.007 72.5%, 1.005 75%, 1.004 77.5%, 1.002 80%, 1.002 82.5%, 1.001 85%, 1 87.5%, 1 90%, 1 92.5%, 0.999 95%, 0.999 97.5%, 1)",
+    "description": "Spring: stiffness 900, damping 0.76, 320ms, overshoot 2.5%."
+  },
+  "--s4-motion-spring-rise-lively": {
+    "type": "easing",
+    "value": "linear(0, 0.017 2.5%, 0.062 5%, 0.127 7.5%, 0.203 10%, 0.287 12.5%, 0.372 15%, 0.456 17.5%, 0.536 20%, 0.611 22.5%, 0.68 25%, 0.741 27.5%, 0.795 30%, 0.842 32.5%, 0.882 35%, 0.916 37.5%, 0.944 40%, 0.966 42.5%, 0.984 45%, 0.998 47.5%, 1.008 50%, 1.016 52.5%, 1.021 55%, 1.024 57.5%, 1.025 60%, 1.025 62.5%, 1.025 65%, 1.023 67.5%, 1.022 70%, 1.02 72.5%, 1.018 75%, 1.015 77.5%, 1.013 80%, 1.011 82.5%, 1.009 85%, 1.008 87.5%, 1.006 90%, 1.005 92.5%, 1.004 95%, 1.003 97.5%, 1)",
+    "description": "Spring: stiffness 1060, damping 0.76, 240ms, overshoot 2.5%."
   },
   "--md-sys-motion-spring-fast-spatial": {
     "type": "easing",

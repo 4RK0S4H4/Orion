@@ -5,6 +5,7 @@
 @import url("base/density.css");
 @import url("base/gray.css");
 @import url("base/brand.css");
+@import url("base/defaults.css");
 /* actions */
 @import url("button/button.css");
 @import url("icon-button/icon-button.css");

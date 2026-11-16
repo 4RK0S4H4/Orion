@@ -19,3 +19,8 @@ large 16, large-increased 20, extra-large 28, extra-large-increased 32, extra-ex
 - **Nested corners are concentric** (decision 0052): inner radius = outer radius minus the gap, or a full pill.
 - Nothing docks to a screen edge (decision 0043): panels float clear of every edge, so no corner is squared off for one.
 - Don't invent radii in app CSS; pick a step from the scale.
+
+## Corners on a container
+`data-corners="round|soft|firm"` works on any element and nests (decision 0055 dial, round 0056): every shape alias
+re-resolves on that element, so a firm panel inside a round app is firm inside and still concentric.
+`data-corners="round"` brings stock corners back inside a branded page.

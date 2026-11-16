@@ -8,8 +8,8 @@
    surface: always solid, never glass. Every value comes from tokens. */
 @layer s4.components {
   .s4-card {
-    /* elevated (default) */
-    --_bg: var(--md-sys-color-surface-container-low);
+    /* elevated (default; an app may make filled its default: data-cards, base/defaults.css) */
+    --_bg: var(--_app-card-bg, var(--md-sys-color-surface-container-low));
     --_fg: var(--md-sys-color-on-surface);
     --_fg-variant: var(--md-sys-color-on-surface-variant);
     --_outline: transparent;
@@ -41,6 +41,7 @@
   }
 
   /* ---------- variants ---------- */
+  .s4-card[data-variant="elevated"] { --_bg: var(--md-sys-color-surface-container-low); }   /* elevated by name, whatever the app's default */
   .s4-card[data-variant="filled"] {
     --_bg: var(--md-sys-color-surface-container-highest);
     --_elevation: var(--md-sys-elevation-level0);

@@ -28,3 +28,11 @@
 | title-medium / small | Card and pane titles, list headlines |
 | body-* | Running text, list supporting text |
 | label-* | Buttons, chips, tabs, badges, captions |
+
+## Faces on a container
+`data-type-display` and `data-type-text` work on any element and nest (`inter` brings Inter and its letter spacing back
+inside a branded page). An element with `data-type-text` sets its own font, since the font is inherited from `<body>`.
+
+## Roomy density
+`data-density="roomy"` is for content sites: wider margins, gaps and reading column (`--s4-layout-*`) and body text at
+18/28. Control sizes do not change.
