@@ -25,7 +25,7 @@
     background: var(--md-sys-color-surface);
     color: var(--md-sys-color-on-surface);
   }
-  .s4-site > main { flex: 1 0 auto; }
+  .s4-site > :is(main, .s4-docs) { flex: 1 0 auto; }
   @media (prefers-reduced-motion: no-preference) {
     :where(html:has(> body.s4-site)) { scroll-behavior: smooth; }
   }
@@ -160,12 +160,18 @@
   }
   .s4-site-menu:not([data-open]) { display: none; }
   .s4-site-menu-links { flex-direction: column; align-items: stretch; }
-  .s4-site-menu-links .s4-button { justify-content: flex-start; inline-size: 100%; }
+  .s4-site-menu-links .s4-button {
+    justify-content: flex-start;
+    inline-size: 100%;
+    --_size: var(--md-sys-typescale-title-large-size);
+    --_line: var(--md-sys-typescale-title-large-line-height);
+    --_track: var(--md-sys-typescale-title-large-tracking);
+  }
   .s4-site-menu-actions { display: flex; gap: var(--s4-space-2); padding-block-start: var(--s4-space-2); }
   .s4-site-menu-actions > .s4-button { flex: 1 1 0; }
 
   @media (width < 840px) {
-    .s4-site-nav, .s4-site-actions > :not([data-keep]) { display: none; }
+    .s4-site-nav, .s4-site-actions > :not([data-keep], .s4-site-menu-button) { display: none; }
     .s4-site-menu-button { display: inline-flex; }
   }
   @media (width >= 840px) {
@@ -192,7 +198,7 @@
   .s4-site-section[data-tone="low"] { background: var(--md-sys-color-surface-container-low); }
   .s4-site-section[data-tone="high"] { background: var(--md-sys-color-surface-container-high); }
   /* the accent: one per page at most. The roles are remapped inside so buttons, text and icons stay proven pairs */
-  :is(.s4-site-section, .s4-bento-cell, .s4-cta)[data-tone="accent"],
+  :is(.s4-site-section, .s4-bento-cell, .s4-cta, .s4-media-box, .s4-site-stage)[data-tone="accent"],
   .s4-plan[data-featured] {
     --md-sys-color-on-surface: var(--md-sys-color-on-primary-container);
     --md-sys-color-on-surface-variant: var(--md-sys-color-on-primary-container);
@@ -443,6 +449,7 @@
   :is(.s4-media-box, .s4-site-stage)[data-ratio="21:9"] { --_ratio: 21 / 9; }
   :is(.s4-media-box, .s4-site-stage)[data-ratio="4:5"] { --_ratio: 4 / 5; }
   :is(.s4-media-box, .s4-site-stage)[data-ratio="16:9"] { --_ratio: 16 / 9; }
+  a.s4-media-box { text-decoration: none; }
   .s4-media-box > :is(img, video, iframe) {
     position: absolute;
     inset: 0;
@@ -477,6 +484,13 @@
     line-height: var(--md-sys-typescale-body-small-line-height);
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
   }
+
+  /* a plain grid of equal items (projects, posts) that fills every row: 1, then 2 from 600, then data-columns (3) from 840 */
+  .s4-site-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-8) var(--s4-space-6); margin: 0; padding: 0; list-style: none; }
+  @container s4-site-section (width >= 600px) { .s4-site-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @container s4-site-section (width >= 840px) { .s4-site-grid { grid-template-columns: repeat(var(--_cols, 3), minmax(0, 1fr)); } }
+  .s4-site-grid[data-columns="2"] { --_cols: 2; }
+  .s4-site-grid[data-columns="4"] { --_cols: 4; }
 
   /* ================= feature rows: text beside a picture, alternating ================= */
   .s4-feature-rows { display: grid; gap: var(--s4-site-section-space); }
@@ -691,7 +705,8 @@
   }
 
   /* ================= pricing ================= */
-  .s4-plans-period { display: flex; justify-content: center; margin-block-end: var(--s4-space-8); }
+  .s4-plans-period { display: flex; justify-content: center; margin-block: var(--s4-site-section-gap) var(--s4-space-8); }
+  .s4-plans + .s4-plan-note { margin-block: var(--s4-space-6) 0; text-align: center; }
   .s4-plans { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-4); margin: 0; padding: 0; list-style: none; }
   @container s4-site-section (width >= 840px) { .s4-plans { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); } }
   .s4-plan {
@@ -723,7 +738,7 @@
   .s4-plan > .s4-checks > li > .s4-icon { margin-block-start: calc((var(--md-sys-typescale-body-medium-line-height) - var(--s4-size-icon-small)) / 2); }
   .s4-plan-note { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
   /* the featured plan is the accent fill (see the tone rule above): its status pill is the surface, so it reads as a label */
-  .s4-plan[data-featured] .s4-status { --_bg: var(--md-sys-color-surface); --_fg: var(--md-sys-color-on-surface); }
+  .s4-plan[data-featured] .s4-status { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
 
   /* comparison table: all plans side by side; under 600 one plan at a time, picked with a joined capsule group */
   .s4-compare { container-type: inline-size; display: grid; gap: var(--s4-space-4); }
@@ -787,9 +802,10 @@
   .s4-site-footer-top { display: grid; gap: var(--s4-site-section-gap); }
   .s4-site-footer-brand { display: grid; justify-items: start; align-content: start; gap: var(--s4-space-4); max-inline-size: calc(var(--s4-site-measure) * 0.7); }
   .s4-site-footer-brand > p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
-  .s4-site-footer-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
-  .s4-site-footer-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-footer-signup > .s4-button { margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
+  .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
+  .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
+  .s4-site-signup > .s4-button { margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links h2 {
     margin: 0 0 var(--s4-space-3);
@@ -890,6 +906,7 @@
   }
   .s4-docs-bar { display: flex; align-items: center; gap: var(--s4-space-2); }
   .s4-docs-main { min-inline-size: 0; display: grid; gap: var(--s4-space-8); align-content: start; }
+  .s4-docs-main > * { min-inline-size: 0; }
   .s4-docs-nav { display: grid; align-content: start; gap: var(--s4-space-6); }
   .s4-docs-nav h2 {
     margin: 0 0 var(--s4-space-1);
@@ -901,7 +918,7 @@
     font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
   }
   :is(.s4-docs-nav, .s4-toc) ul { display: grid; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; }
-  :is(.s4-docs-nav, .s4-toc) .s4-button { inline-size: 100%; justify-content: flex-start; white-space: normal; text-align: start; }
+  :is(.s4-docs-nav, .s4-toc) .s4-button { inline-size: 100%; block-size: auto; min-block-size: var(--_h); padding-block: var(--s4-space-1); justify-content: flex-start; white-space: normal; text-align: start; }
   .s4-toc { display: none; align-content: start; gap: var(--s4-space-2); }
   .s4-toc > h2 { margin: 0; padding-inline: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
   .s4-toc .s4-button { --_h: var(--s4-size-button-small); }
@@ -933,8 +950,9 @@
     .s4-docs-nav { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-12)); overflow: auto; margin-inline-start: calc(var(--s4-space-3) * -1); }
   }
   @media (width >= 1200px) {
-    .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, var(--s4-layout-content-reading)) minmax(0, 1fr); }
-    .s4-toc { display: grid; position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-inline-size: calc(var(--s4-space-16) * 4); }
+    .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr) calc(var(--s4-space-16) * 3.5); }
+    .s4-docs-main { max-inline-size: var(--s4-layout-content-reading); }
+    .s4-toc { display: grid; position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); }
   }
 
   @media (forced-colors: active) {

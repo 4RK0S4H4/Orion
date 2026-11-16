@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blog · Ledgerly</title>
+<!-- Template: Blog. A blog or changelog index from the website kit (components/site): a heading, one featured post with a cover, a dated list of posts with tags, pagination and a newsletter band. Each post opens the Article template (article.html); reading goes on a page, never a dialog. -->
+<meta name="description" content="Notes from the Ledgerly team on paying bills on time, running a household budget and building the product. New posts every two weeks.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Ledgerly">
+<meta property="og:title" content="Blog · Ledgerly">
+<meta property="og:description" content="Notes on paying bills on time, household money and building Ledgerly.">
+<meta property="og:image" content="https://example.com/og/ledgerly-blog-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/blog">
+<link rel="alternate" type="application/rss+xml" title="Ledgerly Blog" href="https://example.com/blog/feed.xml">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=70e5f57">
+<style>
+  /* the featured post's cover, set in type on the accent fill: no image file needed */
+  .bl-cover { display: grid; align-content: space-between; justify-items: start; gap: var(--s4-space-4); inline-size: 100%; block-size: 100%; padding: var(--s4-site-section-gap); }
+  .bl-cover-figure { font-family: var(--s4-site-hero-font); font-size: calc(var(--s4-site-hero-size) * 1.6); line-height: 1; letter-spacing: var(--s4-site-hero-tracking); font-weight: var(--s4-site-hero-weight); font-variant-numeric: tabular-nums; }
+  .bl-cover-bars { display: flex; align-items: flex-end; gap: var(--s4-space-2); block-size: calc(var(--s4-space-16) * 1.5); }
+  .bl-cover-bars > span { inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-on-primary-container); opacity: 0.35; }
+  .bl-cover-bars > span:last-child { opacity: 1; }
+  .bl-tags { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+</style>
+</head>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="landing.html">Product</a></li>
+        <li><a class="s4-button" data-variant="text" href="pricing.html">Pricing</a></li>
+        <li><a class="s4-button" data-variant="text" href="landing.html#customers">Customers</a></li>
+        <li><a class="s4-button" data-variant="text" href="blog.html" aria-current="page">Blog</a></li>
+        <li><a class="s4-button" data-variant="text" href="docs.html">Docs</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" data-variant="text" href="#sign-in">Sign In</a>
+      <a class="s4-button" href="#start" data-keep>Start Free</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+<main id="main">
+  <section class="s4-site-section" aria-labelledby="blog-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">Blog and Changelog</p>
+      <h1 class="s4-hero-title" id="blog-h">Notes on Money, Bills and Building Ledgerly</h1>
+      <p class="s4-site-lead">Short, practical posts every two weeks, and a changelog entry for every release.</p>
+    </div>
+
+    <article class="s4-post-featured" aria-labelledby="feat-h">
+      <a class="s4-media-box" data-ratio="3:2" data-tone="accent" href="article.html" aria-label="Getting Paid Faster: read the post">
+        <span class="bl-cover" aria-hidden="true">
+          <span class="bl-cover-figure">9 days</span>
+          <span class="bl-cover-bars"><span style="block-size: 92%"></span><span style="block-size: 80%"></span><span style="block-size: 74%"></span><span style="block-size: 61%"></span><span style="block-size: 48%"></span><span style="block-size: 30%"></span></span>
+        </span>
+      </a>
+      <div>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">4 Min Read</span></div>
+        <h2 class="s4-site-subtitle" data-size="l" id="feat-h"><a href="article.html">Getting Paid Faster: Three Habits That Cut Nine Days</a></h2>
+        <p class="s4-site-lead">Invoices sent the same day, a pay link on every one, and reminders that don’t nag. What we learned from 120,000 invoices.</p>
+        <p class="s4-post-meta"><span class="s4-avatar" data-size="s" data-tone="tertiary">PR</span>Priya Raman · <time datetime="2026-11-12">Nov 12, 2026</time></p>
+      </div>
+    </article>
+
+    <h2 class="s4-visually-hidden">Latest Posts</h2>
+    <ul class="s4-posts">
+      <li><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-11-05">Nov 5, 2026</time><span>Changelog</span></p>
+        <h3><a href="article.html">Ledgerly 4.2: Bank Sync for 2,400 European Banks</a></h3>
+        <p>Connect a bank in Germany, France, Spain or the Netherlands in under a minute, and pay bills in euros from the same list.</p>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Release</span><span class="s4-status">Banks</span></div>
+      </article></li>
+      <li><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-29">Oct 29, 2026</time><span>6 min read</span></p>
+        <h3><a href="article.html">The Household Bill Meeting, in Fifteen Minutes a Month</a></h3>
+        <p>A simple agenda for two people who share bills: what changed, what’s coming, and one thing to cancel.</p>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">Households</span></div>
+      </article></li>
+      <li><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-15">Oct 15, 2026</time><span>Changelog</span></p>
+        <h3><a href="article.html">Ledgerly 4.1: Approvals for Teams</a></h3>
+        <p>Choose who has to agree before a payment leaves. Set a limit per person, and see every decision in the audit log.</p>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Release</span><span class="s4-status">Teams</span></div>
+      </article></li>
+      <li><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-01">Oct 1, 2026</time><span>5 min read</span></p>
+        <h3><a href="article.html">Why We Never Hold Your Money</a></h3>
+        <p>Most bill-pay apps move money through their own account first. Here is why we chose not to, and what it costs us.</p>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Company</span><span class="s4-status">Security</span></div>
+      </article></li>
+      <li><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-09-17">Sep 17, 2026</time><span>3 min read</span></p>
+        <h3><a href="article.html">Five Subscriptions People Forget, and How to Find Them</a></h3>
+        <p>We looked at which recurring charges members cancel most once they see them listed in one place.</p>
+        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">Saving</span></div>
+      </article></li>
+    </ul>
+    <nav class="s4-pagination" aria-label="Pagination">
+      <a class="s4-page" href="#page-1" aria-label="Previous Page" aria-disabled="true"><span class="s4-icon" data-icon="chevron-left"></span></a>
+      <a class="s4-page" href="#page-1" aria-current="page">1</a>
+      <a class="s4-page" href="#page-2">2</a>
+      <a class="s4-page" href="#page-3">3</a>
+      <a class="s4-page" href="#page-2" aria-label="Next Page"><span class="s4-icon" data-icon="chevron-right"></span></a>
+    </nav>
+  </section>
+
+  <section class="s4-site-section" data-tone="low" aria-labelledby="news-h">
+    <div class="s4-cta">
+      <div>
+        <h2 class="s4-site-title" id="news-h">One Useful Note a Month</h2>
+        <p class="s4-site-lead">The best post of the month and what shipped, in one short email. No tracking pixels.</p>
+      </div>
+      <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
+        <div class="s4-text-field"><input id="blog-email" type="email" autocomplete="email" required><label for="blog-email">Email</label></div>
+        <button class="s4-button" type="submit">Subscribe</button>
+      </form>
+    </div>
+  </section>
+</main>
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+      <p>Bills paid on time, from the bank you already use. Made in Bristol and Lisbon.</p>
+      <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
+        <div class="s4-text-field"><input id="news-email" type="email" autocomplete="email" required><label for="news-email">Email for Monthly Tips</label></div>
+        <button class="s4-button" data-variant="tonal" type="submit">Subscribe</button>
+      </form>
+    </div>
+    <nav class="s4-site-footer-links" aria-label="Footer">
+      <div><h2>Product</h2><ul><li><a href="landing.html#how">How It Works</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="landing.html#security">Security</a></li><li><a href="blog.html">Changelog</a></li></ul></div>
+      <div><h2>Company</h2><ul><li><a href="site.html">About</a></li><li><a href="landing.html#customers">Customers</a></li><li><a href="#careers">Careers</a></li><li><a href="#press">Press</a></li></ul></div>
+      <div><h2>Resources</h2><ul><li><a href="blog.html">Blog</a></li><li><a href="docs.html">Docs</a></li><li><a href="#help">Help Center</a></li><li><a href="#status">Status</a></li></ul></div>
+      <div><h2>Legal</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#terms">Terms</a></li><li><a href="#cookies">Cookies</a></li><li><a href="#licenses">Licenses</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 Ledgerly Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="../components/assets/icons.js?v=27d8ac2" defer></script>
+<script src="../components/orion.js?v=18f7b53" defer></script>
+<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
+</body>
+</html>

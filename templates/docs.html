@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Connect a Bank · Ledgerly Docs</title>
+<!-- Template: Docs. A documentation page from the website kit (components/site): a sidebar of every page (a floating glass panel on a phone), the page in prose at reading width, "On This Page" contents that follow the reader from 1200, and previous / next links. -->
+<meta name="description" content="Connect a bank to Ledgerly in under a minute: supported banks, read-only access, what we store, and how to disconnect.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ledgerly Docs">
+<meta property="og:title" content="Connect a Bank · Ledgerly Docs">
+<meta property="og:description" content="Supported banks, read-only access, what we store, and how to disconnect.">
+<meta property="og:image" content="https://example.com/og/ledgerly-docs-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/docs/connect-a-bank">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../components/orion.css?v=70e5f57">
+</head>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="landing.html">Product</a></li>
+        <li><a class="s4-button" data-variant="text" href="pricing.html">Pricing</a></li>
+        <li><a class="s4-button" data-variant="text" href="landing.html#customers">Customers</a></li>
+        <li><a class="s4-button" data-variant="text" href="blog.html">Blog</a></li>
+        <li><a class="s4-button" data-variant="text" href="docs.html" aria-current="page">Docs</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" data-variant="text" href="#sign-in">Sign In</a>
+      <a class="s4-button" href="#start" data-keep>Start Free</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+<div class="s4-docs">
+  <div class="s4-docs-bar">
+    <button class="s4-button" data-variant="tonal" type="button" data-site-panel="docs-nav"><span class="s4-icon" data-icon="sidebar"></span>Browse Docs</button>
+  </div>
+  <nav class="s4-docs-nav" id="docs-nav" aria-label="Documentation">
+    <div>
+      <h2>Getting Started</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#intro">Introduction</a></li>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Connect a Bank</a></li>
+        <li><a class="s4-button" data-variant="text" href="#first-bill">Add Your First Bill</a></li>
+        <li><a class="s4-button" data-variant="text" href="#household">Invite Your Household</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Paying</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#autopay">Autopay</a></li>
+        <li><a class="s4-button" data-variant="text" href="#approvals">Approvals</a></li>
+        <li><a class="s4-button" data-variant="text" href="#undo">Undo and Refunds</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Developers</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#api-keys">API Keys</a></li>
+        <li><a class="s4-button" data-variant="text" href="#webhooks">Webhooks</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="s4-docs-main" id="main">
+    <nav class="s4-breadcrumbs" aria-label="Breadcrumb"><ol>
+      <li><a class="s4-breadcrumb-link" href="#docs">Docs</a></li>
+      <li><a class="s4-breadcrumb-link" href="#getting-started">Getting Started</a></li>
+      <li aria-current="page">Connect a Bank</li>
+    </ol></nav>
+    <article class="s4-prose" id="top">
+      <h1>Connect a Bank</h1>
+      <p class="s4-prose-lead">Ledgerly pays bills from the bank account you choose. Connecting takes under a minute and gives us read-only access until you approve a payment.</p>
+      <h2 id="before">Before You Start</h2>
+      <p>You need the online banking sign-in for the account you pay bills from. Ledgerly never sees or stores that password: you type it into your bank’s own page.</p>
+      <ul>
+        <li>Over 12,000 banks and credit unions in the US, the UK and the EU are supported.</li>
+        <li>Business accounts work the same way as personal ones.</li>
+        <li>You can connect one bank on Free, five on Plus and as many as you like on Team.</li>
+      </ul>
+      <h2 id="connect">Connect in Four Steps</h2>
+      <ol>
+        <li>Open <strong>Settings</strong> and choose <strong>Banks</strong>.</li>
+        <li>Choose <strong>Add a Bank</strong> and search for yours by name.</li>
+        <li>Sign in on your bank’s page and allow <strong>read-only access</strong>.</li>
+        <li>Pick the account bills should come from. Done.</li>
+      </ol>
+      <blockquote>A payment always needs your tap, or an autopay rule you set. Read-only access lets us see balances and due dates; it cannot move money.</blockquote>
+      <h2 id="api">Connect With the API</h2>
+      <p>Teams can start a connection from their own tools. Create a key in <code>Settings › Developers</code>, then ask for a connection link:</p>
+      <pre><code>curl https://api.ledgerly.example/v2/bank-links \
+  -H "Authorization: Bearer $LEDGERLY_KEY" \
+  -d country=GB \
+  -d return_url=https://your.app/banks/done</code></pre>
+      <p>The response holds a <code>url</code> to send the person to. When they finish, we call your <code>return_url</code> with the new account’s <code>id</code>.</p>
+      <h2 id="stored">What We Store</h2>
+      <p>The account name, the last four digits, the balance and the transactions that match a bill. We keep them for as long as the bank stays connected, and delete them 30 days after you disconnect.</p>
+      <h2 id="disconnect">Disconnect a Bank</h2>
+      <p>In <strong>Settings › Banks</strong>, choose the bank and then <strong>Disconnect</strong>. Bills on autopay from that account pause and ask you for another one. You can undo for ten seconds.</p>
+    </article>
+    <nav class="s4-docs-pager" aria-label="Previous and Next">
+      <a class="s4-card" href="#intro" rel="prev"><span>Previous</span><span>Introduction</span></a>
+      <a class="s4-card" href="#first-bill" rel="next"><span>Next</span><span>Add Your First Bill</span></a>
+    </nav>
+  </main>
+
+  <aside class="s4-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On This Page</h2>
+    <ul>
+      <li><a class="s4-button" data-variant="text" href="#before">Before You Start</a></li>
+      <li><a class="s4-button" data-variant="text" href="#connect">Connect in Four Steps</a></li>
+      <li><a class="s4-button" data-variant="text" href="#api">Connect With the API</a></li>
+      <li><a class="s4-button" data-variant="text" href="#stored">What We Store</a></li>
+      <li><a class="s4-button" data-variant="text" href="#disconnect">Disconnect a Bank</a></li>
+    </ul>
+  </aside>
+</div>
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+      <p>Bills paid on time, from the bank you already use. Made in Bristol and Lisbon.</p>
+      <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
+        <div class="s4-text-field"><input id="news-email" type="email" autocomplete="email" required><label for="news-email">Email for Monthly Tips</label></div>
+        <button class="s4-button" data-variant="tonal" type="submit">Subscribe</button>
+      </form>
+    </div>
+    <nav class="s4-site-footer-links" aria-label="Footer">
+      <div><h2>Product</h2><ul><li><a href="landing.html#how">How It Works</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="landing.html#security">Security</a></li><li><a href="blog.html">Changelog</a></li></ul></div>
+      <div><h2>Company</h2><ul><li><a href="site.html">About</a></li><li><a href="landing.html#customers">Customers</a></li><li><a href="#careers">Careers</a></li><li><a href="#press">Press</a></li></ul></div>
+      <div><h2>Resources</h2><ul><li><a href="blog.html">Blog</a></li><li><a href="docs.html">Docs</a></li><li><a href="#help">Help Center</a></li><li><a href="#status">Status</a></li></ul></div>
+      <div><h2>Legal</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#terms">Terms</a></li><li><a href="#cookies">Cookies</a></li><li><a href="#licenses">Licenses</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 Ledgerly Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="../components/assets/icons.js?v=27d8ac2" defer></script>
+<script src="../components/orion.js?v=18f7b53" defer></script>
+<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
+</body>
+</html>
