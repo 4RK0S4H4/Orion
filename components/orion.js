@@ -121,19 +121,31 @@
      role from the seed). */
   var ACCENT = ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary', 'surface-tint',
     'primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant'];
-  function schemeFor(dark, c) {
+  function schemeFor(dark, c, cfg) {
     /* Tinted (decision 0052): every role from the seed. Unless the app asked for a variant, tinted uses M3's calm
        "tonal" scheme (surfaces carry a little of the color, like stock Material You), not the vivid accent variant:
        a whole screen in a vivid tint is tiring. Controls that are a fixed neutral gray take the scheme's outline. */
-    var M = window.M3Color, tinted = state.surfaces === 'tinted';
-    var s = M.scheme(state.seed, tinted && !state.variantSet ? 'tonal' : state.variant, dark, c);
+    cfg = cfg || state;
+    var M = window.M3Color, tinted = cfg.surfaces === 'tinted';
+    var s = M.scheme(cfg.seed, tinted && !cfg.variantSet ? 'tonal' : cfg.variant, dark, c);
     if (tinted) { s['--s4-color-control'] = s.outline; return s; }
-    var pal = M.palettes(state.seed, state.variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
+    var pal = M.palettes(cfg.seed, cfg.variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
     var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
     o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
     o['on-secondary-container'] = tone(dark ? 90 : 10);
     o['--s4-focus-ring-color'] = s.primary;
     return o;
+  }
+  /* one role list as light-dark(light, dark): the element's own color-scheme (set by the token blocks for every light
+     or dark scope) picks the value, so a scoped scheme follows whatever mode the element is in */
+  function rolesLD(L, D) { return Object.keys(L).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')'; }).join(';'); }
+  /* Scoped rules (issue 52) inside @scope: the nearest scope root wins, whatever the order. sel lists the subjects
+     relative to :scope; the high-contrast copies put the page-wide contrast in front of each. */
+  function scopedCss(scopeSel, subjects, L, D, LH, DH) {
+    var pre = function (p) { return subjects.map(function (x) { return p + ' ' + x; }).join(','); };
+    return '@scope (' + scopeSel + '){:where(' + subjects.join(',') + '){' + rolesLD(L, D) + '}}' +
+      '@media (prefers-contrast: more){@scope (' + scopeSel + '){:where(' + pre(':root:not([data-contrast])') + '){' + rolesLD(LH, DH) + '}}}' +
+      '@scope (' + scopeSel + '){:where(' + pre(':root[data-contrast="high"]') + '){' + rolesLD(LH, DH) + '}}';
   }
   function writeColor() {
     var el = document.getElementById('s4-dynamic-color');
@@ -150,11 +162,44 @@
         W(':root[data-contrast="high"]') + '{' + rolesCss(LH) + '}' +
         '@media (prefers-color-scheme: dark) and (prefers-contrast: more){' + W(':root:not([data-theme="light"]):not([data-contrast])') + '{' + rolesCss(DH) + '}}' +
         '@media (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])[data-contrast="high"]') + '{' + rolesCss(DH) + '}}' +
-        W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}}';
+        W(':root[data-theme="dark"][data-contrast="high"]') + '{' + rolesCss(DH) + '}' +
+        /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one */
+        scopedCss(':not(:root):is([data-theme], [data-gray]):not([data-accent], [data-accent] *)', [':scope'], L, D, LH, DH) + '}';
       if (!el) { el = document.createElement('style'); el.id = 's4-dynamic-color'; document.head.appendChild(el); }
       el.textContent = css;
+      writeScoped();
       metaThemeColor();
       S4.util.emit(document, 's4-theme', S4.theme());
+    });
+  }
+  /* Scoped accents (issue 52): data-accent="blue | #0b57d0" on any element (optional data-accent-variant and
+     data-surfaces="tinted"), or S4.theme({ seed, variant, surfaces }, element). Each distinct scheme is written once,
+     keyed by data-s4-accent-id; contrast follows the page. */
+  var scoped = {};
+  function accentCfg(node) {
+    var raw = node.getAttribute('data-accent'), seed = raw && (S4.theme.accents[raw.toLowerCase()] || raw);
+    if (!seed || !/^#[0-9a-f]{6}$/i.test(seed)) return null;
+    var v = node.getAttribute('data-accent-variant');
+    return { seed: seed, variant: v || 'vibrant', variantSet: !!v, surfaces: node.getAttribute('data-surfaces') === 'tinted' ? 'tinted' : 'neutral' };
+  }
+  function writeScoped() {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-accent]:not(html)'));
+    if (!nodes.length && !document.getElementById('s4-scoped-color')) return;
+    loadColor(function () {
+      var c = state.contrast >= 1 ? 1 : state.contrast, css = '';
+      nodes.forEach(function (node) {
+        var cfg = accentCfg(node);
+        if (!cfg) { node.removeAttribute('data-s4-accent-id'); return; }
+        var key = (cfg.seed + '-' + (cfg.variantSet ? cfg.variant : '') + '-' + cfg.surfaces + '-' + c).toLowerCase().replace(/[^a-z0-9-]/g, '');
+        node.setAttribute('data-s4-accent-id', key);
+        if (!scoped[key]) scoped[key] = scopedCss('[data-s4-accent-id="' + key + '"]', [':scope', ':scope [data-theme]', ':scope [data-gray]'],
+          schemeFor(false, c, cfg), schemeFor(true, c, cfg), schemeFor(false, 1, cfg), schemeFor(true, 1, cfg));
+      });
+      var used = {}; nodes.forEach(function (n) { var k = n.getAttribute('data-s4-accent-id'); if (k) used[k] = scoped[k]; });
+      Object.keys(used).forEach(function (k) { css += used[k]; });
+      var el = document.getElementById('s4-scoped-color');
+      if (!el) { el = document.createElement('style'); el.id = 's4-scoped-color'; document.head.appendChild(el); }
+      el.textContent = '@layer s4.tokens{' + css + '}';
     });
   }
   function metaThemeColor() {
@@ -172,7 +217,33 @@
     { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
     { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' }
   ];
-  S4.theme = function (opts) {
+  /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
+     A key set to null or '' removes the attribute (the container follows the page again); a default value ('round',
+     'pure', 'inter', mode 'light') is written, so the container goes back to stock Orion inside a branded page. */
+  function themeElement(el, opts) {
+    var attr = function (name, v) { if (v == null || v === '' || v === 'system') el.removeAttribute(name); else el.setAttribute(name, v); };
+    if (opts) {
+      if ('mode' in opts) attr('data-theme', opts.mode);
+      if ('seed' in opts) attr('data-accent', opts.seed);
+      if ('variant' in opts) attr('data-accent-variant', opts.variant);
+      if ('surfaces' in opts) attr('data-surfaces', opts.surfaces === 'tinted' ? 'tinted' : null);
+      BRAND.forEach(function (d) {
+        if (!(d.key in opts)) return;
+        var v = opts[d.key];
+        if (d.key === 'page' && v === 'plain') v = null;   /* page tone only adds: a plain region inside a soft page is not a dial */
+        if (!d.prop || !v || v === d.base || FACES.indexOf(v) >= 0) { attr(d.attr, v); if (d.prop) el.style.removeProperty(d.prop); return; }
+        attr(d.attr, 'custom'); el.style.setProperty(d.prop, v);
+      });
+      if ('seed' in opts || 'variant' in opts || 'surfaces' in opts) writeScoped();
+      S4.util.emit(el, 's4-theme', themeElement(el));
+    }
+    var o = { mode: el.getAttribute('data-theme') || null, seed: el.getAttribute('data-accent') || null,
+      variant: el.getAttribute('data-accent-variant') || null, surfaces: el.getAttribute('data-surfaces') || null };
+    BRAND.forEach(function (d) { var v = el.getAttribute(d.attr); o[d.key] = v === 'custom' ? el.style.getPropertyValue(d.prop).trim() : v; });
+    return o;
+  }
+  S4.theme = function (opts, el) {
+    if (el && el !== root) return themeElement(el, opts);
     if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
       corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter' };
     var colorChanged = false;
@@ -201,7 +272,7 @@
       if (v) root.setAttribute(d.attr, preset ? v : 'custom'); else root.removeAttribute(d.attr);
       if (preset) root.style.removeProperty(d.prop); else root.style.setProperty(d.prop, v);
     });
-    if (colorChanged) writeColor(); else { metaThemeColor(); S4.util.emit(document, 's4-theme', S4.theme()); }
+    if (colorChanged) { writeColor(); writeScoped(); } else { metaThemeColor(); S4.util.emit(document, 's4-theme', S4.theme()); }
     var key = opts.save || S4.theme.key;
     if (key) { S4.theme.key = key; try { localStorage.setItem(key, JSON.stringify(S4.theme())); } catch (e) {} }
     return S4.theme();
@@ -217,6 +288,8 @@
     return !!saved;
   };
   if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', metaThemeColor);
+  /* declarative scoped accents: data-accent on any element added to the page */
+  S4.register('scoped-accent', function (scope) { if (S4.util.all(scope, '[data-accent]:not(html)').length) writeScoped(); });
 })();
 
 /* ---- motion/motion.js ---- */
