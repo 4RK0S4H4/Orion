@@ -17,6 +17,34 @@ enough to never be in the way, but never looking instant. This amends 0022 (simp
 (transform and opacity, one transition per element, nothing cloned) unless the owner agrees otherwise; record as a new
 decision and show options in a motion lab with the scrubber before building.
 
+## From the design review (2026-11-16)
+
+Found by the end-to-end review ([`explore/design-review.html`](../../explore/design-review.html)), not by the owner; no
+reference images (the review page shows each one). The big ones wait on the owner's answers to the review's eight
+questions; the small ones can be fixed without asking.
+
+- **51.** An app can only change its color: corners follow tokens halfway (54 height-computed pills, 56 direct uses of
+  the full corner), `--s4-shape-button`, `--s4-shape-icon-button` and `--s4-shape-snackbar` are read by nothing, no
+  type, gray-temperature or motion-energy dial. Waits on review questions 1 to 3.
+- **52.** Themes only work on the whole page (every token block is on `:root`, aliases resolve there): no dark sidebar
+  in a light app, no branded band. Part of the brand dials work.
+- **53.** Websites: one thin landing template; no site header, footer, pricing, testimonials, media hero, feature rows,
+  article index, docs layout, fluid display type or section rhythm. Waits on question 6.
+- **54.** Neutral mode reads flat (gray on gray, headings at weight 400). Waits on question 5.
+- **55.** Letter spacing is Material's (tuned for Roboto) on Inter: body text looks loose. Waits on question 4.
+- **56.** Wide windows are left-anchored: showcase home cards 236 wide beside 500px of nothing at 1280; landing feature
+  cards stop at 936 of 1200. Card grids should fill their row.
+- **57.** Documents have drifted from the decisions: `framework.md` ("Nine complete starter apps"), `philosophy.md`
+  section 4 (menus drop out of their button, sheets slide from the edge), `foundations/shape.md` (full to small,
+  square sheet edge, extra-small segments), `foundations/color.md` and `accessibility.md` ("42 pairs"; 78 are checked),
+  the skill description ("46 components", "eight app templates") and its opening ("It **is** Material 3 Expressive").
+- **58.** Small things: the Elevated button looks like the Text button on a card (no shadow to elevate with); avatar
+  stacks cover each other's initials; breadcrumb chevrons sit unevenly between pills and the current page.
+- **59.** Rich inputs and data at scale (combobox, tag input, upload, time, number, one-time code, tree, table resize /
+  pinning / virtual rows): already Horizon 2; the review argues for pulling rich inputs forward.
+- **60.** Desktop anatomy beyond the title bar: menu bar, status bar, document tabs, sidebar tree, settings window, a
+  real shell example.
+
 ## Open (2026-11-14)
 
 Issues 1 to 6, 8 to 10, 12 to 18, 20 to 23 and 32 to 35 were built in the overhaul (decision 0043) and were accepted by the owner (0044). Issues 38 to 41 were built on 2026-11-14 (decisions 0046 to 0048, see Done); they wait for the owner's look. Open: idea A. The owner's picks from idea list B (all of them) were built on 2026-11-15 (decision 0051).

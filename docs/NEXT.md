@@ -36,6 +36,15 @@ panels, dialogs and phones stay modal). The owner then confirmed the long swipe 
 to do in that repo: the mockup stays a mockup here, do not propose or start work in the tracker repo. Nothing is
 waiting on the owner.
 
+**Added 2026-11-16 (design review):** the owner asked for an end-to-end review "like a professional web designer",
+a comparison with other systems, and a way to make Orion "super customized as a base" per app. Published as
+[`explore/design-review.html`](../explore/design-review.html): verdict, eleven findings (issues 51 to 60), the
+comparison, a proposal for brand dials (what stays fixed, what opens up) with the same screen as four apps, and eight
+big questions. **Waiting on the owner's answers**; they decide whether corners and typeface may change per app (that
+would amend 0023 to 0025 and the Inter rule), letter spacing, hierarchy in neutral mode, a website kit, and what comes
+first. Until then nothing from the review is built except one fix (the dashboard's revenue rise uses the success tone,
+not the accent). Without asking, a next session may do issue 57 (document drift), 56 (card grids fill) and 58.
+
 **Next session, without asking (Horizon 1 of the roadmap):**
 1. Fix whatever the owner's looks turn up, as numbered issues with their screenshots.
 2. Build two real apps end to end with the skill (one phone-first, one desktop) and fix what the skill gets wrong.
@@ -69,6 +78,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-16 (design review): end-to-end review, comparison and brand dials proposal published as a quiz; issues 51 to 60 logged. Next: the owner's eight answers, then a numbered decision.
 - 2026-11-15 (any-app round): never focus a field (0049), pages (0050), the eight ideas built (0051): palette, resizable panes, states, forms, rewards, direct manipulation, charts, six templates; ROADMAP written. Next: the owner's looks, then Horizon 1.
 - 2026-11-14 (production round): one motion philosophy (0046), placement ladder and expand in place (0047), quizzes on the live bundle (0048), production suite in Chromium and WebKit in CI, idea list B quiz. Next: the owner's looks and quiz picks.
 - 2026-11-14 (handoff): owner's next round recorded as issues 38 to 41 and idea list B; nothing built. Next session: start at "Now".

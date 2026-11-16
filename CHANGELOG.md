@@ -8,6 +8,8 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+- Fixed: the dashboard template shows a rise in revenue in the success tone, not the accent (an orange or red accent made good news look like a warning).
+
 The overhaul (decision 0043): one language for phones, desktop windows and desktop apps.
 
 ### Added

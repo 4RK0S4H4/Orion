@@ -269,4 +269,18 @@ window.S4_REVIEW_DEMOS = [
       { id: 'templates', label: 'Next app template', options: [{ v: 'A', label: 'Editor' }, { v: 'B', label: 'Calendar' }, { v: 'C', label: 'Kanban Board' }, { v: 'D', label: 'Media Gallery' }, { v: 'E', label: 'Checkout' }, { v: 'F', label: 'Onboarding' }, { v: 'All', label: 'All Six' }, { v: 'None', label: 'None For Now' }] }
     ]
   }
+  ,
+  {
+    id: 'design-review', title: 'Design Review', href: 'explore/design-review.html',
+    questions: [
+      { id: 'custom', label: 'How far an app may move from stock Orion', options: [{ v: 'A', label: 'Color Only', desc: 'As today: accent, neutral or tinted, density. Every app is clearly the same family.' }, { v: 'B', label: 'Brand Dials', desc: 'Also gray temperature, corner softness, typeface and motion energy, as checked presets. Filled, no shadows and the behaviours stay fixed.' }, { v: 'C', label: 'Everything Open', desc: 'Also outlines, shadows and sharp corners per app. Orion becomes a base kit more than a language.' }] },
+      { id: 'shape', label: 'Corners per app', options: [{ v: 'A', label: 'Always Round', desc: 'Pills and today\u2019s radii in every app.' }, { v: 'B', label: 'Soft Range', desc: 'One dial from pills down to about 10, never sharp; still concentric (Pulse and Console above).' }, { v: 'C', label: 'Any Radius', desc: 'Down to crisp 4 to 6 as well (Field Notes above).' }] },
+      { id: 'type', label: 'Typeface per app', options: [{ v: 'A', label: 'Inter Always' }, { v: 'B', label: 'App Picks The Display Face', desc: 'Headings and big numbers; text, labels and controls stay Inter.' }, { v: 'C', label: 'App Picks Both', desc: 'A display face and a text face, each with its own tuned spacing.' }] },
+      { id: 'tracking', label: 'Letter spacing', options: [{ v: 'A', label: 'Material\u2019s Spacing (Today)' }, { v: 'B', label: 'Tuned For Inter' }] },
+      { id: 'hierarchy', label: 'Hierarchy in neutral mode', options: [{ v: 'A', label: 'As Today' }, { v: 'B', label: 'Stronger Type', desc: 'Heavier, tighter headings and numbers.' }, { v: 'C', label: 'Page Tone', desc: 'White cards on a soft gray page, as an option per app.' }, { v: 'D', label: 'Both' }] },
+      { id: 'web', label: 'Website kit', options: [{ v: 'Yes', label: 'Build It' }, { v: 'Later', label: 'Not Yet' }, { v: 'No', label: 'Orion Is For Apps' }] },
+      { id: 'next', label: 'What comes first', options: [{ v: 'A', label: 'Tidy, Then Brand Dials' }, { v: 'B', label: 'Website Kit' }, { v: 'C', label: 'Rich Inputs And Data' }, { v: 'D', label: 'Desktop Anatomy' }, { v: 'E', label: 'Real Apps First', desc: 'Keep the roadmap as it is.' }] },
+      { id: 'dist', label: 'Who Orion is for', options: [{ v: 'A', label: 'Only Me, Through The Skill', desc: 'No package, no typed API. Smaller bundles only where a page needs them.' }, { v: 'B', label: 'Others Too, Later', desc: 'Plan for a package, minified builds and typed API in 2.0.' }] }
+    ]
+  }
 ];

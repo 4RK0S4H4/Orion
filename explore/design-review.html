@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: Design Review</title>
+<link rel="stylesheet" href="../components/orion.css">
+<style>
+  @layer s4.components {
+    .dr-bar { display: flex; align-items: center; padding: var(--s4-space-3) var(--s4-space-4); background: var(--md-sys-color-surface-container); }
+    .dr-bar h1 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+    .dr-page { max-inline-size: 64rem; margin: 0 auto; padding: var(--s4-space-6) var(--s4-space-4) var(--s4-space-16); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+    .dr-sec { display: flex; flex-direction: column; gap: var(--s4-space-4); min-inline-size: 0; }
+    .dr-sec > h2 { margin: 0; font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); }
+    .dr-sec > h3 { margin: var(--s4-space-2) 0 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
+    .dr-sec > p, .dr-lead { margin: 0; max-inline-size: 70ch; color: var(--md-sys-color-on-surface-variant); }
+    .dr-lead { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); color: var(--md-sys-color-on-surface); }
+    .dr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--dr-min, 17rem)), 1fr)); gap: var(--s4-space-3); }
+    .dr-box { display: flex; flex-direction: column; gap: var(--s4-space-1); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); min-inline-size: 0; }
+    .dr-box > b { font-weight: var(--md-sys-typescale-title-small-weight); }
+    .dr-box > span, .dr-box > p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+    .dr-box > .s4-status { align-self: flex-start; margin-block-end: var(--s4-space-1); }
+    .dr-score { --dr-min: 9rem; }
+    .dr-score .dr-box > strong { font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); font-variant-numeric: tabular-nums; }
+    .dr-fix { color: var(--md-sys-color-on-surface); }
+    .dr-brands { --dr-min: 13rem; align-items: start; }
+    .dr-brand-wrap { display: flex; flex-direction: column; gap: var(--s4-space-2); min-inline-size: 0; }
+    .dr-brand-wrap > b { font-weight: var(--md-sys-typescale-title-small-weight); }
+    .dr-brand-wrap > small { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+    .dr-page code { font-family: var(--md-ref-typeface-mono); font-size: 0.9em; }
+  }
+</style>
+<!-- What is being judged (the preview screens). Unlayered on purpose: these are mock-ups of app-level restyling,
+     the thing the review proposes to turn into checked tokens. Nothing outside .dr-brand or .rv-preview uses them. -->
+<style>
+  .dr-brand { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-4); border-radius: var(--dr-r-box, var(--md-sys-shape-corner-large)); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); min-inline-size: 0; overflow: hidden; }
+  .dr-brand h4 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--dr-w-title, 500); font-family: var(--dr-display, inherit); letter-spacing: var(--dr-track-title, 0); }
+  .dr-brand .dr-num { font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-family: var(--dr-display, inherit); font-weight: var(--dr-w-num, 400); font-variant-numeric: tabular-nums; letter-spacing: var(--dr-track-title, 0); }
+  .dr-brand .dr-panel { display: flex; flex-direction: column; gap: var(--s4-space-1); padding: var(--s4-space-4); border-radius: var(--dr-r-box, var(--md-sys-shape-corner-large)); background: var(--md-sys-color-surface-container-low); }
+  .dr-brand .dr-panel small { color: var(--md-sys-color-on-surface-variant); }
+  .dr-brand .dr-actions { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .dr-brand .s4-chip-set { flex-wrap: wrap; }
+  .dr-brand .s4-switch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); }
+  .dr-brand[data-brand] *, .dr-brand[data-brand] { font-family: var(--dr-text, inherit); }
+  .dr-brand[data-brand] h4, .dr-brand[data-brand] .dr-num { font-family: var(--dr-display, var(--dr-text, inherit)); }
+  .dr-brand[data-brand] .s4-button, .dr-brand[data-brand] .s4-chip, .dr-brand[data-brand] .s4-status { border-radius: var(--dr-r-control); }
+  .dr-brand[data-brand] .s4-text-field, .dr-brand[data-brand] .s4-text-field input { border-radius: var(--dr-r-field); }
+
+  /* Field Notes: editorial. Serif display, crisp corners, warm paper, rust accent. */
+  .dr-brand[data-brand="notes"] {
+    --dr-display: ui-serif, "New York", Georgia, serif; --dr-w-title: 600; --dr-w-num: 500; --dr-track-title: -0.01em;
+    --dr-r-control: 6px; --dr-r-field: 6px; --dr-r-box: 8px;
+    --md-sys-color-surface: light-dark(#fbf8f3, #171512); --md-sys-color-surface-container-low: light-dark(#f3eee6, #201d19);
+    --md-sys-color-surface-container-highest: light-dark(#e6dfd3, #34302a); --md-sys-color-surface-container-high: light-dark(#ece6dc, #2a2622);
+    --md-sys-color-primary: light-dark(#a33a12, #ffb59b); --md-sys-color-on-primary: light-dark(#ffffff, #3b0f00);
+    --md-sys-color-secondary-container: light-dark(#f6d9cc, #5a2a18); --md-sys-color-on-secondary-container: light-dark(#3b0f00, #ffdbcf);
+  }
+  /* Pulse: friendly consumer app. Rounded face, tinted violet surfaces, heavier headings. */
+  .dr-brand[data-brand="pulse"] {
+    --dr-text: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; --dr-w-title: 700; --dr-w-num: 700;
+    --dr-r-control: 9999px; --dr-r-field: 20px; --dr-r-box: 28px;
+    --md-sys-color-surface: light-dark(#faf7ff, #15121c); --md-sys-color-surface-container-low: light-dark(#f1ebfd, #1e1a28);
+    --md-sys-color-surface-container-highest: light-dark(#e2d9f6, #332d42); --md-sys-color-surface-container-high: light-dark(#e9e1f9, #292435);
+    --md-sys-color-primary: light-dark(#6b3fd4, #cfbcff); --md-sys-color-on-primary: light-dark(#ffffff, #2a0a73);
+    --md-sys-color-secondary-container: light-dark(#e3d7ff, #4a3a80); --md-sys-color-on-secondary-container: light-dark(#21005d, #eaddff);
+  }
+  /* Console: a dense professional tool. Mono numerals and labels, small corners, cool grays, compact sizes. */
+  .dr-brand[data-brand="console"] {
+    --dr-display: ui-monospace, "SF Mono", Menlo, Consolas, monospace; --dr-w-title: 600; --dr-w-num: 500; --dr-track-title: -0.02em;
+    --dr-r-control: 8px; --dr-r-field: 8px; --dr-r-box: 10px;
+    --md-sys-color-surface: light-dark(#f7f9fb, #0d1116); --md-sys-color-surface-container-low: light-dark(#edf1f5, #151b22);
+    --md-sys-color-surface-container-highest: light-dark(#dbe2ea, #2a333e); --md-sys-color-surface-container-high: light-dark(#e3e9ef, #202832);
+    --md-sys-color-primary: light-dark(#0b57d0, #a8c7fa); --md-sys-color-on-primary: light-dark(#ffffff, #062e6f);
+    --md-sys-color-secondary-container: light-dark(#d3e3fd, #0842a0); --md-sys-color-on-secondary-container: light-dark(#041e49, #d3e3fd);
+  }
+  .dr-brand[data-brand="console"] .dr-num { font-size: var(--md-sys-typescale-headline-large-size); }
+
+  /* Letter spacing preview */
+  .dr-type { padding: var(--s4-space-4); display: flex; flex-direction: column; gap: var(--s4-space-2); }
+  .dr-type h4 { margin: 0; font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: 400; }
+  .dr-type p { margin: 0; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); letter-spacing: var(--md-sys-typescale-body-large-tracking); }
+  .dr-type small { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); letter-spacing: var(--md-sys-typescale-body-medium-tracking); color: var(--md-sys-color-on-surface-variant); }
+  .dr-type[data-tuned] h4 { letter-spacing: -0.019em; }
+  .dr-type[data-tuned] p { letter-spacing: -0.011em; }
+  .dr-type[data-tuned] small { letter-spacing: -0.006em; }
+
+  /* Hierarchy preview */
+  .dr-depth { padding: var(--s4-space-4); display: flex; flex-direction: column; gap: var(--s4-space-3); border-radius: inherit; }
+  .dr-depth h4 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: 400; }
+  .dr-depth .dr-card { display: flex; flex-direction: column; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .dr-depth .dr-card small { color: var(--md-sys-color-on-surface-variant); }
+  .dr-depth .dr-card b { font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: 400; font-variant-numeric: tabular-nums; }
+  .dr-depth[data-depth="page"] { background: var(--md-sys-color-surface-container); }
+  .dr-depth[data-depth="page"] .dr-card { background: var(--md-sys-color-surface-container-lowest); }
+  .dr-depth[data-depth="type"] h4, .dr-depth[data-depth="both"] h4 { font-weight: 650; letter-spacing: -0.015em; }
+  .dr-depth[data-depth="type"] .dr-card b, .dr-depth[data-depth="both"] .dr-card b { font-weight: 650; letter-spacing: -0.02em; }
+  .dr-depth[data-depth="both"] { background: var(--md-sys-color-surface-container); }
+  .dr-depth[data-depth="both"] .dr-card { background: var(--md-sys-color-surface-container-lowest); }
+</style>
+</head>
+<body>
+<header class="dr-bar"><h1>Design Review</h1></header>
+<main class="dr-page">
+
+  <section class="dr-sec">
+    <p class="dr-lead">An end-to-end review of S4 Orion as a language for apps, websites and desktop apps, on phones and computers: what holds up, what does not yet, how it compares with the systems people reach for, and what would let each app look like itself. Eight questions at the end need your answer.</p>
+    <p>Method: every foundation and framework document was read, the tokens and all 61 component stylesheets were measured, and the showcase and nine templates were looked at in Chromium at 390 and 1280, light and dark. One screen was then restyled with tokens alone (font, corners, accent) to see how far an app can move today. Not covered: a real iPhone or Safari, and screen readers.</p>
+  </section>
+
+  <section class="dr-sec">
+    <h2>The Verdict</h2>
+    <p class="dr-lead">Orion is unusually well engineered and more opinionated about behaviour than any system it is compared with below. It is ready for apps. It is not yet ready for websites, and an app cannot yet make it its own beyond color.</p>
+    <div class="dr-grid dr-score">
+      <div class="dr-box"><span>Foundations and Tokens</span><strong>9/10</strong><span>Tokens only, proven by checks.</span></div>
+      <div class="dr-box"><span>Behaviour</span><strong>9/10</strong><span>Placement ladder, pages, states, undo.</span></div>
+      <div class="dr-box"><span>Accessibility</span><strong>8/10</strong><span>Built in; right-to-left and print open.</span></div>
+      <div class="dr-box"><span>App Components</span><strong>8/10</strong><span>61; rich inputs and big data missing.</span></div>
+      <div class="dr-box"><span>Visual Hierarchy</span><strong>6/10</strong><span>Calm, but flat in neutral mode.</span></div>
+      <div class="dr-box"><span>Desktop Apps</span><strong>6/10</strong><span>Window layer exists; no menu bar or shell.</span></div>
+      <div class="dr-box"><span>Websites</span><strong>4/10</strong><span>One thin landing template.</span></div>
+      <div class="dr-box"><span>Per-App Customization</span><strong>4/10</strong><span>Color only; shape and type are fixed.</span></div>
+    </div>
+  </section>
+
+  <section class="dr-sec">
+    <h2>What Holds Up</h2>
+    <div class="dr-grid">
+      <div class="dr-box"><b>Token Discipline Is Real</b><span>Across 61 component stylesheets: 2 hex values, 1 literal font size, every transition on a named pattern. Most public systems do not get close to this.</span></div>
+      <div class="dr-box"><b>Proof Instead Of Promises</b><span>Contrast pairs in four modes, glass legibility over 97 schemes, 210 accent schemes, motion patterns and concentric corners are all failed by a machine. No system compared here ships this.</span></div>
+      <div class="dr-box"><b>Behaviour Is Part Of The Language</b><span>Where things open, how you go into a thing and back, loading and empty states, do-then-undo, never moving the cursor. Material and Apple describe these; Orion builds and checks them.</span></div>
+      <div class="dr-box"><b>Size Follows The Pointer, Layout Follows The Width</b><span>Keeping density and window class separate is the right model for touch laptops and narrow desktop windows. Few web systems make that split.</span></div>
+      <div class="dr-box"><b>Any Accent, Two Color Modes</b><span>One seed gives a complete, contrast-safe scheme, neutral or tinted. This is the strongest theming feature and it already works.</span></div>
+      <div class="dr-box"><b>Glass With A Guarantee</b><span>Glass only on what floats, with a contrast floor and three fallbacks. That is more careful than most glass on the web.</span></div>
+    </div>
+  </section>
+
+  <section class="dr-sec">
+    <h2>Findings</h2>
+    <p>Ordered by how much each one limits "any app, any website, and unique per app".</p>
+    <div class="dr-grid" style="--dr-min: 19rem">
+      <div class="dr-box"><span class="s4-status" data-tone="error">Major</span><b>1. An App Can Only Change Its Color</b><span>The test: one screen restyled by tokens alone. The accent followed everywhere. Corners followed halfway (chips and status pills squared off; buttons, the segmented group and the navigation indicator stayed pills), because 54 places compute the pill from the height and 56 use the full corner directly. Three shape tokens are defined and read by nothing (button, icon button, snackbar). The display face followed; nothing documents a type, spacing or gray-temperature dial.</span><span class="dr-fix">Fix: a small, named set of brand dials, each a checked preset (section "Making It Unique Per App").</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="error">Major</span><b>2. Themes Only Work On The Whole Page</b><span>Every token block is attached to the root, and the alias tokens resolve there. A dark sidebar in a light app, a branded band on a website, or two themes side by side cannot be done with tokens. Radix Themes, daisyUI and Bootstrap all allow a theme on any element.</span><span class="dr-fix">Fix: let the mode and brand attributes work on any container.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="error">Major</span><b>3. Websites Are An Afterthought</b><span>The landing template is a headline, three cards, an accordion and a call to action. There is no site header with a phone menu, footer, pricing, testimonial, logo row, picture or video hero, feature rows with a screenshot, article index, or documentation layout with a sidebar and contents. Display type is a fixed 57px rather than fluid, and there is no section rhythm scale. On 1280 the three feature cards stop at 936 of 1200 and leave a hole.</span><span class="dr-fix">Fix: a website kit: about ten section components, fluid display type, section spacing tokens, four site templates.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>4. Neutral Mode Reads Flat</b><span>With no shadows and no outlines, every layer is separated by a few percent of gray: page, card, chip, field and tonal button sit within three steps. On the dashboard the eye lands on the one black bar and nothing else ranks. Headings are weight 400, so "Overview" (22) and "October" (24) carry the same voice as body text.</span><span class="dr-fix">Fix: stronger type hierarchy by default, and an optional page tone (white cards on a soft gray page). Question 5.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>5. Roboto's Letter Spacing On Inter</b><span>The type scale keeps Material's tracking (+0.5px at 16, +0.2px at 14), which was tuned for Roboto. Inter is already wider, so body text looks loose, most visibly in the article template. Inter's own guidance is slightly negative at text sizes and tighter as size grows.</span><span class="dr-fix">Fix: retune the tracking column for Inter. Question 4 shows both.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>6. Wide Windows Are Left-Anchored</b><span>On the showcase home at 1280, two 236px cards sit beside 500px of nothing and the search field stops at 720. Card grids do not fill their row, and nothing says what a view does between 1200 and 1600 beyond a cap.</span><span class="dr-fix">Fix: card grids that fill, and a rule per page width for what joins at large and extra-large (a third pane, a wider grid).</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>7. Input And Data Gaps</b><span>Missing for real apps: combobox with search, tag input, file drop and upload progress, time and date-time, number stepper, one-time code, rating, tree, carousel, rich popover, code block. Tables lack column resize, pinned columns, virtual rows, filters and saved views. Most are already on Horizon 2.</span><span class="dr-fix">Fix: pull rich inputs forward; they block more app types than anything else on the roadmap.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>8. Desktop Apps Stop At The Title Bar</b><span>The window layer, shortcuts, context menus and compact density are right. Still missing: a menu bar, a status bar, document tabs, a sidebar tree, a settings window, and one real Electron or Tauri shell to prove the drag regions and window controls.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="warning">Moderate</span><b>9. The Documents Have Drifted</b><span>The skill and foundations still say things later decisions reversed: "Nine starter apps" (15), "46 components, eight templates" (61, 15), menus that "drop out of their button" and sheets that "slide from the edge" (0042, 0043), buttons that square "full to small", a bottom sheet's square edge, "42 pairs" (78), and "Orion is Material 3 Expressive" next to "not a clone of Material". The skill builds from these, so drift here becomes drift in apps.</span><span class="dr-fix">Fix: one pass over philosophy, foundations and the skill header, then a check that counts match.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="info">Minor</span><b>10. Small Things Seen</b><span>A rise in revenue wears the accent, so with an orange or red accent good news looks like a warning beside the red "Spent" pill (fixed in this round: it uses the success tone). The Elevated button has no shadow to be elevated with and looks like the Text button on a card. Avatar stacks cover each other's initials. Breadcrumb chevrons sit unevenly. The "+4" in the stack and the tonal toggle are faint in dark mode.</span></div>
+      <div class="dr-box"><span class="s4-status" data-tone="info">Minor</span><b>11. Reach And Delivery</b><span>38 physical left and right rules remain against 59 logical ones, and there are no print styles (both on Horizon 1). The bundle is 70 KB of CSS and 69 KB of script compressed, plus 79 KB of icons and a 165 KB font: fine for apps, heavy for a landing page, and there is no way to ship less. No typed API and no package, which only matters if anyone else is to use it.</span></div>
+    </div>
+  </section>
+
+  <section class="dr-sec">
+    <h2>Compared With Other Systems</h2>
+    <p>What each one is best at, and what Orion should take from it. None of them should be copied whole.</p>
+    <div class="dr-grid" style="--dr-min: 19rem">
+      <div class="dr-box"><b>Material 3 Expressive</b><span>Orion's foundation: roles from a seed, type and shape scales, springs. Orion is calmer (neutral base, no halos, no shadows) and goes further on behaviour. Material is ahead on adaptive layout guidance for large screens and on shape as a theme you can change.</span><span class="dr-fix">Take: the large-screen pane rules; shape as a theme.</span></div>
+      <div class="dr-box"><b>Apple (Human Interface Guidelines, Liquid Glass)</b><span>The reference for glass on floating chrome and for desktop apps: menu bar, sidebar, inspector, toolbar, settings window. Orion's glass rules are close to Apple's and better proven for contrast. Apple is far ahead on desktop conventions.</span><span class="dr-fix">Take: the desktop app anatomy, as Orion patterns.</span></div>
+      <div class="dr-box"><b>Fluent 2 (Microsoft)</b><span>Best for dense productivity software: three densities, data grids, command bars, tree views, and a brand ramp that leaves neutrals alone, which is Orion's neutral mode. Visually plainer than Orion.</span><span class="dr-fix">Take: data grid, tree and command bar patterns.</span></div>
+      <div class="dr-box"><b>Tailwind With shadcn/ui</b><span>The current default for new web apps. It is a kit you copy and own: unlimited freedom, no opinions on behaviour, consistency is your job. Its theme is a handful of variables (base gray, accent, radius, font), which is exactly the short list Orion lacks.</span><span class="dr-fix">Take: the size of the theme contract: five or six dials, not five hundred tokens.</span></div>
+      <div class="dr-box"><b>Radix Themes</b><span>The cleanest theming model: accent color, gray family, radius, scaling and panel background, set on any element and nestable. Good-looking as shipped and visibly different per app with five settings.</span><span class="dr-fix">Take: gray family, radius and scaling dials; themes on any container.</span></div>
+      <div class="dr-box"><b>daisyUI</b><span>Shows how far named themes go: dozens of looks from one component set by changing colors, three radii (controls, fields, boxes), size, border and depth. Shallow on behaviour and accessibility.</span><span class="dr-fix">Take: separate radii for controls, fields and boxes; named presets.</span></div>
+      <div class="dr-box"><b>Ant Design</b><span>The widest component set for business software (forms, tables, trees, uploads, transfer lists) and a token algorithm: seed tokens produce everything else, with compact and dark as algorithms. Heavy and recognisably "enterprise".</span><span class="dr-fix">Take: the breadth list for inputs and data; algorithms as presets.</span></div>
+      <div class="dr-box"><b>Mantine And Chakra</b><span>Application kits with 100+ parts and hooks, themed through one object including default props per component. They need React; Orion's plain CSS and one script is a real advantage for one-file apps.</span><span class="dr-fix">Take: per-app component defaults (this app's buttons are tonal).</span></div>
+      <div class="dr-box"><b>Bootstrap 5</b><span>Still the widest reach for websites: grid, navbar, footer patterns, carousel, and a theme attribute on any element. Dated look, weak on app behaviour.</span><span class="dr-fix">Take: the website section set Orion does not have.</span></div>
+      <div class="dr-box"><b>Carbon, Polaris, Primer, Atlassian</b><span>Product systems with the best written guidance: content rules, patterns per task, strict contribution contracts. Each is tied to one brand, so they customize poorly.</span><span class="dr-fix">Take: pattern pages per task (filtering, bulk actions, onboarding).</span></div>
+    </div>
+    <h3>Where Orion Already Leads</h3>
+    <p>Machine-checked guarantees; behaviour rules that are built, not described; the pointer and width split; glass with a contrast floor; no build step; and a skill that applies it the same way each time. Where it trails: theming beyond color, website sections, rich inputs and data at scale, desktop app anatomy, and delivery.</p>
+  </section>
+
+  <section class="dr-sec">
+    <h2>Making It Unique Per App</h2>
+    <p>The risk in opening a system up is that it stops being a language. The way through is to fix what makes Orion recognisable and open a short list of dials, each with presets that pass the same checks as the default.</p>
+    <div class="dr-grid" style="--dr-min: 19rem">
+      <div class="dr-box"><b>Stays Fixed (This Is Orion)</b><span>Filled, never outlined. No shadows. Glass only on what floats, with the contrast floor. Concentric corners. The ten motion patterns. The placement ladder, pages, states and undo. Title Case labels. Text and controls proven for contrast. Things you click are rounder than things you type into.</span></div>
+      <div class="dr-box"><b>Opens Up (The Brand Dials)</b><span>1. Accent and color mode (exists). 2. Gray temperature: pure, warm, cool. 3. Corners: one softness dial moving controls, fields and boxes together, concentric by rule. 4. Type: a display face, a text face, weight of headings, with tracking retuned per face. 5. Density and scale (exists; add roomy for websites). 6. Motion energy: calm, standard, lively, same patterns. 7. Icon set (exists). 8. Defaults per app: which button variant is the main one, list style, page tone.</span></div>
+      <div class="dr-box"><b>Signature (The App's Own)</b><span>Decision 0053 already covers this: the elements only this app has (a ring, a road, a board) are drawn from Orion's rules in the app's own stylesheet. Add a place for brand moments: logo, illustration and picture slots, a hero, an empty-state picture.</span></div>
+      <div class="dr-box"><b>How It Would Be Used</b><span>One call or one attribute block per app, saved with the theme: <code>S4.theme({ seed, surfaces, gray, corners, type, energy })</code>. Each dial is a token set on the root or any container. The checks run over every preset, as the accent check does over 210 schemes today.</span></div>
+    </div>
+    <h3>The Same Screen, Four Apps</h3>
+    <p>Mock-ups of what the dials would allow. The first is Orion as it ships. The other three are restyled by hand here; with the dials they would be a few lines per app.</p>
+    <div class="dr-grid dr-brands" id="dr-brands"></div>
+  </section>
+
+  <section class="dr-sec">
+    <h2>Suggested Order</h2>
+    <div class="dr-grid" style="--dr-min: 19rem">
+      <div class="dr-box"><b>1. Tidy What Exists</b><span>Bring the documents and the skill header back in line with the decisions; retune letter spacing; fix the small things in finding 10; make card grids fill.</span></div>
+      <div class="dr-box"><b>2. Brand Dials</b><span>Route every corner through three shape tokens (controls, fields, boxes); add gray temperature, type and energy presets; themes on any container; a check over all presets; a "Make It Yours" page in the skill.</span></div>
+      <div class="dr-box"><b>3. Website Kit</b><span>Site header and footer, hero with media, feature rows, pricing, testimonials, logo row, article index, documentation layout; fluid display type; section rhythm; a lighter bundle for pages.</span></div>
+      <div class="dr-box"><b>4. Rich Inputs And Data</b><span>Combobox, tag input, upload, time, number, one-time code; table resize, pinning, virtual rows, filters.</span></div>
+      <div class="dr-box"><b>5. Desktop Anatomy</b><span>Menu bar, status bar, document tabs, tree, settings window, one real shell.</span></div>
+      <div class="dr-box"><b>Throughout</b><span>The roadmap's own test stays the judge: build real apps with the skill, one phone-first and one desktop, and fix what it gets wrong.</span></div>
+    </div>
+  </section>
+
+  <section class="dr-sec" data-q="custom">
+    <h2>1. How Far May An App Move From Stock Orion?</h2>
+    <p>Look at the four screens above. This sets the size of the whole customization layer.</p>
+  </section>
+  <section class="dr-sec" data-q="shape">
+    <h2>2. May An App Change Its Corners?</h2>
+    <p>"Round and filled" is recorded in decisions 0023 to 0025, so this reopens them only if you say so.</p>
+  </section>
+  <section class="dr-sec" data-q="type">
+    <h2>3. May An App Change Its Typeface?</h2>
+    <p>Inter is part of the personal layer today. Field Notes and Console above use a different display face; Pulse changes the text face too.</p>
+  </section>
+  <section class="dr-sec" data-q="tracking">
+    <h2>4. Letter Spacing For Inter</h2>
+    <p>The same text with Material's spacing (today) and spacing tuned for Inter.</p>
+  </section>
+  <section class="dr-sec" data-q="hierarchy">
+    <h2>5. Hierarchy In Neutral Mode</h2>
+    <p>Four ways for a dashboard to rank its content without shadows or outlines.</p>
+  </section>
+  <section class="dr-sec" data-q="web">
+    <h2>6. A Website Kit</h2>
+    <p>Section components and templates for marketing sites, blogs and documentation.</p>
+  </section>
+  <section class="dr-sec" data-q="next">
+    <h2>7. What Comes First?</h2>
+    <p>The roadmap currently says: real apps first, then Horizon 2. This review argues for the brand dials before that.</p>
+  </section>
+  <section class="dr-sec" data-q="dist">
+    <h2>8. Who Is Orion For?</h2>
+    <p>This decides whether packaging, typed APIs and smaller bundles are worth building.</p>
+  </section>
+</main>
+<script src="../components/assets/icons.js"></script>
+<script src="../components/orion.js"></script>
+<script src="lib/questions.js"></script>
+<script src="lib/review.js"></script>
+<script>
+function el(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+
+/* the same screen, four apps */
+var BRANDS = [
+  { id: '', name: 'Orion As Shipped', note: 'Inter, pills, neutral gray, monochrome accent.', title: 'Notes', stat: '128', unit: 'Notes this month' },
+  { id: 'notes', name: 'Field Notes', note: 'Editorial: serif display, crisp corners, warm paper, rust accent.', title: 'Field Notes', stat: '128', unit: 'Entries this month' },
+  { id: 'pulse', name: 'Pulse', note: 'Friendly: rounded face, tinted violet, heavy headings, extra round.', title: 'Pulse', stat: '7,412', unit: 'Steps today' },
+  { id: 'console', name: 'Console', note: 'Professional tool: mono display, small corners, cool gray, compact.', title: 'deploys', stat: '99.98%', unit: 'Uptime, 30 days' }
+];
+function screen(b, n) {
+  return '<div class="dr-brand"' + (b.id ? ' data-brand="' + b.id + '"' : '') + (b.id === 'console' ? ' data-density="compact"' : '') + '>' +
+    '<h4>' + b.title + '</h4>' +
+    '<div class="s4-chip-set" data-select="single" aria-label="Filter ' + n + '"><button class="s4-chip" data-type="filter" aria-pressed="true" type="button"><span class="s4-chip-check"></span>All</button><button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Recent</button><button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Shared</button></div>' +
+    '<div class="dr-panel"><small>' + b.unit + '</small><span class="dr-num">' + b.stat + '</span><span><span class="s4-status" data-tone="success">+8%</span></span></div>' +
+    '<div class="s4-text-field"><label for="dr-f' + n + '">Title</label><input id="dr-f' + n + '" autocomplete="off" value="Weekend plans"></div>' +
+    '<label class="s4-switch-row"><span class="s4-body-large">Sync Automatically</span><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>' +
+    '<div class="dr-actions"><button class="s4-button" type="button">Save</button><button class="s4-button" data-variant="tonal" type="button">Share</button></div>' +
+  '</div>';
+}
+var brands = document.getElementById('dr-brands');
+BRANDS.forEach(function (b, i) {
+  brands.appendChild(el('<div class="dr-brand-wrap"><b>' + b.name + '</b><small>' + b.note + '</small><div class="rv-preview" style="margin-block-start: var(--s4-space-5)">' + screen(b, i) + '</div></div>'));
+});
+
+/* previews for the questions that have something to look at */
+var TEXT = '<h4>Getting Paid Faster</h4><p>Clients tend to pay in the order invoices arrive. An invoice sent the day the work ends lands before the month’s batch of bills.</p><small>Updated Nov 12 · 4 min read · Invoice INV-10482</small>';
+function depth(kind) {
+  return el('<div><div class="dr-depth"' + (kind ? ' data-depth="' + kind + '"' : '') + '><h4>October</h4><div class="dr-card"><small>Revenue</small><b>$48.2K</b></div><div class="dr-card"><small>Open Invoices</small><b>14</b></div></div></div>');
+}
+var PREVIEWS = {
+  'tracking:A': function () { return el('<div><div class="dr-type">' + TEXT + '</div></div>'); },
+  'tracking:B': function () { return el('<div><div class="dr-type" data-tuned>' + TEXT + '</div></div>'); },
+  'hierarchy:A': function () { return depth(''); },
+  'hierarchy:B': function () { return depth('type'); },
+  'hierarchy:C': function () { return depth('page'); },
+  'hierarchy:D': function () { return depth('both'); }
+};
+
+var demo = window.S4_REVIEW_DEMOS.filter(function (d) { return d.id === 'design-review'; })[0];
+document.querySelectorAll('.dr-sec[data-q]').forEach(function (sec) {
+  var q = demo.questions.filter(function (x) { return x.id === sec.dataset.q; })[0];
+  var g = document.createElement('div'); g.className = 'rv-group'; g.style.setProperty('--rv-min', PREVIEWS[q.id + ':A'] ? '18rem' : '14rem'); g.setAttribute('role', 'radiogroup'); g.setAttribute('aria-label', q.label);
+  q.options.forEach(function (o) {
+    var p = PREVIEWS[q.id + ':' + o.v];
+    g.appendChild(S4Review.card({ pick: q.id + ':' + o.v, letter: o.v, title: o.label, desc: o.desc || '', preview: p ? p() : null }));
+  });
+  sec.appendChild(g);
+});
+S4.init(document);
+S4Review.page('design-review');
+</script>
+</body>
+</html>
