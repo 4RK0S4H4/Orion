@@ -111,8 +111,12 @@
         { width: from + 'px', paddingLeft: cs.paddingLeft, paddingRight: cs.paddingRight, opacity: 1, marginInlineEnd: '0px' },
         { width: '0px', paddingLeft: '0px', paddingRight: '0px', opacity: 0, marginInlineEnd: -gap + 'px' }], 'fast-spatial-calm')));
     } else {
-      var to = open ? el.scrollHeight : 0;
-      anims.push(track(el, M.animate(el, [{ height: from + 'px' }, { height: to + 'px' }], 'reveal')));
+      var to = open ? el.scrollHeight : 0, vs = getComputedStyle(el);
+      /* the box's own padding closes with it: a border-box cannot be shorter than its padding, so without this the
+         last few pixels stall and then snap shut */
+      var shut = { height: '0px', paddingTop: '0px', paddingBottom: '0px' }, full = { height: to + 'px', paddingTop: vs.paddingTop, paddingBottom: vs.paddingBottom };
+      var start = open ? (running ? { height: from + 'px', paddingTop: vs.paddingTop, paddingBottom: vs.paddingBottom } : shut) : { height: from + 'px', paddingTop: vs.paddingTop, paddingBottom: vs.paddingBottom };
+      anims.push(track(el, M.animate(el, [start, open ? full : shut], 'reveal')));
       if (open && !running) kids.forEach(function (c) {
         anims.push(track(el, M.animate(c, [{ opacity: 0, transform: 'translateY(' + (M.reduced() ? 0 : -4) + 'px)' }, { opacity: 1, transform: 'none' }], 'settle', { fill: 'backwards', delay: 40 })));
       });

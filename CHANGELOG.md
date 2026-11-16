@@ -46,6 +46,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - List rows hover with "Edges Lean": the box's edges flow out, the edge nearest the pointer first (decision 0044).
 
 ### Fixed
+- Accordion and expand-in-place: closing no longer stalls and snaps at the end (Reveal closes the box's padding with its height).
 - Dragging on a real phone: the dragged element is no longer re-inserted mid-touch (reorder kept cancelling on iOS); a swiped row settles from where the finger left it instead of snapping (decision 0052).
 - The command palette's search box and rows are concentric with its corners; the suite now checks nested corners on every page.
 - Focus rings were cut off in the accordion, in scrolling chip rows and in the desktop title bar.
