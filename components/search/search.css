@@ -27,6 +27,9 @@
     cursor: text;
     transition: background-color var(--s4-motion-state);
   }
+  /* a search that filters the content below it spans that content's column (the alignment policy, layout README);
+     the 720 cap is for a search that stands alone, such as one in a top app bar */
+  .s4-search[data-filter] { max-inline-size: none; }
   /* a leading icon button (menu, back) sits closer to the edge, like trailing ones */
   .s4-search:has(> .s4-icon-button:first-child) { padding-inline-start: var(--s4-space-2); }
   .s4-search > .s4-icon { color: var(--md-sys-color-on-surface); }
