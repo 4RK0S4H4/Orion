@@ -330,13 +330,11 @@
       <div class="sp-matcher-text">
         <p class="s4-eyebrow">Plant Library</p>
         <h2 class="s4-site-title" id="plants-h">What Are You Growing?</h2>
-        <p class="s4-site-lead">Sprig knows 640 houseplants, from the easy ones to the drama queens. Pick one to see what it would tell you this week.</p>
-        <div class="s4-chip-set" data-select="single" id="plant-pick" aria-label="Plant">
-          <button class="s4-chip" data-type="filter" type="button" value="fern" aria-pressed="true">Boston Fern</button>
-          <button class="s4-chip" data-type="filter" type="button" value="monstera">Monstera</button>
-          <button class="s4-chip" data-type="filter" type="button" value="snake">Snake Plant</button>
-          <button class="s4-chip" data-type="filter" type="button" value="calathea">Calathea</button>
-          <button class="s4-chip" data-type="filter" type="button" value="fig">Fiddle-Leaf Fig</button>
+        <p class="s4-site-lead">Sprig knows 640 houseplants, from the easy ones to the drama queens. Pick one to see what it would tell you this week; the app knows the other 637.</p>
+        <div class="s4-button-group" data-connected data-select="single" id="plant-pick" aria-label="Plant">
+          <button class="s4-button" type="button" value="fern" aria-pressed="true">Fern</button>
+          <button class="s4-button" type="button" value="monstera">Monstera</button>
+          <button class="s4-button" type="button" value="fig">Fig</button>
         </div>
         <dl class="sp-care" aria-live="polite">
           <div><dt>Likes</dt><dd data-care="range">55–75%</dd></div>
@@ -437,10 +435,10 @@
       <div class="sp-order-pick">
         <h2 class="s4-site-title" id="order-h">Reserve a Sprig for Every Pot</h2>
         <p class="s4-site-lead">Nothing to pay until it ships in March. Cancel with one tap before then.</p>
-        <div class="s4-chip-set" data-select="single" data-period aria-label="Pack">
-          <button class="s4-chip" data-type="filter" type="button" value="one">One Sensor</button>
-          <button class="s4-chip" data-type="filter" type="button" value="three" aria-pressed="true">Three Pack</button>
-          <button class="s4-chip" data-type="filter" type="button" value="six">Six Pack</button>
+        <div class="s4-button-group" data-connected data-select="single" data-period data-fit="content" aria-label="Pack">
+          <button class="s4-button" type="button" value="one">One</button>
+          <button class="s4-button" type="button" value="three" aria-pressed="true">Three</button>
+          <button class="s4-button" type="button" value="six">Six</button>
         </div>
         <p class="sp-order-price" aria-live="polite"><span data-period-one="€39" data-period-three="€99" data-period-six="€179">€99</span><span data-period-one="for one sensor" data-period-three="for three, €33 each" data-period-six="for six, €29.83 each">for three, €33 each</span></p>
       </div>
@@ -482,7 +480,7 @@
   </div>
 </footer>
 <script src="../components/assets/icons-solar.js?v=3efbe5b" defer></script>
-<script src="../components/orion.min.js?v=c9d904c" defer></script>
+<script src="../components/orion.min.js?v=d4fa1a1" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {
   /* Sprig's brand: tinted from a leaf green, rounded display face, lively motion (decisions 0052, 0055, 0056) */
@@ -506,7 +504,7 @@ addEventListener('DOMContentLoaded', function () {
     var ring = document.querySelector('[data-care-ring]'); if (ring) ring.setAttribute('data-value', String(p.now));
     screen.setAttribute('aria-label', 'The Sprig app for a ' + p.name + ': soil moisture ' + Math.round(p.now * 100) + ' percent. ' + p.mood + ' ' + p.next + ': ' + p.amount + '.');
   }
-  pick.addEventListener('s4-change', function (e) { var chip = e.target.closest('.s4-chip'); if (chip && chip.getAttribute('aria-pressed') === 'true') show(chip.value); });
+  pick.addEventListener('s4-change', function (e) { if (e.detail && e.detail.value) show(e.detail.value); });
 });
 </script>
 </body>

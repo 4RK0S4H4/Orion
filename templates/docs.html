@@ -74,7 +74,8 @@
   /* was this page helpful: answered in place */
   .ml-helpful { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-3) var(--s4-space-6); padding: var(--s4-space-4) var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
   .ml-helpful > p { margin: 0; font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
-  .ml-helpful[data-answered] .s4-chip-set { display: none; }
+  .ml-helpful[data-answered] .ml-answers { display: none; }
+  .ml-answers { flex-wrap: nowrap; }
   .ml-thanks { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   .ml-thanks a { color: var(--md-sys-color-on-surface); }
 </style>
@@ -233,9 +234,9 @@ mallet flash mallet.toml --side left</code></pre></div>
 
     <div class="ml-helpful" id="helpful">
       <p>Was This Page Helpful?</p>
-      <div class="s4-chip-set" data-select="single" aria-label="Was This Page Helpful?">
-        <button class="s4-chip" data-type="filter" type="button" value="yes">Yes</button>
-        <button class="s4-chip" data-type="filter" type="button" value="no">Not Really</button>
+      <div class="s4-site-actions-row ml-answers">
+        <button class="s4-button" data-variant="tonal" type="button" value="yes">Yes</button>
+        <button class="s4-button" data-variant="tonal" type="button" value="no">Not Really</button>
       </div>
       <p class="ml-thanks" aria-live="polite" hidden></p>
     </div>
@@ -279,7 +280,7 @@ mallet flash mallet.toml --side left</code></pre></div>
   </div>
 </footer>
 <script src="../components/assets/icons-solar.js?v=3efbe5b" defer></script>
-<script src="../components/orion.min.js?v=c9d904c" defer></script>
+<script src="../components/orion.min.js?v=d4fa1a1" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {
   /* the project's brand: amber on cool grays, a monospace display face, soft corners (0055) */
@@ -287,8 +288,8 @@ addEventListener('DOMContentLoaded', function () {
 
   /* was this page helpful: the answer is taken in place, with a way to say more */
   var box = document.getElementById('helpful'), thanks = box.querySelector('.ml-thanks');
-  box.addEventListener('s4-change', function (e) {
-    var chip = e.target.closest('.s4-chip'); if (!chip || chip.getAttribute('aria-pressed') !== 'true') return;
+  box.addEventListener('click', function (e) {
+    var chip = e.target.closest('.ml-answers > button'); if (!chip) return;
     box.setAttribute('data-answered', '');
     thanks.hidden = false;
     thanks.innerHTML = chip.value === 'yes' ? 'Thanks. It helps us decide what to write next.' : 'Sorry about that. <a href="#issue">Tell us what was missing</a> and we will fix the page.';

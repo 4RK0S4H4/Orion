@@ -154,7 +154,7 @@
       </li>
       <li class="s4-plan">
         <div class="s4-plan-head">
-          <h2 class="s4-plan-name">Enterprise</h2>
+          <h2 class="s4-plan-name">Scale</h2>
           <p>Private regions, your own cloud, a named engineer.</p>
         </div>
         <p class="s4-plan-price"><span class="s4-plan-amount">Custom</span><span class="s4-plan-per">billed yearly</span></p>
@@ -229,10 +229,10 @@
         <button class="s4-button" type="button" value="1">Hobby</button>
         <button class="s4-button" type="button" value="2" aria-pressed="true">Pro</button>
         <button class="s4-button" type="button" value="3">Team</button>
-        <button class="s4-button" type="button" value="4">Enterprise</button>
+        <button class="s4-button" type="button" value="4">Scale</button>
       </div>
       <table>
-        <thead><tr><th scope="col"><span class="s4-visually-hidden">Feature</span></th><th scope="col">Hobby</th><th scope="col">Pro</th><th scope="col">Team</th><th scope="col">Enterprise</th></tr></thead>
+        <thead><tr><th scope="col"><span class="s4-visually-hidden">Feature</span></th><th scope="col">Hobby</th><th scope="col">Pro</th><th scope="col">Team</th><th scope="col">Scale</th></tr></thead>
         <tbody data-group>
           <tr><th scope="rowgroup" colspan="5">Running Jobs</th></tr>
                   <tr><th scope="row">Jobs Included a Month</th><td>100k</td><td>1M</td><td>10M</td><td>Custom</td></tr>
@@ -280,7 +280,7 @@
         <details class="s4-accordion-item" name="faq" open><summary>What happens if I go over on Hobby?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">New jobs wait in the queue until the month resets or you upgrade. Nothing is dropped and we never charge a card you haven’t added.</div></details>
         <details class="s4-accordion-item" name="faq"><summary>Can I set a spending limit?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Yes, on every paid plan. Choose a monthly cap; at 100% Spool pauses new jobs, or keeps going and emails you, whichever you pick.</div></details>
         <details class="s4-accordion-item" name="faq"><summary>Do yearly plans include more jobs?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">The same jobs each month, for two months less. Extra jobs are billed monthly at the same rate.</div></details>
-        <details class="s4-accordion-item" name="faq"><summary>Is my data stored with you?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Job payloads are encrypted and deleted when the run history expires. On Enterprise, jobs and payloads stay in your own cloud account.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>Is my data stored with you?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Job payloads are encrypted and deleted when the run history expires. On Scale, jobs and payloads stay in your own cloud account.</div></details>
       </div>
     </div>
   </section>
@@ -321,7 +321,7 @@
   </div>
 </footer>
 <script src="../components/assets/icons-solar.js?v=3efbe5b" defer></script>
-<script src="../components/orion.min.js?v=c9d904c" defer></script>
+<script src="../components/orion.min.js?v=d4fa1a1" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {
   /* Spool's brand: violet, the soft page, system faces, pill corners, tonal buttons by default (0055, 0056) */
@@ -356,7 +356,7 @@ addEventListener('DOMContentLoaded', function () {
     $('calc-extra-min').textContent = money(best.xm);
     var next = PLANS[bi + 1], advice = PLANS[bi].name + ' is your cheapest plan.';
     if (next) { var j = jobs; while (j < 4e8) { var a = price(PLANS[bi], j, j * secs / 60), b = price(next, j, j * secs / 60); if (!a || (b && b.total <= a.total)) break; j += 1e5; } advice += j < 4e8 ? ' ' + next.name + ' starts to pay off above ' + (j >= 1e6 ? (Math.round(j / 1e5) / 10) + 'M' : Math.round(j / 1e3) + 'k') + ' jobs a month.' : ''; }
-    else advice += ' Above 200M jobs a month, Enterprise pricing is usually lower: talk to us.';
+    else advice += ' Above 200M jobs a month, Scale is usually lower: talk to us.';
     $('calc-advice').textContent = advice;
     /* the month: weekdays carry the load, weekends about half; heights only, nothing animates */
     var bars = month.children, weekday = jobs / (23 + 8 * 0.5);

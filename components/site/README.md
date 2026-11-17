@@ -81,7 +81,7 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-quotes` | Short quotes as filled cards, 1 then 3 columns | — |
 | `.s4-numbers` > `.s4-number` | Big numbers: a `dl` with `dt` (label) and `dd` (value) | `data-columns="3"` |
 | `.s4-plans-period` | Holds the period switch: a Joined Capsule group with `data-period` | — |
-| `[data-period]` | On a Joined Capsule group or a single-select chip set (`data-select="single"`, chips with `value`): picks which `data-period-<value>` text shows. Also for packs, sizes or seats, not only periods | — |
+| `[data-period]` | On a connected button group (a value: a period, a pack, a size, seats): picks which `data-period-<value>` text shows | — |
 | `.s4-plans` > `.s4-plan` | `.s4-plan-head` (`.s4-plan-name`), `.s4-plan-price` (`.s4-plan-amount`, `.s4-plan-per`), a button, `.s4-checks` | `data-featured` (the accent fill) |
 | `[data-period-<value>]` | Text shown for that period, on any element in the same section (or `[data-period-scope]`) | — |
 | `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own Joined Capsule group (values 1…4) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
