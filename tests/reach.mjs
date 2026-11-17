@@ -343,6 +343,10 @@ function ringInfo() {
       return { width: w, contrast: c, rect: el.getBoundingClientRect(), ringBox: b.tagName };
     }
   }
+  /* a field's keyboard ring is an outline on its box (the field's ::before, issues 62 and 64): outside the box, so it is
+     measured against what is behind the field */
+  const box = el.closest('.s4-text-field');
+  if (box) { const bs = getComputedStyle(box, '::before'), bw = parseFloat(bs.outlineWidth) || 0; if (bs.outlineStyle !== 'none' && bw >= 1) { const col = h.parse(bs.outlineColor), back = h.behind(box.parentElement || box); return { width: bw, contrast: h.contrast(col[3] < 1 ? h.over(col, back) : col, back), rect: el.getBoundingClientRect(), ringBox: 'field' }; } }
   /* the ink ring of a field is a spread shadow on its ::before; a split grip lights its bar */
   const host = el.closest('.s4-text-field, .s4-search, .s4-date-picker-field');
   if (host) { const sh = getComputedStyle(host, '::before').boxShadow; const m = /((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px(?!\s*inset)/.exec(sh); const m2 = /((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px\s+inset/.exec(sh) || /inset\s+((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px/.exec(sh); const hit = m || m2; if (hit && parseFloat(hit[2]) >= 1) { const col = h.parse(hit[1]); const back = h.behind(host.parentElement || host); return { width: parseFloat(hit[2]) + (m && m2 ? parseFloat(m2[2]) : 0), contrast: h.contrast(col[3] < 1 ? h.over(col, back) : col, back), rect: el.getBoundingClientRect() }; } }

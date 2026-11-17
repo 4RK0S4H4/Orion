@@ -3750,9 +3750,12 @@
   .s4-search-input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 1; }
   .s4-search-input::-webkit-search-cancel-button,
   .s4-search-input::-webkit-search-decoration { appearance: none; display: none; }
-  /* focus: the ring is drawn inside the bar's edge. A search bar usually sits at the very top of a pane, under the top
-     app bar or against a scrolling edge, where a ring outside the bar gets cut off. */
-  .s4-search:has(> .s4-search-input:focus-visible) {
+  /* focus (issues 62, 64): the bar is the field, so it carries the one mark and the input none. A tap or a click shows
+     the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the ring,
+     drawn inside the bar's edge: a search bar usually sits at the very top of a pane, under the top app bar or against
+     a scrolling edge, where a ring outside the bar gets cut off. */
+  :where([data-s4-focus="pointer"]) .s4-search:has(> .s4-search-input:focus) { box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest)); }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-search:has(> .s4-search-input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: calc(-1 * var(--s4-focus-ring-width));
   }
@@ -5872,7 +5875,8 @@
     border-radius: calc(var(--_row) / 2 + var(--s4-space-1));
     background: var(--md-sys-color-surface-container);
   }
-  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_bg: transparent; --_outline: transparent; --_ring: 0px; --_h: var(--_row); }
+  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_h: var(--_row); }
+  .s4-composer > .s4-text-field, .s4-composer > .s4-text-field:has(> :is(input, textarea):focus) { --_bg: transparent; --_outline: transparent; --_ring: 0px; }
   .s4-composer > .s4-text-field:first-child { padding-inline-start: var(--s4-space-2); }
   .s4-composer > .s4-icon-button {
     --_radius-pressed: var(--_radius-round);
@@ -5880,7 +5884,19 @@
     flex: none;
     margin: calc((var(--_row) - var(--_h)) / 2);
   }
-  .s4-composer:has(textarea:focus-visible, input:focus-visible) {
+  /* focus (issues 62, 64): the composer is the field, so it carries the one mark and the text field inside none. A tap
+     or a click shows the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the
+     ring around the whole pill. (The quiet ring is drawn on ::after so the glass edge stays.) */
+  .s4-composer > .s4-text-field:has(> :is(input, textarea):focus-visible)::before { outline: none; }
+  :where([data-s4-focus="pointer"]) .s4-composer:has(textarea:focus, input:focus)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest));
+    pointer-events: none;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-composer:has(textarea:focus-visible, input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
   }
@@ -6972,15 +6988,17 @@
      <div class="s4-text-field-supporting">Sentence case helper text.</div>
    </div>
    One look: a quiet box (thin outline, medium corners, surface fill) with the label above it. No floating label, no filled
-   variant; data-variant is ignored, so older markup still works. Hover darkens the outline, focus turns it into ink
-   (on-surface, 2dp ring). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
+   variant; data-variant is ignored, so older markup still works. Hover lifts the fill; focus is a quiet accent hairline
+   for a tap or click and the focus ring for the keyboard (see states). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
    without a label is just the box. Parts are placed on a grid, so their source order only matters for leading vs trailing icons. */
 @layer s4.components {
   .s4-text-field {
     --_bg: var(--md-sys-color-surface-container-highest);
     --_outline: transparent;
     --_ring: 0px;
-    --_ring-color: var(--md-sys-color-on-surface);
+    --_ring-color: var(--s4-focus-ring-color);
+    --_mark: var(--md-sys-color-primary);
+    --_quiet: color-mix(in oklab, var(--_mark) 45%, var(--md-sys-color-surface-container-highest));
     --_label: var(--md-sys-color-on-surface-variant);
     --_caret: var(--md-sys-color-on-surface);
     --_icon-color: var(--md-sys-color-on-surface-variant);
@@ -7004,7 +7022,7 @@
     align-self: stretch;
     border-radius: var(--s4-shape-text-field);
     background: var(--_bg);
-    box-shadow: inset 0 0 0 1px var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
+    box-shadow: inset 0 0 0 var(--_outline-width, 1px) var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
     pointer-events: none;
     transition:
       box-shadow var(--s4-motion-state), background-color var(--s4-motion-state);
@@ -7126,20 +7144,32 @@
   .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: calc(var(--s4-space-4) + 7ch); }   /* room for the counter at any text size */
 
   /* ---------- states ----------
-     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus, so focusing only
-     adds the ring. An error keeps the normal fill: the label and the message turn error-colored, the message gets a small
-     mark, and the focus ring is the error color. No red box. */
+     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus. An error keeps the
+     normal fill: the label and the message turn error-colored, the message gets a small mark, and the focus marks take
+     the error color. No red box.
+     Focus (issues 62, 64): one mark, never two, chosen by how focus arrived (data-s4-focus, set by core.js).
+       - a tap or a click: the quiet ring, a hairline inside the box in the accent mixed into the fill (in monochrome a
+         soft gray, never a white wire). You put the cursor there yourself; the caret and the hairline are enough.
+       - the keyboard (or no script): the ring every control has, in the focus ring color, outside the box.
+     Nothing else outlines a field (decision 0023: the focus ring is the only line allowed). */
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
-  .s4-text-field:has(> :is(input, select, textarea):focus) {
-    --_outline: var(--_ring-color);
-    --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_bg: var(--md-sys-color-surface-container-high);
     --_label: var(--md-sys-color-on-surface);
+  }
+  :where([data-s4-focus="pointer"]) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_outline: var(--_quiet);
+    --_outline-width: 1.5px;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible)::before {
+    outline: var(--s4-focus-ring-width) solid var(--_ring-color);
+    outline-offset: var(--s4-focus-ring-offset);
   }
   .s4-text-field:is([data-error], :has(> [aria-invalid="true"])) {
     --_ring-color: var(--md-sys-color-error);
+    --_mark: var(--md-sys-color-error);
     --_label: var(--md-sys-color-error);
     --_caret: var(--md-sys-color-error);
     --_supporting: var(--md-sys-color-error);
