@@ -167,6 +167,8 @@
   }
   .s4-slider > input:disabled { cursor: default; }
 
+  /* on paper the value is what matters; the stop layer reaches half a step past the track and widened the sheet */
+  @media print { .s4-slider[data-stops] .s4-slider-stops { display: none; } }
   @media (forced-colors: active) {
     .s4-slider::before { background: Highlight; forced-color-adjust: none; }
     .s4-slider::after { background: GrayText; forced-color-adjust: none; }

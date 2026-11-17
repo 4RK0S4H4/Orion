@@ -371,7 +371,7 @@ async function keysAudit(page, add, rtl) {
       return { native: el.matches('.s4-date-picker-field, input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]'), scrub: !!el.closest('.rv-scrub'), tag: h.tag(el), kx: el.hasAttribute('data-kx'), info, fixed, sc, rect: { l: r.left + scrollX + offX, r: r.right + scrollX + offX, t: r.top + scrollY + off, b: r.bottom + scrollY + off }, inDialog: !!el.closest('dialog, [popover]') };
     });
     if (st.done) break;
-    if (reached.has(st.tag) && i > expected.length) break;
+    if (reached.has(st.tag) && i > expected.length && !st.native) break;   /* a native time or date field takes one Tab per part (hours, minutes, AM/PM): not a loop */
     reached.add(st.tag);
     if (st.kx || true) {
       const i2 = st.info;

@@ -15,7 +15,7 @@
      timetable. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=04e04e7">
+<link rel="stylesheet" href="../components/orion.css?v=edee874">
 <style>
   /* Proof's own layout and elements: tokens only; nothing here restyles an Orion component */
   .pf-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
@@ -61,7 +61,7 @@
   .pf-track::before { content: ""; position: absolute; inset-block: var(--s4-space-5) 0; inline-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); }
   .pf-plan li:last-child .pf-track::before { display: none; }
   .pf-track > i { position: relative; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); margin-block-start: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
-  .pf-plan li[data-wait] .pf-track > i { background: var(--md-sys-color-surface-container-highest); }
+  .pf-plan li[data-wait] .pf-track > i { background: var(--md-sys-color-outline); }   /* a wait: the dough works, you do not */
   .pf-step { display: grid; padding-block-end: var(--s4-space-4); }
   .pf-step strong { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight, 600); }
   .pf-step span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
@@ -139,14 +139,14 @@
 <script src="../components/orion.js?v=2de1b81"></script>
 <script>
 /* Proof's brand: a bakery navy over the dials set on <html>. The light/dark choice follows the templates hub. */
-(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#24406b' }); })();
+(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#24406b', variant: 'fidelity' }); })();
 
 var $ = function (id) { return document.getElementById(id); };
 var RECIPES = {
-  country: { unit: 'Loaves', one: 'loaf', count: 2, weight: 900, hyd: 78, lev: 20, whole: 15, salt: 2, bake: 45, oven: '250 °C, lid on 20 min', cold: true },
-  rye: { unit: 'Loaves', one: 'loaf', count: 1, weight: 1000, hyd: 82, lev: 30, whole: 70, salt: 2, bake: 60, oven: '230 °C in a tin', cold: false },
-  focaccia: { unit: 'Trays', one: 'tray', count: 1, weight: 1200, hyd: 85, lev: 15, whole: 0, salt: 2.4, bake: 25, oven: '230 °C, oiled tray', cold: true },
-  bagels: { unit: 'Bagels', one: 'bagel', count: 8, weight: 110, hyd: 58, lev: 15, whole: 0, salt: 2, bake: 20, oven: 'boil 1 min, then 230 °C', cold: true }
+  country: { unit: 'Loaves', one: 'loaf', many: 'loaves', count: 2, weight: 900, hyd: 78, lev: 20, whole: 15, salt: 2, bake: 45, oven: '250 °C, lid on 20 min', cold: true },
+  rye: { unit: 'Loaves', one: 'loaf', many: 'loaves', count: 1, weight: 1000, hyd: 82, lev: 30, whole: 70, salt: 2, bake: 60, oven: '230 °C in a tin', cold: false },
+  focaccia: { unit: 'Trays', one: 'tray', many: 'trays', count: 1, weight: 1200, hyd: 85, lev: 15, whole: 0, salt: 2.4, bake: 25, oven: '230 °C, oiled tray', cold: true },
+  bagels: { unit: 'Bagels', one: 'bagel', many: 'bagels', count: 8, weight: 110, hyd: 58, lev: 15, whole: 0, salt: 2, bake: 20, oven: 'boil 1 min, then 230 °C', cold: true }
 };
 var recipe = 'country', grams = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });
 function num(id) { return parseFloat($(id).value); }
@@ -163,7 +163,7 @@ function calc() {
   var flourIn = flour - levain / 2, wholeG = flourIn * whole / 100, white = flourIn - wholeG;
   var rows = [['flour', recipe === 'rye' ? 'White Flour' : 'Bread Flour', white], ['whole', recipe === 'rye' ? 'Dark Rye' : 'Whole Wheat', wholeG], ['water', 'Water', water], ['levain', 'Levain (Ripe)', levain], ['salt', 'Salt', saltG]].filter(function (r) { return r[2] > 0.5; });
   $('total').textContent = grams.format(total);
-  $('total-meta').textContent = n + ' ' + (n === 1 ? R.one : R.one + 's') + ' of ' + grams.format(w) + ' g';
+  $('total-meta').textContent = n + ' ' + (n === 1 ? R.one : R.many) + ' of ' + grams.format(w) + ' g';
   $('bar').innerHTML = rows.map(function (r) { return '<i data-k="' + r[0] + '" style="--w:' + (r[2] / total * 100).toFixed(2) + '"></i>'; }).join('');
   $('bar').setAttribute('aria-label', 'The dough by weight: ' + rows.map(function (r) { return r[1] + ' ' + Math.round(r[2] / total * 100) + '%'; }).join(', '));
   $('ing').innerHTML = rows.map(function (r) { return '<li data-k="' + r[0] + '"><i aria-hidden="true"></i><span>' + r[1] + '</span><span class="pf-pct">' + (r[0] === 'levain' || r[0] === 'salt' || r[0] === 'water' ? Math.round(r[2] / flour * 1000) / 10 + '%' : '') + '</span><span class="pf-g">' + grams.format(r[2]) + ' g</span></li>'; }).join('');
@@ -171,13 +171,13 @@ function calc() {
   var bulk = Math.max(150, (4.5 * 60 + (24 - t) * 15) * (20 / Math.max(lev, 5)) ** 0.35), start = $('start').value ? +$('start').value.slice(0, 2) * 60 + +$('start').value.slice(3) : 540;
   var steps = [[start, 'Mix', 'Flour and water first, salt after 30 minutes'], [start + 30, 'Bulk Rise', dur(bulk) + ' at ' + t + ' °C, four folds in the first two hours'], [start + 30 + bulk, recipe === 'bagels' ? 'Shape Bagels' : 'Divide and Shape', 'Pre-shape, rest 20 min, shape tight']];
   var shaped = start + 30 + bulk + 30;
-  if (R.cold) { steps.push([shaped, 'Proof in the Fridge', 'Overnight, 10 to 14 hours', true]); steps.push([Math.min(Math.max(shaped + 600, 1440 + 8 * 60), shaped + 840), 'Bake Tomorrow', R.oven + ', ' + R.bake + ' min']); }
+  if (R.cold) { var bakeAt = Math.min(Math.max(shaped + 600, 1440 + 8 * 60), shaped + 1080); steps.push([shaped, 'Proof in the Fridge', 'Overnight, ' + dur(bakeAt - shaped) + ' at 4 °C', true]); steps.push([bakeAt, 'Bake Tomorrow', R.oven + ', ' + R.bake + ' min']); }
   else { steps.push([shaped, 'Proof on the Bench', dur(90 + (24 - t) * 10) + ', until it domes', true]); steps.push([shaped + 90 + (24 - t) * 10, 'Bake', R.oven + ', ' + R.bake + ' min']); }
   var last = steps[steps.length - 1][0] + R.bake;
   steps.push([last, 'Out of the Oven', 'Cool two hours before you cut it']);
   $('plan').innerHTML = steps.map(function (s) { return '<li' + (s[3] ? ' data-wait' : '') + '><span class="pf-time">' + hm(s[0]) + '</span><span class="pf-track" aria-hidden="true"><i></i></span><span class="pf-step"><strong>' + s[1] + '</strong><span>' + s[2] + '</span></span></li>'; }).join('');
   /* a word from the baker when the numbers ask for trouble */
-  var tip = recipe === 'rye' && hyd < 75 ? 'Rye drinks water. Under 75% it bakes into a brick.' : recipe !== 'focaccia' && hyd > 84 ? 'This is wetter than most bakers can shape. Bake it in a tin.' : t >= 27 ? 'A warm kitchen: use cool water and watch the dough, not the clock.' : '';
+  var tip = n * w > 6000 ? 'Over 6 kg of dough: mix it in two batches unless you have a mixer.' : recipe === 'rye' && hyd < 75 ? 'Rye drinks water. Under 75% it bakes into a brick.' : recipe !== 'focaccia' && hyd > 84 ? 'This is wetter than most bakers can shape. Bake it in a tin.' : t >= 27 ? 'A warm kitchen: use cool water and watch the dough, not the clock.' : '';
   $('tip').hidden = !tip; $('tip-text').textContent = tip;
 }
 ['count', 'weight', 'hyd', 'lev', 'whole', 'salt', 'temp', 'start'].forEach(function (id) { $(id).addEventListener('input', calc); });
