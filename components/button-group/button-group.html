@@ -6,11 +6,17 @@
 <title>Button Group · S4 Orion</title>
 <link rel="stylesheet" href="../index.css">
 <link rel="stylesheet" href="../_example/example.css">
+<style>
+  /* page-only: a colorful backdrop so the glass shows */
+  .bg-backdrop { padding: var(--s4-space-8) var(--s4-space-4); background: linear-gradient(115deg, var(--s4-chart-1) 0 22%, var(--s4-chart-3) 22% 41%, var(--s4-chart-2) 41% 63%, var(--s4-chart-5) 63% 80%, var(--s4-chart-4) 80%); }
+  .bg-glass { padding: var(--s4-space-2); border-radius: calc(min(calc(var(--s4-size-button) / 2), var(--s4-shape-control)) + var(--s4-space-1) + var(--s4-space-2)); }   /* concentric with the track inside */
+</style>
 </head>
 <body>
 <header class="ex-bar"><h1><a href="../">Components</a> / Button Group</h1></header>
 <main class="ex-main">
-  <p>Button groups put related buttons together. A <b>standard</b> group spaces buttons 8dp apart and reacts as one: press and hold a button to see it widen while its neighbours give way. A <b>connected</b> group joins buttons into one control for choosing between options, like a segmented button; the selected option morphs fully round.</p>
+  <p>Button groups put related buttons together. A <b>standard</b> group spaces buttons 8dp apart and reacts as one: press and hold a button to see it widen while its neighbours give way. A <b>connected</b> group is the Ink Track (decision 0059): one filled track with the options on it, and an accent ink pill that slides to your choice, its front edge leading and its back edge trailing.</p>
+  <p><b>Button group or tabs?</b> If it swaps what is on the screen, it is <a href="../tabs/tabs.html">tabs</a>. If it changes a value or how the same thing is shown, it is a button group. If it narrows a collection and there can be many, it is <a href="../chip/chip.html">chips</a>.</p>
 
   <section class="ex-sec">
     <h2>Standard</h2>
@@ -33,7 +39,7 @@
 
   <section class="ex-sec">
     <h2>Connected, Single Select</h2>
-    <p><code>data-connected data-select="single"</code>: exactly one option is selected. Tab to the group, then use the arrow keys and Space. Stretches to fill its width by default.</p>
+    <p><code>data-connected data-select="single"</code>: exactly one option is selected; the ink slides to it. The period of one chart, the status a list is filtered by: the same content, shown another way. Tab to the group, then use the arrow keys and Space. Stretches to fill its width by default.</p>
     <div class="ex-board col">
       <div class="s4-button-group" data-connected data-select="single" aria-label="Period" id="period">
         <button class="s4-button" data-variant="tonal" type="button" value="week">Week</button>
@@ -42,22 +48,28 @@
         <button class="s4-button" data-variant="tonal" type="button" value="year">Year</button>
       </div>
       <p class="s4-body-medium s4-on-surface-variant" style="margin:0">Showing: <b id="period-out">month</b></p>
-      <div class="s4-button-group" data-connected data-select="single" aria-label="Bill Status">
-        <button class="s4-button" type="button" value="all" aria-pressed="true">All</button>
-        <button class="s4-button" type="button" value="due">Due</button>
-        <button class="s4-button" type="button" value="paid">Paid</button>
+      <div class="s4-button-group" data-connected data-select="single" aria-label="Billing">
+        <button class="s4-button" type="button" value="monthly" aria-pressed="true">Monthly</button>
+        <button class="s4-button" type="button" value="yearly">Yearly</button>
       </div>
     </div>
+    <p>A pair is a group with two options, drawn the same way.</p>
   </section>
 
   <section class="ex-sec">
     <h2>Connected, Multi Select and Fit Content</h2>
-    <p><code>data-select="multi"</code> toggles each option. <code>data-fit="content"</code> keeps the group as wide as its labels.</p>
+    <p><code>data-select="multi"</code> toggles each option: each selected option fills in place, and selected neighbours fuse into one pill. <code>data-fit="content"</code> keeps the group as wide as its labels. Icon options need an <code>aria-label</code>.</p>
     <div class="ex-board col">
       <div class="s4-button-group" data-connected data-select="multi" data-fit="content" aria-label="Notify By">
         <button class="s4-button" data-variant="tonal" type="button" value="email" aria-pressed="true"><span class="s4-icon" data-icon="mail"></span>Email</button>
         <button class="s4-button" data-variant="tonal" type="button" value="sms">SMS</button>
         <button class="s4-button" data-variant="tonal" type="button" value="push" aria-pressed="true">Push</button>
+      </div>
+      <div class="s4-button-group" data-connected data-select="multi" data-fit="content" aria-label="Attach">
+        <button class="s4-icon-button" type="button" value="photos" aria-label="Photos" aria-pressed="true"><span class="s4-icon" data-icon="image"></span></button>
+        <button class="s4-icon-button" type="button" value="links" aria-label="Links" aria-pressed="true"><span class="s4-icon" data-icon="link"></span></button>
+        <button class="s4-icon-button" type="button" value="places" aria-label="Places"><span class="s4-icon" data-icon="location"></span></button>
+        <button class="s4-icon-button" type="button" value="files" aria-label="Files"><span class="s4-icon" data-icon="attach"></span></button>
       </div>
       <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Layout">
         <button class="s4-icon-button" data-variant="tonal" type="button" value="list" aria-label="List" aria-pressed="true"><span class="s4-icon" data-icon="bills"></span></button>
@@ -69,7 +81,7 @@
 
   <section class="ex-sec">
     <h2>Sizes</h2>
-    <p>The group follows its buttons' <code>data-size</code>; inner corners grow with the size.</p>
+    <p>The group follows its buttons' <code>data-size</code>; the track's corner is always the option's corner plus its padding (concentric).</p>
     <div class="ex-board col">
       <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Currency, extra small">
         <button class="s4-button" data-size="xs" data-variant="tonal" type="button" aria-pressed="true">USD</button>
@@ -84,6 +96,32 @@
       <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Currency, large">
         <button class="s4-button" data-size="l" data-variant="tonal" type="button" aria-pressed="true">USD</button>
         <button class="s4-button" data-size="l" data-variant="tonal" type="button">EUR</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>On Glass</h2>
+    <p>Inside a glass bar or panel the glass is the track and the ink is a tint of the accent (items on glass are tints); every label is on-surface.</p>
+    <div class="ex-board bg-backdrop">
+      <div class="s4-glass bg-glass">
+        <div class="s4-button-group" data-connected data-select="single" aria-label="Map Style">
+          <button class="s4-button" type="button" value="map" aria-pressed="true">Map</button>
+          <button class="s4-button" type="button" value="satellite">Satellite</button>
+          <button class="s4-button" type="button" value="transit">Transit</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Any Accent, Firm Corners</h2>
+    <p>The ink is the accent; the track and the ink follow the corner dial (here <code>S4.theme({ seed: 'teal', corners: 'firm', surfaces: 'tinted' }, board)</code>).</p>
+    <div class="ex-board col" id="dialed">
+      <div class="s4-button-group" data-connected data-select="single" aria-label="Status">
+        <button class="s4-button" type="button" value="draft">Draft</button>
+        <button class="s4-button" type="button" value="review">Review</button>
+        <button class="s4-button" type="button" value="done" aria-pressed="true">Done</button>
       </div>
     </div>
   </section>
@@ -108,6 +146,7 @@
 <script src="../button-group/button-group.js"></script>
 <script src="../_example/example.js"></script>
 <script>
+  S4.theme({ seed: 'teal', corners: 'firm', surfaces: 'tinted' }, document.getElementById('dialed'));
   document.getElementById('period').addEventListener('s4-change', function (e) { document.getElementById('period-out').textContent = e.detail.value; });
 </script>
 </body>
