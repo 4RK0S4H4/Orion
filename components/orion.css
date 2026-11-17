@@ -6536,6 +6536,8 @@
     inset-inline-start: var(--s4-space-4);
     z-index: 1;
   }
+  /* a poster with a play control on a phone: a wide ratio would leave the play control on top of the words */
+  @container s4-site-section (width < 600px) { .s4-media-box:has(> .s4-media-empty):has(> .s4-media-play) { --_ratio: 4 / 3; } }
   .s4-media-caption {
     color: var(--md-sys-color-on-surface-variant);
     font-family: var(--md-sys-typescale-body-small-font);
@@ -6865,7 +6867,7 @@
   .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
   .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
   .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-signup > .s4-button { margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup > .s4-button { flex: none; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links :is(h2, h3) {
     margin: 0 0 var(--s4-space-3);
@@ -6907,6 +6909,66 @@
   .s4-site-footer-links[data-columns="2"] { --_cols: 2; }
   @media (width >= 840px) {
     .s4-site-footer-top { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+  }
+
+  /* ================= index: a numbered list of everything (all projects, past issues, an archive) =================
+     <ol class="s4-site-index"><li><a class="s4-site-index-row" href="…">
+       <span class="s4-site-index-n">07</span><span class="s4-site-index-title">Govanhill Library</span>
+       <span class="s4-site-index-meta"><span>Glasgow</span><span>Library and baths</span></span>
+       <span class="s4-site-index-year">2025</span></a></li></ol>
+     A phone shows the meta under the title; from 840 every meta is its own column. Rows hover with a rounded fill and
+     the dividers beside a hovered row fade (decision 0045). */
+  .s4-site-index { display: grid; margin: 0; padding: 0; list-style: none; }
+  .s4-site-index > li { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); transition: border-color var(--s4-motion-state); }
+  .s4-site-index > li:first-child { border-block-start-color: transparent; }
+  .s4-site-index > li:has(> .s4-site-index-row:hover), .s4-site-index > li:has(> .s4-site-index-row:hover) + li { border-block-start-color: transparent; }
+  .s4-site-index-row {
+    display: grid;
+    grid-template-columns: calc(var(--s4-space-8) + var(--s4-space-2)) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    margin-inline: calc(var(--s4-space-3) * -1);
+    padding: var(--s4-space-5) var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-large);
+    color: var(--md-sys-color-on-surface);
+    text-decoration: none;
+    transition: background-color var(--s4-motion-state);
+  }
+  a.s4-site-index-row:hover { background: var(--md-sys-color-surface-container-low); }
+  .s4-site-index-n, .s4-site-index-year {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-site-index-year { grid-column: 3; grid-row: 1; justify-self: end; }
+  .s4-site-index-title {
+    min-inline-size: 0;
+    font-family: var(--md-sys-typescale-title-large-font);
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    letter-spacing: var(--md-sys-typescale-title-large-tracking);
+    font-weight: var(--md-sys-typescale-title-large-weight);
+    overflow-wrap: anywhere;
+  }
+  .s4-site-index-meta {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s4-space-3);
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+  @container s4-site-section (width >= 840px) {
+    .s4-site-index-row { grid-template-columns: calc(var(--s4-space-12) + var(--s4-space-4)) minmax(0, 5fr) minmax(0, 3fr) minmax(0, 3fr) calc(var(--s4-space-12) + var(--s4-space-4)); padding-block: var(--s4-space-6); }
+    .s4-site-index-meta { display: contents; }
+    .s4-site-index-year { grid-column: -2 / -1; grid-row: 1; }
+    .s4-site-index-row > *, .s4-site-index-meta > * { grid-row: 1; }
+    .s4-site-index-meta > * { min-inline-size: 0; }
+    .s4-site-index-title { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); letter-spacing: var(--md-sys-typescale-headline-small-tracking); font-weight: var(--md-sys-typescale-headline-small-weight); }
   }
 
   /* ================= blog / changelog index ================= */
@@ -6988,6 +7050,29 @@
   .s4-docs-pager > a > span:last-child { font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
   .s4-docs-pager > a[rel="next"] { text-align: end; }
   @media (width >= 600px) { .s4-docs-pager { grid-template-columns: repeat(2, minmax(0, 1fr)); } .s4-docs-pager > a[rel="next"]:only-child { grid-column: 2; } }
+  /* a note in documentation: a filled block with an icon and a title, never a colored stripe or an outline.
+     <aside class="s4-callout" data-tone="warning"><span class="s4-icon" data-icon="warning"></span>
+       <p class="s4-callout-title">Unplug the Other Half</p><p>One sentence or two.</p></aside> */
+  .s4-callout {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s4-space-1) var(--s4-space-3);
+    padding: var(--s4-space-4) var(--s4-space-5);
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--s4-color-info-container);
+    color: var(--s4-color-on-info-container);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+  .s4-callout > :is(p, ul, ol, div) { grid-column: 2; margin: 0; }
+  .s4-callout > .s4-icon { grid-row: 1 / span 2; margin-block-start: calc((var(--md-sys-typescale-body-medium-line-height) - var(--s4-size-icon-small)) / 2); --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-callout > .s4-callout-title { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .s4-callout :is(code, kbd) { background: none; padding: 0; font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-callout[data-tone="warning"] { background: var(--s4-color-warning-container); color: var(--s4-color-on-warning-container); }
+  .s4-callout[data-tone="success"] { background: var(--s4-color-success-container); color: var(--s4-color-on-success-container); }
+  .s4-callout[data-tone="neutral"] { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); }
+  @media (forced-colors: active) { .s4-callout { border: 1px solid CanvasText; } }
+
   @media (width < 840px) {
     /* on a phone the sidebar is a floating glass panel opened from the docs bar */
     .s4-docs-nav {
