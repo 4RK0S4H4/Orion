@@ -450,7 +450,7 @@ function day() {
 function boatOptions() {
   var sel = $('f-boat'), keep = sel.value;
   sel.innerHTML = '<option value=""></option>' + BOATS.filter(function (b) { return !inRepair(b, picked); }).map(function (b) { return '<option value="' + b.id + '">' + b.name + ' · ' + b.cls + ' · ' + b.seats + (b.seats === 1 ? ' Seat' : ' Seats') + '</option>'; }).join('');
-  sel.value = keep;
+  sel.value = keep; sel.dispatchEvent(new Event('change'));   /* a change event redraws the field's glass picker */
 }
 
 /* ---------- my sails and the fleet ---------- */
