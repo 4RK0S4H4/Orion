@@ -14,7 +14,7 @@
     function norm(v) { return v == null || v === '' ? 'none' : String(v).toLowerCase(); }
     function sync() {
       var cur = norm((S4.theme() || {})[key]);
-      Array.prototype.forEach.call(g.children, function (x, i) { x.setAttribute('aria-pressed', String(norm(opts[i][1]) === cur)); });
+      Array.prototype.forEach.call(g.querySelectorAll(':scope > .s4-button'), function (x, i) { x.setAttribute('aria-pressed', String(norm(opts[i][1]) === cur)); });
     }
     sync();
     document.addEventListener('s4-theme', sync);

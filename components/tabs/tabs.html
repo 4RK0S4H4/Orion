@@ -9,18 +9,23 @@
 <style>
   /* page-only */
   .demo-tabs { max-width: 640px; }
-  .demo-tabs .s4-tab-panel { padding: var(--s4-space-4) var(--s4-space-2) 0; }
+  .demo-tabs .s4-tab-panel { padding: var(--s4-space-3) 0 0; }
+  .demo-card { max-width: 640px; }
+  .tg-panel { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s4-space-4); }
+  .tg-total { display: flex; align-items: baseline; gap: var(--s4-space-2); margin: 0; }
+  .demo-card > .s4-card-body { display: flex; flex-direction: column; gap: var(--s4-space-2); }
   .demo-log { margin: var(--s4-space-3) 0 0; font-size: var(--md-sys-typescale-body-small-size); color: var(--md-sys-color-on-surface-variant); }
 </style>
 </head>
 <body>
 <header class="ex-bar"><h1><a href="../">Components</a> / Tabs</h1></header>
 <main class="ex-main">
-  <p>Tabs switch between related views of the same content at the same level, such as a list of bills by status. <b>Primary</b> tabs sit under the top app bar and organize the whole screen; <b>secondary</b> tabs sit inside a content area and divide it further. Use the arrow keys, Home and End: the selection follows focus.</p>
+  <p>Tabs move between different panels of content within one screen: a bill's Details, Payments and Notes. They belong with the nav bar and the nav rail: no tray, the labels sit on the surface, and the selected tab gets the same neutral indicator the nav bar and rail use, which slides from tab to tab. <b>Primary</b> tabs sit under the top app bar and organize the whole screen; <b>secondary</b> tabs sit inside a pane or card and divide it further. Use the arrow keys, Home and End: the selection follows focus.</p>
+  <p><b>Tabs or a button group?</b> If it swaps what is on the screen, it is tabs. If it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid), it is a <a href="../button-group/button-group.html">button group</a>. If it narrows a collection and there can be many, it is <a href="../chip/chip.html">chips</a>.</p>
 
   <section class="ex-sec">
     <h2>Primary</h2>
-    <p>The tabs sit in a soft tray; the selected one is a flat ink pill that slides between them (no raised shadow); the panel slides in from the side you're heading (shared axis).</p>
+    <p>Labels on the surface; the selected tab's indicator slides to the next tab (Ink) and its label steps up in weight; the panel slides in from the side you're heading (shared axis). Each status is its own list.</p>
       <div class="demo-tabs">
       <div class="s4-tabs" role="tablist" aria-label="Bill Status">
         <button class="s4-tab" type="button" role="tab" id="pa-t0" aria-controls="pa-p0" aria-selected="true">Due</button>
@@ -36,7 +41,7 @@
 
   <section class="ex-sec">
     <h2>Primary with Icons</h2>
-    <p>Icons sit above the labels (64dp).</p>
+    <p>Icons sit above the labels and the indicator holds both, as in the nav bar.</p>
       <div class="demo-tabs">
       <div class="s4-tabs" role="tablist" aria-label="Sections">
         <button class="s4-tab" type="button" role="tab" id="pb-t0" aria-controls="pb-p0" aria-selected="true"><span class="s4-icon" data-icon="bills"></span>Bills</button>
@@ -51,59 +56,79 @@
 
   <section class="ex-sec">
     <h2>Secondary</h2>
-    <p><code>data-variant="secondary"</code>: the same tray and pill, with icons beside the labels.</p>
-      <div class="demo-tabs">
-      <div class="s4-tabs" role="tablist" aria-label="Period" data-variant="secondary">
-        <button class="s4-tab" type="button" role="tab" id="sa-t0" aria-controls="sa-p0" aria-selected="true">This Month</button>
-        <button class="s4-tab" type="button" role="tab" id="sa-t1" aria-controls="sa-p1" aria-selected="false">Last Month</button>
-        <button class="s4-tab" type="button" role="tab" id="sa-t2" aria-controls="sa-p2" aria-selected="false">This Year</button>
+    <p><code>data-variant="secondary"</code>: inside a pane or card. Smaller and quieter: a 32dp indicator in a lower tone, icons beside the labels.</p>
+    <article class="s4-card demo-card"><div class="s4-card-body">
+      <h3 class="s4-card-title">Amazon Web Services</h3>
+      <div class="s4-tabs" role="tablist" aria-label="Bill" data-variant="secondary">
+        <button class="s4-tab" type="button" role="tab" id="sa-t0" aria-controls="sa-p0" aria-selected="true">Details</button>
+        <button class="s4-tab" type="button" role="tab" id="sa-t1" aria-controls="sa-p1" aria-selected="false">Payments</button>
+        <button class="s4-tab" type="button" role="tab" id="sa-t2" aria-controls="sa-p2" aria-selected="false">Notes</button>
       </div>
-      <div class="s4-tab-panel" role="tabpanel" id="sa-p0" aria-labelledby="sa-t0"><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">This Month Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,000.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sa-p1" aria-labelledby="sa-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Last Month Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,137.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sa-p2" aria-labelledby="sa-t2" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">This Year Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,274.00</span></span></div></li></ul></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sa-p0" aria-labelledby="sa-t0"><dl class="s4-dl"><div class="s4-dl-row"><dt>Amount</dt><dd>$3,412.57</dd></div><div class="s4-dl-row"><dt>Due</dt><dd>Oct 30</dd></div><div class="s4-dl-row"><dt>Account</dt><dd>Operations</dd></div></dl></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sa-p1" aria-labelledby="sa-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">September</span><span class="s4-list-supporting">Paid Sep 29</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$3,210.04</span></span></div></li><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">August</span><span class="s4-list-supporting">Paid Aug 30</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$3,188.91</span></span></div></li></ul></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sa-p2" aria-labelledby="sa-t2" hidden><p class="s4-body-medium" style="margin:0">Usage went up after the October launch. Check the reserved instances before renewal.</p></div>
+    </div></article>
+    <article class="s4-card demo-card" style="margin-top:var(--s4-space-4)"><div class="s4-card-body">
+      <h3 class="s4-card-title">Office Lease</h3>
+      <div class="s4-tabs" role="tablist" aria-label="Lease" data-variant="secondary">
+        <button class="s4-tab" type="button" role="tab" id="sb-t0" aria-controls="sb-p0" aria-selected="true"><span class="s4-icon" data-icon="document"></span>Summary</button>
+        <button class="s4-tab" type="button" role="tab" id="sb-t1" aria-controls="sb-p1" aria-selected="false"><span class="s4-icon" data-icon="schedule"></span>History</button>
+        <button class="s4-tab" type="button" role="tab" id="sb-t2" aria-controls="sb-p2" aria-selected="false"><span class="s4-icon" data-icon="attach"></span>Files</button>
       </div>
-      <div class="demo-tabs" style="margin-top:var(--s4-space-4)">
-      <div class="s4-tabs" role="tablist" aria-label="View" data-variant="secondary">
-        <button class="s4-tab" type="button" role="tab" id="sb-t0" aria-controls="sb-p0" aria-selected="true"><span class="s4-icon" data-icon="document"></span>List</button>
-        <button class="s4-tab" type="button" role="tab" id="sb-t1" aria-controls="sb-p1" aria-selected="false"><span class="s4-icon" data-icon="calendar"></span>Calendar</button>
-        <button class="s4-tab" type="button" role="tab" id="sb-t2" aria-controls="sb-p2" aria-selected="false"><span class="s4-icon" data-icon="chart"></span>Chart</button>
+      <div class="s4-tab-panel" role="tabpanel" id="sb-p0" aria-labelledby="sb-t0"><p class="s4-body-medium" style="margin:0">WeWork, 12 desks, renews every month on the 1st.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sb-p1" aria-labelledby="sb-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Renewed</span><span class="s4-list-supporting">Nov 1</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,800.00</span></span></div></li><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Desks added</span><span class="s4-list-supporting">Sep 14</span></span><span class="s4-list-trailing"><span class="s4-list-amount">+4</span></span></div></li></ul></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sb-p2" aria-labelledby="sb-t2" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Lease agreement.pdf</span><span class="s4-list-supporting">Signed Mar 3</span></span><span class="s4-list-trailing"><span class="s4-list-amount">2.4 MB</span></span></div></li></ul></div>
+    </div></article>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Tabs and a Button Group Together</h2>
+    <p>The tabs swap what is on the screen (Spending, Vendors). The button group inside the Spending panel changes how the same numbers are shown (by week, month or year): it is a value, so it is a track with the accent ink, never a second row of tabs.</p>
+    <div class="demo-tabs">
+      <div class="s4-tabs" role="tablist" aria-label="Report">
+        <button class="s4-tab" type="button" role="tab" id="tg-t0" aria-controls="tg-p0" aria-selected="true">Spending</button>
+        <button class="s4-tab" type="button" role="tab" id="tg-t1" aria-controls="tg-p1" aria-selected="false">Vendors</button>
       </div>
-      <div class="s4-tab-panel" role="tabpanel" id="sb-p0" aria-labelledby="sb-t0"><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">List Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,000.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sb-p1" aria-labelledby="sb-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Calendar Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,137.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sb-p2" aria-labelledby="sb-t2" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Chart Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,274.00</span></span></div></li></ul></div>
+      <div class="s4-tab-panel" role="tabpanel" id="tg-p0" aria-labelledby="tg-t0">
+        <div class="tg-panel">
+          <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Spending By" id="tg-period">
+            <button class="s4-button" data-size="xs" type="button" value="week">Week</button>
+            <button class="s4-button" data-size="xs" type="button" value="month" aria-pressed="true">Month</button>
+            <button class="s4-button" data-size="xs" type="button" value="year">Year</button>
+          </div>
+          <p class="tg-total"><span class="s4-headline-small" id="tg-amount">$12,480</span><span class="s4-body-medium s4-on-surface-variant" id="tg-per">this month</span></p>
+        </div>
       </div>
+      <div class="s4-tab-panel" role="tabpanel" id="tg-p1" aria-labelledby="tg-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Amazon Web Services</span><span class="s4-list-supporting">Cloud</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$3,412.57</span></span></div></li><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">WeWork</span><span class="s4-list-supporting">Office</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,800.00</span></span></div></li><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Iron Mountain</span><span class="s4-list-supporting">Records</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,240.00</span></span></div></li></ul></div>
+    </div>
   </section>
 
   <section class="ex-sec">
     <h2>Scrollable</h2>
-    <p><code>data-scrollable</code>: tabs keep their natural width and the row scrolls sideways; the selected tab scrolls into view.</p>
+    <p><code>data-scrollable</code>: many sections. Tabs keep their natural width and the row scrolls sideways; the selected tab scrolls into view. The row never wraps.</p>
       <div class="demo-tabs">
-      <div class="s4-tabs" role="tablist" aria-label="Month" data-scrollable>
-        <button class="s4-tab" type="button" role="tab" id="sc-t0" aria-controls="sc-p0" aria-selected="false">January</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t1" aria-controls="sc-p1" aria-selected="false">February</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t2" aria-controls="sc-p2" aria-selected="false">March</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t3" aria-controls="sc-p3" aria-selected="false">April</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t4" aria-controls="sc-p4" aria-selected="false">May</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t5" aria-controls="sc-p5" aria-selected="false">June</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t6" aria-controls="sc-p6" aria-selected="false">July</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t7" aria-controls="sc-p7" aria-selected="false">August</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t8" aria-controls="sc-p8" aria-selected="false">September</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t9" aria-controls="sc-p9" aria-selected="true">October</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t10" aria-controls="sc-p10" aria-selected="false">November</button>
-        <button class="s4-tab" type="button" role="tab" id="sc-t11" aria-controls="sc-p11" aria-selected="false">December</button>
+      <div class="s4-tabs" role="tablist" aria-label="Workspace" data-scrollable>
+        <button class="s4-tab" type="button" role="tab" id="sc-t0" aria-controls="sc-p0" aria-selected="false">Overview</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t1" aria-controls="sc-p1" aria-selected="false">Activity</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t2" aria-controls="sc-p2" aria-selected="false">Bills</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t3" aria-controls="sc-p3" aria-selected="false">Vendors</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t4" aria-controls="sc-p4" aria-selected="false">Budgets</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t5" aria-controls="sc-p5" aria-selected="false">Members</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t6" aria-controls="sc-p6" aria-selected="true">Approvals</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t7" aria-controls="sc-p7" aria-selected="false">Integrations</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t8" aria-controls="sc-p8" aria-selected="false">Audit Log</button>
+        <button class="s4-tab" type="button" role="tab" id="sc-t9" aria-controls="sc-p9" aria-selected="false">Settings</button>
       </div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p0" aria-labelledby="sc-t0" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">January Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,000.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p1" aria-labelledby="sc-t1" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">February Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,137.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p2" aria-labelledby="sc-t2" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">March Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,274.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p3" aria-labelledby="sc-t3" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">April Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,411.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p4" aria-labelledby="sc-t4" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">May Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,548.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p5" aria-labelledby="sc-t5" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">June Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,685.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p6" aria-labelledby="sc-t6" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">July Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,822.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p7" aria-labelledby="sc-t7" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">August Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,959.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p8" aria-labelledby="sc-t8" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">September Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,096.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p9" aria-labelledby="sc-t9"><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">October Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,233.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p10" aria-labelledby="sc-t10" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">November Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,370.00</span></span></div></li></ul></div>
-      <div class="s4-tab-panel" role="tabpanel" id="sc-p11" aria-labelledby="sc-t11" hidden><ul class="s4-list"><li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">December Report</span><span class="s4-list-supporting">Generated Oct 25</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,507.00</span></span></div></li></ul></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p0" aria-labelledby="sc-t0" hidden><p class="s4-body-medium" style="margin:0">Overview for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p1" aria-labelledby="sc-t1" hidden><p class="s4-body-medium" style="margin:0">Activity for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p2" aria-labelledby="sc-t2" hidden><p class="s4-body-medium" style="margin:0">Bills for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p3" aria-labelledby="sc-t3" hidden><p class="s4-body-medium" style="margin:0">Vendors for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p4" aria-labelledby="sc-t4" hidden><p class="s4-body-medium" style="margin:0">Budgets for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p5" aria-labelledby="sc-t5" hidden><p class="s4-body-medium" style="margin:0">Members for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p6" aria-labelledby="sc-t6"><p class="s4-body-medium" style="margin:0">Approvals for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p7" aria-labelledby="sc-t7" hidden><p class="s4-body-medium" style="margin:0">Integrations for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p8" aria-labelledby="sc-t8" hidden><p class="s4-body-medium" style="margin:0">Audit Log for the Operations workspace.</p></div>
+      <div class="s4-tab-panel" role="tabpanel" id="sc-p9" aria-labelledby="sc-t9" hidden><p class="s4-body-medium" style="margin:0">Settings for the Operations workspace.</p></div>
       </div>
   </section>
   <p class="ex-foot">Source: <code>components/tabs/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
@@ -115,6 +140,9 @@
 <script src="../button-group/button-group.js"></script>
 <script src="../_example/example.js"></script>
 <script>
+  /* page-only: the period changes the same number */
+  var TG = { week: ['$2,910', 'this week'], month: ['$12,480', 'this month'], year: ['$141,205', 'this year'] };
+  document.getElementById('tg-period').addEventListener('s4-change', function (e) { var v = TG[e.detail.value]; document.getElementById('tg-amount').textContent = v[0]; document.getElementById('tg-per').textContent = v[1]; });
   /* page-only: show the s4-change event */
   document.addEventListener('s4-change', function (e) {
     if (e.target.getAttribute('aria-label') === 'Bill Status') document.getElementById('tabs-log').textContent = 'Selected: ' + e.detail.tab.textContent.trim() + ' (index ' + e.detail.index + ')';

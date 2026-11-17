@@ -2492,14 +2492,17 @@
 }
 
 /* ---- button-group/button-group.css ---- */
-/* Button group (S4 Orion: Joined Capsule, decision 0026)
+/* Button group (S4 Orion: Ink Track, decision 0059)
    Standard: <div class="s4-button-group"> <button class="s4-button">…</button> … </div>
      Buttons 8dp apart. Pressing one widens it a little while its neighbours give way (M3 Expressive press interaction).
-   Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="View">
-     A Joined Capsule (decision 0026): segments 2dp apart, fully round outer ends, small rounded joins; the selected segment is a full pill filled with the inverse color.
+   Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="Period">
+     The Ink Track (decision 0059): one filled track with the options as words on it; the selected option is an accent
+     ink pill that slides to the next choice, its front edge leading and its back edge trailing (the Ink pattern). With
+     several choices (data-select="multi") each selected option fills in place and selected neighbours fuse into one pill.
      Connected groups stretch to fill their width (equal weights); data-fit="content" keeps them as wide as their labels.
+   A button group sets a value or changes how the same content is shown. If it swaps what is on the screen, it is tabs.
    Works with .s4-button and .s4-icon-button children. The size comes from the buttons' own data-size.
-   button-group.js manages aria-pressed (data-select), arrow-key navigation and the s4-change event. */
+   button-group.js manages aria-pressed (data-select), arrow-key navigation, the s4-change event and the sliding ink. */
 @layer s4.components {
   .s4-button-group {
     display: flex;
@@ -2531,45 +2534,131 @@
     width: calc(var(--_w) - var(--_give));
   }
 
-  /* ---------- connected group: the Joined Capsule (decision 0026, picked by the owner) ----------
-     One row of segments 2dp apart: fully round outer ends, small rounded joins, and the selected segment turns into a
-     full pill filled with the inverse color. Tabs are a tray with a sliding pill; a group has no tray and nothing slides. */
-  .s4-button-group[data-connected] { gap: 2px; }
+  /* ---------- connected group: the Ink Track (decision 0059) ----------
+     The track is one filled shape, its corner concentric with the options inside it (decision 0052): an option's corner
+     is min(half its height, --s4-shape-control) and the track adds its own padding to that. */
+  .s4-button-group[data-connected] {
+    --_gh: var(--s4-size-button);                                            /* the options' height (their data-size) */
+    --_gp: var(--s4-space-1);                                                /* the track's padding */
+    --_track: var(--md-sys-color-surface-container-highest);
+    --_rest: var(--md-sys-color-on-surface-variant);
+    --_ink: var(--md-sys-color-primary);                                     /* the accent */
+    --_on-ink: var(--md-sys-color-on-primary);
+    --_ink-alpha: 1;
+    --_ink-fill: color-mix(in srgb, var(--_ink) calc(var(--_ink-alpha) * 100%), transparent);
+    position: relative;
+    isolation: isolate;
+    gap: 0;
+    padding: var(--_gp);
+    background: var(--_track);
+    border-radius: calc(min(calc(var(--_gh) / 2), var(--s4-shape-control)) + var(--_gp));
+  }
+  .s4-button-group[data-connected]:has(> [data-size="xs"]) { --_gh: var(--s4-size-button-small); }
+  .s4-button-group[data-connected]:has(> [data-size="m"]) { --_gh: var(--s4-size-button-medium); }
+  .s4-button-group[data-connected]:has(> [data-size="l"]) { --_gh: var(--s4-size-button-large); }
+  .s4-button-group[data-connected]:has(> [data-size="xl"]) { --_gh: var(--s4-size-button-extra-large); }
+
+  /* the options are words on the track: no fill of their own, whatever variant they name */
   .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button) {
-    --_full: min(calc(var(--_h) / 2), var(--s4-shape-button));   /* a finite "full": with 9999px the browser scales every corner down to nothing */
-    --_r: var(--md-sys-shape-corner-small);
-    --_bg: var(--md-sys-color-surface-container-highest);
-    --_fg: var(--md-sys-color-on-surface-variant);
+    --_r: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    --_radius: var(--_r);
+    --_radius-pressed: var(--_r);                                           /* press-to-square never inside a rounded container (0043) */
+    --_radius-selected: var(--_r);
+    --_radius-round: var(--_r);
+    --_radius-square: var(--_r);
+    --_bg: transparent;
+    --_fg: var(--_rest);
+    --_outline: transparent;
+    --_elevation: var(--md-sys-elevation-level0);
+    z-index: 1;
     flex: 1 1 0;
     min-inline-size: fit-content;   /* never narrower than its label (a label never breaks mid-word), yet never wider than the group: the group wraps instead */
     border-radius: var(--_r);
   }
-  .s4-button-group[data-connected]:has(> [data-size="l"], > [data-size="xl"]) > :is(.s4-button, .s4-icon-button) { --_r: var(--md-sys-shape-corner-medium); }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):first-child {
-    border-start-start-radius: var(--_full);
-    border-end-start-radius: var(--_full);
-  }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):last-child {
-    border-start-end-radius: var(--_full);
-    border-end-end-radius: var(--_full);
-  }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] {
-    --_bg: var(--md-sys-color-inverse-surface);
-    --_fg: var(--md-sys-color-inverse-on-surface);
-    border-radius: var(--_full);
-  }
+  .s4-button-group[data-connected] > .s4-button { --_pad: calc(var(--_h) * 0.3); }      /* words on a track need less room than a lone button: four options fit a phone */
+  .s4-button-group[data-connected] > .s4-icon-button { --_w: calc(var(--_h) * 1.25); }   /* an icon option is a short pill, not a circle */
+  .s4-button-group[data-connected][data-fit="content"] { inline-size: fit-content; max-inline-size: 100%; }   /* never stretched by a flex or grid parent */
   .s4-button-group[data-connected][data-fit="content"] > :is(.s4-button, .s4-icon-button) { flex: none; }
-  /* a disabled option of a toggle group: button.css's aria-pressed colors would otherwise win over its disabled colors */
+  @media (hover: hover) {
+    .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):not([aria-pressed="true"], :disabled, [aria-disabled="true"]):hover { --_fg: var(--md-sys-color-on-surface); }
+  }
+
+  /* selected: the option paints the ink itself (no script, or several selected) … */
+  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] { --_bg: var(--_ink-fill); --_fg: var(--_on-ink); }
+  /* … and selected neighbours fuse into one pill (not across a wrapped row: button-group.js marks where a row starts) */
+  .s4-button-group[data-connected]:not([data-s4-ink]) > [aria-pressed="true"]:has(+ [aria-pressed="true"]:not([data-s4-break], :disabled)):not(:disabled) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .s4-button-group[data-connected]:not([data-s4-ink]) > [aria-pressed="true"]:not(:disabled) + [aria-pressed="true"]:not([data-s4-break], :disabled) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  /* … with one choice, the ink is one pill behind the options that slides to the selected one (button-group.js) */
+  .s4-button-group[data-connected][data-s4-ink] > [aria-pressed="true"] { --_bg: transparent; }
+  .s4-button-group-ink {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    overflow: clip;                 /* a lively overshoot never leaves the track */
+    opacity: var(--_ink-alpha);     /* on glass the two edges below are one tint, not two overlapping ones */
+    pointer-events: none;
+  }
+  /* two copies of the pill, drawn as one shape: the front one on Ink, the back one on calm Ink (ink leaving), so the
+     edge in the direction of travel leads and the other trails, then they land together */
+  .s4-button-group-ink::before,
+  .s4-button-group-ink::after {
+    content: "";
+    position: absolute;
+    left: 0;                        /* physical: button-group.js measures physical offsets */
+    top: 0;
+    inline-size: var(--_iw, 0px);
+    block-size: var(--_ih, 0px);
+    border-radius: min(calc(var(--_ih, 0px) / 2), var(--s4-shape-control));
+    background: var(--_ink);
+    transform: translate(var(--_ix, 0px), var(--_iy, 0px));
+  }
+  .s4-button-group-ink[data-animate]::before {
+    transition: transform var(--s4-motion-ink), inline-size var(--s4-motion-ink), block-size var(--s4-motion-ink);
+  }
+  .s4-button-group-ink[data-animate]::after {
+    transition: transform var(--s4-motion-ink-calm), inline-size var(--s4-motion-ink-calm), block-size var(--s4-motion-ink-calm);
+  }
+
+  /* a disabled option is faded words on the track */
   .s4-button-group > :is(.s4-button, .s4-icon-button)[aria-pressed]:is(:disabled, [aria-disabled="true"]) {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     --_outline: transparent;
   }
-  /* the focus ring would hide under the next button */
-  .s4-button-group[data-connected] > :focus-visible { z-index: 1; }
+  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):is(:disabled, [aria-disabled="true"]) { --_bg: transparent; }
+  /* the focus ring stays above the neighbours */
+  .s4-button-group[data-connected] > :focus-visible { z-index: 2; }
 
+  /* items on glass are tints (decision 0043): the glass is the track (a fill under the ink would stack two tints, which
+     check-glass cannot prove for every accent), the ink is the accent at the selected-fill opacity and every label is
+     on-surface, exactly the selected item check-glass proves for 210 schemes. */
+  :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled], .s4-site-panel[data-open], .s4-nav-bar,
+         .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet,
+         .s4-snackbar) .s4-button-group[data-connected] {
+    --_track: transparent;
+    --_ink-alpha: var(--s4-glass-fill-selected-opacity);
+    --_on-ink: var(--md-sys-color-on-surface);
+    --_rest: var(--md-sys-color-on-surface);
+  }
+
+  /* forced colors: the track and every option get a real border; the selected option is Highlight */
   @media (forced-colors: active) {
+    .s4-button-group[data-connected] { border: 1px solid CanvasText; }
     .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button) { border: 1px solid ButtonText; }
+    .s4-button-group-ink { display: none; }
+    .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
   }
 }
 
@@ -3522,52 +3611,58 @@
 }
 
 /* ---- tabs/tabs.css ---- */
-/* Tabs (S4 Orion, Segmented Tray, decision 0009, fully rounded like the button groups)
-   <div class="s4-tabs" role="tablist" aria-label="Bills" data-variant="secondary" data-scrollable>
+/* Tabs (S4 Orion: the navigation family, decision 0059; amends the Segmented Tray of 0009)
+   <div class="s4-tabs" role="tablist" aria-label="Bill" data-variant="secondary" data-scrollable>
      <button class="s4-tab" role="tab" id="tab-due" aria-selected="true" aria-controls="panel-due">
        <span class="s4-icon" data-icon="schedule"></span>Due</button>
      …
    </div>
    <div class="s4-tab-panel" role="tabpanel" id="panel-due" aria-labelledby="tab-due">…</div>
-   Primary (default): the tabs sit in a soft tray (surface-container-high); the selected tab is a flat ink pill
-   (on-surface, with an inverse label) that slides between tabs, no raised shadow. With icons the icon sits above the
-   label. Secondary (inside a card or pane): the same tray and pill, with icons inline.
-   tabs.js slides one pill between tabs (spatial spring), switches panels with the shared axis pattern, and adds
-   arrow / Home / End keys with automatic activation. Without JS the selected tab paints its own pill.
-   data-scrollable: tabs keep their natural width and the row scrolls sideways. */
+   Tabs move between different panels of content within one screen. They belong with the nav bar and the nav rail, not
+   with the button group: no tray, the labels sit on the surface, and the selected tab gets the same neutral navigation
+   indicator (secondary-container, the nav indicator's corner) that slides from tab to tab on the Ink pattern; its label
+   steps up in weight. Primary (default): under the top app bar, 40dp pills (icons stack above the label). Secondary
+   (inside a pane or card): smaller and quieter, 32dp pills in a lower tone, icons inline.
+   The row never wraps: when the tabs do not fit, it scrolls sideways (data-scrollable adds scroll padding).
+   tabs.js slides the indicator, switches panels with the shared axis pattern, keeps the label width steady when the weight
+   changes, and adds arrow / Home / End keys with automatic activation. Without JS the selected tab paints its own pill. */
 @layer s4.components {
   .s4-tabs {
-    --_tray: var(--md-sys-color-surface-container-high);
-    --_pill: var(--md-sys-color-on-surface);
-    --_pill-fg: var(--md-sys-color-surface);
-    --_pad: var(--s4-space-1);
-    --_r: var(--s4-shape-control);
+    --_pill: var(--md-sys-color-secondary-container);
+    --_pill-fg: var(--md-sys-color-on-secondary-container);
+    --_th: var(--s4-size-button);                              /* the tab (and indicator) height */
     position: relative;
     display: flex;
-    align-items: stretch;
-    gap: calc(var(--s4-space-1) / 2);
-    padding: var(--_pad);
-    background: var(--_tray);
-    border-radius: calc(var(--s4-shape-control) + var(--_pad));   /* concentric with the tabs inside it (decision 0052) */
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-inline-size: 0;
+    padding-block: max(0px, calc((var(--s4-size-touch-target) - var(--_th)) / 2));   /* room for the 48dp touch target inside the scrolling row */
     isolation: isolate;
-    overflow-x: auto;                 /* larger text or many tabs: the strip scrolls, labels never overlap */
+    overflow-x: auto;                 /* many tabs or larger text: the row scrolls, labels never overlap or wrap */
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
+  .s4-tabs::-webkit-scrollbar { display: none; }
+  .s4-tabs:not([data-variant="secondary"]):has(> .s4-tab > .s4-icon) { --_th: calc(var(--s4-size-touch-target) + var(--s4-space-2)); }
+  .s4-tabs[data-variant="secondary"] {
+    --_pill: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);   /* quieter: a step above whatever it sits on (a pane, a card, glass) */
+    --_pill-fg: var(--md-sys-color-on-surface);
+    --_th: var(--s4-size-button-small);
+  }
 
   .s4-tab {
     --_fg: var(--md-sys-color-on-surface-variant);
+    --_r: min(calc(var(--_th) / 2), var(--s4-shape-nav-indicator));
     position: relative;
     z-index: 1;
-    flex: 1 1 0;
+    flex: none;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: calc(var(--s4-space-1) / 2);
-    min-inline-size: max-content;     /* equal shares when there is room; when text is larger the strip scrolls instead of the labels overlapping */
-    min-block-size: calc(var(--s4-size-touch-target) - 2 * var(--_pad));
+    min-block-size: var(--_th);
     margin: 0;
     padding: 0 var(--s4-space-4);
     border: 0;
@@ -3588,49 +3683,76 @@
     --s4-icon-size: var(--s4-size-icon);
     transition: color var(--s4-motion-state);
   }
+  /* the 48dp touch target, inside the row's padding so the scrolling row never clips it */
+  .s4-tab::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: max(100%, var(--s4-size-touch-target));
+    transform: translateY(-50%);
+  }
   @media (hover: hover) {
     .s4-tab[aria-selected="false"]:not(:disabled, [aria-disabled="true"]):hover { --_fg: var(--md-sys-color-on-surface); }
   }
-  .s4-tab[aria-selected="true"] { --_fg: var(--_pill-fg); }
-  .s4-tabs:not([data-variant="secondary"]) > .s4-tab:has(> .s4-icon) { min-block-size: calc(var(--s4-size-touch-target) + var(--s4-space-4)); }
-  .s4-tabs[data-variant="secondary"] > .s4-tab { flex-direction: row; gap: var(--s4-space-2); }
+  .s4-tab[aria-selected="true"] {
+    --_fg: var(--_pill-fg);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-tabs:not([data-variant="secondary"]) > .s4-tab:has(> .s4-icon) { padding: var(--s4-space-1) var(--s4-space-5); }
+  .s4-tabs[data-variant="secondary"] > .s4-tab {
+    flex-direction: row;
+    gap: var(--s4-space-2);
+    padding: 0 var(--s4-space-3);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-tabs[data-variant="secondary"] > .s4-tab[aria-selected="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+
+  /* the label keeps the width of its selected (heavier) weight, so selecting a tab never shifts its neighbours
+     (tabs.js wraps the label's text in .s4-tab-label with data-text) */
+  .s4-tab-label { display: inline-flex; flex-direction: column; align-items: center; }
+  .s4-tab-label::after {
+    content: attr(data-text);
+    content: attr(data-text) / "";                 /* no alternative text: screen readers read the label once */
+    block-size: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+    user-select: none;
+    pointer-events: none;
+  }
 
   .s4-tab:is(:disabled, [aria-disabled="true"]) {
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
   }
 
-  /* ---------- the pill ---------- */
+  /* ---------- the indicator ---------- */
   /* without JS: the selected tab paints its own */
   .s4-tabs:not([data-s4tabs]) > .s4-tab[aria-selected="true"] { background: var(--_pill); }
-  .s4-tab::after { display: none; }
-  /* with JS (tabs.js marks the list): one pill that slides, behind the labels */
+  /* with JS (tabs.js marks the list): one pill that slides, behind the labels, measured to the selected tab's box */
   .s4-tabs-indicator {
     position: absolute;
     left: 0;                                    /* physical: JS measures physical offsets */
-    top: var(--_pad);
-    bottom: var(--_pad);
+    top: 0;
     z-index: 0;
-    inline-size: var(--_w, 0);
-    border-radius: var(--_r);
+    inline-size: var(--_w, 0px);
+    block-size: var(--_h, 0px);
+    border-radius: min(calc(var(--_h, 0px) / 2), var(--s4-shape-nav-indicator));   /* the nav indicator's corner: a pill at the default, the corner dial otherwise */
     background: var(--_pill);
-    transform: translateX(var(--_x, 0));
+    transform: translate(var(--_x, 0px), var(--_y, 0px));
     pointer-events: none;
   }
   .s4-tabs-indicator[data-animate] {
-    transition:
-      transform var(--s4-motion-ink), inline-size var(--s4-motion-ink);
+    transition: transform var(--s4-motion-ink), inline-size var(--s4-motion-ink), block-size var(--s4-motion-ink);
   }
 
   /* ---------- scrollable ---------- */
-  .s4-tabs[data-scrollable] {
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    scroll-padding-inline: var(--s4-space-12);
-  }
-  .s4-tabs[data-scrollable]::-webkit-scrollbar { display: none; }
-  .s4-tabs[data-scrollable] > .s4-tab { flex: 0 0 auto; }
+  .s4-tabs[data-scrollable] { scroll-padding-inline: var(--s4-space-12); }
 
   /* ---------- panels ---------- */
   .s4-tab-panel { display: block; outline-offset: var(--s4-focus-ring-offset); }
@@ -3640,7 +3762,6 @@
     .s4-tabs-indicator { background: Highlight; forced-color-adjust: none; }
     .s4-tabs:not([data-s4tabs]) > .s4-tab[aria-selected="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
     .s4-tab[aria-selected="true"] { color: HighlightText; }
-    .s4-tabs { border: 1px solid CanvasText; }
   }
 }
 

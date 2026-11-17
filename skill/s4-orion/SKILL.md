@@ -192,7 +192,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - One **filled** button per area for the main action; **tonal** for a strong second; **text** for the rest. Nothing is ever outlined (decision 0023): fields, chips, checkboxes, radios and cards are filled; the old `outlined` variants draw filled. Small things are pills (chips, status, buttons, fields, FAB); no sharp or squared corners on them.
 - A **FAB** only when one action dominates a screen (Add Bill); never two FABs.
 - Icon-only actions are icon buttons with `aria-label` and usually a `data-tooltip`.
-- Related choices: a **connected button group** for 2–5 short options; **filter chips** for more, or for multi-select.
+- **Tabs, button group or chips** (decision 0059): if it swaps what is on the screen, it is **tabs** (`.s4-tabs`, every tab with a `tabpanel`); if it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid, units), it is a **connected button group** (`data-connected data-select="single|multi"`, 2 to 5 short options, the Ink Track); if it narrows a collection and there can be many, it is **filter chips**. Never a button group with `aria-controls` panels, never tabs without panels: the page checker fails both.
 - Destructive confirm buttons get `data-color="error"`; a per-row delete stays a plain icon button.
 
 **Showing data**
@@ -272,6 +272,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 | `position: fixed` app bars or a full-height scrolling `main` | Fights the shell's sticky bars and phone browser behavior | The `.s4-app` shell, window scroll |
 | Sentence-case buttons ("Save changes") or Title Case sentences | Breaks the house writing style | "Save Changes"; "Your changes are saved." |
 | Status shown only by color | Fails for color-blind users | `.s4-status` with a word |
+| Tabs to pick a period or a list / grid view, or a button group that shows and hides panels | Two controls look alike and do each other's job | A value or a view of the same thing: button group; different panels: tabs (decision 0059) |
 | Icon-only button without `aria-label` | Unusable with a screen reader | Add `aria-label` (and `data-tooltip`) |
 | Styling bare elements (`button {}`, `h2 {}`) in app CSS | Leaks into components | Style the app's own classes |
 | Editing `orion.css` / copying component CSS into the app | Forks the system | App CSS with tokens; ask to change the system |

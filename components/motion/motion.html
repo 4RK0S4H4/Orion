@@ -43,15 +43,15 @@
       <div class="mo-card"><h3>State</h3><p>A control answers: hover, press, focus, selected. Color only, 90ms.</p>
         <div class="mo-stage"><button class="s4-chip" type="button" aria-pressed="false">Unread</button><button class="s4-chip" type="button" aria-pressed="true">Flagged</button><button class="s4-button" data-variant="tonal" type="button">Hover Me</button></div>
         <code>--s4-motion-state</code></div>
-      <div class="mo-card"><h3>Ink</h3><p>A state fill moves or grows, with a subtle liquid overshoot.</p>
+      <div class="mo-card"><h3>Ink</h3><p>A state fill moves or grows, with a subtle liquid overshoot. Tap a period: the ink's front edge leads and its back edge trails (calm Ink).</p>
         <div class="mo-stage"><label class="s4-switch"><input type="checkbox" role="switch"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span>Autopay</label>
           <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Remind Me</label>
           <label class="s4-radio"><input type="radio" name="mo-r" checked><span class="s4-radio-ring"></span>Card</label><label class="s4-radio"><input type="radio" name="mo-r"><span class="s4-radio-ring"></span>Bank</label></div>
-        <div class="s4-tabs" role="tablist" aria-label="Ink Demo"><button class="s4-tab" type="button" role="tab" aria-selected="true">Due</button><button class="s4-tab" type="button" role="tab" aria-selected="false">Paid</button><button class="s4-tab" type="button" role="tab" aria-selected="false">Overdue</button></div>
+        <div class="s4-button-group" data-connected data-select="single" aria-label="Period"><button class="s4-button" type="button" value="day" aria-pressed="true">Day</button><button class="s4-button" type="button" value="week">Week</button><button class="s4-button" type="button" value="month">Month</button><button class="s4-button" type="button" value="year">Year</button></div>
         <code>--s4-motion-ink · --s4-motion-ink-calm</code></div>
       <div class="mo-card"><h3>Morph</h3><p>A control changes its own shape or size. Press and hold a button; toggle the FAB.</p>
         <div class="mo-stage"><button class="s4-button" type="button">Press Me</button>
-          <div class="s4-button-group" data-connected aria-label="View"><button class="s4-button" data-variant="tonal" type="button" aria-pressed="true">Day</button><button class="s4-button" data-variant="tonal" type="button" aria-pressed="false">Week</button><button class="s4-button" data-variant="tonal" type="button" aria-pressed="false">Month</button></div>
+          <div class="s4-button-group" aria-label="Bill Actions"><button class="s4-button" data-variant="tonal" type="button">Edit</button><button class="s4-button" data-variant="tonal" type="button">Snooze</button><button class="s4-button" data-variant="tonal" type="button">Share</button></div>
           <button class="s4-fab" type="button" id="mo-fab"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button></div>
         <code>--s4-motion-morph · --s4-motion-morph-calm</code></div>
       <div class="mo-card"><h3>Bend</h3><p>An icon turns into its next state.</p>

@@ -34,6 +34,8 @@ replacing a leading icon if there is one. Assist icons are primary.
 `.s4-chip-remove` gets a close icon; a click (or Delete / Backspace on it) fires a cancelable `s4-remove { chip }`
 (call `preventDefault()` to keep the chip), then the chip collapses and is removed and focus moves to its neighbour.
 
+**Chips, button group or tabs?** If it narrows a collection and there can be many, it is chips. If it changes a value or how the same thing is shown, it is a [button group](../button-group/). If it swaps what is on the screen, it is [tabs](../tabs/) (decision 0059).
+
 **When to use what:** filter chips to narrow a list; input chips for values someone entered (tags, people);
 assist chips for a related action ("Add to Calendar"); suggestion chips for likely values or replies.
 

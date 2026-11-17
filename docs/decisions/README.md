@@ -22,7 +22,7 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | Items on glass are tints, not solid patches | 0043 (replaces 0015) |
 | Motion: pop, drop, slide, rise, shared axis; only transform and opacity | 0022, amended by 0042 (liquid ink) |
 | Shape and fill: nothing outlined, small things are pills, no sharp corners, inputs medium-rounded | 0023, 0024, 0025 |
-| Button groups: the Joined Capsule | 0026 |
+| Button groups (the Ink Track) and tabs (the navigation family): which is which | 0059 |
 | FAB: glass tinted with its own color | 0025, 0032 |
 | Icons: Solar; menu = hamburger (Line Duotone) | 0007, amended by 0043 |
 | Framework: layouts, page widths, templates, new content components | 0041 |
@@ -39,9 +39,9 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0006 | Liquid glass, the Material way | Not adopted |
 | 0007 | Icon Lab answers (menu = dots) | Active (menu is a hamburger since 0043) |
 | 0008 | Owner critique 2026-11-07 | Refined (motion parts superseded by 0022) |
-| 0009 | Style Lab: text fields, checkboxes, tabs | Refined by 0023, 0024 (checkboxes are filled circles; tabs keep the tray) |
+| 0009 | Style Lab: text fields, checkboxes, tabs | Refined by 0023, 0024 (checkboxes are filled circles); tabs amended by 0059 (no tray, the nav indicator) |
 | 0010 | Owner critique round 2: pill snackbar, round tabs, sliding nav highlight | Active |
-| 0011 | Style Lab 2: notched groups, centered-card phone sheet | Groups superseded by 0026; phone sheet superseded by 0043 (floating panels) |
+| 0011 | Style Lab 2: notched groups, centered-card phone sheet | Groups superseded by 0026, then 0059; phone sheet superseded by 0043 (floating panels) |
 | 0012 | Liquid glass on real pages (WebKit) | Superseded by 0019, then abandoned |
 | 0013 | Thin frost line edge, glass without shadow | Edge superseded by 0021+; no shadow active (0017) |
 | 0014 | Calmer color through glass | Superseded by 0021 (saturate 150%) |
@@ -54,9 +54,9 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0021 | Glass from the playground | Active (numbers refined by 0028, 0035) |
 | 0022 | Simpler motion | Active |
 | 0023 | Filled and pills; the Orion Showcase demo | Active |
-| 0024 | Tray groups, squarer inputs, glass drop-downs | Active (tray groups replaced by 0026) |
+| 0024 | Tray groups, squarer inputs, glass drop-downs | Active (tray groups replaced by 0026, then 0059) |
 | 0025 | No sharp corners, glass FAB, eight more components | Active |
-| 0026 | Joined Capsule button groups | Active |
+| 0026 | Joined Capsule button groups | Superseded by 0059 (the Ink Track); its glass lab part stands |
 | 0027 | Glass edge matches the playground | Refined by 0028–0037 |
 | 0028 | Owner's glass numbers, edge glow and sheen | Refined by 0034–0037 |
 | 0029 | Edge width follows the screen density | Active |
@@ -89,3 +89,4 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0056 | Themes on any container (every dial on any element, nesting), motion energy, four app defaults, roomy density | Active (our call, owner can overrule; built in round 0056) |
 | 0057 | The website kit: site type, rhythm, sections, five site templates; lighter files for pages | Active (our call, owner can overrule; built in round 0056) |
 | 0058 | Reach: right-to-left, print, text size, forced colors, keyboard, the reach suite; the dial presets proven in the suite | Active (our call, owner can overrule; built in round 0056) |
+| 0059 | Button groups are the Ink Track (sliding accent ink on a filled track); tabs join the navigation family (no tray, the nav indicator); the rule: swaps the screen = tabs, a value or a view of the same thing = button group, narrowing a collection = chips; the page checker and suite guard it | Active (owner's quiz answers and question; built) |

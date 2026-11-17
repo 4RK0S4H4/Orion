@@ -4,7 +4,7 @@
    Loads each page as a 390px dark phone and a 1280px light desktop (Playwright + Chromium) and reports:
      errors   – console errors, failed requests, unknown icons, sideways scroll, text below WCAG AA as rendered
                 (on glass: against the worst backdrop after the glass's own filter and tint), icon-only controls with
-                no name, and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
+                no name, a button group that swaps panels or tabs without panels (decision 0059), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
                 easings, glass on content, bare element selectors)
      warnings – more than one filled button in one area, labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -67,7 +67,7 @@ function lintCss(css, where) {
 
 /* ---------------- in-page audit (runs in the browser) ---------------- */
 function audit() {
-  const issues = { overflow: [], contrast: [], names: [], filled: [], caseWarn: [], glassContent: [] };
+  const issues = { overflow: [], contrast: [], names: [], filled: [], caseWarn: [], glassContent: [], roles: [] };
   const vw = document.documentElement.clientWidth;
   if (document.documentElement.scrollWidth > vw + 1) {
     const wide = [...document.querySelectorAll('body *')].filter((e) => { const r = e.getBoundingClientRect(); return r.width && r.right > vw + 1 && getComputedStyle(e).position !== 'fixed'; })
@@ -116,6 +116,8 @@ function audit() {
       if (bg && bg[3] > 0) { layers.push(bg); if (bg[3] >= 1) break; }
       /* a selected tab or nav item sits on the pill that slides behind it (a sibling element, not an ancestor) */
       if (n.matches('.s4-tab[aria-selected="true"], .s4-nav-item[aria-current]:not([aria-current="false"])')) { const pill = n.parentElement && n.parentElement.querySelector(':scope > .s4-tabs-indicator, :scope > .s4-nav-pill'); const pb = pill && parse(getComputedStyle(pill).backgroundColor); if (pb && pb[3] > 0) layers.push(pb); }
+      /* the selected option of a connected button group sits on the ink that slides behind it (decision 0059) */
+      if (n.matches('.s4-button-group[data-s4-ink] > [aria-pressed="true"]')) { const ink = n.parentElement.querySelector(':scope > .s4-button-group-ink:not([hidden])'); const ib = ink && parse(getComputedStyle(ink, '::before').backgroundColor); if (ib) { ib[3] *= +getComputedStyle(ink).opacity; if (ib[3] > 0) layers.push(ib); } }
     }
     if (unknown || opacity < 0.99) continue;                                  /* images and fading content: skip */
     const size = parseFloat(cs.fontSize), bold = +cs.fontWeight >= 700, large = size >= 24 || (bold && size >= 18.66);
@@ -133,6 +135,27 @@ function audit() {
     if (hidden(b) || !b.getClientRects().length) continue;
     const name = (b.getAttribute('aria-label') || '').trim() || (b.getAttribute('aria-labelledby') ? 'x' : '') || (b.title || '').trim() || b.textContent.trim();
     if (!name) issues.names.push(path(b));
+  }
+  /* decision 0059: a button group sets a value or changes how the same thing is shown; tabs swap panels */
+  const nameOf = (e) => (e.getAttribute('aria-label') || e.id || '').trim();
+  for (const g of document.querySelectorAll('.s4-button-group')) {
+    const opts = [...g.children].filter((b) => b.matches('.s4-button, .s4-icon-button'));
+    const targets = new Set(); let why = g.matches('[role="tablist"]') ? 'it is a tablist' : '';
+    for (const b of opts) {
+      if (b.matches('[role="tab"]')) why = 'its options are tabs';
+      if (b.matches('[data-view], [data-page-open]')) why = 'an option opens a view or a page';
+      for (const id of (b.getAttribute('aria-controls') || '').split(/\s+/).filter(Boolean)) {
+        const t = document.getElementById(id); if (!t) continue; targets.add(t);
+        if (t.matches('[role="tabpanel"], .s4-tab-panel, .s4-view, .s4-subpage') || (t.hidden && !b.hasAttribute('aria-expanded'))) why = `an option controls the panel #${id}`;
+      }
+    }
+    if (!why && targets.size > 1) why = `its options control ${targets.size} different regions`;
+    if (why) issues.roles.push(`button group "${nameOf(g)}" swaps panels (${why}): if it swaps what is on the screen, it is tabs (.s4-tabs with tab panels)`);
+  }
+  for (const l of document.querySelectorAll('.s4-tabs')) {
+    const tabs = [...l.querySelectorAll('.s4-tab')];
+    const bare = tabs.filter((t) => { const id = t.getAttribute('aria-controls'); return !id || !document.getElementById(id); });
+    if (tabs.length && bare.length) issues.roles.push(`tabs "${nameOf(l)}" without panels (${bare.length} of ${tabs.length} tabs control no tab panel): tabs swap panels; if it changes a value or how the same thing is shown, it is a button group`);
   }
   /* glass on content */
   for (const g of document.querySelectorAll('.s4-glass')) if (g.matches('.s4-card, .s4-pane, .s4-list, .s4-table, .s4-text-field, main, article, p, li, td') || (g.closest('.s4-content') && /^(static|relative)$/.test(getComputedStyle(g).position)))
@@ -219,6 +242,7 @@ for (const page of pages) {
       r.contrast.forEach((x) => errors.add(`${at} low contrast ${x}`));
       r.names.forEach((x) => errors.add(`${at} control with no accessible name (add aria-label): ${x}`));
       r.glassContent.forEach((x) => errors.add(`${at} glass on content: ${x}`));
+      r.roles.forEach((x) => errors.add(`${at} ${x}`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };

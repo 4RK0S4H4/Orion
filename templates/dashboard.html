@@ -11,7 +11,7 @@
      Its own elements, drawn from Orion's rules: the runway meter, paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=111d301">
+<link rel="stylesheet" href="../components/orion.css?v=a186eaa">
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
   .tl-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-3) var(--s4-space-4); padding-block: var(--s4-space-2) var(--s4-space-6); }
@@ -263,7 +263,7 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Save Draft</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=d4385af"></script>
+<script src="../components/orion.js?v=f9b35ff"></script>
 <script>
 /* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
 (function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#1d6b52', variant: 'tonal' }); })();

@@ -69,6 +69,27 @@ function audit(opts) {
   }
   /* icons */
   document.querySelectorAll('.s4-icon[data-icon]').forEach((i) => { if (!i.querySelector('svg') && !inPreview(i)) out.push(`icon not drawn: "${i.dataset.icon}"`); });
+  /* decision 0059: a button group sets a value or changes how the same thing is shown; tabs swap panels */
+  const gname = (e) => (e.getAttribute('aria-label') || e.id || '').trim();
+  document.querySelectorAll('.s4-button-group').forEach((g) => {
+    if (inPreview(g)) return;
+    const targets = new Set(); let why = g.matches('[role="tablist"]') ? 'it is a tablist' : '';
+    [...g.children].filter((b) => b.matches('.s4-button, .s4-icon-button')).forEach((b) => {
+      if (b.matches('[role="tab"]')) why = 'its options are tabs';
+      if (b.matches('[data-view], [data-page-open]')) why = 'an option opens a view or a page';
+      (b.getAttribute('aria-controls') || '').split(/\s+/).filter(Boolean).forEach((id) => {
+        const t = document.getElementById(id); if (!t) return; targets.add(t);
+        if (t.matches('[role="tabpanel"], .s4-tab-panel, .s4-view, .s4-subpage') || (t.hidden && !b.hasAttribute('aria-expanded'))) why = `an option controls the panel #${id}`;
+      });
+    });
+    if (!why && targets.size > 1) why = `its options control ${targets.size} different regions`;
+    if (why) out.push(`button group "${gname(g)}" swaps panels (${why}): if it swaps what is on the screen, it is tabs`);
+  });
+  document.querySelectorAll('.s4-tabs').forEach((l) => {
+    if (inPreview(l)) return;
+    const tabs = [...l.querySelectorAll('.s4-tab')], bare = tabs.filter((t) => { const id = t.getAttribute('aria-controls'); return !id || !document.getElementById(id); });
+    if (tabs.length && bare.length) out.push(`tabs "${gname(l)}" without panels (${bare.length} of ${tabs.length}): if it changes a value or how the same thing is shown, it is a button group`);
+  });
   /* duplicate ids */
   const seen = new Map();
   document.querySelectorAll('[id]').forEach((e) => { if (e.id && !e.closest('svg')) seen.set(e.id, (seen.get(e.id) || 0) + 1); });
@@ -190,7 +211,7 @@ function dialAudit(opts) {
   const shown = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width >= 8 && r.height >= 8 && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0 && !el.closest('[hidden], [inert], [data-s4-skip], svg'); };
   /* (a) corners: everything you click that is meant to follow the dial must not be a pill when the dial is not round */
   if (opts.dial) {
-    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > *, .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option';
+    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option';
     const EXEMPT = '.s4-badge, .s4-avatar, .s4-chip-avatar, .s4-switch *, .s4-radio *, .s4-checkbox *, .s4-slider *, .s4-progress *, .s4-date-picker-day, .s4-status-dot, .s4-chip-remove, [data-shape="circle"]';
     const seen = new Set();
     for (const el of document.querySelectorAll(FOLLOW)) {
@@ -250,6 +271,7 @@ function contrastAudit(seeded) {
       if (s.backgroundImage !== 'none') unknown = true;
       if (bg && bg[3] > 0) { layers.push(bg); if (bg[3] >= 1) break; }
       if (n.matches('.s4-tab[aria-selected="true"], .s4-nav-item[aria-current]:not([aria-current="false"])')) { const pill = n.parentElement && n.parentElement.querySelector(':scope > .s4-tabs-indicator, :scope > .s4-nav-pill'); const pb = pill && parse(getComputedStyle(pill).backgroundColor); if (pb && pb[3] > 0) layers.push(pb); }
+      if (n.matches('.s4-button-group[data-s4-ink] > [aria-pressed="true"]')) { const ink = n.parentElement.querySelector(':scope > .s4-button-group-ink:not([hidden])'); const ib = ink && parse(getComputedStyle(ink, '::before').backgroundColor); if (ib) { ib[3] *= +getComputedStyle(ink).opacity; if (ib[3] > 0) layers.push(ib); } }
     }
     if (unknown || opacity < 0.99) continue;
     const size = parseFloat(cs.fontSize), bold = +cs.fontWeight >= 700, large = size >= 24 || (bold && size >= 18.66), need = large ? 3 : 4.5;
@@ -428,10 +450,34 @@ async function use(page, add, phone) {
     for (const t of (await page.$$('.s4-tab[aria-selected="false"]')).slice(0, 6)) {
       if (!(await t.isVisible())) continue;
       const panel = await t.getAttribute('aria-controls'), label = ((await t.textContent()) || '').trim();
-      try { await t.scrollIntoViewIfNeeded({ timeout: 1500 }); await t.click({ timeout: 2500 }); } catch (e) { add(`tab "${label}" could not be clicked`); continue; }
+      try { await t.scrollIntoViewIfNeeded({ timeout: 1500 }); } catch (e) {}
+      const lefts = () => t.evaluate((x) => [...x.closest('.s4-tabs').querySelectorAll('.s4-tab')].map((y) => Math.round(y.getBoundingClientRect().left - x.closest('.s4-tabs').getBoundingClientRect().left + x.closest('.s4-tabs').scrollLeft)).join(','));
+      const before = await lefts();
+      try { await t.click({ timeout: 2500 }); } catch (e) { add(`tab "${label}" could not be clicked`); continue; }
       await settle(460);
       if ((await t.getAttribute('aria-selected')) !== 'true') add(`tab "${label}" did not become selected`);
+      if ((await lefts()) !== before) add(`tab "${label}": selecting it moved the other tabs (the heavier label must keep its width)`);
+      const pill = await t.evaluate((x) => { const ind = x.parentElement.querySelector(':scope > .s4-tabs-indicator'); if (!ind) return ''; const a = ind.getBoundingClientRect(), b = x.getBoundingClientRect(); return Math.abs(a.left - b.left) > 1.5 || Math.abs(a.width - b.width) > 1.5 || Math.abs(a.top - b.top) > 1.5 || Math.abs(a.height - b.height) > 1.5 ? `${Math.round(a.left)},${Math.round(a.width)} vs ${Math.round(b.left)},${Math.round(b.width)}` : ''; });
+      if (pill) add(`tab "${label}": the indicator did not land on it (${pill})`);
       if (panel && await page.evaluate((id) => { const p = document.getElementById(id); return !!p && p.hidden; }, panel)) add(`tab panel "${panel}" stayed hidden`);
+    }
+    /* connected button groups (the Ink Track, decision 0059): the ink lands on the option you pick */
+    for (const g of (await visible('.s4-button-group[data-connected][data-select="single"]:not([data-brand-dial], [data-theme-mode], [data-theme-contrast], #mode, #contrast, #icon-set, .ex-bar *)')).slice(0, 4)) {
+      const pick = await g.evaluate((x) => { const b = [...x.children].find((c) => c.matches('.s4-button, .s4-icon-button') && c.getAttribute('aria-pressed') === 'false' && !c.disabled); if (!b) return ''; const k = 'ink' + Math.random().toString(36).slice(2); b.setAttribute('data-ink-probe', k); return k; });
+      if (!pick) continue;
+      const off = page.locator(`[data-ink-probe="${pick}"]`);
+      const what = (await g.getAttribute('aria-label')) || 'button group';
+      if (!(await click(off, `option of "${what}"`))) continue;
+      await settle(460);
+      if ((await off.getAttribute('aria-pressed')) !== 'true') { add(`button group "${what}": the option did not become selected`); continue; }
+      const miss = await off.evaluate((b) => {
+        const g = b.parentElement, ink = g.querySelector(':scope > .s4-button-group-ink');
+        if (!g.hasAttribute('data-s4-ink') || !ink || ink.hidden) return 'no ink';
+        const pe = getComputedStyle(ink, '::before'), m = new DOMMatrix(pe.transform), gr = g.getBoundingClientRect(), br = b.getBoundingClientRect();
+        const x = gr.left + g.clientLeft + m.m41, y = gr.top + g.clientTop + m.m42, w = parseFloat(pe.width), h = parseFloat(pe.height);
+        return Math.abs(x - br.left) > 1.5 || Math.abs(y - br.top) > 1.5 || Math.abs(w - br.width) > 1.5 || Math.abs(h - br.height) > 1.5 ? `ink at ${Math.round(x)},${Math.round(w)}, option at ${Math.round(br.left)},${Math.round(br.width)}` : '';
+      });
+      if (miss) add(`button group "${what}": the ink did not land on the selected option (${miss})`);
     }
     /* accordions */
     for (const s of (await page.$$('.s4-accordion-item:not([open]) > summary')).slice(0, 4)) {
@@ -543,7 +589,7 @@ const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templ
 async function pressAudit(page, add) {
   const picks = await page.evaluate(() => {
     const seen = new Set(), out = [];
-    document.querySelectorAll('.s4-button, .s4-icon-button, .s4-chip, .s4-fab, .s4-segment, .s4-button-group > *').forEach((b, i) => {
+    document.querySelectorAll('.s4-button, .s4-icon-button, .s4-chip, .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink)').forEach((b, i) => {
       const r = b.getBoundingClientRect(); if (!r.width || b.disabled || b.closest('[hidden], dialog:not([open]), [data-s4-skip]')) return;
       if (r.bottom < 0 || r.top > innerHeight) return;
       const k = b.className + '|' + (b.dataset.variant || ''); if (seen.has(k) || out.length >= 5) return; seen.add(k);

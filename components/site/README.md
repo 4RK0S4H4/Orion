@@ -80,11 +80,11 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-quote` | One large quote (`blockquote` + `.s4-quote-cite`), hanging punctuation | `data-align="center"` |
 | `.s4-quotes` | Short quotes as filled cards, 1 then 3 columns | — |
 | `.s4-numbers` > `.s4-number` | Big numbers: a `dl` with `dt` (label) and `dd` (value) | `data-columns="3"` |
-| `.s4-plans-period` | Holds the period switch: a Joined Capsule group with `data-period` | — |
+| `.s4-plans-period` | Holds the period switch: a connected button group (the Ink Track) with `data-period` | — |
 | `[data-period]` | On a connected button group (a value: a period, a pack, a size, seats): picks which `data-period-<value>` text shows | — |
 | `.s4-plans` > `.s4-plan` | `.s4-plan-head` (`.s4-plan-name`), `.s4-plan-price` (`.s4-plan-amount`, `.s4-plan-per`), a button, `.s4-checks` | `data-featured` (the accent fill) |
 | `[data-period-<value>]` | Text shown for that period, on any element in the same section (or `[data-period-scope]`) | — |
-| `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own Joined Capsule group (values 1…4) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
+| `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own connected button group (values 1…4; it changes which plan the same table shows, so it is a button group, not tabs) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
 | `.s4-cta` | Words and actions in a band | `data-align="center"` |
 | `.s4-site-signup` | An email field and a button on one line | — |
 | `.s4-site-index` > `li` > `.s4-site-index-row` | A numbered list of everything (all projects, past issues, an archive): `.s4-site-index-n`, `.s4-site-index-title`, `.s4-site-index-meta` (one or two spans), `.s4-site-index-year`. Meta under the title on a phone, its own columns from 840; rows hover with a rounded fill | — |
