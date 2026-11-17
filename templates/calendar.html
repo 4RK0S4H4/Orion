@@ -1,147 +1,468 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="cool" data-type-display="rounded" data-energy="lively" data-lists="segmented">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Calendar · S4 Orion Template</title>
-<!-- Template: Calendar. For schedules, bookings, shifts, content plans and anything that lives on dates. A month grid
-     with the day's agenda beside it (under it on a phone); pick a day to see it, add an event in place under the
-     agenda's heading, open an event as a page. The grid is a real table of buttons, so the arrow keys work. -->
+<title>Moorings · Boat Bookings</title>
+<!-- Template: Calendar, as a product (issue 66). Moorings is the boat-booking calendar of a small sailing club: members
+     book the club's five boats by the hour, and the day you pick shows the water before the bookings (tide, wind,
+     daylight), because that decides whether you go at all. For schedules, bookings, shifts, rotas and content plans:
+     keep the month grid (a real table of buttons, arrow keys walk the days), the day beside it (under it on a phone),
+     booking in place under the day, a booking as a page, and Undo instead of "Are you sure?".
+     Brand through the dials only: tinted color mode on a sea blue (everything carries a little of the water), cool
+     grays, the rounded display face, round corners (the stock pills), lively motion, segmented lists. The conditions
+     band is a scoped dark region (data-theme="dark"): the night sea in light mode as well as dark.
+     Its own elements, drawn from Orion's rules: the tide curve, the fleet board (one track a boat across the sailing
+     day) and the wind marks on the month. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.css?v=5545f95">
 <style>
-  /* the app's own layout: tokens only */
-  .cal-head { display: flex; align-items: center; gap: var(--s4-space-2); }
-  .cal-head h2 { margin: 0 auto 0 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
-  .cal-grid { inline-size: 100%; border-collapse: separate; border-spacing: var(--s4-space-1); table-layout: fixed; }
-  .cal-grid th { padding-block: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-label-medium-weight); text-align: center; }
-  .cal-grid td { padding: 0; }
-  .cal-day { display: flex; flex-direction: column; align-items: stretch; gap: var(--s4-space-1); inline-size: 100%; min-block-size: var(--s4-space-12); padding: var(--s4-space-1); border: 0; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); font: inherit; text-align: start; cursor: pointer; overflow: hidden; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
-  @container s4-app (width >= 840px) { .cal-day { min-block-size: calc(var(--s4-space-16) + var(--s4-space-6)); padding: var(--s4-space-2); } }
-  @media (hover: hover) { .cal-day:hover { background: var(--md-sys-color-surface-container-high); } }
-  .cal-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
-  .cal-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-  .cal-num { align-self: flex-start; display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); font-variant-numeric: tabular-nums; }
-  .cal-day[data-today] .cal-num { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
-  .cal-ev { display: none; padding-inline: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  /* a phone shows dots for events; a wide screen shows their names */
-  .cal-dots { display: flex; gap: var(--s4-space-1); padding-inline: var(--s4-space-1); min-block-size: var(--s4-space-2); }
-  .cal-dots > i { inline-size: var(--s4-space-1); block-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: currentColor; opacity: 0.7; }
-  @container s4-app (width >= 840px) { .cal-ev { display: block; } .cal-dots { display: none; } }
-  .s4-subpage > article { max-inline-size: 40rem; margin-inline: auto; }
-  @media (forced-colors: active) { .cal-day { border: 1px solid ButtonText; } }
+  /* Moorings' own layout and elements: tokens only; nothing here restyles an Orion component */
+  .mr-kicker { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  .mr-h { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); letter-spacing: var(--md-sys-typescale-headline-small-tracking); }
+  .mr-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .mr-num { font-variant-numeric: tabular-nums; }
+
+  /* ---------- the month ---------- */
+  .mr-month-head { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .mr-month-head > div { margin-inline-end: auto; min-inline-size: 0; }
+  .mr-month-title { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-large-weight); letter-spacing: var(--md-sys-typescale-headline-large-tracking); }
+  .mr-grid { inline-size: 100%; border-collapse: separate; border-spacing: var(--s4-space-1); table-layout: fixed; margin-inline: calc(var(--s4-space-1) * -1); inline-size: calc(100% + var(--s4-space-2)); }
+  .mr-grid th { padding-block: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); text-align: center; }
+  .mr-grid td { padding: 0; }
+  /* a day is a button; its corner follows the corners dial and never goes past a large card corner */
+  .mr-day { --_r: min(var(--s4-shape-control), var(--md-sys-shape-corner-large)); display: flex; flex-direction: column; align-items: stretch; gap: var(--s4-space-1); inline-size: 100%; min-block-size: var(--s4-space-12); padding: var(--s4-space-1); border: 0; border-radius: var(--_r); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); font: inherit; text-align: start; cursor: pointer; overflow: hidden; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
+  @container s4-app (width >= 840px) { .mr-day { min-block-size: calc(var(--s4-space-16) + var(--s4-space-8)); padding: var(--s4-space-2); } }
+  @media (hover: hover) { .mr-day:hover { background: var(--md-sys-color-surface-container-high); } }
+  .mr-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
+  .mr-day[data-past]:not([aria-pressed="true"]) { color: var(--md-sys-color-on-surface-variant); }
+  .mr-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .mr-date { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-1); }
+  .mr-n { display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); line-height: 1; font-weight: var(--md-sys-typescale-label-large-weight); font-variant-numeric: tabular-nums; }
+  .mr-day[data-today] .mr-n { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  /* wind mark: a short bar under the number on a phone, the speed in words on a wide screen */
+  .mr-wind { display: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mr-wind[data-strong] { padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+  .mr-gust { display: block; inline-size: var(--s4-space-4); block-size: calc(var(--s4-space-1) - 1px); margin-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-error); }
+  .mr-ev { display: none; padding-inline: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mr-ev[data-mine] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  .mr-more { display: none; padding-inline: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); }
+  .mr-dots { display: flex; gap: var(--s4-space-1); padding-inline: var(--s4-space-1); min-block-size: var(--s4-space-2); align-items: center; }
+  .mr-dots > i { inline-size: calc(var(--s4-space-1) + 1px); block-size: calc(var(--s4-space-1) + 1px); border-radius: var(--md-sys-shape-corner-full); background: currentColor; opacity: 0.55; }
+  .mr-dots > i[data-mine] { background: var(--md-sys-color-primary); opacity: 1; }
+  .mr-day[aria-pressed="true"] .mr-dots > i[data-mine] { background: currentColor; }
+  @container s4-app (width >= 840px) { .mr-ev, .mr-more { display: block; } .mr-wind { display: inline-block; } .mr-dots, .mr-gust { display: none; } }
+  /* the key is part of the month */
+  .mr-key { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-5); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .mr-key li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .mr-key i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
+  .mr-key i[data-k="mine"] { background: var(--md-sys-color-primary); }
+  .mr-key i[data-k="wind"] { block-size: var(--s4-space-1); inline-size: var(--s4-space-4); background: var(--md-sys-color-error); }
+
+  /* ---------- the day ---------- */
+  .mr-day-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4-space-3); }
+  .mr-day-head > div { min-inline-size: 0; }
+
+  /* conditions: a scoped dark band, the water before the bookings */
+  .mr-sea { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .mr-sea-top { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4-space-3); }
+  .mr-verdict { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .mr-wind-big { display: flex; align-items: center; gap: var(--s4-space-3); }
+  .mr-knots { font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-emphasized-display-small-weight, 600); font-variant-numeric: tabular-nums; }
+  .mr-knots small { margin-inline-start: var(--s4-space-1); font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); font-weight: var(--md-sys-typescale-title-medium-weight); color: var(--md-sys-color-on-surface-variant); }
+  /* the wind arrow: points where the wind blows to; turned once, never animated */
+  .mr-arrow { flex: none; display: grid; place-items: center; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .mr-arrow > svg { inline-size: var(--s4-space-6); block-size: var(--s4-space-6); transform: rotate(var(--deg)); }
+  /* the tide: a filled curve over the day, high and low written under it */
+  .mr-tide { display: grid; gap: var(--s4-space-2); margin: 0; }
+  .mr-tide svg { display: block; inline-size: 100%; block-size: calc(var(--s4-space-16) + var(--s4-space-4)); overflow: visible; }
+  :dir(rtl) .mr-tide svg { transform: scaleX(-1); }
+  .mr-tide .t-fill { fill: var(--md-sys-color-primary-container); }
+  .mr-tide .t-line { fill: none; stroke: var(--md-sys-color-primary); stroke-width: 2.5; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+  .mr-tide .t-dark { fill: var(--md-sys-color-surface-container-highest); }
+  .mr-tide .t-now { stroke: var(--md-sys-color-on-surface); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .mr-tide-scale { display: flex; justify-content: space-between; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+  .mr-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3) var(--s4-space-4); margin: 0; }
+  @container s4-app (width >= 1600px) { .mr-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .mr-facts div { display: grid; gap: var(--s4-space-1); }
+  .mr-facts dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .mr-facts dd { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; }
+
+  /* the fleet board: one track a boat across the sailing day (08:00 to 20:00); a booking is a filled block */
+  .mr-board { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .mr-boat { display: grid; grid-template-columns: calc(var(--s4-space-16) + var(--s4-space-4)) minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); }
+  .mr-boat-name { min-inline-size: 0; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  .mr-boat-name small { display: block; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-weight: var(--md-sys-typescale-label-small-weight); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mr-track { position: relative; block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
+  .mr-block { position: absolute; inset-block: var(--s4-space-1); inset-inline-start: calc(var(--s) * 1%); inline-size: calc(var(--w) * 1%); min-inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-tertiary-container); }
+  .mr-block[data-mine] { background: var(--md-sys-color-primary); }
+  .mr-track[data-repair] { display: flex; align-items: center; padding-inline: var(--s4-space-3); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mr-now { position: absolute; inset-block: calc(var(--s4-space-1) * -1); inset-inline-start: calc(var(--s) * 1%); inline-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-surface); }
+  .mr-hours { display: grid; grid-template-columns: calc(var(--s4-space-16) + var(--s4-space-4)) minmax(0, 1fr); gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+  .mr-hours > span:last-child { display: flex; justify-content: space-between; }
+  .mr-free { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* a boat badge: two letters on the boat's own tone, so rows read at a glance */
+  .mr-badge { flex: none; display: grid; place-items: center; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  .mr-badge[data-mine] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+
+  /* ---------- my sails ---------- */
+  .mr-season { display: grid; gap: var(--s4-space-5); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .mr-season-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s4-space-2) var(--s4-space-3); }
+  .mr-season-big strong { font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-large-size); line-height: var(--md-sys-typescale-display-large-line-height); font-weight: var(--md-sys-typescale-emphasized-display-large-weight, 600); font-variant-numeric: tabular-nums; }
+  .mr-season p { margin: 0; }
+  /* a season of weeks: one pill a week, its fill how long you were out */
+  .mr-weeks { display: grid; grid-template-columns: repeat(26, minmax(0, 1fr)); align-items: end; gap: calc(var(--s4-space-1) / 2); block-size: var(--s4-space-16); }
+  .mr-weeks > i { block-size: max(var(--s4-space-1), calc(var(--h) * 1%)); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-primary-container); opacity: 0.35; }
+  .mr-weeks > i[data-on] { opacity: 1; }
+  .mr-weeks-scale { display: flex; justify-content: space-between; font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); }
+  .mr-two { display: grid; gap: var(--s4-layout-gap); }
+  @container s4-app (width >= 840px) { .mr-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; } }
+
+  /* ---------- fleet ---------- */
+  .mr-fleet { display: grid; gap: var(--s4-layout-gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); margin: 0; padding: 0; list-style: none; }
+  .mr-hull { display: grid; gap: var(--s4-space-4); }
+  .mr-hull-top { display: flex; align-items: center; gap: var(--s4-space-3); }
+  .mr-hull-top > div { flex: 1; min-inline-size: 0; }
+  /* the boat drawn from shapes: a sail and a hull, in the boat's tone */
+  .mr-sail { display: block; inline-size: 100%; block-size: calc(var(--s4-space-16) + var(--s4-space-6)); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); }
+  .mr-sail .s-main { fill: var(--md-sys-color-primary); }
+  .mr-sail .s-jib { fill: var(--md-sys-color-tertiary); }
+  .mr-sail .s-hull { fill: var(--md-sys-color-on-surface); }
+  .mr-sail .s-sea { fill: var(--md-sys-color-primary-container); }
+  .mr-hull[data-repair] .mr-sail .s-main, .mr-hull[data-repair] .mr-sail .s-jib { fill: var(--md-sys-color-surface-container-highest); }
+
+  .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
+  .mr-check { display: grid; gap: var(--s4-space-3); }
+  @media (forced-colors: active) { .mr-day, .mr-track, .mr-block, .mr-sea { border: 1px solid CanvasText; } .mr-block[data-mine] { background: Highlight; } }
 </style>
 </head>
 <body>
 <div class="s4-app">
   <nav class="s4-nav-rail" aria-label="Main">
-    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
+      <button class="s4-fab" type="button" data-expand="new-booking" id="mr-book-rail"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Book a Boat</span></button></div>
     <div class="s4-nav-rail-items">
-      <a class="s4-nav-item" href="#month" data-view="month" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Month</span></a>
-      <a class="s4-nav-item" href="#upcoming" data-view="upcoming"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="list"></span></span><span class="s4-nav-label">Upcoming</span></a>
+      <a class="s4-nav-item" href="#calendar" data-view="calendar" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Calendar</span></a>
+      <a class="s4-nav-item" href="#sails" data-view="sails"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">My Sails</span></a>
+      <a class="s4-nav-item" href="#fleet" data-view="fleet"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="location"></span></span><span class="s4-nav-label">Fleet</span></a>
     </div>
   </nav>
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Month</h1></div>
-      <div class="s4-app-bar-actions"><button class="s4-button" data-variant="tonal" data-size="s" type="button" id="cal-today">Today</button></div>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Calendar</h1><p class="s4-app-bar-subtitle">Larkspur Bay Sailing Club</p></div>
+      <div class="s4-app-bar-actions"><button class="s4-button" data-variant="tonal" data-size="s" type="button" id="mr-today">Today</button></div>
     </header>
     <main class="s4-content" data-width="wide">
-      <section class="s4-view" data-view="month" data-title="Month">
-        <div class="s4-split" data-layout="supporting" data-resizable data-resize-key="orion-template-calendar">
+      <!-- Calendar: the month, and the day beside it -->
+      <section class="s4-view" data-view="calendar" data-title="Calendar">
+        <div class="s4-split" data-layout="supporting" data-resizable data-resize-key="moorings-split">
           <section class="s4-split-pane s4-stack" aria-label="Month">
-            <div class="cal-head"><h2 id="cal-title" aria-live="polite">November 2026</h2><button class="s4-icon-button" type="button" aria-label="Previous Month" id="cal-prev"><span class="s4-icon" data-icon="chevron-left"></span></button><button class="s4-icon-button" type="button" aria-label="Next Month" id="cal-next"><span class="s4-icon" data-icon="chevron-right"></span></button></div>
-            <table class="cal-grid" id="cal-grid" aria-labelledby="cal-title"><thead><tr><th scope="col" abbr="Monday">Mon</th><th scope="col" abbr="Tuesday">Tue</th><th scope="col" abbr="Wednesday">Wed</th><th scope="col" abbr="Thursday">Thu</th><th scope="col" abbr="Friday">Fri</th><th scope="col" abbr="Saturday">Sat</th><th scope="col" abbr="Sunday">Sun</th></tr></thead><tbody></tbody></table>
+            <div class="mr-month-head">
+              <div><p class="mr-kicker" id="mr-count">23 bookings</p><h2 class="mr-month-title" id="mr-title" aria-live="polite">November 2026</h2></div>
+              <button class="s4-icon-button" type="button" aria-label="Previous Month" data-tooltip="Previous Month" id="mr-prev"><span class="s4-icon" data-icon="chevron-left"></span></button>
+              <button class="s4-icon-button" type="button" aria-label="Next Month" data-tooltip="Next Month" id="mr-next"><span class="s4-icon" data-icon="chevron-right"></span></button>
+            </div>
+            <table class="mr-grid" id="mr-grid" aria-labelledby="mr-title"><thead><tr><th scope="col" abbr="Monday">Mon</th><th scope="col" abbr="Tuesday">Tue</th><th scope="col" abbr="Wednesday">Wed</th><th scope="col" abbr="Thursday">Thu</th><th scope="col" abbr="Friday">Fri</th><th scope="col" abbr="Saturday">Sat</th><th scope="col" abbr="Sunday">Sun</th></tr></thead><tbody></tbody></table>
+            <ul class="mr-key" aria-label="Key"><li><i data-k="mine"></i>Your Booking</li><li><i></i>Club Booking</li><li><i data-k="wind"></i>Strong Wind Forecast (20 kn or More)</li></ul>
           </section>
-          <aside class="s4-split-pane" data-sticky aria-label="Day">
-            <section class="s4-pane">
-              <div class="s4-row" style="justify-content:space-between"><h2 class="s4-pane-title" id="day-title">Today</h2><button class="s4-button" data-variant="tonal" data-size="s" type="button" data-expand="new-event"><span class="s4-icon" data-icon="add"></span>New Event</button></div>
-              <!-- a new event is typed in place, under the day it belongs to (decision 0047) -->
-              <div class="s4-expand" id="new-event" data-variant="inset" hidden>
-                <form class="s4-form s4-expand-body" id="ev-form">
-                  <div class="s4-text-field"><input id="ev-title" name="title" autocomplete="off" required data-msg-required="Give the event a name."><label for="ev-title">Event</label></div>
-                  <div class="s4-text-field"><input id="ev-time" name="time" type="time" value="10:00" required><label for="ev-time">Starts</label></div>
-                  <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Add Event</button></div>
-                </form>
+
+          <aside class="s4-split-pane s4-stack" data-sticky aria-label="Day">
+            <div class="mr-day-head">
+              <div><p class="mr-kicker" id="mr-day-kicker">Today</p><h2 class="mr-h" id="mr-day-title">Saturday, 14 November</h2></div>
+              <button class="s4-button" data-variant="filled" data-size="s" type="button" data-expand="new-booking" id="mr-book"><span class="s4-icon" data-icon="add"></span>Book</button>
+            </div>
+
+            <!-- a booking is made in place, under the day it belongs to (decision 0047) -->
+            <div class="s4-expand" id="new-booking" data-variant="inset" hidden>
+              <form class="s4-form s4-expand-body" id="mr-form">
+                <div class="s4-text-field"><select id="f-boat" name="boat" required data-msg-required="Pick a boat."><option value=""></option></select><label for="f-boat">Boat</label></div>
+                <div class="s4-form-row">
+                  <div class="s4-text-field"><input id="f-start" name="start" type="time" value="13:00" min="08:00" max="18:00" step="1800" required data-msg-min="The boat shed opens at 08:00." data-msg-max="Book by 18:00 so the boat is back before dark."><label for="f-start">Out At</label></div>
+                  <div class="s4-text-field"><select id="f-hours" name="hours" required><option value="2">2 Hours</option><option value="3" selected>3 Hours</option><option value="5">Half Day</option></select><label for="f-hours">For</label></div>
+                </div>
+                <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Book Boat</button></div>
+              </form>
+            </div>
+
+            <section class="mr-sea" data-theme="dark" aria-labelledby="mr-verdict">
+              <div class="mr-sea-top">
+                <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><p class="mr-verdict" id="mr-verdict">Good for Dinghies</p><p class="mr-sub" id="mr-verdict-sub">Steady breeze, gusts under 20 knots.</p></div>
+                <span class="s4-status" data-tone="primary" id="mr-window">Forecast</span>
               </div>
-              <div class="s4-states" id="day-states" data-state="empty">
-                <ul class="s4-list" data-when="ready" id="day-list" aria-labelledby="day-title"></ul>
-                <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="calendar"></span></span><h3 class="s4-empty-title">Nothing Planned</h3><p class="s4-empty-text">This day is free.</p></div>
+              <div class="mr-wind-big">
+                <span class="mr-arrow" id="mr-arrow" style="--deg: 45deg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l6 9h-4v9h-4v-9H6z" fill="currentColor"/></svg></span>
+                <p class="mr-knots" style="margin:0"><span id="mr-kn">14</span><small>kn</small></p>
+                <p class="mr-sub" id="mr-wind-text" style="margin-inline-start:auto;text-align:end">From the southwest<br>Gusts 19 kn</p>
               </div>
+              <figure class="mr-tide" aria-labelledby="mr-tide-cap">
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none" aria-hidden="true" id="mr-tide-svg"></svg>
+                <div class="mr-tide-scale" aria-hidden="true"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+                <figcaption class="mr-sub" id="mr-tide-cap">Tide</figcaption>
+              </figure>
+              <dl class="mr-facts">
+                <div><dt>High Water</dt><dd id="mr-high">10:42</dd></div>
+                <div><dt>Low Water</dt><dd id="mr-low">16:55</dd></div>
+                <div><dt>Sunset</dt><dd id="mr-sunset">19:58</dd></div>
+                <div><dt>Water</dt><dd id="mr-water">16 °C</dd></div>
+              </dl>
             </section>
+
+            <section class="s4-pane" aria-labelledby="mr-board-h">
+              <h3 class="s4-pane-title" id="mr-board-h">Fleet</h3>
+              <ul class="mr-board" id="mr-board" aria-label="Who has each boat"></ul>
+              <div class="mr-hours" aria-hidden="true"><span></span><span><span>08</span><span>11</span><span>14</span><span>17</span><span>20</span></span></div>
+            </section>
+
+            <div class="s4-states" id="mr-day-states" data-state="ready">
+              <ul class="s4-list" data-when="ready" id="mr-day-list" aria-label="Bookings on this day"></ul>
+              <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="calendar"></span></span><h3 class="s4-empty-title">Every Boat Is Free</h3><p class="s4-empty-text">No one has booked this day yet. Book in the morning before the breeze fills in.</p></div>
+            </div>
           </aside>
         </div>
       </section>
-      <section class="s4-view" data-view="upcoming" data-title="Upcoming" hidden>
-        <ul class="s4-list" id="up-list" aria-label="Upcoming Events" data-dividers></ul>
+
+      <!-- My Sails: the season so far, what is coming, the logbook -->
+      <section class="s4-view s4-stack" data-view="sails" data-title="My Sails" hidden>
+        <section class="mr-season" aria-labelledby="mr-season-h">
+          <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><p class="s4-label-large" id="mr-season-h" style="margin:0">Season 2026–27 · Sam Teale</p>
+            <p class="mr-season-big"><strong id="mr-hrs" data-count-to="41">41</strong><span class="s4-title-large">hours on the water</span></p>
+            <p class="s4-body-medium">15 sails since the club opened in September. Kestrel is your boat: 9 of them.</p></div>
+          <div class="s4-stack" style="--s4-gap: var(--s4-space-2)">
+            <div class="mr-weeks" id="mr-weeks" role="img" aria-label="Hours sailed each week since September: most in late October"></div>
+            <div class="mr-weeks-scale" aria-hidden="true"><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span></div>
+          </div>
+        </section>
+        <div class="mr-two">
+          <section class="s4-stack" aria-labelledby="mr-up-h">
+            <h2 class="mr-h" id="mr-up-h">Coming Up</h2>
+            <div class="s4-states" id="mr-up-states" data-state="ready">
+              <ul class="s4-list" data-when="ready" id="mr-up-list" aria-labelledby="mr-up-h"></ul>
+              <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="calendar"></span></span><h3 class="s4-empty-title">Nothing Booked</h3><p class="s4-empty-text">Pick a day on the calendar to book a boat.</p></div>
+            </div>
+          </section>
+          <section class="s4-pane" aria-labelledby="mr-log-h">
+            <h2 class="s4-pane-title" id="mr-log-h">Logbook</h2>
+            <dl class="s4-dl">
+              <div class="s4-dl-row"><dt>Rating</dt><dd>Dinghy Helm, Keelboat Crew</dd></div>
+              <div class="s4-dl-row"><dt>Longest Sail</dt><dd>5 h, Osprey, Oct 24</dd></div>
+              <div class="s4-dl-row"><dt>Windiest</dt><dd>22 kn, Kestrel, Oct 31</dd></div>
+              <div class="s4-dl-row"><dt>Duty Officer</dt><dd>Next on Sunday, Nov 29</dd></div>
+            </dl>
+          </section>
+        </div>
       </section>
 
-      <section class="s4-subpage" data-page="event" data-title="Event" hidden>
+      <!-- Fleet: the five boats, one is in the shed -->
+      <section class="s4-view s4-stack" data-view="fleet" data-title="Fleet" hidden>
+        <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><h2 class="mr-h">The Club Fleet</h2><p class="mr-sub">Five boats on the hard by the slipway. Book any boat your rating covers.</p></div>
+        <ul class="mr-fleet" id="mr-fleet"></ul>
+      </section>
+
+      <!-- a booking: a page you go into (#calendar/booking/b7) -->
+      <section class="s4-subpage" data-page="booking" data-title="Booking" hidden>
         <article class="s4-stack">
-          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="e-title">Event</h2><div class="s4-subpage-meta"><span class="s4-icon" data-icon="schedule"></span><span id="e-when"></span></div></header>
-          <section class="s4-pane">
-            <dl class="s4-dl"><div class="s4-dl-row"><dt>Calendar</dt><dd>Work</dd></div><div class="s4-dl-row"><dt>Reminder</dt><dd>30 minutes before</dd></div></dl>
-            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="e-remove">Remove Event</button></div>
+          <header class="s4-subpage-header"><p class="mr-kicker" id="b-boat">Kestrel · RS Quest</p><h2 class="s4-subpage-title" id="b-title">Booking</h2><div class="s4-subpage-meta"><span class="s4-icon" data-icon="schedule"></span><span id="b-when"></span></div></header>
+          <section class="s4-pane" aria-label="On the water"><div class="s4-stat-row" style="--s4-stat-min: 6rem">
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Out</span><span class="s4-stat-value" id="b-out">09:00</span><span class="s4-stat-meta" id="b-back">back 12:00</span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Wind</span><span class="s4-stat-value" id="b-wind">14 kn</span><span class="s4-stat-meta" id="b-wind-meta">southwest</span></div>
+            <div class="s4-stat" data-size="small"><span class="s4-stat-label">Crew</span><span class="s4-stat-value" id="b-crew">2</span><span class="s4-stat-meta" id="b-crew-meta">of 3 seats</span></div>
+          </div></section>
+          <section class="s4-pane" aria-labelledby="b-check-h">
+            <h3 class="s4-pane-title" id="b-check-h">Before You Sail</h3>
+            <div class="mr-check">
+              <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Sign Out on the Board by the Shed</label>
+              <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Buoyancy Aid for Everyone Aboard</label>
+              <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Tell the Duty Officer Your Route</label>
+            </div>
+          </section>
+          <section class="s4-pane" aria-label="Details">
+            <dl class="s4-dl"><div class="s4-dl-row"><dt>Skipper</dt><dd id="b-who"></dd></div><div class="s4-dl-row"><dt>Rating Needed</dt><dd id="b-rating"></dd></div><div class="s4-dl-row"><dt>Duty Officer</dt><dd>Mere Tane, channel 77</dd></div></dl>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="b-cancel">Cancel Booking</button></div>
           </section>
         </article>
       </section>
     </main>
   </div>
   <nav class="s4-nav-bar" aria-label="Main">
-    <a class="s4-nav-item" href="#month" data-view="month" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Month</span></a>
-    <a class="s4-nav-item" href="#upcoming" data-view="upcoming"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="list"></span></span><span class="s4-nav-label">Upcoming</span></a>
+    <a class="s4-nav-item" href="#calendar" data-view="calendar" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Calendar</span></a>
+    <a class="s4-nav-item" href="#sails" data-view="sails"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">My Sails</span></a>
+    <a class="s4-nav-item" href="#fleet" data-view="fleet"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="location"></span></span><span class="s4-nav-label">Fleet</span></a>
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
 <script src="../components/orion.js?v=d4385af"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
-/* the data (a real app loads and saves this). "Today" is fixed so the template always looks the same. */
-var TODAY = '2026-11-14', view = { y: 2026, m: 10 }, picked = TODAY, seq = 20;
-var events = [
-  { id: 'e1', date: '2026-11-03', time: '09:30', title: 'Planning' }, { id: 'e2', date: '2026-11-09', time: '14:00', title: 'Design review' },
-  { id: 'e3', date: '2026-11-14', time: '10:00', title: 'Standup' }, { id: 'e4', date: '2026-11-14', time: '13:00', title: 'Lunch with Maya' },
-  { id: 'e5', date: '2026-11-14', time: '16:30', title: 'Budget check' }, { id: 'e6', date: '2026-11-18', time: '11:00', title: 'Launch checklist' },
-  { id: 'e7', date: '2026-11-20', time: '09:00', title: 'Invoice due' }, { id: 'e8', date: '2026-11-26', time: '15:00', title: 'Offsite prep' },
-  { id: 'e9', date: '2026-12-02', time: '10:00', title: 'Quarter review' }
+<script>
+/* Moorings' brand: tinted sea blue over the dials set on <html>. The light/dark choice follows the templates hub. */
+(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#00658f', surfaces: 'tinted' }); })();
+
+/* the data (a real app loads and saves this). "Today" and "now" are fixed so the template always looks the same. */
+var TODAY = '2026-11-14', NOW = 11 + 20 / 60, ME = 'Sam Teale', view = { y: 2026, m: 10 }, picked = TODAY, seq = 40;
+var BOATS = [
+  { id: 'kestrel', name: 'Kestrel', cls: 'RS Quest', seats: 3, rating: 'Dinghy Helm', note: 'The training boat. Forgiving, dry, roomy.' },
+  { id: 'petrel', name: 'Petrel', cls: 'RS Quest', seats: 3, rating: 'Dinghy Helm', note: 'Kestrel’s twin.', repair: 'Centreboard repair, back Nov 21' },
+  { id: 'wren', name: 'Wren', cls: 'ILCA 6', seats: 1, rating: 'Dinghy Helm', note: 'Single-hander. Quick, wet, honest.' },
+  { id: 'tern', name: 'Tern', cls: 'Wayfarer', seats: 4, rating: 'Dinghy Helm', note: 'For families and picnics round the point.' },
+  { id: 'osprey', name: 'Osprey', cls: 'J/22 Keelboat', seats: 4, rating: 'Keelboat Helm', note: 'The club’s keelboat, moored off the jetty.' }
 ];
-var app = document.querySelector('.s4-app'), body = document.querySelector('#cal-grid tbody');
+var B = {}; BOATS.forEach(function (b) { B[b.id] = b; });
+function bk(id, date, start, hours, boat, who, crew, title) { return { id: id, date: date, start: start, hours: hours, boat: boat, who: who, crew: crew, title: title }; }
+var bookings = [
+  bk('b1', '2026-11-01', 10, 3, 'kestrel', ME, 2, 'Round the Mark'), bk('b2', '2026-11-01', 13, 2, 'wren', 'Dev Malhotra', 1, 'Practice Starts'),
+  bk('b3', '2026-11-03', 16, 2, 'tern', 'Ruth Okafor', 3, 'Evening Sail'), bk('b4', '2026-11-07', 9, 5, 'osprey', 'The Lindqvists', 4, 'Day Out to Gull Rock'),
+  bk('b5', '2026-11-07', 10, 3, 'kestrel', 'Junior Squadron', 3, 'Junior Squadron'), bk('b6', '2026-11-08', 11, 3, 'kestrel', ME, 2, 'Sail with Ana'),
+  bk('b7', '2026-11-11', 15, 2, 'wren', 'Dev Malhotra', 1, 'Tuning Run'), bk('b8', '2026-11-12', 9, 2, 'tern', 'Ruth Okafor', 2, 'Morning Sail'),
+  bk('b9', '2026-11-14', 9, 3, 'kestrel', ME, 2, 'Sail with Ana'), bk('b10', '2026-11-14', 10, 2, 'wren', 'Dev Malhotra', 1, 'Practice Starts'),
+  bk('b11', '2026-11-14', 12.5, 5, 'osprey', 'The Lindqvists', 4, 'Picnic at Gull Rock'), bk('b12', '2026-11-14', 14, 3, 'tern', 'Junior Squadron', 4, 'Junior Squadron'),
+  bk('b13', '2026-11-15', 10, 3, 'kestrel', 'Ruth Okafor', 2, 'Capsize Drill'), bk('b14', '2026-11-15', 13, 2, 'wren', ME, 1, 'Single-Handed Hour'),
+  bk('b15', '2026-11-18', 16, 2, 'tern', 'Ana Ruiz', 3, 'Evening Sail'), bk('b16', '2026-11-21', 9, 5, 'osprey', ME, 3, 'Keelboat Day'),
+  bk('b17', '2026-11-21', 10, 3, 'kestrel', 'Junior Squadron', 3, 'Junior Squadron'), bk('b18', '2026-11-22', 11, 3, 'petrel', 'Dev Malhotra', 2, 'First Sail After Repair'),
+  bk('b19', '2026-11-25', 15, 2, 'wren', 'Ruth Okafor', 1, 'Tuning Run'), bk('b20', '2026-11-28', 10, 3, 'kestrel', ME, 2, 'Round the Mark'),
+  bk('b21', '2026-11-28', 9, 5, 'tern', 'The Lindqvists', 4, 'Family Day'), bk('b22', '2026-11-29', 10, 2, 'wren', 'Dev Malhotra', 1, 'Club Race'),
+  bk('b23', '2026-12-05', 9, 5, 'osprey', ME, 3, 'Keelboat Day')
+];
+/* the forecast reaches ten days; days past it have no wind mark */
+var WIND = { '2026-11-10': [11, 'W', 270], '2026-11-11': [9, 'NW', 315], '2026-11-12': [13, 'SW', 225], '2026-11-13': [21, 'S', 180], '2026-11-14': [14, 'SW', 225],
+  '2026-11-15': [12, 'SW', 225], '2026-11-16': [17, 'W', 270], '2026-11-17': [24, 'NW', 315], '2026-11-18': [22, 'NW', 315], '2026-11-19': [10, 'N', 0],
+  '2026-11-20': [8, 'NE', 45], '2026-11-21': [12, 'E', 90], '2026-11-22': [15, 'SE', 135], '2026-11-23': [19, 'S', 180], '2026-11-24': [16, 'SW', 225] };
+var DIR = { N: 'north', NE: 'northeast', E: 'east', SE: 'southeast', S: 'south', SW: 'southwest', W: 'west', NW: 'northwest' };
+
+var app = document.querySelector('.s4-app'), body = document.querySelector('#mr-grid tbody'), $ = function (id) { return document.getElementById(id); };
 function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 function parse(s) { var p = s.split('-'); return new Date(+p[0], +p[1] - 1, +p[2]); }
-function on(date) { return events.filter(function (e) { return e.date === date; }).sort(function (a, b) { return a.time < b.time ? -1 : 1; }); }
-function long(date) { return parse(date).toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' }); }
+function hm(h) { return String(Math.floor(h)).padStart(2, '0') + ':' + String(Math.round((h % 1) * 60)).padStart(2, '0'); }
+function on(date) { return bookings.filter(function (b) { return b.date === date; }).sort(function (a, b) { return a.start - b.start; }); }
+function long(date) { return parse(date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }); }
+function short(date) { return parse(date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
 function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function mine(b) { return b.who === ME; }
+function inRepair(boat, date) { return boat.repair && date < '2026-11-21'; }
+
+/* ---------- the month ---------- */
 function grid(dir) {
   var first = new Date(view.y, view.m, 1), start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
-  document.getElementById('cal-title').textContent = first.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+  $('mr-title').textContent = first.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  var month = iso(first).slice(0, 7), n = bookings.filter(function (b) { return b.date.slice(0, 7) === month; }).length;
+  $('mr-count').textContent = n ? n + (n === 1 ? ' booking' : ' bookings') : 'No bookings yet';
   var html = '', d = new Date(start);
   for (var w = 0; w < 6; w++) {
     html += '<tr>';
     for (var i = 0; i < 7; i++) {
-      var s = iso(d), ev = on(s), out = d.getMonth() !== view.m;
-      html += '<td><button class="cal-day" type="button" data-date="' + s + '"' + (out ? ' data-outside' : '') + (s === TODAY ? ' data-today' : '') + ' aria-pressed="' + (s === picked) + '" aria-label="' + long(s) + (ev.length ? ', ' + ev.length + (ev.length === 1 ? ' event' : ' events') : '') + '" tabindex="' + (s === picked ? 0 : -1) + '"><span class="cal-num">' + d.getDate() + '</span>' +
-        ev.slice(0, 2).map(function (e) { return '<span class="cal-ev">' + esc(e.title) + '</span>'; }).join('') + (ev.length ? '<span class="cal-dots">' + ev.slice(0, 3).map(function () { return '<i></i>'; }).join('') + '</span>' : '') + '</button></td>';
+      var s = iso(d), ev = on(s), out = d.getMonth() !== view.m, wind = WIND[s], strong = wind && wind[0] >= 20;
+      var label = long(s) + (ev.length ? ', ' + ev.length + (ev.length === 1 ? ' booking' : ' bookings') : ', no bookings') + (ev.some(mine) ? ', one is yours' : '') + (wind ? ', wind ' + wind[0] + ' knots' + (strong ? ', strong wind warning' : '') : '');
+      html += '<td><button class="mr-day" type="button" data-date="' + s + '"' + (out ? ' data-outside' : '') + (s < TODAY ? ' data-past' : '') + (s === TODAY ? ' data-today' : '') +
+        ' aria-pressed="' + (s === picked) + '" aria-label="' + label + '" tabindex="' + (s === picked ? 0 : -1) + '">' +
+        '<span class="mr-date"><span class="mr-n">' + d.getDate() + '</span>' + (wind && !out ? '<span class="mr-wind"' + (strong ? ' data-strong' : '') + '>' + wind[0] + ' kn</span>' : '') + '</span>' +
+        (strong && !out ? '<span class="mr-gust"></span>' : '') +
+        ev.slice(0, 2).map(function (e) { return '<span class="mr-ev"' + (mine(e) ? ' data-mine' : '') + '>' + hm(e.start) + ' ' + esc(B[e.boat].name) + '</span>'; }).join('') +
+        (ev.length > 2 ? '<span class="mr-more">' + (ev.length - 2) + ' more</span>' : '') +
+        (ev.length ? '<span class="mr-dots">' + ev.slice(0, 4).map(function (e) { return '<i' + (mine(e) ? ' data-mine' : '') + '></i>'; }).join('') + '</span>' : '') + '</button></td>';
       d.setDate(d.getDate() + 1);
     }
     html += '</tr>';
     if (d.getMonth() !== view.m && w >= 3) break;
   }
   body.innerHTML = html;
-  if (!body.querySelector('[tabindex="0"]')) { var f = body.querySelector('.cal-day:not([data-outside])'); if (f) f.tabIndex = 0; }
+  if (!body.querySelector('[tabindex="0"]')) { var f = body.querySelector('.mr-day:not([data-outside])'); if (f) f.tabIndex = 0; }
   if (dir) S4.transition.enter(body, dir, { distance: 16 });
 }
+
+/* ---------- the day: conditions, fleet board, bookings ---------- */
+var SPAN = [8, 20];
+function pct(h) { return Math.max(0, Math.min(100, (h - SPAN[0]) / (SPAN[1] - SPAN[0]) * 100)); }
+function tide(date) {
+  /* a semi-diurnal tide: high water moves about 50 minutes later each day */
+  var k = Math.round((parse(date) - parse(TODAY)) / 864e5), high = ((10.7 + k * 0.83) % 12.42 + 12.42) % 12.42, P = 12.42;
+  var pts = [], hi = [], lo = [];
+  for (var x = 0; x <= 48; x++) { var t = x / 2, y = Math.cos((t - high) / P * 2 * Math.PI); pts.push([t * 10, 30 - y * 22]); }
+  for (var h = high; h < 24; h += P) hi.push(h); for (var l = high + P / 2 - P; l < 24; l += P) if (l >= 0) lo.push(l);
+  var line = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+  var svg = '<rect class="t-dark" x="0" y="0" width="70" height="60" rx="0" opacity="0.6"/><rect class="t-dark" x="200" y="0" width="40" height="60" opacity="0.6"/>' +
+    '<path class="t-fill" d="' + line + ' L240 60 L0 60 Z"/><path class="t-line" d="' + line + '"/>' + (date === TODAY ? '<line class="t-now" x1="' + NOW * 10 + '" x2="' + NOW * 10 + '" y1="0" y2="60"/>' : '');
+  $('mr-tide-svg').innerHTML = svg;
+  var range = (2.2 + 0.6 * Math.cos(k / 2)).toFixed(1);
+  $('mr-high').textContent = hi.map(hm).join(', '); $('mr-low').textContent = lo.map(hm).join(', ');
+  $('mr-tide-cap').textContent = 'Tide: high water ' + hi.map(hm).join(' and ') + ', low ' + lo.map(hm).join(' and ') + '; ' + range + ' m range. Shaded hours are dark.';
+}
+function conditions(date) {
+  var w = WIND[date];
+  $('mr-sunset').textContent = hm(19 + 58 / 60 + (parse(date) - parse(TODAY)) / 864e5 * 1.6 / 60);
+  $('mr-water').textContent = (16 + Math.round(((parse(date) - parse(TODAY)) / 864e5) / 12)) + ' °C';
+  tide(date);
+  if (!w) {
+    $('mr-verdict').textContent = date < '2026-11-10' ? 'Logged' : 'No Forecast Yet';
+    $('mr-verdict-sub').textContent = date < '2026-11-10' ? 'This day is past the forecast log.' : 'The forecast reaches ten days. Book now and check again nearer the day.';
+    $('mr-kn').textContent = '–'; $('mr-wind-text').innerHTML = 'Wind not<br>forecast yet'; $('mr-arrow').style.setProperty('--deg', '0deg');
+    $('mr-window').textContent = date < TODAY ? 'Past' : 'Beyond Forecast'; $('mr-window').dataset.tone = 'secondary'; return;
+  }
+  var gust = Math.round(w[0] * 1.35), strong = w[0] >= 20;
+  $('mr-verdict').textContent = strong ? 'Keelboat Only' : w[0] < 8 ? 'Light Airs' : 'Good for Dinghies';
+  $('mr-verdict-sub').textContent = strong ? 'Strong wind warning. Dinghies stay on the hard.' : w[0] < 8 ? 'A slow drift. Good for a first sail.' : 'Steady breeze, gusts under ' + (gust < 20 ? 20 : gust + 1) + ' knots.';
+  $('mr-kn').textContent = w[0]; $('mr-wind-text').innerHTML = 'From the ' + DIR[w[1]] + '<br>Gusts ' + gust + ' kn';
+  /* the arrow points downwind: where the wind blows to */
+  $('mr-arrow').style.setProperty('--deg', ((w[2] + 180) % 360) + 'deg');
+  $('mr-window').textContent = strong ? 'Strong Wind' : date < TODAY ? 'Logged' : 'Forecast'; $('mr-window').dataset.tone = strong ? 'error' : 'primary';
+}
+function board(date) {
+  var list = on(date);
+  $('mr-board').innerHTML = BOATS.map(function (b) {
+    var mineB = list.filter(function (x) { return x.boat === b.id; }), rep = inRepair(b, date), freeAt = SPAN[0];
+    mineB.forEach(function (x) { if (x.start <= freeAt + 0.01) freeAt = Math.max(freeAt, x.start + x.hours); });
+    var words = rep ? b.repair : mineB.length ? mineB.map(function (x) { return hm(x.start) + '–' + hm(x.start + x.hours) + ' ' + x.who; }).join('; ') : 'Free all day';
+    var track = rep ? '<span class="mr-track" data-repair>In the shed</span>' :
+      '<span class="mr-track" aria-hidden="true">' + mineB.map(function (x) { return '<i class="mr-block"' + (mine(x) ? ' data-mine' : '') + ' style="--s:' + pct(x.start).toFixed(2) + ';--w:' + (pct(x.start + x.hours) - pct(x.start)).toFixed(2) + '"></i>'; }).join('') +
+      (date === TODAY ? '<i class="mr-now" style="--s:' + pct(NOW).toFixed(2) + '"></i>' : '') + '</span>';
+    return '<li class="mr-boat"><span class="mr-boat-name">' + esc(b.name) + '<small>' + (rep ? 'In repair' : mineB.length ? (freeAt >= SPAN[1] ? 'Out all day' : 'Free from ' + hm(freeAt === SPAN[0] ? SPAN[0] : freeAt)) : 'Free all day') + '</small></span>' + track + '<span class="s4-visually-hidden">' + esc(b.name) + ': ' + esc(words) + '</span></li>';
+  }).join('');
+}
+function row(b, withDate) {
+  var boat = B[b.boat];
+  return '<li><button class="s4-list-item" type="button" data-page-open="booking" data-page-id="' + b.id + '"><span class="mr-badge"' + (mine(b) ? ' data-mine' : '') + ' aria-hidden="true">' + boat.name.slice(0, 2) + '</span>' +
+    '<span class="s4-list-content">' + (withDate ? '<span class="s4-list-overline">' + short(b.date) + '</span>' : '') + '<span class="s4-list-headline">' + esc(b.title) + '</span><span class="s4-list-supporting">' + esc(boat.name) + ' · ' + (mine(b) ? 'You' : esc(b.who)) + (b.crew > 1 ? ' + ' + (b.crew - 1) : '') + '</span></span>' +
+    '<span class="s4-list-trailing mr-num">' + hm(b.start) + '–' + hm(b.start + b.hours) + '</span></button></li>';
+}
 function day() {
-  var list = on(picked);
-  document.getElementById('day-title').textContent = picked === TODAY ? 'Today' : long(picked);
-  document.getElementById('day-list').innerHTML = list.map(function (e) { return '<li><button class="s4-list-item" type="button" data-page-open="event" data-page-id="' + e.id + '"><span class="s4-list-content"><span class="s4-list-headline">' + esc(e.title) + '</span><span class="s4-list-supporting s4-num">' + e.time + '</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></button></li>'; }).join('');
-  S4.init(document.getElementById('day-list'));
-  S4.states.set(document.getElementById('day-states'), list.length ? 'ready' : 'empty');
+  var list = on(picked), t = picked === TODAY;
+  $('mr-day-kicker').textContent = t ? 'Today' : picked < TODAY ? 'Past Day' : Math.round((parse(picked) - parse(TODAY)) / 864e5) === 1 ? 'Tomorrow' : 'In ' + Math.round((parse(picked) - parse(TODAY)) / 864e5) + ' Days';
+  $('mr-day-title').textContent = long(picked);
+  conditions(picked); board(picked);
+  $('mr-day-list').innerHTML = list.map(function (b) { return row(b, false); }).join('');
+  S4.init($('mr-day-list'));
+  S4.states.set($('mr-day-states'), list.length ? 'ready' : 'empty');
+  /* booking is for today onwards: the button stays, but explains itself on a past day */
+  boatOptions();
 }
-function upcoming() {
-  var list = events.filter(function (e) { return e.date >= TODAY; }).sort(function (a, b) { return (a.date + a.time) < (b.date + b.time) ? -1 : 1; });
-  document.getElementById('up-list').innerHTML = list.map(function (e) { return '<li><button class="s4-list-item" type="button" data-page-open="event" data-page-id="' + e.id + '"><span class="s4-list-content"><span class="s4-list-overline">' + long(e.date) + '</span><span class="s4-list-headline">' + esc(e.title) + '</span></span><span class="s4-list-trailing s4-num">' + e.time + '</span></button></li>'; }).join('');
-  S4.init(document.getElementById('up-list'));
+function boatOptions() {
+  var sel = $('f-boat'), keep = sel.value;
+  sel.innerHTML = '<option value=""></option>' + BOATS.filter(function (b) { return !inRepair(b, picked); }).map(function (b) { return '<option value="' + b.id + '">' + b.name + ' (' + b.cls + ', ' + b.seats + (b.seats === 1 ? ' seat' : ' seats') + ')</option>'; }).join('');
+  sel.value = keep;
 }
+
+/* ---------- my sails and the fleet ---------- */
+function sails() {
+  var list = bookings.filter(function (b) { return mine(b) && b.date >= TODAY; }).sort(function (a, b) { return (a.date + a.start) < (b.date + b.start) ? -1 : 1; });
+  $('mr-up-list').innerHTML = list.map(function (b) { return row(b, true); }).join(''); S4.init($('mr-up-list'));
+  S4.states.set($('mr-up-states'), list.length ? 'ready' : 'empty');
+}
+var WEEKS = [0, 2, 3, 0, 5, 3, 4, 2, 6, 3, 5, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+$('mr-weeks').innerHTML = WEEKS.map(function (h, i) { return '<i style="--h:' + (h / 6 * 100) + '"' + (i < 11 ? ' data-on' : i === 11 || i === 12 ? ' data-on' : '') + '></i>'; }).join('');
+function fleet() {
+  $('mr-fleet').innerHTML = BOATS.map(function (b) {
+    var rep = inRepair(b, TODAY), out = bookings.filter(function (x) { return x.boat === b.id && x.date.slice(0, 7) === '2026-11'; }).reduce(function (n, x) { return n + x.hours; }, 0);
+    var big = b.seats > 3;
+    return '<li class="s4-pane mr-hull"' + (rep ? ' data-repair' : '') + '>' +
+      '<svg class="mr-sail" viewBox="0 0 200 92" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect class="s-sea" x="0" y="74" width="200" height="18"/>' +
+      '<path class="s-main" d="M100 ' + (big ? 10 : 16) + ' L100 66 L' + (big ? 146 : 140) + ' 66 Z"/><path class="s-jib" d="M95 ' + (big ? 18 : 26) + ' L95 66 L' + (big ? 62 : 70) + ' 66 Z"/>' +
+      '<path class="s-hull" d="M' + (big ? 52 : 62) + ' 70 L' + (big ? 152 : 142) + ' 70 L' + (big ? 140 : 132) + ' 80 L' + (big ? 64 : 72) + ' 80 Z"/></svg>' +
+      '<div class="mr-hull-top"><span class="mr-badge" aria-hidden="true">' + b.name.slice(0, 2) + '</span><div><h3 class="s4-title-medium" style="margin:0">' + b.name + '</h3><p class="mr-sub">' + b.cls + ' · ' + b.seats + (b.seats === 1 ? ' seat' : ' seats') + '</p></div>' +
+      '<span class="s4-status"' + (rep ? ' data-tone="error" data-dot' : ' data-tone="primary"') + '>' + (rep ? 'In Repair' : 'Ready') + '</span></div>' +
+      '<p class="mr-sub">' + (rep ? b.repair + '. ' : '') + b.note + '</p>' +
+      '<dl class="s4-dl"><div class="s4-dl-row"><dt>Rating</dt><dd>' + b.rating + '</dd></div><div class="s4-dl-row"><dt>Booked in November</dt><dd class="mr-num">' + out + ' h</dd></div></dl></li>';
+  }).join('');
+}
+
+/* ---------- moving around ---------- */
 function pick(date, focus) {
   picked = date; var d = parse(date), dir = 0;
   if (d.getMonth() !== view.m || d.getFullYear() !== view.y) { dir = (d.getFullYear() * 12 + d.getMonth()) > (view.y * 12 + view.m) ? 1 : -1; view = { y: d.getFullYear(), m: d.getMonth() }; }
@@ -149,32 +470,61 @@ function pick(date, focus) {
   if (focus) { var b = body.querySelector('[data-date="' + date + '"]'); if (b) b.focus(); }
 }
 function shift(n) { var d = new Date(view.y, view.m + n, 1); view = { y: d.getFullYear(), m: d.getMonth() }; grid(n); }
-body.addEventListener('click', function (e) { var b = e.target.closest('.cal-day'); if (b) pick(b.dataset.date, true); });
-/* arrow keys walk the days, like any date grid */
+body.addEventListener('click', function (e) { var b = e.target.closest('.mr-day'); if (b) pick(b.dataset.date, true); });
+/* arrow keys walk the days, Home and End the week, like any date grid */
 body.addEventListener('keydown', function (e) {
-  var b = e.target.closest('.cal-day'); if (!b) return;
-  var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key]; if (!step) return;
+  var b = e.target.closest('.mr-day'); if (!b) return;
+  var rtl = getComputedStyle(b).direction === 'rtl', step = { ArrowLeft: rtl ? 1 : -1, ArrowRight: rtl ? -1 : 1, ArrowUp: -7, ArrowDown: 7, PageUp: -28, PageDown: 28 }[e.key]; if (!step) return;
   e.preventDefault(); var d = parse(b.dataset.date); d.setDate(d.getDate() + step); pick(iso(d), true);
 });
-document.getElementById('cal-prev').addEventListener('click', function () { shift(-1); });
-document.getElementById('cal-next').addEventListener('click', function () { shift(1); });
-document.getElementById('cal-today').addEventListener('click', function () { S4.app.go(app, 'month'); pick(TODAY); });
-document.getElementById('ev-form').addEventListener('s4-submit', function (e) {
+$('mr-prev').addEventListener('click', function () { shift(-1); });
+$('mr-next').addEventListener('click', function () { shift(1); });
+$('mr-today').addEventListener('click', function () { S4.app.go(app, 'calendar'); pick(TODAY); });
+/* the rail's Book a Boat opens the same form under the day */
+$('mr-book-rail').addEventListener('click', function () { S4.app.go(app, 'calendar'); });
+
+/* a boat cannot be out twice: the clash is the field's own error, written so it says what to do */
+function clash() {
+  var f = $('mr-form'), boat = f.boat.value, start = f.start.value ? +f.start.value.slice(0, 2) + f.start.value.slice(3) / 60 : 0, hours = +f.hours.value;
+  var hit = boat && on(picked).filter(function (b) { return b.boat === boat && b.start < start + hours && start < b.start + b.hours; })[0];
+  f.boat.setCustomValidity(hit ? B[boat].name + ' is out ' + hm(hit.start) + '–' + hm(hit.start + hit.hours) + '. Pick another boat or a later time.' : '');
+  return hit;
+}
+['boat', 'start', 'hours'].forEach(function (n) { $('mr-form')[n].addEventListener('change', clash); });
+$('mr-form').addEventListener('submit', function () { clash(); }, true);
+$('mr-form').addEventListener('s4-submit', function (e) {
   e.preventDefault();
-  var ev = { id: 'e' + (++seq), date: picked, time: e.detail.values.time, title: e.detail.values.title }; events.push(ev);
-  S4.expand.close('new-event', 'add'); e.target.reset(); grid(); day(); upcoming();
-  S4.snackbar({ text: 'Event added', action: 'Undo', onAction: function () { events.splice(events.indexOf(ev), 1); grid(); day(); upcoming(); } });
+  if (picked < TODAY) { S4.snackbar('That day has passed. Pick today or later.'); return; }
+  if (clash()) return;
+  var v = e.detail.values, b = bk('b' + (++seq), picked, +v.start.slice(0, 2) + v.start.slice(3) / 60, +v.hours, v.boat, ME, 1, B[v.boat].name + ' for ' + (v.hours === '5' ? 'the Afternoon' : v.hours + ' Hours'));
+  bookings.push(b); S4.expand.close('new-booking', 'add'); e.target.reset(); grid(); day(); sails(); fleet();
+  S4.snackbar({ text: B[b.boat].name + ' is yours from ' + hm(b.start), action: 'Undo', onAction: function () { bookings.splice(bookings.indexOf(b), 1); grid(); day(); sails(); fleet(); } });
 });
-var page = document.querySelector('.s4-subpage[data-page="event"]'), open = null;
+
+/* ---------- a booking, as a page ---------- */
+var page = document.querySelector('.s4-subpage[data-page="booking"]'), open = null;
 page.addEventListener('s4-open', function (e) {
-  open = events.filter(function (x) { return x.id === e.detail.id; })[0] || events[0];
-  page.dataset.title = open.title; document.getElementById('e-title').textContent = open.title; document.getElementById('e-when').textContent = long(open.date) + ' at ' + open.time;
+  open = bookings.filter(function (x) { return x.id === e.detail.id; })[0] || bookings[8];
+  var boat = B[open.boat], w = WIND[open.date];
+  page.dataset.title = open.title;
+  $('b-boat').textContent = boat.name + ' · ' + boat.cls; $('b-title').textContent = open.title; $('b-when').textContent = long(open.date);
+  $('b-out').textContent = hm(open.start); $('b-back').textContent = 'back by ' + hm(open.start + open.hours);
+  $('b-wind').textContent = w ? w[0] + ' kn' : '–'; $('b-wind-meta').textContent = w ? 'from the ' + DIR[w[1]] : 'not forecast yet';
+  $('b-crew').textContent = open.crew; $('b-crew-meta').textContent = 'of ' + boat.seats + (boat.seats === 1 ? ' seat' : ' seats');
+  $('b-who').textContent = mine(open) ? 'You (' + ME + ')' : open.who; $('b-rating').textContent = boat.rating;
+  $('b-cancel').hidden = !mine(open) || open.date < TODAY;
 });
-document.getElementById('e-remove').addEventListener('click', function () {
-  var ev = open, i = events.indexOf(ev); events.splice(i, 1); grid(); day(); upcoming(); S4.pages.back(app);
-  S4.snackbar({ text: 'Event removed', action: 'Undo', onAction: function () { events.splice(i, 0, ev); grid(); day(); upcoming(); } });
+/* cancelling happens at once and can be undone (decision 0047) */
+$('b-cancel').addEventListener('click', function () {
+  var b = open, i = bookings.indexOf(b); bookings.splice(i, 1); grid(); day(); sails(); fleet(); S4.pages.back(app);
+  S4.snackbar({ text: B[b.boat].name + ' is free again', action: 'Undo', onAction: function () { bookings.splice(i, 0, b); grid(); day(); sails(); fleet(); } });
 });
-grid(); day(); upcoming();
+
+S4.palette && S4.palette.register([
+  { label: 'Book a Boat', group: 'Moorings', icon: 'add', run: function () { S4.app.go(app, 'calendar'); S4.expand.open && S4.expand.open('new-booking'); } },
+  { label: 'Go to Today', group: 'Moorings', icon: 'calendar', run: function () { S4.app.go(app, 'calendar'); pick(TODAY); } }
+]);
+grid(); day(); sails(); fleet();
 </script>
 </body>
 </html>
