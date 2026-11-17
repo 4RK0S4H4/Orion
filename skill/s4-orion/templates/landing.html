@@ -59,7 +59,6 @@
   .sp-glyph[data-size="l"] { inline-size: var(--s4-space-16); block-size: var(--s4-space-16); --s4-icon-size: var(--s4-size-icon-large); }
   .sp-glyph { display: grid; place-items: center; flex: none; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: 700; font-variant-numeric: tabular-nums; --s4-icon-size: var(--s4-size-icon-small); }
   .sp-glyph[data-tone="tertiary"] { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
-  @container s4-site-section (width < 600px) { .sp-float[data-at="mid"] { display: none; } .sp-care { grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-2); } .sp-care > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4-space-3); padding-block: var(--s4-space-3); } }
   @container s4-site-section (width >= 600px) { .sp-hero-stage { aspect-ratio: 5 / 4; } }
   @container s4-site-section (width >= 840px) { .sp-hero-stage { aspect-ratio: 4 / 5; } }
 
@@ -145,6 +144,8 @@
   .sp-order-price > span:last-child { font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
   @container s4-site-section (width >= 840px) { .sp-order { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s4-site-section-gap); } }
   .sp-fine { margin: 0; font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  /* phones: one notification on the hero stage, the care facts as rows */
+  @container s4-site-section (width < 600px) { .sp-float[data-at="mid"] { display: none; } .sp-care { grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-2); } .sp-care > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4-space-3); padding-block: var(--s4-space-3); } }
 </style>
 </head>
 <body class="s4-site">

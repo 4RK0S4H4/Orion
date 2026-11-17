@@ -1,183 +1,398 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="warm" data-corners="firm" data-energy="calm" data-type-display="custom" style="--md-ref-typeface-brand: Futura, 'Futura PT', 'Century Gothic', 'Avenir Next', Avenir, system-ui, sans-serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Northbound · Design and Engineering Studio</title>
-<!-- Template: Site. A small company or personal site from the website kit (components/site): a centered hero with the work below it in a browser frame, selected work as figures with captions, a video slot with a poster, services as an icon list, a centered quote, three numbers and a contact band. Use it for a studio, a portfolio or an about page. -->
-<meta name="description" content="Northbound is a six-person studio that designs and builds calm, fast software for small businesses and public services. Based in Edinburgh, working everywhere.">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<title>Hollis &amp; Vane · Architects, Glasgow</title>
+<!-- Template: Site. A studio or portfolio site from the website kit (components/site): a statement hero over a large
+     drawing, selected work as figures with captions, an index of every project, a dark band for the job on site now,
+     a film slot with a poster, how the practice works, a quote and numbers, and a contact band with a map.
+     Brand: Hollis & Vane, a small architecture practice. Terracotta accent on warm grays, firm corners, a geometric
+     display face (Futura where the system has it), calm motion. Drawings are plans made of filled shapes (walls are
+     the text color, so a plan prints as poché in light mode and as a negative in dark), inline SVG, never image files.
+     Use it for a studio, a portfolio or an about page; swap the drawings for your own work. -->
+<meta name="description" content="Hollis & Vane is a fourteen-person architecture practice in Glasgow. We design schools, libraries and timber housing for councils, charities and housing co-operatives.">
+<meta name="theme-color" content="#fcfbfa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100f0e" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Northbound">
-<meta property="og:title" content="Northbound · Design and Engineering Studio">
-<meta property="og:description" content="We design and build calm, fast software for small businesses and public services.">
-<meta property="og:image" content="https://example.com/og/northbound-1200x630.png">
+<meta property="og:site_name" content="Hollis &amp; Vane">
+<meta property="og:title" content="Hollis &amp; Vane · Architects, Glasgow">
+<meta property="og:description" content="Schools, libraries and timber housing for councils, charities and housing co-operatives.">
+<meta property="og:image" content="https://example.com/og/hollis-vane-1200x630.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://example.com/">
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('hollis-vane-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.min.css?v=01d10bd">
+<link rel="stylesheet" href="../components/orion.min.css?v=9535e4d">
 <style>
-  /* pictures for this page, composed from Orion components (no image files) */
-  .nb-app { display: grid; grid-template-columns: minmax(0, 1fr); flex: 1; min-block-size: 0; }
-  .nb-app-side { display: none; }
-  .nb-app-main { display: grid; align-content: start; gap: var(--s4-space-4); padding: var(--s4-space-5); min-inline-size: 0; }
-  .nb-app-main > h2 { margin: 0; }
-  .nb-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3); }
-  .nb-stats .s4-stat { padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
-  .nb-stats .s4-stat:nth-child(3) { display: none; }
+  /* ---------- Hollis & Vane: the type, the plans, the index, the site band, the map ---------- */
+  /* a geometric face reads lighter at the same weight: display steps at 500, set a size larger */
+  :root { --s4-site-hero-weight: 500; --s4-site-title-weight: 500; }
+
+  /* plans: filled shapes only. Walls take the text color, rooms the page, the one room that matters the accent tint */
+  .hv-plan { display: block; inline-size: 100%; block-size: auto; }
+  .hv-plan .wall { fill: var(--md-sys-color-on-surface); }
+  .hv-plan .room { fill: var(--md-sys-color-surface-container-lowest); }
+  .hv-plan .hall { fill: var(--md-sys-color-surface-container); }
+  .hv-plan .key { fill: var(--md-sys-color-primary-container); }
+  .hv-plan .water { fill: var(--md-sys-color-secondary-container); }
+  .hv-plan .lane { fill: var(--md-sys-color-on-secondary-container); opacity: 0.25; }
+  .hv-plan .ground { fill: var(--md-sys-color-surface-container-high); }
+  .hv-plan .tree { fill: var(--md-sys-color-on-surface-variant); opacity: 0.22; }
+  .hv-plan .step { fill: var(--md-sys-color-on-surface); opacity: 0.35; }
+  .hv-plan .swing { fill: none; stroke: var(--md-sys-color-on-surface-variant); stroke-width: 1.5; }
+  .hv-plan .accent { fill: var(--md-sys-color-primary); }
+  .hv-plan .label { fill: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-label-small-font); font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .hv-plan .label[data-big] { font-size: 16px; fill: var(--md-sys-color-on-primary-container); }
+  @container s4-site-section (width < 600px) { .hv-plan[data-wide] .label { display: none; } }
+
+  /* hero: a statement set big, the lead and actions beside it from 840, the drawing across the full width below */
+  .hv-hero { display: grid; gap: var(--s4-site-section-gap); }
+  .hv-hero-text { display: grid; gap: var(--s4-space-6); align-items: end; }
+  .hv-hero-text > div { display: grid; justify-items: start; gap: var(--s4-space-5); }
+  .hv-hero-text > div > * { margin: 0; }
+  .hv-hero-text > div > .s4-site-actions-row { justify-self: stretch; }
+  .hv-hero .s4-hero-title { margin: 0; max-inline-size: 13ch; font-size: calc(var(--s4-site-hero-size) * 1.3); line-height: calc(var(--s4-site-hero-line-height) * 1.18); }
+  .hv-hero .s4-eyebrow { margin: 0; }
+  @container s4-site-section (width >= 840px) { .hv-hero-text { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: var(--s4-site-section-gap); } }
+  .hv-sheet { margin: 0; display: grid; gap: var(--s4-space-3); }
+  .hv-sheet-art { position: relative; padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
+  @container s4-site-section (width >= 840px) { .hv-sheet-art { padding: var(--s4-space-10) var(--s4-space-12); } }
+  .hv-sheet figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-6); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
+
+  /* selected work: one large and two stacked on a 12-column grid */
+  .hv-works { display: grid; gap: var(--s4-space-10) var(--s4-space-6); margin: 0; padding: 0; list-style: none; }
+  .hv-work { margin: 0; display: grid; gap: var(--s4-space-4); }
+  .hv-work-art { display: grid; place-items: center; padding: var(--s4-space-6); aspect-ratio: 4 / 3; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
+  .hv-work-art > .hv-plan { max-block-size: 100%; }
+  .hv-work-name { display: grid; gap: var(--s4-space-1); }
+  .hv-work-name > * { margin: 0; }
+  .hv-work-name h3 { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: 500; }
+  .hv-work-name h3 a { color: inherit; text-decoration: none; }
+  .hv-work-name h3 a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.15em; }
+  .hv-work-name p { color: var(--md-sys-color-on-surface-variant); max-inline-size: var(--s4-site-measure); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   @container s4-site-section (width >= 840px) {
-    .nb-app { grid-template-columns: calc(var(--s4-space-16) * 3.5) minmax(0, 1fr); }
-    .nb-app-side { display: grid; align-content: start; gap: var(--s4-space-1); padding: var(--s4-space-4) var(--s4-space-3); background: var(--md-sys-color-surface-container-low); }
-    .nb-app-main { padding: var(--s4-space-8); gap: var(--s4-space-6); }
-    .nb-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .nb-stats .s4-stat:nth-child(3) { display: grid; }
+    .hv-works { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; }
+    .hv-works > li:first-child { grid-row: span 2; }
+    .hv-works > li:first-child .hv-work-art { aspect-ratio: 4 / 4.2; }
+    .hv-works > li:not(:first-child) .hv-work-art { aspect-ratio: 16 / 10; }
   }
-  .nb-side-item { display: flex; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-3); border-radius: min(var(--s4-space-5), var(--s4-shape-control)); }
-  .nb-side-item[data-on] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-  .nb-work { display: grid; align-content: space-between; justify-items: start; inline-size: 100%; block-size: 100%; padding: var(--s4-space-6); }
-  .nb-work .s4-icon { --s4-icon-size: var(--s4-space-10); }
-  .nb-work-name { font-family: var(--s4-site-title-font); font-size: var(--s4-site-title-size); line-height: var(--s4-site-title-line-height); letter-spacing: var(--s4-site-title-tracking); font-weight: var(--s4-site-title-weight); text-wrap: balance; }
-  .nb-media-caption { display: grid; gap: var(--s4-space-1); }
-  .nb-media-caption > strong { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
+
+  /* on site now: a dark band inside a light page (a scoped theme, decision 0056) */
+  .hv-site { display: grid; gap: var(--s4-site-section-gap); }
+  .hv-site-head { display: grid; gap: var(--s4-space-4); }
+  .hv-site-head > * { margin: 0; }
+  .hv-road { display: grid; gap: var(--s4-space-3); }
+  .hv-road-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-2) var(--s4-space-4); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); }
+  .hv-road-head > :last-child { color: var(--md-sys-color-on-surface-variant); }
+  .hv-road-ends { display: flex; justify-content: space-between; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .hv-diary { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .hv-diary > li { display: grid; grid-template-columns: calc(var(--s4-space-12) + var(--s4-space-2)) minmax(0, 1fr); gap: var(--s4-space-4); padding: var(--s4-space-4) var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); }
+  .hv-diary time { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-body-medium-line-height); font-variant-numeric: tabular-nums; }
+  .hv-diary p { margin: 0; }
+  .hv-site-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(var(--s4-space-16) * 1.75), 1fr)); gap: var(--s4-space-4); margin: 0; }
+  .hv-site-figures > div { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--s4-space-1); }
+  .hv-site-figures dd { margin: 0; white-space: nowrap; font-family: var(--s4-site-title-font); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .hv-site-figures dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  @container s4-site-section (width >= 840px) { .hv-site { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: start; } }
+
+  /* how we work: four stages, big numerals over a rule */
+  .hv-stages { display: grid; gap: var(--s4-space-8) var(--s4-space-6); margin: 0; padding: 0; list-style: none; counter-reset: stage; }
+  .hv-stages > li { display: grid; align-content: start; gap: var(--s4-space-3); padding-block-start: var(--s4-space-4); border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); counter-increment: stage; }
+  .hv-stages > li::before { content: "0" counter(stage); color: var(--md-sys-color-primary); font-family: var(--s4-site-title-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .hv-stages h3 { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: 500; }
+  .hv-stages p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  @container s4-site-section (width >= 600px) { .hv-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @container s4-site-section (width >= 1000px) { .hv-stages { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  /* contact: words beside a map of the street, drawn in the band's own ink */
+  .hv-contact { display: grid; gap: var(--s4-site-section-gap); align-items: center; }
+  .hv-contact-text { display: grid; justify-items: start; gap: var(--s4-space-5); }
+  .hv-contact-text > * { margin: 0; }
+  .hv-address { font-style: normal; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .hv-map { display: block; inline-size: 100%; block-size: auto; border-radius: var(--md-sys-shape-corner-extra-large); }
+  .hv-map .block { fill: var(--md-sys-color-on-primary-container); opacity: 0.14; }
+  .hv-map .park { fill: var(--md-sys-color-on-primary-container); opacity: 0.26; }
+  .hv-map .river { fill: var(--md-sys-color-on-primary-container); opacity: 0.4; }
+  .hv-map .here { fill: var(--md-sys-color-on-primary-container); }
+  .hv-map .here-ring { fill: var(--md-sys-color-on-primary-container); opacity: 0.2; }
+  .hv-map .label { fill: var(--md-sys-color-on-primary-container); font-family: var(--md-sys-typescale-label-small-font); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  @container s4-site-section (width >= 840px) { .hv-contact { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
+
+  .hv-mark { inline-size: var(--s4-space-8); block-size: var(--s4-space-8); }
+  .hv-mark .wall { fill: var(--md-sys-color-on-surface); }
+  .hv-mark .key { fill: var(--md-sys-color-primary); }
 </style>
 </head>
 <body class="s4-site">
 <a class="s4-skip-link" href="#main">Skip to Content</a>
 <header class="s4-site-header">
   <div class="s4-site-bar">
-    <a class="s4-site-logo" href="#top" aria-label="Northbound Home"><span class="s4-site-logo-mark" aria-hidden="true">N</span>Northbound</a>
+    <a class="s4-site-logo" href="#top" aria-label="Hollis and Vane Home">
+      <svg class="hv-mark" viewBox="0 0 32 32" aria-hidden="true"><path class="wall" d="M4 4 H28 V28 H18 V24 H24 V8 H8 V24 H14 V28 H4 Z"/><rect class="key" x="11" y="11" width="10" height="10" rx="2"/></svg>
+      Hollis &amp; Vane
+    </a>
     <nav class="s4-site-nav" aria-label="Main">
       <ul>
         <li><a class="s4-button" data-variant="text" href="#work">Work</a></li>
-        <li><a class="s4-button" data-variant="text" href="#services">Services</a></li>
-        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Studio</a></li>
-        <li><a class="s4-button" data-variant="text" href="blog.html">Journal</a></li>
+        <li><a class="s4-button" data-variant="text" href="#index">Index</a></li>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Practice</a></li>
+        <li><a class="s4-button" data-variant="text" href="blog.html">Writing</a></li>
       </ul>
     </nav>
     <div class="s4-site-actions">
-      <a class="s4-button" href="#contact" data-keep>Start a Project</a>
+      <a class="s4-button" href="#contact" data-keep>Talk to Us</a>
       <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
     </div>
   </div>
 </header>
 
 <main id="main">
+  <!-- hero: a statement, then one building drawn across the page -->
   <section class="s4-site-section" id="top" aria-labelledby="hero-h">
-    <div class="s4-hero" data-layout="stack">
-      <div class="s4-hero-text">
-        <p class="s4-eyebrow">Design and Engineering Studio</p>
-        <h1 class="s4-hero-title" id="hero-h">We Build Calm Software for Busy People</h1>
-        <p class="s4-site-lead">Six of us, in Edinburgh and online. We design and build the tools small businesses and public services use every day, and we stay to look after them.</p>
-        <div class="s4-site-actions-row">
-          <a class="s4-button" data-size="m" href="#contact">Start a Project</a>
-          <a class="s4-button" data-variant="tonal" data-size="m" href="#work">See Our Work</a>
+    <div class="hv-hero">
+      <div class="hv-hero-text">
+        <div>
+          <p class="s4-eyebrow">Architects · Glasgow · Since 2009</p>
+          <h1 class="s4-hero-title" id="hero-h">Buildings for the Ordinary Parts of a Day</h1>
         </div>
-      </div>
-      <div class="s4-hero-media">
-        <div class="s4-frame" data-device="browser" role="img" aria-label="The clinic booking tool we built for Lothian Physio: today’s 14 appointments, three open slots and 96% attendance.">
-          <div class="s4-frame-bar"><span class="s4-frame-address">book.lothianphysio.example</span></div>
-          <div class="s4-frame-screen" inert>
-            <div class="nb-app">
-              <div class="nb-app-side">
-                <span class="nb-side-item s4-title-small" data-on><span class="s4-icon" data-icon="calendar"></span>Today</span>
-                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="people"></span>Patients</span>
-                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="chart"></span>Reports</span>
-                <span class="nb-side-item s4-title-small"><span class="s4-icon" data-icon="settings"></span>Settings</span>
-              </div>
-              <div class="nb-app-main">
-                <h2 class="s4-headline-small">Tuesday, 18 November</h2>
-                <div class="nb-stats">
-                  <div class="s4-stat"><span class="s4-stat-label">Appointments</span><span class="s4-stat-value">14</span></div>
-                  <div class="s4-stat"><span class="s4-stat-label">Open Slots</span><span class="s4-stat-value">3</span></div>
-                  <div class="s4-stat"><span class="s4-stat-label">Attendance</span><span class="s4-stat-value">96%</span></div>
-                </div>
-                <ul class="s4-list">
-                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s">EC</span></span><span class="s4-list-content"><span class="s4-list-headline">Eilidh Campbell</span><span class="s4-list-supporting">09:00 · Knee, follow-up</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="success">Arrived</span></span></div></li>
-                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s" data-tone="secondary">TS</span></span><span class="s4-list-content"><span class="s4-list-headline">Tomasz Szymański</span><span class="s4-list-supporting">09:45 · Shoulder, first visit</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
-                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s" data-tone="tertiary">AR</span></span><span class="s4-list-content"><span class="s4-list-headline">Amira Rahman</span><span class="s4-list-supporting">10:30 · Back, review</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
-                  <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar" data-size="s">JB</span></span><span class="s4-list-content"><span class="s4-list-headline">James Brodie</span><span class="s4-list-supporting">11:15 · Ankle, first visit</span></span><span class="s4-list-trailing"><span class="s4-status">Booked</span></span></div></li>
-              </div>
-            </div>
+        <div>
+          <p class="s4-site-lead">Fourteen of us, on the top floor of an old bakery in Govanhill. We design schools, libraries and timber homes for councils, charities and housing co-operatives, and we stay with them long after the ribbon.</p>
+          <div class="s4-site-actions-row">
+            <a class="s4-button" data-size="m" href="#contact">Talk to Us</a>
+            <a class="s4-button" data-variant="tonal" data-size="m" href="#work">See the Work</a>
           </div>
         </div>
       </div>
+      <figure class="hv-sheet">
+        <div class="hv-sheet-art" role="img" aria-label="Ground floor plan of Govanhill Library and Baths: an entrance hall and café on the left, the reading room in the middle, the pool hall on the right, with a children's library, study rooms, changing rooms and plant along Calder Street.">
+          <svg class="hv-plan" data-wide viewBox="0 0 1200 470" aria-hidden="true">
+            <circle class="tree" cx="120" cy="26" r="20"/><circle class="tree" cx="190" cy="22" r="16"/><circle class="tree" cx="430" cy="24" r="22"/><circle class="tree" cx="510" cy="20" r="15"/><circle class="tree" cx="900" cy="24" r="20"/><circle class="tree" cx="1080" cy="22" r="18"/>
+            <rect class="wall" x="60" y="56" width="1080" height="352" rx="10"/>
+            <rect class="hall" x="70" y="66" width="232" height="152" rx="4"/>
+            <rect class="room" x="70" y="228" width="232" height="170" rx="4"/>
+            <rect class="key" x="312" y="66" width="452" height="244" rx="4"/>
+            <rect class="room" x="312" y="320" width="222" height="78" rx="4"/>
+            <rect class="room" x="544" y="320" width="220" height="78" rx="4"/>
+            <rect class="hall" x="774" y="66" width="356" height="244" rx="4"/>
+            <rect class="water" x="806" y="98" width="292" height="180" rx="10"/>
+            <rect class="lane" x="806" y="142" width="292" height="3"/><rect class="lane" x="806" y="186" width="292" height="3"/><rect class="lane" x="806" y="230" width="292" height="3"/>
+            <rect class="room" x="774" y="320" width="172" height="78" rx="4"/>
+            <rect class="room" x="956" y="320" width="174" height="78" rx="4"/>
+            <!-- doors: openings in the walls -->
+            <rect class="hall" x="140" y="398" width="60" height="10"/>
+            <rect class="hall" x="302" y="120" width="10" height="50"/>
+            <rect class="hall" x="140" y="218" width="50" height="10"/>
+            <rect class="key" x="764" y="160" width="10" height="50"/>
+            <rect class="room" x="400" y="310" width="44" height="10"/><rect class="room" x="630" y="310" width="44" height="10"/>
+            <rect class="room" x="840" y="310" width="40" height="10"/>
+            <path class="swing" d="M200 398 A 60 60 0 0 0 140 338"/>
+            <!-- stair to the gallery -->
+            <rect class="step" x="96" y="90" width="80" height="6" rx="3"/><rect class="step" x="96" y="104" width="80" height="6" rx="3"/><rect class="step" x="96" y="118" width="80" height="6" rx="3"/><rect class="step" x="96" y="132" width="80" height="6" rx="3"/><rect class="step" x="96" y="146" width="80" height="6" rx="3"/>
+            <!-- reading tables -->
+            <rect class="room" x="360" y="120" width="140" height="24" rx="12"/><rect class="room" x="360" y="190" width="140" height="24" rx="12"/><rect class="room" x="560" y="120" width="140" height="24" rx="12"/><rect class="room" x="560" y="190" width="140" height="24" rx="12"/>
+            <text class="label" x="86" y="200">Entrance</text>
+            <text class="label" x="86" y="384">Café</text>
+            <text class="label" data-big x="332" y="290">Reading Room</text>
+            <text class="label" x="328" y="364">Children</text>
+            <text class="label" x="560" y="364">Study</text>
+            <text class="label" x="822" y="300">Pool Hall</text>
+            <text class="label" x="790" y="364">Changing</text>
+            <text class="label" x="972" y="364">Plant</text>
+            <text class="label" x="60" y="450">Calder Street</text>
+            <!-- north and scale -->
+            <path class="accent" d="M1110 424 L1122 456 L1110 449 L1098 456 Z"/>
+            <rect class="wall" x="940" y="446" width="40" height="6" rx="3"/><rect class="step" x="980" y="446" width="40" height="6" rx="3"/><rect class="wall" x="1020" y="446" width="40" height="6" rx="3"/>
+            <text class="label" x="940" y="436">0</text><text class="label" x="1036" y="436">10 m</text>
+          </svg>
+        </div>
+        <figcaption><span>Govanhill Library and Baths, ground floor. Opened April 2025.</span><span>Glasgow City Council · 3,400 m²</span></figcaption>
+      </figure>
     </div>
   </section>
 
+  <!-- selected work: one large figure and two beside it -->
   <section class="s4-site-section" id="work" aria-labelledby="work-h">
     <div class="s4-site-section-head" data-layout="split">
       <p class="s4-eyebrow">Selected Work</p>
-      <h2 class="s4-site-title" id="work-h">Tools People Open Every Morning</h2>
-      <p class="s4-site-lead">We take on four projects a year, so each one gets the whole studio.</p>
+      <h2 class="s4-site-title" id="work-h">Three Buildings We Would Do Again</h2>
+      <p class="s4-site-lead">We take on five or six projects at a time. Every one is drawn by the people who will be on site when it is built.</p>
     </div>
-    <ul class="s4-site-grid">
-      <li><figure class="s4-media">
-        <div class="s4-media-box" data-ratio="4:3"><span class="nb-work"><span class="s4-icon" data-icon="calendar" aria-hidden="true"></span><span class="nb-work-name">Lothian Physio</span></span></div>
-        <figcaption class="s4-media-caption nb-media-caption"><strong>Booking for a Clinic Group</strong>Missed appointments down from 11% to 4% in a year.</figcaption>
+    <ul class="hv-works">
+      <li><figure class="hv-work">
+        <div class="hv-work-art" role="img" aria-label="Plan of Kelvin Primary School: four classroom wings around a planted courtyard, the hall to the north.">
+          <svg class="hv-plan" viewBox="0 0 400 400" aria-hidden="true">
+            <rect class="wall" x="20" y="20" width="360" height="360" rx="8"/>
+            <rect class="hall" x="28" y="28" width="344" height="88" rx="4"/>
+            <rect class="room" x="28" y="124" width="84" height="76" rx="4"/><rect class="room" x="28" y="208" width="84" height="76" rx="4"/><rect class="room" x="28" y="292" width="84" height="80" rx="4"/>
+            <rect class="room" x="288" y="124" width="84" height="76" rx="4"/><rect class="room" x="288" y="208" width="84" height="76" rx="4"/><rect class="room" x="288" y="292" width="84" height="80" rx="4"/>
+            <rect class="room" x="120" y="292" width="76" height="80" rx="4"/><rect class="room" x="204" y="292" width="76" height="80" rx="4"/>
+            <rect class="key" x="120" y="124" width="160" height="160" rx="4"/>
+            <circle class="tree" cx="168" cy="176" r="22"/><circle class="tree" cx="232" cy="232" r="26"/><circle class="tree" cx="226" cy="162" r="12"/>
+            <text class="label" x="44" y="80">Hall</text>
+            <text class="label" x="136" y="272">Courtyard</text>
+          </svg>
+        </div>
+        <figcaption class="hv-work-name">
+          <h3><a href="#kelvin">Kelvin Primary School</a></h3>
+          <p>Ten classrooms around a courtyard the children planted themselves. Every room opens straight onto it, so break time starts at the classroom door.</p>
+        </figcaption>
       </figure></li>
-      <li><figure class="s4-media">
-        <div class="s4-media-box" data-ratio="4:3" data-tone="secondary"><span class="nb-work"><span class="s4-icon" data-icon="cart" aria-hidden="true"></span><span class="nb-work-name">Harbour Grocers</span></span></div>
-        <figcaption class="s4-media-caption nb-media-caption"><strong>Orders for a Village Shop</strong>Click and collect, built in six weeks, run by two people.</figcaption>
+      <li><figure class="hv-work">
+        <div class="hv-work-art" role="img" aria-label="Plan of the Partick timber terrace: six narrow homes side by side, each with a garden behind.">
+          <svg class="hv-plan" viewBox="0 0 480 300" aria-hidden="true">
+            <rect class="ground" x="12" y="176" width="456" height="112" rx="8"/>
+            <rect class="wall" x="12" y="20" width="456" height="160" rx="8"/>
+            <rect class="room" x="20" y="28" width="68" height="144" rx="4"/><rect class="room" x="96" y="28" width="68" height="144" rx="4"/><rect class="key" x="172" y="28" width="68" height="144" rx="4"/><rect class="room" x="248" y="28" width="68" height="144" rx="4"/><rect class="room" x="324" y="28" width="68" height="144" rx="4"/><rect class="room" x="400" y="28" width="60" height="144" rx="4"/>
+            <circle class="tree" cx="54" cy="236" r="18"/><circle class="tree" cx="206" cy="246" r="24"/><circle class="tree" cx="358" cy="232" r="16"/><circle class="tree" cx="430" cy="252" r="14"/>
+          </svg>
+        </div>
+        <figcaption class="hv-work-name">
+          <h3><a href="#partick">Partick Timber Terrace</a></h3>
+          <p>Six co-operative homes in cross-laminated timber, 4.8 metres wide each. Heating bills last winter: £21 a month.</p>
+        </figcaption>
       </figure></li>
-      <li><figure class="s4-media">
-        <div class="s4-media-box" data-ratio="4:3" data-tone="low"><span class="nb-work"><span class="s4-icon" data-icon="location" aria-hidden="true"></span><span class="nb-work-name">Fife Council</span></span></div>
-        <figcaption class="s4-media-caption nb-media-caption"><strong>Report a Road Problem</strong>One form instead of four, used 40,000 times last winter.</figcaption>
+      <li><figure class="hv-work">
+        <div class="hv-work-art" role="img" aria-label="Plan of the Glen Affric bothy: one room with a stove, a sleeping platform and a porch for wet boots.">
+          <svg class="hv-plan" viewBox="0 0 480 300" aria-hidden="true">
+            <rect class="wall" x="110" y="40" width="260" height="190" rx="12"/>
+            <rect class="room" x="120" y="50" width="240" height="120" rx="6"/>
+            <rect class="key" x="120" y="178" width="160" height="42" rx="6"/>
+            <rect class="hall" x="288" y="178" width="72" height="42" rx="6"/>
+            <circle class="accent" cx="330" cy="92" r="14"/>
+            <rect class="hall" x="300" y="230" width="44" height="34" rx="6"/>
+            <circle class="tree" cx="60" cy="90" r="30"/><circle class="tree" cx="420" cy="250" r="26"/><circle class="tree" cx="430" cy="70" r="18"/>
+            <text class="label" x="136" y="204">Bunks</text>
+            <text class="label" x="136" y="80">Room</text>
+          </svg>
+        </div>
+        <figcaption class="hv-work-name">
+          <h3><a href="#affric">Glen Affric Bothy</a></h3>
+          <p>A shelter for walkers, eleven kilometres from the road. Carried in by pony, built in nine days, sleeps eight.</p>
+        </figcaption>
       </figure></li>
     </ul>
   </section>
 
-  <section class="s4-site-section" aria-labelledby="tour-h">
-    <h2 class="s4-visually-hidden" id="tour-h">Studio Tour</h2>
-    <figure class="s4-media">
-      <div class="s4-media-box" data-ratio="21:9">
-        <span class="s4-media-empty"><span class="s4-icon" data-icon="camera" aria-hidden="true"></span>A two-minute tour of the studio and how we work</span>
-        <a class="s4-button s4-media-play" data-size="m" href="#tour-video"><span class="s4-icon" data-icon="play"></span>Watch the Tour</a>
-      </div>
-      <figcaption class="s4-media-caption">Filmed at the studio on Leith Walk, October 2026. Captions in English and Gaelic.</figcaption>
-    </figure>
-  </section>
-
-  <section class="s4-site-section" id="services" aria-labelledby="svc-h">
+  <!-- the index: every project, newest first -->
+  <section class="s4-site-section" id="index" aria-labelledby="index-h">
     <div class="s4-site-section-head">
-      <p class="s4-eyebrow">Services</p>
-      <h2 class="s4-site-title" id="svc-h">From the First Sketch to Year Five</h2>
+      <p class="s4-eyebrow">Index</p>
+      <h2 class="s4-site-title" id="index-h">Everything, Newest First</h2>
     </div>
-    <ul class="s4-features">
-      <li class="s4-feature"><span class="s4-icon" data-icon="search"></span><h3 class="s4-feature-name">Research</h3><p>We sit with the people who will use it before we draw anything.</p></li>
-      <li class="s4-feature"><span class="s4-icon" data-icon="edit"></span><h3 class="s4-feature-name">Product Design</h3><p>Screens, flows and a design system your team can keep using.</p></li>
-      <li class="s4-feature"><span class="s4-icon" data-icon="code"></span><h3 class="s4-feature-name">Engineering</h3><p>Web and mobile apps, built to be fast on an old phone.</p></li>
-      <li class="s4-feature"><span class="s4-icon" data-icon="visible"></span><h3 class="s4-feature-name">Accessibility</h3><p>Every release is checked with screen readers and keyboards.</p></li>
-      <li class="s4-feature"><span class="s4-icon" data-icon="security"></span><h3 class="s4-feature-name">Hosting and Care</h3><p>We run what we build, and answer the phone when it matters.</p></li>
-      <li class="s4-feature"><span class="s4-icon" data-icon="people"></span><h3 class="s4-feature-name">Training</h3><p>We hand over properly: your team learns to change it themselves.</p></li>
-    </ul>
+    <ol class="s4-site-index" reversed>
+      <li><a class="s4-site-index-row" href="#partick-two"><span class="s4-site-index-n">09</span><span class="s4-site-index-title">Partick Timber Housing, Phase Two</span><span class="s4-site-index-meta"><span>Glasgow</span><span>42 homes, on site</span></span><span class="s4-site-index-year">2027</span></a></li>
+      <li><a class="s4-site-index-row" href="#govanhill"><span class="s4-site-index-n">08</span><span class="s4-site-index-title">Govanhill Library and Baths</span><span class="s4-site-index-meta"><span>Glasgow</span><span>Library and pool</span></span><span class="s4-site-index-year">2025</span></a></li>
+      <li><a class="s4-site-index-row" href="#affric"><span class="s4-site-index-n">07</span><span class="s4-site-index-title">Glen Affric Bothy</span><span class="s4-site-index-meta"><span>Highlands</span><span>Shelter</span></span><span class="s4-site-index-year">2024</span></a></li>
+      <li><a class="s4-site-index-row" href="#kelvin"><span class="s4-site-index-n">06</span><span class="s4-site-index-title">Kelvin Primary School</span><span class="s4-site-index-meta"><span>Glasgow</span><span>School</span></span><span class="s4-site-index-year">2023</span></a></li>
+      <li><a class="s4-site-index-row" href="#partick"><span class="s4-site-index-n">05</span><span class="s4-site-index-title">Partick Timber Terrace</span><span class="s4-site-index-meta"><span>Glasgow</span><span>6 homes</span></span><span class="s4-site-index-year">2022</span></a></li>
+      <li><a class="s4-site-index-row" href="#leith"><span class="s4-site-index-n">04</span><span class="s4-site-index-title">Leith Community Kitchen</span><span class="s4-site-index-meta"><span>Edinburgh</span><span>Retrofit</span></span><span class="s4-site-index-year">2020</span></a></li>
+      <li><a class="s4-site-index-row" href="#arran"><span class="s4-site-index-n">03</span><span class="s4-site-index-title">Arran Ferry Waiting Room</span><span class="s4-site-index-meta"><span>Brodick</span><span>Pavilion</span></span><span class="s4-site-index-year">2017</span></a></li>
+      <li><a class="s4-site-index-row" href="#dennistoun"><span class="s4-site-index-n">02</span><span class="s4-site-index-title">Dennistoun Nursery</span><span class="s4-site-index-meta"><span>Glasgow</span><span>Nursery</span></span><span class="s4-site-index-year">2013</span></a></li>
+      <li><a class="s4-site-index-row" href="#bakery"><span class="s4-site-index-n">01</span><span class="s4-site-index-title">The Old Bakery, Our Own Studio</span><span class="s4-site-index-meta"><span>Glasgow</span><span>Workplace</span></span><span class="s4-site-index-year">2009</span></a></li>
+    </ol>
   </section>
 
-  <section class="s4-site-section" aria-label="What Clients Say">
-    <figure class="s4-quote" data-align="center">
-      <blockquote><p>“They asked better questions in the first week than we had in a year. The booking tool just works, and our front desk finally goes home on time.”</p></blockquote>
-      <figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="secondary">FM</span><span><span class="s4-quote-name">Fiona MacLeod</span><span class="s4-quote-role">Practice Manager, Lothian Physio</span></span></figcaption>
+  <!-- on site now: a dark band in a light page -->
+  <section class="s4-site-section" data-tone="high" data-theme="dark" id="on-site" aria-labelledby="site-h">
+    <div class="hv-site">
+      <div class="hv-site-head">
+        <p class="s4-eyebrow">On Site Now</p>
+        <h2 class="s4-site-title" id="site-h">Partick Timber Housing, Phase Two</h2>
+        <p class="s4-site-lead">Forty-two homes for the Partick Housing Co-operative, in timber from Scottish forests. The frame reached the third floor this week.</p>
+        <dl class="hv-site-figures">
+          <div><dt>homes, all for social rent</dt><dd>42</dd></div>
+          <div><dt>of timber, from 140 km away</dt><dd>1,900 m³</dd></div>
+          <div><dt>of carbon held in the frame</dt><dd>1,500 t</dd></div>
+        </dl>
+      </div>
+      <div class="hv-road">
+        <div class="hv-road-head"><span>Stage 6 of 9 · Frame</span><span>Handover in October 2027</span></div>
+        <ol class="s4-milestones" aria-label="Nine stages, five done, the frame is under way">
+          <li data-state="done" data-label="Brief"></li>
+          <li data-state="done" data-label="Concept"></li>
+          <li data-state="done" data-label="Planning"></li>
+          <li data-state="done" data-label="Technical Design"></li>
+          <li data-state="done" data-label="Groundworks"></li>
+          <li data-state="current" data-value="0.6" data-label="Frame"></li>
+          <li data-label="Envelope"></li>
+          <li data-label="Fit-Out"></li>
+          <li data-label="Handover"></li>
+        </ol>
+        <div class="hv-road-ends"><span>Brief, 2023</span><span>Handover</span></div>
+        <ul class="hv-diary" aria-label="Site Diary">
+          <li><time datetime="2026-11-13">13 Nov</time><p>Third-floor panels craned in. Two days ahead of the programme.</p></li>
+          <li><time datetime="2026-11-04">4 Nov</time><p>Open evening for the future tenants: 61 came, and chose the kitchen tiles.</p></li>
+          <li><time datetime="2026-10-22">22 Oct</time><p>The first floor is weathertight. Electricians start next week.</p></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- film slot: the poster state until the film is there -->
+  <section class="s4-site-section" aria-labelledby="film-h">
+    <h2 class="s4-visually-hidden" id="film-h">A Film About Govanhill Baths</h2>
+    <figure class="s4-media">
+      <div class="s4-media-box" data-ratio="21:9" data-tone="low">
+        <span class="s4-media-empty"><span class="s4-icon" data-icon="camera" aria-hidden="true"></span>Six in the Morning: the first swimmers at Govanhill Baths</span>
+        <a class="s4-button s4-media-play" data-size="m" href="#film"><span class="s4-icon" data-icon="play"></span>Watch the Film</a>
+      </div>
+      <figcaption class="s4-media-caption">Four minutes, filmed by Ruth Lindqvist in May 2025. Captions in English and Urdu.</figcaption>
     </figure>
   </section>
 
-  <section class="s4-site-section" aria-label="The Studio in Numbers">
+  <!-- how we work -->
+  <section class="s4-site-section" id="practice" aria-labelledby="practice-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">How We Work</p>
+      <h2 class="s4-site-title" id="practice-h">Slowly at the Start, So It Goes Fast on Site</h2>
+    </div>
+    <ol class="hv-stages">
+      <li><h3>Listen</h3><p>We spend the first month with the people who will use the building: teachers at break, swimmers at six in the morning.</p></li>
+      <li><h3>Draw</h3><p>Plans by hand first, then a model everyone can hold. Nothing is rendered until the plan is right.</p></li>
+      <li><h3>Build</h3><p>An architect from the team is on site every week, and the contractor has our phone numbers.</p></li>
+      <li><h3>Return</h3><p>We go back after one year and after five, measure what we got wrong, and publish it.</p></li>
+    </ol>
+  </section>
+
+  <!-- proof -->
+  <section class="s4-site-section" aria-label="What Clients Say">
+    <figure class="s4-quote">
+      <blockquote><p>“They drew the library around how people actually queue, wait and wander. Visits doubled in the first year, and nobody has asked where the toilets are since.”</p></blockquote>
+      <figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="secondary">NB</span><span><span class="s4-quote-name">Nadia Bashir</span><span class="s4-quote-role">Head of Libraries, Glasgow City Council</span></span></figcaption>
+    </figure>
+  </section>
+  <section class="s4-site-section" data-space="compact" aria-label="The Practice in Numbers">
     <dl class="s4-numbers" data-columns="3">
-      <div class="s4-number"><dt>years building for small teams</dt><dd>11</dd></div>
-      <div class="s4-number"><dt>of our clients have stayed more than three years</dt><dd>9 in 10</dd></div>
-      <div class="s4-number"><dt>projects a year, so each one gets all of us</dt><dd>4</dd></div>
+      <div class="s4-number"><dt>buildings finished, every one still in the use it was built for</dt><dd>31</dd></div>
+      <div class="s4-number"><dt>of our work for public bodies, charities and co-operatives</dt><dd>90%</dd></div>
+      <div class="s4-number"><dt>average energy use of our last five buildings, per square metre a year</dt><dd>38 kWh</dd></div>
     </dl>
   </section>
 
+  <!-- contact: the one accent band, with the street drawn in it -->
   <section class="s4-site-section" data-tone="accent" id="contact" aria-labelledby="contact-h">
-    <div class="s4-cta" data-align="center">
-      <div>
-        <h2 class="s4-site-title" id="contact-h">Tell Us What You’re Making</h2>
-        <p class="s4-site-lead">A short note is plenty. We reply within two working days, even when the answer is no.</p>
+    <div class="hv-contact">
+      <div class="hv-contact-text">
+        <h2 class="s4-site-title" id="contact-h">Come Up for a Coffee</h2>
+        <p class="s4-site-lead">Bring a site plan, a hunch or just a question. We reply to every note within two working days.</p>
+        <address class="hv-address">Hollis &amp; Vane Architects<br>Top Floor, 214 Allison Street<br>Glasgow G42 8RU</address>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="mailto:studio@hollisvane.example"><span class="s4-icon" data-icon="mail"></span>Email the Studio</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="tel:+441415550192"><span class="s4-icon" data-icon="phone"></span>0141 555 0192</a>
+        </div>
       </div>
-      <div class="s4-site-actions-row">
-        <a class="s4-button" data-size="m" href="mailto:hello@northbound.example"><span class="s4-icon" data-icon="mail"></span>hello@northbound.example</a>
-      </div>
+      <svg class="hv-map" viewBox="0 0 560 360" role="img" aria-label="Map: the studio on Allison Street, two streets south of Queen's Park station, with the park to the west.">
+        <rect class="park" x="0" y="0" width="150" height="360" rx="20"/>
+        <rect class="block" x="170" y="0" width="110" height="90" rx="10"/><rect class="block" x="300" y="0" width="120" height="90" rx="10"/><rect class="block" x="440" y="0" width="120" height="90" rx="10"/>
+        <rect class="block" x="170" y="110" width="110" height="110" rx="10"/><rect class="block" x="300" y="110" width="120" height="110" rx="10"/><rect class="block" x="440" y="110" width="120" height="110" rx="10"/>
+        <rect class="block" x="170" y="240" width="110" height="120" rx="10"/><rect class="block" x="440" y="240" width="120" height="120" rx="10"/>
+        <rect class="river" x="300" y="240" width="120" height="120" rx="10"/>
+        <circle class="here-ring" cx="360" cy="300" r="34"/><circle class="here" cx="360" cy="300" r="12"/>
+        <text class="label" x="20" y="340">Queen’s Park</text>
+        <text class="label" x="300" y="232">Allison St</text>
+        <text class="label" x="172" y="104">Station</text>
+      </svg>
     </div>
   </section>
 </main>
@@ -185,17 +400,20 @@
 <footer class="s4-site-footer">
   <div class="s4-site-footer-top">
     <div class="s4-site-footer-brand">
-      <a class="s4-site-logo" href="#top" aria-label="Northbound Home"><span class="s4-site-logo-mark" aria-hidden="true">N</span>Northbound</a>
-      <p>12 Leith Walk, Edinburgh EH6 5AA. Open Monday to Thursday; on Fridays we read and tidy up.</p>
+      <a class="s4-site-logo" href="#top" aria-label="Hollis and Vane Home">
+        <svg class="hv-mark" viewBox="0 0 32 32" aria-hidden="true"><path class="wall" d="M4 4 H28 V28 H18 V24 H24 V8 H8 V24 H14 V28 H4 Z"/><rect class="key" x="11" y="11" width="10" height="10" rx="2"/></svg>
+        Hollis &amp; Vane
+      </a>
+      <p>Chartered architects, RIAS and RIBA registered. A member of the Scottish Employee Ownership Network: the practice belongs to the people in it.</p>
     </div>
     <nav class="s4-site-footer-links" data-columns="3" aria-label="Footer">
-      <div><h2>Studio</h2><ul><li><a href="#work">Work</a></li><li><a href="#services">Services</a></li><li><a href="blog.html">Journal</a></li></ul></div>
-      <div><h2>Elsewhere</h2><ul><li><a href="#newsletter">Newsletter</a></li><li><a href="#mastodon">Mastodon</a></li><li><a href="#github">GitHub</a></li></ul></div>
+      <div><h2>Practice</h2><ul><li><a href="#work">Work</a></li><li><a href="#index">Index</a></li><li><a href="#practice">How We Work</a></li><li><a href="blog.html">Writing</a></li></ul></div>
+      <div><h2>Join Us</h2><ul><li><a href="#jobs">Open Roles</a></li><li><a href="#students">Students</a></li><li><a href="#pay">Our Pay Scale</a></li></ul></div>
       <div><h2>Small Print</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#accessibility">Accessibility</a></li><li><a href="#company">Company Details</a></li></ul></div>
     </nav>
   </div>
   <div class="s4-site-footer-base">
-    <p>© 2026 Northbound Studio Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <p>© 2026 Hollis &amp; Vane Architects LLP · Icons by 480 Design (CC BY 4.0)</p>
     <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
       <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
       <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
@@ -205,6 +423,13 @@
 </footer>
 <script src="../components/assets/icons-solar.js?v=3efbe5b" defer></script>
 <script src="../components/orion.min.js?v=3a63f83" defer></script>
-<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
+<script>
+addEventListener('DOMContentLoaded', function () {
+  /* the practice's brand: terracotta on warm grays, firm corners, a geometric display face, calm motion (0055, 0056).
+     The face and the dials are also on <html>, so the first paint already has them; this call adds the accent and keeps saving. */
+  S4.theme.restore('hollis-vane-theme', { mode: 'system', seed: '#a3482a', variant: 'fidelity', gray: 'warm', corners: 'firm', energy: 'calm',
+    display: "Futura, 'Futura PT', 'Century Gothic', 'Avenir Next', Avenir, system-ui, sans-serif" });
+});
+</script>
 </body>
 </html>

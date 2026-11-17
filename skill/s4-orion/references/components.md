@@ -1929,6 +1929,7 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own Joined Capsule group (values 1…4) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
 | `.s4-cta` | Words and actions in a band | `data-align="center"` |
 | `.s4-site-signup` | An email field and a button on one line | — |
+| `.s4-site-index` > `li` > `.s4-site-index-row` | A numbered list of everything (all projects, past issues, an archive): `.s4-site-index-n`, `.s4-site-index-title`, `.s4-site-index-meta` (one or two spans), `.s4-site-index-year`. Meta under the title on a phone, its own columns from 840; rows hover with a rounded fill | — |
 | `.s4-post-featured`, `.s4-posts` > `.s4-post` | A featured post (cover + text) and a dated list (`.s4-post-meta`, `h3` link, sentence, tags) | — |
 | `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager` | — |
 | `[data-site-panel="id"]` | A button that opens that element as a floating glass panel on a phone (the docs sidebar) | — |
