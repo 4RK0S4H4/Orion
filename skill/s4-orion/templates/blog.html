@@ -1,111 +1,232 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="warm" data-page="soft" data-corners="soft" data-energy="calm" data-density="roomy" data-type-display="custom" data-type-text="custom" style="--md-ref-typeface-brand: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; --md-ref-typeface-plain: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Blog · Ledgerly</title>
-<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). Blog. A blog or changelog index from the website kit (components/site): a heading, one featured post with a cover, a dated list of posts with tags, pagination and a newsletter band. Each post opens the Article template (article.html); reading goes on a page, never a dialog. -->
-<meta name="description" content="Notes from the Ledgerly team on paying bills on time, running a household budget and building the product. New posts every two weeks.">
-<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e0e0e" media="(prefers-color-scheme: dark)">
+<title>Tidewater · A Journal of Coasts, Rivers and the People Who Work Them</title>
+<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). Blog. A publication's index from the website kit (components/site): a masthead, the current issue (a
+     cover set in type with its contents), one featured essay, the latest writing filtered by section in place (with an
+     empty state), pagination, back issues and a newsletter band. Each piece opens the Article template (article.html);
+     reading goes on a page, never a dialog.
+     Brand: Tidewater, a quarterly literary journal. Deep sea-blue accent on warm grays, the soft page (paper in light
+     mode), one book serif for display and text, soft corners, roomy density, calm motion. Covers are drawn from filled
+     shapes in the accent's own tones, never image files. -->
+<meta name="description" content="Tidewater is a quarterly journal of coasts, rivers and the people who work them: essays, reportage and field notes from the edge of the water. Issue 14, The Salt Issue, is out now.">
+<meta name="theme-color" content="#f3f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100f0e" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Ledgerly">
-<meta property="og:title" content="Blog · Ledgerly">
-<meta property="og:description" content="Notes on paying bills on time, household money and building Ledgerly.">
-<meta property="og:image" content="https://example.com/og/ledgerly-blog-1200x630.png">
+<meta property="og:site_name" content="Tidewater">
+<meta property="og:title" content="Tidewater · Issue 14, The Salt Issue">
+<meta property="og:description" content="Essays, reportage and field notes from the edge of the water. A quarterly journal since 2019.">
+<meta property="og:image" content="https://example.com/og/tidewater-14-1200x630.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="canonical" href="https://example.com/blog">
-<link rel="alternate" type="application/rss+xml" title="Ledgerly Blog" href="https://example.com/blog/feed.xml">
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="canonical" href="https://example.com/journal/">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('tidewater-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="orion.min.css">
 <style>
-  /* the featured post's cover, set in type on the accent fill: no image file needed */
-  .bl-cover { display: grid; align-content: space-between; justify-items: start; gap: var(--s4-space-4); inline-size: 100%; block-size: 100%; padding: var(--s4-site-section-gap); }
-  .bl-cover-figure { font-family: var(--s4-site-hero-font); font-size: calc(var(--s4-site-hero-size) * 1.6); line-height: 1; letter-spacing: var(--s4-site-hero-tracking); font-weight: var(--s4-site-hero-weight); font-variant-numeric: tabular-nums; }
-  .bl-cover-bars { display: flex; align-items: flex-end; gap: var(--s4-space-2); block-size: calc(var(--s4-space-16) * 1.5); }
-  .bl-cover-bars > span { inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-on-primary-container); opacity: 0.35; }
-  .bl-cover-bars > span:last-child { opacity: 1; }
-  .bl-tags { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  /* ---------- Tidewater: the masthead, covers, the contents page, the section filter, back issues ---------- */
+  /* a book serif sets a little looser and lighter than Inter's display steps */
+  :root { --s4-site-hero-weight: 500; --s4-site-title-weight: 500; }
+
+  /* masthead: rules above and below, the name set very large, the issue line in small capitals */
+  .tw-mast { display: grid; justify-items: center; gap: var(--s4-space-4); padding-block: var(--s4-space-4) var(--s4-space-8); text-align: center; border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+  .tw-mast > * { margin: 0; }
+  .tw-issue-line { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s4-space-1) var(--s4-space-6); inline-size: 100%; padding-block: var(--s4-space-3); border-block: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-variant: small-caps; letter-spacing: 0.06em; font-variant-numeric: oldstyle-nums; }
+  .tw-mast .s4-hero-title { max-inline-size: none; font-size: calc(var(--s4-site-hero-size) * 2.1); line-height: 1.05; font-weight: 400; letter-spacing: -0.01em; }
+  .tw-mast .s4-site-lead { font-style: italic; }
+
+  /* the current issue: a cover beside its contents page */
+  .tw-issue { display: grid; gap: var(--s4-site-section-gap); align-items: start; }
+  @container s4-site-section (width >= 840px) { .tw-issue { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); } }
+  .tw-cover { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); text-decoration: none; }
+  .tw-cover > svg { position: absolute; inset: auto 0 0; inline-size: 100%; block-size: auto; }
+  .tw-cover .band { fill: var(--md-sys-color-on-primary-container); }
+  .tw-cover .sun { fill: var(--md-sys-color-on-primary-container); opacity: 0.18; }
+  .tw-cover-type { position: absolute; inset: 0; display: grid; align-content: start; gap: var(--s4-space-1); padding: var(--s4-space-6) var(--s4-space-6); }
+  .tw-cover-name { font-family: var(--s4-site-hero-font); font-size: calc(var(--s4-site-title-size) * 1.1); line-height: 1.05; font-weight: 400; }
+  .tw-cover-line { display: flex; justify-content: space-between; gap: var(--s4-space-3); padding-block: var(--s4-space-2); border-block: var(--s4-size-divider) solid currentColor; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-variant: small-caps; letter-spacing: 0.06em; font-variant-numeric: oldstyle-nums; }
+  .tw-cover-theme { margin-block-start: var(--s4-space-4); font-family: var(--s4-site-hero-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-style: italic; }
+  .tw-issue-body { display: grid; gap: var(--s4-space-6); }
+  .tw-issue-body > * { margin: 0; }
+  .tw-contents { display: grid; margin: 0; padding: 0; list-style: none; }
+  .tw-contents > li + li { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+  .tw-contents a { display: grid; grid-template-columns: calc(var(--s4-space-10) + var(--s4-space-2)) minmax(0, 1fr); gap: var(--s4-space-1) var(--s4-space-4); padding-block: var(--s4-space-4); color: inherit; text-decoration: none; }
+  .tw-contents a:hover .tw-contents-title { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
+  .tw-page { grid-row: span 2; color: var(--md-sys-color-primary); font-family: var(--s4-site-title-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-variant-numeric: oldstyle-nums tabular-nums; }
+  .tw-contents-title { font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: 500; }
+  .tw-byline { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .tw-byline i { font-variant: small-caps; font-style: normal; letter-spacing: 0.05em; }
+
+  /* the featured essay's cover: an estuary drawn as filled depth bands */
+  .tw-estuary { inline-size: 100%; block-size: 100%; }
+  .tw-estuary .d1 { fill: var(--md-sys-color-on-secondary-container); opacity: 0.12; }
+  .tw-estuary .d2 { fill: var(--md-sys-color-on-secondary-container); opacity: 0.24; }
+  .tw-estuary .d3 { fill: var(--md-sys-color-on-secondary-container); opacity: 0.4; }
+  .tw-estuary .d4 { fill: var(--md-sys-color-on-secondary-container); opacity: 0.62; }
+  .tw-estuary .mark { fill: var(--md-sys-color-on-secondary-container); }
+  .tw-estuary .label { fill: var(--md-sys-color-on-secondary-container); font-family: var(--md-sys-typescale-label-small-font); font-size: 15px; font-style: italic; }
+  @container s4-site-section (width < 600px) { .tw-estuary .label { display: none; } }
+  .tw-drop { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+
+  /* latest writing: the section filter and the empty state it can lead to */
+  .tw-latest-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s4-space-4) var(--s4-space-8); margin-block-end: var(--s4-space-6); }
+  .tw-latest-head > h2 { margin: 0; }
+  .tw-section { color: var(--md-sys-color-primary); font-variant: small-caps; letter-spacing: 0.06em; }
+  .tw-empty { padding-block: var(--s4-space-12); }
+
+  /* back issues: small covers set in type, each in its own tone */
+  .tw-back { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-4); margin: 0; padding: 0; list-style: none; }
+  @container s4-site-section (width >= 840px) { .tw-back { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .tw-back a { display: grid; align-content: space-between; gap: var(--s4-space-4); aspect-ratio: 4 / 5; padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); text-decoration: none; transition: background-color var(--s4-motion-state); }
+  .tw-back a:hover { background: var(--md-sys-color-surface-container-highest); }
+  .tw-back li:nth-child(2) a { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .tw-back li:nth-child(4) a { background: var(--md-sys-color-inverse-surface); color: var(--md-sys-color-inverse-on-surface); }
+  .tw-back-n { font-family: var(--s4-site-hero-font); font-size: var(--s4-site-title-size); line-height: 1; font-variant-numeric: oldstyle-nums; }
+  .tw-back-theme { display: grid; gap: var(--s4-space-1); }
+  .tw-back-theme > span:first-child { font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-style: italic; }
+  .tw-back-theme > span:last-child { font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-variant: small-caps; letter-spacing: 0.06em; font-variant-numeric: oldstyle-nums; }
+  .tw-mark { display: inline-grid; place-items: center; inline-size: var(--s4-space-8); block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-family: var(--s4-site-hero-font); font-size: var(--md-sys-typescale-title-large-size); font-style: italic; line-height: 1; }
 </style>
 </head>
 <body class="s4-site">
 <a class="s4-skip-link" href="#main">Skip to Content</a>
 <header class="s4-site-header">
   <div class="s4-site-bar">
-    <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
+    <a class="s4-site-logo" href="#top" aria-label="Tidewater Home"><span class="tw-mark" aria-hidden="true">T</span>Tidewater</a>
     <nav class="s4-site-nav" aria-label="Main">
       <ul>
-        <li><a class="s4-button" data-variant="text" href="landing.html">Product</a></li>
-        <li><a class="s4-button" data-variant="text" href="pricing.html">Pricing</a></li>
-        <li><a class="s4-button" data-variant="text" href="landing.html#customers">Customers</a></li>
-        <li><a class="s4-button" data-variant="text" href="blog.html" aria-current="page">Blog</a></li>
-        <li><a class="s4-button" data-variant="text" href="docs.html">Docs</a></li>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Journal</a></li>
+        <li><a class="s4-button" data-variant="text" href="#issue">Current Issue</a></li>
+        <li><a class="s4-button" data-variant="text" href="#back">Archive</a></li>
+        <li><a class="s4-button" data-variant="text" href="#submit">Submissions</a></li>
       </ul>
     </nav>
     <div class="s4-site-actions">
       <a class="s4-button" data-variant="text" href="#sign-in">Sign In</a>
-      <a class="s4-button" href="#start" data-keep>Start Free</a>
+      <a class="s4-button" href="#subscribe" data-keep>Subscribe</a>
       <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
     </div>
   </div>
 </header>
-<main id="main">
-  <section class="s4-site-section" aria-labelledby="blog-h">
-    <div class="s4-site-section-head">
-      <p class="s4-eyebrow">Blog and Changelog</p>
-      <h1 class="s4-hero-title" id="blog-h">Notes on Money, Bills and Building Ledgerly</h1>
-      <p class="s4-site-lead">Short, practical posts every two weeks, and a changelog entry for every release.</p>
-    </div>
 
-    <article class="s4-post-featured" aria-labelledby="feat-h">
-      <a class="s4-media-box" data-ratio="3:2" data-tone="accent" href="article.html" aria-label="Getting Paid Faster: read the post">
-        <span class="bl-cover" aria-hidden="true">
-          <span class="bl-cover-figure">9 days</span>
-          <span class="bl-cover-bars"><span style="block-size: 92%"></span><span style="block-size: 80%"></span><span style="block-size: 74%"></span><span style="block-size: 61%"></span><span style="block-size: 48%"></span><span style="block-size: 30%"></span></span>
+<main id="main">
+  <!-- masthead -->
+  <section class="s4-site-section" id="top" data-space="compact" aria-labelledby="mast-h">
+    <div class="tw-mast">
+      <p class="tw-issue-line"><span>Issue 14 · Winter 2026</span><span>The Salt Issue</span><span>Since 2019</span></p>
+      <h1 class="s4-hero-title" id="mast-h">Tidewater</h1>
+      <p class="s4-site-lead">A quarterly journal of coasts, rivers and the people who work them.</p>
+    </div>
+  </section>
+
+  <!-- the current issue: its cover beside the contents page -->
+  <section class="s4-site-section" id="issue" aria-labelledby="issue-h">
+    <div class="tw-issue">
+      <a class="tw-cover" href="#buy" aria-label="Issue 14, The Salt Issue: buy the print edition">
+        <svg viewBox="0 0 400 320" aria-hidden="true">
+          <circle class="sun" cx="290" cy="70" r="56"/>
+          <path class="band" opacity="0.16" d="M0 120 C 70 100, 130 136, 200 120 S 330 100, 400 118 V 320 H 0 Z"/>
+          <path class="band" opacity="0.3" d="M0 168 C 80 146, 150 186, 220 166 S 340 150, 400 166 V 320 H 0 Z"/>
+          <path class="band" opacity="0.5" d="M0 214 C 60 198, 140 232, 210 212 S 350 196, 400 212 V 320 H 0 Z"/>
+          <path class="band" opacity="0.78" d="M0 262 C 90 244, 160 280, 240 260 S 350 248, 400 260 V 320 H 0 Z"/>
+        </svg>
+        <span class="tw-cover-type" aria-hidden="true">
+          <span class="tw-cover-name">Tidewater</span>
+          <span class="tw-cover-line"><span>Nº 14</span><span>Winter 2026</span></span>
+          <span class="tw-cover-theme">The Salt Issue</span>
         </span>
       </a>
+      <div class="tw-issue-body">
+        <p class="s4-eyebrow">In This Issue</p>
+        <h2 class="s4-site-title" id="issue-h">Salt: What the Sea Leaves Behind</h2>
+        <p class="s4-site-lead">Six pieces on salt marsh, salt pans and the salt in our blood, from Essex to the Camargue.</p>
+        <ol class="tw-contents">
+          <li><a href="article.html"><span class="tw-page">4</span><span class="tw-contents-title">The Last Salt Maker on Mersea</span><span class="tw-byline">Reportage · <i>Hannah Okafor</i></span></a></li>
+          <li><a href="article.html"><span class="tw-page">18</span><span class="tw-contents-title">Marsh Samphire, and How to Wait for It</span><span class="tw-byline">Field Notes · <i>Tom Ashdown</i></span></a></li>
+          <li><a href="article.html"><span class="tw-page">27</span><span class="tw-contents-title">A Grammar of the Saltings</span><span class="tw-byline">Essay · <i>Iona Macrae</i></span></a></li>
+          <li><a href="article.html"><span class="tw-page">41</span><span class="tw-contents-title">White Gold of the Camargue</span><span class="tw-byline">Photographs · <i>Léa Fontaine</i></span></a></li>
+          <li><a href="article.html"><span class="tw-page">56</span><span class="tw-contents-title">Tears, Sweat and the Sea</span><span class="tw-byline">Essay · <i>Dr Samir Haddad</i></span></a></li>
+        </ol>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="#buy">Buy the Print Issue, £14</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="article.html">Read Online</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- featured essay, then the latest writing filtered by section -->
+  <section class="s4-site-section" id="latest" aria-labelledby="latest-h">
+    <article class="s4-post-featured" aria-labelledby="feat-h">
+      <a class="s4-media-box" data-ratio="3:2" data-tone="secondary" href="article.html" aria-label="The River That Runs Both Ways: read the essay">
+        <svg class="tw-estuary" viewBox="0 0 600 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+          <path class="d1" d="M-20 60 C 120 40, 200 140, 320 150 S 520 120, 620 170 V 420 H -20 Z"/>
+          <path class="d2" d="M-20 140 C 110 120, 210 210, 330 214 S 520 190, 620 236 V 420 H -20 Z"/>
+          <path class="d3" d="M-20 220 C 120 200, 220 270, 340 268 S 520 260, 620 296 V 420 H -20 Z"/>
+          <path class="d4" d="M-20 300 C 140 280, 240 330, 350 324 S 520 330, 620 350 V 420 H -20 Z"/>
+          <circle class="mark" cx="228" cy="190" r="6"/>
+          <text class="label" x="242" y="186">Tollesbury, 1.2 m</text>
+          <circle class="mark" cx="430" cy="276" r="6"/>
+          <text class="label" x="444" y="272">Blackwater, 4.7 m</text>
+        </svg>
+      </a>
       <div>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">4 Min Read</span></div>
-        <h2 class="s4-site-subtitle" data-size="l" id="feat-h"><a href="article.html">Getting Paid Faster: Three Habits That Cut Nine Days</a></h2>
-        <p class="s4-site-lead">Invoices sent the same day, a pay link on every one, and reminders that don’t nag. What we learned from 120,000 invoices.</p>
-        <p class="s4-post-meta"><span class="s4-avatar" data-size="s" data-tone="tertiary">PR</span>Priya Raman · <time datetime="2026-11-12">Nov 12, 2026</time></p>
+        <p class="s4-post-meta"><span class="tw-section">Essay</span><span>18 min read</span></p>
+        <h2 class="s4-site-subtitle" data-size="l" id="feat-h"><a href="article.html">The River That Runs Both Ways</a></h2>
+        <p class="tw-drop">Twice a day the Blackwater forgets which way the sea is. Iona Macrae spent a year on a houseboat at Tollesbury learning to read it, and found a village that still keeps time by the tide.</p>
+        <p class="s4-post-meta"><span class="s4-avatar" data-size="s" data-tone="secondary">IM</span>Iona Macrae · <time datetime="2026-11-14">14 November 2026</time></p>
       </div>
     </article>
 
-    <h2 class="s4-visually-hidden">Latest Posts</h2>
-    <ul class="s4-posts">
-      <li><article class="s4-post">
-        <p class="s4-post-meta"><time datetime="2026-11-05">Nov 5, 2026</time><span>Changelog</span></p>
-        <h3><a href="article.html">Ledgerly 4.2: Bank Sync for 2,400 European Banks</a></h3>
-        <p>Connect a bank in Germany, France, Spain or the Netherlands in under a minute, and pay bills in euros from the same list.</p>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Release</span><span class="s4-status">Banks</span></div>
+    <div class="tw-latest-head">
+      <h2 class="s4-site-title" id="latest-h">Latest Writing</h2>
+      <div class="s4-chip-set" data-select="single" id="section-pick" aria-label="Section">
+        <button class="s4-chip" data-type="filter" type="button" value="all" aria-pressed="true">Everything</button>
+        <button class="s4-chip" data-type="filter" type="button" value="essay">Essays</button>
+        <button class="s4-chip" data-type="filter" type="button" value="reportage">Reportage</button>
+        <button class="s4-chip" data-type="filter" type="button" value="field">Field Notes</button>
+        <button class="s4-chip" data-type="filter" type="button" value="letters">Letters</button>
+      </div>
+    </div>
+    <ul class="s4-posts" id="posts">
+      <li data-section="reportage"><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-11-07">7 Nov 2026</time><span class="tw-section">Reportage</span></p>
+        <h3><a href="article.html">The Ferryman of Butley Creek Has Retired. Nobody Has Replaced Him.</a></h3>
+        <p>For forty-one summers Brian Fisk rowed walkers across sixty metres of mud and water. The parish council has a rowing boat and no ferryman.</p>
+        <p class="tw-byline">By <i>Hannah Okafor</i> · 11 min read</p>
       </article></li>
-      <li><article class="s4-post">
-        <p class="s4-post-meta"><time datetime="2026-10-29">Oct 29, 2026</time><span>6 min read</span></p>
-        <h3><a href="article.html">The Household Bill Meeting, in Fifteen Minutes a Month</a></h3>
-        <p>A simple agenda for two people who share bills: what changed, what’s coming, and one thing to cancel.</p>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">Households</span></div>
+      <li data-section="field"><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-30">30 Oct 2026</time><span class="tw-section">Field Notes</span></p>
+        <h3><a href="article.html">Counting Brent Geese at Dawn, in Bad Weather, With Good Company</a></h3>
+        <p>The October count at Leigh-on-Sea: 4,312 geese, nine volunteers, one flask of soup between them, and a tide that came in faster than the forecast.</p>
+        <p class="tw-byline">By <i>Tom Ashdown</i> · 6 min read</p>
       </article></li>
-      <li><article class="s4-post">
-        <p class="s4-post-meta"><time datetime="2026-10-15">Oct 15, 2026</time><span>Changelog</span></p>
-        <h3><a href="article.html">Ledgerly 4.1: Approvals for Teams</a></h3>
-        <p>Choose who has to agree before a payment leaves. Set a limit per person, and see every decision in the audit log.</p>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Release</span><span class="s4-status">Teams</span></div>
+      <li data-section="essay"><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-17">17 Oct 2026</time><span class="tw-section">Essay</span></p>
+        <h3><a href="article.html">On Living Below the High-Water Mark</a></h3>
+        <p>A third of the Netherlands sits below the sea. The writer grew up in a house a metre under it, and still listens for the pumps at night.</p>
+        <p class="tw-byline">By <i>Anouk de Vries</i> · 14 min read</p>
       </article></li>
-      <li><article class="s4-post">
-        <p class="s4-post-meta"><time datetime="2026-10-01">Oct 1, 2026</time><span>5 min read</span></p>
-        <h3><a href="article.html">Why We Never Hold Your Money</a></h3>
-        <p>Most bill-pay apps move money through their own account first. Here is why we chose not to, and what it costs us.</p>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Company</span><span class="s4-status">Security</span></div>
+      <li data-section="reportage"><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-10-03">3 Oct 2026</time><span class="tw-section">Reportage</span></p>
+        <h3><a href="article.html">The Oyster Beds Are Coming Back, One Reef at a Time</a></h3>
+        <p>In the Solent, a fishermen’s co-operative and a university lab have laid 9,000 native oysters in cages under the marina pontoons.</p>
+        <p class="tw-byline">By <i>Priya Natarajan</i> · 9 min read</p>
       </article></li>
-      <li><article class="s4-post">
-        <p class="s4-post-meta"><time datetime="2026-09-17">Sep 17, 2026</time><span>3 min read</span></p>
-        <h3><a href="article.html">Five Subscriptions People Forget, and How to Find Them</a></h3>
-        <p>We looked at which recurring charges members cancel most once they see them listed in one place.</p>
-        <div class="bl-tags"><span class="s4-status" data-tone="secondary">Guide</span><span class="s4-status">Saving</span></div>
+      <li data-section="field"><article class="s4-post">
+        <p class="s4-post-meta"><time datetime="2026-09-19">19 Sep 2026</time><span class="tw-section">Field Notes</span></p>
+        <h3><a href="article.html">What the Wrack Line Told Me in September</a></h3>
+        <p>A month of walking the same kilometre of shingle at Dungeness, and a list of everything the sea gave back.</p>
+        <p class="tw-byline">By <i>Iona Macrae</i> · 5 min read</p>
       </article></li>
     </ul>
+    <div class="s4-empty tw-empty" id="posts-empty" hidden>
+      <span class="s4-empty-icon"><span class="s4-icon" data-icon="mail"></span></span>
+      <h3 class="s4-empty-title">No Letters Yet This Winter</h3>
+      <p class="s4-empty-text">Readers’ letters appear here once the issue has been out a month. Write to us and yours could be first.</p>
+      <a class="s4-button" data-variant="tonal" href="#submit">Write a Letter</a>
+    </div>
     <nav class="s4-pagination" aria-label="Pagination">
       <a class="s4-page" href="#page-1" aria-label="Previous Page" aria-disabled="true"><span class="s4-icon" data-icon="chevron-left"></span></a>
       <a class="s4-page" href="#page-1" aria-current="page">1</a>
@@ -115,38 +236,50 @@
     </nav>
   </section>
 
-  <section class="s4-site-section" data-tone="low" aria-labelledby="news-h">
+  <!-- back issues -->
+  <section class="s4-site-section" id="back" aria-labelledby="back-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">The Archive</p>
+      <h2 class="s4-site-title" id="back-h">Thirteen Issues Behind Us</h2>
+      <p class="s4-site-lead">Every back issue is free to read online after a year. Print copies of most are still on the shelf.</p>
+    </div>
+    <ul class="tw-back">
+      <li><a href="#issue-13"><span class="tw-back-n">13</span><span class="tw-back-theme"><span>Estuaries</span><span>Autumn 2026</span></span></a></li>
+      <li><a href="#issue-12"><span class="tw-back-n">12</span><span class="tw-back-theme"><span>Lighthouses</span><span>Summer 2026</span></span></a></li>
+      <li><a href="#issue-11"><span class="tw-back-n">11</span><span class="tw-back-theme"><span>The Catch</span><span>Spring 2026</span></span></a></li>
+      <li><a href="#issue-10"><span class="tw-back-n">10</span><span class="tw-back-theme"><span>Storms</span><span>Winter 2025</span></span></a></li>
+    </ul>
+  </section>
+
+  <!-- newsletter band -->
+  <section class="s4-site-section" data-tone="low" id="subscribe" aria-labelledby="news-h">
     <div class="s4-cta">
       <div>
-        <h2 class="s4-site-title" id="news-h">One Useful Note a Month</h2>
-        <p class="s4-site-lead">The best post of the month and what shipped, in one short email. No tracking pixels.</p>
+        <h2 class="s4-site-title" id="news-h">The Slack Water Letter</h2>
+        <p class="s4-site-lead">One email at each turn of the tide, four times a year: the new issue, a piece from the archive and a reader’s letter.</p>
       </div>
       <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
         <div class="s4-text-field"><input id="blog-email" type="email" autocomplete="email" required><label for="blog-email">Email</label></div>
-        <button class="s4-button" type="submit">Subscribe</button>
+        <button class="s4-button" type="submit">Sign Up</button>
       </form>
     </div>
   </section>
 </main>
+
 <footer class="s4-site-footer">
   <div class="s4-site-footer-top">
     <div class="s4-site-footer-brand">
-      <a class="s4-site-logo" href="landing.html" aria-label="Ledgerly Home"><span class="s4-site-logo-mark" aria-hidden="true">L</span>Ledgerly</a>
-      <p>Bills paid on time, from the bank you already use. Made in Bristol and Lisbon.</p>
-      <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
-        <div class="s4-text-field"><input id="news-email" type="email" autocomplete="email" required><label for="news-email">Email for Monthly Tips</label></div>
-        <button class="s4-button" data-variant="tonal" type="submit">Subscribe</button>
-      </form>
+      <a class="s4-site-logo" href="#top" aria-label="Tidewater Home"><span class="tw-mark" aria-hidden="true">T</span>Tidewater</a>
+      <p>Edited and printed in Harwich. Published by the Tidewater Trust, a registered charity (no. 1184420). We pay every writer and photographer, always.</p>
     </div>
-    <nav class="s4-site-footer-links" aria-label="Footer">
-      <div><h2>Product</h2><ul><li><a href="landing.html#how">How It Works</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="landing.html#security">Security</a></li><li><a href="blog.html">Changelog</a></li></ul></div>
-      <div><h2>Company</h2><ul><li><a href="site.html">About</a></li><li><a href="landing.html#customers">Customers</a></li><li><a href="#careers">Careers</a></li><li><a href="#press">Press</a></li></ul></div>
-      <div><h2>Resources</h2><ul><li><a href="blog.html">Blog</a></li><li><a href="docs.html">Docs</a></li><li><a href="#help">Help Center</a></li><li><a href="#status">Status</a></li></ul></div>
-      <div><h2>Legal</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#terms">Terms</a></li><li><a href="#cookies">Cookies</a></li><li><a href="#licenses">Licenses</a></li></ul></div>
+    <nav class="s4-site-footer-links" data-columns="3" aria-label="Footer">
+      <div><h2>Read</h2><ul><li><a href="#issue">Current Issue</a></li><li><a href="#back">Archive</a></li><li><a href="#latest">Latest Writing</a></li></ul></div>
+      <div><h2>Take Part</h2><ul><li><a href="#submit">Submissions</a></li><li><a href="#subscribe">Subscribe</a></li><li><a href="#stockists">Stockists</a></li></ul></div>
+      <div><h2>The Trust</h2><ul><li><a href="site.html">About</a></li><li><a href="#donate">Donate</a></li><li><a href="#privacy">Privacy</a></li></ul></div>
     </nav>
   </div>
   <div class="s4-site-footer-base">
-    <p>© 2026 Ledgerly Ltd · Icons by 480 Design (CC BY 4.0)</p>
+    <p>© 2026 The Tidewater Trust · Icons by 480 Design (CC BY 4.0)</p>
     <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
       <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
       <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
@@ -156,6 +289,21 @@
 </footer>
 <script src="icons-solar.js" defer></script>
 <script src="orion.min.js" defer></script>
-<script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('orion-template-theme', { mode: 'system' }); });</script>
+<script>
+addEventListener('DOMContentLoaded', function () {
+  /* the journal's brand: sea blue on warm paper, one book serif, soft corners, roomy, calm (0055, 0056) */
+  var SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
+  S4.theme.restore('tidewater-theme', { mode: 'system', seed: '#1f4e66', variant: 'fidelity', gray: 'warm', page: 'soft', corners: 'soft', energy: 'calm', display: SERIF, text: SERIF });
+
+  /* filter the latest writing by section, in place; an empty section says so and offers the next step */
+  var pick = document.getElementById('section-pick'), list = document.getElementById('posts'), empty = document.getElementById('posts-empty');
+  pick.addEventListener('s4-change', function (e) {
+    var chip = e.target.closest('.s4-chip'); if (!chip || chip.getAttribute('aria-pressed') !== 'true') return;
+    var shown = 0;
+    list.querySelectorAll(':scope > li').forEach(function (li) { var on = chip.value === 'all' || li.dataset.section === chip.value; li.hidden = !on; if (on) shown++; });
+    list.hidden = !shown; empty.hidden = !!shown;
+  });
+});
+</script>
 </body>
 </html>

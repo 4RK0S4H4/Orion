@@ -58,7 +58,7 @@
   .hv-sheet { margin: 0; display: grid; gap: var(--s4-space-3); }
   .hv-sheet-art { position: relative; padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
   @container s4-site-section (width >= 840px) { .hv-sheet-art { padding: var(--s4-space-10) var(--s4-space-12); } }
-  .hv-sheet figcaption, .hv-work figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-6); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
+  .hv-sheet figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-6); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
 
   /* selected work: one large and two stacked on a 12-column grid */
   .hv-works { display: grid; gap: var(--s4-space-10) var(--s4-space-6); margin: 0; padding: 0; list-style: none; }
@@ -70,7 +70,7 @@
   .hv-work-name h3 { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: 500; }
   .hv-work-name h3 a { color: inherit; text-decoration: none; }
   .hv-work-name h3 a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.15em; }
-  .hv-work-name p { color: var(--md-sys-color-on-surface-variant); max-inline-size: var(--s4-site-measure); }
+  .hv-work-name p { color: var(--md-sys-color-on-surface-variant); max-inline-size: var(--s4-site-measure); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   @container s4-site-section (width >= 840px) {
     .hv-works { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto; }
     .hv-works > li:first-child { grid-row: span 2; }
