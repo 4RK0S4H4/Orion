@@ -47,7 +47,7 @@
     --_bg: var(--md-sys-color-surface-container-highest);
     --_fg: var(--md-sys-color-on-surface-variant);
     flex: 1 1 0;
-    min-width: min(max-content, 100%);
+    min-inline-size: fit-content;   /* never narrower than its label (a label never breaks mid-word), yet never wider than the group: the group wraps instead */
     border-radius: var(--_r);
   }
   .s4-button-group[data-connected]:has(> [data-size="l"], > [data-size="xl"]) > :is(.s4-button, .s4-icon-button) { --_r: var(--md-sys-shape-corner-medium); }

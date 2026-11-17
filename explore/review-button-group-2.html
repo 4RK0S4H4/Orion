@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: Button Groups, Round 2</title>
+<link rel="stylesheet" href="../components/orion.css?v=5545f95">
+<style>
+/* The quiz around the previews: layout only (decision 0048). Looks come from Orion. */
+body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.lab { max-inline-size: var(--s4-layout-content-wide, 1200px); margin: 0 auto; padding: var(--s4-space-6) var(--s4-space-4) var(--s4-space-16); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+.lab h1, .lab h2, .lab p { margin: 0; }
+.lab-intro { display: flex; flex-direction: column; gap: var(--s4-space-3); max-inline-size: 72ch; }
+.lab-intro p, .lab-sec > p { color: var(--md-sys-color-on-surface-variant); }
+.lab-sec { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+.lab-sec > .rv-group { --rv-min: 340px; margin-block-start: var(--s4-space-3); }
+
+/* ================= what is being judged: everything below lives inside the previews ================= */
+.pv { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-4); }
+.pv-row { display: flex; flex-direction: column; gap: var(--s4-space-2); min-inline-size: 0; }
+.pv-cap { font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); color: var(--md-sys-color-on-surface-variant); }
+.pv-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-3); }
+.pv-backdrop { position: relative; padding: var(--s4-space-6) var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); overflow: hidden; background:
+  linear-gradient(115deg, var(--s4-chart-1) 0 22%, var(--s4-chart-3) 22% 41%, var(--s4-chart-2) 41% 63%, var(--s4-chart-5) 63% 80%, var(--s4-chart-4) 80%); }
+.pv-glass { padding: var(--s4-space-2); border-radius: calc(min(calc(var(--s4-size-icon-button) / 2), var(--s4-shape-control)) + var(--s4-space-3)); }
+.pv-dial { padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+
+/* ---------- shared anatomy of every take ---------- */
+.bg {
+  --_h: var(--s4-size-icon-button);
+  --_pad: var(--s4-space-3);
+  --_r: min(calc(var(--_h) / 2), var(--s4-shape-control));
+  --_tray: var(--md-sys-color-surface-container-highest);
+  --_sel: var(--md-sys-color-primary);
+  --_on-sel: var(--md-sys-color-on-primary);
+  --_fg: var(--md-sys-color-on-surface);
+  position: relative;
+  display: flex;
+  inline-size: 100%;
+  min-inline-size: 0;
+  font-family: var(--md-sys-typescale-label-large-font);
+  font-size: var(--md-sys-typescale-label-large-size);
+  line-height: var(--md-sys-typescale-label-large-line-height);
+  letter-spacing: var(--md-sys-typescale-label-large-tracking);
+  font-weight: var(--md-sys-typescale-label-large-weight);
+}
+.bg[data-fit] { inline-size: auto; display: inline-flex; }
+.bg[data-size="s"] { --_h: var(--s4-size-button-small); --_pad: var(--s4-space-3); }
+.bg[data-size="l"] { --_h: var(--s4-size-button-medium); --_pad: var(--s4-space-6); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); }
+.bg > button {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 0;
+  min-inline-size: fit-content;
+  min-block-size: var(--_h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s4-space-2);
+  margin: 0;
+  padding: 0 var(--_pad);
+  border: 0;
+  border-radius: var(--_r);
+  background: transparent;
+  color: var(--_fg);
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  --s4-icon-size: calc(var(--_h) * 0.5);
+  transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+}
+.bg[data-fit] > button { flex: none; }
+.bg > button:has(> .s4-icon:only-child) { padding: 0; min-inline-size: calc(var(--_h) * 1.25); }
+.bg > button[aria-pressed="true"] { color: var(--_on-sel); }
+.bg > button:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); z-index: 3; }
+/* on glass, items are tints (decision 0043): the tray is a tint of the text color, the selection a strong tint of the accent */
+.s4-glass .bg { --_tray: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent); --_sel: color-mix(in srgb, var(--md-sys-color-primary) 88%, transparent); }
+
+/* ---------- A. Ink Track: one capsule; the selection is an ink pill that slides, its edges leading and trailing ---------- */
+.tA { padding: var(--s4-space-1); border-radius: calc(var(--_r) + var(--s4-space-1)); background: var(--_tray); }
+.tA > button { color: var(--md-sys-color-on-surface-variant); }
+.tA > button[aria-pressed="true"] { color: var(--_on-sel); }
+@media (hover: hover) { .tA > button:not([aria-pressed="true"]):hover { color: var(--md-sys-color-on-surface); } }
+.tA-ink { position: absolute; inset-block: var(--s4-space-1); z-index: 0; border-radius: var(--_r); background: var(--_sel); pointer-events: none; }
+.tA-ink[data-dir="end"] { transition: right var(--s4-motion-ink), left var(--s4-motion-ink-calm); }
+.tA-ink[data-dir="start"] { transition: left var(--s4-motion-ink), right var(--s4-motion-ink-calm); }
+/* several at once: selected neighbours fuse into one longer pill (their touching corners go square) */
+.tA[data-select="multi"] > button[aria-pressed="true"] { background: var(--_sel); transition: background-color var(--s4-motion-state), color var(--s4-motion-state), border-radius var(--s4-motion-morph); }
+.tA[data-select="multi"] > button[aria-pressed="true"]:has(+ [aria-pressed="true"]) { border-start-end-radius: 0; border-end-end-radius: 0; }
+.tA[data-select="multi"] > [aria-pressed="true"] + button[aria-pressed="true"] { border-start-start-radius: 0; border-end-start-radius: 0; }
+
+/* ---------- B. Lone Pill: no tray; options are words; only the selection is filled, and the fill grows in place ---------- */
+.tB { gap: var(--s4-space-1); }
+.tB > button { color: var(--md-sys-color-on-surface-variant); isolation: isolate; }
+.tB > button::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--_sel); opacity: 0; transform: scale(0.82); transition: opacity var(--s4-motion-state), transform var(--s4-motion-ink-calm); }
+.tB > button[aria-pressed="true"] { color: var(--_on-sel); }
+.tB > button[aria-pressed="true"]::before { opacity: 1; transform: none; transition: opacity var(--s4-motion-state), transform var(--s4-motion-ink); }
+@media (hover: hover) { .tB > button:not([aria-pressed="true"]):hover { background: var(--_tray); color: var(--md-sys-color-on-surface); } }
+.tB > button:active:not([aria-pressed="true"]) { background: var(--_tray); }
+
+/* ---------- C. Linked Beads: pills held together by short bridges; a selected bead fills, a run of them fills its bridges too ---------- */
+.tC { --_gap: var(--s4-space-3); gap: var(--_gap); isolation: isolate; }
+.tC > button { z-index: auto; background: var(--_tray); }
+/* the bridge runs under both neighbours (z-index -1 in the group), so its ends always vanish into their curves */
+.tC > button:not(:last-child)::after { content: ""; position: absolute; z-index: -1; inset-inline-start: calc(100% - var(--_r)); inset-block: 40%; inline-size: calc(var(--_gap) + 2 * var(--_r)); border-radius: var(--md-sys-shape-corner-full); background: var(--_tray); transition: background-color var(--s4-motion-state); }
+.s4-glass .tC > button:not(:last-child)::after { inset-inline-start: 100%; inline-size: var(--_gap); border-radius: 0; }   /* tints overlap visibly: on glass the bridge only fills the gap */
+.tC > button[aria-pressed="true"] { background: var(--_sel); }
+.tC > button[aria-pressed="true"]:has(+ [aria-pressed="true"])::after { background: var(--_sel); }
+@media (hover: hover) { .tC > button:not([aria-pressed="true"]):hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--_tray)); } }
+
+/* ---------- D. Break Out: the options are one joined capsule; the selection breaks out of it as its own pill ---------- */
+.tD { --_gap: var(--s4-space-1); }
+.tD > button { background: var(--_tray); border-radius: 0; transition: background-color var(--s4-motion-state), color var(--s4-motion-state), border-radius var(--s4-motion-morph), margin var(--s4-motion-morph); }
+.tD > button:is(:first-child, [aria-pressed="true"], [aria-pressed="true"] + *) { border-start-start-radius: var(--_r); border-end-start-radius: var(--_r); }
+.tD > button:is(:last-child, [aria-pressed="true"], :has(+ [aria-pressed="true"])) { border-start-end-radius: var(--_r); border-end-end-radius: var(--_r); }
+.tD > button[aria-pressed="true"]:not(:first-child) { margin-inline-start: var(--_gap); }
+.tD > button[aria-pressed="true"]:not(:last-child) { margin-inline-end: var(--_gap); }
+.tD > button[aria-pressed="true"] { background: var(--_sel); }
+@media (hover: hover) { .tD > button:not([aria-pressed="true"]):hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--_tray)); } }
+
+/* ---------- E. Lifted Tone: one capsule; the selection is lifted by tone (the brightest surface), the label takes the accent ---------- */
+.tE { padding: var(--s4-space-1); border-radius: calc(var(--_r) + var(--s4-space-1)); background: var(--_tray); gap: var(--s4-space-1); }
+.tE > button { color: var(--md-sys-color-on-surface-variant); }
+.tE > button[aria-pressed="true"] { background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-primary); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+@media (hover: hover) { .tE > button:not([aria-pressed="true"]):hover { color: var(--md-sys-color-on-surface); } }
+.s4-glass .tE > button[aria-pressed="true"] { background: color-mix(in srgb, var(--md-sys-color-surface-container-lowest) 85%, transparent); }
+
+/* ---------- pairs: Pair Switch. Two halves of one track; the knob slides end to end and a tap anywhere flips it ---------- */
+.tP { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; inline-size: auto; padding: var(--s4-space-1); border-radius: calc(var(--_r) + var(--s4-space-1)); background: var(--_tray); }
+.tP > button { color: var(--md-sys-color-on-surface-variant); }
+.tP > button[aria-pressed="true"] { color: var(--_on-sel); }
+.tP-knob { position: absolute; inset-block: var(--s4-space-1); inset-inline-start: var(--s4-space-1); inline-size: calc(50% - var(--s4-space-1)); border-radius: var(--_r); background: var(--_sel); pointer-events: none; transition: transform var(--s4-motion-ink); }
+.tP:has(> button:last-of-type[aria-pressed="true"]) .tP-knob { transform: translateX(100%); }
+[dir="rtl"] .tP:has(> button:last-of-type[aria-pressed="true"]) .tP-knob { transform: translateX(-100%); }
+</style>
+</head>
+<body>
+<main class="lab">
+  <header class="lab-intro">
+    <h1 class="s4-headline-small">Button Groups, Round 2</h1>
+    <p class="s4-body-large">You asked for a connected button group that is not Material's: today's Joined Capsule looks odd, most of all with two buttons. Here are five takes of Orion's own, each live: tap the options inside a preview to try them (that never answers). Every take is filled, has no shadows, works for two to four options, one or several choices, icons, three sizes, on glass, with any accent and with firmer corners.</p>
+    <p class="s4-body-large">Tap a card's header to pick it. Keep is today's group, for comparison. Then say whether a pair should get its own form.</p>
+  </header>
+  <section class="lab-sec" aria-labelledby="q1">
+    <h2 class="s4-title-large" id="q1">1. Which Take</h2>
+    <p>Rows: two, three and four options (one choice), icons (several choices), small and large, on glass, and in teal with firm corners.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Which take" id="takes"></div>
+  </section>
+  <section class="lab-sec" aria-labelledby="q2">
+    <h2 class="s4-title-large" id="q2">2. Pairs</h2>
+    <p>Two options are where today's group looks oddest. A pair can simply use the take you pick, or get a form of its own that works like a switch with words on it.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Pairs" id="pairs"></div>
+  </section>
+</main>
+<footer></footer>
+<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/orion.js?v=d4385af"></script>
+<script src="lib/questions.js?v=9bfa089"></script>
+<script src="lib/review.js?v=c12ab1a"></script>
+<script>
+(function () {
+  var ICON_VIEW = [['list', 'List'], ['dashboard', 'Grid'], ['calendar', 'Calendar'], ['chart', 'Chart']];
+  var ICON_ADD = [['image', 'Photos'], ['link', 'Links'], ['location', 'Places'], ['attach', 'Files']];
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function group(cls, labels, o) {
+    o = o || {};
+    var sel = o.sel == null ? 0 : o.sel;
+    var h = '<div class="bg ' + cls + '" role="group" aria-label="' + esc(o.label || 'Choice') + '" data-select="' + (o.multi ? 'multi' : 'single') + '"' + (o.size ? ' data-size="' + o.size + '"' : '') + (o.fit ? ' data-fit' : '') + '>';
+    labels.forEach(function (l, i) {
+      var on = o.multi ? (o.sel || []).indexOf(i) >= 0 : i === sel;
+      var inner = Array.isArray(l) ? '<span class="s4-icon" data-icon="' + l[0] + '"></span>' : esc(l);
+      h += '<button type="button" aria-pressed="' + on + '"' + (Array.isArray(l) ? ' aria-label="' + esc(l[1]) + '"' : '') + ' tabindex="' + (o.multi || on ? 0 : -1) + '">' + inner + '</button>';
+    });
+    return h + '</div>';
+  }
+  function row(cap, html) { return '<div class="pv-row"><span class="pv-cap">' + cap + '</span>' + html + '</div>'; }
+  function preview(cls, keep) {
+    var g = keep ? keepGroup : function (labels, o) { return group(cls, labels, o); };
+    var el = document.createElement('div'); el.className = 'pv';
+    el.innerHTML =
+      row('Two', g(['Monthly', 'Yearly'], { label: 'Billing' })) +
+      row('Three', g(['Day', 'Week', 'Month'], { label: 'Period', sel: 1 })) +
+      row('Four', g(['Week', 'Month', 'Quarter', 'Year'], { label: 'Range', sel: 1 })) +
+      row('Icons, several at once', '<div class="pv-line">' + g(ICON_ADD, { label: 'Attach', multi: true, sel: [0, 1], fit: true }) + g(ICON_VIEW.slice(0, 3), { label: 'View', fit: true }) + '</div>') +
+      row('Small and large', '<div class="pv-line">' + g(['USD', 'EUR', 'GBP'], { label: 'Currency', size: 's', fit: true }) + '</div>' + g(['Off', 'Auto', 'On'], { label: 'Sync', size: 'l', sel: 1 })) +
+      row('On glass', '<div class="pv-backdrop"><div class="s4-glass pv-glass">' + g(['Map', 'Satellite', 'Transit'], { label: 'Map style' }) + '</div></div>') +
+      row('Teal, firm corners', '<div class="pv-dial" data-dial>' + g(['Draft', 'Review', 'Done'], { label: 'Status', sel: 2 }) + '</div>');
+    el.querySelectorAll('[data-dial]').forEach(function (d) { S4.theme({ seed: 'teal', corners: 'firm' }, d); });
+    return el;
+  }
+  /* Keep: the shipped Joined Capsule, untouched */
+  function keepGroup(labels, o) {
+    o = o || {};
+    var sel = o.sel == null ? 0 : o.sel, icon = Array.isArray(labels[0]);
+    var size = o.size === 's' ? 'xs' : o.size === 'l' ? 'm' : '';
+    var h = '<div class="s4-button-group" data-connected data-select="' + (o.multi ? 'multi' : 'single') + '"' + (o.fit ? ' data-fit="content"' : '') + ' aria-label="' + esc(o.label || 'Choice') + '">';
+    labels.forEach(function (l, i) {
+      var on = o.multi ? (o.sel || []).indexOf(i) >= 0 : i === sel;
+      h += icon ? '<button class="s4-icon-button" data-variant="tonal" type="button" aria-pressed="' + on + '" aria-label="' + esc(l[1]) + '"><span class="s4-icon" data-icon="' + l[0] + '"></span></button>'
+        : '<button class="s4-button" type="button"' + (size ? ' data-size="' + size + '"' : '') + ' aria-pressed="' + on + '">' + esc(l) + '</button>';
+    });
+    return h + '</div>';
+  }
+
+  /* ---------- behaviour for the takes (the shipped group has its own) ---------- */
+  function placeInk(g, animate) {
+    if (!g.classList.contains('tA') || g.dataset.select === 'multi') return;
+    var ink = g.querySelector('.tA-ink');
+    if (!ink) { ink = document.createElement('span'); ink.className = 'tA-ink'; ink.setAttribute('aria-hidden', 'true'); g.insertBefore(ink, g.firstChild); }
+    var b = g.querySelector('button[aria-pressed="true"]'); if (!b) return;
+    var gr = g.getBoundingClientRect(), br = b.getBoundingClientRect();
+    var l = br.left - gr.left - g.clientLeft, r = gr.right - br.right - g.clientLeft;
+    var oldL = parseFloat(ink.style.left);
+    if (!animate) ink.removeAttribute('data-dir');
+    else ink.setAttribute('data-dir', l > oldL ? 'end' : 'start');
+    ink.style.left = l + 'px'; ink.style.right = r + 'px';
+  }
+  function choose(g, b) {
+    var multi = g.dataset.select === 'multi', btns = Array.prototype.slice.call(g.querySelectorAll(':scope > button'));
+    if (g.classList.contains('tP')) { b = btns.filter(function (x) { return x.getAttribute('aria-pressed') !== 'true'; })[0]; }   /* a pair flips, wherever you tap */
+    if (multi) b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+    else btns.forEach(function (x) { var on = x === b; x.setAttribute('aria-pressed', String(on)); x.tabIndex = on ? 0 : -1; });
+    placeInk(g, true);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('.bg > button'); if (!b) return;
+    choose(b.parentElement, b);
+  });
+  document.addEventListener('keydown', function (e) {
+    var b = e.target.closest && e.target.closest('.bg > button'); if (!b) return;
+    var k = e.key, rtl = getComputedStyle(b).direction === 'rtl';
+    if (k !== 'ArrowRight' && k !== 'ArrowLeft') return;
+    var btns = Array.prototype.slice.call(b.parentElement.querySelectorAll(':scope > button')), i = btns.indexOf(b);
+    var step = (k === 'ArrowRight') !== rtl ? 1 : -1, n = btns[(i + step + btns.length) % btns.length];
+    e.preventDefault(); n.focus();
+    if (b.parentElement.dataset.select !== 'multi') choose(b.parentElement, n);
+  });
+  function placeAll(animate) { document.querySelectorAll('.bg.tA').forEach(function (g) { placeInk(g, animate); }); }
+  window.addEventListener('resize', function () { placeAll(false); });
+  document.addEventListener('s4-theme', function () { requestAnimationFrame(function () { placeAll(false); }); });
+
+  var TAKES = [
+    { k: 'A', cls: 'tA', name: 'Ink Track', desc: 'One filled capsule with the options as words on it. The selection is an ink pill that slides between them: its front edge leads and its back edge catches up, so it stretches as it moves. With several choices, selected neighbours fuse into one longer pill.' },
+    { k: 'B', cls: 'tB', name: 'Lone Pill', desc: 'No tray and no boxes. The options are words in a row and only the choice is filled; its fill grows in place. The lightest take: the group is held together by the row itself.' },
+    { k: 'C', cls: 'tC', name: 'Linked Beads', desc: 'Separate pills held together by short bridges, like beads on a string. The choice fills with the accent; with several choices, a run of selected beads fills its bridges too and reads as one piece.' },
+    { k: 'D', cls: 'tD', name: 'Break Out', desc: 'The options are one joined capsule with no lines between them. The choice breaks out of it as its own accent pill, with a small gap on each side; the rest close up around it.' },
+    { k: 'E', cls: 'tE', name: 'Lifted Tone', desc: 'One filled capsule; the choice is lifted by tone (the brightest surface, the darkest in dark mode) and its label takes the accent, in a slightly heavier weight. Quiet, no strong fill anywhere.' },
+    { k: 'Keep', keep: true, name: 'Joined Capsule', tag: 'Today', desc: 'Today’s group (decision 0026): segments 2px apart, round outer ends, small inner corners; the selected one becomes a full pill.' }
+  ];
+  var takes = document.getElementById('takes');
+  TAKES.forEach(function (o) { takes.appendChild(S4Review.card({ pick: 'take:' + o.k, letter: o.k, title: o.name, desc: o.desc, tag: o.tag || '', preview: preview(o.cls, o.keep) })); });
+
+  function pairPreview(kind) {
+    var el = document.createElement('div'); el.className = 'pv';
+    if (kind === 'switch') {
+      var p = function (a, b, o) { o = o || {}; return '<div class="bg tP" role="group" aria-label="' + esc(o.label) + '" data-select="single"' + (o.size ? ' data-size="' + o.size + '"' : '') + '><span class="tP-knob" aria-hidden="true"></span>' +
+        '<button type="button" aria-pressed="true"' + (Array.isArray(a) ? ' aria-label="' + a[1] + '"' : '') + '>' + (Array.isArray(a) ? '<span class="s4-icon" data-icon="' + a[0] + '"></span>' : a) + '</button>' +
+        '<button type="button" aria-pressed="false" tabindex="-1"' + (Array.isArray(b) ? ' aria-label="' + b[1] + '"' : '') + '>' + (Array.isArray(b) ? '<span class="s4-icon" data-icon="' + b[0] + '"></span>' : b) + '</button></div>'; };
+      el.innerHTML = row('Words', p('Monthly', 'Yearly', { label: 'Billing' })) + row('Icons', p(['light-mode', 'Light'], ['dark-mode', 'Dark'], { label: 'Theme' })) +
+        row('Small and large', '<div class="pv-line">' + p('List', 'Board', { label: 'Layout', size: 's' }) + p('Buy', 'Rent', { label: 'Mode', size: 'l' }) + '</div>') +
+        row('On glass', '<div class="pv-backdrop"><div class="s4-glass pv-glass" style="display:inline-block">' + p('Map', 'Satellite', { label: 'Map style' }) + '</div></div>');
+    } else {
+      el.innerHTML = [['tA', 'A. Ink Track'], ['tB', 'B. Lone Pill'], ['tC', 'C. Linked Beads'], ['tD', 'D. Break Out'], ['tE', 'E. Lifted Tone']].map(function (t) { return row(t[1], group(t[0], ['Monthly', 'Yearly'], { label: 'Billing, ' + t[1] })); }).join('');
+    }
+    return el;
+  }
+  var pairs = document.getElementById('pairs');
+  pairs.appendChild(S4Review.card({ pick: 'pairs:Same', letter: 'Same', title: 'Same As The Take', desc: 'A pair is just a group with two options, drawn like any other.', preview: pairPreview('same') }));
+  pairs.appendChild(S4Review.card({ pick: 'pairs:Switch', letter: 'Switch', title: 'Pair Switch', desc: 'Two equal halves of one track and a knob that slides end to end. A tap anywhere flips it, like a switch with words on it. Only for exactly two options.', preview: pairPreview('switch') }));
+
+  S4Review.page('button-group-2');
+  requestAnimationFrame(function () { placeAll(false); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { placeAll(false); });
+})();
+</script>
+</body>
+</html>

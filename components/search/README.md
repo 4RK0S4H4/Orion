@@ -32,8 +32,8 @@ count with `data-filter`, else `null`). Escape clears. Clicking the bar's empty 
 - Don't add a Search button; results update as you type.
 - Don't use a search bar as a general text field.
 
-**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The M3 focus ring
-wraps the whole bar. The clear button is a real button with a label. Forced colors: the bar gets a border.
+**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The bar is the field and
+carries the one focus mark: the focus ring inside its edge from the keyboard, a quiet accent hairline after a tap or click. The clear button is a real button with a label. Forced colors: the bar gets a border.
 
 **Tokens:** `--s4-size-text-field` (56), `--s4-shape-search`, `--md-sys-color-surface-container-high`,
 `--md-sys-typescale-body-large-*`, `--s4-layout-list-width` (×2 = 720 max).

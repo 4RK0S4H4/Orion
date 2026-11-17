@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=7ccdf5d">
+<link rel="stylesheet" href="orion.css?v=1e59523">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -237,7 +237,7 @@
               <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Remind Me Before It Starts</label>
               <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Share With Everyone</label>
               <fieldset>
-                <legend class="s4-label-large">Sort By</legend>
+                <legend>Sort By</legend>
                 <label class="s4-radio"><input type="radio" name="sort" value="date" checked><span class="s4-radio-ring"></span>Date</label>
                 <label class="s4-radio"><input type="radio" name="sort" value="name"><span class="s4-radio-ring"></span>Name</label>
               </fieldset>
@@ -480,7 +480,7 @@
   <div class="s4-sheet-content">
     <div class="demo-form">
       <fieldset>
-        <legend class="s4-label-large">Show</legend>
+        <legend>Show</legend>
         <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Shared</label>
         <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Starred</label>
       </fieldset>
@@ -495,7 +495,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=60f9639"></script>
+<script src="orion.js?v=d4385af"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

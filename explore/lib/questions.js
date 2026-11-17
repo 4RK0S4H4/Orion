@@ -186,6 +186,16 @@ window.S4_REVIEW_DEMOS = [
   }
   ,
   {
+    id: 'button-group-2', title: 'Button Groups, Round 2', href: 'explore/review-button-group-2.html',
+    questions: [
+      { id: 'take', label: 'Connected button group', help: 'Orion\u2019s own take, not Material\u2019s. Keep is today\u2019s Joined Capsule.',
+        options: [{ v: 'A', label: 'Ink Track' }, { v: 'B', label: 'Lone Pill' }, { v: 'C', label: 'Linked Beads' }, { v: 'D', label: 'Break Out' }, { v: 'E', label: 'Lifted Tone' }, { v: 'Keep', label: 'Joined Capsule (today)' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'pairs', label: 'Pairs', help: 'Should a group of exactly two options get its own form?',
+        options: [{ v: 'Same', label: 'Same As The Take' }, { v: 'Switch', label: 'Pair Switch' }] }
+    ]
+  }
+  ,
+  {
     id: 'light-edge', title: 'Light Mode Glass Edge', href: 'explore/review-light-edge.html',
     questions: [
       { id: 'lightedge', label: 'Light mode glass edge', help: 'Dark mode is unchanged. How should the edge of glass read on a pale page?',
