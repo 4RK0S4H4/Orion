@@ -13,7 +13,7 @@
      (data-join="extra-large"); below that it opens in place from the ticket. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=0c22b7d">
+<link rel="stylesheet" href="../components/orion.css?v=37a13a2">
 <style>
   /* Relay's own layout and elements: tokens only, nothing restyles an Orion component */
   .rl-queue-head { display: flex; flex-direction: column; gap: var(--s4-space-3); padding-block-end: var(--s4-space-2); }
@@ -163,7 +163,7 @@
             <section class="s4-pane" id="ctx-pane" aria-label="Customer"></section>
           </aside>
         </div>
-        <button class="s4-fab" data-fixed type="button" data-sheet="rl-new"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Ticket</span></button>
+        <button class="s4-fab" data-color="primary" data-fixed type="button" data-sheet="rl-new"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Ticket</span></button>
       </section>
 
       <!-- The ticket as a page (decision 0050): its own URL (#queue/ticket/t0), Back in the bar, at reading width -->
@@ -229,21 +229,21 @@
 var T = {
   t0: { id: '#48207', topic: 'Printing', name: 'Ana Ribeiro', first: 'Ana', av: 'AR', subject: 'Labels print upside down', plan: 'Pro', company: 'Cerâmica Ribeiro', since: 'Mar 2024', pay: '$79/mo', orders: '1,240/mo', left: '1h 12m left', used: '60%', tone: 'warning', what: 'First reply promised in 3 hours (Pro)',
     thread: [['them', 'Since this morning every label on our Zebra ZD421 comes out flipped. Nothing changed on our side.', 'Ana · 8:02'], ['note', 'Firmware 3.2 went out to Zebra printers last night. Two more shops reported this. Eng is on it.', 'Jonas, Engineering · 8:40']],
-    suggest: ['Known issue, fix today', 'Rotate in print settings', 'Ask for a test print'],
+    suggest: ['Known Issue, Fix Today|this came from last night’s printer update. A fix goes out today.', 'Rotate In Settings|until the fix lands, turn on Rotate 180° under Settings, Printing.', 'Ask For A Test Print|could you print the test label from Settings, Printing and send a photo?'],
     others: ['Return labels missing logo · Solved', 'Invoice in euros · Solved'] },
   t1: { id: '#48211', topic: 'Integrations', name: 'Tomás Vidal', first: 'Tomás', av: 'TV', subject: 'Can’t connect my Shopify store', plan: 'Free', company: 'Vidal Surf', since: 'Nov 2026', pay: 'Free', orders: '38/mo', left: '3h 40m left', used: '8%', tone: 'primary', what: 'First reply promised in 4 hours (Free)',
     thread: [['them', 'The connect button spins and then nothing happens. I tried Chrome and Safari.', 'Tomás · 9:51']],
-    suggest: ['Allow pop-ups for Parcel', 'Reinstall the app', 'Send a screen recording'], others: [] },
+    suggest: ['Allow Pop-Ups|Shopify opens in a pop-up. Allowing pop-ups for Parcel usually fixes it.', 'Reinstall The App|please remove Parcel from Shopify and add it again from our site.', 'Ask For A Recording|could you send a short screen recording of what happens?'], others: [] },
   t2: { id: '#48213', topic: 'Billing', name: 'Grace Okafor', first: 'Grace', av: 'GO', subject: 'Charged twice for November', plan: 'Business', company: 'Okafor Home', since: 'Jan 2023', pay: '$249/mo', orders: '6,900/mo', left: '20 min late', used: '100%', tone: 'error', what: 'First reply promised in 1 hour (Business)',
     thread: [['them', 'Two charges of $249 on the same day. Please refund one. Receipts attached.', 'Grace · 9:20'], ['me', 'Thanks Grace, looking at this now.', 'Auto-reply · 9:20']],
-    suggest: ['Refund issued, 3–5 days', 'Hand to Billing', 'Ask for the card’s last 4'],
+    suggest: ['Refund Issued|I’ve refunded the duplicate $249. It shows on your card in 3 to 5 days.', 'Hand To Billing|I’ve passed this to our billing team, who will write to you today.', 'Ask For Card Digits|Could you send the last four digits of the card that was charged?'],
     others: ['Add a second warehouse · Solved', 'Export to Xero · Solved', 'Customs forms for Canada · Solved'] },
   t3: { id: '#48190', topic: 'Import', name: 'Henrik Larsen', first: 'Henrik', av: 'HL', subject: 'Bulk import stops at row 312', plan: 'Pro', company: 'Larsen Cycles', since: 'Aug 2025', pay: '$79/mo', orders: '820/mo', left: '6h 05m left', used: '25%', tone: 'primary', what: 'First reply promised in 8 hours (Pro, weekend)',
     thread: [['them', 'CSV attached. The first 311 orders went in fine, then it stops with no message.', 'Henrik · Sat 22:14']],
-    suggest: ['Row 312 has a comma in the address', 'Split the file in two'], others: ['Weight units in pounds · Solved'] },
+    suggest: ['Comma In Row 312|row 312 has a comma inside the address. Quote that field and import again.', 'Split The File|splitting the file at row 312 will get the rest in while we look.'], others: ['Weight units in pounds · Solved'] },
   t4: { id: '#48176', topic: 'Feature Request', name: 'Mei Tanaka', first: 'Mei', av: 'MT', subject: 'Delivery windows on the tracking page', plan: 'Business', company: 'Tanaka Tea', since: 'Jun 2022', pay: '$249/mo', orders: '3,100/mo', left: 'Waiting on Mei', used: '0%', tone: 'none', what: 'The clock is paused until she writes back',
     thread: [['them', 'Could customers pick a two-hour delivery window on the tracking page?', 'Mei · Thu 14:03'], ['me', 'Good idea. Which carriers do you ship with most? I’ll pass it to the team.', 'You · Thu 15:30']],
-    suggest: ['Added to the roadmap vote', 'Close as planned'], others: ['Gift notes on packing slips · Solved'] }
+    suggest: ['Added To The Roadmap|I’ve added delivery windows to the roadmap vote. Thank you.', 'Close As Planned|this is planned for spring, so I’ll close the ticket and write when it ships.'], others: ['Gift notes on packing slips · Solved'] }
 };
 function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function thread(t) {
@@ -267,11 +267,10 @@ function show(key) {
   document.getElementById('d-left').textContent = t.left; document.getElementById('d-what').textContent = t.what;
   document.getElementById('d-thread').innerHTML = thread(t);
   var chips = document.getElementById('d-suggest');
-  chips.innerHTML = t.suggest.map(function (s) { return '<button class="s4-chip" type="button" data-type="assist">' + esc(s) + '</button>'; }).join('');
+  chips.innerHTML = t.suggest.map(function (s) { var p = s.split('|'); return '<button class="s4-chip" type="button" data-type="assist" data-text="' + esc(p[1]) + '">' + esc(p[0]) + '</button>'; }).join('');
   document.getElementById('reply-label').textContent = 'Reply To ' + t.first;
   document.getElementById('ctx-pane').innerHTML = customer(t, 3);
   document.getElementById('ctx-inline-body').innerHTML = customer(t, 3);
-  S4.init && S4.init(document.getElementById('d-thread').closest('.rl-ticket'));
 }
 show('t2');
 list.addEventListener('s4-change', function () {
@@ -282,7 +281,7 @@ list.addEventListener('s4-change', function () {
 /* a suggested reply fills the reply box and opens it; the cursor goes where the person taps (decision 0049) */
 document.getElementById('d-suggest').addEventListener('click', function (e) {
   var c = e.target.closest('.s4-chip'); if (!c) return;
-  document.getElementById('reply-text').value = 'Hi ' + T[current].first + ', ' + c.textContent.charAt(0).toLowerCase() + c.textContent.slice(1) + '.';
+  var x = c.dataset.text; document.getElementById('reply-text').value = 'Hi ' + T[current].first + ', ' + (/^[A-Z]’|^I /.test(x) ? x : x.charAt(0).toLowerCase() + x.slice(1));
   S4.expand.open('reply');
 });
 document.querySelectorAll('.rl-ticket .s4-expand form').forEach(function (f) {

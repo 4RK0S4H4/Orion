@@ -3296,6 +3296,8 @@
       block-size var(--s4-motion-ink);
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
+  /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {
