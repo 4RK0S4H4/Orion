@@ -732,7 +732,7 @@ S4.register('fab', function (scope) {
     if (!S4.util.once(label, 'fabLabel')) return;
     function measure() {
       label.style.setProperty('--_label-w', 'none');
-      var w = label.scrollWidth;
+      var w = Math.max(label.scrollWidth, label.getBoundingClientRect().width);   /* scrollWidth rounds: a label 81.4 wide read as 81 and wrapped */
       if (w) label.style.setProperty('--_label-w', Math.ceil(w) + 'px'); else label.style.removeProperty('--_label-w');
     }
     measure();
