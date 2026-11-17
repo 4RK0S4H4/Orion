@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-gray="cool" data-type-display="rounded" data-energy="lively" data-lists="segmented">
+<html lang="en" data-type-display="rounded" data-energy="lively" data-lists="segmented">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,8 +9,8 @@
      daylight), because that decides whether you go at all. For schedules, bookings, shifts, rotas and content plans:
      keep the month grid (a real table of buttons, arrow keys walk the days), the day beside it (under it on a phone),
      booking in place under the day, a booking as a page, and Undo instead of "Are you sure?".
-     Brand through the dials only: tinted color mode on a sea blue (everything carries a little of the water), cool
-     grays, the rounded display face, round corners (the stock pills), lively motion, segmented lists. The conditions
+     Brand through the dials only: tinted color mode on a sea teal (everything carries a little of the water),
+     the rounded display face, round corners (the stock pills), lively motion, segmented lists. The conditions
      band is a scoped dark region (data-theme="dark"): the night sea in light mode as well as dark.
      Its own elements, drawn from Orion's rules: the tide curve, the fleet board (one track a boat across the sailing
      day) and the wind marks on the month. -->
@@ -38,11 +38,11 @@
   .mr-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
   .mr-day[data-past]:not([aria-pressed="true"]) { color: var(--md-sys-color-on-surface-variant); }
   .mr-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-  .mr-date { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-1); }
-  .mr-n { display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); line-height: 1; font-weight: var(--md-sys-typescale-label-large-weight); font-variant-numeric: tabular-nums; }
+  .mr-date { display: flex; align-items: center; gap: var(--s4-space-1); }
+  .mr-n { flex: none; white-space: nowrap; display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); line-height: 1; font-weight: var(--md-sys-typescale-label-large-weight); font-variant-numeric: tabular-nums; }
   .mr-day[data-today] .mr-n { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
   /* wind mark: a short bar under the number on a phone, the speed in words on a wide screen */
-  .mr-wind { display: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .mr-wind { display: none; align-self: flex-end; margin-block-start: auto; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; white-space: nowrap; }
   .mr-wind[data-strong] { padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
   .mr-gust { display: block; inline-size: var(--s4-space-4); block-size: calc(var(--s4-space-1) - 1px); margin-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-error); }
   .mr-ev { display: none; padding-inline: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -56,13 +56,14 @@
   /* the key is part of the month */
   .mr-key { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-5); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
   .mr-key li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
-  .mr-key i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
+  .mr-key i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
   .mr-key i[data-k="mine"] { background: var(--md-sys-color-primary); }
   .mr-key i[data-k="wind"] { block-size: var(--s4-space-1); inline-size: var(--s4-space-4); background: var(--md-sys-color-error); }
 
   /* ---------- the day ---------- */
-  .mr-day-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4-space-3); }
-  .mr-day-head > div { min-inline-size: 0; }
+  .mr-day-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4-space-3); padding-block-start: var(--s4-space-2); padding-inline-end: var(--s4-space-2); }   /* room for the Book button's focus ring inside the sticky pane */
+  .mr-day-head > div { flex: 1 1 auto; min-inline-size: 0; }
+  .mr-day-head > .s4-button { flex: none; }
 
   /* conditions: a scoped dark band, the water before the bookings */
   .mr-sea { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
@@ -84,27 +85,26 @@
   .mr-tide .t-now { stroke: var(--md-sys-color-on-surface); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
   .mr-tide-scale { display: flex; justify-content: space-between; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
   .mr-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3) var(--s4-space-4); margin: 0; }
-  @container s4-app (width >= 1600px) { .mr-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
   .mr-facts div { display: grid; gap: var(--s4-space-1); }
   .mr-facts dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
   .mr-facts dd { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; }
 
   /* the fleet board: one track a boat across the sailing day (08:00 to 20:00); a booking is a filled block */
   .mr-board { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
-  .mr-boat { display: grid; grid-template-columns: calc(var(--s4-space-16) + var(--s4-space-4)) minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); }
+  .mr-boat { display: grid; grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); }
   .mr-boat-name { min-inline-size: 0; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
   .mr-boat-name small { display: block; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-weight: var(--md-sys-typescale-label-small-weight); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mr-track { position: relative; block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
-  .mr-block { position: absolute; inset-block: var(--s4-space-1); inset-inline-start: calc(var(--s) * 1%); inline-size: calc(var(--w) * 1%); min-inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-tertiary-container); }
+  .mr-block { position: absolute; inset-block: var(--s4-space-1); inset-inline-start: calc(var(--s) * 1%); inline-size: calc(var(--w) * 1%); min-inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
   .mr-block[data-mine] { background: var(--md-sys-color-primary); }
-  .mr-track[data-repair] { display: flex; align-items: center; padding-inline: var(--s4-space-3); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mr-track[data-repair] { display: flex; align-items: center; padding-inline: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mr-now { position: absolute; inset-block: calc(var(--s4-space-1) * -1); inset-inline-start: calc(var(--s) * 1%); inline-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-surface); }
-  .mr-hours { display: grid; grid-template-columns: calc(var(--s4-space-16) + var(--s4-space-4)) minmax(0, 1fr); gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+  .mr-hours { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
   .mr-hours > span:last-child { display: flex; justify-content: space-between; }
   .mr-free { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
 
   /* a boat badge: two letters on the boat's own tone, so rows read at a glance */
-  .mr-badge { flex: none; display: grid; place-items: center; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  .mr-badge { flex: none; display: grid; place-items: center; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
   .mr-badge[data-mine] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
 
   /* ---------- my sails ---------- */
@@ -122,7 +122,7 @@
 
   /* ---------- fleet ---------- */
   .mr-fleet { display: grid; gap: var(--s4-layout-gap); grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); margin: 0; padding: 0; list-style: none; }
-  .mr-hull { display: grid; gap: var(--s4-space-4); }
+  .mr-hull { display: grid; align-content: start; gap: var(--s4-space-4); }
   .mr-hull-top { display: flex; align-items: center; gap: var(--s4-space-3); }
   .mr-hull-top > div { flex: 1; min-inline-size: 0; }
   /* the boat drawn from shapes: a sail and a hull, in the boat's tone */
@@ -215,8 +215,9 @@
               <div class="mr-hours" aria-hidden="true"><span></span><span><span>08</span><span>11</span><span>14</span><span>17</span><span>20</span></span></div>
             </section>
 
+            <h3 class="s4-title-medium" id="mr-list-h" style="margin:0">Bookings</h3>
             <div class="s4-states" id="mr-day-states" data-state="ready">
-              <ul class="s4-list" data-when="ready" id="mr-day-list" aria-label="Bookings on this day"></ul>
+              <ul class="s4-list" data-when="ready" id="mr-day-list" aria-labelledby="mr-list-h"></ul>
               <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="calendar"></span></span><h3 class="s4-empty-title">Every Boat Is Free</h3><p class="s4-empty-text">No one has booked this day yet. Book in the morning before the breeze fills in.</p></div>
             </div>
           </aside>
@@ -227,7 +228,7 @@
       <section class="s4-view s4-stack" data-view="sails" data-title="My Sails" hidden>
         <section class="mr-season" aria-labelledby="mr-season-h">
           <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><p class="s4-label-large" id="mr-season-h" style="margin:0">Season 2026–27 · Sam Teale</p>
-            <p class="mr-season-big"><strong id="mr-hrs" data-count-to="41">41</strong><span class="s4-title-large">hours on the water</span></p>
+            <div class="mr-season-big"><strong id="mr-hrs">41</strong><span class="s4-title-large">hours on the water</span></div>
             <p class="s4-body-medium">15 sails since the club opened in September. Kestrel is your boat: 9 of them.</p></div>
           <div class="s4-stack" style="--s4-gap: var(--s4-space-2)">
             <div class="mr-weeks" id="mr-weeks" role="img" aria-label="Hours sailed each week since September: most in late October"></div>
@@ -258,6 +259,18 @@
       <section class="s4-view s4-stack" data-view="fleet" data-title="Fleet" hidden>
         <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><h2 class="mr-h">The Club Fleet</h2><p class="mr-sub">Five boats on the hard by the slipway. Book any boat your rating covers.</p></div>
         <ul class="mr-fleet" id="mr-fleet"></ul>
+        <!-- the sixth tile: reporting damage is made in place, right where the boats are -->
+        <template id="mr-report-tpl"><li class="s4-pane mr-hull" id="mr-report">
+          <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><h3 class="s4-title-medium" style="margin:0">Something Broken?</h3><p class="mr-sub">A frayed sheet, a stuck block, a cracked tiller. Tell the bosun before the next crew takes the boat out.</p></div>
+          <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" data-expand="mr-damage"><span class="s4-icon" data-icon="warning"></span>Report Damage</button></div>
+          <div class="s4-expand" id="mr-damage" data-variant="inset" hidden>
+            <form class="s4-form s4-expand-body" id="mr-damage-form">
+              <div class="s4-text-field"><select id="d-boat" name="boat" required data-msg-required="Which boat is it?"><option value=""></option><option value="kestrel">Kestrel</option><option value="petrel">Petrel</option><option value="wren">Wren</option><option value="tern">Tern</option><option value="osprey">Osprey</option></select><label for="d-boat">Boat</label></div>
+              <div class="s4-text-field"><textarea id="d-what" name="what" rows="2" required data-msg-required="Say what is wrong, so the bosun brings the right part."></textarea><label for="d-what">What Is Wrong</label></div>
+              <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Send to Bosun</button></div>
+            </form>
+          </div>
+        </li></template>
       </section>
 
       <!-- a booking: a page you go into (#calendar/booking/b7) -->
@@ -294,8 +307,8 @@
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
 <script src="../components/orion.js?v=d4385af"></script>
 <script>
-/* Moorings' brand: tinted sea blue over the dials set on <html>. The light/dark choice follows the templates hub. */
-(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#00658f', surfaces: 'tinted' }); })();
+/* Moorings' brand: tinted sea teal over the dials set on <html>. The light/dark choice follows the templates hub. */
+(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#006a6a', surfaces: 'tinted' }); })();
 
 /* the data (a real app loads and saves this). "Today" and "now" are fixed so the template always looks the same. */
 var TODAY = '2026-11-14', NOW = 11 + 20 / 60, ME = 'Sam Teale', view = { y: 2026, m: 10 }, picked = TODAY, seq = 40;
@@ -353,11 +366,12 @@ function grid(dir) {
       var label = long(s) + (ev.length ? ', ' + ev.length + (ev.length === 1 ? ' booking' : ' bookings') : ', no bookings') + (ev.some(mine) ? ', one is yours' : '') + (wind ? ', wind ' + wind[0] + ' knots' + (strong ? ', strong wind warning' : '') : '');
       html += '<td><button class="mr-day" type="button" data-date="' + s + '"' + (out ? ' data-outside' : '') + (s < TODAY ? ' data-past' : '') + (s === TODAY ? ' data-today' : '') +
         ' aria-pressed="' + (s === picked) + '" aria-label="' + label + '" tabindex="' + (s === picked ? 0 : -1) + '">' +
-        '<span class="mr-date"><span class="mr-n">' + d.getDate() + '</span>' + (wind && !out ? '<span class="mr-wind"' + (strong ? ' data-strong' : '') + '>' + wind[0] + ' kn</span>' : '') + '</span>' +
+        '<span class="mr-date"><span class="mr-n">' + d.getDate() + '</span></span>' +
         (strong && !out ? '<span class="mr-gust"></span>' : '') +
-        ev.slice(0, 2).map(function (e) { return '<span class="mr-ev"' + (mine(e) ? ' data-mine' : '') + '>' + hm(e.start) + ' ' + esc(B[e.boat].name) + '</span>'; }).join('') +
+        ev.slice(0, 2).map(function (e) { return '<span class="mr-ev"' + (mine(e) ? ' data-mine' : '') + '>' + esc(B[e.boat].name) + '</span>'; }).join('') +
         (ev.length > 2 ? '<span class="mr-more">' + (ev.length - 2) + ' more</span>' : '') +
-        (ev.length ? '<span class="mr-dots">' + ev.slice(0, 4).map(function (e) { return '<i' + (mine(e) ? ' data-mine' : '') + '></i>'; }).join('') + '</span>' : '') + '</button></td>';
+        (ev.length ? '<span class="mr-dots">' + ev.slice(0, 4).map(function (e) { return '<i' + (mine(e) ? ' data-mine' : '') + '></i>'; }).join('') + '</span>' : '') +
+        (wind && !out ? '<span class="mr-wind"' + (strong ? ' data-strong' : '') + '>' + wind[0] + ' kn</span>' : '') + '</button></td>';
       d.setDate(d.getDate() + 1);
     }
     html += '</tr>';
@@ -407,13 +421,12 @@ function conditions(date) {
 function board(date) {
   var list = on(date);
   $('mr-board').innerHTML = BOATS.map(function (b) {
-    var mineB = list.filter(function (x) { return x.boat === b.id; }), rep = inRepair(b, date), freeAt = SPAN[0];
-    mineB.forEach(function (x) { if (x.start <= freeAt + 0.01) freeAt = Math.max(freeAt, x.start + x.hours); });
+    var mineB = list.filter(function (x) { return x.boat === b.id; }), rep = inRepair(b, date), freeAt = Math.max.apply(null, [SPAN[0]].concat(mineB.map(function (x) { return x.start + x.hours; })));
     var words = rep ? b.repair : mineB.length ? mineB.map(function (x) { return hm(x.start) + '–' + hm(x.start + x.hours) + ' ' + x.who; }).join('; ') : 'Free all day';
-    var track = rep ? '<span class="mr-track" data-repair>In the shed</span>' :
+    var track = rep ? '<span class="mr-track" data-repair>In the shed until Nov 21</span>' :
       '<span class="mr-track" aria-hidden="true">' + mineB.map(function (x) { return '<i class="mr-block"' + (mine(x) ? ' data-mine' : '') + ' style="--s:' + pct(x.start).toFixed(2) + ';--w:' + (pct(x.start + x.hours) - pct(x.start)).toFixed(2) + '"></i>'; }).join('') +
       (date === TODAY ? '<i class="mr-now" style="--s:' + pct(NOW).toFixed(2) + '"></i>' : '') + '</span>';
-    return '<li class="mr-boat"><span class="mr-boat-name">' + esc(b.name) + '<small>' + (rep ? 'In repair' : mineB.length ? (freeAt >= SPAN[1] ? 'Out all day' : 'Free from ' + hm(freeAt === SPAN[0] ? SPAN[0] : freeAt)) : 'Free all day') + '</small></span>' + track + '<span class="s4-visually-hidden">' + esc(b.name) + ': ' + esc(words) + '</span></li>';
+    return '<li class="mr-boat"><span class="mr-boat-name">' + esc(b.name) + '<small>' + (rep ? 'In repair' : mineB.length ? (freeAt >= SPAN[1] - 1 ? 'Out all day' : 'Free after ' + hm(freeAt)) : 'Free all day') + '</small></span>' + track + '<span class="s4-visually-hidden">' + esc(b.name) + ': ' + esc(words) + '</span></li>';
   }).join('');
 }
 function row(b, withDate) {
@@ -429,13 +442,14 @@ function day() {
   conditions(picked); board(picked);
   $('mr-day-list').innerHTML = list.map(function (b) { return row(b, false); }).join('');
   S4.init($('mr-day-list'));
+  $('mr-list-h').textContent = list.length ? list.length + (list.length === 1 ? ' Booking' : ' Bookings') : 'Bookings';
   S4.states.set($('mr-day-states'), list.length ? 'ready' : 'empty');
   /* booking is for today onwards: the button stays, but explains itself on a past day */
   boatOptions();
 }
 function boatOptions() {
   var sel = $('f-boat'), keep = sel.value;
-  sel.innerHTML = '<option value=""></option>' + BOATS.filter(function (b) { return !inRepair(b, picked); }).map(function (b) { return '<option value="' + b.id + '">' + b.name + ' (' + b.cls + ', ' + b.seats + (b.seats === 1 ? ' seat' : ' seats') + ')</option>'; }).join('');
+  sel.innerHTML = '<option value=""></option>' + BOATS.filter(function (b) { return !inRepair(b, picked); }).map(function (b) { return '<option value="' + b.id + '">' + b.name + ' · ' + b.cls + ' · ' + b.seats + (b.seats === 1 ? ' Seat' : ' Seats') + '</option>'; }).join('');
   sel.value = keep;
 }
 
@@ -447,12 +461,19 @@ function sails() {
 }
 var WEEKS = [0, 2, 3, 0, 5, 3, 4, 2, 6, 3, 5, 3, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 $('mr-weeks').innerHTML = WEEKS.map(function (h, i) { return '<i style="--h:' + (h / 6 * 100) + '"' + (i < 11 ? ' data-on' : i === 11 || i === 12 ? ' data-on' : '') + '></i>'; }).join('');
+function bindReport() {
+  $('mr-damage-form').addEventListener('s4-submit', function (e) {
+    e.preventDefault(); var boat = B[e.detail.values.boat];
+    S4.expand.close('mr-damage', 'send'); e.target.reset();
+    S4.snackbar(boat.name + ' reported. The bosun will check it this afternoon.');
+  });
+}
 function fleet() {
   $('mr-fleet').innerHTML = BOATS.map(function (b) {
     var rep = inRepair(b, TODAY), out = bookings.filter(function (x) { return x.boat === b.id && x.date.slice(0, 7) === '2026-11'; }).reduce(function (n, x) { return n + x.hours; }, 0);
     var big = b.seats > 3;
     return '<li class="s4-pane mr-hull"' + (rep ? ' data-repair' : '') + '>' +
-      '<svg class="mr-sail" viewBox="0 0 200 92" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect class="s-sea" x="0" y="74" width="200" height="18"/>' +
+      '<svg class="mr-sail" viewBox="0 0 200 92" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><rect class="s-sea" x="-1000" y="74" width="2200" height="18"/>' +
       '<path class="s-main" d="M100 ' + (big ? 10 : 16) + ' L100 66 L' + (big ? 146 : 140) + ' 66 Z"/><path class="s-jib" d="M95 ' + (big ? 18 : 26) + ' L95 66 L' + (big ? 62 : 70) + ' 66 Z"/>' +
       '<path class="s-hull" d="M' + (big ? 52 : 62) + ' 70 L' + (big ? 152 : 142) + ' 70 L' + (big ? 140 : 132) + ' 80 L' + (big ? 64 : 72) + ' 80 Z"/></svg>' +
       '<div class="mr-hull-top"><span class="mr-badge" aria-hidden="true">' + b.name.slice(0, 2) + '</span><div><h3 class="s4-title-medium" style="margin:0">' + b.name + '</h3><p class="mr-sub">' + b.cls + ' · ' + b.seats + (b.seats === 1 ? ' seat' : ' seats') + '</p></div>' +
@@ -460,6 +481,7 @@ function fleet() {
       '<p class="mr-sub">' + (rep ? b.repair + '. ' : '') + b.note + '</p>' +
       '<dl class="s4-dl"><div class="s4-dl-row"><dt>Rating</dt><dd>' + b.rating + '</dd></div><div class="s4-dl-row"><dt>Booked in November</dt><dd class="mr-num">' + out + ' h</dd></div></dl></li>';
   }).join('');
+  if (!$('mr-report')) { $('mr-fleet').appendChild($('mr-report-tpl').content.cloneNode(true)); S4.init($('mr-report')); bindReport(); }
 }
 
 /* ---------- moving around ---------- */
