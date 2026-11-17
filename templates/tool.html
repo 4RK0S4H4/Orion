@@ -1,47 +1,134 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="warm" data-type-display="custom" data-buttons="tonal" style="--md-ref-typeface-brand: Optima, Candara, 'Gill Sans', 'Noto Sans', 'Segoe UI', sans-serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tool · S4 Orion Template</title>
-<!-- Template: Tool. For calculators, converters, generators and editors: one screen, no navigation, inputs in the main pane and the result in a sticky supporting pane. -->
+<title>Proof · Dough Calculator</title>
+<!-- Template: Tool, as a product (issue 66). Proof is a sourdough calculator for home bakers: say how many loaves and
+     how wet, and it gives the weights to put on the scale and the day's timetable, worked out from how warm the kitchen
+     is. For calculators, converters, generators and editors: one screen, no navigation, inputs in the main pane, the
+     result in a sticky supporting pane, every change shown at once (no Calculate button), Reset with Undo.
+     Brand through the dials only: a bakery navy accent, warm grays (flour and paper), a humanist display face (a
+     system font stack: Optima on Apple devices), the stock round corners, tonal buttons by default. The result pane is
+     a scoped tinted region (data-accent + data-surfaces="tinted"): the one place colored all over.
+     Its own elements, drawn from Orion's rules: the dough bar (what the dough is made of, by weight) and the bake
+     timetable. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.css?v=04e04e7">
+<style>
+  /* Proof's own layout and elements: tokens only; nothing here restyles an Orion component */
+  .pf-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .pf-intro { display: grid; gap: var(--s4-space-2); padding-block-end: var(--s4-space-2); }
+  .pf-title { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-large-weight, 600); }
+  @container s4-app (width >= 840px) { .pf-title { font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); } }
+  /* a slider row: its name and value on one line, the slider under it, a note under that */
+  .pf-dial { display: grid; gap: var(--s4-space-1); }
+  .pf-dial-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); }
+  .pf-dial-head label { font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .pf-dial-head output { font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); font-variant-numeric: tabular-nums; }
+  .pf-dial .pf-sub { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* ---------- the result: a tinted region ---------- */
+  .pf-result { display: grid; gap: var(--s4-space-5); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .pf-total { display: grid; gap: var(--s4-space-1); }
+  .pf-total-label { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); }
+  .pf-total-value { font-family: var(--md-sys-typescale-display-medium-font); font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-display-medium-weight, 600); font-variant-numeric: tabular-nums; }
+  .pf-total-value small { margin-inline-start: var(--s4-space-1); font-size: var(--md-sys-typescale-title-large-size); color: var(--md-sys-color-on-surface-variant); font-weight: 400; }
+
+  /* the dough bar: one segment an ingredient, its share of the weight; the names and grams are the list under it */
+  .pf-bar { display: flex; gap: 2px; block-size: var(--s4-space-6); }
+  .pf-bar > i { flex: var(--w) 1 0; min-inline-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--_k); }
+  .pf-bar > i:first-child { border-start-start-radius: var(--md-sys-shape-corner-full); border-end-start-radius: var(--md-sys-shape-corner-full); }
+  .pf-bar > i:last-child { border-start-end-radius: var(--md-sys-shape-corner-full); border-end-end-radius: var(--md-sys-shape-corner-full); }
+  [data-k="flour"] { --_k: var(--md-sys-color-primary); }
+  [data-k="whole"] { --_k: var(--md-sys-color-tertiary); }
+  [data-k="water"] { --_k: var(--md-sys-color-secondary); }
+  [data-k="levain"] { --_k: var(--md-sys-color-primary-fixed-dim); }
+  [data-k="salt"] { --_k: var(--md-sys-color-on-surface); }
+  .pf-ing { display: grid; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; }
+  .pf-ing li { display: grid; grid-template-columns: var(--s4-space-3) minmax(0, 1fr) auto auto; align-items: center; gap: var(--s4-space-3); padding-block: var(--s4-space-2); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .pf-ing li + li { border-block-start: 1px solid var(--md-sys-color-outline-variant); }
+  .pf-ing i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--_k); }
+  .pf-g { font-family: var(--md-sys-typescale-title-medium-font); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; text-align: end; }
+  .pf-pct { min-inline-size: 3.5em; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); font-variant-numeric: tabular-nums; text-align: end; }
+
+  /* the timetable: what to do and when, a dot a step on one track; the overnight wait is the long one */
+  .pf-plan { display: grid; margin: 0; padding: 0; list-style: none; }
+  .pf-plan li { display: grid; grid-template-columns: 3.5rem var(--s4-space-4) minmax(0, 1fr); gap: var(--s4-space-3); }
+  .pf-time { padding-block-start: 1px; font-variant-numeric: tabular-nums; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-body-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); text-align: end; }
+  .pf-track { position: relative; display: flex; justify-content: center; }
+  .pf-track::before { content: ""; position: absolute; inset-block: var(--s4-space-5) 0; inline-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); }
+  .pf-plan li:last-child .pf-track::before { display: none; }
+  .pf-track > i { position: relative; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); margin-block-start: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .pf-plan li[data-wait] .pf-track > i { background: var(--md-sys-color-surface-container-highest); }
+  .pf-step { display: grid; padding-block-end: var(--s4-space-4); }
+  .pf-step strong { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight, 600); }
+  .pf-step span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  @media (forced-colors: active) { .pf-bar > i, .pf-ing i, .pf-track > i { background: CanvasText; } .pf-result { border: 1px solid CanvasText; } }
+</style>
 </head>
 <body>
 <div class="s4-app">
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Loan Calculator</h1></div>
-      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Reset" data-tooltip="Reset" id="reset"><span class="s4-icon" data-icon="refresh"></span></button></div>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Proof</h1><p class="s4-app-bar-subtitle">Dough Calculator</p></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Start Over" data-tooltip="Start Over" id="reset"><span class="s4-icon" data-icon="refresh"></span></button></div>
     </header>
     <main class="s4-content">
       <div class="s4-split" data-layout="supporting">
-        <section class="s4-split-pane s4-stack" aria-label="Inputs">
-          <section class="s4-pane" aria-labelledby="loan-h">
-            <h2 class="s4-pane-title" id="loan-h">Loan</h2>
-            <div class="s4-text-field"><span class="s4-text-field-affix" data-prefix>$</span><input id="amount" inputmode="decimal" value="25,000"><label for="amount">Amount</label></div>
-            <div class="s4-text-field"><input id="rate" inputmode="decimal" value="6.5"><label for="rate">Interest Rate</label><span class="s4-text-field-affix" data-suffix>%</span></div>
-            <label class="s4-body-medium s4-on-surface-variant" for="years">Term: <span id="years-out" class="s4-num">5 years</span></label>
-            <div class="s4-slider" data-stops><input type="range" id="years" min="1" max="10" value="5"></div>
-          </section>
-          <section class="s4-pane" aria-labelledby="opt-h">
-            <h2 class="s4-pane-title" id="opt-h">Payments</h2>
-            <div class="s4-button-group" data-connected data-select="single" aria-label="Payment Frequency" id="freq">
-              <button class="s4-button" data-variant="tonal" type="button" value="12" aria-pressed="true">Monthly</button>
-              <button class="s4-button" data-variant="tonal" type="button" value="26">Every 2 Weeks</button>
+        <section class="s4-split-pane s4-stack" aria-label="Your Bake">
+          <div class="pf-intro"><h2 class="pf-title">What Are You Baking?</h2><p class="pf-sub">Weights for the scale and a timetable for the day. Everything changes as you go.</p></div>
+
+          <section class="s4-pane" aria-labelledby="bake-h">
+            <h2 class="s4-pane-title" id="bake-h">The Bake</h2>
+            <!-- the recipe sets the values below: a choice of value, so a button group (decision 0059) -->
+            <div class="s4-button-group" data-connected data-select="single" aria-label="Recipe" id="recipe">
+              <button class="s4-button" data-size="s" type="button" value="country" aria-pressed="true">Country</button>
+              <button class="s4-button" data-size="s" type="button" value="rye">Rye</button>
+              <button class="s4-button" data-size="s" type="button" value="focaccia">Focaccia</button>
+              <button class="s4-button" data-size="s" type="button" value="bagels">Bagels</button>
             </div>
+            <form class="s4-form" id="bake-form" novalidate>
+              <div class="s4-form-row">
+                <div class="s4-text-field"><input id="count" name="count" type="number" inputmode="numeric" min="1" max="12" value="2" required data-msg-required="How many are you baking?" data-msg-min="Bake at least one." data-msg-max="Twelve is a bakery’s worth. Split it into two bakes."><label for="count" id="count-l">Loaves</label></div>
+                <div class="s4-text-field"><input id="weight" name="weight" type="number" inputmode="numeric" min="80" max="2500" step="10" value="900" required data-msg-required="Give each one a weight." data-msg-min="At least 80 g each." data-msg-max="Under 2.5 kg each, or it will not bake through."><label for="weight">Each Weighs</label><span class="s4-text-field-affix" data-suffix>g</span></div>
+              </div>
+            </form>
+          </section>
+
+          <section class="s4-pane" aria-labelledby="pct-h">
+            <h2 class="s4-pane-title" id="pct-h">Baker’s Percentages</h2>
+            <p class="pf-sub">Everything is a share of the flour’s weight.</p>
+            <div class="pf-dial"><div class="pf-dial-head"><label for="hyd">Water</label><output for="hyd" id="hyd-out">78%</output></div>
+              <div class="s4-slider" data-suffix="%"><input type="range" id="hyd" min="55" max="90" step="1" value="78"></div>
+              <p class="pf-sub" id="hyd-note">Open and glossy. Wet hands for shaping.</p></div>
+            <div class="pf-dial"><div class="pf-dial-head"><label for="lev">Levain</label><output for="lev" id="lev-out">20%</output></div>
+              <div class="s4-slider" data-suffix="%"><input type="range" id="lev" min="5" max="35" step="1" value="20"></div></div>
+            <div class="pf-dial"><div class="pf-dial-head"><label for="whole">Whole Grain</label><output for="whole" id="whole-out">15%</output></div>
+              <div class="s4-slider" data-suffix="%"><input type="range" id="whole" min="0" max="100" step="5" value="15"></div></div>
+            <div class="pf-dial"><div class="pf-dial-head"><label for="salt">Salt</label><output for="salt" id="salt-out">2.0%</output></div>
+              <div class="s4-slider" data-stops data-suffix="%"><input type="range" id="salt" min="1.6" max="2.6" step="0.2" value="2"></div></div>
+          </section>
+
+          <section class="s4-pane" aria-labelledby="kitchen-h">
+            <h2 class="s4-pane-title" id="kitchen-h">Your Kitchen</h2>
+            <div class="pf-dial"><div class="pf-dial-head"><label for="temp">Room Temperature</label><output for="temp" id="temp-out">23 °C</output></div>
+              <div class="s4-slider" data-stops data-suffix=" °C"><input type="range" id="temp" min="18" max="28" step="1" value="23"></div>
+              <p class="pf-sub">Warmer rises faster: every degree is about 15 minutes of bulk.</p></div>
+            <div class="s4-text-field"><input id="start" type="time" value="09:00" step="900"><label for="start">Mix At</label></div>
           </section>
         </section>
-        <aside class="s4-split-pane" data-sticky aria-label="Result">
-          <section class="s4-pane" data-color="high">
-            <div class="s4-stat"><span class="s4-stat-label">Each Payment</span><span class="s4-stat-value" id="pay">$489.15</span><span class="s4-stat-meta" id="pay-meta">60 monthly payments</span></div>
-            <dl class="s4-dl">
-              <div class="s4-dl-row"><dt>Total Interest</dt><dd id="interest">$4,349.00</dd></div>
-              <div class="s4-dl-row"><dt>Total Paid</dt><dd id="total">$29,349.00</dd></div>
-            </dl>
-            <button class="s4-button" data-variant="tonal" type="button" id="copy"><span class="s4-icon" data-icon="copy"></span>Copy Result</button>
+
+        <aside class="s4-split-pane" data-sticky aria-label="Weights and Timetable">
+          <section class="pf-result" id="result" data-accent="#24406b" data-surfaces="tinted" aria-live="polite" aria-atomic="false">
+            <div class="pf-total"><span class="pf-total-label" id="total-label">Total Dough</span><span class="pf-total-value"><span id="total">1,800</span><small>g</small></span><p class="pf-sub" id="total-meta">2 loaves of 900 g</p></div>
+            <div class="pf-bar" id="bar" role="img" aria-label="What the dough is made of"></div>
+            <ul class="pf-ing" id="ing" aria-label="On the scale"></ul>
+            <div class="s4-banner" role="status" id="tip" hidden><span class="s4-icon" data-icon="info"></span><p class="s4-banner-text" id="tip-text"></p></div>
+            <h3 class="s4-title-medium" style="margin:0" id="plan-h">The Day</h3>
+            <ol class="pf-plan" id="plan" aria-labelledby="plan-h"></ol>
+            <div class="s4-row"><button class="s4-button" data-variant="filled" type="button" id="copy"><span class="s4-icon" data-icon="copy"></span>Copy Recipe</button></div>
           </section>
         </aside>
       </div>
@@ -50,23 +137,71 @@
 </div>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
 <script src="../components/orion.js?v=2de1b81"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+<script>
+/* Proof's brand: a bakery navy over the dials set on <html>. The light/dark choice follows the templates hub. */
+(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#24406b' }); })();
+
 var $ = function (id) { return document.getElementById(id); };
-var money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-var per = 12;
+var RECIPES = {
+  country: { unit: 'Loaves', one: 'loaf', count: 2, weight: 900, hyd: 78, lev: 20, whole: 15, salt: 2, bake: 45, oven: '250 °C, lid on 20 min', cold: true },
+  rye: { unit: 'Loaves', one: 'loaf', count: 1, weight: 1000, hyd: 82, lev: 30, whole: 70, salt: 2, bake: 60, oven: '230 °C in a tin', cold: false },
+  focaccia: { unit: 'Trays', one: 'tray', count: 1, weight: 1200, hyd: 85, lev: 15, whole: 0, salt: 2.4, bake: 25, oven: '230 °C, oiled tray', cold: true },
+  bagels: { unit: 'Bagels', one: 'bagel', count: 8, weight: 110, hyd: 58, lev: 15, whole: 0, salt: 2, bake: 20, oven: 'boil 1 min, then 230 °C', cold: true }
+};
+var recipe = 'country', grams = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });
+function num(id) { return parseFloat($(id).value); }
+function hm(mins) { mins = ((Math.round(mins / 5) * 5) % 1440 + 1440) % 1440; return String(Math.floor(mins / 60)).padStart(2, '0') + ':' + String(mins % 60).padStart(2, '0'); }
+function dur(m) { m = Math.round(m / 5) * 5; var h = Math.floor(m / 60), r = m % 60; return (h ? h + ' h' : '') + (h && r ? ' ' : '') + (r ? r + ' min' : ''); }
 function calc() {
-  var p = parseFloat($('amount').value.replace(/[^0-9.]/g, '')) || 0, r = (parseFloat($('rate').value) || 0) / 100 / per;
-  var y = +$('years').value, n = y * per, pay = r ? p * r / (1 - Math.pow(1 + r, -n)) : p / n;
-  $('years-out').textContent = y + (y === 1 ? ' year' : ' years');
-  $('pay').textContent = money.format(pay || 0);
-  $('pay-meta').textContent = n + (per === 12 ? ' monthly' : ' biweekly') + ' payments';
-  $('interest').textContent = money.format(Math.max(0, pay * n - p));
-  $('total').textContent = money.format(pay * n);
+  var R = RECIPES[recipe], n = num('count'), w = num('weight'), hyd = num('hyd'), lev = num('lev'), whole = num('whole'), salt = num('salt'), t = num('temp');
+  var ok = n >= 1 && n <= 12 && w >= 80 && w <= 2500;
+  $('hyd-out').textContent = hyd + '%'; $('lev-out').textContent = lev + '%'; $('whole-out').textContent = whole + '%'; $('salt-out').textContent = salt.toFixed(1) + '%'; $('temp-out').textContent = t + ' °C';
+  $('hyd-note').textContent = hyd < 62 ? 'Stiff and smooth: knead it, it will not stick.' : hyd < 72 ? 'Easy to handle. A tight, even crumb.' : hyd < 80 ? 'Open and glossy. Wet hands for shaping.' : 'Very wet. Fold it in the tub and bake it hot.';
+  if (!ok) { $('total').textContent = '–'; $('total-meta').textContent = 'Fix the count and weight to see the recipe.'; return; }
+  /* baker's percentages: flour is 100; the levain is half flour, half water (100% hydration) */
+  var total = n * w, flour = total / (1 + hyd / 100 + salt / 100), levain = flour * lev / 100, water = flour * hyd / 100 - levain / 2, saltG = flour * salt / 100;
+  var flourIn = flour - levain / 2, wholeG = flourIn * whole / 100, white = flourIn - wholeG;
+  var rows = [['flour', recipe === 'rye' ? 'White Flour' : 'Bread Flour', white], ['whole', recipe === 'rye' ? 'Dark Rye' : 'Whole Wheat', wholeG], ['water', 'Water', water], ['levain', 'Levain (Ripe)', levain], ['salt', 'Salt', saltG]].filter(function (r) { return r[2] > 0.5; });
+  $('total').textContent = grams.format(total);
+  $('total-meta').textContent = n + ' ' + (n === 1 ? R.one : R.one + 's') + ' of ' + grams.format(w) + ' g';
+  $('bar').innerHTML = rows.map(function (r) { return '<i data-k="' + r[0] + '" style="--w:' + (r[2] / total * 100).toFixed(2) + '"></i>'; }).join('');
+  $('bar').setAttribute('aria-label', 'The dough by weight: ' + rows.map(function (r) { return r[1] + ' ' + Math.round(r[2] / total * 100) + '%'; }).join(', '));
+  $('ing').innerHTML = rows.map(function (r) { return '<li data-k="' + r[0] + '"><i aria-hidden="true"></i><span>' + r[1] + '</span><span class="pf-pct">' + (r[0] === 'levain' || r[0] === 'salt' || r[0] === 'water' ? Math.round(r[2] / flour * 1000) / 10 + '%' : '') + '</span><span class="pf-g">' + grams.format(r[2]) + ' g</span></li>'; }).join('');
+  /* the day: bulk takes about 15 minutes longer for every degree under 26, and shorter with more levain */
+  var bulk = Math.max(150, (4.5 * 60 + (24 - t) * 15) * (20 / Math.max(lev, 5)) ** 0.35), start = $('start').value ? +$('start').value.slice(0, 2) * 60 + +$('start').value.slice(3) : 540;
+  var steps = [[start, 'Mix', 'Flour and water first, salt after 30 minutes'], [start + 30, 'Bulk Rise', dur(bulk) + ' at ' + t + ' °C, four folds in the first two hours'], [start + 30 + bulk, recipe === 'bagels' ? 'Shape Bagels' : 'Divide and Shape', 'Pre-shape, rest 20 min, shape tight']];
+  var shaped = start + 30 + bulk + 30;
+  if (R.cold) { steps.push([shaped, 'Proof in the Fridge', 'Overnight, 10 to 14 hours', true]); steps.push([Math.min(Math.max(shaped + 600, 1440 + 8 * 60), shaped + 840), 'Bake Tomorrow', R.oven + ', ' + R.bake + ' min']); }
+  else { steps.push([shaped, 'Proof on the Bench', dur(90 + (24 - t) * 10) + ', until it domes', true]); steps.push([shaped + 90 + (24 - t) * 10, 'Bake', R.oven + ', ' + R.bake + ' min']); }
+  var last = steps[steps.length - 1][0] + R.bake;
+  steps.push([last, 'Out of the Oven', 'Cool two hours before you cut it']);
+  $('plan').innerHTML = steps.map(function (s) { return '<li' + (s[3] ? ' data-wait' : '') + '><span class="pf-time">' + hm(s[0]) + '</span><span class="pf-track" aria-hidden="true"><i></i></span><span class="pf-step"><strong>' + s[1] + '</strong><span>' + s[2] + '</span></span></li>'; }).join('');
+  /* a word from the baker when the numbers ask for trouble */
+  var tip = recipe === 'rye' && hyd < 75 ? 'Rye drinks water. Under 75% it bakes into a brick.' : recipe !== 'focaccia' && hyd > 84 ? 'This is wetter than most bakers can shape. Bake it in a tin.' : t >= 27 ? 'A warm kitchen: use cool water and watch the dough, not the clock.' : '';
+  $('tip').hidden = !tip; $('tip-text').textContent = tip;
 }
-['amount', 'rate', 'years'].forEach(function (id) { $(id).addEventListener('input', calc); });
-$('freq').addEventListener('s4-change', function (e) { per = +e.detail.value; calc(); });
-$('reset').addEventListener('click', function () { $('amount').value = '25,000'; $('rate').value = '6.5'; $('years').value = 5; $('years').dispatchEvent(new Event('input')); calc(); });
-$('copy').addEventListener('click', function () { navigator.clipboard && navigator.clipboard.writeText($('pay').textContent); S4.snackbar({ text: 'Result copied' }); });
-calc();</script>
+['count', 'weight', 'hyd', 'lev', 'whole', 'salt', 'temp', 'start'].forEach(function (id) { $(id).addEventListener('input', calc); });
+function apply(name) {
+  var R = RECIPES[name]; recipe = name;
+  $('count').value = R.count; $('weight').value = R.weight; $('hyd').value = R.hyd; $('lev').value = R.lev; $('whole').value = R.whole; $('salt').value = R.salt; $('count-l').textContent = R.unit;
+  ['hyd', 'lev', 'whole', 'salt'].forEach(function (id) { $(id).dispatchEvent(new Event('input', { bubbles: true })); });
+  calc();
+}
+$('recipe').addEventListener('s4-change', function (e) { apply(e.detail.value); });
+/* start over, with Undo: nothing you set is lost by one tap */
+function snapshot() { var o = { recipe: recipe }; ['count', 'weight', 'hyd', 'lev', 'whole', 'salt', 'temp', 'start'].forEach(function (id) { o[id] = $(id).value; }); return o; }
+function restore(o) { recipe = o.recipe; ['count', 'weight', 'hyd', 'lev', 'whole', 'salt', 'temp', 'start'].forEach(function (id) { $(id).value = o[id]; $(id).dispatchEvent(new Event('input', { bubbles: true })); }); pressRecipe(o.recipe); $('count-l').textContent = RECIPES[o.recipe].unit; calc(); }
+function pressRecipe(v) { $('recipe').querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.value === v)); }); }
+$('reset').addEventListener('click', function () {
+  var before = snapshot(); $('temp').value = 23; $('start').value = '09:00'; $('temp').dispatchEvent(new Event('input', { bubbles: true })); pressRecipe('country'); apply('country');
+  S4.snackbar({ text: 'Back to a country loaf', action: 'Undo', onAction: function () { restore(before); } });
+});
+$('copy').addEventListener('click', function () {
+  var text = $('total-meta').textContent + '\n' + Array.prototype.map.call($('ing').children, function (li) { return li.children[1].textContent + ': ' + li.children[3].textContent; }).join('\n') + '\n\n' + Array.prototype.map.call($('plan').children, function (li) { return li.querySelector('.pf-time').textContent + '  ' + li.querySelector('strong').textContent; }).join('\n');
+  try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+  S4.snackbar('Recipe copied. Paste it on the fridge.');
+});
+calc();
+</script>
 </body>
 </html>
