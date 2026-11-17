@@ -90,7 +90,9 @@
         "list": "list",
         "book": "book-minimalistic",
         "tune": "tuning-2",
-        "mic": "microphone"
+        "mic": "microphone",
+        "minus": "minus",
+        "plus": "add"
       }
     },
     "phosphor-duotone": {
@@ -181,7 +183,9 @@
         "list": "list-bullets",
         "book": "book-open",
         "tune": "sliders-horizontal",
-        "mic": "microphone"
+        "mic": "microphone",
+        "minus": "minus",
+        "plus": "plus"
       }
     },
     "phosphor-bold-duotone": {
@@ -272,7 +276,9 @@
         "list": "list-bullets",
         "book": "book-open",
         "tune": "sliders-horizontal",
-        "mic": "microphone"
+        "mic": "microphone",
+        "minus": "minus",
+        "plus": "plus"
       }
     }
   }

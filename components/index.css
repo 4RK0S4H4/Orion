@@ -50,6 +50,7 @@
 @import url("site/site.css");
 /* inputs */
 @import url("text-field/text-field.css");
+@import url("combobox/combobox.css");
 @import url("form/form.css");
 @import url("date-picker/date-picker.css");
 @import url("switch/switch.css");

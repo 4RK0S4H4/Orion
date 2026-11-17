@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Combobox · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Combobox</h1></header>
+<main class="ex-main">
+  <p>A text field that suggests as you type. The list opens in glass right under the field (above it when there is no room, as over a phone’s keyboard), the part that matches is bold, and the cursor never leaves the field: arrows move through the options, Enter chooses, Escape closes. One value; the trailing button shows every option while the field is empty and clears it once there is text.</p>
+
+  <section class="ex-sec">
+    <h2>Fixed Options</h2>
+    <p>Options come from a <code>&lt;template&gt;</code> inside the field, with groups and a line of supporting text. Without <code>data-free</code> only an option may be chosen; anything else is an error when you leave the field.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-combobox" id="cb-country">
+          <label for="country">Country</label>
+          <input id="country">
+          <input type="hidden" name="country">
+          <template>
+            <optgroup label="Europe">
+              <option value="pt" data-supporting="Lisbon">Portugal</option>
+              <option value="es" data-supporting="Madrid">Spain</option>
+              <option value="fr" data-supporting="Paris">France</option>
+              <option value="de" data-supporting="Berlin">Germany</option>
+              <option value="is" data-supporting="Reykjavík">Iceland</option>
+            </optgroup>
+            <optgroup label="Americas">
+              <option value="br" data-supporting="Brasília">Brazil</option>
+              <option value="ca" data-supporting="Ottawa">Canada</option>
+              <option value="mx" data-supporting="Mexico City">Mexico</option>
+              <option value="us" data-supporting="Washington, D.C.">United States</option>
+            </optgroup>
+            <optgroup label="Asia Pacific">
+              <option value="au" data-supporting="Canberra">Australia</option>
+              <option value="jp" data-supporting="Tokyo">Japan</option>
+              <option value="nz" data-supporting="Wellington">New Zealand</option>
+            </optgroup>
+          </template>
+          <div class="s4-text-field-supporting">Where the account is registered.</div>
+        </div>
+        <div class="s4-text-field s4-combobox">
+          <label for="category">Category</label>
+          <input id="category" value="Utilities">
+          <template>
+            <option data-icon="bills">Utilities</option>
+            <option data-icon="card">Subscriptions</option>
+            <option data-icon="home">Rent</option>
+            <option data-icon="cart">Groceries</option>
+            <option data-icon="globe">Travel</option>
+            <option data-icon="document" disabled>Archived (Read Only)</option>
+          </template>
+          <div class="s4-text-field-supporting">A value chosen earlier is marked in the list.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Free Text</h2>
+    <p><code>data-free</code>: the options are suggestions; whatever is typed is the value.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-combobox" data-free>
+          <label for="title">Job Title</label>
+          <input id="title" autocomplete="organization-title">
+          <template>
+            <option>Product Designer</option>
+            <option>Product Manager</option>
+            <option>Software Engineer</option>
+            <option>Data Analyst</option>
+            <option>Accountant</option>
+            <option>Operations Lead</option>
+          </template>
+          <div class="s4-text-field-supporting">Pick a suggestion or write your own.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Search As You Type</h2>
+    <p><code>S4.combobox.source(field, fn)</code> fetches results for what was typed (here a pretend server that takes a moment). The list shows Searching…, then the results, “No matches” or an error with Try Again. Type “zz” for no matches.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-combobox" id="cb-people" data-min-chars="1">
+          <label for="assignee">Assign To</label>
+          <span class="s4-icon" data-icon="person"></span>
+          <input id="assignee">
+          <div class="s4-text-field-supporting">Search by name or team.</div>
+        </div>
+        <div class="s4-text-field s4-combobox" id="cb-offline" data-error-text="Couldn’t reach the airport list. Check your connection.">
+          <label for="airport">Airport</label>
+          <span class="s4-icon" data-icon="globe"></span>
+          <input id="airport">
+          <div class="s4-text-field-supporting">This one is offline: type anything to see the error.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In a Form</h2>
+    <p>Inside <code>.s4-form</code> the combobox is checked like any field: when you leave it, never while you type. Errors keep the field’s normal fill.</p>
+    <div class="ex-board">
+      <form class="s4-form s4-stack" id="cb-form" style="inline-size: 100%">
+        <div class="ri-grid">
+          <div class="s4-text-field s4-combobox">
+            <label for="ship-country">Ship To</label>
+            <input id="ship-country" required data-msg-required="Choose a country to ship to." value="Atlantis">
+            <template><option>Portugal</option><option>Spain</option><option>France</option><option>Ireland</option><option>Italy</option></template>
+            <div class="s4-text-field-supporting">We ship to Europe only.</div>
+          </div>
+          <div class="s4-text-field s4-combobox" data-error="Choose a carrier.">
+            <label for="carrier">Carrier</label>
+            <input id="carrier" required>
+            <template><option>CTT Expresso</option><option>DHL</option><option>UPS</option></template>
+            <div class="s4-text-field-supporting">Prices on the next step.</div>
+          </div>
+          <div class="s4-text-field s4-combobox">
+            <label for="cb-disabled">Warehouse</label>
+            <input id="cb-disabled" value="Porto North" disabled>
+            <template><option>Porto North</option></template>
+            <div class="s4-text-field-supporting">Set by your plan.</div>
+          </div>
+        </div>
+        <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" data-variant="filled" type="submit">Continue</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Compact and in a Floating Panel</h2>
+    <p>In compact density the field and its options are pointer-sized. In a floating panel the field is a tint of the glass, like every field there.</p>
+    <div class="ex-board" data-density="compact">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-combobox">
+          <label for="tz">Time Zone</label>
+          <input id="tz" value="Europe/Lisbon">
+          <template><option>Europe/Lisbon</option><option>Europe/London</option><option>Europe/Madrid</option><option>America/New_York</option><option>America/Los_Angeles</option><option>Asia/Tokyo</option></template>
+        </div>
+      </div>
+      <button class="s4-button" data-variant="tonal" data-dialog="cb-panel">Move Bill</button>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/combobox/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+
+<dialog class="s4-dialog" id="cb-panel" aria-labelledby="cb-panel-h">
+  <h2 class="s4-dialog-headline" id="cb-panel-h">Move to folder</h2>
+  <div class="s4-dialog-content">
+    <div class="s4-text-field s4-combobox">
+      <label for="folder">Folder</label>
+      <input id="folder">
+      <template><option>Household</option><option>Taxes 2026</option><option>Work Expenses</option><option>Car</option><option>Health</option></template>
+    </div>
+  </div>
+  <div class="s4-dialog-actions">
+    <button class="s4-button" data-variant="text" data-close="cancel">Cancel</button>
+    <button class="s4-button" data-variant="text" data-close="move">Move</button>
+  </div>
+</dialog>
+
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../menu/menu.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../progress/progress.js"></script>
+<script src="../dialog/dialog.js"></script>
+<script src="../combobox/combobox.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  var people = [
+    ['Ana Ribeiro', 'Finance'], ['André Costa', 'Design'], ['Beatriz Lopes', 'Operations'], ['Carlos Mendes', 'Finance'],
+    ['Diana Sousa', 'Engineering'], ['Eduardo Pinto', 'Engineering'], ['Filipa Rocha', 'Design'], ['Gonçalo Nunes', 'Sales'],
+    ['Inês Martins', 'Sales'], ['João Ferreira', 'Operations'], ['Mariana Alves', 'Engineering'], ['Rui Carvalho', 'Finance']
+  ];
+  S4.combobox.source(document.getElementById('cb-people'), function (q) {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        var n = S4.combobox.norm(q);
+        resolve(people.filter(function (p) { return S4.combobox.norm(p[0] + ' ' + p[1]).indexOf(n) >= 0; })
+          .map(function (p) { return { value: p[0], label: p[0], supporting: p[1], group: p[1] === 'Finance' ? 'Your Team' : 'Everyone Else' }; })
+          .sort(function (a, b) { return a.group === b.group ? 0 : a.group === 'Your Team' ? -1 : 1; }));
+      }, 700);
+    });
+  });
+  S4.combobox.source(document.getElementById('cb-offline'), function () {
+    return new Promise(function (resolve, reject) { setTimeout(function () { reject(new Error('offline')); }, 600); });
+  });
+  document.getElementById('cb-form').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.form.saved(e.target, 'Ready to ship'); });
+</script>
+</body>
+</html>
