@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tag Input · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Tag Input</h1></header>
+<main class="ex-main">
+  <p>Several values in one field. Each chosen value is a chip inside the box and the cursor sits after them; the box grows a line at a time and keeps its corners. Type to pick from suggestions or to make a new one, paste a list separated by commas, remove a chip with its button or with Backspace in the empty field.</p>
+
+  <section class="ex-sec">
+    <h2>Pick and Create</h2>
+    <p>Suggestions from a <code>&lt;template&gt;</code>; <code>data-create</code> lets people add their own (Enter or a comma). <code>data-max</code> shows a counter and stops at the limit. Try pasting <q>Rent, Car, Health; Gifts</q>.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-tag-input" data-name="labels" data-values="Taxes, Household" data-max="5" data-create data-noun="labels">
+          <label for="labels">Labels</label>
+          <input id="labels">
+          <template>
+            <option>Taxes</option><option>Household</option><option>Urgent</option><option>Work Expenses</option>
+            <option>Subscriptions</option><option>Travel</option><option>Car</option><option>Health</option><option>Gifts</option>
+          </template>
+          <div class="s4-text-field-supporting">Up to five.</div>
+        </div>
+        <div class="s4-text-field s4-tag-input" data-name="recipients" data-noun="people">
+          <label for="share">Share With</label>
+          <input id="share" placeholder="Name or team">
+          <template>
+            <option value="ana" data-supporting="Finance">Ana Ribeiro</option>
+            <option value="andre" data-supporting="Design">André Costa</option>
+            <option value="beatriz" data-supporting="Operations">Beatriz Lopes</option>
+            <option value="carlos" data-supporting="Finance">Carlos Mendes</option>
+            <option value="diana" data-supporting="Engineering">Diana Sousa</option>
+            <option value="finance" data-supporting="Team, 6 people">Finance Team</option>
+          </template>
+          <div class="s4-text-field-supporting">Only people in your workspace.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Many Values</h2>
+    <p>The chips wrap onto more lines; the box’s corners stay the same and the label and supporting text stay where they are.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-tag-input" data-name="skills" data-create data-values="Accessibility, Design Systems, Prototyping, Research, Motion, Typography, Front End">
+          <label for="skills">Skills</label>
+          <input id="skills">
+          <div class="s4-text-field-supporting">Anything you would like to be asked about.</div>
+        </div>
+        <div class="s4-text-field s4-tag-input" data-name="cc" data-values="Ana Ribeiro, Carlos Mendes">
+          <label for="cc-off">Copied</label>
+          <input id="cc-off" disabled>
+          <div class="s4-text-field-supporting">Set by your team’s rules.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In a Form</h2>
+    <p><code>required</code> means at least one. The message shows when you leave the field and clears as soon as a value is added.</p>
+    <div class="ex-board">
+      <form class="s4-form s4-stack" id="ti-form" style="inline-size: 100%">
+        <div class="ri-grid">
+          <div class="s4-text-field s4-tag-input" data-name="topics" data-error="Add at least one topic." data-noun="topics">
+            <label for="topics">Topics</label>
+            <input id="topics" required data-msg-required="Add at least one topic.">
+            <template><option>Budgets</option><option>Bills</option><option>Savings</option><option>Investing</option><option>Taxes</option></template>
+            <div class="s4-text-field-supporting">What this newsletter covers.</div>
+          </div>
+          <div class="s4-text-field s4-tag-input" data-name="emails" data-create data-noun="addresses" data-density="compact">
+            <label for="emails">Invite by Email (Compact)</label>
+            <input id="emails" inputmode="email">
+            <div class="s4-text-field-supporting">Paste a list; commas or new lines.</div>
+          </div>
+        </div>
+        <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" data-variant="filled" type="submit">Save</button></div>
+      </form>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/tag-input/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../menu/menu.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../progress/progress.js"></script>
+<script src="../combobox/combobox.js"></script>
+<script src="../tag-input/tag-input.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  document.getElementById('ti-form').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.form.saved(e.target, 'Saved'); });
+</script>
+</body>
+</html>

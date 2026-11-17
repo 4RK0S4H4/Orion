@@ -506,6 +506,21 @@ async function use(page, add, phone) {
       if ((await inp.getAttribute('aria-expanded')) !== 'false') add('combobox: Escape did not close its list');
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-tag-input:not([data-s4-async]):not([data-full]):not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator('.s4-tag-input-row > input');
+      const count = () => f.evaluate((x) => x.querySelectorAll('.s4-chip:not([data-leaving])').length);
+      if (!(await click(inp, 'tag input'))) continue;
+      const n = await count(), create = await f.evaluate((x) => x.hasAttribute('data-create'));
+      if (create) { await page.keyboard.type('Zebra Crossing'); await page.keyboard.press('Enter'); }
+      else { await page.keyboard.press('ArrowDown'); await settle(300); await page.keyboard.press('Enter'); }
+      await settle(300);
+      if ((await count()) !== n + 1) add('tag input: Enter did not add a chip');
+      if (!(await inp.evaluate((i) => document.activeElement === i))) add('tag input: the cursor left the field after adding');
+      await page.keyboard.press('Backspace'); await settle(420);
+      if ((await count()) !== n) add('tag input: Backspace in the empty field did not remove the last chip');
+      await page.keyboard.press('Escape');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
