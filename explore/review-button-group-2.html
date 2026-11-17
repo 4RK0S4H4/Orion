@@ -142,6 +142,7 @@ body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-c
     <h1 class="s4-headline-small">Button Groups, Round 2</h1>
     <p class="s4-body-large">You asked for a connected button group that is not Material's: today's Joined Capsule looks odd, most of all with two buttons. Here are five takes of Orion's own, each live: tap the options inside a preview to try them (that never answers). Every take is filled, has no shadows, works for two to four options, one or several choices, icons, three sizes, on glass, with any accent and with firmer corners.</p>
     <p class="s4-body-large">Tap a card's header to pick it. Keep is today's group, for comparison. Then say whether a pair should get its own form.</p>
+    <p class="s4-body-large"><b>Answered 2026-11-17:</b> A, Ink Track; pairs Same As The Take. It shipped as decision 0059, so the last card now shows the shipped Ink Track, not the Joined Capsule.</p>
   </header>
   <section class="lab-sec" aria-labelledby="q1">
     <h2 class="s4-title-large" id="q1">1. Which Take</h2>
@@ -190,7 +191,7 @@ body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-c
     el.querySelectorAll('[data-dial]').forEach(function (d) { S4.theme({ seed: 'teal', corners: 'firm' }, d); });
     return el;
   }
-  /* Keep: the shipped Joined Capsule, untouched */
+  /* Keep: the shipped group (the Joined Capsule when asked; the Ink Track since decision 0059) */
   function keepGroup(labels, o) {
     o = o || {};
     var sel = o.sel == null ? 0 : o.sel, icon = Array.isArray(labels[0]);
@@ -247,7 +248,7 @@ body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-c
     { k: 'C', cls: 'tC', name: 'Linked Beads', desc: 'Separate pills held together by short bridges, like beads on a string. The choice fills with the accent; with several choices, a run of selected beads fills its bridges too and reads as one piece.' },
     { k: 'D', cls: 'tD', name: 'Break Out', desc: 'The options are one joined capsule with no lines between them. The choice breaks out of it as its own accent pill, with a small gap on each side; the rest close up around it.' },
     { k: 'E', cls: 'tE', name: 'Lifted Tone', desc: 'One filled capsule; the choice is lifted by tone (the brightest surface, the darkest in dark mode) and its label takes the accent, in a slightly heavier weight. Quiet, no strong fill anywhere.' },
-    { k: 'Keep', keep: true, name: 'Joined Capsule', tag: 'Today', desc: 'Today’s group (decision 0026): segments 2px apart, round outer ends, small inner corners; the selected one becomes a full pill.' }
+    { k: 'Keep', keep: true, name: 'Joined Capsule', tag: 'Shipped', desc: 'When asked, today’s group (decision 0026): segments 2px apart, round outer ends, small inner corners. This card draws the shipped component, which is now the Ink Track (decision 0059).' }
   ];
   var takes = document.getElementById('takes');
   TAKES.forEach(function (o) { takes.appendChild(S4Review.card({ pick: 'take:' + o.k, letter: o.k, title: o.name, desc: o.desc, tag: o.tag || '', preview: preview(o.cls, o.keep) })); });
