@@ -35,12 +35,19 @@ context beside it). Works inside an [app shell](../app/); window classes are con
 | `data-open` (split) | list-detail under 840: the detail replaces the list | absent (list shown) |
 | `[data-split-open]` / `[data-split-back]` | inside the split: set / clear `data-open`; back buttons hide from 840 | — |
 | `data-sticky` (pane) | from 840 the pane stays in view under the top app bar and scrolls inside itself | — |
-| `--s4-split-list`, `--s4-split-support` | column widths | 360, 400 |
+| `data-join="extra-large"` (pane) | a third list-detail pane (the open item's context) shown from 1600 only; what it holds must also be reachable from the detail | — |
+| `--s4-split-list`, `--s4-split-support`, `--s4-split-join` | column widths | 360, 400, 360 |
 
 | Window | list-detail | supporting |
 |---|---|---|
 | < 840 | one pane at a time; opening adds a history entry so the phone's Back returns to the list | supporting pane stacks under the main pane |
 | ≥ 840 | list 360 + detail | main + 400 supporting pane |
+| ≥ 1600 | list 360 + detail + joined context 360 | the same |
+
+**Wide windows and alignment (issue 56):** capped content is centred beside the rail at every width, and the top app
+bar's title and actions follow that column (the page width of the content or of the visible view). Nothing joins at
+large (1200–1599): the rail expands there and takes the extra width; at extra-large a joined pane appears and `wide`
+pages grow. Card grids (`.s4-grid`) fill their row. The full ladder is in `docs/foundations/spacing.md`.
 
 **Resizable panes:** add `data-resizable` to a `.s4-split` (and `data-resize-key="name"` to remember the width). From
 840 a grip sits between the panes: drag it, or focus it and use the arrow keys (Home and End for the limits);

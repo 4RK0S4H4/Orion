@@ -1541,7 +1541,10 @@
   /* ---------- layout helpers ---------- */
   .s4-stack { display: flex; flex-direction: column; gap: var(--s4-gap, var(--s4-layout-gap)); }
   .s4-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-gap, var(--s4-space-2)); }
-  .s4-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
+  /* a grid of cards or tiles fills its row (issue 56): as many columns of at least --s4-min as fit, and the items share
+     the row, so two cards never float at the start of a wide window. A collection that filters (a gallery, search
+     results) sets --s4-grid-fill: auto-fill, so one result stays the size of one tile instead of a banner. */
+  .s4-grid { display: grid; grid-template-columns: repeat(var(--s4-grid-fill, auto-fit), minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
 }
 
 /* Forced colors (Windows High Contrast): backgrounds and shadows are removed, so every control needs a real edge.
@@ -2848,6 +2851,25 @@
   .s4-view[data-width="reading"] { max-inline-size: var(--s4-layout-content-reading); margin-inline: auto; }
   .s4-view[data-width="wide"] { max-inline-size: var(--s4-layout-content-wide); margin-inline: auto; }
 
+  /* ---------- one alignment policy (issue 56) ----------
+     Capped content is centred in the space beside the rail, at every width. The top app bar's title and actions line
+     up with the same column, so a title never sits 100px left of the content it names. The column the bar follows is
+     the page width of what is shown: the content's data-width, or the visible view's. */
+  .s4-app-body { --_cap: var(--s4-content-max, var(--s4-layout-content-max)); }
+  .s4-app-body:has(> .s4-content[data-width="reading"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="reading"]:not([hidden])) { --_cap: var(--s4-layout-content-reading); }
+  .s4-app-body:has(> .s4-content[data-width="wide"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="wide"]:not([hidden])) { --_cap: var(--s4-layout-content-wide); }
+  .s4-app-body:has(> .s4-content[data-width="full"]) { --_cap: 100%; }
+  @container s4-app (width >= 600px) {
+    /* the bar's own slot adds 8 inside its padding, so the padding is the column's edge minus 8 */
+    .s4-app-body > .s4-top-app-bar {
+      padding-inline:
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-left, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)))
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-right, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)));
+    }
+  }
+
   /* ---------- canonical layouts ---------- */
   .s4-split {
     display: grid;
@@ -2921,12 +2943,30 @@
     .s4-split:not([data-layout="supporting"]) :has(> [data-split-back]:only-child) { display: none; }
   }
 }
+/* extra-large (>= 1600): a third pane joins list-detail (issue 56). <section class="s4-split-pane" data-join="extra-large">
+   is the context of the open item (who, related, history): a column of --s4-split-join (360) after the detail. Below
+   1600 it is not shown, so what it holds must also be reachable from the detail (a page, an expand, a menu). It never
+   joins at large: the rail expands there and a third column would squeeze the detail under 400. */
+@layer s4.components {
+  @container s4-app (width >= 1600px) {
+    .s4-split:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable]:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) var(--s4-layout-pane-gap) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable] > [data-join="extra-large"] { margin-inline-start: var(--s4-layout-pane-gap); }
+  }
+}
 /* compact and medium: list-detail shows one pane at a time. In the utilities layer so a utility class on a pane
    (.s4-stack, .s4-row) can't show a pane that should be hidden. */
 @layer s4.utilities {
   @container s4-app (width < 840px) {
     .s4-split:not([data-layout="supporting"]):not([data-open]) > .s4-split-pane ~ .s4-split-pane { display: none; }
     .s4-split:not([data-layout="supporting"])[data-open] > .s4-split-pane:first-child { display: none; }
+  }
+  @container s4-app (width < 1600px) {
+    .s4-split > .s4-split-pane[data-join="extra-large"] { display: none; }
   }
 }
 
@@ -3256,6 +3296,8 @@
       block-size var(--s4-motion-ink);
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
+  /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {
@@ -3726,6 +3768,9 @@
     cursor: text;
     transition: background-color var(--s4-motion-state);
   }
+  /* a search that filters the content below it spans that content's column (the alignment policy, layout README);
+     the 720 cap is for a search that stands alone, such as one in a top app bar */
+  .s4-search[data-filter] { max-inline-size: none; }
   /* a leading icon button (menu, back) sits closer to the edge, like trailing ones */
   .s4-search:has(> .s4-icon-button:first-child) { padding-inline-start: var(--s4-space-2); }
   .s4-search > .s4-icon { color: var(--md-sys-color-on-surface); }
@@ -4106,7 +4151,7 @@
     font-size: var(--md-sys-typescale-title-medium-size);
     line-height: var(--md-sys-typescale-title-medium-line-height);
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
-    font-weight: var(--md-sys-typescale-title-medium-weight);
+    font-weight: var(--md-sys-typescale-title-large-weight);   /* heading weight: a pane title outranks the card titles, list headlines and labels inside it at the same size (typography.md) */
     color: var(--_fg);
   }
   .s4-pane-supporting {
