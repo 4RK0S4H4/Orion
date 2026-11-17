@@ -205,10 +205,12 @@
     --md-sys-color-on-surface-variant: var(--md-sys-color-on-primary-container);
     --md-sys-color-primary: var(--md-sys-color-on-primary-container);
     --md-sys-color-on-primary: var(--md-sys-color-primary-container);
-    --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the ring stays 3:1 on the accent */
     background: var(--md-sys-color-primary-container);
     color: var(--md-sys-color-on-primary-container);
   }
+  /* a ring drawn on the accent stays 3:1 there; the accent element's own ring is drawn on the page, so it keeps the page's */
+  :is(.s4-site-section, .s4-bento-cell, .s4-cta, .s4-media-box, .s4-site-stage)[data-tone="accent"] > *,
+  .s4-plan[data-featured] > * { --s4-focus-ring-color: var(--md-sys-color-on-primary-container); }
 
   /* heading block of a section: eyebrow, title, lead (start-aligned by default; centered or split on request) */
   .s4-site-section-head {

@@ -27,6 +27,7 @@ Round 0056: themes on any container, the website kit, reach (decisions 0056 to 0
 - Changed: app templates no longer write `data-expand="auto"` on their rails (it is the default), so an app's `data-rail` applies.
 - Fixed: right-to-left slider, progress, stepper, switch, menu alignment, FAB and rail safe areas; invisible checkbox and radio in forced colors; missing focus ring on date fields; 1.19:1 focus ring in vibrant toolbars; text field counter overlap.
 - Fixed: the corner dial reaches the tabs tray, the nav pill and the chip remove button; pressed icon buttons are never rounder than at rest; error and text buttons on glass reach 4.5:1; vibrant toolbar tonal buttons readable; breadcrumb chevron spacing; the landing feature grid no longer leaves a hole at 1280.
+- Fixed (found by combining the round's work): the site header, logo row and hero frames grow with 200% text and fit 320 wide; the focus ring stays 3:1 on the accent band; the landing phone's button stays concentric under the corner dials; unselected toggle button text reaches 4.5:1 in tinted mode.
 
 Brand dials (decision 0055):
 
