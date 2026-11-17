@@ -17,6 +17,31 @@ enough to never be in the way, but never looking instant. This amends 0022 (simp
 (transform and opacity, one transition per element, nothing cloned) unless the owner agrees otherwise; record as a new
 decision and show options in a motion lab with the scrubber before building.
 
+## Owner critiques (2026-11-17)
+
+Sent with screenshots after the round 0056 publish; "more minor critiques and ideas for you to carry forward".
+
+- **61.** Radio list in a pane (checkout, Delivery): "layout is a little bad here and looks glitched, with where the
+  text is and the radio button so close to the corner, conflicted with the corner radius."
+  Image: `img/2026-11-17-radio-list-corner.png`.
+- **62.** Text field focus is "a bit too harsh and contrasty, especially in monochrome, either find a different way to
+  indicate or use diff colors." Image: `img/2026-11-17-field-focus-harsh.png`.
+- **63.** Connected button group (the Joined Capsule, decision 0026): "I want a different take ... too similar to
+  material 3 expressive, and I think it looks a bit odd. something with the same level of creativity, but not
+  material. looks odd especially for 2 buttons." This reopens 0026 at the owner's request: show options in a quiz.
+  Images: `img/2026-11-17-button-group-connected.png`, `img/2026-11-17-button-group-sizes.png`.
+- **64.** Chat composer: "on the text box select focus, this looks super bad, not sure why the whole message bar is
+  outlined in white as well, that's weird." Two rings at once (the field and the bar).
+  Image: `img/2026-11-17-composer-double-ring.png`.
+- **65.** Onboarding step dots: "also bug here" (the active dot is a squashed ellipse, not a clean pill, and sits off
+  the row). Image: `img/2026-11-17-onboarding-dots.png`.
+- **66.** Direction for templates: monochrome stays for Orion's own pages (the design language site, showcase,
+  reference pages). **Every template should be its own thing**: "super unique", a high quality standalone page with
+  Orion as the base, showing "how far this framework can be customized in all aspects ... focus on making the page
+  fulfill that purpose and see in what ways S4 Orion holds you back or what you would want different. Similar to how
+  other CSS frameworks are super customizable." Each template build is also a lesson: what it had to work around
+  becomes a change to Orion.
+
 ## From the design review (2026-11-16)
 
 Found by the end-to-end review ([`explore/design-review.html`](../../explore/design-review.html)), not by the owner; no
