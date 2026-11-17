@@ -488,6 +488,24 @@ async function use(page, add, phone) {
       const st = await s.evaluate((x) => ({ open: x.parentElement.open, h: (x.parentElement.querySelector('.s4-accordion-body') || x).getBoundingClientRect().height }));
       if (!st.open || st.h < 4) add(`accordion "${label}" did not open`);
     }
+    /* rich inputs (issue 59): every interaction they add, with the cursor left where the person put it (decision 0049) */
+    const listFits = () => page.evaluate(() => { const p = [...document.querySelectorAll('.s4-combobox-menu')].find((x) => x.matches(':popover-open')); if (!p) return 'none'; const r = p.getBoundingClientRect(); return r.left < -1 || r.right > innerWidth + 1 || r.top < -1 || r.bottom > innerHeight + 1 ? 'off' : 'ok'; });
+    for (const f of (await visible('.s4-combobox:not([data-s4-async]):not(:has(> input:disabled))')).slice(0, 2)) {
+      const inp = f.locator(':scope > input[role="combobox"]');
+      if (!(await click(inp, 'combobox'))) continue;
+      await page.keyboard.press('ArrowDown'); await settle(420);
+      const st = await inp.evaluate((i) => { const l = document.getElementById(i.getAttribute('aria-controls') || ''), a = document.getElementById(i.getAttribute('aria-activedescendant') || ''); return { exp: i.getAttribute('aria-expanded'), n: l ? l.querySelectorAll('[role="option"]').length : 0, active: !!a && a.getAttribute('role') === 'option', kept: document.activeElement === i }; });
+      if (st.exp !== 'true' || !st.n) add('combobox: Down did not open its list of options');
+      else {
+        if (!st.active) add('combobox: Down did not make an option active (aria-activedescendant)');
+        if (!st.kept) add('combobox: the cursor left the field while moving through the options');
+        if ((await listFits()) === 'off') add('combobox list does not fit the screen');
+        (await page.evaluate(nestAudit)).forEach(add);
+      }
+      await page.keyboard.press('Escape'); await settle(380);
+      if ((await inp.getAttribute('aria-expanded')) !== 'false') add('combobox: Escape did not close its list');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;

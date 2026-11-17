@@ -7459,6 +7459,89 @@
   }
 }
 
+/* ---- combobox/combobox.css ---- */
+/* Combobox / autocomplete: a text field (the Quiet Box) whose list opens in glass below it (above when there is no
+   room, e.g. over a phone's keyboard). The field itself is .s4-text-field; this file draws only the list and the parts
+   the combobox adds. The list (.s4-combobox-menu) is also what S4.listbox opens for the tag input and the time field.
+   <div class="s4-text-field s4-combobox">
+     <label for="city">City</label><input id="city"><template><option>Lisbon</option>…</template>
+   </div> */
+@layer s4.components {
+  /* ---------- the list: the glass menu surface, positioned by script ---------- */
+  .s4-combobox-menu {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    box-sizing: border-box;
+    max-width: calc(100vw - 2 * var(--s4-space-2));
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: var(--s4-space-2);
+    border: 0;
+    border-radius: var(--s4-shape-menu);
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    scrollbar-width: thin;
+  }
+  .s4-combobox-menu:popover-open { display: flex; flex-direction: column; gap: 2px; }
+  .s4-combobox-list, .s4-combobox-group { display: flex; flex-direction: column; gap: 2px; }
+  .s4-combobox-list:empty { display: none; }
+  .s4-combobox-group + .s4-combobox-group { margin-block-start: var(--s4-space-1); }
+  .s4-combobox-option { cursor: pointer; }
+  .s4-combobox-option > .s4-menu-item-text { padding-block: var(--s4-space-2); }
+  /* the active option (aria-activedescendant): the focus ring, since the cursor stays in the field */
+  .s4-combobox-option[data-active] {
+    outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+  }
+  .s4-combobox-option[data-active]::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  .s4-combobox-option[aria-selected="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .s4-combobox-option[aria-selected="true"] .s4-menu-item-supporting { color: inherit; }
+  .s4-combobox-check { flex: none; margin-inline-start: auto; visibility: hidden; color: inherit; }
+  .s4-combobox-option[aria-selected="true"] > .s4-combobox-check { visibility: visible; }
+  .s4-combobox-option[aria-disabled="true"] { cursor: default; color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
+  .s4-combobox-option[aria-disabled="true"]::before { display: none; }
+  /* the part of each option that matches what was typed */
+  .s4-combobox-match { background: none; color: inherit; font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+
+  /* loading, empty and error notes under (or instead of) the options */
+  .s4-combobox-note {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-2) var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding: var(--s4-space-2) var(--s4-space-3);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+    font-weight: var(--md-sys-typescale-body-medium-weight);
+  }
+  .s4-combobox-note[hidden] { display: none; }
+  .s4-combobox-note > .s4-progress[data-type] { flex: none; width: var(--s4-size-icon); height: var(--s4-size-icon); }
+  .s4-combobox-note-text { flex: 1 1 12ch; min-inline-size: 0; }
+  .s4-combobox-note[data-kind="error"] { color: var(--md-sys-color-error); }
+  .s4-combobox-note > .s4-button { margin-inline-start: auto; }
+
+  /* the trailing Show Options / Clear button: the chevron turns over while the list is open (Bend) */
+  .s4-combobox-toggle > .s4-icon { transition: rotate var(--s4-motion-bend); }
+  .s4-combobox-toggle[aria-expanded="true"] > .s4-icon { rotate: 180deg; }
+
+  @media (forced-colors: active) {
+    .s4-combobox-menu { border: 1px solid CanvasText; }
+    .s4-combobox-option[data-active] { outline-color: Highlight; }
+    .s4-combobox-option[aria-selected="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+    .s4-combobox-match { text-decoration: underline; }
+  }
+}
+
 /* ---- form/form.css ---- */
 /* Form (S4 addition, decision 0051): layout and the quiet marks of a form that behaves.
    <form class="s4-form" novalidate>

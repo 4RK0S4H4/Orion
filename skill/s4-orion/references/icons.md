@@ -87,3 +87,5 @@ Arrows and chevrons are Linear, everything else Bold Duotone. Other sets: solar,
 | `book` | book-minimalistic |
 | `tune` | tuning-2 |
 | `mic` | microphone |
+| `minus` | minus |
+| `plus` | add |

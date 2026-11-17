@@ -245,7 +245,7 @@
   function fire(input) { input.dispatchEvent(new Event('input', { bubbles: true })); input.dispatchEvent(new Event('change', { bubbles: true })); }
 
   S4.combobox = {
-    source: function (field, fn) { sources.set(field, fn); },
+    source: function (field, fn) { sources.set(field, fn); field.setAttribute('data-s4-async', ''); },
     set: function (field, value) { if (field._s4combo) field._s4combo.set(value); },
     filter: filter, mark: mark, norm: norm, parse: parse
   };
