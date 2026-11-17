@@ -117,6 +117,14 @@ phone), and Mallet's "Was this helpful" went from chips to two plain buttons (th
   and the CTA band is `low`. Hollis & Vane uses it in the contact band; the plans use the accent tint for the one room
   that matters, which is drawing, not a band.
 
+## Tests changed (and why)
+- `tests/suite.mjs`: the `[data-period]` check assumed the values `monthly` and `yearly`. It now reads the values the
+  switch itself names, so Sprig's pack picker and Mallet's layer switch are checked too (not weakened: every switch
+  must still change its texts).
+- Reach found three things, all fixed in the pages: Hollis & Vane's site figures overlapped at 200% text (a
+  `nowrap`), and Mallet's code panels and keymap pushed the page sideways at 320 (grid children without
+  `min-inline-size: 0`).
+
 ## Changelog lines
 - Changed: the five site templates are now Sprig (product launch), Hollis & Vane (studio), Tidewater (journal),
   Mallet (docs) and Spool (pricing), each with its own dials, drawings and sections.
