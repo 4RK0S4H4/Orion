@@ -22,9 +22,10 @@
   .ob-step p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
   .ob-setup { display: grid; gap: var(--s4-space-4); inline-size: 100%; text-align: start; }
   .ob-foot { display: grid; justify-items: center; gap: var(--s4-space-4); padding: var(--s4-space-4) var(--s4-space-6); padding-block-end: calc(var(--s4-space-6) + env(safe-area-inset-bottom, 0px)); }
-  .ob-dots { display: flex; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
-  .ob-dots > li { inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state); }
-  .ob-dots > li[aria-current] { background: var(--md-sys-color-primary); transform: scaleX(2.5); margin-inline: var(--s4-space-2); }
+  .ob-dots { display: flex; align-items: center; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  /* the current step is a pill of the dot's height (issue 65: a scaled circle was an ellipse); its length changes at once, only the color fades (State) */
+  .ob-dots > li { flex: none; inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); transition: background-color var(--s4-motion-state); }
+  .ob-dots > li[aria-current] { inline-size: calc(var(--s4-space-2) * 3); background: var(--md-sys-color-primary); }
   .ob-actions { display: flex; gap: var(--s4-space-2); inline-size: min(100%, 28rem); }
   .ob-actions > .s4-button { flex: 1; }
 </style>
