@@ -6,18 +6,52 @@
    issue 19): the ink grows in from the middle on the ink spring (a subtle liquid overshoot) and drains out calmly.
    No state-layer halo (decision 0043); 48dp touch target. */
 @layer s4.components {
-  /* a labelled group of radios or checkboxes: a soft outlined box instead of the browser's square fieldset */
+  /* a labelled group of radios or checkboxes (issue 61): the legend reads like a field label (above, at the content edge,
+     where the pane title and the other labels start) and the options sit in one filled box like a field's, one comfortable
+     row each. The box's corners are the field corner; every row keeps its disc 16 from the box's side and 18 from its
+     top and bottom, so nothing crowds a rounded corner, under any corner dial. Rows are separated by space only. */
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     min-inline-size: 0;
     margin: 0;
-    padding: var(--s4-space-1) var(--s4-space-4) var(--s4-space-2);
+    padding: 0;
     border: 0;
-    background: var(--md-sys-color-surface-container);
-    border-radius: var(--md-sys-shape-corner-extra-large);
+    background: none;
   }
-  /* the legend is a heading inside the box (a normal legend would straddle the top edge) */
-  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend { float: inline-start; width: 100%; padding: var(--s4-space-2) 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+  /* the legend is a label above the box (a normal legend would straddle the top edge) */
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend {
+    float: inline-start;
+    width: 100%;
+    padding: 0 0 var(--s4-space-1);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend + * { clear: inline-start; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) {
+    display: flex;
+    gap: var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding: var(--s4-space-2) var(--s4-space-4);
+    background: var(--md-sys-color-surface-container-highest);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox)::after { inset: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) > :is(.s4-radio-ring, .s4-checkbox-box) { margin: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):first-of-type {
+    padding-block-start: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-start-start-radius: var(--s4-shape-text-field);
+    border-start-end-radius: var(--s4-shape-text-field);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):last-of-type {
+    padding-block-end: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-end-start-radius: var(--s4-shape-text-field);
+    border-end-end-radius: var(--s4-shape-text-field);
+  }
   .s4-radio {
     --_ring: var(--md-sys-color-on-surface-variant);
     --_state: var(--md-sys-color-on-surface);

@@ -28,6 +28,7 @@ floats at the bottom over the thread, so it is glass.
 **Do**
 - Put assistant answers with headings or lists in a `.s4-prose` inside the bubble, or full width without a bubble.
 - Keep the composer's text field label-less with an `aria-label`; the send button is the one filled control.
+- The composer is the field: it carries the one focus mark (the ring from the keyboard, a quiet hairline after a tap); the text field inside shows none.
 
 **Don't**
 - Don't color bubbles per person; mine and theirs is the only distinction.

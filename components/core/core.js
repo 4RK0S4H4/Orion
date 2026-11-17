@@ -25,6 +25,14 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else setTimeout(boot);
 
+  /* ---------- how focus arrived (issues 62, 64) ----------
+     data-s4-focus on <html> is "pointer" when the last focus came from a tap or a click and "key" otherwise. A text input
+     matches :focus-visible on a click as well, so things you type into read this: a tap shows their quiet state, the
+     keyboard shows the full ring. Typing never changes it; only the next focus does. No script, no attribute: the ring. */
+  var lastPointer = -1e9;
+  document.addEventListener('pointerdown', function () { lastPointer = Date.now(); }, true);
+  document.addEventListener('focusin', function () { root.setAttribute('data-s4-focus', Date.now() - lastPointer < 800 ? 'pointer' : 'key'); }, true);
+
   /* ---------- small utilities ---------- */
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },

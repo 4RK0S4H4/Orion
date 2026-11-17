@@ -1,5 +1,7 @@
-/* Tabs behaviour (WAI-ARIA tabs, automatic activation).
-   - One pill per tab list slides to the selected tab on the spatial spring (the tab's full width).
+/* Tabs behaviour (WAI-ARIA tabs, automatic activation). Tabs move between panels (decision 0059): every tab controls one.
+   - One indicator per tab list slides to the selected tab on the Ink pattern (measured to the tab's box).
+   - Each label's text is wrapped in .s4-tab-label (data-text holds it) so the heavier selected weight never changes
+     the tab's width.
    - Panels (aria-controls) switch with the shared axis pattern: the old panel slides 30px away and fades out, the new
      one slides in from the side of the newly selected tab. Movement on the spatial spring, fades on effects.
    - Keys: Left / Right move and select (wrapping), Home / End go to the first / last tab. Roving tabindex.
@@ -22,10 +24,12 @@ S4.register('tabs', function (scope) {
       var tab = list.querySelector('.s4-tab[aria-selected="true"]');
       if (!tab) { indicator.style.setProperty('--_w', '0px'); return; }
       var lr = list.getBoundingClientRect(), tr = tab.getBoundingClientRect();
-      var base = lr.left + list.clientLeft - list.scrollLeft, x = tr.left - base, w = tr.width;
+      var x = tr.left - (lr.left + list.clientLeft - list.scrollLeft), y = tr.top - (lr.top + list.clientTop - list.scrollTop);
       indicator.toggleAttribute('data-animate', !!animate);
       indicator.style.setProperty('--_x', x + 'px');
-      indicator.style.setProperty('--_w', w + 'px');
+      indicator.style.setProperty('--_y', y + 'px');
+      indicator.style.setProperty('--_w', tr.width + 'px');
+      indicator.style.setProperty('--_h', tr.height + 'px');
     }
 
     /* ---------- panels: shared axis ---------- */
@@ -68,6 +72,16 @@ S4.register('tabs', function (scope) {
     var all = tabs();
     var selected = all.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || all[0];
     all.forEach(function (t) {
+      if (!t.querySelector('.s4-tab-label')) {
+        Array.prototype.slice.call(t.childNodes).forEach(function (n) {
+          if (n.nodeType !== 3 || !n.nodeValue.trim()) return;
+          var label = document.createElement('span');
+          label.className = 's4-tab-label';
+          label.setAttribute('data-text', n.nodeValue.trim());
+          label.textContent = n.nodeValue.trim();
+          t.replaceChild(label, n);
+        });
+      }
       if (!t.id) t.id = 's4-tab-' + (++uid);
       if (!t.hasAttribute('role')) t.setAttribute('role', 'tab');
       if (t.tagName === 'BUTTON' && !t.hasAttribute('type')) t.type = 'button';

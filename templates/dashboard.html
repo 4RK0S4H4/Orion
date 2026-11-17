@@ -1,23 +1,91 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="warm" data-page="soft" data-corners="firm" data-type-display="serif" data-energy="calm" data-cards="filled">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Dashboard · S4 Orion Template</title>
-<!-- Template: Dashboard. For analytics, finance, admin and status apps: a few numbers people check, a trend, a short
-     list of what needs attention, and a detailed table one tap away. -->
+<title>Tally · Studio Cash</title>
+<!-- Template: Dashboard, as a product (issue 66). Tally is cash and invoices for a small design studio: the owner opens it
+     on Monday morning to answer three questions in order: how much cash is there and how long does it last, is money
+     coming in faster than it goes out, and who owes us. Brand through the dials only: a deep green accent, warm grays,
+     the soft page tone, firm corners, a serif display face (a ledger, not a cockpit), calm motion, filled cards.
+     Its own elements, drawn from Orion's rules: the runway meter, paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=3b5fc15">
+<link rel="stylesheet" href="../components/orion.css?v=a186eaa">
 <style>
-  /* the app's own layout: tokens only */
-  .dash-grid { display: grid; gap: var(--s4-layout-gap); }
-  @container s4-app (width >= 840px) { .dash-grid { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
-  .dash-chart { display: flex; align-items: flex-end; gap: var(--s4-space-2); block-size: calc(var(--s4-size-button-large) * 2); padding-block-start: var(--s4-space-4); }
-  .dash-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: var(--s4-space-1); block-size: 100%; }
-  .dash-bar > i { inline-size: 100%; max-inline-size: var(--s4-size-button-medium); block-size: var(--h); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-highest); }
-  .dash-bar[aria-current] > i { background: var(--md-sys-color-primary); }
-  .dash-bar > span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); }
+  /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
+  .tl-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-3) var(--s4-space-4); padding-block: var(--s4-space-2) var(--s4-space-6); }
+  .tl-head > div { margin-inline-end: auto; }
+  .tl-kicker { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .tl-title { margin: 0; }
+  .tl-period { flex: none; }   /* the period switch keeps its own width; the header wraps instead */
+
+  /* the grid: one column on a phone; hero + numbers, then the chart beside who owes us; from 1600 "Coming Up" joins as a third column */
+  .tl-grid { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "numbers" "flow" "owed" "aging" "soon"; }
+  .tl-grid > * { min-inline-size: 0; }
+  .tl-hero { grid-area: hero; } .tl-numbers { grid-area: numbers; } .tl-flow { grid-area: flow; } .tl-owed { grid-area: owed; } .tl-aging { grid-area: aging; } .tl-soon { grid-area: soon; }
+  @container s4-app (width >= 840px) {
+    .tl-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "hero numbers" "flow owed" "flow aging" "soon soon"; }
+  }
+  @container s4-app (width >= 1600px) {
+    .tl-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-areas: "hero numbers soon" "flow owed soon" "flow aging soon"; }
+  }
+
+  /* hero: the one number, then how long it lasts */
+  .tl-cash { display: flex; flex-direction: column; gap: var(--s4-space-1); }
+  .tl-cash-value { color: var(--md-sys-color-on-surface); font-variant-numeric: tabular-nums; }
+  .tl-cash-meta { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  .tl-cash-meta strong { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-medium-weight); }
+  /* runway meter: one pill a month, the months the cash covers are filled, the part month is filled in part */
+  .tl-runway { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s4-space-1); margin-block-start: var(--s4-space-4); }
+  .tl-runway > i { position: relative; overflow: hidden; block-size: var(--s4-space-3); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); }
+  .tl-runway > i[data-full] { background: var(--md-sys-color-primary); }
+  .tl-runway > i[data-part]::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--p); background: var(--md-sys-color-primary); }
+  .tl-runway > i[data-line]::after { content: ""; position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: calc(var(--s4-space-1) / 2); background: var(--md-sys-color-on-surface); }
+  .tl-runway-scale { display: flex; justify-content: space-between; margin-block-start: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+
+  /* money in and out: paired bars, a month a pair; the open month is named, not colored differently */
+  .tl-legend { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .tl-legend li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .tl-key { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
+  .tl-key[data-out] { background: var(--md-sys-color-on-surface-variant); }
+  /* the chart takes whatever height its row gives it, so it never leaves a hole beside a taller neighbour */
+  .tl-bars { flex: 1 1 auto; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s4-space-1); min-block-size: calc(var(--s4-size-button-large) * 2); }
+  .tl-month { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--s4-space-1); block-size: 100%; }
+  .tl-pair { display: flex; align-items: flex-end; justify-content: center; gap: calc(var(--s4-space-1) / 2); min-block-size: 0; }
+  .tl-pair > i { inline-size: min(40%, var(--s4-space-3)); block-size: var(--h); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
+  .tl-pair > i + i { background: var(--md-sys-color-on-surface-variant); }
+  .tl-month > span { text-align: center; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); }
+  .tl-month[aria-current] > span { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  /* in a narrow pane (a phone, or large text) only the quarters and the open month keep their names; the table has all */
+  @container (width < 560px) { .tl-month:not([data-tick]) > span { visibility: hidden; } }
+  .tl-flow-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-2); }
+
+  /* who owes us, by age: one bar, the share of each age band; the words carry the amounts */
+  .tl-agebar { display: flex; gap: calc(var(--s4-space-1) / 2); block-size: var(--s4-space-4); }
+  .tl-agebar > i { flex: var(--w) 1 0; border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
+  .tl-agebar > i:first-child { border-start-start-radius: var(--s4-shape-chip); border-end-start-radius: var(--s4-shape-chip); }
+  .tl-agebar > i:last-child { border-start-end-radius: var(--s4-shape-chip); border-end-end-radius: var(--s4-shape-chip); }
+  .tl-agebar > i[data-tone="warning"] { background: var(--s4-color-warning); }
+  .tl-agebar > i[data-tone="error"] { background: var(--md-sys-color-error); }
+  .tl-ages { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: var(--s4-space-3); margin: 0; }
+  .tl-ages > div { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .tl-ages dt { display: flex; align-items: center; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .tl-ages dd { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); font-variant-numeric: tabular-nums; }
+  .tl-ages .tl-key[data-tone="warning"] { background: var(--s4-color-warning); }
+  .tl-ages .tl-key[data-tone="error"] { background: var(--md-sys-color-error); }
+
+  /* coming up: dated tiles that fill the row on a wide page and stack in the narrow third column */
+  .tl-upcoming { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .tl-upcoming > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); }
+  .tl-up-date { grid-column: 1 / -1; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
+  .tl-up-name { min-inline-size: 0; overflow-wrap: anywhere; }
+  .tl-up-amt { font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-title-medium-weight); }
+  .tl-up-amt[data-in] { color: var(--s4-color-success); }
+  .tl-table-wrap { overflow-x: auto; }
+  .tl-accounts { display: grid; gap: var(--s4-layout-gap); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
+  .tl-balance { margin: 0; font-variant-numeric: tabular-nums; }
+  @media (forced-colors: active) { .tl-runway > i, .tl-pair > i, .tl-agebar > i, .tl-key { border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
@@ -28,105 +96,192 @@
     </div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#overview" data-view="overview" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Overview</span></a>
-      <a class="s4-nav-item" href="#reports" data-view="reports"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Reports</span></a>
+      <a class="s4-nav-item" href="#invoices" data-view="invoices"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="bills"></span></span><span class="s4-nav-label">Invoices</span></a>
       <a class="s4-nav-item" href="#accounts" data-view="accounts"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="wallet"></span></span><span class="s4-nav-label">Accounts</span></a>
     </div>
   </nav>
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Overview</h1></div>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Tally</h1></div>
       <div class="s4-app-bar-actions">
         <button class="s4-icon-button" type="button" aria-label="Export" data-tooltip="Export"><span class="s4-icon" data-icon="export"></span></button>
-        <button class="s4-icon-button" type="button" aria-label="More" data-menu="dash-more"><span class="s4-icon" data-icon="more-vert"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="More" data-menu="tl-more"><span class="s4-icon" data-icon="more-vert"></span></button>
       </div>
     </header>
-    <main class="s4-content">
-      <section class="s4-view" data-view="overview" data-title="Overview">
-        <div class="s4-page-header">
-          <h2 class="s4-headline-small">October</h2>
-          <div class="s4-button-group" data-connected data-select="single" aria-label="Period">
-            <button class="s4-button" data-variant="tonal" type="button" value="week">Week</button>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view" data-view="overview" data-title="Tally">
+        <div class="tl-head">
+          <div><p class="tl-kicker">Atelier North · Week 47</p><h2 class="tl-title s4-headline-medium">Cash, November</h2></div>
+          <div class="tl-period"><div class="s4-button-group" data-connected data-select="single" aria-label="Period">
             <button class="s4-button" data-variant="tonal" type="button" value="month" aria-pressed="true">Month</button>
+            <button class="s4-button" data-variant="tonal" type="button" value="quarter">Quarter</button>
             <button class="s4-button" data-variant="tonal" type="button" value="year">Year</button>
-          </div>
+          </div></div>
+          <button class="s4-button" data-variant="filled" type="button" data-sheet="tl-new"><span class="s4-icon" data-icon="add"></span>New Invoice</button>
         </div>
-        <div class="s4-stack">
-          <section class="s4-pane" aria-label="Key Numbers">
-            <div class="s4-stat-row">
-              <div class="s4-stat"><span class="s4-stat-label">Revenue</span><span class="s4-stat-value">$48.2K</span><span class="s4-stat-meta"><span class="s4-status" data-tone="success">+8%</span>vs. September</span></div>
-              <div class="s4-stat"><span class="s4-stat-label">Spent</span><span class="s4-stat-value">$31.7K</span><span class="s4-stat-meta"><span class="s4-status" data-tone="error">+12%</span>vs. September</span></div>
-              <div class="s4-stat"><span class="s4-stat-label">Open Invoices</span><span class="s4-stat-value">14</span><span class="s4-stat-meta">3 overdue</span></div>
-              <div class="s4-stat"><span class="s4-stat-label">Runway</span><span class="s4-stat-value">11 mo</span><span class="s4-stat-meta">At this month’s burn</span></div>
+
+        <div class="tl-grid">
+          <section class="s4-pane tl-hero" aria-labelledby="cash-h">
+            <div class="tl-cash">
+              <h3 class="s4-pane-title" id="cash-h">Cash On Hand</h3>
+              <span class="tl-cash-value s4-display-medium s4-emphasized" data-hero>$84,320</span>
+              <p class="tl-cash-meta s4-body-medium">Lasts <strong>7.2 months</strong> at October’s spend of $11,700. Your safe line is 6.</p>
+            </div>
+            <div>
+              <div class="tl-runway" role="img" aria-label="Runway: 7.2 of 12 months covered; the safe line is 6 months">
+                <i data-full></i><i data-full></i><i data-full></i><i data-full></i><i data-full></i><i data-full data-line></i><i data-full></i><i data-part style="--p: 20%"></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="tl-runway-scale" aria-hidden="true"><span>Dec</span><span>Safe Line · May</span><span>Nov ’27</span></div>
             </div>
           </section>
-          <div class="dash-grid">
-            <section class="s4-pane" aria-labelledby="trend-h">
-              <h3 class="s4-pane-title" id="trend-h">Revenue by Month</h3>
-              <p class="s4-pane-supporting">Thousands of dollars, this year.</p>
-              <div class="dash-chart" role="img" aria-label="Revenue by month: May 31K, June 35K, July 33K, August 40K, September 44K, October 48K">
-                <div class="dash-bar" style="--h: 62%"><i></i><span>May</span></div>
-                <div class="dash-bar" style="--h: 70%"><i></i><span>Jun</span></div>
-                <div class="dash-bar" style="--h: 66%"><i></i><span>Jul</span></div>
-                <div class="dash-bar" style="--h: 80%"><i></i><span>Aug</span></div>
-                <div class="dash-bar" style="--h: 88%"><i></i><span>Sep</span></div>
-                <div class="dash-bar" style="--h: 96%" aria-current="true"><i></i><span>Oct</span></div>
+
+          <section class="s4-pane tl-numbers" aria-label="This Month">
+            <div class="s4-stat-row">
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Money In</span><span class="s4-stat-value">$38,400</span><span class="s4-stat-meta"><span class="s4-status" data-tone="success">+9%</span>vs. October</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Money Out</span><span class="s4-stat-value">$29,100</span><span class="s4-stat-meta"><span class="s4-status" data-tone="warning">+7%</span>vs. October</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Owed To You</span><span class="s4-stat-value">$21,860</span><span class="s4-stat-meta">9 invoices</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Tax Set Aside</span><span class="s4-stat-value">$9,200</span><span class="s4-stat-meta">Due Jan 15</span></div>
+            </div>
+          </section>
+
+          <section class="s4-pane tl-flow" aria-labelledby="flow-h">
+            <h3 class="s4-pane-title" id="flow-h">Money In And Out</h3>
+            <p class="s4-pane-supporting">The last twelve months, in thousands. In has beaten out for six months running.</p>
+            <ul class="tl-legend"><li><span class="tl-key"></span>Money In</li><li><span class="tl-key" data-out></span>Money Out</li></ul>
+            <div class="tl-bars" role="img" aria-label="Money in and out by month, December to November; in rose from 18 to 38 thousand, out from 20 to 29 thousand" id="tl-bars"></div>
+            <div class="tl-flow-foot">
+              <span class="s4-body-small s4-on-surface-variant">Net this year: <span class="s4-num">+$61,300</span></span>
+              <button class="s4-button" data-variant="text" data-size="s" type="button" data-expand="tl-flow-table">Show As Table</button>
+            </div>
+            <div class="s4-expand" id="tl-flow-table" hidden>
+              <div class="tl-table-wrap">
+                <table class="s4-table" data-density="compact">
+                  <caption class="s4-visually-hidden">Money in and out by month, in thousands of dollars</caption>
+                  <thead><tr><th scope="col">Month</th><th scope="col" class="num">In</th><th scope="col" class="num">Out</th><th scope="col" class="num">Net</th></tr></thead>
+                  <tbody id="tl-flow-rows"></tbody>
+                </table>
               </div>
-            </section>
-            <section class="s4-pane" aria-labelledby="attn-h">
-              <h3 class="s4-pane-title" id="attn-h">Needs Attention</h3>
-              <ul class="s4-list">
-                <li><a class="s4-list-item" href="#reports"><span class="s4-list-leading"><span class="s4-icon" data-icon="warning"></span></span><span class="s4-list-content"><span class="s4-list-headline">Northwind invoice</span><span class="s4-list-supporting">12 days overdue</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,400</span></span></a></li>
-                <li><a class="s4-list-item" href="#reports"><span class="s4-list-leading"><span class="s4-icon" data-icon="card"></span></span><span class="s4-list-content"><span class="s4-list-headline">Card ending 4412</span><span class="s4-list-supporting">Expires next month</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-                <li><a class="s4-list-item" href="#reports"><span class="s4-list-leading"><span class="s4-icon" data-icon="document"></span></span><span class="s4-list-content"><span class="s4-list-headline">Q3 report</span><span class="s4-list-supporting">Ready to review</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-              </ul>
-            </section>
-          </div>
+            </div>
+          </section>
+
+          <section class="s4-pane tl-owed" aria-labelledby="owed-h">
+            <h3 class="s4-pane-title" id="owed-h">Needs A Nudge</h3>
+            <p class="s4-pane-supporting">Overdue, oldest first. A reminder goes out in your name.</p>
+            <ul class="s4-list" data-style="segmented" id="tl-owed-list">
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">NW</span></span><span class="s4-list-content"><span class="s4-list-headline">Northwind Coffee</span><span class="s4-list-supporting">Brand refresh · 34 days late</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$6,400</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">HB</span></span><span class="s4-list-content"><span class="s4-list-headline">Harbor Books</span><span class="s4-list-supporting">Catalogue layout · 12 days late</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$2,150</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-avatar">FL</span></span><span class="s4-list-content"><span class="s4-list-headline">Fieldline Studio</span><span class="s4-list-supporting">Signage · 5 days late</span></span><span class="s4-list-trailing"><span class="s4-list-amount">$1,310</span></span></div></li>
+            </ul>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="tl-remind">Remind All Three</button></div>
+          </section>
+
+          <section class="s4-pane tl-aging" aria-labelledby="aging-h">
+            <h3 class="s4-pane-title" id="aging-h">Owed, By Age</h3>
+            <div class="tl-agebar" role="img" aria-label="Owed to you by age: current $12,000, 1 to 30 days $3,460, 31 to 60 days $6,400">
+              <i style="--w: 12000"></i><i data-tone="warning" style="--w: 3460"></i><i data-tone="error" style="--w: 6400"></i>
+            </div>
+            <dl class="tl-ages">
+              <div><dt><span class="tl-key"></span>Not Yet Due</dt><dd>$12,000</dd></div>
+              <div><dt><span class="tl-key" data-tone="warning"></span>1–30 Days Late</dt><dd>$3,460</dd></div>
+              <div><dt><span class="tl-key" data-tone="error"></span>31–60 Days Late</dt><dd>$6,400</dd></div>
+            </dl>
+          </section>
+
+          <section class="s4-pane tl-soon" aria-labelledby="soon-h">
+            <h3 class="s4-pane-title" id="soon-h">Coming Up</h3>
+            <ol class="tl-upcoming">
+              <li><span class="tl-up-date">Fri, Nov 20</span><span class="tl-up-name">Payroll</span><span class="tl-up-amt">−$8,600</span></li>
+              <li><span class="tl-up-date">Tue, Dec 1</span><span class="tl-up-name">Studio rent</span><span class="tl-up-amt">−$2,400</span></li>
+              <li><span class="tl-up-date">Expected Dec 3</span><span class="tl-up-name">Contoso deposit</span><span class="tl-up-amt" data-in>+$5,120</span></li>
+              <li><span class="tl-up-date">Fri, Dec 4</span><span class="tl-up-name">Adobe and Figma</span><span class="tl-up-amt">−$310</span></li>
+            </ol>
+          </section>
         </div>
       </section>
 
-      <section class="s4-view" data-view="reports" data-title="Reports" hidden>
-        <div class="s4-page-header"><h2 class="s4-headline-small">Invoices</h2><button class="s4-button" data-variant="tonal" type="button"><span class="s4-icon" data-icon="filter"></span>Filter</button></div>
+      <section class="s4-view" data-view="invoices" data-title="Invoices" hidden>
+        <div class="tl-head">
+          <div><p class="tl-kicker">9 open · $21,860</p><h2 class="tl-title s4-headline-medium">Invoices</h2></div>
+          <button class="s4-button" data-variant="filled" type="button" data-sheet="tl-new"><span class="s4-icon" data-icon="add"></span>New Invoice</button>
+        </div>
         <div class="s4-table-wrap" data-sticky>
           <table class="s4-table">
             <caption class="s4-visually-hidden">Invoices</caption>
             <thead><tr>
               <th scope="col" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Client<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col">Project</th>
               <th scope="col">Status</th>
               <th scope="col" aria-sort="none"><button type="button" class="s4-table-sort">Due<span class="s4-icon" data-icon="chevron-down"></span></button></th>
               <th scope="col" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Amount<span class="s4-icon" data-icon="chevron-down"></span></button></th>
             </tr></thead>
             <tbody>
-              <tr><td>Northwind</td><td><span class="s4-status" data-tone="error">Overdue</span></td><td data-value="2026-10-01">Oct 1</td><td class="num" data-value="2400">$2,400.00</td></tr>
-              <tr><td>Contoso</td><td><span class="s4-status" data-tone="tertiary">Due</span></td><td data-value="2026-11-20">Nov 20</td><td class="num" data-value="5120">$5,120.00</td></tr>
-              <tr><td>Fabrikam</td><td><span class="s4-status">Paid</span></td><td data-value="2026-10-15">Oct 15</td><td class="num" data-value="860">$860.00</td></tr>
-              <tr><td>Tailspin</td><td><span class="s4-status" data-tone="tertiary">Due</span></td><td data-value="2026-11-28">Nov 28</td><td class="num" data-value="1975.5">$1,975.50</td></tr>
+              <tr><td>Northwind Coffee</td><td>Brand refresh</td><td><span class="s4-status" data-tone="error">34 Days Late</span></td><td data-value="2026-10-14">Oct 14</td><td class="num" data-value="6400">$6,400.00</td></tr>
+              <tr><td>Harbor Books</td><td>Catalogue layout</td><td><span class="s4-status" data-tone="warning">12 Days Late</span></td><td data-value="2026-11-05">Nov 5</td><td class="num" data-value="2150">$2,150.00</td></tr>
+              <tr><td>Fieldline Studio</td><td>Signage</td><td><span class="s4-status" data-tone="warning">5 Days Late</span></td><td data-value="2026-11-12">Nov 12</td><td class="num" data-value="1310">$1,310.00</td></tr>
+              <tr><td>Contoso</td><td>Annual report</td><td><span class="s4-status">Sent</span></td><td data-value="2026-12-03">Dec 3</td><td class="num" data-value="5120">$5,120.00</td></tr>
+              <tr><td>Tailspin Toys</td><td>Packaging, phase 2</td><td><span class="s4-status">Sent</span></td><td data-value="2026-12-10">Dec 10</td><td class="num" data-value="4880">$4,880.00</td></tr>
+              <tr><td>Fabrikam</td><td>Website copy</td><td><span class="s4-status" data-tone="success">Paid</span></td><td data-value="2026-11-02">Nov 2</td><td class="num" data-value="2000">$2,000.00</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
       <section class="s4-view" data-view="accounts" data-title="Accounts" hidden>
-        <div class="s4-empty">
-          <span class="s4-empty-icon"><span class="s4-icon" data-icon="wallet"></span></span>
-          <h2 class="s4-empty-title">No Accounts Yet</h2>
-          <p class="s4-empty-text">Connect a bank account to see balances here.</p>
-          <button class="s4-button" type="button">Connect Account</button>
+        <div class="tl-head"><div><p class="tl-kicker">2 accounts</p><h2 class="tl-title s4-headline-medium">Accounts</h2></div></div>
+        <div class="s4-stack">
+          <div class="s4-banner" role="status" data-tone="error">
+            <span class="s4-icon" data-icon="warning"></span>
+            <p class="s4-banner-text">Savings stopped syncing on Nov 14. Balances there may be out of date.</p>
+            <div class="s4-banner-actions"><button class="s4-button" data-variant="text" type="button" id="tl-reconnect">Reconnect</button></div>
+          </div>
+          <div class="tl-accounts">
+            <article class="s4-card"><div class="s4-card-body"><h3 class="s4-card-title">Operating</h3><p class="s4-card-subhead">Checking ·· 4412</p><p class="tl-balance s4-headline-small">$62,140</p><p class="s4-card-supporting">Updated 8 minutes ago</p></div></article>
+            <article class="s4-card"><div class="s4-card-body"><h3 class="s4-card-title">Savings</h3><p class="s4-card-subhead">Reserve ·· 0907</p><p class="tl-balance s4-headline-small">$22,180</p><p class="s4-card-supporting">Last synced Nov 14</p></div></article>
+          </div>
         </div>
       </section>
     </main>
   </div>
   <nav class="s4-nav-bar" aria-label="Main">
     <a class="s4-nav-item" href="#overview" data-view="overview" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Overview</span></a>
-    <a class="s4-nav-item" href="#reports" data-view="reports"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Reports</span></a>
+    <a class="s4-nav-item" href="#invoices" data-view="invoices"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="bills"></span></span><span class="s4-nav-label">Invoices</span></a>
     <a class="s4-nav-item" href="#accounts" data-view="accounts"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="wallet"></span></span><span class="s4-nav-label">Accounts</span></a>
   </nav>
 </div>
-<div class="s4-menu" id="dash-more" aria-label="More">
-  <button class="s4-menu-item" type="button"><span class="s4-icon" data-icon="refresh"></span>Refresh</button>
-  <button class="s4-menu-item" type="button"><span class="s4-icon" data-icon="settings"></span>Settings</button>
+<div class="s4-menu" id="tl-more" aria-label="More">
+  <button class="s4-menu-item" type="button"><span class="s4-icon" data-icon="refresh"></span>Sync Now</button>
+  <button class="s4-menu-item" type="button"><span class="s4-icon" data-icon="settings"></span>Studio Settings</button>
 </div>
+<!-- a new invoice is a task you save or cancel: a modal floating panel (decision 0054) -->
+<dialog class="s4-side-sheet" id="tl-new" aria-labelledby="tl-new-h">
+  <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="tl-new-h">New Invoice</h2><button class="s4-icon-button" data-close type="button" aria-label="Close"><span class="s4-icon" data-icon="close"></span></button></div>
+  <div class="s4-sheet-content s4-stack">
+    <div class="s4-text-field"><input id="tl-client" type="text" autocomplete="organization"><label for="tl-client">Client</label></div>
+    <div class="s4-text-field"><input id="tl-project" type="text" autocomplete="off"><label for="tl-project">Project</label></div>
+    <div class="s4-text-field"><input id="tl-amount" type="text" inputmode="decimal" autocomplete="off"><label for="tl-amount">Amount</label></div>
+  </div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Save Draft</button></div>
+</dialog>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
-<script src="../components/orion.js?v=60f9639"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });</script>
+<script src="../components/orion.js?v=f9b35ff"></script>
+<script>
+/* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
+(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#1d6b52', variant: 'tonal' }); })();
+/* the data (a real app loads this) */
+var MONTHS = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+var IN = [18, 22, 19, 26, 24, 31, 28, 27, 33, 29, 35, 38], OUT = [20, 19, 21, 22, 23, 24, 25, 24, 26, 27, 27, 29], MAX = 40;
+var bars = document.getElementById('tl-bars'), rows = document.getElementById('tl-flow-rows');
+MONTHS.forEach(function (m, i) {
+  var d = document.createElement('div'); d.className = 'tl-month'; if (i === MONTHS.length - 1) d.setAttribute('aria-current', 'true'); if (i % 3 === 0 || i === MONTHS.length - 1) d.setAttribute('data-tick', '');
+  d.innerHTML = '<div class="tl-pair"><i style="--h:' + (IN[i] / MAX * 100) + '%"></i><i style="--h:' + (OUT[i] / MAX * 100) + '%"></i></div><span>' + m + '</span>';
+  bars.appendChild(d);
+  var tr = document.createElement('tr'); var net = IN[i] - OUT[i];
+  tr.innerHTML = '<td>' + m + '</td><td class="num">' + IN[i] + '</td><td class="num">' + OUT[i] + '</td><td class="num">' + (net > 0 ? '+' : '') + net + '</td>';
+  rows.appendChild(tr);
+});
+document.getElementById('tl-remind').addEventListener('click', function () { S4.snackbar({ text: 'Reminders sent to 3 clients', action: 'Undo' }); });
+document.getElementById('tl-reconnect').addEventListener('click', function () { S4.snackbar('Reconnecting Savings…'); });
+document.getElementById('tl-new').addEventListener('s4-close', function (e) { if (e.detail && e.detail.value === 'save') S4.snackbar({ text: 'Draft saved', action: 'Open' }); });
+</script>
 </body>
 </html>

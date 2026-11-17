@@ -1541,7 +1541,10 @@
   /* ---------- layout helpers ---------- */
   .s4-stack { display: flex; flex-direction: column; gap: var(--s4-gap, var(--s4-layout-gap)); }
   .s4-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-gap, var(--s4-space-2)); }
-  .s4-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
+  /* a grid of cards or tiles fills its row (issue 56): as many columns of at least --s4-min as fit, and the items share
+     the row, so two cards never float at the start of a wide window. A collection that filters (a gallery, search
+     results) sets --s4-grid-fill: auto-fill, so one result stays the size of one tile instead of a banner. */
+  .s4-grid { display: grid; grid-template-columns: repeat(var(--s4-grid-fill, auto-fit), minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
 }
 
 /* Forced colors (Windows High Contrast): backgrounds and shadows are removed, so every control needs a real edge.
@@ -2489,14 +2492,17 @@
 }
 
 /* ---- button-group/button-group.css ---- */
-/* Button group (S4 Orion: Joined Capsule, decision 0026)
+/* Button group (S4 Orion: Ink Track, decision 0059)
    Standard: <div class="s4-button-group"> <button class="s4-button">…</button> … </div>
      Buttons 8dp apart. Pressing one widens it a little while its neighbours give way (M3 Expressive press interaction).
-   Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="View">
-     A Joined Capsule (decision 0026): segments 2dp apart, fully round outer ends, small rounded joins; the selected segment is a full pill filled with the inverse color.
+   Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="Period">
+     The Ink Track (decision 0059): one filled track with the options as words on it; the selected option is an accent
+     ink pill that slides to the next choice, its front edge leading and its back edge trailing (the Ink pattern). With
+     several choices (data-select="multi") each selected option fills in place and selected neighbours fuse into one pill.
      Connected groups stretch to fill their width (equal weights); data-fit="content" keeps them as wide as their labels.
+   A button group sets a value or changes how the same content is shown. If it swaps what is on the screen, it is tabs.
    Works with .s4-button and .s4-icon-button children. The size comes from the buttons' own data-size.
-   button-group.js manages aria-pressed (data-select), arrow-key navigation and the s4-change event. */
+   button-group.js manages aria-pressed (data-select), arrow-key navigation, the s4-change event and the sliding ink. */
 @layer s4.components {
   .s4-button-group {
     display: flex;
@@ -2528,45 +2534,131 @@
     width: calc(var(--_w) - var(--_give));
   }
 
-  /* ---------- connected group: the Joined Capsule (decision 0026, picked by the owner) ----------
-     One row of segments 2dp apart: fully round outer ends, small rounded joins, and the selected segment turns into a
-     full pill filled with the inverse color. Tabs are a tray with a sliding pill; a group has no tray and nothing slides. */
-  .s4-button-group[data-connected] { gap: 2px; }
+  /* ---------- connected group: the Ink Track (decision 0059) ----------
+     The track is one filled shape, its corner concentric with the options inside it (decision 0052): an option's corner
+     is min(half its height, --s4-shape-control) and the track adds its own padding to that. */
+  .s4-button-group[data-connected] {
+    --_gh: var(--s4-size-button);                                            /* the options' height (their data-size) */
+    --_gp: var(--s4-space-1);                                                /* the track's padding */
+    --_track: var(--md-sys-color-surface-container-highest);
+    --_rest: var(--md-sys-color-on-surface-variant);
+    --_ink: var(--md-sys-color-primary);                                     /* the accent */
+    --_on-ink: var(--md-sys-color-on-primary);
+    --_ink-alpha: 1;
+    --_ink-fill: color-mix(in srgb, var(--_ink) calc(var(--_ink-alpha) * 100%), transparent);
+    position: relative;
+    isolation: isolate;
+    gap: 0;
+    padding: var(--_gp);
+    background: var(--_track);
+    border-radius: calc(min(calc(var(--_gh) / 2), var(--s4-shape-control)) + var(--_gp));
+  }
+  .s4-button-group[data-connected]:has(> [data-size="xs"]) { --_gh: var(--s4-size-button-small); }
+  .s4-button-group[data-connected]:has(> [data-size="m"]) { --_gh: var(--s4-size-button-medium); }
+  .s4-button-group[data-connected]:has(> [data-size="l"]) { --_gh: var(--s4-size-button-large); }
+  .s4-button-group[data-connected]:has(> [data-size="xl"]) { --_gh: var(--s4-size-button-extra-large); }
+
+  /* the options are words on the track: no fill of their own, whatever variant they name */
   .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button) {
-    --_full: min(calc(var(--_h) / 2), var(--s4-shape-button));   /* a finite "full": with 9999px the browser scales every corner down to nothing */
-    --_r: var(--md-sys-shape-corner-small);
-    --_bg: var(--md-sys-color-surface-container-highest);
-    --_fg: var(--md-sys-color-on-surface-variant);
+    --_r: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    --_radius: var(--_r);
+    --_radius-pressed: var(--_r);                                           /* press-to-square never inside a rounded container (0043) */
+    --_radius-selected: var(--_r);
+    --_radius-round: var(--_r);
+    --_radius-square: var(--_r);
+    --_bg: transparent;
+    --_fg: var(--_rest);
+    --_outline: transparent;
+    --_elevation: var(--md-sys-elevation-level0);
+    z-index: 1;
     flex: 1 1 0;
-    min-width: min(max-content, 100%);
+    min-inline-size: fit-content;   /* never narrower than its label (a label never breaks mid-word), yet never wider than the group: the group wraps instead */
     border-radius: var(--_r);
   }
-  .s4-button-group[data-connected]:has(> [data-size="l"], > [data-size="xl"]) > :is(.s4-button, .s4-icon-button) { --_r: var(--md-sys-shape-corner-medium); }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):first-child {
-    border-start-start-radius: var(--_full);
-    border-end-start-radius: var(--_full);
-  }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):last-child {
-    border-start-end-radius: var(--_full);
-    border-end-end-radius: var(--_full);
-  }
-  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] {
-    --_bg: var(--md-sys-color-inverse-surface);
-    --_fg: var(--md-sys-color-inverse-on-surface);
-    border-radius: var(--_full);
-  }
+  .s4-button-group[data-connected] > .s4-button { --_pad: calc(var(--_h) * 0.3); }      /* words on a track need less room than a lone button: four options fit a phone */
+  .s4-button-group[data-connected] > .s4-icon-button { --_w: calc(var(--_h) * 1.25); }   /* an icon option is a short pill, not a circle */
+  .s4-button-group[data-connected][data-fit="content"] { inline-size: fit-content; max-inline-size: 100%; }   /* never stretched by a flex or grid parent */
   .s4-button-group[data-connected][data-fit="content"] > :is(.s4-button, .s4-icon-button) { flex: none; }
-  /* a disabled option of a toggle group: button.css's aria-pressed colors would otherwise win over its disabled colors */
+  @media (hover: hover) {
+    .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):not([aria-pressed="true"], :disabled, [aria-disabled="true"]):hover { --_fg: var(--md-sys-color-on-surface); }
+  }
+
+  /* selected: the option paints the ink itself (no script, or several selected) … */
+  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] { --_bg: var(--_ink-fill); --_fg: var(--_on-ink); }
+  /* … and selected neighbours fuse into one pill (not across a wrapped row: button-group.js marks where a row starts) */
+  .s4-button-group[data-connected]:not([data-s4-ink]) > [aria-pressed="true"]:has(+ [aria-pressed="true"]:not([data-s4-break], :disabled)):not(:disabled) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .s4-button-group[data-connected]:not([data-s4-ink]) > [aria-pressed="true"]:not(:disabled) + [aria-pressed="true"]:not([data-s4-break], :disabled) {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+  /* … with one choice, the ink is one pill behind the options that slides to the selected one (button-group.js) */
+  .s4-button-group[data-connected][data-s4-ink] > [aria-pressed="true"] { --_bg: transparent; }
+  .s4-button-group-ink {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    overflow: clip;                 /* a lively overshoot never leaves the track */
+    opacity: var(--_ink-alpha);     /* on glass the two edges below are one tint, not two overlapping ones */
+    pointer-events: none;
+  }
+  /* two copies of the pill, drawn as one shape: the front one on Ink, the back one on calm Ink (ink leaving), so the
+     edge in the direction of travel leads and the other trails, then they land together */
+  .s4-button-group-ink::before,
+  .s4-button-group-ink::after {
+    content: "";
+    position: absolute;
+    left: 0;                        /* physical: button-group.js measures physical offsets */
+    top: 0;
+    inline-size: var(--_iw, 0px);
+    block-size: var(--_ih, 0px);
+    border-radius: min(calc(var(--_ih, 0px) / 2), var(--s4-shape-control));
+    background: var(--_ink);
+    transform: translate(var(--_ix, 0px), var(--_iy, 0px));
+  }
+  .s4-button-group-ink[data-animate]::before {
+    transition: transform var(--s4-motion-ink), inline-size var(--s4-motion-ink), block-size var(--s4-motion-ink);
+  }
+  .s4-button-group-ink[data-animate]::after {
+    transition: transform var(--s4-motion-ink-calm), inline-size var(--s4-motion-ink-calm), block-size var(--s4-motion-ink-calm);
+  }
+
+  /* a disabled option is faded words on the track */
   .s4-button-group > :is(.s4-button, .s4-icon-button)[aria-pressed]:is(:disabled, [aria-disabled="true"]) {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent);
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
     --_outline: transparent;
   }
-  /* the focus ring would hide under the next button */
-  .s4-button-group[data-connected] > :focus-visible { z-index: 1; }
+  .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button):is(:disabled, [aria-disabled="true"]) { --_bg: transparent; }
+  /* the focus ring stays above the neighbours */
+  .s4-button-group[data-connected] > :focus-visible { z-index: 2; }
 
+  /* items on glass are tints (decision 0043): the glass is the track (a fill under the ink would stack two tints, which
+     check-glass cannot prove for every accent), the ink is the accent at the selected-fill opacity and every label is
+     on-surface, exactly the selected item check-glass proves for 210 schemes. */
+  :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled], .s4-site-panel[data-open], .s4-nav-bar,
+         .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet,
+         .s4-snackbar) .s4-button-group[data-connected] {
+    --_track: transparent;
+    --_ink-alpha: var(--s4-glass-fill-selected-opacity);
+    --_on-ink: var(--md-sys-color-on-surface);
+    --_rest: var(--md-sys-color-on-surface);
+  }
+
+  /* forced colors: the track and every option get a real border; the selected option is Highlight */
   @media (forced-colors: active) {
+    .s4-button-group[data-connected] { border: 1px solid CanvasText; }
     .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button) { border: 1px solid ButtonText; }
+    .s4-button-group-ink { display: none; }
+    .s4-button-group[data-connected] > :is(.s4-button, .s4-icon-button)[aria-pressed="true"] {
+      forced-color-adjust: none;
+      background: Highlight;
+      color: HighlightText;
+      border-color: Highlight;
+    }
   }
 }
 
@@ -2848,6 +2940,25 @@
   .s4-view[data-width="reading"] { max-inline-size: var(--s4-layout-content-reading); margin-inline: auto; }
   .s4-view[data-width="wide"] { max-inline-size: var(--s4-layout-content-wide); margin-inline: auto; }
 
+  /* ---------- one alignment policy (issue 56) ----------
+     Capped content is centred in the space beside the rail, at every width. The top app bar's title and actions line
+     up with the same column, so a title never sits 100px left of the content it names. The column the bar follows is
+     the page width of what is shown: the content's data-width, or the visible view's. */
+  .s4-app-body { --_cap: var(--s4-content-max, var(--s4-layout-content-max)); }
+  .s4-app-body:has(> .s4-content[data-width="reading"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="reading"]:not([hidden])) { --_cap: var(--s4-layout-content-reading); }
+  .s4-app-body:has(> .s4-content[data-width="wide"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="wide"]:not([hidden])) { --_cap: var(--s4-layout-content-wide); }
+  .s4-app-body:has(> .s4-content[data-width="full"]) { --_cap: 100%; }
+  @container s4-app (width >= 600px) {
+    /* the bar's own slot adds 8 inside its padding, so the padding is the column's edge minus 8 */
+    .s4-app-body > .s4-top-app-bar {
+      padding-inline:
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-left, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)))
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-right, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)));
+    }
+  }
+
   /* ---------- canonical layouts ---------- */
   .s4-split {
     display: grid;
@@ -2921,12 +3032,30 @@
     .s4-split:not([data-layout="supporting"]) :has(> [data-split-back]:only-child) { display: none; }
   }
 }
+/* extra-large (>= 1600): a third pane joins list-detail (issue 56). <section class="s4-split-pane" data-join="extra-large">
+   is the context of the open item (who, related, history): a column of --s4-split-join (360) after the detail. Below
+   1600 it is not shown, so what it holds must also be reachable from the detail (a page, an expand, a menu). It never
+   joins at large: the rail expands there and a third column would squeeze the detail under 400. */
+@layer s4.components {
+  @container s4-app (width >= 1600px) {
+    .s4-split:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable]:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) var(--s4-layout-pane-gap) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable] > [data-join="extra-large"] { margin-inline-start: var(--s4-layout-pane-gap); }
+  }
+}
 /* compact and medium: list-detail shows one pane at a time. In the utilities layer so a utility class on a pane
    (.s4-stack, .s4-row) can't show a pane that should be hidden. */
 @layer s4.utilities {
   @container s4-app (width < 840px) {
     .s4-split:not([data-layout="supporting"]):not([data-open]) > .s4-split-pane ~ .s4-split-pane { display: none; }
     .s4-split:not([data-layout="supporting"])[data-open] > .s4-split-pane:first-child { display: none; }
+  }
+  @container s4-app (width < 1600px) {
+    .s4-split > .s4-split-pane[data-join="extra-large"] { display: none; }
   }
 }
 
@@ -3256,6 +3385,8 @@
       block-size var(--s4-motion-ink);
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
+  /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {
@@ -3480,52 +3611,58 @@
 }
 
 /* ---- tabs/tabs.css ---- */
-/* Tabs (S4 Orion, Segmented Tray, decision 0009, fully rounded like the button groups)
-   <div class="s4-tabs" role="tablist" aria-label="Bills" data-variant="secondary" data-scrollable>
+/* Tabs (S4 Orion: the navigation family, decision 0059; amends the Segmented Tray of 0009)
+   <div class="s4-tabs" role="tablist" aria-label="Bill" data-variant="secondary" data-scrollable>
      <button class="s4-tab" role="tab" id="tab-due" aria-selected="true" aria-controls="panel-due">
        <span class="s4-icon" data-icon="schedule"></span>Due</button>
      …
    </div>
    <div class="s4-tab-panel" role="tabpanel" id="panel-due" aria-labelledby="tab-due">…</div>
-   Primary (default): the tabs sit in a soft tray (surface-container-high); the selected tab is a flat ink pill
-   (on-surface, with an inverse label) that slides between tabs, no raised shadow. With icons the icon sits above the
-   label. Secondary (inside a card or pane): the same tray and pill, with icons inline.
-   tabs.js slides one pill between tabs (spatial spring), switches panels with the shared axis pattern, and adds
-   arrow / Home / End keys with automatic activation. Without JS the selected tab paints its own pill.
-   data-scrollable: tabs keep their natural width and the row scrolls sideways. */
+   Tabs move between different panels of content within one screen. They belong with the nav bar and the nav rail, not
+   with the button group: no tray, the labels sit on the surface, and the selected tab gets the same neutral navigation
+   indicator (secondary-container, the nav indicator's corner) that slides from tab to tab on the Ink pattern; its label
+   steps up in weight. Primary (default): under the top app bar, 40dp pills (icons stack above the label). Secondary
+   (inside a pane or card): smaller and quieter, 32dp pills in a lower tone, icons inline.
+   The row never wraps: when the tabs do not fit, it scrolls sideways (data-scrollable adds scroll padding).
+   tabs.js slides the indicator, switches panels with the shared axis pattern, keeps the label width steady when the weight
+   changes, and adds arrow / Home / End keys with automatic activation. Without JS the selected tab paints its own pill. */
 @layer s4.components {
   .s4-tabs {
-    --_tray: var(--md-sys-color-surface-container-high);
-    --_pill: var(--md-sys-color-on-surface);
-    --_pill-fg: var(--md-sys-color-surface);
-    --_pad: var(--s4-space-1);
-    --_r: var(--s4-shape-control);
+    --_pill: var(--md-sys-color-secondary-container);
+    --_pill-fg: var(--md-sys-color-on-secondary-container);
+    --_th: var(--s4-size-button);                              /* the tab (and indicator) height */
     position: relative;
     display: flex;
-    align-items: stretch;
-    gap: calc(var(--s4-space-1) / 2);
-    padding: var(--_pad);
-    background: var(--_tray);
-    border-radius: calc(var(--s4-shape-control) + var(--_pad));   /* concentric with the tabs inside it (decision 0052) */
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-inline-size: 0;
+    padding-block: max(0px, calc((var(--s4-size-touch-target) - var(--_th)) / 2));   /* room for the 48dp touch target inside the scrolling row */
     isolation: isolate;
-    overflow-x: auto;                 /* larger text or many tabs: the strip scrolls, labels never overlap */
+    overflow-x: auto;                 /* many tabs or larger text: the row scrolls, labels never overlap or wrap */
     overflow-y: hidden;
     overscroll-behavior-x: contain;
     scrollbar-width: none;
   }
+  .s4-tabs::-webkit-scrollbar { display: none; }
+  .s4-tabs:not([data-variant="secondary"]):has(> .s4-tab > .s4-icon) { --_th: calc(var(--s4-size-touch-target) + var(--s4-space-2)); }
+  .s4-tabs[data-variant="secondary"] {
+    --_pill: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);   /* quieter: a step above whatever it sits on (a pane, a card, glass) */
+    --_pill-fg: var(--md-sys-color-on-surface);
+    --_th: var(--s4-size-button-small);
+  }
 
   .s4-tab {
     --_fg: var(--md-sys-color-on-surface-variant);
+    --_r: min(calc(var(--_th) / 2), var(--s4-shape-nav-indicator));
     position: relative;
     z-index: 1;
-    flex: 1 1 0;
+    flex: none;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: calc(var(--s4-space-1) / 2);
-    min-inline-size: max-content;     /* equal shares when there is room; when text is larger the strip scrolls instead of the labels overlapping */
-    min-block-size: calc(var(--s4-size-touch-target) - 2 * var(--_pad));
+    min-block-size: var(--_th);
     margin: 0;
     padding: 0 var(--s4-space-4);
     border: 0;
@@ -3546,49 +3683,76 @@
     --s4-icon-size: var(--s4-size-icon);
     transition: color var(--s4-motion-state);
   }
+  /* the 48dp touch target, inside the row's padding so the scrolling row never clips it */
+  .s4-tab::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    height: max(100%, var(--s4-size-touch-target));
+    transform: translateY(-50%);
+  }
   @media (hover: hover) {
     .s4-tab[aria-selected="false"]:not(:disabled, [aria-disabled="true"]):hover { --_fg: var(--md-sys-color-on-surface); }
   }
-  .s4-tab[aria-selected="true"] { --_fg: var(--_pill-fg); }
-  .s4-tabs:not([data-variant="secondary"]) > .s4-tab:has(> .s4-icon) { min-block-size: calc(var(--s4-size-touch-target) + var(--s4-space-4)); }
-  .s4-tabs[data-variant="secondary"] > .s4-tab { flex-direction: row; gap: var(--s4-space-2); }
+  .s4-tab[aria-selected="true"] {
+    --_fg: var(--_pill-fg);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-tabs:not([data-variant="secondary"]) > .s4-tab:has(> .s4-icon) { padding: var(--s4-space-1) var(--s4-space-5); }
+  .s4-tabs[data-variant="secondary"] > .s4-tab {
+    flex-direction: row;
+    gap: var(--s4-space-2);
+    padding: 0 var(--s4-space-3);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-tabs[data-variant="secondary"] > .s4-tab[aria-selected="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+
+  /* the label keeps the width of its selected (heavier) weight, so selecting a tab never shifts its neighbours
+     (tabs.js wraps the label's text in .s4-tab-label with data-text) */
+  .s4-tab-label { display: inline-flex; flex-direction: column; align-items: center; }
+  .s4-tab-label::after {
+    content: attr(data-text);
+    content: attr(data-text) / "";                 /* no alternative text: screen readers read the label once */
+    block-size: 0;
+    overflow: hidden;
+    visibility: hidden;
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+    user-select: none;
+    pointer-events: none;
+  }
 
   .s4-tab:is(:disabled, [aria-disabled="true"]) {
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
   }
 
-  /* ---------- the pill ---------- */
+  /* ---------- the indicator ---------- */
   /* without JS: the selected tab paints its own */
   .s4-tabs:not([data-s4tabs]) > .s4-tab[aria-selected="true"] { background: var(--_pill); }
-  .s4-tab::after { display: none; }
-  /* with JS (tabs.js marks the list): one pill that slides, behind the labels */
+  /* with JS (tabs.js marks the list): one pill that slides, behind the labels, measured to the selected tab's box */
   .s4-tabs-indicator {
     position: absolute;
     left: 0;                                    /* physical: JS measures physical offsets */
-    top: var(--_pad);
-    bottom: var(--_pad);
+    top: 0;
     z-index: 0;
-    inline-size: var(--_w, 0);
-    border-radius: var(--_r);
+    inline-size: var(--_w, 0px);
+    block-size: var(--_h, 0px);
+    border-radius: min(calc(var(--_h, 0px) / 2), var(--s4-shape-nav-indicator));   /* the nav indicator's corner: a pill at the default, the corner dial otherwise */
     background: var(--_pill);
-    transform: translateX(var(--_x, 0));
+    transform: translate(var(--_x, 0px), var(--_y, 0px));
     pointer-events: none;
   }
   .s4-tabs-indicator[data-animate] {
-    transition:
-      transform var(--s4-motion-ink), inline-size var(--s4-motion-ink);
+    transition: transform var(--s4-motion-ink), inline-size var(--s4-motion-ink), block-size var(--s4-motion-ink);
   }
 
   /* ---------- scrollable ---------- */
-  .s4-tabs[data-scrollable] {
-    overflow-x: auto;
-    overflow-y: hidden;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    scroll-padding-inline: var(--s4-space-12);
-  }
-  .s4-tabs[data-scrollable]::-webkit-scrollbar { display: none; }
-  .s4-tabs[data-scrollable] > .s4-tab { flex: 0 0 auto; }
+  .s4-tabs[data-scrollable] { scroll-padding-inline: var(--s4-space-12); }
 
   /* ---------- panels ---------- */
   .s4-tab-panel { display: block; outline-offset: var(--s4-focus-ring-offset); }
@@ -3598,7 +3762,6 @@
     .s4-tabs-indicator { background: Highlight; forced-color-adjust: none; }
     .s4-tabs:not([data-s4tabs]) > .s4-tab[aria-selected="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
     .s4-tab[aria-selected="true"] { color: HighlightText; }
-    .s4-tabs { border: 1px solid CanvasText; }
   }
 }
 
@@ -3726,6 +3889,9 @@
     cursor: text;
     transition: background-color var(--s4-motion-state);
   }
+  /* a search that filters the content below it spans that content's column (the alignment policy, layout README);
+     the 720 cap is for a search that stands alone, such as one in a top app bar */
+  .s4-search[data-filter] { max-inline-size: none; }
   /* a leading icon button (menu, back) sits closer to the edge, like trailing ones */
   .s4-search:has(> .s4-icon-button:first-child) { padding-inline-start: var(--s4-space-2); }
   .s4-search > .s4-icon { color: var(--md-sys-color-on-surface); }
@@ -3750,9 +3916,12 @@
   .s4-search-input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 1; }
   .s4-search-input::-webkit-search-cancel-button,
   .s4-search-input::-webkit-search-decoration { appearance: none; display: none; }
-  /* focus: the ring is drawn inside the bar's edge. A search bar usually sits at the very top of a pane, under the top
-     app bar or against a scrolling edge, where a ring outside the bar gets cut off. */
-  .s4-search:has(> .s4-search-input:focus-visible) {
+  /* focus (issues 62, 64): the bar is the field, so it carries the one mark and the input none. A tap or a click shows
+     the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the ring,
+     drawn inside the bar's edge: a search bar usually sits at the very top of a pane, under the top app bar or against
+     a scrolling edge, where a ring outside the bar gets cut off. */
+  :where([data-s4-focus="pointer"]) .s4-search:has(> .s4-search-input:focus) { box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest)); }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-search:has(> .s4-search-input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: calc(-1 * var(--s4-focus-ring-width));
   }
@@ -4103,7 +4272,7 @@
     font-size: var(--md-sys-typescale-title-medium-size);
     line-height: var(--md-sys-typescale-title-medium-line-height);
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
-    font-weight: var(--md-sys-typescale-title-medium-weight);
+    font-weight: var(--md-sys-typescale-title-large-weight);   /* heading weight: a pane title outranks the card titles, list headlines and labels inside it at the same size (typography.md) */
     color: var(--_fg);
   }
   .s4-pane-supporting {
@@ -5872,7 +6041,8 @@
     border-radius: calc(var(--_row) / 2 + var(--s4-space-1));
     background: var(--md-sys-color-surface-container);
   }
-  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_bg: transparent; --_outline: transparent; --_ring: 0px; --_h: var(--_row); }
+  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_h: var(--_row); }
+  .s4-composer > .s4-text-field, .s4-composer > .s4-text-field:has(> :is(input, textarea):focus) { --_bg: transparent; --_outline: transparent; --_ring: 0px; }
   .s4-composer > .s4-text-field:first-child { padding-inline-start: var(--s4-space-2); }
   .s4-composer > .s4-icon-button {
     --_radius-pressed: var(--_radius-round);
@@ -5880,7 +6050,19 @@
     flex: none;
     margin: calc((var(--_row) - var(--_h)) / 2);
   }
-  .s4-composer:has(textarea:focus-visible, input:focus-visible) {
+  /* focus (issues 62, 64): the composer is the field, so it carries the one mark and the text field inside none. A tap
+     or a click shows the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the
+     ring around the whole pill. (The quiet ring is drawn on ::after so the glass edge stays.) */
+  .s4-composer > .s4-text-field:has(> :is(input, textarea):focus-visible)::before { outline: none; }
+  :where([data-s4-focus="pointer"]) .s4-composer:has(textarea:focus, input:focus)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest));
+    pointer-events: none;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-composer:has(textarea:focus-visible, input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
   }
@@ -6475,6 +6657,8 @@
     inset-inline-start: var(--s4-space-4);
     z-index: 1;
   }
+  /* a poster with a play control on a phone: a wide ratio would leave the play control on top of the words */
+  @container s4-site-section (width < 600px) { .s4-media-box:has(> .s4-media-empty):has(> .s4-media-play) { --_ratio: 4 / 3; } }
   .s4-media-caption {
     color: var(--md-sys-color-on-surface-variant);
     font-family: var(--md-sys-typescale-body-small-font);
@@ -6804,7 +6988,7 @@
   .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
   .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
   .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-signup > .s4-button { margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup > .s4-button { flex: none; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links :is(h2, h3) {
     margin: 0 0 var(--s4-space-3);
@@ -6846,6 +7030,66 @@
   .s4-site-footer-links[data-columns="2"] { --_cols: 2; }
   @media (width >= 840px) {
     .s4-site-footer-top { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+  }
+
+  /* ================= index: a numbered list of everything (all projects, past issues, an archive) =================
+     <ol class="s4-site-index"><li><a class="s4-site-index-row" href="…">
+       <span class="s4-site-index-n">07</span><span class="s4-site-index-title">Govanhill Library</span>
+       <span class="s4-site-index-meta"><span>Glasgow</span><span>Library and baths</span></span>
+       <span class="s4-site-index-year">2025</span></a></li></ol>
+     A phone shows the meta under the title; from 840 every meta is its own column. Rows hover with a rounded fill and
+     the dividers beside a hovered row fade (decision 0045). */
+  .s4-site-index { display: grid; margin: 0; padding: 0; list-style: none; }
+  .s4-site-index > li { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); transition: border-color var(--s4-motion-state); }
+  .s4-site-index > li:first-child { border-block-start-color: transparent; }
+  .s4-site-index > li:has(> .s4-site-index-row:hover), .s4-site-index > li:has(> .s4-site-index-row:hover) + li { border-block-start-color: transparent; }
+  .s4-site-index-row {
+    display: grid;
+    grid-template-columns: calc(var(--s4-space-8) + var(--s4-space-2)) minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    margin-inline: calc(var(--s4-space-3) * -1);
+    padding: var(--s4-space-5) var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-large);
+    color: var(--md-sys-color-on-surface);
+    text-decoration: none;
+    transition: background-color var(--s4-motion-state);
+  }
+  a.s4-site-index-row:hover { background: var(--md-sys-color-surface-container-low); }
+  .s4-site-index-n, .s4-site-index-year {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-site-index-year { grid-column: 3; grid-row: 1; justify-self: end; }
+  .s4-site-index-title {
+    min-inline-size: 0;
+    font-family: var(--md-sys-typescale-title-large-font);
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    letter-spacing: var(--md-sys-typescale-title-large-tracking);
+    font-weight: var(--md-sys-typescale-title-large-weight);
+    overflow-wrap: anywhere;
+  }
+  .s4-site-index-meta {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s4-space-3);
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+  @container s4-site-section (width >= 840px) {
+    .s4-site-index-row { grid-template-columns: calc(var(--s4-space-12) + var(--s4-space-4)) minmax(0, 5fr) minmax(0, 3fr) minmax(0, 3fr) calc(var(--s4-space-12) + var(--s4-space-4)); padding-block: var(--s4-space-6); }
+    .s4-site-index-meta { display: contents; }
+    .s4-site-index-year { grid-column: -2 / -1; grid-row: 1; }
+    .s4-site-index-row > *, .s4-site-index-meta > * { grid-row: 1; }
+    .s4-site-index-meta > * { min-inline-size: 0; }
+    .s4-site-index-title { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); letter-spacing: var(--md-sys-typescale-headline-small-tracking); font-weight: var(--md-sys-typescale-headline-small-weight); }
   }
 
   /* ================= blog / changelog index ================= */
@@ -6927,6 +7171,29 @@
   .s4-docs-pager > a > span:last-child { font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
   .s4-docs-pager > a[rel="next"] { text-align: end; }
   @media (width >= 600px) { .s4-docs-pager { grid-template-columns: repeat(2, minmax(0, 1fr)); } .s4-docs-pager > a[rel="next"]:only-child { grid-column: 2; } }
+  /* a note in documentation: a filled block with an icon and a title, never a colored stripe or an outline.
+     <aside class="s4-callout" data-tone="warning"><span class="s4-icon" data-icon="warning"></span>
+       <p class="s4-callout-title">Unplug the Other Half</p><p>One sentence or two.</p></aside> */
+  .s4-callout {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s4-space-1) var(--s4-space-3);
+    padding: var(--s4-space-4) var(--s4-space-5);
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--s4-color-info-container);
+    color: var(--s4-color-on-info-container);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+  }
+  .s4-callout > :is(p, ul, ol, div) { grid-column: 2; margin: 0; }
+  .s4-callout > .s4-icon { grid-row: 1 / span 2; margin-block-start: calc((var(--md-sys-typescale-body-medium-line-height) - var(--s4-size-icon-small)) / 2); --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-callout > .s4-callout-title { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .s4-callout :is(code, kbd) { background: none; padding: 0; font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  .s4-callout[data-tone="warning"] { background: var(--s4-color-warning-container); color: var(--s4-color-on-warning-container); }
+  .s4-callout[data-tone="success"] { background: var(--s4-color-success-container); color: var(--s4-color-on-success-container); }
+  .s4-callout[data-tone="neutral"] { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); }
+  @media (forced-colors: active) { .s4-callout { border: 1px solid CanvasText; } }
+
   @media (width < 840px) {
     /* on a phone the sidebar is a floating glass panel opened from the docs bar */
     .s4-docs-nav {
@@ -6972,15 +7239,17 @@
      <div class="s4-text-field-supporting">Sentence case helper text.</div>
    </div>
    One look: a quiet box (thin outline, medium corners, surface fill) with the label above it. No floating label, no filled
-   variant; data-variant is ignored, so older markup still works. Hover darkens the outline, focus turns it into ink
-   (on-surface, 2dp ring). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
+   variant; data-variant is ignored, so older markup still works. Hover lifts the fill; focus is a quiet accent hairline
+   for a tap or click and the focus ring for the keyboard (see states). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
    without a label is just the box. Parts are placed on a grid, so their source order only matters for leading vs trailing icons. */
 @layer s4.components {
   .s4-text-field {
     --_bg: var(--md-sys-color-surface-container-highest);
     --_outline: transparent;
     --_ring: 0px;
-    --_ring-color: var(--md-sys-color-on-surface);
+    --_ring-color: var(--s4-focus-ring-color);
+    --_mark: var(--md-sys-color-primary);
+    --_quiet: color-mix(in oklab, var(--_mark) 45%, var(--md-sys-color-surface-container-highest));
     --_label: var(--md-sys-color-on-surface-variant);
     --_caret: var(--md-sys-color-on-surface);
     --_icon-color: var(--md-sys-color-on-surface-variant);
@@ -7004,7 +7273,7 @@
     align-self: stretch;
     border-radius: var(--s4-shape-text-field);
     background: var(--_bg);
-    box-shadow: inset 0 0 0 1px var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
+    box-shadow: inset 0 0 0 var(--_outline-width, 1px) var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
     pointer-events: none;
     transition:
       box-shadow var(--s4-motion-state), background-color var(--s4-motion-state);
@@ -7126,20 +7395,32 @@
   .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: calc(var(--s4-space-4) + 7ch); }   /* room for the counter at any text size */
 
   /* ---------- states ----------
-     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus, so focusing only
-     adds the ring. An error keeps the normal fill: the label and the message turn error-colored, the message gets a small
-     mark, and the focus ring is the error color. No red box. */
+     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus. An error keeps the
+     normal fill: the label and the message turn error-colored, the message gets a small mark, and the focus marks take
+     the error color. No red box.
+     Focus (issues 62, 64): one mark, never two, chosen by how focus arrived (data-s4-focus, set by core.js).
+       - a tap or a click: the quiet ring, a hairline inside the box in the accent mixed into the fill (in monochrome a
+         soft gray, never a white wire). You put the cursor there yourself; the caret and the hairline are enough.
+       - the keyboard (or no script): the ring every control has, in the focus ring color, outside the box.
+     Nothing else outlines a field (decision 0023: the focus ring is the only line allowed). */
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
-  .s4-text-field:has(> :is(input, select, textarea):focus) {
-    --_outline: var(--_ring-color);
-    --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_bg: var(--md-sys-color-surface-container-high);
     --_label: var(--md-sys-color-on-surface);
+  }
+  :where([data-s4-focus="pointer"]) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_outline: var(--_quiet);
+    --_outline-width: 1.5px;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible)::before {
+    outline: var(--s4-focus-ring-width) solid var(--_ring-color);
+    outline-offset: var(--s4-focus-ring-offset);
   }
   .s4-text-field:is([data-error], :has(> [aria-invalid="true"])) {
     --_ring-color: var(--md-sys-color-error);
+    --_mark: var(--md-sys-color-error);
     --_label: var(--md-sys-color-error);
     --_caret: var(--md-sys-color-error);
     --_supporting: var(--md-sys-color-error);
@@ -7749,18 +8030,52 @@
    issue 19): the ink grows in from the middle on the ink spring (a subtle liquid overshoot) and drains out calmly.
    No state-layer halo (decision 0043); 48dp touch target. */
 @layer s4.components {
-  /* a labelled group of radios or checkboxes: a soft outlined box instead of the browser's square fieldset */
+  /* a labelled group of radios or checkboxes (issue 61): the legend reads like a field label (above, at the content edge,
+     where the pane title and the other labels start) and the options sit in one filled box like a field's, one comfortable
+     row each. The box's corners are the field corner; every row keeps its disc 16 from the box's side and 18 from its
+     top and bottom, so nothing crowds a rounded corner, under any corner dial. Rows are separated by space only. */
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     min-inline-size: 0;
     margin: 0;
-    padding: var(--s4-space-1) var(--s4-space-4) var(--s4-space-2);
+    padding: 0;
     border: 0;
-    background: var(--md-sys-color-surface-container);
-    border-radius: var(--md-sys-shape-corner-extra-large);
+    background: none;
   }
-  /* the legend is a heading inside the box (a normal legend would straddle the top edge) */
-  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend { float: inline-start; width: 100%; padding: var(--s4-space-2) 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+  /* the legend is a label above the box (a normal legend would straddle the top edge) */
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend {
+    float: inline-start;
+    width: 100%;
+    padding: 0 0 var(--s4-space-1);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend + * { clear: inline-start; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) {
+    display: flex;
+    gap: var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding: var(--s4-space-2) var(--s4-space-4);
+    background: var(--md-sys-color-surface-container-highest);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox)::after { inset: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) > :is(.s4-radio-ring, .s4-checkbox-box) { margin: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):first-of-type {
+    padding-block-start: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-start-start-radius: var(--s4-shape-text-field);
+    border-start-end-radius: var(--s4-shape-text-field);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):last-of-type {
+    padding-block-end: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-end-start-radius: var(--s4-shape-text-field);
+    border-end-end-radius: var(--s4-shape-text-field);
+  }
   .s4-radio {
     --_ring: var(--md-sys-color-on-surface-variant);
     --_state: var(--md-sys-color-on-surface);

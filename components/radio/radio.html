@@ -7,8 +7,6 @@
 <link rel="stylesheet" href="../index.css">
 <link rel="stylesheet" href="../_example/example.css">
 <style>
-  .rd-group { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; }
-  .rd-group > legend { padding: 0; margin-bottom: var(--s4-space-2); }
 </style>
 </head>
 <body>
@@ -21,13 +19,13 @@
     <p>Wrap related radios in a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code>.</p>
     <div class="ex-board">
       <fieldset class="rd-group">
-        <legend class="s4-title-small">Pay With</legend>
+        <legend>Pay With</legend>
         <label class="s4-radio"><input type="radio" name="pay" value="checking" checked><span class="s4-radio-ring"></span>Checking •••• 4021</label>
         <label class="s4-radio"><input type="radio" name="pay" value="card"><span class="s4-radio-ring"></span>Card •••• 8830</label>
         <label class="s4-radio"><input type="radio" name="pay" value="savings"><span class="s4-radio-ring"></span>Savings •••• 1177</label>
       </fieldset>
       <fieldset class="rd-group">
-        <legend class="s4-title-small">Repeat</legend>
+        <legend>Repeat</legend>
         <label class="s4-radio"><input type="radio" name="repeat" value="never"><span class="s4-radio-ring"></span>Never</label>
         <label class="s4-radio"><input type="radio" name="repeat" value="monthly" checked><span class="s4-radio-ring"></span>Monthly</label>
         <label class="s4-radio"><input type="radio" name="repeat" value="yearly"><span class="s4-radio-ring"></span>Yearly</label>
@@ -40,12 +38,12 @@
     <p>Disabled radios can't be chosen; <code>data-error</code> marks a required group nobody answered.</p>
     <div class="ex-board">
       <fieldset class="rd-group">
-        <legend class="s4-title-small">Transfer Speed</legend>
+        <legend>Transfer Speed</legend>
         <label class="s4-radio"><input type="radio" name="speed" checked disabled><span class="s4-radio-ring"></span>Standard</label>
         <label class="s4-radio"><input type="radio" name="speed" disabled><span class="s4-radio-ring"></span>Instant</label>
       </fieldset>
       <fieldset class="rd-group">
-        <legend class="s4-title-small">Expense Type</legend>
+        <legend>Expense Type</legend>
         <label class="s4-radio" data-error><input type="radio" name="type" aria-invalid="true"><span class="s4-radio-ring"></span>Business</label>
         <label class="s4-radio" data-error><input type="radio" name="type" aria-invalid="true"><span class="s4-radio-ring"></span>Personal</label>
       </fieldset>

@@ -49,7 +49,9 @@ error message in sync with `data-error`.
 - Don't put helper text and an error in two places; `data-error` replaces the helper text.
 
 **Accessibility:** native controls with real `<label for>`; supporting text is `aria-describedby`; errors set
-`aria-invalid`; the 2dp ink ring is the focus indication; the whole container is a click target;
+`aria-invalid`; focus (issues 62, 64): from the keyboard the focus ring (3dp, focus ring color, outside the box); after
+a tap or click a quiet accent hairline inside the box (core.js sets `data-s4-focus="pointer|key"` on `<html>`), never
+both; the whole container is a click target;
 forced-colors mode draws real borders.
 
 **Tokens:** `--s4-size-text-field`, `--s4-shape-text-field`, `--md-sys-color-surface-container-highest`,

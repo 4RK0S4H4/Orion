@@ -17,7 +17,8 @@ option card. Answers are saved in the browser so several labs can be worked thro
 | `review-direction.html` | Superseded by [0023](../docs/decisions/0023-filled-and-pills.md): the owner kept the current direction, filled and pills (it restyles the old demo and no longer fits the new one) |
 | `review-icon-set.html` | Open: icon set (Solar Bold Duotone today, Phosphor Duotone, Phosphor Bold Duotone); also switchable live in the showcase, Settings, Icon Style |
 | `glass-playground.html` | Tool, not a quiz: tune the real glass (tint, blur, boost, edge, floating button tint) over three backdrops, with the live contrast guarantee; send the numbers back |
-| `review-button-group.html` | Answered: E, Joined Capsule ([0026](../docs/decisions/0026-joined-capsule-and-accurate-glass-lab.md)) |
+| `review-button-group.html` | Answered: E, Joined Capsule ([0026](../docs/decisions/0026-joined-capsule-and-accurate-glass-lab.md), superseded by 0059) |
+| `review-button-group-2.html` | Answered 2026-11-17: A, Ink Track; pairs Same As The Take (issue 63, [0059](../docs/decisions/0059-button-groups-and-tabs.md), which also moved tabs to the navigation family). Its Keep card now shows the shipped Ink Track |
 | `review-light-edge.html` | Open: how glass edges should read on light mode (today, hairline outline, shaded rim, edge shade); dark unchanged |
 | `review-depth.html` | Open: how glass and the solid base combine as elevation (chrome only, three levels, one glass hero, glass sheet) |
 | `review-edge-refract.html` | Open: glass rim line (clear rim that shows and brightens the backdrop; today, hairline, bright, wide) |

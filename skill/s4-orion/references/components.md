@@ -111,8 +111,13 @@ disabled uses M3's 12% / 38%; forced-colors mode draws a border on contained var
 
 ## Button Group
 
-Groups related buttons. A **standard** group reacts as one when pressed; a **connected** group joins buttons into a
-single control for choosing between options (M3 Expressive's replacement for segmented buttons).
+Groups related buttons. A **standard** group reacts as one when pressed; a **connected** group is one control for
+choosing a value: the **Ink Track** (decision 0059), one filled track with the options on it and an accent ink pill that
+slides to the choice.
+
+**Button group, tabs or chips?** If it swaps what is on the screen, it is [tabs](#tabs). If it changes a value or how
+the same thing is shown, it is a button group. If it narrows a collection and there can be many, it is
+[chips](#chip).
 
 ```html
 <!-- standard: actions -->
@@ -121,45 +126,73 @@ single control for choosing between options (M3 Expressive's replacement for seg
   <button class="s4-button" type="button">Mark Paid</button>
 </div>
 
-<!-- connected, single select -->
+<!-- connected, single select: a value -->
 <div class="s4-button-group" data-connected data-select="single" aria-label="Period">
-  <button class="s4-button" data-variant="tonal" type="button" value="week">Week</button>
-  <button class="s4-button" data-variant="tonal" type="button" value="month" aria-pressed="true">Month</button>
-  <button class="s4-button" data-variant="tonal" type="button" value="year">Year</button>
+  <button class="s4-button" type="button" value="week">Week</button>
+  <button class="s4-button" type="button" value="month" aria-pressed="true">Month</button>
+  <button class="s4-button" type="button" value="year">Year</button>
+</div>
+
+<!-- connected, several at once, icons -->
+<div class="s4-button-group" data-connected data-select="multi" data-fit="content" aria-label="Attach">
+  <button class="s4-icon-button" type="button" value="photos" aria-label="Photos" aria-pressed="true"><span class="s4-icon" data-icon="image"></span></button>
+  <button class="s4-icon-button" type="button" value="links" aria-label="Links"><span class="s4-icon" data-icon="link"></span></button>
 </div>
 ```
 
 | Attribute (on the group) | Values | Default |
 |---|---|---|
-| `data-connected` | buttons 2dp apart, outer corners full, inner corners small and angular (xs 4, s and m 8, l 16, xl 20; tighter while pressed); the selected button morphs fully round | standard: 8dp apart |
-| `data-select` | `single` (exactly one pressed, radio-like), `multi` (each toggles) | none: plain buttons |
-| `data-fit` | `content`: as wide as the labels | connected groups stretch to fill (equal weights) |
+| `data-connected` | the Ink Track: a filled track (`surface-container-highest`, 4dp padding, corner concentric with the options) holding the options as words; the selected option is the accent ink | standard: buttons 8dp apart |
+| `data-select` | `single` (exactly one pressed, radio-like: the ink slides), `multi` (each toggles: each selected option fills in place, selected neighbours fuse into one pill) | none: plain buttons |
+| `data-fit` | `content`: as wide as the labels (never stretched by its parent) | connected groups stretch to fill (equal weights) |
 | `aria-label` | names the choice ("Period") | — |
 
-Children are `.s4-button` or `.s4-icon-button`; the group follows their `data-size`. Standard groups have the M3
-Expressive press interaction: the pressed button widens ~15% while its neighbours give way (fast-spatial spring).
+Children are `.s4-button` or `.s4-icon-button`; the group follows their `data-size` (xs 32, s 40, m 56, l 96, xl 136).
+In a connected group their `data-variant` does not matter: every option is words on the track. Standard groups have
+the M3 Expressive press interaction: the pressed button widens ~15% while its neighbours give way.
 
 **Behaviour** (`button-group.js`): manages `aria-pressed` for `data-select`, fires `s4-change { value, values, button }`
 on the group (`value` is the pressed button's `value` attribute, or the array of values for multi). Connected and
 selecting groups are one tab stop (roving tabindex): Arrow keys move focus (RTL aware), Home / End jump, Space / Enter
 press; disabled buttons are skipped. Groups get `role="group"`.
 
-**When to use what:** connected + `single` for 2–5 mutually exclusive views or filters (Week / Month / Year);
-connected + `multi` for independent options shown together; standard for a set of related actions.
+**The ink** (connected groups while at most one option is pressed): one pill behind the options, placed by script over
+the pressed option whoever changed `aria-pressed` (a click, the keyboard, a page script). It is drawn twice, the front
+copy on Ink (`--s4-motion-ink`) and the back copy on calm Ink (`--s4-motion-ink-calm`), so the edge in the direction of
+travel leads and the other trails, then they land together. Reduced motion: it jumps. Calm energy: both copies move
+alike. A lively overshoot is clipped to the track. Without script the selected option paints its own pill. When a
+group wraps (larger text, a narrow pane), options keep their full label width and the ink moves between rows; a fused
+run of selected options never joins across a row break.
+
+**When to use what:** connected + `single` for 2 to 5 short, fixed options that set a value or change how the same
+content is shown (Week / Month / Year on a chart, list or grid, units, alignment); a pair (Monthly / Yearly) is the same
+form with two options. Connected + `multi` for independent options shown together (formatting, attachments). Standard
+for a set of related actions. A toolbar of actions can be connected (`role="toolbar"`).
 
 **Do**
-- Give each button a `value` and the group an `aria-label`.
-- Keep labels short and parallel; use the same variant and size for every button in a group.
+- Give each button a `value` and the group an `aria-label`; icon options need their own `aria-label`.
+- Keep labels short and parallel; use the same size for every button in a group.
 
 **Don't**
+- Don't use a button group to swap panels of content (`aria-controls` pointing at a panel, a script that shows one
+  region and hides another): that is tabs. The page checker and the suite fail on it.
 - Don't put more than five options in a connected group; use a select or chips.
-- Don't mix connected groups with unrelated actions.
+- Don't make it scroll; it wraps.
 
-**Accessibility:** buttons stay native `<button>`s with `aria-pressed`; one tab stop per group with arrow keys; focus
-ring stays above neighbours; forced-colors mode draws borders.
+**On glass** (inside a glass bar, panel, menu or dialog): items on glass are tints (decision 0043). The glass is the
+track (no fill of its own: a fill under the ink would stack two tints, which `check-glass` cannot prove for every
+accent); the ink is the accent at `--s4-glass-fill-selected-opacity`; every label is `on-surface`. That selected tint
+is what `scripts/check-glass.mjs` proves for 210 schemes.
 
-**Tokens:** `--s4-space-2` (gap), `--md-sys-shape-corner-*` (inner, pressed and selected corners),
-`--md-sys-motion-spring-fast-spatial` (press and shape morph), plus the button and icon-button tokens.
+**Accessibility:** buttons stay native `<button>`s with `aria-pressed`; one tab stop per group with arrow keys; the
+focus ring stays above the neighbours; selection shows as fill and label color, never color alone. Forced colors: the
+track and every option get a border; the selected option is `Highlight` with `HighlightText`.
+
+**Tokens:** `--s4-space-1` (track padding), `--s4-space-2` (standard gap), `--s4-shape-control` (option corner, clamped to
+half the height; the track adds its padding), `--md-sys-color-surface-container-highest` (track),
+`--md-sys-color-on-surface-variant` (labels), `--md-sys-color-primary` / `on-primary` (ink), `--s4-motion-ink`,
+`--s4-motion-ink-calm` (the ink), `--s4-motion-morph` (press and fusing corners), `--s4-motion-state` (colors),
+`--s4-glass-fill-selected-opacity` (on glass), plus the button and icon-button tokens.
 
 ---
 
@@ -310,12 +343,19 @@ context beside it). Works inside an [app shell](#app); window classes are contai
 | `data-open` (split) | list-detail under 840: the detail replaces the list | absent (list shown) |
 | `[data-split-open]` / `[data-split-back]` | inside the split: set / clear `data-open`; back buttons hide from 840 | — |
 | `data-sticky` (pane) | from 840 the pane stays in view under the top app bar and scrolls inside itself | — |
-| `--s4-split-list`, `--s4-split-support` | column widths | 360, 400 |
+| `data-join="extra-large"` (pane) | a third list-detail pane (the open item's context) shown from 1600 only; what it holds must also be reachable from the detail | — |
+| `--s4-split-list`, `--s4-split-support`, `--s4-split-join` | column widths | 360, 400, 360 |
 
 | Window | list-detail | supporting |
 |---|---|---|
 | < 840 | one pane at a time; opening adds a history entry so the phone's Back returns to the list | supporting pane stacks under the main pane |
 | ≥ 840 | list 360 + detail | main + 400 supporting pane |
+| ≥ 1600 | list 360 + detail + joined context 360 | the same |
+
+**Wide windows and alignment (issue 56):** capped content is centred beside the rail at every width, and the top app
+bar's title and actions follow that column (the page width of the content or of the visible view). Nothing joins at
+large (1200–1599): the rail expands there and takes the extra width; at extra-large a joined pane appears and `wide`
+pages grow. Card grids (`.s4-grid`) fill their row. The full ladder is in `docs/foundations/spacing.md`.
 
 **Resizable panes:** add `data-resizable` to a `.s4-split` (and `data-resize-key="name"` to remember the width). From
 840 a grip sits between the panes: drag it, or focus it and use the arrow keys (Home and End for the limits);
@@ -589,48 +629,66 @@ height from 840 and mirrors the nav bar.
 
 ## Tabs
 
-Switch between related views of the same content at one level. The Segmented Tray (decision 0009): tabs in a soft tray with a flat ink pill that slides to the selected tab (primary), (secondary: the same, with icons inline).
+Move between different panels of content within one screen: a bill's Details, Payments and Notes; a workspace's
+Overview, Activity and Files. Tabs belong to the **navigation family** with the nav bar and the nav rail (decision
+0059, amending the Segmented Tray of 0009): no tray, the labels sit on the surface, and the selected tab gets the same
+neutral indicator the nav bar and rail use, sliding from tab to tab; its label steps up in weight.
+
+**Tabs, button group or chips?** If it swaps what is on the screen, it is tabs. If it changes a value or how the same
+thing is shown (Week / Month / Year on a chart, list or grid), it is a [button group](#button-group). If it narrows a
+collection and there can be many, it is [chips](#chip).
 
 ```html
-<div class="s4-tabs" role="tablist" aria-label="Bill Status">
-  <button class="s4-tab" type="button" role="tab" id="tab-due" aria-controls="panel-due" aria-selected="true">Due</button>
-  <button class="s4-tab" type="button" role="tab" id="tab-paid" aria-controls="panel-paid" aria-selected="false">Paid</button>
+<div class="s4-tabs" role="tablist" aria-label="Bill">
+  <button class="s4-tab" type="button" role="tab" id="tab-details" aria-controls="panel-details" aria-selected="true">Details</button>
+  <button class="s4-tab" type="button" role="tab" id="tab-payments" aria-controls="panel-payments" aria-selected="false">Payments</button>
 </div>
-<div class="s4-tab-panel" role="tabpanel" id="panel-due" aria-labelledby="tab-due">…</div>
-<div class="s4-tab-panel" role="tabpanel" id="panel-paid" aria-labelledby="tab-paid" hidden>…</div>
+<div class="s4-tab-panel" role="tabpanel" id="panel-details" aria-labelledby="tab-details">…</div>
+<div class="s4-tab-panel" role="tabpanel" id="panel-payments" aria-labelledby="tab-payments" hidden>…</div>
 ```
 
 | Attribute | Values | Default |
 |---|---|---|
-| `data-variant` | `secondary` | primary |
-| `data-scrollable` | tabs keep their width; the row scrolls sideways | fixed (tabs share the width) |
+| `data-variant` | `secondary`: inside a pane or card. Smaller (32dp indicator, label-large) and quieter (the indicator is a 12% tint of the text color over whatever it sits on), icons inline | primary: 40dp indicator in `secondary-container`, title-small, icons stacked above the label |
+| `data-scrollable` | adds scroll padding so the selected tab scrolls clear of the edge (any row scrolls sideways when the tabs do not fit; it never wraps) | — |
 | `aria-selected` | `true` on the current tab | first tab |
-| `aria-controls` | id of the tab's panel | — |
-| icon | `<span class="s4-icon" data-icon="…">` before the label: stacked (64dp) in primary, inline in secondary | — |
+| `aria-controls` | id of the tab's panel: **required**, every tab has a panel | — |
+| icon | `<span class="s4-icon" data-icon="…">` before the label: stacked in primary (the indicator holds icon and label, as in the nav bar), inline in secondary | — |
 
-**When to use what:** **primary** tabs right under the top app bar to organize the whole screen; **secondary** tabs inside
-a content area (a card, a pane) to divide it further. Use **scrollable** for more than about 4 tabs on a phone.
+Tabs sit at the start of the row and are as wide as their labels (16dp each side; 12 in secondary). The indicator's
+corner is the nav indicator's (`--s4-shape-nav-indicator`, clamped to half its height), so it follows the corner dial.
 
-**Behaviour (`tabs.js`):** one pill slides between tabs on the spatial spring (the tab's full width). Panels switch with the shared axis pattern: the old panel slides 30px away and
-fades out, the new one slides in from the side of the newly selected tab. Keys: Left / Right (wrapping), Home / End,
-with automatic activation and a roving tabindex. Fires `s4-change { tab, index, panel }` on the tab list. Missing ids,
-roles and `aria-labelledby` are filled in. Without JS each selected tab paints its own pill.
+**When to use what:** **primary** tabs right under the top app bar to organize the whole screen; **secondary** tabs
+inside a pane or card to divide it further. Many tabs on a phone: the row scrolls (add `data-scrollable`).
+
+**Behaviour (`tabs.js`):** one indicator slides between tabs on the Ink pattern, measured to the selected tab's box.
+Each label's text is wrapped in `.s4-tab-label` (`data-text` holds it) so the heavier selected weight never changes the
+tab's width or moves its neighbours. Panels switch with the shared axis pattern (Switch): the old panel slides 30px away
+and fades out, the new one slides in from the side of the newly selected tab. Keys: Left / Right (wrapping, RTL aware),
+Home / End, with automatic activation and a roving tabindex. Fires `s4-change { tab, index, panel }` on the tab list.
+Missing ids, roles and `aria-labelledby` are filled in. Without JS each selected tab paints its own indicator.
 
 **Do**
 - Use short Title Case labels (one or two words) and keep the tab order stable.
-- Put tabs at the top of the content they switch.
+- Put tabs at the top of the content they switch; give every tab a panel.
 
 **Don't**
-- Don't use tabs for a sequence of steps or for actions.
+- Don't use tabs to set a value or change how the same content is shown (a period, a unit, list or grid): that is a
+  button group. Tabs without panels fail the page checker and the suite.
+- Don't use tabs for a sequence of steps (a stepper) or for actions.
 - Don't nest primary tabs inside primary tabs; use secondary tabs.
 
-**Accessibility:** WAI-ARIA tabs pattern; the tab list is one tab stop and panels are focusable. Selected uses color
-and the pill (and a solid icon), not color alone. Inner focus ring so a scrolling row never clips it. Forced colors:
-the pill uses Highlight and the row gets a border.
+**Accessibility:** WAI-ARIA tabs pattern; the tab list is one tab stop and panels are focusable. Selected shows as the
+indicator, the label color and a heavier weight (and a solid icon), not color alone. Inner focus ring so a scrolling
+row never clips it; the 48dp touch target sits inside the row's padding. Forced colors: the indicator is `Highlight`
+and the selected label `HighlightText`.
 
-**Tokens:** `--s4-size-touch-target`, `--md-sys-typescale-title-small-*`, `--md-sys-color-primary`,
-`--md-sys-color-on-surface-variant`, `--md-sys-color-surface-variant` (divider), `--s4-motion-pattern-shared-axis-distance`,
-`--md-sys-motion-spring-spatial`, `--md-sys-motion-spring-effects`.
+**Tokens:** `--s4-size-button` / `--s4-size-button-small` (indicator height), `--s4-size-touch-target`,
+`--s4-shape-nav-indicator`, `--md-sys-typescale-title-small-*` and `--md-sys-typescale-label-large-*` (labels; the
+`emphasized` weights when selected), `--md-sys-color-secondary-container` / `on-secondary-container` (primary
+indicator), `--md-sys-color-on-surface` (secondary indicator tint and label), `--md-sys-color-on-surface-variant`
+(labels at rest), `--s4-motion-ink` (indicator), `--s4-motion-state` (label color), the Switch pattern
+(`S4.transition.sharedAxis`) for panels.
 
 ---
 
@@ -721,8 +779,8 @@ count with `data-filter`, else `null`). Escape clears. Clicking the bar's empty 
 - Don't add a Search button; results update as you type.
 - Don't use a search bar as a general text field.
 
-**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The M3 focus ring
-wraps the whole bar. The clear button is a real button with a label. Forced colors: the bar gets a border.
+**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The bar is the field and
+carries the one focus mark: the focus ring inside its edge from the keyboard, a quiet accent hairline after a tap or click. The clear button is a real button with a label. Forced colors: the bar gets a border.
 
 **Tokens:** `--s4-size-text-field` (56), `--s4-shape-search`, `--md-sys-color-surface-container-high`,
 `--md-sys-typescale-body-large-*`, `--s4-layout-list-width` (×2 = 720 max).
@@ -1825,6 +1883,7 @@ floats at the bottom over the thread, so it is glass.
 **Do**
 - Put assistant answers with headings or lists in a `.s4-prose` inside the bubble, or full width without a bubble.
 - Keep the composer's text field label-less with an `aria-label`; the send button is the one filled control.
+- The composer is the field: it carries the one focus mark (the ring from the keyboard, a quiet hairline after a tap); the text field inside shows none.
 
 **Don't**
 - Don't color bubbles per person; mine and theirs is the only distinction.
@@ -1922,14 +1981,17 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-quote` | One large quote (`blockquote` + `.s4-quote-cite`), hanging punctuation | `data-align="center"` |
 | `.s4-quotes` | Short quotes as filled cards, 1 then 3 columns | — |
 | `.s4-numbers` > `.s4-number` | Big numbers: a `dl` with `dt` (label) and `dd` (value) | `data-columns="3"` |
-| `.s4-plans-period` | Holds the period switch: a Joined Capsule group with `data-period` | — |
+| `.s4-plans-period` | Holds the period switch: a connected button group (the Ink Track) with `data-period` | — |
+| `[data-period]` | On a connected button group (a value: a period, a pack, a size, seats): picks which `data-period-<value>` text shows | — |
 | `.s4-plans` > `.s4-plan` | `.s4-plan-head` (`.s4-plan-name`), `.s4-plan-price` (`.s4-plan-amount`, `.s4-plan-per`), a button, `.s4-checks` | `data-featured` (the accent fill) |
 | `[data-period-<value>]` | Text shown for that period, on any element in the same section (or `[data-period-scope]`) | — |
-| `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own Joined Capsule group (values 1…4) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
+| `.s4-compare` | A comparison table; under 600 one plan column at a time, picked with its own connected button group (values 1…4; it changes which plan the same table shows, so it is a button group, not tabs) | `tbody[data-group]` starts a group with a `th scope="rowgroup"` row |
 | `.s4-cta` | Words and actions in a band | `data-align="center"` |
 | `.s4-site-signup` | An email field and a button on one line | — |
+| `.s4-site-index` > `li` > `.s4-site-index-row` | A numbered list of everything (all projects, past issues, an archive): `.s4-site-index-n`, `.s4-site-index-title`, `.s4-site-index-meta` (one or two spans), `.s4-site-index-year`. Meta under the title on a phone, its own columns from 840; rows hover with a rounded fill | — |
 | `.s4-post-featured`, `.s4-posts` > `.s4-post` | A featured post (cover + text) and a dated list (`.s4-post-meta`, `h3` link, sentence, tags) | — |
 | `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager` | — |
+| `.s4-callout` | A note in documentation or prose: `.s4-icon`, `.s4-callout-title`, one or two short paragraphs. Filled, never a stripe or an outline | `data-tone="warning|success|neutral"` (info by default) |
 | `[data-site-panel="id"]` | A button that opens that element as a floating glass panel on a phone (the docs sidebar) | — |
 | `.s4-site-footer` | `.s4-site-footer-top` (`.s4-site-footer-brand`, `.s4-site-footer-links`) and `.s4-site-footer-base` (small print, a theme switch) | `data-columns="2|3"` on the links (4 default) |
 
@@ -2092,7 +2154,9 @@ error message in sync with `data-error`.
 - Don't put helper text and an error in two places; `data-error` replaces the helper text.
 
 **Accessibility:** native controls with real `<label for>`; supporting text is `aria-describedby`; errors set
-`aria-invalid`; the 2dp ink ring is the focus indication; the whole container is a click target;
+`aria-invalid`; focus (issues 62, 64): from the keyboard the focus ring (3dp, focus ring color, outside the box); after
+a tap or click a quiet accent hairline inside the box (core.js sets `data-s4-focus="pointer|key"` on `<html>`), never
+both; the whole container is a click target;
 forced-colors mode draws real borders.
 
 **Tokens:** `--s4-size-text-field`, `--s4-shape-text-field`, `--md-sys-color-surface-container-highest`,
@@ -2172,6 +2236,8 @@ replacing a leading icon if there is one. Assist icons are primary.
 **Behaviour** (`chip.js`): filter chips toggle `aria-pressed` and fire `s4-change { pressed }` on the chip. Input chips:
 `.s4-chip-remove` gets a close icon; a click (or Delete / Backspace on it) fires a cancelable `s4-remove { chip }`
 (call `preventDefault()` to keep the chip), then the chip collapses and is removed and focus moves to its neighbour.
+
+**Chips, button group or tabs?** If it narrows a collection and there can be many, it is chips. If it changes a value or how the same thing is shown, it is a [button group](#button-group). If it swaps what is on the screen, it is [tabs](#tabs) (decision 0059).
 
 **When to use what:** filter chips to narrow a list; input chips for values someone entered (tags, people);
 assist chips for a related action ("Add to Calendar"); suggestion chips for likely values or replies.
@@ -2279,6 +2345,7 @@ Picks exactly one option from a short visible list. M3 radio button on a native 
 the ink grows in from the middle on the ink spring and drains out calmly. 40dp circular state layer; 48dp hit area. No JS.
 
 **Do:** group with `<fieldset>` + `<legend>` (or `role="radiogroup"` + `aria-label`); keep 2–7 options.
+A `<fieldset>` of radios or checkboxes is drawn by the component (issue 61): the legend is a label above, like a field's, and the options sit in one filled box with a comfortable row each, inset from every corner. Don't restyle the fieldset or the legend on the page (no padding or class overrides).
 **Don't:** use radios for a single on/off choice, or for long lists (use a select in a [text field](#text-field)).
 
 **Accessibility:** native radios: Tab into the group, arrow keys move and select; focus ring around the ring;

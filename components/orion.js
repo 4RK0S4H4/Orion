@@ -28,6 +28,14 @@
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else setTimeout(boot);
 
+  /* ---------- how focus arrived (issues 62, 64) ----------
+     data-s4-focus on <html> is "pointer" when the last focus came from a tap or a click and "key" otherwise. A text input
+     matches :focus-visible on a click as well, so things you type into read this: a tap shows their quiet state, the
+     keyboard shows the full ring. Typing never changes it; only the next focus does. No script, no attribute: the ring. */
+  var lastPointer = -1e9;
+  document.addEventListener('pointerdown', function () { lastPointer = Date.now(); }, true);
+  document.addEventListener('focusin', function () { root.setAttribute('data-s4-focus', Date.now() - lastPointer < 800 ? 'pointer' : 'key'); }, true);
+
   /* ---------- small utilities ---------- */
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },
@@ -601,7 +609,11 @@ S4.register('icon-button', function (scope) {
    Both keep aria-pressed in sync and fire s4-change on the group: { value, values, button } where value is the pressed
    button's value attribute (single) or the array of pressed values (multi).
    Connected and selecting groups are one tab stop with a roving tabindex: arrow keys move focus, Home/End jump to the
-   ends, Space/Enter press. */
+   ends, Space/Enter press.
+   Connected groups (the Ink Track, decision 0059): while at most one option is pressed (any group but data-select="multi"),
+   one ink pill behind the options slides to it, whoever changed aria-pressed (a click, the keyboard, a page script);
+   with several pressed each option fills itself and button-group.js marks where a wrapped row starts, so a fused run of
+   selected options never joins across rows. */
 S4.register('button-group', function (scope) {
   var ITEM = '.s4-button, .s4-icon-button';
   S4.util.all(scope, '.s4-button-group').forEach(function (g) {
@@ -649,6 +661,8 @@ S4.register('button-group', function (scope) {
       stop(b);
     });
 
+    if (g.hasAttribute('data-connected')) inkTrack(g, mode, items, pressed);
+
     if (!roving) return;
     g.addEventListener('focusin', function (e) { var b = e.target.closest(ITEM); if (b && b.parentElement === g) stop(b); });
     g.addEventListener('keydown', function (e) {
@@ -666,6 +680,47 @@ S4.register('button-group', function (scope) {
       to.focus();
     });
   });
+
+  /* the Ink Track: one ink pill (two copies of it, the front edge on Ink and the back on calm Ink: see the stylesheet)
+     placed over the pressed option; the stylesheet moves it, the script only says where */
+  function inkTrack(g, mode, items, pressed) {
+    var ink = document.createElement('span');
+    ink.className = 's4-button-group-ink';
+    ink.setAttribute('aria-hidden', 'true');
+    g.insertBefore(ink, g.firstChild);
+    var placed = false;
+    function attr(el, name, on) { if (el.hasAttribute(name) !== on) el.toggleAttribute(name, on); }
+    function place(animate) {
+      var list = items(), on = pressed();
+      /* where a wrapped row starts (a fused run of selected options stops there) */
+      var top = null;
+      list.forEach(function (b, i) { var t = b.offsetTop; attr(b, 'data-s4-break', i > 0 && t > top + 1); top = t; });
+      var one = mode !== 'multi' && on.length <= 1;
+      attr(g, 'data-s4-ink', one);
+      var b = on[0];
+      if (!one || !b || !b.offsetWidth) { attr(ink, 'hidden', true); placed = false; return; }
+      attr(ink, 'hidden', false);
+      var gr = g.getBoundingClientRect(), br = b.getBoundingClientRect();
+      attr(ink, 'data-animate', !!animate && placed);
+      ink.style.setProperty('--_ix', (br.left - gr.left - g.clientLeft) + 'px');
+      ink.style.setProperty('--_iy', (br.top - gr.top - g.clientTop) + 'px');
+      ink.style.setProperty('--_iw', br.width + 'px');
+      ink.style.setProperty('--_ih', br.height + 'px');
+      placed = true;
+    }
+    place(false);
+    new MutationObserver(function (records) {
+      var moved = records.some(function (r) { return r.type === 'attributes'; });
+      place(moved);
+    }).observe(g, { attributes: true, subtree: true, childList: true, attributeFilter: ['aria-pressed', 'disabled'] });
+    if ('ResizeObserver' in window) {
+      var ro = new ResizeObserver(function () { place(false); });
+      ro.observe(g);
+      items().forEach(function (b) { ro.observe(b); });
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(false); });
+    document.addEventListener('s4-theme', function () { requestAnimationFrame(function () { place(false); }); });
+  }
 });
 
 /* ---- fab/fab.js ---- */
@@ -1228,8 +1283,10 @@ S4.register('nav-rail', function (scope) {
 });
 
 /* ---- tabs/tabs.js ---- */
-/* Tabs behaviour (WAI-ARIA tabs, automatic activation).
-   - One pill per tab list slides to the selected tab on the spatial spring (the tab's full width).
+/* Tabs behaviour (WAI-ARIA tabs, automatic activation). Tabs move between panels (decision 0059): every tab controls one.
+   - One indicator per tab list slides to the selected tab on the Ink pattern (measured to the tab's box).
+   - Each label's text is wrapped in .s4-tab-label (data-text holds it) so the heavier selected weight never changes
+     the tab's width.
    - Panels (aria-controls) switch with the shared axis pattern: the old panel slides 30px away and fades out, the new
      one slides in from the side of the newly selected tab. Movement on the spatial spring, fades on effects.
    - Keys: Left / Right move and select (wrapping), Home / End go to the first / last tab. Roving tabindex.
@@ -1252,10 +1309,12 @@ S4.register('tabs', function (scope) {
       var tab = list.querySelector('.s4-tab[aria-selected="true"]');
       if (!tab) { indicator.style.setProperty('--_w', '0px'); return; }
       var lr = list.getBoundingClientRect(), tr = tab.getBoundingClientRect();
-      var base = lr.left + list.clientLeft - list.scrollLeft, x = tr.left - base, w = tr.width;
+      var x = tr.left - (lr.left + list.clientLeft - list.scrollLeft), y = tr.top - (lr.top + list.clientTop - list.scrollTop);
       indicator.toggleAttribute('data-animate', !!animate);
       indicator.style.setProperty('--_x', x + 'px');
-      indicator.style.setProperty('--_w', w + 'px');
+      indicator.style.setProperty('--_y', y + 'px');
+      indicator.style.setProperty('--_w', tr.width + 'px');
+      indicator.style.setProperty('--_h', tr.height + 'px');
     }
 
     /* ---------- panels: shared axis ---------- */
@@ -1298,6 +1357,16 @@ S4.register('tabs', function (scope) {
     var all = tabs();
     var selected = all.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || all[0];
     all.forEach(function (t) {
+      if (!t.querySelector('.s4-tab-label')) {
+        Array.prototype.slice.call(t.childNodes).forEach(function (n) {
+          if (n.nodeType !== 3 || !n.nodeValue.trim()) return;
+          var label = document.createElement('span');
+          label.className = 's4-tab-label';
+          label.setAttribute('data-text', n.nodeValue.trim());
+          label.textContent = n.nodeValue.trim();
+          t.replaceChild(label, n);
+        });
+      }
       if (!t.id) t.id = 's4-tab-' + (++uid);
       if (!t.hasAttribute('role')) t.setAttribute('role', 'tab');
       if (t.tagName === 'BUTTON' && !t.hasAttribute('type')) t.type = 'button';

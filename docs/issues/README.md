@@ -26,7 +26,7 @@ Sent with screenshots after the round 0056 publish; "more minor critiques and id
   Image: `img/2026-11-17-radio-list-corner.png`.
 - **62.** Text field focus is "a bit too harsh and contrasty, especially in monochrome, either find a different way to
   indicate or use diff colors." Image: `img/2026-11-17-field-focus-harsh.png`.
-- **63.** Connected button group (the Joined Capsule, decision 0026): "I want a different take ... too similar to
+- **63.** Done 2026-11-17 (decision 0059: the owner picked A, Ink Track, in `explore/review-button-group-2.html`, pairs the same; tabs moved to the navigation family so the two never look alike; the page checker and suite guard which is which). Connected button group (the Joined Capsule, decision 0026): "I want a different take ... too similar to
   material 3 expressive, and I think it looks a bit odd. something with the same level of creativity, but not
   material. looks odd especially for 2 buttons." This reopens 0026 at the owner's request: show options in a quiz.
   Images: `img/2026-11-17-button-group-connected.png`, `img/2026-11-17-button-group-sizes.png`.
