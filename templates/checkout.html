@@ -9,7 +9,7 @@
      a phone), errors only when you leave a field, and a small reward at the end. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=3b5fc15">
+<link rel="stylesheet" href="../components/orion.css?v=1925229">
 <style>
   /* the app's own layout: tokens only */
   .co-steps { position: relative; }
@@ -45,8 +45,8 @@
                   <div class="s4-text-field"><input id="co-city" name="city" autocomplete="address-level2" required data-msg-required="Enter the city."><label for="co-city">City</label></div>
                   <div class="s4-text-field"><input id="co-zip" name="zip" inputmode="numeric" autocomplete="postal-code" required pattern="[0-9]{4,6}" data-msg-required="Enter the postal code." data-msg-pattern="A postal code is 4 to 6 digits."><label for="co-zip">Postal Code</label></div>
                 </div>
-                <fieldset class="s4-stack" style="border:0;margin:0;padding:0;--s4-gap:var(--s4-space-1)">
-                  <legend class="s4-label-large" style="padding:0;margin-block-end:var(--s4-space-2)">Delivery</legend>
+                <fieldset>
+                  <legend>Delivery</legend>
                   <label class="s4-radio"><input type="radio" name="speed" value="standard" checked><span class="s4-radio-ring"></span>Standard, 3 to 5 days · Free</label>
                   <label class="s4-radio"><input type="radio" name="speed" value="express"><span class="s4-radio-ring"></span>Express, next day · $12.00</label>
                 </fieldset>
