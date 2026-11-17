@@ -5,7 +5,7 @@
      the page has none) with Pop. Escape, a tap outside, choosing a link or growing past 840 close it; focus goes back
      to the button. It is a disclosure (aria-expanded), not a modal.
    - [data-site-panel="id"] on a button: the same for another panel (the docs sidebar on a phone).
-   - [data-period] on a joined capsule group: each element with data-period-<value> in the same section shows that text.
+   - [data-period] on a joined capsule group or a single-select chip set: each element with data-period-<value> in the same section shows that text.
    - .s4-compare: its button group (values 1..4) picks the plan column shown under 600.
    - .s4-toc: the link of the section being read gets aria-current="location". */
 S4.register('site', function (scope) {
@@ -111,7 +111,12 @@ S4.register('site', function (scope) {
       var root = group.closest('[data-period-scope], .s4-site-section, main') || document;
       root.querySelectorAll('[data-period-' + value + ']').forEach(function (el) { el.textContent = el.getAttribute('data-period-' + value); });
     }
-    group.addEventListener('s4-change', function (e) { if (e.detail && typeof e.detail.value === 'string') show(e.detail.value); });
+    group.addEventListener('s4-change', function (e) {
+      if (e.detail && typeof e.detail.value === 'string') return show(e.detail.value);
+      /* a single-select chip set works the same way: the pressed chip's value (a pack, a size, a plan) */
+      var chip = e.target.closest && e.target.closest('.s4-chip[value]');
+      if (chip && chip.getAttribute('aria-pressed') === 'true') show(chip.value);
+    });
     var on = group.querySelector('[aria-pressed="true"][value]');
     if (on) show(on.value);
   });

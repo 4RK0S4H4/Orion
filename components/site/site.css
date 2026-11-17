@@ -815,7 +815,7 @@
   .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
   .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
   .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-signup > .s4-button { margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup > .s4-button { flex: none; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links :is(h2, h3) {
     margin: 0 0 var(--s4-space-3);
