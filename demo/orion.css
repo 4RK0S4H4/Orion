@@ -1541,7 +1541,10 @@
   /* ---------- layout helpers ---------- */
   .s4-stack { display: flex; flex-direction: column; gap: var(--s4-gap, var(--s4-layout-gap)); }
   .s4-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-gap, var(--s4-space-2)); }
-  .s4-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
+  /* a grid of cards or tiles fills its row (issue 56): as many columns of at least --s4-min as fit, and the items share
+     the row, so two cards never float at the start of a wide window. A collection that filters (a gallery, search
+     results) sets --s4-grid-fill: auto-fill, so one result stays the size of one tile instead of a banner. */
+  .s4-grid { display: grid; grid-template-columns: repeat(var(--s4-grid-fill, auto-fit), minmax(min(var(--s4-min, 280px), 100%), 1fr)); gap: var(--s4-gap, var(--s4-layout-gap)); }
 }
 
 /* Forced colors (Windows High Contrast): backgrounds and shadows are removed, so every control needs a real edge.
@@ -2538,7 +2541,7 @@
     --_bg: var(--md-sys-color-surface-container-highest);
     --_fg: var(--md-sys-color-on-surface-variant);
     flex: 1 1 0;
-    min-width: min(max-content, 100%);
+    min-inline-size: fit-content;   /* never narrower than its label (a label never breaks mid-word), yet never wider than the group: the group wraps instead */
     border-radius: var(--_r);
   }
   .s4-button-group[data-connected]:has(> [data-size="l"], > [data-size="xl"]) > :is(.s4-button, .s4-icon-button) { --_r: var(--md-sys-shape-corner-medium); }
@@ -2848,6 +2851,25 @@
   .s4-view[data-width="reading"] { max-inline-size: var(--s4-layout-content-reading); margin-inline: auto; }
   .s4-view[data-width="wide"] { max-inline-size: var(--s4-layout-content-wide); margin-inline: auto; }
 
+  /* ---------- one alignment policy (issue 56) ----------
+     Capped content is centred in the space beside the rail, at every width. The top app bar's title and actions line
+     up with the same column, so a title never sits 100px left of the content it names. The column the bar follows is
+     the page width of what is shown: the content's data-width, or the visible view's. */
+  .s4-app-body { --_cap: var(--s4-content-max, var(--s4-layout-content-max)); }
+  .s4-app-body:has(> .s4-content[data-width="reading"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="reading"]:not([hidden])) { --_cap: var(--s4-layout-content-reading); }
+  .s4-app-body:has(> .s4-content[data-width="wide"]),
+  .s4-app-body:has(> .s4-content > :is(.s4-view, .s4-subpage)[data-width="wide"]:not([hidden])) { --_cap: var(--s4-layout-content-wide); }
+  .s4-app-body:has(> .s4-content[data-width="full"]) { --_cap: 100%; }
+  @container s4-app (width >= 600px) {
+    /* the bar's own slot adds 8 inside its padding, so the padding is the column's edge minus 8 */
+    .s4-app-body > .s4-top-app-bar {
+      padding-inline:
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-left, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)))
+        max(calc(var(--s4-layout-margin) - var(--s4-space-2)), env(safe-area-inset-right, 0px), calc((100% - var(--_cap)) / 2 - var(--s4-space-2)));
+    }
+  }
+
   /* ---------- canonical layouts ---------- */
   .s4-split {
     display: grid;
@@ -2921,12 +2943,30 @@
     .s4-split:not([data-layout="supporting"]) :has(> [data-split-back]:only-child) { display: none; }
   }
 }
+/* extra-large (>= 1600): a third pane joins list-detail (issue 56). <section class="s4-split-pane" data-join="extra-large">
+   is the context of the open item (who, related, history): a column of --s4-split-join (360) after the detail. Below
+   1600 it is not shown, so what it holds must also be reachable from the detail (a page, an expand, a menu). It never
+   joins at large: the rail expands there and a third column would squeeze the detail under 400. */
+@layer s4.components {
+  @container s4-app (width >= 1600px) {
+    .s4-split:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable]:not([data-layout="supporting"]):has(> [data-join="extra-large"]) {
+      grid-template-columns: minmax(0, var(--s4-split-list, var(--s4-layout-list-width))) var(--s4-layout-pane-gap) minmax(0, 1fr) minmax(0, var(--s4-split-join, var(--s4-layout-list-width)));
+    }
+    .s4-split[data-resizable] > [data-join="extra-large"] { margin-inline-start: var(--s4-layout-pane-gap); }
+  }
+}
 /* compact and medium: list-detail shows one pane at a time. In the utilities layer so a utility class on a pane
    (.s4-stack, .s4-row) can't show a pane that should be hidden. */
 @layer s4.utilities {
   @container s4-app (width < 840px) {
     .s4-split:not([data-layout="supporting"]):not([data-open]) > .s4-split-pane ~ .s4-split-pane { display: none; }
     .s4-split:not([data-layout="supporting"])[data-open] > .s4-split-pane:first-child { display: none; }
+  }
+  @container s4-app (width < 1600px) {
+    .s4-split > .s4-split-pane[data-join="extra-large"] { display: none; }
   }
 }
 
@@ -3256,6 +3296,8 @@
       block-size var(--s4-motion-ink);
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
+  /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {
@@ -3726,6 +3768,9 @@
     cursor: text;
     transition: background-color var(--s4-motion-state);
   }
+  /* a search that filters the content below it spans that content's column (the alignment policy, layout README);
+     the 720 cap is for a search that stands alone, such as one in a top app bar */
+  .s4-search[data-filter] { max-inline-size: none; }
   /* a leading icon button (menu, back) sits closer to the edge, like trailing ones */
   .s4-search:has(> .s4-icon-button:first-child) { padding-inline-start: var(--s4-space-2); }
   .s4-search > .s4-icon { color: var(--md-sys-color-on-surface); }
@@ -3750,9 +3795,12 @@
   .s4-search-input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 1; }
   .s4-search-input::-webkit-search-cancel-button,
   .s4-search-input::-webkit-search-decoration { appearance: none; display: none; }
-  /* focus: the ring is drawn inside the bar's edge. A search bar usually sits at the very top of a pane, under the top
-     app bar or against a scrolling edge, where a ring outside the bar gets cut off. */
-  .s4-search:has(> .s4-search-input:focus-visible) {
+  /* focus (issues 62, 64): the bar is the field, so it carries the one mark and the input none. A tap or a click shows
+     the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the ring,
+     drawn inside the bar's edge: a search bar usually sits at the very top of a pane, under the top app bar or against
+     a scrolling edge, where a ring outside the bar gets cut off. */
+  :where([data-s4-focus="pointer"]) .s4-search:has(> .s4-search-input:focus) { box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest)); }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-search:has(> .s4-search-input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: calc(-1 * var(--s4-focus-ring-width));
   }
@@ -4103,7 +4151,7 @@
     font-size: var(--md-sys-typescale-title-medium-size);
     line-height: var(--md-sys-typescale-title-medium-line-height);
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
-    font-weight: var(--md-sys-typescale-title-medium-weight);
+    font-weight: var(--md-sys-typescale-title-large-weight);   /* heading weight: a pane title outranks the card titles, list headlines and labels inside it at the same size (typography.md) */
     color: var(--_fg);
   }
   .s4-pane-supporting {
@@ -5872,7 +5920,8 @@
     border-radius: calc(var(--_row) / 2 + var(--s4-space-1));
     background: var(--md-sys-color-surface-container);
   }
-  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_bg: transparent; --_outline: transparent; --_ring: 0px; --_h: var(--_row); }
+  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_h: var(--_row); }
+  .s4-composer > .s4-text-field, .s4-composer > .s4-text-field:has(> :is(input, textarea):focus) { --_bg: transparent; --_outline: transparent; --_ring: 0px; }
   .s4-composer > .s4-text-field:first-child { padding-inline-start: var(--s4-space-2); }
   .s4-composer > .s4-icon-button {
     --_radius-pressed: var(--_radius-round);
@@ -5880,7 +5929,19 @@
     flex: none;
     margin: calc((var(--_row) - var(--_h)) / 2);
   }
-  .s4-composer:has(textarea:focus-visible, input:focus-visible) {
+  /* focus (issues 62, 64): the composer is the field, so it carries the one mark and the text field inside none. A tap
+     or a click shows the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the
+     ring around the whole pill. (The quiet ring is drawn on ::after so the glass edge stays.) */
+  .s4-composer > .s4-text-field:has(> :is(input, textarea):focus-visible)::before { outline: none; }
+  :where([data-s4-focus="pointer"]) .s4-composer:has(textarea:focus, input:focus)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest));
+    pointer-events: none;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-composer:has(textarea:focus-visible, input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
   }
@@ -7057,15 +7118,17 @@
      <div class="s4-text-field-supporting">Sentence case helper text.</div>
    </div>
    One look: a quiet box (thin outline, medium corners, surface fill) with the label above it. No floating label, no filled
-   variant; data-variant is ignored, so older markup still works. Hover darkens the outline, focus turns it into ink
-   (on-surface, 2dp ring). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
+   variant; data-variant is ignored, so older markup still works. Hover lifts the fill; focus is a quiet accent hairline
+   for a tap or click and the focus ring for the keyboard (see states). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
    without a label is just the box. Parts are placed on a grid, so their source order only matters for leading vs trailing icons. */
 @layer s4.components {
   .s4-text-field {
     --_bg: var(--md-sys-color-surface-container-highest);
     --_outline: transparent;
     --_ring: 0px;
-    --_ring-color: var(--md-sys-color-on-surface);
+    --_ring-color: var(--s4-focus-ring-color);
+    --_mark: var(--md-sys-color-primary);
+    --_quiet: color-mix(in oklab, var(--_mark) 45%, var(--md-sys-color-surface-container-highest));
     --_label: var(--md-sys-color-on-surface-variant);
     --_caret: var(--md-sys-color-on-surface);
     --_icon-color: var(--md-sys-color-on-surface-variant);
@@ -7089,7 +7152,7 @@
     align-self: stretch;
     border-radius: var(--s4-shape-text-field);
     background: var(--_bg);
-    box-shadow: inset 0 0 0 1px var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
+    box-shadow: inset 0 0 0 var(--_outline-width, 1px) var(--_outline), 0 0 0 var(--_ring) var(--_ring-color);
     pointer-events: none;
     transition:
       box-shadow var(--s4-motion-state), background-color var(--s4-motion-state);
@@ -7211,20 +7274,32 @@
   .s4-text-field:has(> .s4-text-field-counter) > .s4-text-field-supporting { padding-inline-end: calc(var(--s4-space-4) + 7ch); }   /* room for the counter at any text size */
 
   /* ---------- states ----------
-     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus, so focusing only
-     adds the ring. An error keeps the normal fill: the label and the message turn error-colored, the message gets a small
-     mark, and the focus ring is the error color. No red box. */
+     One change at a time (decision 0043): hover lifts the fill and keeps it while the field has focus. An error keeps the
+     normal fill: the label and the message turn error-colored, the message gets a small mark, and the focus marks take
+     the error color. No red box.
+     Focus (issues 62, 64): one mark, never two, chosen by how focus arrived (data-s4-focus, set by core.js).
+       - a tap or a click: the quiet ring, a hairline inside the box in the accent mixed into the fill (in monochrome a
+         soft gray, never a white wire). You put the cursor there yourself; the caret and the hairline are enough.
+       - the keyboard (or no script): the ring every control has, in the focus ring color, outside the box.
+     Nothing else outlines a field (decision 0023: the focus ring is the only line allowed). */
   @media (hover: hover) {
     .s4-text-field:hover { --_bg: var(--md-sys-color-surface-container-high); }
   }
-  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible),
-  .s4-text-field:has(> :is(input, select, textarea):focus) {
-    --_outline: var(--_ring-color);
-    --_ring: 1px;   /* with the 1px outline: a 2dp ink ring */
+  .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_bg: var(--md-sys-color-surface-container-high);
     --_label: var(--md-sys-color-on-surface);
+  }
+  :where([data-s4-focus="pointer"]) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus) {
+    --_outline: var(--_quiet);
+    --_outline-width: 1.5px;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-text-field:has(> :is(input, select, textarea, .s4-text-field-select, .s4-date-picker-field):focus-visible)::before {
+    outline: var(--s4-focus-ring-width) solid var(--_ring-color);
+    outline-offset: var(--s4-focus-ring-offset);
   }
   .s4-text-field:is([data-error], :has(> [aria-invalid="true"])) {
     --_ring-color: var(--md-sys-color-error);
+    --_mark: var(--md-sys-color-error);
     --_label: var(--md-sys-color-error);
     --_caret: var(--md-sys-color-error);
     --_supporting: var(--md-sys-color-error);
@@ -7834,18 +7909,52 @@
    issue 19): the ink grows in from the middle on the ink spring (a subtle liquid overshoot) and drains out calmly.
    No state-layer halo (decision 0043); 48dp touch target. */
 @layer s4.components {
-  /* a labelled group of radios or checkboxes: a soft outlined box instead of the browser's square fieldset */
+  /* a labelled group of radios or checkboxes (issue 61): the legend reads like a field label (above, at the content edge,
+     where the pane title and the other labels start) and the options sit in one filled box like a field's, one comfortable
+     row each. The box's corners are the field corner; every row keeps its disc 16 from the box's side and 18 from its
+     top and bottom, so nothing crowds a rounded corner, under any corner dial. Rows are separated by space only. */
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     min-inline-size: 0;
     margin: 0;
-    padding: var(--s4-space-1) var(--s4-space-4) var(--s4-space-2);
+    padding: 0;
     border: 0;
-    background: var(--md-sys-color-surface-container);
-    border-radius: var(--md-sys-shape-corner-extra-large);
+    background: none;
   }
-  /* the legend is a heading inside the box (a normal legend would straddle the top edge) */
-  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend { float: inline-start; width: 100%; padding: var(--s4-space-2) 0 var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+  /* the legend is a label above the box (a normal legend would straddle the top edge) */
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend {
+    float: inline-start;
+    width: 100%;
+    padding: 0 0 var(--s4-space-1);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
   fieldset:has(> :is(.s4-radio, .s4-checkbox)) > legend + * { clear: inline-start; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) {
+    display: flex;
+    gap: var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding: var(--s4-space-2) var(--s4-space-4);
+    background: var(--md-sys-color-surface-container-highest);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox)::after { inset: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox) > :is(.s4-radio-ring, .s4-checkbox-box) { margin: 0; }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):first-of-type {
+    padding-block-start: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-start-start-radius: var(--s4-shape-text-field);
+    border-start-end-radius: var(--s4-shape-text-field);
+  }
+  fieldset:has(> :is(.s4-radio, .s4-checkbox)) > :is(.s4-radio, .s4-checkbox):last-of-type {
+    padding-block-end: calc(var(--s4-space-2) + var(--s4-space-1));
+    border-end-start-radius: var(--s4-shape-text-field);
+    border-end-end-radius: var(--s4-shape-text-field);
+  }
   .s4-radio {
     --_ring: var(--md-sys-color-on-surface-variant);
     --_state: var(--md-sys-color-on-surface);

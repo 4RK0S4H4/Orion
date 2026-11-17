@@ -343,6 +343,10 @@ function ringInfo() {
       return { width: w, contrast: c, rect: el.getBoundingClientRect(), ringBox: b.tagName };
     }
   }
+  /* a field's keyboard ring is an outline on its box (the field's ::before, issues 62 and 64): outside the box, so it is
+     measured against what is behind the field */
+  const box = el.closest('.s4-text-field');
+  if (box) { const bs = getComputedStyle(box, '::before'), bw = parseFloat(bs.outlineWidth) || 0; if (bs.outlineStyle !== 'none' && bw >= 1) { const col = h.parse(bs.outlineColor), back = h.behind(box.parentElement || box); return { width: bw, contrast: h.contrast(col[3] < 1 ? h.over(col, back) : col, back), rect: el.getBoundingClientRect(), ringBox: 'field' }; } }
   /* the ink ring of a field is a spread shadow on its ::before; a split grip lights its bar */
   const host = el.closest('.s4-text-field, .s4-search, .s4-date-picker-field');
   if (host) { const sh = getComputedStyle(host, '::before').boxShadow; const m = /((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px(?!\s*inset)/.exec(sh); const m2 = /((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px\s+inset/.exec(sh) || /inset\s+((?:rgba?|color)\([^)]+\))\s+0px\s+0px\s+0px\s+([\d.]+)px/.exec(sh); const hit = m || m2; if (hit && parseFloat(hit[2]) >= 1) { const col = h.parse(hit[1]); const back = h.behind(host.parentElement || host); return { width: parseFloat(hit[2]) + (m && m2 ? parseFloat(m2[2]) : 0), contrast: h.contrast(col[3] < 1 ? h.over(col, back) : col, back), rect: el.getBoundingClientRect() }; } }
@@ -363,8 +367,8 @@ async function keysAudit(page, add, rtl) {
       const el = document.activeElement; if (!el || el === document.body) return { done: true };
       const info = window.__ringInfo();
       const h = window.__h; let fixed = false; for (let p = el; p && p !== document.body; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.position === 'fixed' || cs.position === 'sticky') fixed = true; }
-      const r = el.getBoundingClientRect(); let off = 0; for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) { off = p.scrollTop; break; } } const sc = (() => { for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) return h.tag(p); } return ''; })();
-      return { native: el.matches('.s4-date-picker-field, input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]'), scrub: !!el.closest('.rv-scrub'), tag: h.tag(el), kx: el.hasAttribute('data-kx'), info, fixed, sc, rect: { l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY + off, b: r.bottom + scrollY + off }, inDialog: !!el.closest('dialog, [popover]') };
+      const r = el.getBoundingClientRect(); let off = 0; for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) { off = p.scrollTop; break; } } let offX = 0; for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowX) && p.scrollWidth > p.clientWidth + 1) { offX = p.scrollLeft; break; } }   /* positions in the content of a sideways scroller (a board), like scrollTop for a tall one */ const sc = (() => { for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) return h.tag(p); } return ''; })();
+      return { native: el.matches('.s4-date-picker-field, input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]'), scrub: !!el.closest('.rv-scrub'), tag: h.tag(el), kx: el.hasAttribute('data-kx'), info, fixed, sc, rect: { l: r.left + scrollX + offX, r: r.right + scrollX + offX, t: r.top + scrollY + off, b: r.bottom + scrollY + off }, inDialog: !!el.closest('dialog, [popover]') };
     });
     if (st.done) break;
     if (reached.has(st.tag) && i > expected.length) break;

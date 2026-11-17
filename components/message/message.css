@@ -83,7 +83,8 @@
     border-radius: calc(var(--_row) / 2 + var(--s4-space-1));
     background: var(--md-sys-color-surface-container);
   }
-  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_bg: transparent; --_outline: transparent; --_ring: 0px; --_h: var(--_row); }
+  .s4-composer > .s4-text-field { flex: 1; min-inline-size: 0; --_h: var(--_row); }
+  .s4-composer > .s4-text-field, .s4-composer > .s4-text-field:has(> :is(input, textarea):focus) { --_bg: transparent; --_outline: transparent; --_ring: 0px; }
   .s4-composer > .s4-text-field:first-child { padding-inline-start: var(--s4-space-2); }
   .s4-composer > .s4-icon-button {
     --_radius-pressed: var(--_radius-round);
@@ -91,7 +92,19 @@
     flex: none;
     margin: calc((var(--_row) - var(--_h)) / 2);
   }
-  .s4-composer:has(textarea:focus-visible, input:focus-visible) {
+  /* focus (issues 62, 64): the composer is the field, so it carries the one mark and the text field inside none. A tap
+     or a click shows the quiet ring (an accent hairline inside the edge, mixed into the fill); the keyboard shows the
+     ring around the whole pill. (The quiet ring is drawn on ::after so the glass edge stays.) */
+  .s4-composer > .s4-text-field:has(> :is(input, textarea):focus-visible)::before { outline: none; }
+  :where([data-s4-focus="pointer"]) .s4-composer:has(textarea:focus, input:focus)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest));
+    pointer-events: none;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-composer:has(textarea:focus-visible, input:focus-visible) {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
   }

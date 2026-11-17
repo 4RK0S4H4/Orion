@@ -310,12 +310,19 @@ context beside it). Works inside an [app shell](#app); window classes are contai
 | `data-open` (split) | list-detail under 840: the detail replaces the list | absent (list shown) |
 | `[data-split-open]` / `[data-split-back]` | inside the split: set / clear `data-open`; back buttons hide from 840 | — |
 | `data-sticky` (pane) | from 840 the pane stays in view under the top app bar and scrolls inside itself | — |
-| `--s4-split-list`, `--s4-split-support` | column widths | 360, 400 |
+| `data-join="extra-large"` (pane) | a third list-detail pane (the open item's context) shown from 1600 only; what it holds must also be reachable from the detail | — |
+| `--s4-split-list`, `--s4-split-support`, `--s4-split-join` | column widths | 360, 400, 360 |
 
 | Window | list-detail | supporting |
 |---|---|---|
 | < 840 | one pane at a time; opening adds a history entry so the phone's Back returns to the list | supporting pane stacks under the main pane |
 | ≥ 840 | list 360 + detail | main + 400 supporting pane |
+| ≥ 1600 | list 360 + detail + joined context 360 | the same |
+
+**Wide windows and alignment (issue 56):** capped content is centred beside the rail at every width, and the top app
+bar's title and actions follow that column (the page width of the content or of the visible view). Nothing joins at
+large (1200–1599): the rail expands there and takes the extra width; at extra-large a joined pane appears and `wide`
+pages grow. Card grids (`.s4-grid`) fill their row. The full ladder is in `docs/foundations/spacing.md`.
 
 **Resizable panes:** add `data-resizable` to a `.s4-split` (and `data-resize-key="name"` to remember the width). From
 840 a grip sits between the panes: drag it, or focus it and use the arrow keys (Home and End for the limits);
@@ -721,8 +728,8 @@ count with `data-filter`, else `null`). Escape clears. Clicking the bar's empty 
 - Don't add a Search button; results update as you type.
 - Don't use a search bar as a general text field.
 
-**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The M3 focus ring
-wraps the whole bar. The clear button is a real button with a label. Forced colors: the bar gets a border.
+**Accessibility:** a `search` landmark; the input needs `aria-label` (the placeholder isn't a label). The bar is the field and
+carries the one focus mark: the focus ring inside its edge from the keyboard, a quiet accent hairline after a tap or click. The clear button is a real button with a label. Forced colors: the bar gets a border.
 
 **Tokens:** `--s4-size-text-field` (56), `--s4-shape-search`, `--md-sys-color-surface-container-high`,
 `--md-sys-typescale-body-large-*`, `--s4-layout-list-width` (×2 = 720 max).
@@ -1825,6 +1832,7 @@ floats at the bottom over the thread, so it is glass.
 **Do**
 - Put assistant answers with headings or lists in a `.s4-prose` inside the bubble, or full width without a bubble.
 - Keep the composer's text field label-less with an `aria-label`; the send button is the one filled control.
+- The composer is the field: it carries the one focus mark (the ring from the keyboard, a quiet hairline after a tap); the text field inside shows none.
 
 **Don't**
 - Don't color bubbles per person; mine and theirs is the only distinction.
@@ -2095,7 +2103,9 @@ error message in sync with `data-error`.
 - Don't put helper text and an error in two places; `data-error` replaces the helper text.
 
 **Accessibility:** native controls with real `<label for>`; supporting text is `aria-describedby`; errors set
-`aria-invalid`; the 2dp ink ring is the focus indication; the whole container is a click target;
+`aria-invalid`; focus (issues 62, 64): from the keyboard the focus ring (3dp, focus ring color, outside the box); after
+a tap or click a quiet accent hairline inside the box (core.js sets `data-s4-focus="pointer|key"` on `<html>`), never
+both; the whole container is a click target;
 forced-colors mode draws real borders.
 
 **Tokens:** `--s4-size-text-field`, `--s4-shape-text-field`, `--md-sys-color-surface-container-highest`,
@@ -2282,6 +2292,7 @@ Picks exactly one option from a short visible list. M3 radio button on a native 
 the ink grows in from the middle on the ink spring and drains out calmly. 40dp circular state layer; 48dp hit area. No JS.
 
 **Do:** group with `<fieldset>` + `<legend>` (or `role="radiogroup"` + `aria-label`); keep 2–7 options.
+A `<fieldset>` of radios or checkboxes is drawn by the component (issue 61): the legend is a label above, like a field's, and the options sit in one filled box with a comfortable row each, inset from every corner. Don't restyle the fieldset or the legend on the page (no padding or class overrides).
 **Don't:** use radios for a single on/off choice, or for long lists (use a select in a [text field](#text-field)).
 
 **Accessibility:** native radios: Tab into the group, arrow keys move and select; focus ring around the ring;

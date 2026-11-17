@@ -54,3 +54,26 @@ to the desktop size of the next one up (between a 360 and a 1280 window, then it
 Faces, weights and tracking follow the display and body roles, so the brand dials (`display: serif`, any face) apply
 to sites with no extra rules. Headings are 600 with Inter's tight tracking; a lead is the body face at 400. Smaller
 headings inside a section use the fixed roles (headline-small, title-large). One `h1` per page.
+
+## Which role where on an app screen (issue 54)
+
+Three levels must be told apart at a glance on every screen: **what this is** (the page), **the parts** (sections and
+panes), **the things in a part** (cards, rows, fields). Size carries the first step, weight the second, color
+(`on-surface` vs `on-surface-variant`) the third. Never use the accent to make something rank.
+
+| Level | Where | Role | Weight | Color |
+|---|---|---|---|---|
+| Page title | top app bar title (`.s4-app-bar-title`) | title-large (22) | 600 | on-surface |
+| Page heading in content | `.s4-page-header` h2, `.s4-subpage-title` | headline-small (24) to headline-medium (28) | 600 to 700 | on-surface |
+| Hero number | `.s4-stat-value` | display-small (36); `data-size="small"` headline-small | 700 | on-surface |
+| Section / pane title | `.s4-pane-title`, `.s4-section-title` | title-medium (16) | 600 (pane), 700 (section) | on-surface |
+| Card title, list headline | `.s4-card-title`, `.s4-list-headline` | title-medium / body-large (16) | 500 / 400 | on-surface |
+| Field and control labels | stat label, segmented labels, table header | label-large / title-small (14) | 500 | on-surface-variant |
+| Supporting text | `.s4-pane-supporting`, `.s4-card-supporting`, `.s4-list-supporting` | body-medium (14) | 400 | on-surface-variant |
+| Metadata | times, counts, `.s4-stat-meta`, captions | body-small / label-small (12 / 11) | 400 / 500 | on-surface-variant |
+
+- **The page title is the largest words in a view;** only a hero number may be larger. `tests/layout.mjs` checks it.
+- A pane title and the card titles inside it share a size, so the pane title takes the heading weight (600): weight,
+  not size, separates them, and the card stays the reader's target.
+- Numbers people compare are tabular; a number that needs attention gets size or position (first in the row), never
+  a second color. Status tones (`.s4-status`) are for state words, the same tone for the same state everywhere.
