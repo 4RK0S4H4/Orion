@@ -2279,6 +2279,7 @@ Picks exactly one option from a short visible list. M3 radio button on a native 
 the ink grows in from the middle on the ink spring and drains out calmly. 40dp circular state layer; 48dp hit area. No JS.
 
 **Do:** group with `<fieldset>` + `<legend>` (or `role="radiogroup"` + `aria-label`); keep 2–7 options.
+A `<fieldset>` of radios or checkboxes is drawn by the component (issue 61): the legend is a label above, like a field's, and the options sit in one filled box with a comfortable row each, inset from every corner. Don't restyle the fieldset or the legend on the page (no padding or class overrides).
 **Don't:** use radios for a single on/off choice, or for long lists (use a select in a [text field](#text-field)).
 
 **Accessibility:** native radios: Tab into the group, arrow keys move and select; focus ring around the ring;
