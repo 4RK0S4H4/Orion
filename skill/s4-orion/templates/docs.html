@@ -8,7 +8,7 @@
      glass panel on a phone), a dark page head, the page in prose at reading width with a live diagram, callouts, code
      per platform in tabs and a table, "Was this page helpful?" answered in place, "On This Page" contents that follow
      the reader from 1200, and previous and next.
-     Brand: Mallet, open-source firmware for split keyboards. Amber accent on cool grays, a monospace display face,
+     Brand: Mallet, open-source firmware for split keyboards. Cyan accent on cool grays, a monospace display face,
      soft corners, standard motion. The keymap is real markup (each key a cell whose legend swaps with the layer, through
      the kit's [data-period] switch), not an image. -->
 <meta name="description" content="Layers let a 42-key Mallet keyboard do the work of a full-size one. How layers stack, how to define one in mallet.toml, and how to flash it to your board.">
@@ -283,8 +283,8 @@ mallet flash mallet.toml --side left</code></pre></div>
 <script src="orion.min.js" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {
-  /* the project's brand: amber on cool grays, a monospace display face, soft corners (0055) */
-  S4.theme.restore('mallet-docs-theme', { mode: 'system', seed: '#c27a00', gray: 'cool', corners: 'soft', display: 'mono' });
+  /* the project's brand: cyan on cool grays, a monospace display face, soft corners (0055) */
+  S4.theme.restore('mallet-docs-theme', { mode: 'system', seed: '#0088a3', gray: 'cool', corners: 'soft', display: 'mono' });
 
   /* was this page helpful: the answer is taken in place, with a way to say more */
   var box = document.getElementById('helpful'), thanks = box.querySelector('.ml-thanks');

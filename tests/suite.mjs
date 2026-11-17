@@ -343,11 +343,13 @@ async function use(page, add, phone) {
     /* website kit: the pricing period switch changes the prices; the comparison picker changes the column */
     for (const g of await visible('[data-period]')) {
       const off = g.locator('button[value]:not([aria-pressed="true"])').first();
-      const before = await page.evaluate(() => [...document.querySelectorAll('[data-period-monthly], [data-period-yearly]')].map((e) => e.textContent).join('|'));
+      /* the switch's own values (monthly/yearly, a pack, a layer): whatever it names, its texts must change */
+      const sel = await g.evaluate((x) => [...x.querySelectorAll('button[value]')].map((b) => '[data-period-' + b.value + ']').join(', '));
+      const before = await page.evaluate((sel) => [...document.querySelectorAll(sel)].map((e) => e.textContent).join('|'), sel);
       if (!(await click(off, 'pricing period switch'))) continue;
       await settle(300);
-      const after = await page.evaluate(() => [...document.querySelectorAll('[data-period-monthly], [data-period-yearly]')].map((e) => e.textContent).join('|'));
-      if (before === after) add('pricing period switch did not change the prices');
+      const after = await page.evaluate((sel) => [...document.querySelectorAll(sel)].map((e) => e.textContent).join('|'), sel);
+      if (before === after) add('period switch ([data-period]) did not change its texts');
     }
     for (const c of await visible('.s4-compare > .s4-button-group')) {
       const off = c.locator('button[value]:not([aria-pressed="true"])').first();

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-gray="warm" data-page="soft" data-corners="soft" data-energy="calm" data-density="roomy" data-type-display="custom" data-type-text="custom" style="--md-ref-typeface-brand: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; --md-ref-typeface-plain: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif">
+<html lang="en" data-gray="warm" data-corners="soft" data-energy="calm" data-density="roomy" data-type-display="custom" data-type-text="custom" style="--md-ref-typeface-brand: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; --md-ref-typeface-plain: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,11 +8,10 @@
      cover set in type with its contents), one featured essay, the latest writing filtered by section in place (with an
      empty state), pagination, back issues and a newsletter band. Each piece opens the Article template (article.html);
      reading goes on a page, never a dialog.
-     Brand: Tidewater, a quarterly literary journal. Deep sea-blue accent on warm grays, the soft page (paper in light
-     mode), one book serif for display and text, soft corners, roomy density, calm motion. Covers are drawn from filled
+     Brand: Tidewater, a quarterly literary journal. Deep sea-blue accent on warm grays, one book serif for display and text, soft corners, roomy density, calm motion. Covers are drawn from filled
      shapes in the accent's own tones, never image files. -->
 <meta name="description" content="Tidewater is a quarterly journal of coasts, rivers and the people who work them: essays, reportage and field notes from the edge of the water. Issue 14, The Salt Issue, is out now.">
-<meta name="theme-color" content="#f3f1ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#fcfbfa" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#100f0e" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Tidewater">
@@ -291,9 +290,9 @@
 <script src="orion.min.js" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {
-  /* the journal's brand: sea blue on warm paper, one book serif, soft corners, roomy, calm (0055, 0056) */
+  /* the journal's brand: sea blue on warm grays, one book serif, soft corners, roomy, calm (0055, 0056) */
   var SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
-  S4.theme.restore('tidewater-theme', { mode: 'system', seed: '#1f4e66', variant: 'fidelity', gray: 'warm', page: 'soft', corners: 'soft', energy: 'calm', display: SERIF, text: SERIF });
+  S4.theme.restore('tidewater-theme', { mode: 'system', seed: '#1f4e66', variant: 'fidelity', gray: 'warm', corners: 'soft', energy: 'calm', display: SERIF, text: SERIF });
 
   /* filter the latest writing by section, in place; an empty section says so and offers the next step */
   var pick = document.getElementById('section-pick'), list = document.getElementById('posts'), empty = document.getElementById('posts-empty');
