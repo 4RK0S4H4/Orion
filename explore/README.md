@@ -18,6 +18,7 @@ option card. Answers are saved in the browser so several labs can be worked thro
 | `review-icon-set.html` | Open: icon set (Solar Bold Duotone today, Phosphor Duotone, Phosphor Bold Duotone); also switchable live in the showcase, Settings, Icon Style |
 | `glass-playground.html` | Tool, not a quiz: tune the real glass (tint, blur, boost, edge, floating button tint) over three backdrops, with the live contrast guarantee; send the numbers back |
 | `review-button-group.html` | Answered: E, Joined Capsule ([0026](../docs/decisions/0026-joined-capsule-and-accurate-glass-lab.md)) |
+| `review-button-group-2.html` | Open (issue 63, reopens 0026 at the owner's request): a connected group of Orion's own (Ink Track, Lone Pill, Linked Beads, Break Out, Lifted Tone, or Keep) and whether pairs get a Pair Switch |
 | `review-light-edge.html` | Open: how glass edges should read on light mode (today, hairline outline, shaded rim, edge shade); dark unchanged |
 | `review-depth.html` | Open: how glass and the solid base combine as elevation (chrome only, three levels, one glass hero, glass sheet) |
 | `review-edge-refract.html` | Open: glass rim line (clear rim that shows and brightens the backdrop; today, hairline, bright, wide) |
