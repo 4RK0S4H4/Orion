@@ -1,61 +1,223 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-gray="cool" data-energy="lively" data-type-display="custom" style="--md-ref-typeface-brand: 'DIN Condensed', 'DIN Alternate', 'Avenir Next Condensed', 'Roboto Condensed', 'Arial Narrow', 'Liberation Sans Narrow', sans-serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sign In · S4 Orion Template</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Sign In. For sign-in, sign-up, onboarding and any one-task screen with no navigation: a centered pane on a reading-width page. -->
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<title>Overhang · Sign In</title>
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Sign In, as a product (issue 66). Overhang is a bouldering gym under the railway arches; members sign in
+     to book a slot, check their pass and log the problems they climb. For sign-in, sign-up and any one-task screen
+     with no navigation: the brand's picture on one side (on top on a phone), one short form, and what is useful before
+     signing in (how busy the gym is right now).
+     Brand through the dials: a chalk-bag magenta accent, cool grays, a condensed display face (a system stack: DIN
+     Condensed on Apple devices), stock round corners, lively motion. The wall is a scoped dark region
+     (data-theme="dark"): the gym at night, in light mode too.
+     Its own elements, drawn from Orion's rules: the wall (panels, bolt holes and holds drawn from shapes; this week's
+     problem in the accent, lighting hold by hold as the form is filled in) and the busy meter. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('overhang-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="orion.css">
 <style>
-  .auth { min-block-size: 100dvh; display: grid; align-content: center; }
-  .auth-brand { display: grid; justify-items: center; gap: var(--s4-space-2); text-align: center; padding-block-end: var(--s4-space-6); }
-  .auth-brand .s4-icon { --s4-icon-size: var(--s4-size-icon-large); }
-  .auth-alt { text-align: center; }
+  /* Overhang's own layout and elements: tokens only; nothing here restyles an Orion component */
+  .oh-door { display: grid; gap: var(--s4-space-6); padding-block: var(--s4-space-2) var(--s4-space-8); grid-template-areas: "wall" "form" "tonight"; }
+  .oh-wall { grid-area: wall; position: relative; display: grid; align-content: space-between; gap: var(--s4-space-6); min-block-size: 27rem; padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); overflow: hidden; isolation: isolate; }
+  .oh-tonight { grid-area: tonight; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-high); }
+  .oh-form-side { grid-area: form; display: grid; align-content: center; justify-items: stretch; }
+  .oh-form-col { display: grid; gap: var(--s4-space-5); inline-size: 100%; max-inline-size: 26rem; margin-inline: auto; }
+  @container s4-app (width >= 840px) {
+    .oh-door { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "wall form" "tonight form"; column-gap: var(--s4-space-12); row-gap: var(--s4-space-2); min-block-size: calc(100dvh - var(--s4-space-4)); padding-block: var(--s4-space-3); }
+    .oh-wall { min-block-size: 0; padding: var(--s4-space-8); }
+    /* the busy meter sits under the wall, a second dark block */
+  }
+
+  @container s4-app (width >= 1400px) { .oh-door { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); } }
+
+  /* ---------- the wall ---------- */
+  .oh-art { position: absolute; inset: 0; z-index: -1; inline-size: 100%; block-size: 100%; }
+  .oh-art .panel-a { fill: var(--md-sys-color-surface-container); }
+  .oh-art .panel-b { fill: var(--md-sys-color-surface-container-high); }
+  .oh-art .panel-c { fill: var(--md-sys-color-surface-container-low); }
+  .oh-art .bolt { fill: var(--md-sys-color-outline-variant); }
+  .oh-art .volume { fill: var(--md-sys-color-surface-container-highest); }
+  .oh-art .hold { opacity: .6; }
+  .oh-art .h1 { fill: var(--s4-chart-2); } .oh-art .h2 { fill: var(--s4-chart-3); } .oh-art .h3 { fill: var(--s4-chart-4); } .oh-art .h4 { fill: var(--s4-chart-1); } .oh-art .h5 { fill: var(--s4-chart-6); }
+  /* this week's problem in the accent; its holds brighten one by one as the form is filled in (State) */
+  .oh-art .route-hold { fill: var(--md-sys-color-primary); opacity: .45; transition: opacity var(--s4-motion-state); }
+  .oh-art [data-lit] .route-hold { opacity: 1; }
+  .oh-art .tape { fill: var(--md-sys-color-on-surface); }
+  .oh-art .tape-text { fill: var(--md-sys-color-surface-container-lowest); font-family: var(--md-sys-typescale-label-small-font); font-size: var(--md-sys-typescale-label-small-size); font-weight: 700; }
+
+  .oh-mark { display: grid; gap: var(--s4-space-2); }
+  .oh-word { margin: 0; font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-medium-size); line-height: .9; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+  .oh-word span { color: var(--md-sys-color-primary); }
+  .oh-where { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  @container s4-app (width >= 840px) { .oh-word { font-size: var(--md-sys-typescale-display-large-size); } }
+  .oh-problem { display: grid; gap: var(--s4-space-1); justify-self: start; max-inline-size: min(17rem, 62%); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-highest); }
+  .oh-problem strong { display: flex; align-items: center; gap: var(--s4-space-2); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight, 600); }
+  .oh-problem strong i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .oh-problem span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  @container s4-app (width >= 840px) { .oh-problem { max-inline-size: 20rem; } }
+
+  /* ---------- tonight: the busy meter, one bar an hour, now in the accent ---------- */
+  .oh-busy { display: grid; gap: var(--s4-space-3); padding: var(--s4-space-4) var(--s4-space-5); color: var(--md-sys-color-on-surface); }
+  .oh-busy-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); flex-wrap: wrap; }
+  .oh-busy-head h2 { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); }
+  .oh-now { display: flex; align-items: baseline; gap: var(--s4-space-2); }
+  .oh-now b { font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .oh-now span, .oh-busy p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .oh-bars { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); align-items: end; gap: 3px; block-size: var(--s4-space-12); margin: 0; padding: 0; list-style: none; }
+  .oh-bars li { block-size: calc(var(--v) * 1%); min-block-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 2px 2px; background: var(--md-sys-color-surface-container-highest); }
+  .oh-bars li[data-past] { background: var(--md-sys-color-outline-variant); }
+  .oh-bars li[aria-current] { background: var(--md-sys-color-primary); }
+  .oh-hours { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 3px; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+  .oh-hours span { grid-column: span 3; }
+  .oh-hours span:last-child { grid-column: span 1; text-align: end; }
+
+  /* ---------- the form side ---------- */
+  .oh-hello { display: grid; gap: var(--s4-space-2); }
+  .oh-hello h1 { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: 700; }
+  .oh-hello p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .oh-between { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-2); }
+  .oh-or { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .oh-or::before, .oh-or::after { content: ""; block-size: 1px; background: var(--md-sys-color-outline-variant); }
+  .oh-new { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-1) var(--s4-space-2); margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .oh-small { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .oh-form-col .s4-button[type="submit"], .oh-form-col #passkey { inline-size: 100%; }
+  @media (forced-colors: active) { .oh-wall, .oh-tonight, .oh-problem { border: 1px solid CanvasText; } .oh-bars li, .oh-problem strong i { background: CanvasText; } .oh-bars li[aria-current] { background: Highlight; } }
 </style>
 </head>
 <body>
 <div class="s4-app">
   <div class="s4-app-body">
-    <main class="s4-content auth" data-width="reading">
-      <div class="auth-brand">
-        <span class="s4-empty-icon"><span class="s4-icon" data-icon="sparkle"></span></span>
-        <h1 class="s4-headline-medium s4-emphasized" style="margin:0">Welcome Back</h1>
-        <p class="s4-body-medium s4-on-surface-variant" style="margin:0">Sign in to pick up where you left off.</p>
-      </div>
-      <form class="s4-pane" id="signin" novalidate>
-        <div class="s4-text-field"><span class="s4-icon" data-icon="mail"></span><input id="email" type="email" autocomplete="email" required><label for="email">Email</label></div>
-        <div class="s4-text-field"><span class="s4-icon" data-icon="lock"></span><input id="pw" type="password" autocomplete="current-password" required><label for="pw">Password</label>
-          <button class="s4-icon-button" type="button" aria-label="Show Password" id="pw-toggle"><span class="s4-icon" data-icon="visible"></span></button></div>
-        <div class="s4-row" style="justify-content: space-between">
-          <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Keep Me Signed In</label>
-          <a class="s4-button" data-variant="text" href="#reset">Forgot Password?</a>
+    <main class="s4-content oh-door" data-width="full">
+      <!-- The brand's picture: the wall at night (a scoped dark region). Decorative art behind real text: the name,
+           where the gym is and this week's problem, written out. -->
+      <section class="oh-wall" data-theme="dark" aria-labelledby="oh-name">
+        <svg class="oh-art" id="art" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false"></svg>
+        <div class="oh-mark">
+          <p class="oh-word" id="oh-name" data-hero>Over<span>hang</span></p>
+          <p class="oh-where">Bouldering · Arches 4–6, Leeds</p>
         </div>
-        <button class="s4-button" data-size="m" type="submit">Sign In</button>
-        <div class="s4-divider" role="separator"></div>
-        <button class="s4-button" data-variant="tonal" data-size="m" type="button"><span class="s4-icon" data-icon="key"></span>Sign In With a Passkey</button>
-      </form>
-      <p class="auth-alt s4-body-medium">New here? <a class="s4-button" data-variant="text" href="#signup">Create an Account</a></p>
+        <p class="oh-problem"><strong><i aria-hidden="true"></i>New on the Cave: Problem 14, V4</strong><span>Pink holds, start low on the two taped holds. Set on Monday by Priya.</span></p>
+      </section>
+
+      <!-- The one task: sign in. Errors on leaving a field (.s4-form); forgetting the password opens in place. -->
+      <div class="oh-form-side">
+        <div class="oh-form-col">
+          <div class="oh-hello">
+            <h1>Back on the Wall</h1>
+            <p>Sign in to book a slot, check your pass and tick off what you sent.</p>
+          </div>
+          <form class="s4-form s4-stack" id="signin" novalidate>
+            <div class="s4-text-field"><span class="s4-icon" data-icon="mail"></span><input id="email" type="email" autocomplete="email" required data-msg-required="Enter the email you joined with." data-msg-type="That doesn’t look like an email. Check for the @."><label for="email">Email</label></div>
+            <div class="s4-text-field"><span class="s4-icon" data-icon="lock"></span><input id="pw" type="password" autocomplete="current-password" required minlength="8" data-msg-required="Enter your password." data-msg-length="Your password is at least 8 characters."><label for="pw">Password</label>
+              <button class="s4-icon-button" type="button" aria-label="Show Password" id="pw-toggle"><span class="s4-icon" data-icon="visible"></span></button></div>
+            <div class="oh-between">
+              <label class="s4-checkbox"><input type="checkbox" checked><span class="s4-checkbox-box"></span>Keep Me Signed In</label>
+              <button class="s4-button" data-variant="text" type="button" data-expand="reset">Forgot Password?</button>
+            </div>
+            <div class="s4-expand" id="reset" data-variant="inset" hidden>
+              <div class="s4-expand-body">
+                <p class="oh-small">We’ll email you a link that works for 30 minutes.</p>
+                <div class="s4-text-field"><input id="reset-email" type="email" autocomplete="email"><label for="reset-email">Email for the Link</label></div>
+                <div class="s4-expand-actions">
+                  <button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button>
+                  <button class="s4-button" type="button" id="send-link">Send Link</button>
+                </div>
+              </div>
+            </div>
+            <button class="s4-button" data-variant="filled" data-size="m" type="submit" id="go">Sign In</button>
+          </form>
+          <div class="oh-or">or</div>
+          <button class="s4-button" data-variant="tonal" data-size="m" type="button" id="passkey"><span class="s4-icon" data-icon="key"></span>Sign In With a Passkey</button>
+          <p class="oh-new">New to Overhang? <a class="s4-button" data-variant="text" href="#induction">Book an Induction</a></p>
+          <p class="oh-small">Open today 10:00–22:00. Shoes and chalk to hire at the desk.</p>
+        </div>
+      </div>
+
+      <!-- Useful before signing in: how busy it is. A picture and its words; the bars are one hour each. -->
+      <section class="oh-tonight" data-theme="dark" aria-labelledby="busy-h">
+        <div class="oh-busy">
+          <div class="oh-busy-head">
+            <h2 id="busy-h">Right Now</h2>
+            <div class="oh-now"><b>62</b><span>climbing · busy</span></div>
+          </div>
+          <ol class="oh-bars" id="bars" aria-label="How busy, hour by hour"></ol>
+          <div class="oh-hours" aria-hidden="true"><span>10:00</span><span>13:00</span><span>16:00</span><span>19:00</span><span>22</span></div>
+          <p>Usually quieter after 20:30. The Cave is busiest; the Slab is half empty.</p>
+        </div>
+      </section>
     </main>
   </div>
 </div>
 <script src="icons.js"></script>
 <script src="orion.js"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
-var form = document.getElementById('signin');
-document.getElementById('pw-toggle').addEventListener('click', function () {
-  var pw = document.getElementById('pw'), show = pw.type === 'password';
+<script>
+/* Overhang's brand, under its own key: magenta over the dials set on <html>. */
+var CONDENSED = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();
+S4.theme.restore('overhang-theme', { mode: 'system', seed: '#c8236b', gray: 'cool', energy: 'lively', display: CONDENSED });
+
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- the wall: panels, bolt holes, volumes, other problems' holds, and this week's problem ---------- */
+(function () {
+  var svg = $('art'), out = [];
+  /* hold shapes, about 40 x 30: a jug, a sloper, a pinch, a crimp */
+  var SHAPE = ['M2 18 C2 6 14 0 24 2 C36 4 40 14 36 22 C32 30 8 30 2 18 Z', 'M0 20 C4 4 36 4 40 20 C30 27 10 27 0 20 Z', 'M4 26 L18 3 C20 0 24 0 26 3 L38 24 C40 28 36 30 32 30 H8 C4 30 2 29 4 26 Z', 'M0 12 C0 6 4 4 10 4 H30 C36 4 40 6 40 12 C40 16 36 18 30 18 H10 C4 18 0 16 0 12 Z'];
+  function hold(cls, x, y, k, sc, a) { return '<path class="' + cls + '" d="' + SHAPE[k] + '" transform="translate(' + x + ' ' + y + ') rotate(' + a + ') scale(' + sc + ') translate(-20 -15)"/>'; }
+  /* angled plywood panels and three volumes */
+  out.push('<path class="panel-a" d="M0 0 H600 V800 H0 Z"/>', '<path class="panel-b" d="M0 0 H330 L280 360 L0 420 Z"/>', '<path class="panel-c" d="M330 0 H600 V300 L280 360 Z"/>', '<path class="panel-b" d="M280 360 L600 300 V560 L330 620 Z"/>', '<path class="panel-c" d="M0 420 L280 360 L330 620 L0 700 Z"/>');
+  out.push('<path class="volume" d="M300 520 L380 430 L410 560 Z"/>', '<path class="volume" d="M90 250 L190 210 L150 330 Z"/>', '<path class="volume" d="M500 240 L590 200 L580 330 Z"/>');
+  /* bolt holes on a 40 grid */
+  for (var y = 20; y < 800; y += 40) for (var x = 20; x < 600; x += 40) out.push('<circle class="bolt" cx="' + x + '" cy="' + y + '" r="2.2"/>');
+  /* holds of other problems: a seeded scatter, so the wall is the same on every visit */
+  var s = 11; function r() { s = (s * 9301 + 49297) % 233280; return s / 233280; }
+  for (var i = 0, n = 0; n < 34 && i < 200; i++) {
+    var hx = Math.round(20 + r() * 560), hy = Math.round(20 + r() * 760), k = 1 + Math.floor(r() * 5), sh = Math.floor(r() * 4), sc = (0.45 + r() * 0.6).toFixed(2), a = Math.round(r() * 360);
+    if (hx < 420 && hy < 170) continue;                       /* keep the name clear */
+    if (hx > 360 && hy > 80 && hy < 640) continue;            /* and the problem's line */
+    out.push(hold('hold h' + k, hx, hy, sh, sc, a)); n++;
+  }
+  /* problem 14: a low start on two taped holds, up the right-hand arete to the top jug */
+  var route = [[400, 600, 0, 1, -10], [478, 590, 3, .8, 15], [432, 528, 2, 1, -20], [514, 474, 0, 1.1, 30], [450, 410, 1, 1, 5], [530, 350, 3, .9, -25], [466, 290, 2, 1, 15], [540, 228, 0, 1, -5], [520, 150, 0, 1.4, 0]];
+  route.forEach(function (h, n) { out.push('<g class="route" data-step="' + n + '">' + hold('route-hold', h[0], h[1], h[2], h[3], h[4]) + '</g>'); });
+  out.push('<rect class="tape" x="378" y="624" width="44" height="16" rx="8"/><text class="tape-text" x="400" y="636" text-anchor="middle">START</text>', '<rect class="tape" x="496" y="104" width="48" height="16" rx="8"/><text class="tape-text" x="520" y="116" text-anchor="middle">TOP</text>');
+  svg.innerHTML = out.join('');
+})();
+/* lights the problem's holds up to step n (0 to 9) */
+function light(n) { document.querySelectorAll('#art .route').forEach(function (g) { g.toggleAttribute('data-lit', +g.dataset.step < n); }); }
+
+/* ---------- right now: an hour a bar, past hours quieter, now in the accent ---------- */
+(function () {
+  var load = [18, 22, 30, 41, 38, 35, 46, 64, 82, 90, 74, 48, 26], now = 8;
+  $('bars').innerHTML = load.map(function (v, i) { return '<li style="--v:' + v + '"' + (i < now ? ' data-past' : '') + (i === now ? ' aria-current="time"' : '') + ' aria-label="' + (10 + i) + ':00, ' + (v > 80 ? 'very busy' : v > 55 ? 'busy' : v > 30 ? 'some space' : 'quiet') + '"></li>'; }).join('');
+})();
+
+/* ---------- the form ---------- */
+var form = $('signin'), email = $('email'), pw = $('pw');
+function progress() { var n = 0; if (email.value && email.checkValidity()) n = 4; if (n && pw.value.length >= 8) n = 8; light(n); }
+email.addEventListener('input', progress); pw.addEventListener('input', progress);
+$('pw-toggle').addEventListener('click', function () {
+  var show = pw.type === 'password';
   pw.type = show ? 'text' : 'password';
   this.setAttribute('aria-label', show ? 'Hide Password' : 'Show Password');
   this.querySelector('.s4-icon').setAttribute('data-icon', show ? 'hidden' : 'visible'); S4.init(this);
 });
-form.addEventListener('submit', function (e) {
+form.addEventListener('s4-submit', function (e) {
   e.preventDefault();
-  var email = document.getElementById('email'), field = email.closest('.s4-text-field');
-  if (!email.value || !email.checkValidity()) { field.setAttribute('data-error', 'Enter the email you signed up with.'); return; }
+  light(9);
+  var go = $('go'); go.disabled = true; go.textContent = 'Signing In…';
+  setTimeout(function () { go.disabled = false; go.textContent = 'Sign In'; S4.snackbar({ text: 'Topped out. Your 10-visit pass has 4 climbs left.' }); }, 900);
+});
+/* the reset link: the email they already typed comes along */
+$('reset').addEventListener('s4-open', function () { if (!$('reset-email').value) $('reset-email').value = email.value; });
+$('send-link').addEventListener('click', function () {
+  var f = $('reset-email'), field = f.closest('.s4-text-field');
+  if (!f.value || !f.checkValidity()) { field.setAttribute('data-error', 'Enter the email you joined with.'); return; }
   field.removeAttribute('data-error');
-  S4.snackbar({ text: 'Signed in' });
-});</script>
+  S4.expand.close('reset', 'sent');
+  S4.snackbar('Link sent to ' + f.value + '. Check your spam folder if it’s not there in a minute.');
+});
+$('passkey').addEventListener('click', function () { S4.snackbar('Use Face ID or your phone’s screen lock to sign in.'); });
+</script>
 </body>
 </html>

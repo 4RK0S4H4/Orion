@@ -479,6 +479,19 @@ async function use(page, add, phone) {
       });
       if (miss) add(`button group "${what}": the ink did not land on the selected option (${miss})`);
     }
+    /* brand dial groups (data-brand-dial): picking an option sets that key of S4.theme, and the group follows it back */
+    for (const g of (await visible('.s4-button-group[data-brand-dial]')).slice(0, 2)) {
+      const key = await g.getAttribute('data-brand-dial');
+      const vals = await g.evaluate((x) => ({ was: (x.querySelector('[aria-pressed="true"]') || {}).value, to: (x.querySelector('[value][aria-pressed="false"]:not(:disabled)') || {}).value }));
+      if (!vals.to || !vals.was) continue;
+      if (!(await click(g.locator(`[value="${vals.to}"]`), `brand dial "${key}"`))) continue;
+      await settle(300);
+      const now = await page.evaluate((k) => String(S4.theme()[k]), key);
+      if (now !== vals.to) add(`brand dial "${key}": picking ${vals.to} left S4.theme().${key} at ${now}`);
+      await page.evaluate(([k, v]) => { const o = {}; o[k] = v; S4.theme(o); }, [key, vals.was]);
+      await settle(300);
+      if ((await g.locator(`[value="${vals.was}"]`).getAttribute('aria-pressed')) !== 'true') add(`brand dial "${key}": the group did not follow S4.theme() back to ${vals.was}`);
+    }
     /* accordions */
     for (const s of (await page.$$('.s4-accordion-item:not([open]) > summary')).slice(0, 4)) {
       if (!(await s.isVisible())) continue;
