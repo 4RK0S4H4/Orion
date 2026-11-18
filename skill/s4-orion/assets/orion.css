@@ -7632,7 +7632,7 @@
   .s4-text-field.s4-number-field > .s4-number-field-step { grid-row: 2; margin: 0; }
   .s4-text-field.s4-number-field > .s4-number-field-step[data-dir="-1"] { grid-column: 2; }
   .s4-text-field.s4-number-field > .s4-number-field-step[data-dir="1"] { grid-column: 8; }
-  .s4-text-field.s4-number-field > .s4-text-field-affix[data-prefix] { grid-column: 4; padding-inline: 0 calc(var(--s4-space-1) / 2); }
+  .s4-text-field.s4-number-field > .s4-text-field-affix[data-prefix] { grid-column: 4; padding-inline: 0 var(--s4-space-1); }
   .s4-text-field.s4-number-field > input {
     grid-column: 5;
     min-inline-size: 2ch;
@@ -7640,7 +7640,7 @@
     text-align: center;
     font-variant-numeric: tabular-nums;
   }
-  .s4-text-field.s4-number-field > .s4-text-field-affix[data-suffix] { grid-column: 6; padding-inline: calc(var(--s4-space-1) / 2) 0; }
+  .s4-text-field.s4-number-field > .s4-text-field-affix[data-suffix] { grid-column: 6; padding-inline: var(--s4-space-1) 0; }
   /* with no unit the value is the only text: it may use the whole middle */
   .s4-text-field.s4-number-field:not(:has(> .s4-text-field-affix)) > input { grid-column: 3 / 8; justify-self: center; }
   .s4-text-field.s4-number-field > :is(.s4-text-field-supporting, .s4-text-field-counter) { grid-column: 1 / -1; }

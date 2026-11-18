@@ -211,7 +211,7 @@ function dialAudit(opts) {
   const shown = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width >= 8 && r.height >= 8 && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0 && !el.closest('[hidden], [inert], [data-s4-skip], svg'); };
   /* (a) corners: everything you click that is meant to follow the dial must not be a pill when the dial is not round */
   if (opts.dial) {
-    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option';
+    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option, .s4-color-field-swatch, .s4-rating-star';
     const EXEMPT = '.s4-badge, .s4-avatar, .s4-chip-avatar, .s4-switch *, .s4-radio *, .s4-checkbox *, .s4-slider *, .s4-progress *, .s4-date-picker-day, .s4-status-dot, .s4-chip-remove, [data-shape="circle"]';
     const seen = new Set();
     for (const el of document.querySelectorAll(FOLLOW)) {
@@ -744,7 +744,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker combobox tag-input number-field code-field upload time-field rating color-field password'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */
