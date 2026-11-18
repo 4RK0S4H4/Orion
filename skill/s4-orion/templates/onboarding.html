@@ -1,26 +1,79 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB" data-type-display="custom" style="--md-ref-typeface-brand: 'Gill Sans', 'Gill Sans MT', Seravek, Candara, 'Trebuchet MS', sans-serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Onboarding · S4 Orion Template</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Onboarding. The first minute of an app: three short screens that say what it does, one that sets it up
-     (the things worth asking: a color, notifications), and a door into the app. Always skippable, never more than
-     four steps, and each step is one idea with one button. -->
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<title>Puck · Welcome</title>
+<meta name="description" content="Puck, an espresso dial-in coach: log every shot, change one thing at a time by taste, and know when your beans are at their best.">
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Onboarding, as a product (issue 66). The first minute of an app: three short screens that say what it
+     does, one that sets it up (the things worth asking), and a door into the app. Always skippable, never more than
+     four steps, and each step is one idea with one button.
+     Puck is an espresso dial-in coach for people with a grinder and a scale at home. Brand through the dials only:
+     tinted color mode from an espresso brown (variant fidelity, so it stays coffee instead of turning orange: every
+     surface a little latte), a humanist display face (Gill Sans, Seravek), Phosphor Duotone icons
+     (icons-phosphor-duotone.js). Its own elements, drawn from Orion's rules: the cup with its recipe, the taste dial,
+     the bag and its freshness weeks, and the starting recipe that is worked out as you answer. Phones get one column;
+     from 960 each step is a split: the picture on a big tinted tile, the words and controls beside it. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('puck-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="orion.css">
 <style>
   /* the app's own layout: tokens only */
-  .ob { min-block-size: 100dvh; display: grid; grid-template-rows: auto 1fr auto; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
-  .ob-top { display: flex; justify-content: flex-end; padding: var(--s4-space-3) var(--s4-space-4); padding-block-start: calc(var(--s4-space-3) + env(safe-area-inset-top, 0px)); }
-  .ob-stage { display: grid; place-items: center; padding: var(--s4-space-4) var(--s4-space-6); overflow-x: clip; }
+  .ob { min-block-size: 100dvh; display: grid; grid-template-rows: auto 1fr auto; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); container-type: inline-size; }
+  .ob-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); padding-block-start: calc(var(--s4-space-3) + env(safe-area-inset-top, 0px)); }
+  .pk-mark { display: inline-flex; align-items: center; gap: var(--s4-space-2); margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .pk-mark svg { inline-size: var(--s4-space-8); block-size: var(--s4-space-8); }
+  .pk-mark .puck { fill: var(--md-sys-color-primary); }
+  .pk-mark .ring { fill: var(--md-sys-color-primary-container); }
+  .ob-stage { display: grid; place-items: center; padding: var(--s4-space-2) var(--s4-space-6) var(--s4-space-4); overflow-x: clip; }
   .ob-step { display: grid; justify-items: center; gap: var(--s4-space-4); inline-size: min(100%, 28rem); text-align: center; }
   .ob-step[hidden] { display: none; }
-  .ob-art { display: grid; place-items: center; inline-size: calc(var(--s4-space-16) * 2); block-size: calc(var(--s4-space-16) * 2); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-primary); --s4-icon-size: var(--s4-space-16); }
-  .ob-step h1 { margin: 0; font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
+  .pk-words { display: grid; justify-items: center; gap: var(--s4-space-3); }
+  .ob-step h1 { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
   .ob-step p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .pk-kicker { color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+
+  /* ---------- the pictures: drawn on a big latte tile, real words over them ---------- */
+  .pk-art { --_r: var(--md-sys-shape-corner-extra-large); position: relative; display: grid; place-items: center; inline-size: min(100%, 22rem); aspect-ratio: 5 / 4; border-radius: var(--_r); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); overflow: hidden; }
+  .pk-art > svg { inline-size: 72%; block-size: auto; }
+  .pk-tag { position: absolute; display: inline-flex; align-items: center; gap: var(--s4-space-1); min-block-size: var(--s4-space-8); padding-inline: var(--s4-space-3); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cup .saucer { fill: var(--md-sys-color-surface-container-highest); }
+  .cup .china { fill: var(--md-sys-color-surface-container-lowest); }
+  .cup .coffee { fill: var(--md-sys-color-primary-container); }
+  .cup .art { fill: var(--md-sys-color-on-primary-container); }
+  .cup .steam { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; opacity: 0.35; }
+  /* the taste dial: sour to bitter, the sweet spot in the middle */
+  .dial .zone { fill: none; stroke-width: 22; }
+  .dial .sour { stroke: var(--md-sys-color-tertiary-container); }
+  .dial .sweet { stroke: var(--md-sys-color-primary); }
+  .dial .bitter { stroke: var(--md-sys-color-primary-container); }
+  .dial .needle { fill: var(--md-sys-color-on-surface); }
+  .dial .hub { fill: var(--md-sys-color-surface-container-lowest); }
+  .pk-dial-labels { position: absolute; inset-inline: 12%; inset-block-end: 12%; display: flex; justify-content: space-between; font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  /* the bag and its weeks after roasting */
+  .pk-beans { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-4); align-items: end; inline-size: 84%; }
+  .pk-bag { position: relative; display: grid; align-content: end; inline-size: calc(var(--s4-space-16) * 1.75); aspect-ratio: 3 / 4; padding: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-small) var(--md-sys-shape-corner-small) var(--md-sys-shape-corner-large) var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); text-align: start; }
+  .pk-bag::before { content: ""; position: absolute; inset-inline: 0; inset-block-start: var(--s4-space-3); block-size: var(--s4-space-1); background: var(--md-sys-color-on-primary-container); opacity: 0.35; }
+  .pk-bag b, .pk-bag span { display: block; font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .pk-bag b { font-weight: var(--md-sys-typescale-emphasized-label-medium-weight); }
+  .pk-weeks { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s4-space-1); align-items: end; margin: 0; padding: 0; list-style: none; }
+  .pk-weeks li { display: grid; gap: var(--s4-space-1); justify-items: center; font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-weight: var(--md-sys-typescale-label-small-weight); }
+  .pk-weeks i { inline-size: 100%; block-size: calc(var(--s4-space-16) * 1.6 * var(--h)); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-lowest); }
+  .pk-weeks li[data-peak] i { background: var(--md-sys-color-primary); }
+  .pk-weeks li[data-today] { font-weight: var(--md-sys-typescale-emphasized-label-small-weight); }
+
+  /* ---------- setup: two questions, the recipe they make, a color and a reminder ---------- */
   .ob-setup { display: grid; gap: var(--s4-space-4); inline-size: 100%; text-align: start; }
+  .pk-q { display: grid; gap: var(--s4-space-2); }
+  .pk-q > span { font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-title-small-weight); }
+  .pk-recipe { --_r: var(--md-sys-shape-corner-extra-large); --_pad: var(--s4-space-4); display: grid; gap: var(--s4-space-3); padding: var(--_pad); border-radius: var(--_r); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .pk-recipe-head { display: flex; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  .pk-recipe dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4-space-2); margin: 0; }
+  .pk-recipe dl > div { display: grid; padding: var(--s4-space-2) var(--s4-space-3); border-radius: calc(var(--_r) - var(--_pad)); background: var(--md-sys-color-on-primary-container); color: var(--md-sys-color-primary-container); }
+  .pk-recipe dt { order: 2; font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .pk-recipe dd { order: 1; margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pk-recipe p { margin: 0; color: inherit; font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
   .ob-foot { display: grid; justify-items: center; gap: var(--s4-space-4); padding: var(--s4-space-4) var(--s4-space-6); padding-block-end: calc(var(--s4-space-6) + env(safe-area-inset-bottom, 0px)); }
   .ob-dots { display: flex; align-items: center; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
   /* the current step is a pill of the dot's height (issue 65: a scaled circle was an ellipse); its length changes at once, only the color fades (State) */
@@ -28,43 +81,130 @@
   .ob-dots > li[aria-current] { inline-size: calc(var(--s4-space-2) * 3); background: var(--md-sys-color-primary); }
   .ob-actions { display: flex; gap: var(--s4-space-2); inline-size: min(100%, 28rem); }
   .ob-actions > .s4-button { flex: 1; }
+
+  /* from 960: each step is a split, the picture on a big tile, the words beside it; the foot runs under both */
+  @container (min-width: 960px) {
+    .ob-top { padding-inline: var(--s4-space-8); }
+    .ob-step { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: var(--s4-space-12); inline-size: min(100%, 68rem); text-align: start; }
+    .pk-words { justify-items: start; }
+    .pk-art { inline-size: 100%; aspect-ratio: 1; --_r: var(--md-sys-shape-corner-extra-extra-large); }
+    .ob-step h1 { font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); }
+    .ob-step[data-setup] { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr); }
+    .ob-step[data-done] { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+    .ob-foot { grid-template-columns: auto minmax(0, 1fr); align-items: center; inline-size: min(100% - var(--s4-space-16), 68rem); justify-self: center; padding-inline: 0; }
+    .ob-actions { justify-self: end; inline-size: min(100%, 22rem); }
+  }
+  @media (forced-colors: active) { .pk-art, .pk-tag, .pk-recipe, .pk-bag { border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
 <main class="ob">
-  <div class="ob-top"><button class="s4-button" data-variant="text" type="button" id="ob-skip">Skip</button></div>
+  <div class="ob-top">
+    <p class="pk-mark"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle class="ring" cx="16" cy="16" r="16"/><circle class="puck" cx="16" cy="16" r="10"/><circle class="ring" cx="16" cy="16" r="4"/></svg>Puck</p>
+    <button class="s4-button" data-variant="text" type="button" id="ob-skip">Skip</button>
+  </div>
   <div class="ob-stage" aria-live="polite">
+    <!-- 1: what it does -->
     <section class="ob-step" data-step aria-labelledby="ob-h0">
-      <span class="ob-art"><span class="s4-icon" data-icon="inbox"></span></span>
-      <h1 id="ob-h0">Everything In One Place</h1>
-      <p>Bills, receipts and reminders arrive in one list, newest first.</p>
-    </section>
-    <section class="ob-step" data-step aria-labelledby="ob-h1" hidden>
-      <span class="ob-art"><span class="s4-icon" data-icon="schedule"></span></span>
-      <h1 id="ob-h1">Never Miss A Due Date</h1>
-      <p>We remind you three days before anything is due, and again on the day.</p>
-    </section>
-    <section class="ob-step" data-step aria-labelledby="ob-h2" hidden>
-      <span class="ob-art"><span class="s4-icon" data-icon="chart"></span></span>
-      <h1 id="ob-h2">See Where It Goes</h1>
-      <p>A simple monthly picture of what came in and what went out.</p>
-    </section>
-    <section class="ob-step" data-step aria-labelledby="ob-h3" hidden>
-      <h1 id="ob-h3">Make It Yours</h1>
-      <div class="ob-setup">
-        <section class="s4-pane">
-          <h2 class="s4-pane-title">Accent Color</h2>
-          <div class="s4-swatches" data-theme-seed aria-label="Accent Color"><button class="s4-swatch" type="button" data-seed="#000000" aria-label="Mono"></button><button class="s4-swatch" type="button" data-seed="#0b57d0" aria-label="Blue"></button><button class="s4-swatch" type="button" data-seed="#4f46e5" aria-label="Indigo"></button><button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button><button class="s4-swatch" type="button" data-seed="#2e7d32" aria-label="Green"></button><button class="s4-swatch" type="button" data-seed="#d9480f" aria-label="Orange"></button></div>
-        </section>
-        <section class="s4-pane">
-          <label class="s4-switch" style="justify-content:space-between"><span>Remind Me Before Due Dates</span><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label>
-        </section>
+      <div class="pk-art" role="img" aria-label="An espresso in a white cup, labelled with its recipe: 18 grams in, 36 grams out, 28 seconds">
+        <svg class="cup" viewBox="0 0 200 150" aria-hidden="true" focusable="false">
+          <path class="steam" d="M82 34 c-8 -10 8 -16 0 -28 M100 30 c-8 -10 8 -16 0 -28 M118 34 c-8 -10 8 -16 0 -28"/>
+          <ellipse class="saucer" cx="100" cy="128" rx="78" ry="16"/>
+          <path class="china" d="M146 66 h8 a18 18 0 0 1 0 36 h-8 v-10 h6 a8 8 0 0 0 0 -16 h-6z"/>
+          <path class="china" d="M46 56 h108 v20 a54 54 0 0 1 -108 0z"/>
+          <ellipse class="china" cx="100" cy="56" rx="54" ry="12"/>
+          <ellipse class="coffee" cx="100" cy="57" rx="46" ry="9"/>
+          <path class="art" d="M100 63 c-14 -6 -14 -14 -6 -14 c3 0 5 2 6 4 c1 -2 3 -4 6 -4 c8 0 8 8 -6 14z"/>
+        </svg>
+        <span class="pk-tag" style="inset-inline-start: 7%; inset-block-start: 12%" aria-hidden="true">18 g in</span>
+        <span class="pk-tag" style="inset-inline-end: 7%; inset-block-start: 26%" aria-hidden="true">36 g out</span>
+        <span class="pk-tag" style="inset-inline-start: 10%; inset-block-end: 10%" aria-hidden="true"><span class="s4-icon" data-icon="timer"></span>28 s</span>
+      </div>
+      <div class="pk-words">
+        <span class="pk-kicker">Welcome to Puck</span>
+        <h1 id="ob-h0">Every Shot, Remembered</h1>
+        <p>Weigh it, pull it, taste it. Puck keeps the recipe of every shot, so the good ones are easy to pull again.</p>
       </div>
     </section>
-    <section class="ob-step" data-step aria-labelledby="ob-h4" hidden>
+    <!-- 2 -->
+    <section class="ob-step" data-step aria-labelledby="ob-h1" hidden>
+      <div class="pk-art" role="img" aria-label="A taste dial from sour to bitter with the needle just left of the sweet spot">
+        <svg class="dial" viewBox="0 0 200 130" aria-hidden="true" focusable="false">
+          <path class="zone sour" d="M30 112 A70 70 0 0 1 64 52"/>
+          <path class="zone sweet" d="M70 47 A70 70 0 0 1 130 47"/>
+          <path class="zone bitter" d="M136 52 A70 70 0 0 1 170 112"/>
+          <path class="needle" d="M96 112 L84 54 L104 110z"/>
+          <circle class="hub" cx="100" cy="112" r="10"/>
+        </svg>
+        <span class="pk-tag" style="inset-inline: 0; margin-inline: auto; inline-size: max-content; inset-block-start: 9%" aria-hidden="true">A bit sour? Grind finer</span>
+        <span class="pk-dial-labels" aria-hidden="true"><span>Sour</span><span>Bitter</span></span>
+      </div>
+      <div class="pk-words">
+        <span class="pk-kicker">Dial in by taste</span>
+        <h1 id="ob-h1">One Change At A Time</h1>
+        <p>Tell Puck how the shot tasted. It tells you the one thing to change next: the grind, the dose or the time.</p>
+      </div>
+    </section>
+    <!-- 3 -->
+    <section class="ob-step" data-step aria-labelledby="ob-h2" hidden>
+      <div class="pk-art" role="img" aria-label="A bag of Kiambu AA roasted on 3 November, and its five weeks after roasting: resting, then two peak weeks (this is the first), then fading and stale">
+        <div class="pk-beans" aria-hidden="true">
+          <div class="pk-bag"><b>Kiambu AA</b><span>Roasted 3 Nov</span></div>
+          <ol class="pk-weeks">
+            <li style="--h: .45"><i></i>Rest</li>
+            <li style="--h: 1" data-peak data-today><i></i>Now</li>
+            <li style="--h: .9" data-peak><i></i>Peak</li>
+            <li style="--h: .6"><i></i>Fade</li>
+            <li style="--h: .3"><i></i>Stale</li>
+          </ol>
+        </div>
+      </div>
+      <div class="pk-words">
+        <span class="pk-kicker">Fresh beans, better shots</span>
+        <h1 id="ob-h2">Know When Beans Peak</h1>
+        <p>Add a bag with its roast date. Puck says when it has rested, when it is at its best, and when to finish it.</p>
+      </div>
+    </section>
+    <!-- 4: setup: only what is worth asking now -->
+    <section class="ob-step" data-step data-setup aria-labelledby="ob-h3" hidden>
+      <div class="pk-words">
+        <span class="pk-kicker">Two questions</span>
+        <h1 id="ob-h3">Set Up Your Bar</h1>
+        <p>Your answers give you a starting recipe. You will tune it by taste from your first shot.</p>
+      </div>
+      <div class="ob-setup">
+        <div class="pk-q"><span id="pk-brew-l">What do you brew with?</span>
+          <div class="s4-button-group" data-connected data-select="single" aria-labelledby="pk-brew-l" id="pk-brew">
+            <button class="s4-button" type="button" value="espresso" aria-pressed="true">Espresso</button>
+            <button class="s4-button" type="button" value="moka">Moka Pot</button>
+            <button class="s4-button" type="button" value="aeropress">AeroPress</button>
+          </div>
+        </div>
+        <div class="pk-q"><span id="pk-taste-l">How do you like it?</span>
+          <div class="s4-button-group" data-connected data-select="single" aria-labelledby="pk-taste-l" id="pk-taste">
+            <button class="s4-button" type="button" value="strong">Strong</button>
+            <button class="s4-button" type="button" value="balanced" aria-pressed="true">Balanced</button>
+            <button class="s4-button" type="button" value="mellow">Mellow</button>
+          </div>
+        </div>
+        <section class="pk-recipe" aria-labelledby="pk-recipe-h" aria-live="polite">
+          <div class="pk-recipe-head"><span id="pk-recipe-h">Your Starting Recipe</span><span id="pk-ratio">1 : 2</span></div>
+          <dl><div><dt>Coffee</dt><dd id="pk-dose">18 g</dd></div><div><dt id="pk-out-l">In the cup</dt><dd id="pk-out">36 g</dd></div><div><dt>Time</dt><dd id="pk-time">25–30 s</dd></div></dl>
+          <p id="pk-tip">Water at 93 °C. Start the timer when you start the pump.</p>
+        </section>
+        <div class="pk-q"><span id="pk-color-l">A color for the app</span>
+          <div class="s4-swatches" data-theme-seed data-variant="fidelity" aria-labelledby="pk-color-l"><button class="s4-swatch" type="button" data-seed="#6f4e37" aria-label="Espresso"></button><button class="s4-swatch" type="button" data-seed="#9a6a2f" aria-label="Caramel"></button><button class="s4-swatch" type="button" data-seed="#8e2c3c" aria-label="Cherry"></button><button class="s4-swatch" type="button" data-seed="#5f7a32" aria-label="Matcha"></button><button class="s4-swatch" type="button" data-seed="#465a8c" aria-label="Blueberry"></button></div>
+        </div>
+        <label class="s4-switch" style="justify-content:space-between"><span>Tell Me When A Bag Peaks</span><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></label>
+      </div>
+    </section>
+    <!-- done -->
+    <section class="ob-step" data-step data-done aria-labelledby="ob-h4" hidden>
       <span class="s4-done-mark" data-size="l" id="ob-mark"></span>
-      <h1 id="ob-h4">You’re All Set</h1>
-      <p>You can change any of this later in Settings.</p>
+      <div class="pk-words">
+        <h1 id="ob-h4">Your Bar Is Ready</h1>
+        <p id="pk-done">First up: <b>18 g in, 36 g out, 25–30 s</b>. Pull it, taste it, and tell Puck how it went. You can change any of this later in Settings.</p>
+      </div>
     </section>
   </div>
   <div class="ob-foot">
@@ -72,9 +212,11 @@
     <div class="ob-actions"><button class="s4-button" data-variant="tonal" data-size="m" type="button" id="ob-back" hidden>Back</button><button class="s4-button" data-size="m" type="button" id="ob-next">Next</button></div>
   </div>
 </main>
-<script src="icons.js"></script>
+<script src="icons-phosphor-duotone.js"></script>
 <script src="orion.js"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
+<script>
+/* Puck's brand: tinted from an espresso brown (fidelity keeps it coffee), a humanist display face (decisions 0052, 0055) */
+S4.theme.restore('puck-theme', { mode: 'system', seed: '#6f4e37', variant: 'fidelity', surfaces: 'tinted', display: "'Gill Sans', 'Gill Sans MT', Seravek, Candara, 'Trebuchet MS', sans-serif" });
 var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]')), dots = Array.prototype.slice.call(document.querySelectorAll('#ob-dots li'));
 var at = 0, axis = {}, next = document.getElementById('ob-next'), back = document.getElementById('ob-back'), skip = document.getElementById('ob-skip'), LAST = steps.length - 1;
 function go(to) {
@@ -84,13 +226,33 @@ function go(to) {
   dots.forEach(function (d, i) { if (i === Math.min(to, dots.length - 1)) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); });
   back.hidden = to === 0 || to === LAST; skip.hidden = to >= LAST - 1;
   document.getElementById('ob-dots').hidden = to === LAST;
-  next.textContent = to === LAST ? 'Open The App' : to === LAST - 1 ? 'Finish' : 'Next';
+  next.textContent = to === LAST ? 'Pull Your First Shot' : to === LAST - 1 ? 'Finish' : 'Next';
   if (to === LAST) setTimeout(function () { S4.reward.done(document.getElementById('ob-mark')); }, 300);
 }
 next.addEventListener('click', function () { if (at === LAST) location.href = 'dashboard.html'; else go(at + 1); });
 back.addEventListener('click', function () { go(at - 1); });
 skip.addEventListener('click', function () { go(LAST - 1); });
-document.addEventListener('keydown', function (e) { if (e.target.closest('input, .s4-swatches')) return; if (e.key === 'ArrowRight') go(at + 1); if (e.key === 'ArrowLeft' && at < LAST) go(at - 1); });
+document.addEventListener('keydown', function (e) { if (e.target.closest('input, .s4-swatches, .s4-button-group')) return; if (e.key === 'ArrowRight') go(at + 1); if (e.key === 'ArrowLeft' && at < LAST) go(at - 1); });
+
+/* the starting recipe follows the two answers, in place */
+(function () {
+  var RATIO = { espresso: { strong: 1.5, balanced: 2, mellow: 2.5 }, moka: { strong: 7, balanced: 8, mellow: 9 }, aeropress: { strong: 10, balanced: 12, mellow: 14 } };
+  var BREW = {
+    espresso: { dose: 18, unit: 'g', out: 'In the cup', time: { strong: '22–26 s', balanced: '25–30 s', mellow: '28–34 s' }, tip: 'Water at 93 °C. Start the timer when you start the pump.' },
+    moka: { dose: 15, unit: 'ml', out: 'Water', time: { strong: '4–5 min', balanced: '4–5 min', mellow: '4–5 min' }, tip: 'Hot water in the base, medium heat, off the heat when it starts to sputter.' },
+    aeropress: { dose: 15, unit: 'ml', out: 'Water', time: { strong: '1:30', balanced: '2:00', mellow: '2:30' }, tip: 'Water just off the boil. Stir once, steep, then press slowly for 30 seconds.' }
+  };
+  var brew = 'espresso', taste = 'balanced', $ = function (id) { return document.getElementById(id); };
+  function show() {
+    var b = BREW[brew], r = RATIO[brew][taste], out = Math.round(b.dose * r) + ' ' + b.unit, time = b.time[taste];
+    $('pk-ratio').textContent = '1 : ' + String(r).replace('.', '.');
+    $('pk-dose').textContent = b.dose + ' g'; $('pk-out-l').textContent = b.out; $('pk-out').textContent = out; $('pk-time').textContent = time; $('pk-tip').textContent = b.tip;
+    $('pk-done').innerHTML = 'First up: <b>' + b.dose + ' g of coffee, ' + out + (brew === 'espresso' ? ' out' : ' of water') + ', ' + time + '</b>. Brew it, taste it, and tell Puck how it went. You can change any of this later in Settings.';
+  }
+  $('pk-brew').addEventListener('s4-change', function (e) { brew = e.detail.value; show(); });
+  $('pk-taste').addEventListener('s4-change', function (e) { taste = e.detail.value; show(); });
+  show();
+})();
 </script>
 </body>
 </html>
