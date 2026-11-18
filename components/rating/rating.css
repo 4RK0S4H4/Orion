@@ -1,0 +1,90 @@
+/* Rating: stars in the accent beside their number. The display is read-only (half steps); the input is a radio group
+   with stars you tap (whole steps). Empty stars use --s4-color-control, so an input's stars meet 3:1; a filled star is
+   the accent. Stars are drawn by rating.js (a fixed shape with rounded points), not taken from the icon set.
+   <span class="s4-rating" data-value="4.5" data-count="128"></span>
+   <fieldset class="s4-rating" data-input data-name="service"><legend>Rate the Service</legend></fieldset> */
+@layer s4.components {
+  .s4-rating {
+    --_size: calc(var(--s4-size-icon-small) * 0.9);
+    --_on-color: var(--md-sys-color-primary);
+    --_off-color: var(--s4-color-control);
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-1) var(--s4-space-2);
+    vertical-align: middle;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-rating[data-size="l"] { --_size: var(--s4-size-icon); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); }
+  .s4-rating-stars { display: inline-flex; align-items: center; gap: calc(var(--s4-space-1) / 2); }
+  .s4-rating-mark { position: relative; display: inline-grid; inline-size: var(--_size); block-size: var(--_size); flex: none; }
+  .s4-rating-mark > span { grid-area: 1 / 1; display: block; }
+  .s4-rating-mark svg { display: block; inline-size: 100%; block-size: 100%; overflow: visible; }
+  .s4-rating-mark path { fill: currentColor; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }   /* rounded points: nothing sharp */
+  .s4-rating-empty { color: var(--_off-color); }
+  .s4-rating-full { color: var(--_on-color); clip-path: inset(0 calc(100% - var(--_fill, 0%)) 0 0); }
+  .s4-rating-full:dir(rtl) { clip-path: inset(0 0 0 calc(100% - var(--_fill, 0%))); }   /* the filled part starts at the inline start */
+  .s4-rating-count { color: var(--md-sys-color-on-surface-variant); font-weight: var(--md-sys-typescale-body-medium-weight); }
+
+  /* ---------- the input ---------- */
+  fieldset.s4-rating { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+  .s4-rating[data-input] { --_size: var(--s4-size-icon-large); display: flex; }
+  .s4-rating[data-input] > legend {
+    float: inline-start;
+    inline-size: 100%;
+    padding: 0 0 var(--s4-space-1);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
+  .s4-rating[data-input] > legend + * { clear: inline-start; }
+  .s4-rating[data-input] .s4-rating-stars { gap: 0; }
+  .s4-rating-star {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: var(--s4-size-touch-target);
+    block-size: var(--s4-size-touch-target);
+    border-radius: min(calc(var(--s4-size-touch-target) / 2), var(--s4-shape-control));
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .s4-rating-star:first-child { margin-inline-start: calc((var(--s4-size-touch-target) - var(--_size)) / -2); }   /* the first star lines up with the label */
+  .s4-rating-star > input { position: absolute; inset: 0; z-index: 1; inline-size: 100%; block-size: 100%; margin: 0; opacity: 0; cursor: inherit; }
+  .s4-rating-star .s4-rating-full { clip-path: none; opacity: 0; transition: opacity var(--s4-motion-state); }
+  .s4-rating-star[data-on] .s4-rating-full { opacity: 1; }
+  .s4-rating-star[data-on] .s4-rating-empty { opacity: 0; transition: opacity var(--s4-motion-state); }
+  .s4-rating-star:has(> input:focus-visible) { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-rating-star:has(> input:disabled) { cursor: default; }
+  .s4-rating[data-input]:has(input:disabled) { --_on-color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); --_off-color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100%), transparent); }
+  .s4-rating[data-input] > .s4-rating-value { min-inline-size: 8ch; }
+  .s4-rating[data-input] > .s4-rating-value[data-empty] { color: var(--md-sys-color-on-surface-variant); font-weight: var(--md-sys-typescale-body-medium-weight); }
+
+  .s4-rating-error {
+    flex-basis: 100%;
+    color: var(--md-sys-color-error);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    font-weight: var(--md-sys-typescale-body-small-weight);
+  }
+  .s4-rating-error[hidden] { display: none; }
+  .s4-rating[data-error] > legend { color: var(--md-sys-color-error); }
+
+  @media (forced-colors: active) {
+    .s4-rating-empty { color: GrayText; }
+    .s4-rating-full { color: CanvasText; }
+    .s4-rating-star { border: 1px solid ButtonText; }
+    .s4-rating-star[data-on] .s4-rating-full { color: Highlight; }
+    .s4-rating-star:has(> input:focus-visible) { outline-color: Highlight; }
+  }
+}

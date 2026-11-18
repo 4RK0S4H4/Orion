@@ -592,6 +592,20 @@ async function use(page, add, phone) {
       const v = await f.evaluate((x) => S4.timeField.value(x));
       if (v !== 17 * 60 + 45) add(`time field: "545p" was not read as 5:45 PM (got ${v})`);
     }
+    for (const r of (await visible('.s4-rating:not([data-input])')).slice(0, 1)) {
+      const st = await r.evaluate((x) => ({ label: x.getAttribute('aria-label') || '', num: (x.querySelector('.s4-rating-value') || {}).textContent || '' }));
+      if (!/out of/.test(st.label) || !st.num.trim()) add('rating: a display has no number beside it or no spoken value');
+    }
+    for (const r of (await visible('.s4-rating[data-input]:not(:has(input:disabled))')).slice(0, 1)) {
+      const stars = r.locator('.s4-rating-star');
+      if (!(await click(stars.nth(2), 'rating star'))) continue;
+      const v = await r.evaluate((x) => { const c = x.querySelector('input:checked'); return c ? +c.value : 0; });
+      if (v !== 3) add(`rating: tapping the third star chose ${v}`);
+      await page.keyboard.press('ArrowRight');
+      const v2 = await r.evaluate((x) => ({ v: (x.querySelector('input:checked') || {}).value, on: x.querySelectorAll('.s4-rating-star[data-on]').length }));
+      if (v2.v !== '4' || v2.on !== 4) add(`rating: the arrow key did not move to four stars (${v2.v}, ${v2.on} lit)`);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
