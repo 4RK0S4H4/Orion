@@ -31,6 +31,7 @@
       if (!input.getAttribute('pattern')) input.setAttribute('pattern', alnum ? '[A-Z0-9]{' + n + '}' : '[0-9]{' + n + '}');
       if (!input.dataset.msgPattern) input.dataset.msgPattern = 'Enter all ' + n + ' ' + (alnum ? 'characters' : 'digits') + '.';
       f.style.setProperty('--_n', n);
+      f.toggleAttribute('data-many', n > 6);
       /* a group's wider gap is an empty track between boxes, so every box keeps the same width */
       var slots = [], tracks = [], col = 0;
       for (var i = 0; i < n; i++) {

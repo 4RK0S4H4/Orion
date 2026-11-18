@@ -552,6 +552,33 @@ async function use(page, add, phone) {
       await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace');
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-upload:not([data-variant]):not([data-disabled])')).slice(0, 1)) {
+      const zone = f.locator('.s4-upload-zone');
+      /* the zone is a real button that opens the file chooser (never drag-only) */
+      try {
+        if (!(await zone.evaluate((z) => z.tagName === 'BUTTON' && !z.disabled && z.tabIndex >= 0))) add('upload: the drop zone is not a real button in the Tab order');
+        await zone.scrollIntoViewIfNeeded({ timeout: 2000 });
+        const [chooser] = await Promise.all([page.waitForEvent('filechooser', { timeout: 6000 }), zone.click({ timeout: 3000 })]);
+        await chooser.setFiles({ name: 'suite-receipt.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 suite') });
+      } catch (e) { add('upload: the drop zone did not open the file chooser (' + String(e.message).split('\n')[0].slice(0, 80) + ')'); continue; }
+      await settle(400);
+      const st = await f.evaluate((x) => { const l = S4.upload.files(x); const last = l[l.length - 1]; return { name: last && last.file.name, id: last && last.id, rows: x.querySelectorAll('.s4-upload-item:not([data-leaving])').length }; });
+      if (st.name !== 'suite-receipt.pdf') { add('upload: a chosen file was not added'); continue; }
+      const row = f.locator(`.s4-upload-item[data-id="${st.id}"]`);
+      await f.evaluate((x, id) => S4.upload.progress(x, id, 0.5), st.id);
+      if ((await row.locator('.s4-upload-progress').getAttribute('data-value')) !== '0.5') add('upload: S4.upload.progress did not move the bar');
+      await f.evaluate((x, id) => S4.upload.fail(x, id, 'Couldn’t upload.'), st.id);
+      const retry = row.locator('.s4-upload-retry');
+      if (!(await retry.isVisible())) add('upload: a failed file shows no Try Again');
+      else {
+        await f.evaluate((x) => { x._suiteRetry = 0; x.addEventListener('s4-retry', () => { x._suiteRetry++; }, { once: true }); });
+        await retry.click();
+        if (!(await f.evaluate((x) => x._suiteRetry))) add('upload: Try Again did not fire s4-retry');
+      }
+      await row.locator('.s4-upload-remove').click(); await settle(450);
+      if (await f.evaluate((x, id) => S4.upload.files(x).some((e) => e.id === id), st.id)) add('upload: Remove did not remove the file');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;

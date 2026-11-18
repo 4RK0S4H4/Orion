@@ -10,6 +10,7 @@
     column-gap: var(--s4-space-2);
     justify-content: start;
   }
+  .s4-text-field.s4-code-field[data-many] { column-gap: var(--s4-space-1); }   /* seven or eight boxes still fit a phone */
   .s4-text-field.s4-code-field::before { display: none; }
   .s4-text-field.s4-code-field > :is(label, .s4-text-field-supporting, .s4-text-field-counter) { grid-column: 1 / -1; }
   .s4-text-field.s4-code-field > input {

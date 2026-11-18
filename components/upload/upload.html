@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>File Upload · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: var(--s4-space-8) var(--s4-space-6); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / File Upload</h1></header>
+<main class="ex-main">
+  <p>A drop zone that is also a button, so it works with a tap, a click, the keyboard or a drag. Each file gets a row with its size, a progress bar while it is sent, Try Again after an error, and Remove. Orion never uploads anything itself: it checks each file, shows it and fires events; the app sends it and reports progress back.</p>
+
+  <section class="ex-sec">
+    <h2>Drop Zone and Files</h2>
+    <p>The hint under the title comes from <code>accept</code>, <code>data-max-size</code> and <code>data-max-files</code>. Here the pretend server takes a few seconds; a file with “fail” in its name fails, and Try Again sends it again. A file that is too big or the wrong type is refused with the reason.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-upload" id="up-receipts" data-max-size="10 MB" data-max-files="5">
+          <span class="s4-upload-label">Receipts</span>
+          <input type="file" name="receipts" accept=".pdf,image/*" multiple>
+          <div class="s4-text-field-supporting">They are attached to this expense report.</div>
+        </div>
+        <div class="s4-upload" id="up-states" data-max-size="10 MB">
+          <span class="s4-upload-label">Every State</span>
+          <input type="file" name="states" accept=".pdf,image/*" multiple>
+          <div class="s4-text-field-supporting">Uploading, uploaded, failed and refused.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Compact and Photo</h2>
+    <p><code>data-variant="compact"</code>: one file in a row the size of a field, for a form. <code>data-variant="avatar"</code>: a round photo with a camera badge; tap it to change the photo.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-upload" data-variant="compact" id="up-compact" data-max-size="5 MB">
+          <span class="s4-upload-label">Proof of Address</span>
+          <input type="file" name="proof" accept=".pdf,.jpg,.png">
+          <div class="s4-text-field-supporting">A bill or bank statement from the last three months.</div>
+        </div>
+        <div class="s4-upload" data-variant="avatar" data-initials="AR" data-max-size="4 MB">
+          <input type="file" name="photo" accept="image/*">
+          <div class="s4-upload-avatar-text">
+            <span class="s4-upload-label">Profile Photo</span>
+            <div class="s4-text-field-supporting">A square photo works best, up to 4 MB.</div>
+            <button class="s4-button" data-variant="text" data-size="s" type="button" data-upload-remove>Remove Photo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In a Form, Error and Disabled</h2>
+    <p>With <code>required</code>, sending the form without a file shows the message; the zone keeps its fill. A disabled upload says why in its supporting text.</p>
+    <div class="ex-board">
+      <form class="s4-form s4-stack" id="up-form" style="inline-size: 100%">
+        <div class="ri-grid">
+          <div class="s4-upload" data-variant="compact" data-error="Add your signed contract.">
+            <span class="s4-upload-label">Signed Contract</span>
+            <input type="file" name="contract" accept=".pdf" required data-msg-required="Add your signed contract.">
+            <div class="s4-text-field-supporting">PDF only.</div>
+          </div>
+          <div class="s4-upload" data-max-size="10 MB">
+            <span class="s4-upload-label">Attachments</span>
+            <input type="file" name="attachments" multiple disabled>
+            <div class="s4-text-field-supporting">Attachments are turned off for this workspace.</div>
+          </div>
+        </div>
+        <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" data-variant="filled" type="submit">Send</button></div>
+      </form>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/upload/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../progress/progress.js"></script>
+<script src="../upload/upload.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  /* a pretend server: progress every few hundred milliseconds; names with "fail" fail halfway */
+  function pretend(field, id, file, stopAt) {
+    var p = 0;
+    S4.upload.progress(field, id, 0);
+    var t = setInterval(function () {
+      p += 0.08 + Math.random() * 0.12;
+      if (/fail/i.test(file.name) && p > 0.5 && !file._retried) { clearInterval(t); S4.upload.fail(field, id, 'Couldn’t upload. The connection dropped.'); return; }
+      if (stopAt && p >= stopAt) { clearInterval(t); S4.upload.progress(field, id, stopAt); return; }
+      if (p >= 1) { clearInterval(t); S4.upload.done(field, id); return; }
+      S4.upload.progress(field, id, p);
+    }, 350);
+  }
+  document.addEventListener('s4-upload', function (e) { var f = e.target; if (f.id === 'up-states') return; pretend(f, e.detail.id, e.detail.file); });
+  document.addEventListener('s4-retry', function (e) { e.detail.file._retried = true; pretend(e.target, e.detail.id, e.detail.file); });
+
+  /* example files for the "every state" list (a drawn picture for the thumbnail) */
+  function picture(cb) {
+    var c = document.createElement('canvas'); c.width = 96; c.height = 96; var g = c.getContext('2d');
+    var css = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim() || 'gray'; };
+    g.fillStyle = css('--md-sys-color-secondary-container'); g.fillRect(0, 0, 96, 96);
+    g.fillStyle = css('--md-sys-color-primary'); g.beginPath(); g.arc(68, 28, 12, 0, 7); g.fill();
+    g.fillStyle = css('--md-sys-color-on-secondary-container'); g.beginPath(); g.moveTo(0, 96); g.lineTo(34, 46); g.lineTo(60, 80); g.lineTo(74, 64); g.lineTo(96, 96); g.fill();
+    c.toBlob(function (b) { cb(new File([b], 'storefront-receipt.png', { type: 'image/png' })); });
+  }
+  var states = document.getElementById('up-states');
+  picture(function (img) {
+    var files = [img, new File([new Uint8Array(2400000)], 'march-utilities.pdf', { type: 'application/pdf' }),
+      new File([new Uint8Array(830000)], 'taxi-fail.pdf', { type: 'application/pdf' }),
+      new File([new Uint8Array(14900000)], 'scan-of-everything.pdf', { type: 'application/pdf' }),
+      new File(['x'], 'notes.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })];
+    S4.upload.add(states, files);
+    var list = S4.upload.files(states);
+    S4.upload.done(states, list[0].id);
+    S4.upload.progress(states, list[1].id, 0.62);
+    S4.upload.fail(states, list[2].id, 'Couldn’t upload. The connection dropped.');
+  });
+  document.getElementById('up-form').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.form.saved(e.target, 'Sent'); });
+</script>
+</body>
+</html>
