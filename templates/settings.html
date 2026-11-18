@@ -1,77 +1,392 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-lists="segmented" data-corners="soft" data-energy="calm">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Settings · S4 Orion Template</title>
-<!-- Template: Settings. For any app’s settings: grouped switches, choices and the theme controls, on a reading-width page, with a danger zone last. -->
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<title>Larkline · Settings</title>
+<!-- Template: Settings, as a product (issue 66). Larkline records a bird's song on your phone and tells you who sang
+     it; this is its settings screen. For any app's settings: grouped switches and choices, the app's theme controls as
+     a designed Appearance section with a live preview, storage, account, and a danger zone last.
+     Brand through the dials: an umber accent (a wren's brown), tinted surfaces (the whole app is the color of a field
+     notebook), soft corners, calm motion, segmented lists as the app default. The Appearance section is where the
+     visitor turns the same dials (S4.theme): day and night, plumage (the accent, each one a bird), paper (tinted or
+     neutral), headings (a field-guide serif or Inter) and contrast. Their choice is saved under Larkline's own key.
+     Its own elements, drawn from Orion's rules: the field card preview (a bird drawn from shapes in the color roles,
+     its song as a sonogram), the notebook header and the storage bar. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('larkline-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.css?v=8e522bf">
+<style>
+  /* Larkline's own layout and elements: tokens only; nothing here restyles an Orion component */
+  .lk-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .lk-small { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* ---------- the notebook: who this is, before what they can change ---------- */
+  .lk-book { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--s4-space-4); padding-block: var(--s4-space-2) var(--s4-space-1); }
+  .lk-book .s4-avatar { inline-size: var(--s4-space-16); block-size: var(--s4-space-16); font-size: var(--md-sys-typescale-title-large-size); }
+  .lk-book h2 { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight, 600); }
+  .lk-tally { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4-space-2); margin: 0; }
+  .lk-tally > div { display: grid; gap: 2px; padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); }
+  .lk-tally dt { order: 2; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .lk-tally dd { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight, 600); font-variant-numeric: tabular-nums; }
+  @container s4-app (width >= 840px) {
+    .lk-book { grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.3fr); }
+    .lk-tally { grid-column: auto; }
+  }
+
+  /* ---------- Appearance: the preview beside the dials ---------- */
+  .lk-look { display: grid; gap: var(--s4-space-6); }
+  .lk-look-head { display: grid; gap: var(--s4-space-1); }
+  .lk-look-title { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight, 600); }
+  .lk-dials { display: grid; gap: var(--s4-space-5); align-content: start; }
+  .lk-dial { display: grid; gap: var(--s4-space-2); }
+  .lk-dial-name { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
+  .lk-dial-name output { color: var(--md-sys-color-on-surface-variant); font-weight: var(--md-sys-typescale-label-large-weight); }
+  @container s4-app (width >= 840px) { .lk-look { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: var(--s4-space-8); } .lk-look-head { grid-column: 1 / -1; } }
+
+  /* the field card: a sighting as the notebook will show it, drawn only in color roles, so every dial reaches it */
+  .lk-stage { display: grid; gap: var(--s4-space-3); align-content: start; }
+  .lk-card { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); }
+  .lk-scene { position: relative; display: grid; place-items: center; aspect-ratio: 16 / 10; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary-container); overflow: hidden; }
+  .lk-scene svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .lk-scene .sky { fill: var(--md-sys-color-secondary-container); }
+  .lk-scene .sun { fill: var(--md-sys-color-primary-fixed-dim); }
+  .lk-scene .hill { fill: var(--md-sys-color-primary-container); }
+  .lk-scene .twig { fill: var(--md-sys-color-on-secondary-container); }
+  .lk-scene .body { fill: var(--md-sys-color-primary); }
+  .lk-scene .wing { fill: color-mix(in oklab, var(--md-sys-color-primary), var(--md-sys-color-on-surface) 30%); }
+  .lk-scene .bar, .lk-scene .brow { fill: color-mix(in oklab, var(--md-sys-color-primary) 35%, var(--md-sys-color-surface-container-lowest)); }
+  .lk-scene .breast { fill: color-mix(in oklab, var(--md-sys-color-primary) 30%, var(--md-sys-color-surface-container-lowest)); }
+  .lk-scene .beak { fill: var(--md-sys-color-on-surface); }
+  .lk-scene .eye { fill: var(--md-sys-color-surface-container-lowest); }
+  .lk-scene .pupil { fill: var(--md-sys-color-on-surface); }
+  .lk-heard { position: absolute; z-index: 1; inset-block-start: var(--s4-space-3); inset-inline-start: var(--s4-space-3); padding: 2px var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-label-medium-weight, 600); font-variant-numeric: tabular-nums; }
+  .lk-name { display: grid; gap: 2px; }
+  .lk-name-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); }
+  .lk-species { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight, 600); }
+  .lk-latin { margin: 0; color: var(--md-sys-color-on-surface-variant); font-style: italic; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .lk-song { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); }
+  .lk-gram { display: flex; align-items: center; gap: 2px; block-size: var(--s4-space-10); }
+  .lk-gram i { flex: 1 1 0; min-inline-size: 1px; block-size: calc(var(--h) * 1%); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+  .lk-gram i[data-quiet] { background: var(--md-sys-color-outline); }
+  .lk-meta { display: flex; flex-wrap: wrap; gap: var(--s4-space-1) var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
+  .lk-meta span { display: inline-flex; align-items: center; gap: var(--s4-space-1); }
+  .lk-meta .s4-icon { --s4-icon-size: var(--s4-space-4); }
+  .lk-caption { margin: 0; padding-inline: var(--s4-space-2); }
+
+  /* ---------- the groups: one column on a phone, two from 1200 ---------- */
+  .lk-cols { display: grid; gap: var(--s4-space-4); align-items: start; }
+  .lk-col { display: grid; gap: var(--s4-space-4); align-content: start; }
+  @container s4-app (width >= 1200px) { .lk-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s4-space-6); } }
+
+  /* a setting with its name and value on one line and the control under it */
+  .lk-row { display: grid; gap: var(--s4-space-2); }
+  .lk-row-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); }
+  .lk-row-head label, .lk-row-head span:first-child { font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .lk-row-head output { font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight, 600); font-variant-numeric: tabular-nums; }
+  .lk-switch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-4); }
+  .lk-switch-row > span { display: grid; gap: 2px; }
+
+  /* the storage bar: what Larkline keeps on this phone, one segment a kind, free space last */
+  .lk-store { display: grid; gap: var(--s4-space-3); }
+  .lk-store-total { display: flex; align-items: baseline; gap: var(--s4-space-2); flex-wrap: wrap; }
+  .lk-store-total strong { font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight, 600); font-variant-numeric: tabular-nums; }
+  .lk-bar { display: flex; gap: 2px; block-size: var(--s4-space-4); }
+  .lk-bar > i { flex: var(--w) 1 0; min-inline-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--_k); }
+  .lk-bar > i:first-child { border-start-start-radius: var(--md-sys-shape-corner-full); border-end-start-radius: var(--md-sys-shape-corner-full); }
+  .lk-bar > i:last-child { border-start-end-radius: var(--md-sys-shape-corner-full); border-end-end-radius: var(--md-sys-shape-corner-full); }
+  .lk-key { display: flex; flex-wrap: wrap; gap: var(--s4-space-1) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
+  .lk-key li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .lk-key i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--_k); }
+  [data-k="rec"] { --_k: var(--md-sys-color-primary); }
+  [data-k="gb"] { --_k: var(--md-sys-color-tertiary); }
+  [data-k="ib"] { --_k: var(--md-sys-color-secondary); }
+  [data-k="sc"] { --_k: var(--md-sys-color-on-primary-container); }
+  [data-k="free"] { --_k: var(--md-sys-color-surface-container-highest); }
+  .lk-packs { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .lk-pack { display: grid; grid-template-columns: var(--s4-space-3) minmax(0, 1fr) auto; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-3) var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); }
+  .lk-pack > i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--_k); }
+  .lk-pack:not([data-on]) > i { background: var(--md-sys-color-outline-variant); }
+  .lk-pack-text { display: grid; gap: 2px; min-inline-size: 0; }
+  .lk-pack-text strong { font-weight: var(--md-sys-typescale-emphasized-body-large-weight, 600); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .lk-pack .s4-progress { grid-column: 2 / -1; }
+  @media (forced-colors: active) { .lk-bar > i, .lk-key i, .lk-pack > i, .lk-gram i { background: CanvasText; } .lk-card, .lk-pack, .lk-tally > div { border: 1px solid CanvasText; } }
+</style>
 </head>
 <body>
 <div class="s4-app">
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <button class="s4-icon-button" type="button" aria-label="Back"><span class="s4-icon" data-icon="back"></span></button>
+      <a class="s4-icon-button" href="#notebook" aria-label="Back to Notebook"><span class="s4-icon" data-icon="back"></span></a>
       <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Settings</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Help" data-tooltip="Help"><span class="s4-icon" data-icon="help"></span></button></div>
     </header>
-    <main class="s4-content" data-width="reading">
+    <main class="s4-content">
       <div class="s4-stack">
-        <section class="s4-pane" aria-labelledby="look-h">
-          <h2 class="s4-pane-title" id="look-h">Appearance</h2>
-          <p class="s4-pane-supporting">Applies to this device.</p>
-          <div class="s4-button-group" data-connected data-select="single" data-theme-mode aria-label="Theme">
-            <button class="s4-button" data-variant="tonal" type="button" value="light"><span class="s4-icon" data-icon="light-mode"></span>Light</button>
-            <button class="s4-button" data-variant="tonal" type="button" value="system" aria-pressed="true">System</button>
-            <button class="s4-button" data-variant="tonal" type="button" value="dark"><span class="s4-icon" data-icon="dark-mode"></span>Dark</button>
+        <!-- Whose notebook this is: settings start from the person, not the switches -->
+        <section class="lk-book" aria-labelledby="book-h">
+          <span class="s4-avatar" aria-hidden="true">MH</span>
+          <div><h2 id="book-h">Maren Holt</h2><p class="lk-sub">Listening on Dunwich Heath since March 2024</p></div>
+          <dl class="lk-tally">
+            <div><dt>Species This Year</dt><dd>138</dd></div>
+            <div><dt>Recordings</dt><dd>412</dd></div>
+            <div><dt>Dawn Walks</dt><dd>61</dd></div>
+          </dl>
+        </section>
+
+        <!-- Appearance: the theme controls, as Larkline's own section. Every control is an S4.theme dial; the field card
+             beside them is a sighting drawn in color roles, so it shows each change at once. -->
+        <section class="s4-pane lk-look" aria-labelledby="look-h">
+          <div class="lk-look-head">
+            <h2 class="lk-look-title" id="look-h">How Larkline Looks</h2>
+            <p class="lk-sub">On this phone only. Your recordings sound the same everywhere.</p>
           </div>
-          <div class="s4-button-group" data-connected data-select="single" data-theme-contrast aria-label="Contrast">
-            <button class="s4-button" data-variant="tonal" type="button" value="0" aria-pressed="true">Standard</button>
-            <button class="s4-button" data-variant="tonal" type="button" value="0.5">Medium</button>
-            <button class="s4-button" data-variant="tonal" type="button" value="1">High</button>
+          <div class="lk-stage">
+            <article class="lk-card" aria-labelledby="pv-name" aria-describedby="pv-cap">
+              <div class="lk-scene">
+                <span class="lk-heard">06:14</span>
+                <svg viewBox="0 0 240 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+                  <rect class="sky" width="240" height="150"/>
+                  <circle class="sun" cx="192" cy="42" r="20"/>
+                  <path class="hill" d="M0 124 C70 104 150 116 240 100 V150 H0 Z"/>
+                  <path class="twig" d="M0 121 L240 113 L240 119 L0 127 Z"/>
+                  <path class="twig" d="M178 116 L208 92 L212 96 L186 117 Z"/>
+                  <rect class="twig" x="110" y="108" width="3.5" height="10" rx="1.75"/>
+                  <rect class="twig" x="124" y="108" width="3.5" height="10" rx="1.75"/>
+                  <path class="body" d="M92 86 L68 50 C66 46 70 44 73 46 L102 78 Z"/>
+                  <ellipse class="body" cx="120" cy="90" rx="34" ry="23"/>
+                  <circle class="body" cx="149" cy="73" r="17"/>
+                  <path class="breast" d="M124 112 C146 110 158 100 160 84 C152 96 140 102 126 104 Z"/>
+                  <path class="wing" d="M96 84 C110 70 132 72 140 82 C130 96 108 98 96 92 Z"/>
+                  <path class="bar" d="M108 78 l5 14 h3 l-5 -14 Z M118 76 l5 16 h3 l-5 -16 Z M128 76 l5 15 h3 l-5 -15 Z M76 53 l8 -3 l1 3 l-8 3 Z M82 61 l8 -3 l1 3 l-8 3 Z"/>
+                  <path class="brow" d="M140 66 C148 61 158 62 165 67 C158 65 148 65 141 69 Z"/>
+                  <path class="beak" d="M164 71 L182 75 L164 79 Z"/>
+                  <circle class="eye" cx="155" cy="72" r="4.2"/>
+                  <circle class="pupil" cx="156" cy="72" r="2.3"/>
+                </svg>
+              </div>
+              <div class="lk-name">
+                <div class="lk-name-row"><h3 class="lk-species" id="pv-name">Wren</h3><span class="s4-status" data-tone="primary" id="pv-match">97% Match</span></div>
+                <p class="lk-latin" id="pv-latin">Troglodytes troglodytes</p>
+              </div>
+              <div class="lk-song">
+                <button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Play the Wren’s Song" id="pv-play"><span class="s4-icon" data-icon="play"></span></button>
+                <div class="lk-gram" id="pv-gram" role="img" aria-label="Sonogram: a loud trill of 12 seconds"></div>
+              </div>
+              <div class="lk-meta"><span><span class="s4-icon" data-icon="location"></span>Dunwich Heath</span><span><span class="s4-icon" data-icon="mic"></span>12 s</span><span><span class="s4-icon" data-icon="calendar"></span>Tue 11 Nov</span></div>
+            </article>
+            <p class="lk-caption lk-sub lk-small" id="pv-cap">A sighting in your notebook, in the look you pick.</p>
           </div>
-          <div class="s4-swatches" data-theme-seed aria-label="Theme Color">
-            <button class="s4-swatch" type="button" data-seed="#000000" aria-label="Mono"></button>
-            <button class="s4-swatch" type="button" data-seed="#4f46e5" aria-label="Indigo"></button>
-            <button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button>
-            <button class="s4-swatch" type="button" data-seed="#c2410c" aria-label="Orange"></button>
+
+          <div class="lk-dials">
+            <div class="lk-dial" role="group" aria-labelledby="d-mode">
+              <span class="lk-dial-name" id="d-mode">Day and Night</span>
+              <div class="s4-button-group" data-connected data-select="single" data-theme-mode aria-label="Day and Night">
+                <button class="s4-button" type="button" value="light"><span class="s4-icon" data-icon="light-mode"></span>Day</button>
+                <button class="s4-button" type="button" value="system" aria-pressed="true">Auto</button>
+                <button class="s4-button" type="button" value="dark"><span class="s4-icon" data-icon="dark-mode"></span>Night</button>
+              </div>
+            </div>
+            <div class="lk-dial" role="group" aria-labelledby="d-plumage">
+              <span class="lk-dial-name"><span id="d-plumage">Plumage</span><output id="plumage-out">Wren</output></span>
+              <!-- each swatch is a bird; fidelity keeps a muted brown instead of turning it vivid -->
+              <div class="s4-swatches" data-theme-seed data-variant="fidelity" aria-label="Plumage">
+                <button class="s4-swatch" type="button" data-seed="#7c4f24" aria-label="Wren"></button>
+                <button class="s4-swatch" type="button" data-seed="#00658f" aria-label="Kingfisher"></button>
+                <button class="s4-swatch" type="button" data-seed="#b5431b" aria-label="Robin"></button>
+                <button class="s4-swatch" type="button" data-seed="#56732a" aria-label="Greenfinch"></button>
+                <button class="s4-swatch" type="button" data-seed="#000000" aria-label="Magpie"></button>
+              </div>
+            </div>
+            <div class="lk-dial" role="group" aria-labelledby="d-paper">
+              <span class="lk-dial-name" id="d-paper">Paper</span>
+              <div class="s4-button-group" data-connected data-select="single" id="paper" aria-label="Paper">
+                <button class="s4-button" type="button" value="tinted" aria-pressed="true">Field Notebook</button>
+                <button class="s4-button" type="button" value="neutral">Plain</button>
+              </div>
+            </div>
+            <div class="lk-dial" role="group" aria-labelledby="d-type">
+              <span class="lk-dial-name" id="d-type">Bird Names</span>
+              <div class="s4-button-group" data-connected data-select="single" id="type" aria-label="Bird Names">
+                <button class="s4-button" type="button" value="inter" aria-pressed="true">Clean</button>
+                <button class="s4-button" type="button" value="serif">Field Guide</button>
+              </div>
+            </div>
+            <div class="lk-dial" role="group" aria-labelledby="d-contrast">
+              <span class="lk-dial-name" id="d-contrast">Contrast</span>
+              <div class="s4-button-group" data-connected data-select="single" data-theme-contrast aria-label="Contrast">
+                <button class="s4-button" type="button" value="0" aria-pressed="true">Standard</button>
+                <button class="s4-button" type="button" value="0.5">Medium</button>
+                <button class="s4-button" type="button" value="1">High</button>
+              </div>
+            </div>
+            <div class="s4-row"><button class="s4-button" data-variant="text" type="button" id="look-reset"><span class="s4-icon" data-icon="refresh"></span>Back to Larkline’s Look</button></div>
           </div>
         </section>
-        <ul class="s4-list" data-style="segmented" aria-label="Notifications">
-          <li class="s4-list-subheader">Notifications</li>
-          <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="notifications"></span></span><span class="s4-list-content"><span class="s4-list-headline">Push Notifications</span><span class="s4-list-supporting">Replies and mentions</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
-          <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="mail"></span></span><span class="s4-list-content"><span class="s4-list-headline">Weekly Email</span><span class="s4-list-supporting">A summary every Monday</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
-        </ul>
-        <ul class="s4-list" data-style="segmented" aria-label="Account">
-          <li class="s4-list-subheader">Account</li>
-          <li><a class="s4-list-item" href="#profile"><span class="s4-list-leading"><span class="s4-icon" data-icon="account"></span></span><span class="s4-list-content"><span class="s4-list-headline">Profile</span><span class="s4-list-supporting">Name, photo and email</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="#security"><span class="s4-list-leading"><span class="s4-icon" data-icon="security"></span></span><span class="s4-list-content"><span class="s4-list-headline">Password and Security</span><span class="s4-list-supporting">Two-step sign-in is on</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="#language"><span class="s4-list-leading"><span class="s4-icon" data-icon="globe"></span></span><span class="s4-list-content"><span class="s4-list-headline">Language</span></span><span class="s4-list-trailing"><span class="s4-list-supporting">English</span><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-        </ul>
-        <section class="s4-pane" aria-labelledby="data-h">
-          <h2 class="s4-pane-title" id="data-h">Storage</h2>
-          <p class="s4-pane-supporting">2.4 GB of 5 GB used.</p>
-          <div class="s4-progress" data-value="0.48" aria-label="Storage Used"></div>
-          <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button"><span class="s4-icon" data-icon="download"></span>Export Data</button></div>
-        </section>
-        <section class="s4-pane" data-color="error" aria-labelledby="danger-h">
-          <h2 class="s4-pane-title" id="danger-h">Delete Account</h2>
-          <p class="s4-pane-supporting">This deletes your account and everything in it. You can’t undo this.</p>
-          <div class="s4-row"><button class="s4-button" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
-        </section>
+
+        <div class="lk-cols">
+          <div class="lk-col">
+            <!-- Switches that apply at once: a segmented list of labels (the whole row toggles) -->
+            <ul class="s4-list" aria-label="Recording">
+              <li class="s4-list-subheader">Recording</li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="mic"></span></span><span class="s4-list-content"><span class="s4-list-headline">Record in Full Quality</span><span class="s4-list-supporting">48 kHz WAV, about 11 MB a minute</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="history"></span></span><span class="s4-list-content"><span class="s4-list-headline">Keep the Five Seconds Before</span><span class="s4-list-supporting">Birds rarely wait for you to tap</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="tune"></span></span><span class="s4-list-content"><span class="s4-list-headline">Cut Wind and Traffic</span><span class="s4-list-supporting">Filters below 800 Hz, where owls and bitterns call</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+            </ul>
+
+            <!-- Choices with a value: a select, a slider with its value beside the name, a switch row -->
+            <section class="s4-pane" aria-labelledby="id-h">
+              <h2 class="s4-pane-title" id="id-h">Naming Birds</h2>
+              <div class="s4-text-field"><select id="region"><option>Britain and Ireland</option><option>Western Europe</option><option>Iberia and Morocco</option><option>Scandinavia and Finland</option><option>North America</option></select><label for="region">Birds of</label><div class="s4-text-field-supporting">Larkline only suggests birds that live where you listen.</div></div>
+              <div class="lk-row">
+                <div class="lk-row-head"><label for="sure">Name a Bird From</label><output for="sure" id="sure-out">80%</output></div>
+                <div class="s4-slider" data-suffix="%"><input type="range" id="sure" min="50" max="95" step="5" value="80"></div>
+                <p class="lk-sub lk-small" id="sure-note">Under 80% sure, Larkline says “Possibly” and shows the three likeliest birds.</p>
+              </div>
+              <label class="lk-switch-row"><span><span>Name Birds While I Record</span><span class="lk-sub lk-small">Names appear on the sonogram as each bird sings</span></span><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>
+            </section>
+
+            <ul class="s4-list" aria-label="Notifications">
+              <li class="s4-list-subheader">Notifications</li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="star"></span></span><span class="s4-list-content"><span class="s4-list-headline">Rare Birds Near You</span><span class="s4-list-supporting">Within 20 km, from the county records</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="light-mode"></span></span><span class="s4-list-content"><span class="s4-list-headline">Dawn Chorus Alarm</span><span class="s4-list-supporting" id="dawn-note">Off. Sunrise tomorrow is 07:14.</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" id="dawn"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+              <li><label class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="mail"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sunday Notebook</span><span class="s4-list-supporting">The week’s birds in one email</span></span><span class="s4-list-trailing"><span class="s4-switch"><input type="checkbox" role="switch" checked><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></span></label></li>
+            </ul>
+          </div>
+
+          <div class="lk-col">
+            <!-- Storage: what is on this phone, drawn; packs remove with Undo and download in place -->
+            <section class="s4-pane" aria-labelledby="store-h">
+              <h2 class="s4-pane-title" id="store-h">Song Packs on This Phone</h2>
+              <div class="lk-store">
+                <p class="lk-store-total"><strong id="store-used" data-hero>3.4 GB</strong><span class="lk-sub">of 8 GB set aside for Larkline</span></p>
+                <div class="lk-bar" id="store-bar" role="img" aria-label="Storage"></div>
+                <ul class="lk-key" id="store-key"></ul>
+              </div>
+              <ul class="lk-packs" id="packs" aria-label="Song Packs">
+                <li class="lk-pack" data-on data-k="gb" data-id="gb"><i aria-hidden="true"></i><span class="lk-pack-text"><strong>Britain and Ireland</strong><span class="lk-sub lk-small">263 birds · 0.9 GB</span></span><button class="s4-button" data-variant="text" data-size="s" type="button">Remove</button></li>
+                <li class="lk-pack" data-on data-k="ib" data-id="ib"><i aria-hidden="true"></i><span class="lk-pack-text"><strong>Iberia and Morocco</strong><span class="lk-sub lk-small">318 birds · 0.4 GB</span></span><button class="s4-button" data-variant="text" data-size="s" type="button">Remove</button></li>
+                <li class="lk-pack" data-k="sc" data-id="sc"><i aria-hidden="true"></i><span class="lk-pack-text"><strong>Scandinavia and Finland</strong><span class="lk-sub lk-small">241 birds · 0.5 GB</span></span><button class="s4-button" data-variant="tonal" data-size="s" type="button"><span class="s4-icon" data-icon="download"></span>Download</button></li>
+              </ul>
+              <p class="lk-sub lk-small">Packs let Larkline name birds with no signal, which on a heath is most of the time.</p>
+            </section>
+
+            <ul class="s4-list" aria-label="Account">
+              <li class="s4-list-subheader">Account</li>
+              <li><a class="s4-list-item" href="#profile"><span class="s4-list-leading"><span class="s4-icon" data-icon="account"></span></span><span class="s4-list-content"><span class="s4-list-headline">Profile</span><span class="s4-list-supporting">maren.holt@fieldpost.co.uk</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
+              <li><a class="s4-list-item" href="#atlas"><span class="s4-list-leading"><span class="s4-icon" data-icon="share"></span></span><span class="s4-list-content"><span class="s4-list-headline">Share With the County Recorder</span><span class="s4-list-supporting">Rare birds only, with the place blurred to 1 km</span></span><span class="s4-list-trailing"><span class="s4-list-supporting">On</span><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
+              <li><button class="s4-list-item" type="button" id="export"><span class="s4-list-leading"><span class="s4-icon" data-icon="export"></span></span><span class="s4-list-content"><span class="s4-list-headline">Export Every Recording</span><span class="s4-list-supporting">412 WAV files and a spreadsheet of sightings</span></span></button></li>
+              <li><button class="s4-list-item" type="button" id="signout"><span class="s4-list-leading"><span class="s4-icon" data-icon="logout"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sign Out</span></span></button></li>
+            </ul>
+
+            <!-- Danger zone, last: the one thing that cannot be undone gets a dialog (decision 0047) -->
+            <section class="s4-pane" data-color="error" aria-labelledby="danger-h">
+              <h2 class="s4-pane-title" id="danger-h">Delete Account</h2>
+              <p class="s4-pane-supporting">This deletes your notebook and all 412 recordings. Export them first if you want to keep them. You can’t undo this.</p>
+              <div class="s4-row"><button class="s4-button" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
+            </section>
+          </div>
+        </div>
       </div>
     </main>
   </div>
 </div>
 <dialog class="s4-dialog" id="confirm-delete" aria-labelledby="cd-h">
   <span class="s4-icon s4-dialog-icon" data-icon="delete"></span>
-  <h2 class="s4-dialog-headline" id="cd-h">Delete your account?</h2>
-  <div class="s4-dialog-content">Everything in it is deleted for good.</div>
-  <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="text" data-color="error" data-close="delete" type="button">Delete</button></div>
+  <h2 class="s4-dialog-headline" id="cd-h">Delete your notebook?</h2>
+  <div class="s4-dialog-content">All 412 recordings and 138 species go for good, on every device.</div>
+  <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Keep It</button><button class="s4-button" data-variant="text" data-color="error" data-close="delete" type="button">Delete</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=27d8ac2"></script>
 <script src="../components/orion.js?v=e4024d6"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });</script>
+<script>
+/* Larkline's look, saved under its own key: the visitor's choices from the Appearance section win over the defaults. */
+var LOOK = { seed: '#7c4f24', variant: 'fidelity', surfaces: 'tinted', display: 'inter', contrast: 0, corners: 'soft', energy: 'calm' };
+S4.theme.restore('larkline-theme', Object.assign({ mode: 'system' }, LOOK));
+
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- the field card follows the plumage ---------- */
+var BIRDS = {
+  '#7c4f24': { name: 'Wren', latin: 'Troglodytes troglodytes', match: 97, song: 'a loud trill of 12 seconds', gram: [20, 34, 58, 72, 80, 76, 88, 92, 84, 90, 86, 94, 88, 80, 92, 70, 84, 66, 74, 40, 0, 0, 30, 62, 78, 70, 54, 28] },
+  '#00658f': { name: 'Kingfisher', latin: 'Alcedo atthis', match: 91, song: 'two sharp whistles', gram: [0, 70, 92, 60, 0, 0, 0, 74, 96, 58, 0, 0, 0, 0, 0, 0, 66, 88, 50, 0, 0, 0, 72, 90, 54, 0, 0, 0] },
+  '#b5431b': { name: 'Robin', latin: 'Erithacus rubecula', match: 98, song: 'a wistful warble with pauses', gram: [0, 48, 76, 62, 80, 0, 0, 56, 90, 70, 40, 0, 0, 0, 66, 84, 58, 72, 0, 0, 52, 78, 92, 60, 0, 0, 44, 64] },
+  '#56732a': { name: 'Greenfinch', latin: 'Chloris chloris', match: 88, song: 'a long wheezing “dzweee”', gram: [10, 18, 26, 34, 42, 50, 56, 62, 66, 70, 72, 74, 74, 72, 70, 66, 62, 56, 48, 40, 0, 0, 36, 58, 70, 58, 36, 0] },
+  'mono': { name: 'Magpie', latin: 'Pica pica', match: 99, song: 'a dry machine-gun chatter', gram: [86, 0, 90, 0, 84, 0, 92, 0, 88, 0, 80, 0, 90, 0, 86, 0, 0, 0, 0, 82, 0, 88, 0, 84, 0, 90, 0, 0] }
+};
+function bird() { var s = (S4.theme().seed || '').toLowerCase(); return BIRDS[s] || BIRDS[s ? LOOK.seed : 'mono'] || BIRDS[LOOK.seed]; }
+function drawCard() {
+  var b = bird();
+  $('pv-name').textContent = b.name; $('pv-latin').textContent = b.latin; $('plumage-out').textContent = b.name;
+  $('pv-match').textContent = b.match + '% Match';
+  $('pv-play').setAttribute('aria-label', 'Play the ' + b.name + '’s Song');
+  $('pv-gram').setAttribute('aria-label', 'Sonogram: ' + b.song);
+  $('pv-gram').innerHTML = b.gram.map(function (h) { return h ? '<i style="--h:' + h + '"></i>' : '<i data-quiet style="--h:8"></i>'; }).join('');
+}
+
+/* ---------- Paper and Bird Names: two more dials, as button groups that follow S4.theme() ---------- */
+function press(group, value) { $(group).querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.value === value)); }); }
+function reflect() { var t = S4.theme(); press('paper', t.surfaces === 'tinted' ? 'tinted' : 'neutral'); press('type', t.display === 'serif' ? 'serif' : 'inter'); drawCard(); }
+$('paper').addEventListener('s4-change', function (e) { S4.theme({ surfaces: e.detail.value }); });
+$('type').addEventListener('s4-change', function (e) { S4.theme({ display: e.detail.value }); });
+document.addEventListener('s4-theme', reflect);
+reflect();
+
+/* back to the brand, with Undo (day or night stays as the visitor set it) */
+$('look-reset').addEventListener('click', function () {
+  var before = S4.theme();
+  S4.theme(LOOK);
+  S4.snackbar({ text: 'Back to Larkline’s own look', action: 'Undo', onAction: function () { S4.theme({ seed: before.seed, variant: before.variant, surfaces: before.surfaces, display: before.display, contrast: before.contrast }); } });
+});
+$('pv-play').addEventListener('click', function () { S4.snackbar('Playing the ' + bird().name + ', recorded at 06:14 on Dunwich Heath'); });
+
+/* ---------- Naming Birds ---------- */
+$('sure').addEventListener('input', function () {
+  var v = this.value; $('sure-out').textContent = v + '%';
+  $('sure-note').textContent = v >= 90 ? 'Only names you can bet on. Larkline will say “Possibly” more often.' : 'Under ' + v + '% sure, Larkline says “Possibly” and shows the three likeliest birds.';
+});
+$('dawn').addEventListener('change', function () { $('dawn-note').textContent = this.checked ? 'At 06:44, half an hour before sunrise.' : 'Off. Sunrise tomorrow is 07:14.'; });
+
+/* ---------- Song packs: the bar is drawn from the packs that are on the phone ---------- */
+var SIZES = { rec: 2.1, gb: 0.9, ib: 0.4, sc: 0.5 }, NAMES = { rec: 'Your Recordings', gb: 'Britain and Ireland', ib: 'Iberia and Morocco', sc: 'Scandinavia' }, CAP = 8;
+function on() { return ['rec'].concat(Array.prototype.filter.call($('packs').children, function (li) { return li.hasAttribute('data-on'); }).map(function (li) { return li.dataset.id; })); }
+function gb(n) { return (Math.round(n * 10) / 10).toFixed(1) + ' GB'; }
+function drawStore() {
+  var ks = on(), used = ks.reduce(function (a, k) { return a + SIZES[k]; }, 0), free = CAP - used;
+  $('store-used').textContent = gb(used);
+  $('store-bar').innerHTML = ks.map(function (k) { return '<i data-k="' + k + '" style="--w:' + SIZES[k] + '"></i>'; }).join('') + '<i data-k="free" style="--w:' + free + '"></i>';
+  $('store-bar').setAttribute('aria-label', 'Storage: ' + ks.map(function (k) { return NAMES[k] + ' ' + gb(SIZES[k]); }).join(', ') + ', ' + gb(free) + ' free');
+  $('store-key').innerHTML = ks.map(function (k) { return '<li data-k="' + k + '"><i aria-hidden="true"></i>' + NAMES[k] + ' ' + gb(SIZES[k]) + '</li>'; }).join('') + '<li data-k="free"><i aria-hidden="true"></i>Free ' + gb(free) + '</li>';
+}
+function setPack(li, isOn) {
+  var btn = li.querySelector('button');
+  li.toggleAttribute('data-on', isOn);
+  btn.dataset.variant = isOn ? 'text' : 'tonal';
+  btn.innerHTML = isOn ? 'Remove' : '<span class="s4-icon" data-icon="download"></span>Download';
+  S4.init(btn); drawStore();
+}
+$('packs').addEventListener('click', function (e) {
+  var btn = e.target.closest('button'); if (!btn) return;
+  var li = btn.closest('.lk-pack'), name = li.querySelector('strong').textContent;
+  if (li.hasAttribute('data-on')) {
+    setPack(li, false);
+    S4.snackbar({ text: name + ' removed. ' + gb(SIZES[li.dataset.id]) + ' free again.', action: 'Undo', onAction: function () { setPack(li, true); } });
+    return;
+  }
+  /* download in place: the button becomes a progress bar, then the pack joins the bar above */
+  btn.hidden = true;
+  var bar = document.createElement('div'); bar.className = 's4-progress'; bar.setAttribute('aria-label', 'Downloading ' + name); bar.dataset.value = '0';
+  li.appendChild(bar); S4.init(li);
+  var v = 0, t = setInterval(function () {
+    v = Math.min(1, v + 0.2); bar.dataset.value = String(v);
+    if (v >= 1) { clearInterval(t); bar.remove(); btn.hidden = false; setPack(li, true); S4.snackbar(name + ' is ready. Larkline can name its birds offline.'); }
+  }, 450);
+});
+drawStore();
+
+$('export').addEventListener('click', function () { S4.snackbar('Preparing 412 recordings. We’ll email Maren a link when it’s ready.'); });
+$('signout').addEventListener('click', function () { S4.snackbar('Signed out. Your recordings stay on this phone until you sign in again.'); });
+document.getElementById('confirm-delete').addEventListener('close', function () { if (this.returnValue === 'delete') S4.snackbar('Your notebook is being deleted.'); });
+</script>
 </body>
 </html>
