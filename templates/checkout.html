@@ -211,7 +211,8 @@
               <li><span class="s4-step-dot">3</span><span class="s4-step-label">Payment</span></li>
             </ol>
             <div class="co-steps" aria-live="polite">
-            <!-- step 1: seats. The plan sits in a dark room (a scoped theme), the ticket types under it -->
+            <!-- step 1: seats. The plan sits in a dark room (a scoped theme), the ticket types under it. The plan is a map of
+                 the room, so it never mirrors (dir="ltr"); the words around it do -->
             <div class="vl-step" data-step="0">
               <section class="vl-house" data-theme="dark" aria-labelledby="vl-house-h">
                 <div class="vl-house-head"><h2 id="vl-house-h">Choose Your Seats</h2><p id="vl-free">31 of 68 seats free</p></div>
@@ -219,7 +220,7 @@
                   <svg viewBox="0 0 300 26" focusable="false"><path d="M6 20 Q150 -4 294 20 L294 24 Q150 2 6 24Z" fill="currentColor"/><path d="M30 24 Q150 8 270 24 L240 26 Q150 14 60 26Z" fill="currentColor" opacity=".12"/></svg>
                   Screen
                 </div>
-                <div class="vl-plan" id="vl-plan" role="group" aria-label="Seat Plan, Screen 2. Use the arrow keys to move between seats."></div>
+                <div class="vl-plan" id="vl-plan" dir="ltr" role="group" aria-label="Seat Plan, Screen 2. Use the arrow keys to move between seats."></div>
                 <ul class="vl-legend" aria-label="Key">
                   <li><span class="vl-key"></span>Free, £11.50</li>
                   <li><span class="vl-key" data-key="sofa"></span>Sofa for two, £14.00 a seat</li>

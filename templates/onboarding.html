@@ -43,6 +43,7 @@
   .cup .art { fill: var(--md-sys-color-on-primary-container); }
   .cup .steam { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; opacity: 0.35; }
   /* the taste dial: sour to bitter, the sweet spot in the middle */
+  .dial:dir(rtl) { transform: scaleX(-1); }   /* the dial reads in the direction of the text, like its labels */
   .dial .zone { fill: none; stroke-width: 22; }
   .dial .sour { stroke: var(--md-sys-color-tertiary-container); }
   .dial .sweet { stroke: var(--md-sys-color-primary); }
