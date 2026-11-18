@@ -96,6 +96,11 @@ patterns).
   or at least name it in the dial table.
 - Custom faces were seen here only as fallbacks (DejaVu Serif for Didot, DejaVu Sans for Gill Sans and SF Rounded).
 
+## Right-to-left choices
+The Velvet's seat plan is a map of a real room, so it keeps `dir="ltr"` (seat 1 stays at screen left) while the words
+around it mirror; its arrow keys read the plan's own direction. Puck's taste dial mirrors with its labels (`:dir(rtl)`),
+so sour and bitter stay under their words.
+
 ## Tests changed (and why)
 None. Two targeted findings were fixed in the pages: the seat that holds the plan's tab stop was 23.9px wide at 390
 (padding trimmed), and a `transform` transition on a seat was off the State pattern (removed).
