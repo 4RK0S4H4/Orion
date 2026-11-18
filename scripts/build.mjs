@@ -143,7 +143,7 @@ const GROUPS = [
   ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state', 'states', 'direct', 'chart', 'ring', 'milestones', 'timeline', 'month']],
   ['Content', ['prose', 'message']],
   ['Websites', ['site']],
-  ['Inputs', ['form', 'text-field', 'combobox', 'tag-input', 'number-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],
+  ['Inputs', ['form', 'text-field', 'combobox', 'tag-input', 'number-field', 'code-field', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches']],
   ['Feedback', ['badge', 'status', 'progress', 'banner', 'skeleton', 'reward', 'snackbar', 'tooltip']],
   ['Overlays', ['menu', 'dialog', 'sheet', 'palette']],
 ];

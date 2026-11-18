@@ -536,6 +536,22 @@ async function use(page, add, phone) {
       if (v2 !== v0) add(`number field: the arrow key did not step back (${v1} -> ${v2}, expected ${v0})`);
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-code-field:not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator(':scope > input');
+      if (!(await click(inp, 'one-time code'))) continue;
+      await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace');
+      await f.evaluate((x) => { x._suiteDone = ''; x.addEventListener('s4-complete', (e) => { x._suiteDone = e.detail.value; }, { once: true }); });
+      await page.keyboard.type('12');
+      const st = await f.evaluate((x) => ({ filled: x.querySelectorAll('.s4-code-field-slot[data-filled]').length, active: [...x.querySelectorAll('.s4-code-field-slot')].findIndex((s) => s.hasAttribute('data-active')) }));
+      if (st.filled !== 2 || st.active !== 2) add(`one-time code: typing did not fill the boxes in order (${st.filled} filled, box ${st.active} active)`);
+      const n = await f.evaluate((x) => x.querySelectorAll('.s4-code-field-slot').length);
+      await page.keyboard.insertText(' 3-4 5 6 7 8 9 0');
+      const st2 = await f.evaluate((x) => ({ v: x.querySelector(':scope > input').value, done: x._suiteDone }));
+      if (st2.v.length !== n || !/^\d+$/.test(st2.v)) add(`one-time code: a pasted code with spaces and dashes did not fill every box ("${st2.v}")`);
+      if (st2.done !== st2.v) add('one-time code: s4-complete did not fire when the last box filled');
+      await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
