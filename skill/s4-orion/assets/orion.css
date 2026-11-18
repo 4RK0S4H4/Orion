@@ -9289,6 +9289,125 @@
   }
 }
 
+/* ---- password/password.css ---- */
+/* Password helpers: a Show Password button at the end of the field, a four-segment strength meter with words under the
+   supporting text, and a Caps Lock notice. Colors only repeat what the words say. */
+@layer s4.components {
+  .s4-password-strength, .s4-password-caps {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-1) var(--s4-space-2);
+    padding-block-start: var(--s4-space-2);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-tracking);
+    font-weight: var(--md-sys-typescale-body-small-weight);
+    cursor: default;
+  }
+  .s4-password-strength { grid-row: 4; }
+  .s4-password-caps { grid-row: 5; color: var(--s4-color-warning); --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-password-strength[hidden], .s4-password-caps[hidden] { display: none; }
+  .s4-password-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s4-space-1); flex: 0 0 calc(var(--s4-space-12) * 2); }
+  .s4-password-bars > span {
+    block-size: var(--s4-space-1);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-surface-container-highest);
+    transition: background-color var(--s4-motion-state);
+  }
+  .s4-password-strength { --_tone: var(--md-sys-color-error); }
+  .s4-password-strength[data-score="2"] { --_tone: var(--s4-color-warning); }
+  .s4-password-strength:is([data-score="3"], [data-score="4"]) { --_tone: var(--s4-color-success); }
+  .s4-password-strength[data-score="0"] > .s4-password-bars > span:nth-child(-n + 1),
+  .s4-password-strength[data-score="1"] > .s4-password-bars > span:nth-child(-n + 1),
+  .s4-password-strength[data-score="2"] > .s4-password-bars > span:nth-child(-n + 2),
+  .s4-password-strength[data-score="3"] > .s4-password-bars > span:nth-child(-n + 3),
+  .s4-password-strength[data-score="4"] > .s4-password-bars > span { background: var(--_tone); }
+  .s4-password-word { color: var(--md-sys-color-on-surface-variant); }
+  @media (forced-colors: active) {
+    .s4-password-bars > span { border: 1px solid CanvasText; }
+  }
+}
+
+/* ---- inline-edit/inline-edit.css ---- */
+/* Inline edit: a value that reads as text and is a real input. Pointing at it shows the field's fill and a pencil; a
+   tap or click puts the cursor in it and it becomes a field, with the text field's focus marks (a quiet hairline after
+   a tap, the ring from the keyboard). Things you type into are medium-rounded (--s4-shape-text-field). */
+@layer s4.components {
+  .s4-inline-edit {
+    --_bg: transparent;
+    --_quiet: color-mix(in oklab, var(--md-sys-color-primary) 45%, var(--md-sys-color-surface-container-highest));
+    display: inline-grid;
+    grid-template-columns: minmax(0, auto);
+    align-items: center;
+    align-self: start;     /* as wide as its value, in a flex column or a grid */
+    justify-self: start;
+    max-inline-size: 100%;
+    vertical-align: middle;
+  }
+  .s4-inline-edit > label {
+    grid-column: 1 / -1;
+    padding-block-end: var(--s4-space-1);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
+  .s4-inline-edit > input {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    min-inline-size: 4ch;
+    max-inline-size: 100%;
+    min-block-size: var(--s4-size-touch-target);
+    margin-inline: calc(var(--s4-space-2) * -1) 0;
+    padding-inline: var(--s4-space-2) calc(var(--s4-space-3) + var(--s4-size-icon-small));
+    border: 0;
+    border-radius: var(--s4-shape-text-field);
+    outline: none;
+    background: var(--_bg);
+    color: var(--md-sys-color-on-surface);
+    font: inherit;
+    letter-spacing: inherit;
+    text-overflow: ellipsis;
+    cursor: text;
+    transition: background-color var(--s4-motion-state), box-shadow var(--s4-motion-state);
+  }
+  .s4-inline-edit-hint {
+    grid-row: 2;
+    grid-column: 1;
+    justify-self: end;
+    margin-inline-end: var(--s4-space-3);
+    color: var(--md-sys-color-on-surface-variant);
+    pointer-events: none;
+    opacity: 0;
+    --s4-icon-size: var(--s4-size-icon-small);
+    transition: opacity var(--s4-motion-state);
+  }
+  @media (hover: hover) {
+    .s4-inline-edit:hover { --_bg: var(--md-sys-color-surface-container-high); }
+    .s4-inline-edit:hover > .s4-inline-edit-hint { opacity: 1; }
+  }
+  @media (hover: none) { .s4-inline-edit-hint { opacity: 1; } }   /* a touch screen has no hover: the pencil always says it can change */
+  .s4-inline-edit:has(> input:focus) { --_bg: var(--md-sys-color-surface-container-highest); }
+  .s4-inline-edit:has(> input:focus) > .s4-inline-edit-hint { opacity: 0; }
+  :where([data-s4-focus="pointer"]) .s4-inline-edit > input:focus { box-shadow: inset 0 0 0 1.5px var(--_quiet); }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-inline-edit > input:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  .s4-inline-edit-message {
+    grid-column: 1 / -1;
+    color: var(--md-sys-color-error);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+  }
+  .s4-inline-edit:not([data-message]) > .s4-inline-edit-message { display: none; }
+  @media (forced-colors: active) { .s4-inline-edit > input { border: 1px solid CanvasText; } }
+}
+
 /* ---- badge/badge.css ---- */
 /* Badge (M3)
    <span class="s4-badge"></span>                small: a 6dp dot (empty element)

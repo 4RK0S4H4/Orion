@@ -66,6 +66,8 @@
 @import url("slider/slider.css");
 @import url("swatches/swatches.css");
 @import url("color-field/color-field.css");
+@import url("password/password.css");
+@import url("inline-edit/inline-edit.css");
 /* feedback */
 @import url("badge/badge.css");
 @import url("status/status.css");

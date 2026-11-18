@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inline Edit · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ri-card { inline-size: 100%; display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .ri-title { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Inline Edit</h1></header>
+<main class="ex-main">
+  <p>A value you change where it is. It reads as plain text and is a real input underneath, so your own tap puts the cursor in it; pointing at it shows a pencil. Enter or leaving saves, Escape puts it back, and a snackbar offers Undo. No Edit button, no dialog, no Save.</p>
+
+  <section class="ex-sec">
+    <h2>Values in Place</h2>
+    <p>It takes the type of what is around it: a heading stays a heading. Clear a required value and leave: it is kept, with a short message.</p>
+    <div class="ex-board">
+      <div class="ri-card">
+        <div class="s4-inline-edit ri-title"><input aria-label="Project Name" value="Kitchen Renovation" required></div>
+        <div class="s4-inline-edit"><label for="owner">Owner</label><input id="owner" value="Ana Ribeiro" required></div>
+        <div class="s4-inline-edit" data-undo-text="Budget changed"><label for="budget">Budget</label><input id="budget" value="$18,500" inputmode="decimal"></div>
+        <div class="s4-inline-edit"><label for="note">Note</label><input id="note" value="Cabinets arrive in March"></div>
+      </div>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/inline-edit/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../snackbar/snackbar.js"></script>
+<script src="../inline-edit/inline-edit.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

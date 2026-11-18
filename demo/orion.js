@@ -5232,6 +5232,156 @@ S4.register('theme-controls', function (scope) {
   });
 })();
 
+/* ---- password/password.js ---- */
+/* Password helpers on the text field: show / hide, a strength meter with words, and a Caps Lock notice.
+     <div class="s4-text-field s4-password" data-strength>
+       <label for="pw">New Password</label>
+       <input id="pw" type="password" autocomplete="new-password" minlength="12">
+       <div class="s4-text-field-supporting">At least 12 characters.</div>
+     </div>
+   - A Show Password button (aria-pressed true while the text shows; its name never changes) ends the field.
+   - data-strength: four segments and a word ("Weak: add numbers or symbols"), updated as you type and read out politely
+     after a pause. Not a rule: the form's own minlength / pattern decide what is accepted.
+   - Caps Lock on while typing in the field: a short notice under it (only on keyboards that report it).
+   S4.password.score(text) -> 0..4. */
+(function () {
+  var S4 = window.S4;
+  var COMMON = /^(password|passw0rd|qwerty|letmein|welcome|admin|iloveyou|monkey|dragon|abc123|123456|111111)/i;
+  function score(t) {
+    if (!t) return -1;
+    var s = 0;
+    if (t.length >= 8) s++;
+    if (t.length >= 12) s++;
+    if (t.length >= 16) s++;
+    var kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter(function (r) { return r.test(t); }).length;
+    if (kinds >= 3) s++;
+    if (kinds === 4 && t.length >= 10) s++;
+    if (COMMON.test(t) || /^(.)\1+$/.test(t) || /^(0123|1234|abcd)/i.test(t)) s = Math.min(s, 1);
+    if (t.length < 8) s = 0;
+    return Math.max(0, Math.min(4, s));
+  }
+  var WORDS = ['Too short', 'Weak', 'Fair', 'Good', 'Strong'];
+  function tip(t, s) {
+    if (t.length < 8) return 'use at least 8 characters';
+    if (s >= 4) return '';
+    if (!/\d/.test(t) || !/[^A-Za-z0-9]/.test(t)) return 'add numbers or symbols';
+    if (t.length < 12) return 'make it longer';
+    return 'a few more words make it stronger';
+  }
+  S4.password = { score: score };
+  S4.register('password', function (scope) {
+    S4.util.all(scope, '.s4-password').forEach(function (f) {
+      if (!S4.util.once(f, 'password')) return;
+      var input = f.querySelector(':scope > input'); if (!input) return;
+      var labelText = ((f.querySelector(':scope > label') || {}).textContent || 'Password').trim();
+      input.setAttribute('autocapitalize', 'off'); input.setAttribute('spellcheck', 'false'); input.setAttribute('autocorrect', 'off');
+      /* show / hide */
+      var btn = document.createElement('button'); btn.type = 'button'; btn.className = 's4-icon-button s4-password-toggle';
+      btn.setAttribute('aria-label', 'Show ' + (/password/i.test(labelText) ? 'Password' : labelText));
+      btn.setAttribute('aria-pressed', 'false');
+      if (input.id) btn.setAttribute('aria-controls', input.id);
+      btn.innerHTML = '<span class="s4-icon" aria-hidden="true"></span>'; S4.icon.set(btn.firstChild, 'visible');
+      input.after(btn);
+      btn.addEventListener('pointerdown', function (e) { if (document.activeElement === input) e.preventDefault(); });   /* keep the cursor where it is, never put it there */
+      btn.addEventListener('click', function () {
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-pressed', String(show));
+        S4.icon.set(btn.firstChild, show ? 'hidden' : 'visible');
+      });
+      /* hide again before the form is sent, so the browser offers to save it as a password */
+      var form = input.form; if (form) form.addEventListener('submit', function () { if (input.type === 'text') btn.click(); });
+      new MutationObserver(function () { btn.disabled = input.disabled; }).observe(input, { attributes: true, attributeFilter: ['disabled'] });
+      btn.disabled = input.disabled;
+
+      /* strength */
+      if (f.hasAttribute('data-strength')) {
+        var meter = document.createElement('div'); meter.className = 's4-password-strength';
+        var bars = document.createElement('span'); bars.className = 's4-password-bars'; bars.setAttribute('aria-hidden', 'true');
+        for (var i = 0; i < 4; i++) bars.appendChild(document.createElement('span'));
+        var word = document.createElement('span'); word.className = 's4-password-word';
+        var live = document.createElement('span'); live.className = 's4-visually-hidden'; live.setAttribute('aria-live', 'polite');
+        meter.appendChild(bars); meter.appendChild(word); meter.appendChild(live);
+        f.appendChild(meter);
+        var t = null;
+        var update = function () {
+          var v = input.value, s = score(v);
+          meter.dataset.score = String(s);
+          meter.hidden = !v;
+          var tipText = v ? tip(v, s) : '';
+          word.textContent = v ? 'Strength: ' + WORDS[Math.max(0, s)] + (tipText ? ', ' + tipText : '') : '';
+          clearTimeout(t); t = setTimeout(function () { live.textContent = word.textContent; }, 900);
+        };
+        input.addEventListener('input', update); update();
+      }
+      /* Caps Lock */
+      var caps = document.createElement('div'); caps.className = 's4-password-caps'; caps.hidden = true; caps.setAttribute('role', 'status');
+      var ci = document.createElement('span'); ci.className = 's4-icon'; ci.setAttribute('aria-hidden', 'true'); caps.appendChild(ci); S4.icon.set(ci, 'warning');
+      caps.appendChild(document.createTextNode('Caps Lock is on'));
+      f.appendChild(caps);
+      var check = function (e) { if (e.getModifierState) caps.hidden = !e.getModifierState('CapsLock'); };
+      input.addEventListener('keydown', check); input.addEventListener('keyup', check);
+      input.addEventListener('blur', function () { caps.hidden = true; });
+    });
+  });
+})();
+
+/* ---- inline-edit/inline-edit.js ---- */
+/* Inline edit: a value you click to change where it is. It is a real input that looks like plain text until you
+   point at it, so your own tap puts the cursor in it (no script ever does, decision 0049).
+     <div class="s4-inline-edit">
+       <label for="name">Display Name</label>                 optional; otherwise aria-label on the input
+       <input id="name" value="Ana Ribeiro" required>
+     </div>
+   - Enter or leaving the field saves; Escape puts the saved value back. An empty required value, or one the input
+     rejects, is not saved: the old value comes back and a short message says why.
+   - Saving fires s4-change { value, previous } on the element and offers Undo in a snackbar (data-undo-text sets its
+     words, "Display name changed" by default); Undo puts the previous value back and fires s4-change again.
+   S4.inlineEdit.set(el, value). */
+(function () {
+  var S4 = window.S4;
+  S4.inlineEdit = { set: function (el, v) { if (el._s4edit) el._s4edit(v); } };
+  S4.register('inline-edit', function (scope) {
+    S4.util.all(scope, '.s4-inline-edit').forEach(function (el) {
+      if (!S4.util.once(el, 'inlineEdit')) return;
+      var input = el.querySelector(':scope > input, :scope > textarea'); if (!input) return;
+      var label = el.querySelector(':scope > label');
+      var name = (label ? label.textContent : input.getAttribute('aria-label') || 'Value').trim();
+      var saved = input.value;
+      input.setAttribute('autocomplete', input.getAttribute('autocomplete') || 'off');
+      var hint = document.createElement('span'); hint.className = 's4-icon s4-inline-edit-hint'; hint.setAttribute('aria-hidden', 'true');
+      input.after(hint); S4.icon.set(hint, 'edit');
+      var msg = document.createElement('div'); msg.className = 's4-inline-edit-message'; msg.setAttribute('role', 'status'); el.appendChild(msg);
+      if (!input.id) input.id = 's4-inline-' + Math.random().toString(36).slice(2, 7);
+      msg.id = input.id + '-msg';
+      input.setAttribute('aria-describedby', ((input.getAttribute('aria-describedby') || '') + ' ' + msg.id).trim());
+      var cancelled = false;
+      function size() { if (input.tagName === 'INPUT') input.style.inlineSize = 'calc(' + Math.max(4, input.value.length + 2) + 'ch + var(--s4-space-2) + var(--s4-space-3) + var(--s4-size-icon-small))'; }
+      function say(t) { msg.textContent = t; el.toggleAttribute('data-message', !!t); }
+      function commit() {
+        var v = input.value.trim();
+        if (v === saved) { input.value = saved; size(); return; }
+        if (!input.checkValidity() || (input.required && !v)) {
+          var why = input.dataset.msg || (input.required && !v ? name + ' can’t be empty, so it was kept.' : input.validationMessage);
+          input.value = saved; size(); say(why); return;
+        }
+        var previous = saved; saved = v; input.value = v; size(); say('');
+        S4.util.emit(el, 's4-change', { value: v, previous: previous });
+        if (S4.snackbar && !el.hasAttribute('data-no-undo')) S4.snackbar({ text: el.dataset.undoText || (name.charAt(0) + name.slice(1).toLowerCase()) + ' changed', action: 'Undo', onAction: function () { var now = saved; saved = previous; input.value = previous; size(); S4.util.emit(el, 's4-change', { value: previous, previous: now }); } });
+      }
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && input.tagName === 'INPUT') { e.preventDefault(); input.blur(); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelled = true; input.value = saved; size(); input.blur(); }
+      });
+      input.addEventListener('focus', function () { say(''); });
+      input.addEventListener('input', size);
+      input.addEventListener('blur', function () { if (cancelled) { cancelled = false; return; } commit(); });
+      el._s4edit = function (v) { saved = String(v); input.value = saved; size(); };
+      size();
+    });
+  });
+})();
+
 /* ---- progress/progress.js ---- */
 /* Progress behaviour: <div class="s4-progress" [data-type="circular"] [data-value="0.6"] aria-label="…">
    Sets role="progressbar", aria-valuemin/max/now (0–100) and --_value from data-value (0–1, clamped); removes

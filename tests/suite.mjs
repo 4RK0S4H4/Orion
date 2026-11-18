@@ -622,6 +622,34 @@ async function use(page, add, phone) {
       if (!back.shut) add('color field: Escape did not close the panel'); else if (!back.focus) add('color field: focus did not return to the swatch');
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-password:not(:has(input:disabled))')).slice(0, 1)) {
+      const t = f.locator('.s4-password-toggle'), inp = f.locator(':scope > input');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      if (!(await click(t, 'show password'))) continue;
+      const st = await f.evaluate((x) => ({ type: x.querySelector(':scope > input').type, pressed: x.querySelector('.s4-password-toggle').getAttribute('aria-pressed'), field: document.activeElement === x.querySelector(':scope > input') }));
+      if (st.type !== 'text' || st.pressed !== 'true') add('password: Show Password did not show the text and set aria-pressed');
+      if (st.field) add('password: Show Password put the cursor in the field (decision 0049)');
+      await t.click();
+      if ((await inp.getAttribute('type')) !== 'password' || (await t.getAttribute('aria-pressed')) !== 'false') add('password: a second press did not hide it again');
+    }
+    for (const f of (await visible('.s4-password[data-strength]')).slice(0, 1)) {
+      const w = await f.evaluate((x) => { const m = x.querySelector('.s4-password-strength'); return m && !m.hidden ? m.textContent : 'none'; });
+      if (!/Strength: /.test(w) && w !== '') add('password: the strength meter has no words');
+    }
+    for (const el of (await visible('.s4-inline-edit:not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = el.locator(':scope > input');
+      const before = await inp.inputValue();
+      await el.evaluate((x) => { x._suiteChange = null; x.addEventListener('s4-change', (e) => { x._suiteChange = e.detail; }, { once: true }); });
+      if (!(await click(inp, 'inline edit'))) continue;
+      await page.keyboard.press('End'); await page.keyboard.type(' X'); await page.keyboard.press('Escape'); await settle(200);
+      if ((await inp.inputValue()) !== before) add('inline edit: Escape did not put the saved value back');
+      await inp.click(); await page.keyboard.press('End'); await page.keyboard.type(' X'); await page.keyboard.press('Enter'); await settle(300);
+      const ch = await el.evaluate((x) => x._suiteChange);
+      if (!ch || ch.previous !== before) add('inline edit: Enter did not save (no s4-change with the previous value)');
+      const undo = page.locator('.s4-snackbar button', { hasText: 'Undo' }).first();
+      if (await undo.isVisible().catch(() => false)) { await undo.click(); await settle(300); if ((await inp.inputValue()) !== before) add('inline edit: Undo did not put the previous value back'); }
+      else add('inline edit: saving offered no Undo');
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
