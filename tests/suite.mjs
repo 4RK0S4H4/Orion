@@ -521,6 +521,21 @@ async function use(page, add, phone) {
       await page.keyboard.press('Escape');
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-number-field:not(:has(input:disabled))')).slice(0, 1)) {
+      const val = () => f.evaluate((x) => S4.numberField.value(x));
+      const plus = f.locator('.s4-number-field-step[data-dir="1"]'), minus = f.locator('.s4-number-field-step[data-dir="-1"]');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      const v0 = await val(), up = !(await plus.isDisabled());
+      if (!(await click(up ? plus : minus, 'number field stepper'))) continue;
+      const v1 = await val();
+      if (up ? !(v1 > v0) : !(v1 < v0)) add(`number field: ${up ? 'plus' : 'minus'} did not step the value (${v0} -> ${v1})`);
+      if (await f.evaluate((x) => x.contains(document.activeElement) && document.activeElement.tagName === 'INPUT')) add('number field: a stepper put the cursor in the field (decision 0049)');
+      if (!(await click(f.locator(':scope > input'), 'number field'))) continue;
+      await page.keyboard.press(up ? 'ArrowDown' : 'ArrowUp');
+      const v2 = await val();
+      if (v2 !== v0) add(`number field: the arrow key did not step back (${v1} -> ${v2}, expected ${v0})`);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;

@@ -7617,6 +7617,58 @@
   }
 }
 
+/* ---- number-field/number-field.css ---- */
+/* Number field with steppers: one Quiet Box holding minus, the value (with its unit) and plus. Same height, label and
+   supporting text as every field; the value sits in the middle in tabular figures. number-field.js adds the buttons.
+   <div class="s4-text-field s4-number-field">
+     <label for="guests">Guests</label><input id="guests" value="2" data-min="1" data-max="12">
+     <span class="s4-text-field-affix" data-suffix>people</span>
+   </div>
+   data-inline: the compact quantity stepper for a list or cart row (40 high, no label above). */
+@layer s4.components {
+  .s4-text-field.s4-number-field {
+    grid-template-columns: var(--s4-space-1) auto minmax(0, 1fr) auto auto auto minmax(0, 1fr) auto var(--s4-space-1);
+  }
+  .s4-text-field.s4-number-field > .s4-number-field-step { grid-row: 2; margin: 0; }
+  .s4-text-field.s4-number-field > .s4-number-field-step[data-dir="-1"] { grid-column: 2; }
+  .s4-text-field.s4-number-field > .s4-number-field-step[data-dir="1"] { grid-column: 8; }
+  .s4-text-field.s4-number-field > .s4-text-field-affix[data-prefix] { grid-column: 4; padding-inline: 0 calc(var(--s4-space-1) / 2); }
+  .s4-text-field.s4-number-field > input {
+    grid-column: 5;
+    min-inline-size: 2ch;
+    max-inline-size: 100%;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-text-field.s4-number-field > .s4-text-field-affix[data-suffix] { grid-column: 6; padding-inline: calc(var(--s4-space-1) / 2) 0; }
+  /* with no unit the value is the only text: it may use the whole middle */
+  .s4-text-field.s4-number-field:not(:has(> .s4-text-field-affix)) > input { grid-column: 3 / 8; justify-self: center; }
+  .s4-text-field.s4-number-field > :is(.s4-text-field-supporting, .s4-text-field-counter) { grid-column: 1 / -1; }
+  .s4-number-field-step { color: var(--md-sys-color-on-surface); }
+  .s4-number-field-step svg [opacity] { opacity: 1; }   /* a stepper's sign is drawn whole, never half toned */
+  /* the value hugs its unit */
+  .s4-text-field.s4-number-field:has(> .s4-text-field-affix[data-suffix]) > input { text-align: end; }
+  .s4-text-field.s4-number-field:has(> .s4-text-field-affix[data-prefix]) > input { text-align: start; }
+  .s4-number-field-step:disabled { color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
+
+  /* the inline quantity stepper: a small box, buttons 32, for a row in a list or a cart */
+  .s4-text-field.s4-number-field[data-inline] {
+    --_h: var(--s4-size-icon-button);
+    display: inline-grid;
+    inline-size: max-content;
+    max-inline-size: 100%;
+    vertical-align: middle;
+    grid-template-columns: var(--s4-space-1) auto 0 auto auto auto 0 auto var(--s4-space-1);
+  }
+  .s4-text-field.s4-number-field[data-inline] > input { padding-inline: var(--s4-space-1); }
+  .s4-text-field.s4-number-field[data-inline] > label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  @media (forced-colors: active) {
+    .s4-number-field-step { border: 1px solid ButtonText; }
+    .s4-number-field-step:disabled { border-color: GrayText; color: GrayText; }
+  }
+}
+
 /* ---- form/form.css ---- */
 /* Form (S4 addition, decision 0051): layout and the quiet marks of a form that behaves.
    <form class="s4-form" novalidate>

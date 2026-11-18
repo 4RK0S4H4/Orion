@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Number Field · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+  .ri-cart { inline-size: 100%; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Number Field</h1></header>
+<main class="ex-main">
+  <p>A number with minus and plus in one box. Tap to step, hold to keep stepping; arrows, Page Up and Page Down from the keyboard; or just type. The value sits in the middle in tabular figures with its unit, and it is read and shown in the page’s language.</p>
+
+  <section class="ex-sec">
+    <h2>Steppers</h2>
+    <p><code>data-min</code>, <code>data-max</code>, <code>data-step</code> on the input; a unit as the field’s prefix or suffix. Minus stops at the minimum, plus at the maximum.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-number-field">
+          <label for="guests">Guests</label>
+          <input id="guests" value="2" data-min="1" data-max="12">
+          <span class="s4-text-field-affix" data-suffix>people</span>
+          <div class="s4-text-field-supporting">Up to twelve.</div>
+        </div>
+        <div class="s4-text-field s4-number-field">
+          <label for="tip">Tip</label>
+          <span class="s4-text-field-affix" data-prefix>$</span>
+          <input id="tip" value="4.50" data-min="0" data-max="500" data-step="0.5" data-decimals="2">
+          <div class="s4-text-field-supporting">Steps of 50 cents.</div>
+        </div>
+        <div class="s4-text-field s4-number-field">
+          <label for="temp">Alert Below</label>
+          <input id="temp" value="-4" data-min="-30" data-max="40">
+          <span class="s4-text-field-affix" data-suffix>°C</span>
+          <div class="s4-text-field-supporting">Below zero is fine.</div>
+        </div>
+        <div class="s4-text-field s4-number-field">
+          <label for="pages">Pages</label>
+          <input id="pages" value="1200" data-min="0" data-step="50" data-page-step="1000">
+          <div class="s4-text-field-supporting">Page Up adds a thousand.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Error and Disabled</h2>
+    <p>Typing past the limits, or something that isn’t a number, is an error when you leave the field; the steppers never go past them.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-number-field" data-error="Enter 1 to 8.">
+          <label for="seats">Seats</label>
+          <input id="seats" value="14" data-min="1" data-max="8">
+          <div class="s4-text-field-supporting">Up to eight per booking.</div>
+        </div>
+        <div class="s4-text-field s4-number-field">
+          <label for="locked">Licenses</label>
+          <input id="locked" value="25" data-min="1" disabled>
+          <div class="s4-text-field-supporting">Change your plan to add more.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In a Cart</h2>
+    <p><code>data-inline</code>: the small quantity stepper for a row. It has no label above it, so the input names itself with <code>aria-label</code>.</p>
+    <div class="ex-board">
+      <ul class="s4-list ri-cart">
+        <li>
+          <div class="s4-list-item">
+            <span class="s4-list-content"><span class="s4-list-headline">Oat Milk, 1 L</span><span class="s4-list-supporting">$2.40 each</span></span>
+            <span class="s4-list-trailing">
+              <span class="s4-text-field s4-number-field" data-inline><input aria-label="Quantity of Oat Milk" value="2" data-min="0" data-max="20"></span>
+            </span>
+          </div>
+        </li>
+        <li>
+          <div class="s4-list-item">
+            <span class="s4-list-content"><span class="s4-list-headline">Sourdough Loaf</span><span class="s4-list-supporting">$4.10 each</span></span>
+            <span class="s4-list-trailing">
+              <span class="s4-text-field s4-number-field" data-inline><input aria-label="Quantity of Sourdough Loaf" value="1" data-min="0" data-max="20"></span>
+            </span>
+          </div>
+        </li>
+        <li>
+          <div class="s4-list-item">
+            <span class="s4-list-content"><span class="s4-list-headline">Coffee Beans, 250 g</span><span class="s4-list-supporting">$8.90 each</span></span>
+            <span class="s4-list-trailing">
+              <span class="s4-text-field s4-number-field" data-inline><input aria-label="Quantity of Coffee Beans" value="0" data-min="0" data-max="20"></span>
+            </span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Compact</h2>
+    <p>In compact density the box, the buttons and the inline stepper are pointer-sized.</p>
+    <div class="ex-board" data-density="compact">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-number-field">
+          <label for="retries">Retries</label>
+          <input id="retries" value="3" data-min="0" data-max="10">
+          <span class="s4-text-field-affix" data-suffix>times</span>
+        </div>
+        <div class="s4-text-field s4-number-field">
+          <label for="interval">Every</label>
+          <input id="interval" value="15" data-min="5" data-max="120" data-step="5">
+          <span class="s4-text-field-affix" data-suffix>min</span>
+        </div>
+        <div class="s4-row"><span class="s4-body-medium">Copies</span><span class="s4-text-field s4-number-field" data-inline><input aria-label="Copies" value="1" data-min="1" data-max="99"></span></div>
+      </div>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/number-field/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../number-field/number-field.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

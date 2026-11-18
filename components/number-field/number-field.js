@@ -37,8 +37,8 @@
       var dec = (parts.find(function (p) { return p.type === 'decimal'; }) || {}).value || '.';
       input.type = 'text';
       input.removeAttribute('min'); input.removeAttribute('max'); input.removeAttribute('step');
-      input.setAttribute('inputmode', places || (min !== null && min < 0) || min === null ? 'decimal' : 'numeric');
-      if (min !== null && min < 0 || min === null) input.setAttribute('inputmode', 'text');
+      /* a phone's number pad has no minus sign: a field that takes negatives gets the full keyboard */
+      input.setAttribute('inputmode', min === null || min < 0 ? 'text' : places ? 'decimal' : 'numeric');
       input.setAttribute('role', 'spinbutton');
       input.setAttribute('autocomplete', 'off');
       if (min !== null) input.setAttribute('aria-valuemin', min);
@@ -72,7 +72,6 @@
       var minus = mk('minus', 'Decrease'), plus = mk('plus', 'Increase');
       minus.dataset.dir = '-1'; plus.dataset.dir = '1';
       (prefix || input).before(minus);
-      if (prefix) prefix.before(minus);
       (suffix || input).after(plus);
       var live = document.createElement('div'); live.className = 's4-visually-hidden'; live.setAttribute('role', 'status'); f.appendChild(live);
       var sayT = null;
@@ -86,7 +85,11 @@
         if (max !== null && n > max) return input.dataset.msgMax || range || 'Enter ' + fmt.format(max) + ' or less.';
         return '';
       }
+      /* the value's box is as wide as its longest value, so minus, value, unit and plus sit together in the middle */
+      var widest = Math.max(1, max !== null ? fmt.format(max).length : 0, min !== null ? fmt.format(min).length : 0);
+      function size() { input.style.inlineSize = 'calc(' + Math.max(widest, input.value.length, 1) + 'ch + 2px)'; }
       function sync() {
+        size();
         var n = parse(input.value);
         input.setCustomValidity(message(n));
         if (n === null || isNaN(n)) { input.removeAttribute('aria-valuenow'); input.removeAttribute('aria-valuetext'); }
@@ -116,7 +119,6 @@
         if (input.disabled || input.readOnly) return;
         var n = parse(input.value);
         if (n === null || isNaN(n)) n = d > 0 ? (min !== null ? min - step : -step) : (max !== null ? max + step : step);
-        n = (min !== null || max !== null) ? n : n;
         set(n + d, true);
         if (document.activeElement !== input) say();
       }
@@ -126,16 +128,16 @@
       [minus, plus].forEach(function (b) {
         var t = null, n = 0, fired = false;
         var stop = function () { clearTimeout(t); t = null; };
-        var tick = function () { n++; by(+b.dataset.dir); if (b.disabled) return stop(); t = setTimeout(tick, n < 6 ? 140 : n < 20 ? 80 : 40); };
+        var tick = function () { n++; by(+b.dataset.dir * step); if (b.disabled) return stop(); t = setTimeout(tick, n < 6 ? 140 : n < 20 ? 80 : 40); };
         b.addEventListener('pointerdown', function (e) {
           if (e.button !== 0 || b.disabled) return;
           e.preventDefault();   /* never moves focus (or the phone's keyboard) */
           try { b.setPointerCapture(e.pointerId); } catch (x) {}
-          fired = true; n = 0; by(+b.dataset.dir);
+          fired = true; n = 0; by(+b.dataset.dir * step);
           t = setTimeout(tick, 450);
         });
         ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (ev) { b.addEventListener(ev, stop); });
-        b.addEventListener('click', function () { if (fired) { fired = false; return; } by(+b.dataset.dir); });   /* a click with no pointer (assistive tech) */
+        b.addEventListener('click', function () { if (fired) { fired = false; return; } by(+b.dataset.dir * step); });   /* a click with no pointer (assistive tech) */
       });
 
       input.addEventListener('keydown', function (e) {
@@ -146,8 +148,6 @@
         else if (k === 'End' && max !== null) { e.preventDefault(); set(max, true); }
         else if (k === 'Enter') { var n = parse(input.value); if (n !== null && !isNaN(n) && !message(n)) set(n, true); }
       });
-      /* by() moves by whole steps; the keys above pass the amount */
-      by = (function (inner) { return function (d) { if (Math.abs(d) === 1 && (step !== 1)) d = d * step; return inner(d); }; })(by);
       input.addEventListener('input', function (e) { if (e.isTrusted) sync(); });
       input.addEventListener('blur', function () {
         var n = parse(input.value);
