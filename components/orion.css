@@ -9210,6 +9210,85 @@
   }
 }
 
+/* ---- color-field/color-field.css ---- */
+/* Color field: a swatch at the start of a Quiet Box and the color as a hex code; the swatch opens a small glass panel
+   with the named accents (.s4-swatches) and a hue slider. The swatch is a round button (a thing you click), the box
+   stays medium-rounded (a thing you type into).
+   <div class="s4-text-field s4-color-field"><label for="c">Accent Color</label><input id="c" value="#4f46e5"></div> */
+@layer s4.components {
+  .s4-color-field > input { text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  .s4-color-field-swatch {
+    --_s: var(--s4-size-button-small);
+    position: relative;
+    grid-row: 2;
+    grid-column: 2;
+    inline-size: var(--_s);
+    block-size: var(--_s);
+    margin: 0 var(--s4-space-3) 0 calc(var(--s4-space-1) * -1);
+    padding: 0;
+    border: 0;
+    border-radius: min(calc(var(--_s) / 2), var(--s4-shape-control));
+    background: var(--_color, var(--md-sys-color-primary));
+    cursor: pointer;
+    transition: background-color var(--s4-motion-state);
+  }
+  /* a 48 touch target around the 32 swatch */
+  .s4-color-field-swatch::after { content: ""; position: absolute; inset: calc((var(--s4-size-touch-target) - var(--_s)) / -2); }
+  .s4-color-field-swatch:disabled { cursor: default; opacity: var(--md-sys-state-disabled-content-opacity); }
+
+  .s4-color-field-panel {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    box-sizing: border-box;
+    inline-size: min(calc(var(--s4-size-touch-target) * 4 + var(--s4-space-2) * 3 + var(--s4-space-4) * 2), calc(100vw - 2 * var(--s4-space-2)));
+    padding: var(--s4-space-2) var(--s4-space-4) var(--s4-space-4);
+    border: 0;
+    border-radius: var(--s4-shape-menu);
+    background: var(--md-sys-color-surface-container);
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-color-field-panel:popover-open { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+  .s4-color-field-heading {
+    padding-block-start: var(--s4-space-2);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+  }
+  /* the hue slider: the spectrum as its track, a bar for its handle (like the slider's) */
+  .s4-color-field-hue {
+    -webkit-appearance: none;
+    appearance: none;
+    inline-size: 100%;
+    block-size: var(--s4-size-touch-target);
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+  .s4-color-field-hue::-webkit-slider-runnable-track { block-size: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-full); background: var(--_hues); }
+  .s4-color-field-hue::-moz-range-track { block-size: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-full); background: var(--_hues); }
+  .s4-color-field-hue::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    inline-size: var(--s4-space-1);
+    block-size: var(--s4-size-button-small);
+    margin-block-start: calc((var(--s4-space-4) - var(--s4-size-button-small)) / 2);
+    border: 0;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-on-surface);
+  }
+  .s4-color-field-hue::-moz-range-thumb { inline-size: var(--s4-space-1); block-size: var(--s4-size-button-small); border: 0; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-surface); }
+  .s4-color-field-hue:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); border-radius: var(--md-sys-shape-corner-full); }
+
+  @media (forced-colors: active) {
+    .s4-color-field-swatch { forced-color-adjust: none; border: 1px solid CanvasText; }
+    .s4-color-field-panel { border: 1px solid CanvasText; }
+    .s4-color-field-hue { forced-color-adjust: none; }
+  }
+}
+
 /* ---- badge/badge.css ---- */
 /* Badge (M3)
    <span class="s4-badge"></span>                small: a 6dp dot (empty element)

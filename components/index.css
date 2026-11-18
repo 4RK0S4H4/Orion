@@ -65,6 +65,7 @@
 @import url("chip/chip.css");
 @import url("slider/slider.css");
 @import url("swatches/swatches.css");
+@import url("color-field/color-field.css");
 /* feedback */
 @import url("badge/badge.css");
 @import url("status/status.css");

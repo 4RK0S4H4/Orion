@@ -606,6 +606,22 @@ async function use(page, add, phone) {
       if (v2.v !== '4' || v2.on !== 4) add(`rating: the arrow key did not move to four stars (${v2.v}, ${v2.on} lit)`);
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-color-field:not([data-theme-seed]):not(:has(input:disabled))')).slice(0, 1)) {
+      const sw = f.locator('.s4-color-field-swatch');
+      if (!(await click(sw, 'color swatch'))) continue;
+      await settle(420);
+      const st = await sw.evaluate((b) => { const p = document.getElementById(b.getAttribute('aria-controls')); const a = document.activeElement; const r = p.getBoundingClientRect(); return { open: p.matches(':popover-open'), exp: b.getAttribute('aria-expanded'), inside: p.contains(a) && a.classList.contains('s4-swatch'), fits: r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1 }; });
+      if (!st.open || st.exp !== 'true') { add('color field: the swatch did not open its panel'); continue; }
+      if (!st.inside) add('color field: focus did not go to the chosen accent');
+      if (!st.fits) add('color field panel does not fit the screen');
+      const before = await f.evaluate((x) => S4.colorField.value(x));
+      await page.keyboard.press('ArrowRight'); await page.keyboard.press('Enter'); await settle(200);
+      if ((await f.evaluate((x) => S4.colorField.value(x))) === before) add('color field: choosing another accent with the keyboard did not change the value');
+      await page.keyboard.press('Escape'); await settle(380);
+      const back = await sw.evaluate((b) => ({ shut: !document.getElementById(b.getAttribute('aria-controls')).matches(':popover-open'), focus: document.activeElement === b }));
+      if (!back.shut) add('color field: Escape did not close the panel'); else if (!back.focus) add('color field: focus did not return to the swatch');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
