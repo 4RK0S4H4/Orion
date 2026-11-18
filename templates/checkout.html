@@ -15,7 +15,7 @@
      keeps the running total and the seat hold, and the e-ticket with its door code (a scoped light tile, so it scans). -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('velvet-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=a186eaa">
+<link rel="stylesheet" href="../components/orion.css?v=2bdd2c0">
 <style>
   /* The Velvet's own layout and elements: tokens only, nothing restyles an Orion component */
   .vl-page { display: grid; gap: var(--s4-space-6); }
@@ -80,7 +80,7 @@
     border-radius: var(--_r) var(--_r) min(var(--s4-shape-control), 22%) min(var(--s4-shape-control), 22%);
     background: var(--_fill); color: var(--md-sys-color-on-primary);
     font: inherit; font-size: var(--md-sys-typescale-label-small-size); line-height: 1; font-weight: var(--md-sys-typescale-emphasized-label-small-weight); font-variant-numeric: tabular-nums;
-    transition: background-color var(--s4-motion-state), transform var(--s4-motion-state);
+    transition: background-color var(--s4-motion-state);
     -webkit-tap-highlight-color: transparent;
   }
   .vl-seat::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--md-sys-color-on-surface); opacity: 0; transition: opacity var(--s4-motion-state); pointer-events: none; }

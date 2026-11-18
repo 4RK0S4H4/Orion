@@ -22,6 +22,9 @@
     --s4-motion-reveal-content: var(--md-sys-motion-spring-effects-duration) var(--md-sys-motion-spring-effects);
     /* Loop: waiting. The only motion that repeats; the easing inside one cycle. */
     --s4-motion-loop: var(--md-sys-motion-spring-slow-effects);
+    /* One cycle of an app's own Loop (a live dot, typing dots): `animation: <name> var(--s4-loop-cycle) var(--s4-motion-loop) infinite`.
+       Components keep their own cycles (--s4-skeleton-cycle, --s4-progress-cycle). */
+    --s4-loop-cycle: 1600ms;
   }
 
   /* Motion energy: data-energy="calm | standard | lively" on <html> or any container (or S4.theme({ energy })).

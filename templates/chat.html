@@ -1,69 +1,288 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB" data-gray="cool" data-type-display="rounded" data-energy="lively">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chat · S4 Orion Template</title>
-<!-- Template: Chat. For messaging, support, comments and AI assistants: a thread of bubbles with a glass composer stuck above the nav bar. -->
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<title>Fetch · Jess Okafor</title>
+<meta name="description" content="Fetch: chat with the person walking your dog, follow today’s walk as it happens and read the walk report when they’re home.">
+<!-- Template: Chat, as a product (issue 66). For messaging, support, comments and AI assistants: a thread of bubbles with
+     a glass composer stuck above the nav bar. Fetch is a dog walking app for Bristol: the owner and their walker talk
+     here, today’s walk is followed live in the thread, and every walk ends with a report.
+     Brand through the dials only: a tennis-ball chartreuse accent (variant fidelity, so the ball keeps its color: a
+     dark olive accent in light mode, the ball itself in dark mode), cool grays, the rounded display face, lively
+     motion, and Phosphor Bold icons (icons-phosphor-bold-duotone.js instead of icons.js).
+     Its own elements, drawn from Orion's rules: the live walk card (a drawn route with where the dog is now), a photo
+     drawn from shapes, the walk report, the typing dots (Loop), and the walker beside the thread on wide screens. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('fetch-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=a186eaa">
+<link rel="stylesheet" href="../components/orion.css?v=2bdd2c0">
+<style>
+  /* Fetch's own layout and elements: tokens only, nothing restyles an Orion component */
+  .ft-chat { display: grid; grid-template-columns: minmax(0, 46rem); gap: var(--s4-space-6); align-items: start; }
+  .ft-chat > * { min-inline-size: 0; }
+  .ft-side { display: none; }
+  @container (min-width: 1100px) {
+    .ft-chat { grid-template-columns: minmax(0, 46rem) minmax(0, 21rem); }
+    .ft-side { display: grid; gap: var(--s4-space-4); position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2)); }
+  }
+  .ft-who { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
+
+  /* ---------- the live walk: the ball's own color, a drawn route, where she is now ---------- */
+  .ft-card { --_r: var(--md-sys-shape-corner-extra-large); --_pad: var(--s4-space-4); align-self: flex-start; inline-size: min(100%, 30rem); display: grid; gap: var(--s4-space-3); margin-block: var(--s4-space-2); padding: var(--_pad); border-radius: var(--_r); }
+  .ft-live { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .ft-live-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-1) var(--s4-space-2); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  .ft-live-head span:last-child { margin-inline-start: auto; font-weight: var(--md-sys-typescale-label-large-weight); }
+  .ft-dot { position: relative; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: currentColor; }
+  .ft-dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; animation: ft-ping var(--s4-loop-cycle) var(--s4-motion-loop) infinite; }
+  @keyframes ft-ping { from { transform: scale(1); opacity: 0.5; } to { transform: scale(2.6); opacity: 0; } }
+  .ft-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4-space-2); margin: 0; }
+  .ft-stats div { display: grid; }
+  .ft-stats dt { order: 2; font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .ft-stats dd { order: 1; margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); font-variant-numeric: tabular-nums; }
+  .ft-map { display: block; inline-size: 100%; block-size: auto; border-radius: calc(var(--_r) - var(--_pad)); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); }
+  .ft-map .wood { fill: var(--md-sys-color-primary-container); opacity: 0.7; }
+  .ft-map .water { fill: var(--md-sys-color-surface-container-highest); }
+  .ft-map .path-done { fill: none; stroke: var(--md-sys-color-primary); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  .ft-map .path-left { fill: none; stroke: var(--md-sys-color-on-surface-variant); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1 8; }
+  .ft-map .home { fill: var(--md-sys-color-on-surface); }
+  .ft-map .here { fill: var(--md-sys-color-primary); }
+  .ft-map .here-ring { fill: var(--md-sys-color-primary); transform-box: fill-box; transform-origin: center; animation: ft-ping var(--s4-loop-cycle) var(--s4-motion-loop) infinite; }
+  .ft-map text { fill: var(--md-sys-color-on-surface-variant); font-size: 9px; font-family: var(--md-ref-typeface-plain); }
+  .ft-meter { display: grid; gap: var(--s4-space-1); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* ---------- a photo from the walk, drawn from shapes (no gray boxes) ---------- */
+  .ft-photo { display: block; inline-size: min(100%, 16rem); block-size: auto; margin-block-end: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-medium); }
+  .ft-photo .sky { fill: var(--md-sys-color-surface-container-lowest); }
+  .ft-photo .hill { fill: var(--md-sys-color-surface-container-highest); }
+  .ft-photo .grass { fill: var(--md-sys-color-primary-container); }
+  .ft-photo .dog { fill: var(--md-sys-color-on-surface); }
+  .ft-photo .ball { fill: var(--md-sys-color-primary); }
+  .ft-photo .stick { fill: var(--md-sys-color-on-surface-variant); }
+
+  /* ---------- the walk report: what happened, in words and three numbers ---------- */
+  .ft-report { background: var(--md-sys-color-surface-container-low); }
+  .ft-report-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-3); align-items: center; }
+  .ft-badge { display: grid; place-items: center; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .ft-report-head h3 { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); }
+  .ft-report .ft-stats { padding: var(--s4-space-3); border-radius: calc(var(--_r) - var(--_pad)); background: var(--md-sys-color-surface-container); }
+  .ft-did { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .ft-did li { display: inline-flex; align-items: center; gap: var(--s4-space-1); min-block-size: var(--s4-space-8); padding-inline: var(--s4-space-2) var(--s4-space-3); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); font-size: var(--md-sys-typescale-label-large-size); --s4-icon-size: var(--s4-space-5); }
+  .ft-did .s4-icon { color: var(--md-sys-color-primary); }
+  .ft-note { margin: 0; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+
+  /* ---------- quick replies and the typing dots ---------- */
+  .ft-quick { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s4-space-2); margin-block-start: var(--s4-space-4); }
+  .ft-typing { align-self: flex-start; display: inline-flex; gap: var(--s4-space-1); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); border-end-start-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-high); }
+  .ft-typing[hidden] { display: none; }
+  .ft-typing i { inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-surface-variant); animation: ft-blink var(--s4-loop-cycle) var(--s4-motion-loop) infinite; }
+  .ft-typing i:nth-child(2) { animation-delay: calc(var(--s4-loop-cycle) / 6); }
+  .ft-typing i:nth-child(3) { animation-delay: calc(var(--s4-loop-cycle) / 3); }
+  @keyframes ft-blink { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .ft-dot::after, .ft-map .here-ring, .ft-typing i { animation: none; } }
+  :root[data-motion="reduced"] :is(.ft-dot::after, .ft-map .here-ring, .ft-typing i) { animation: none; }
+
+  /* ---------- the walker, beside the thread from 1100 ---------- */
+  .ft-walker { display: grid; justify-items: start; gap: var(--s4-space-3); }
+  .ft-walker h2 { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); }
+  .ft-walker p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .ft-rows { display: grid; gap: var(--s4-space-3); margin: 0; padding: 0; list-style: none; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .ft-rows li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-3); align-items: start; }
+  .ft-rows .s4-icon { color: var(--md-sys-color-primary); }
+
+  /* ---------- Biscuit's page ---------- */
+  .ft-dog { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-4); align-items: center; margin-block-end: var(--s4-space-4); }
+  .ft-dog svg { inline-size: calc(var(--s4-space-16) + var(--s4-space-8)); block-size: auto; border-radius: var(--md-sys-shape-corner-full); }
+  .ft-dog .bg { fill: var(--md-sys-color-primary-container); }
+  .ft-dog .fg { fill: var(--md-sys-color-on-primary-container); }
+  .ft-dog h2 { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
+  .ft-dog p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  .ft-stack { display: grid; gap: var(--s4-space-4); max-inline-size: 46rem; }
+  @media (forced-colors: active) { .ft-card, .ft-typing, .ft-did li { border: 1px solid CanvasText; } }
+</style>
 </head>
 <body>
 <div class="s4-app">
   <nav class="s4-nav-rail" aria-label="Main"><div class="s4-nav-rail-items">
-    <a class="s4-nav-item" href="#chats" data-view="chats" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chat"></span></span><span class="s4-nav-label">Chats</span></a>
-    <a class="s4-nav-item" href="#people" data-view="people"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">People</span></a>
-    <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+    <a class="s4-nav-item" href="#chat" data-view="chat" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chat"></span></span><span class="s4-nav-label">Chat</span></a>
+    <a class="s4-nav-item" href="#walks" data-view="walks"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="route"></span></span><span class="s4-nav-label">Walks</span></a>
+    <a class="s4-nav-item" href="#biscuit" data-view="biscuit"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="pet"></span></span><span class="s4-nav-label">Biscuit</span></a>
   </div></nav>
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <button class="s4-icon-button" type="button" aria-label="Back"><span class="s4-icon" data-icon="back"></span></button>
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Maya Chen</h1><p class="s4-app-bar-subtitle">Online</p></div>
-      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Call" data-tooltip="Call"><span class="s4-icon" data-icon="phone"></span></button></div>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Jess Okafor</h1><p class="s4-app-bar-subtitle" id="ft-sub">Walking Biscuit now</p></div>
+      <div class="s4-app-bar-actions"><a class="s4-icon-button" href="tel:+441174960123" aria-label="Call Jess" data-tooltip="Call Jess" id="ft-call"><span class="s4-icon" data-icon="phone"></span></a></div>
     </header>
-    <main class="s4-content" data-width="reading">
-      <section class="s4-view" data-view="chats" data-title="Maya Chen">
-        <ol class="s4-thread" id="thread" aria-label="Conversation with Maya Chen" aria-live="polite">
-          <li class="s4-thread-day">Yesterday</li>
-          <li class="s4-message"><p>Did the photos from the offsite come through?</p><span class="s4-message-meta">Maya · 18:02</span></li>
-          <li class="s4-message" data-from="me"><p>Yes, all 48. Putting the best ones in the deck tonight.</p><span class="s4-message-meta">18:10</span></li>
-          <li class="s4-thread-day">Today</li>
-          <li class="s4-message"><p>Can you send the October invoice before Friday?</p><span class="s4-message-meta">Maya · 9:41</span></li>
-          <li class="s4-message"><p>Finance closes the month early this time.</p><span class="s4-message-meta">Maya · 9:41</span></li>
-          <li class="s4-message" data-from="me"><p>Sent it a minute ago. It’s the one ending 4412.</p><span class="s4-message-meta">9:42</span></li>
-          <li class="s4-message"><div class="s4-prose"><p>Perfect. For next month:</p><ul><li>Same address</li><li>Add the PO number</li></ul></div><span class="s4-message-meta">Maya · 9:44</span></li>
-        </ol>
-        <form class="s4-composer s4-glass" id="composer">
-          <button class="s4-icon-button" type="button" aria-label="Attach File"><span class="s4-icon" data-icon="attach"></span></button>
-          <div class="s4-text-field"><textarea id="msg" rows="1" aria-label="Message" placeholder="Message"></textarea></div>
-          <button class="s4-icon-button" data-variant="filled" type="submit" aria-label="Send"><span class="s4-icon" data-icon="send"></span></button>
-        </form>
+    <main class="s4-content">
+      <!-- the conversation: the thread on the start side, the walker beside it on wide screens -->
+      <section class="s4-view" data-view="chat" data-title="Jess Okafor" data-subtitle="Walking Biscuit now">
+        <div class="ft-chat">
+          <div>
+            <ol class="s4-thread" id="thread" aria-label="Conversation with Jess Okafor" aria-live="polite">
+              <li class="s4-thread-day">Yesterday</li>
+              <li class="s4-message" data-from="me"><p>Morning! Biscuit’s had breakfast. The lead is on the hook by the door.</p><span class="s4-message-meta">09:10</span></li>
+              <li class="s4-message"><p>Perfect, see you at 12.</p><span class="s4-message-meta">Jess · 09:12</span></li>
+              <li class="ft-card ft-report" aria-label="Walk report from Jess, Tuesday">
+                <div class="ft-report-head"><span class="ft-badge"><span class="s4-icon" data-icon="pet"></span></span><div><h3>Walk Report</h3><p class="ft-who">Tue 17 Nov · Leigh Woods loop · Jess · 13:05</p></div></div>
+                <dl class="ft-stats" data-hero><div><dt>Walked</dt><dd>52 min</dd></div><div><dt>Distance</dt><dd>3.1 km</dd></div><div><dt>Sniff stops</dt><dd>23</dd></div></dl>
+                <ul class="ft-did" aria-label="On The Walk"><li><span class="s4-icon" data-icon="water"></span>Drank Water</li><li><span class="s4-icon" data-icon="check"></span>Poo Bagged</li><li><span class="s4-icon" data-icon="favorite"></span>Played Fetch</li></ul>
+                <p class="ft-note">Brilliant recall today: she waited at every road. Paws towelled, water bowl filled.</p>
+              </li>
+              <li class="s4-thread-day">Today</li>
+              <li class="s4-message"><p>Picked Biscuit up. Full happy spin at the door.</p><span class="s4-message-meta">Jess · 12:58</span></li>
+              <li class="ft-card ft-live" aria-label="Today’s walk, live">
+                <div class="ft-live-head"><span class="ft-dot" aria-hidden="true"></span><span>Out Now</span><span>Leigh Woods loop</span></div>
+                <dl class="ft-stats" data-hero><div><dt>Out for</dt><dd id="ft-mins">38 min</dd></div><div><dt>Walked</dt><dd>2.4 km</dd></div><div><dt>Home by</dt><dd>14:15</dd></div></dl>
+                <svg class="ft-map" viewBox="0 0 320 132" role="img" aria-label="Map of the Leigh Woods loop: walked from the car park along the river to the viewpoint; about a third of the loop is left, back through the woods">
+                  <path class="water" d="M0 104 C60 96 90 120 150 110 S250 90 320 102 V132 H0Z"/>
+                  <circle class="wood" cx="70" cy="40" r="30"/><circle class="wood" cx="112" cy="28" r="22"/><circle class="wood" cx="236" cy="44" r="34"/><circle class="wood" cx="282" cy="30" r="20"/><circle class="wood" cx="178" cy="62" r="18"/>
+                  <path class="path-left" d="M246 70 C226 30 160 22 110 40 S48 70 40 86"/>
+                  <path class="path-done" d="M40 86 C70 94 110 92 150 86 S226 92 246 70"/>
+                  <rect class="home" x="33" y="79" width="14" height="14" rx="4"/>
+                  <circle class="here-ring" cx="246" cy="70" r="8"/><circle class="here" cx="246" cy="70" r="7"/>
+                  <text x="30" y="72">Car park</text><text x="232" y="88">Viewpoint</text>
+                </svg>
+                <div class="ft-meter"><span>Two thirds of the loop done, about 25 minutes left</span><div class="s4-progress" data-value="0.66" aria-label="Walk Progress"></div></div>
+              </li>
+              <li class="s4-message">
+                <svg class="ft-photo" viewBox="0 0 240 150" role="img" aria-label="Photo from Jess: Biscuit on the grass carrying a stick, a ball in the air">
+                  <rect class="sky" width="240" height="150"/>
+                  <path class="hill" d="M0 92 C60 70 120 80 240 66 V150 H0Z"/>
+                  <path class="grass" d="M0 118 C70 104 150 112 240 100 V150 H0Z"/>
+                  <circle class="ball" cx="196" cy="38" r="11"/>
+                  <g class="dog"><ellipse cx="104" cy="104" rx="34" ry="15"/><circle cx="142" cy="88" r="13"/><ellipse cx="155" cy="93" rx="10" ry="6"/><ellipse cx="135" cy="96" rx="6" ry="12"/>
+                    <rect x="78" y="108" width="7" height="22" rx="3.5"/><rect x="92" y="110" width="7" height="22" rx="3.5"/><rect x="114" y="110" width="7" height="22" rx="3.5"/><rect x="127" y="108" width="7" height="22" rx="3.5"/>
+                    <ellipse cx="68" cy="92" rx="5" ry="13" transform="rotate(-35 68 92)"/></g>
+                  <rect class="stick" x="146" y="95" width="44" height="5" rx="2.5" transform="rotate(-12 168 97)"/>
+                </svg>
+                <p>She found the big stick again. It’s bigger than her.</p><span class="s4-message-meta">Jess · 13:21</span>
+              </li>
+              <li class="s4-message" data-from="me"><p>Ha! Is she being good with the other dogs?</p><span class="s4-message-meta">13:24</span></li>
+              <li class="s4-message"><p>Mostly. One bark at a cockapoo, then they were best friends.</p><span class="s4-message-meta">Jess · 13:26</span></li>
+            </ol>
+            <div class="ft-typing" id="ft-typing" hidden><i></i><i></i><i></i><span class="s4-visually-hidden">Jess is typing</span></div>
+            <div class="s4-chip-set ft-quick" aria-label="Quick Replies" id="ft-quick">
+              <button class="s4-chip" data-type="suggestion" type="button">Thanks, Jess</button>
+              <button class="s4-chip" data-type="suggestion" type="button">How Muddy Is She?</button>
+              <button class="s4-chip" data-type="suggestion" type="button">Back By 14:15?</button>
+            </div>
+            <form class="s4-composer s4-glass" id="composer">
+              <button class="s4-icon-button" type="button" aria-label="Attach Photo"><span class="s4-icon" data-icon="camera"></span></button>
+              <div class="s4-text-field"><textarea id="msg" rows="1" aria-label="Message Jess" placeholder="Message Jess"></textarea></div>
+              <button class="s4-icon-button" data-variant="filled" type="submit" aria-label="Send"><span class="s4-icon" data-icon="send"></span></button>
+            </form>
+          </div>
+          <aside class="ft-side" aria-label="About Jess and Biscuit">
+            <section class="s4-pane ft-walker" aria-labelledby="ft-walker-h">
+              <span class="s4-avatar" data-size="l" data-status="online" aria-label="Jess Okafor, online">JO</span>
+              <div><h2 id="ft-walker-h">Jess Okafor</h2><p>Walks Biscuit on Tuesdays and Thursdays · 4.9 from 212 walks</p></div>
+              <a class="s4-button" data-variant="tonal" href="tel:+441174960123"><span class="s4-icon" data-icon="phone"></span>Call Jess</a>
+            </section>
+            <section class="s4-pane" aria-labelledby="ft-notes-h">
+              <h2 class="s4-pane-title" id="ft-notes-h">What Jess Knows</h2>
+              <ul class="ft-rows">
+                <li><span class="s4-icon" data-icon="key"></span><span>Key in the lockbox by the side gate</span></li>
+                <li><span class="s4-icon" data-icon="warning"></span><span>No chicken treats: Biscuit is allergic</span></li>
+                <li><span class="s4-icon" data-icon="pet"></span><span>Pulls toward squirrels; good recall with the whistle</span></li>
+                <li><span class="s4-icon" data-icon="calendar"></span><span>Next walk Thursday 19 November, 13:00</span></li>
+              </ul>
+            </section>
+          </aside>
+        </div>
       </section>
-      <section class="s4-view" data-view="people" data-title="People" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="people"></span></span><h2 class="s4-empty-title">No Contacts Yet</h2><p class="s4-empty-text">Invite someone to start a conversation.</p></div></section>
-      <section class="s4-view" data-view="settings" data-title="Settings" hidden><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="settings"></span></span><h2 class="s4-empty-title">Settings</h2><p class="s4-empty-text">See the Settings template.</p></div></section>
+
+      <!-- walks: what is booked and what happened -->
+      <section class="s4-view" data-view="walks" data-title="Walks" data-subtitle="Biscuit with Jess" hidden>
+        <div class="ft-stack">
+          <section class="s4-pane" aria-labelledby="ft-next-h">
+            <h2 class="s4-pane-title" id="ft-next-h">Coming Up</h2>
+            <ul class="s4-list" aria-label="Booked Walks">
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-list-content"><span class="s4-list-headline">Thu 19 Nov, 13:00</span><span class="s4-list-supporting">Leigh Woods loop · 60 min · Jess</span></span><span class="s4-list-trailing s4-num">£16</span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="people"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sat 21 Nov, 10:30</span><span class="s4-list-supporting">Group walk on the Downs · 90 min</span></span><span class="s4-list-trailing s4-num">£20</span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-list-content"><span class="s4-list-headline">Tue 24 Nov, 12:00</span><span class="s4-list-supporting">Leigh Woods loop · 60 min · Jess</span></span><span class="s4-list-trailing s4-num">£16</span></div></li>
+            </ul>
+          </section>
+          <section class="s4-pane" aria-labelledby="ft-past-h">
+            <h2 class="s4-pane-title" id="ft-past-h">This Month</h2>
+            <dl class="ft-stats" data-hero><div><dt>Walks</dt><dd>9</dd></div><div><dt>Walked</dt><dd>27 km</dd></div><div><dt>Sticks found</dt><dd>Many</dd></div></dl>
+          </section>
+        </div>
+      </section>
+
+      <!-- Biscuit: what every walker should know -->
+      <section class="s4-view" data-view="biscuit" data-title="Biscuit" data-subtitle="Cocker spaniel, 4" hidden>
+        <div class="ft-stack">
+          <div class="ft-dog">
+            <svg viewBox="0 0 96 96" aria-hidden="true" focusable="false"><rect class="bg" width="96" height="96"/><g class="fg"><circle cx="48" cy="46" r="20"/><ellipse cx="28" cy="54" rx="9" ry="18"/><ellipse cx="68" cy="54" rx="9" ry="18"/><ellipse cx="48" cy="60" rx="12" ry="9"/></g><g class="bg"><circle cx="41" cy="44" r="2.5"/><circle cx="55" cy="44" r="2.5"/><ellipse cx="48" cy="56" rx="4" ry="3"/></g></svg>
+            <div><h2>Biscuit</h2><p>Cocker spaniel, four years old, golden. Loves sticks, dislikes umbrellas.</p></div>
+          </div>
+          <section class="s4-pane" aria-labelledby="ft-care-h">
+            <h2 class="s4-pane-title" id="ft-care-h">Notes For Walkers</h2>
+            <dl class="s4-dl">
+              <div class="s4-dl-row"><dt>Key</dt><dd>Lockbox by the side gate; the code is given in person</dd></div>
+              <div class="s4-dl-row"><dt>Food</dt><dd>No chicken treats (allergic). Her own treats are in the tin by the lead.</dd></div>
+              <div class="s4-dl-row"><dt>On The Lead</dt><dd>Pulls toward squirrels. Off the lead in the woods is fine; recall is good with the whistle.</dd></div>
+              <div class="s4-dl-row"><dt>Vet</dt><dd>Clifton Vets, 0117 496 0123</dd></div>
+            </dl>
+          </section>
+        </div>
+      </section>
     </main>
   </div>
   <nav class="s4-nav-bar" aria-label="Main">
-    <a class="s4-nav-item" href="#chats" data-view="chats" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chat"></span></span><span class="s4-nav-label">Chats</span></a>
-    <a class="s4-nav-item" href="#people" data-view="people"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">People</span></a>
-    <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+    <a class="s4-nav-item" href="#chat" data-view="chat" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chat"></span></span><span class="s4-nav-label">Chat</span></a>
+    <a class="s4-nav-item" href="#walks" data-view="walks"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="route"></span></span><span class="s4-nav-label">Walks</span></a>
+    <a class="s4-nav-item" href="#biscuit" data-view="biscuit"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="pet"></span></span><span class="s4-nav-label">Biscuit</span></a>
   </nav>
 </div>
-<script src="../components/assets/icons.js?v=563180a"></script>
+<script src="../components/assets/icons-phosphor-bold-duotone.js?v=3bfab68"></script>
 <script src="../components/orion.js?v=f9b35ff"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
-document.getElementById('composer').addEventListener('submit', function (e) {
-  e.preventDefault();
-  var box = document.getElementById('msg'), text = box.value.trim(); if (!text) return;
-  var li = document.createElement('li'); li.className = 's4-message'; li.dataset.from = 'me';
-  var p = document.createElement('p'); p.textContent = text; li.appendChild(p);
-  var m = document.createElement('span'); m.className = 's4-message-meta'; m.textContent = 'Now'; li.appendChild(m);
-  document.getElementById('thread').appendChild(li); box.value = ''; box.dispatchEvent(new Event('input'));
-  S4.transition.rise(li, { open: true });
-  window.scrollTo({ top: document.body.scrollHeight });
-});
-document.getElementById('msg').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.form.requestSubmit(); } });
-window.scrollTo({ top: document.body.scrollHeight });</script>
+<script>
+/* Fetch's brand: the tennis ball (fidelity keeps it chartreuse), cool grays, rounded display, lively motion (decisions 0055, 0056) */
+S4.theme.restore('fetch-theme', { mode: 'system', seed: '#c8e021', variant: 'fidelity', gray: 'cool', display: 'rounded', energy: 'lively' });
+
+(function () {
+  var thread = document.getElementById('thread'), box = document.getElementById('msg'), typing = document.getElementById('ft-typing');
+  var opened = Date.now();   /* the thread's clock carries on from Jess's last message (a real app uses the time sent) */
+  function now() { var m = 13 * 60 + 27 + Math.floor((Date.now() - opened) / 60000); return Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0'); }
+  function bubble(text, mine) {
+    var li = document.createElement('li'); li.className = 's4-message'; if (mine) li.dataset.from = 'me';
+    var p = document.createElement('p'); p.textContent = text; li.appendChild(p);
+    var m = document.createElement('span'); m.className = 's4-message-meta'; m.textContent = (mine ? '' : 'Jess · ') + now(); li.appendChild(m);
+    thread.appendChild(li); S4.transition.rise(li, { open: true });
+    window.scrollTo({ top: document.body.scrollHeight });
+  }
+  /* Jess answers (a stand-in for the real conversation): the typing dots first, then her reply */
+  var replies = [[/mud/i, 'Medium muddy. I’ll towel her paws before she goes in.'], [/thank/i, 'Any time! She’s a joy.'], [/14:15|back|late/i, 'Yes, heading back now. At your door by 14:10 or so.']];
+  var waiting = null;
+  function answer(text) {
+    clearTimeout(waiting); typing.hidden = false; thread.after(typing);
+    waiting = setTimeout(function () {
+      typing.hidden = true;
+      var r = replies.filter(function (x) { return x[0].test(text); })[0];
+      bubble(r ? r[1] : 'Got it. I’ll message when she’s home.', false);
+    }, 1600);
+  }
+  function send(text) { text = text.trim(); if (!text) return; bubble(text, true); answer(text); }
+  document.getElementById('composer').addEventListener('submit', function (e) {
+    e.preventDefault(); send(box.value); box.value = ''; box.dispatchEvent(new Event('input'));
+  });
+  box.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.form.requestSubmit(); } });
+  document.getElementById('ft-quick').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (c) send(c.textContent); });
+
+  /* the live card counts the minutes while the walk is on */
+  var start = Date.now(), mins = document.getElementById('ft-mins');
+  setInterval(function () { mins.textContent = (38 + Math.floor((Date.now() - start) / 60000)) + ' min'; }, 15000);
+
+  /* each view names what it is about under the title; calling Jess belongs to the conversation */
+  function sync(name) {
+    var v = name ? document.querySelector('.s4-view[data-view="' + name + '"]') : document.querySelector('.s4-view:not([hidden])'); if (!v) return;
+    document.getElementById('ft-sub').textContent = v.dataset.subtitle || '';
+    document.getElementById('ft-call').hidden = v.dataset.view !== 'chat';
+  }
+  document.querySelector('.s4-app').addEventListener('s4-change', function (e) { sync(e.detail.view); });
+  setTimeout(function () { sync(); });
+  if (!location.hash || location.hash === '#chat') window.scrollTo({ top: document.body.scrollHeight });
+})();
+</script>
 </body>
 </html>
