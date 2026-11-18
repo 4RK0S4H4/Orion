@@ -7967,6 +7967,18 @@
   }
 }
 
+/* ---- time-field/time-field.css ---- */
+/* Time field: a Quiet Box you type a time into, with a clock button that opens a short list of times in the glass menu
+   (the combobox's list). Nothing here but the button and the list's two-line options for a range; no clock dial.
+   <div class="s4-text-field s4-time-field"><label for="t">Start</label><input id="t" value="09:30"></div> */
+@layer s4.components {
+  .s4-time-field > input { font-variant-numeric: tabular-nums; }
+  .s4-time-field-toggle > .s4-icon { transition: color var(--s4-motion-state); }
+  .s4-time-field-toggle[aria-expanded="true"] { color: var(--md-sys-color-on-surface); }
+  /* a date and a time (or a start and an end) side by side, stacked when there is no room for both whole */
+  .s4-date-time, .s4-time-range { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); gap: var(--s4-space-4) var(--s4-space-3); align-items: start; }
+}
+
 /* ---- form/form.css ---- */
 /* Form (S4 addition, decision 0051): layout and the quiet marks of a form that behaves.
    <form class="s4-form" novalidate>

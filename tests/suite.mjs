@@ -579,6 +579,19 @@ async function use(page, add, phone) {
       if (await f.evaluate((x, id) => S4.upload.files(x).some((e) => e.id === id), st.id)) add('upload: Remove did not remove the file');
       await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
+    for (const f of (await visible('.s4-time-field:not([data-error]):not([data-range-start]):not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator(':scope > input:not([type="hidden"])');
+      if (!(await click(inp, 'time field'))) continue;
+      await settle(420);
+      const n = await inp.evaluate((i) => { const l = document.getElementById(i.getAttribute('aria-controls') || ''); return i.getAttribute('aria-expanded') === 'true' && l ? l.querySelectorAll('[role="option"]').length : 0; });
+      if (!n) add('time field: a tap did not open its list of times');
+      else if ((await listFits()) === 'off') add('time field list does not fit the screen');
+      await page.keyboard.press('Escape'); await settle(300);
+      await page.keyboard.press('Control+A'); await page.keyboard.type('545p');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur()); await settle(200);
+      const v = await f.evaluate((x) => S4.timeField.value(x));
+      if (v !== 17 * 60 + 45) add(`time field: "545p" was not read as 5:45 PM (got ${v})`);
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
