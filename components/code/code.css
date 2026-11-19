@@ -1,0 +1,161 @@
+/* Code (round 0056): a block of code with its file name and language, line numbers, marked lines, a wrap toggle and a
+   copy button; inline code; a diff. Solid content (never glass). The syntax colors are tokens (--s4-syntax-*), fixed
+   hues proven at 4.5:1 on every surface in light, dark, both high-contrast modes and on every tinted scheme, so code
+   reads the same with any accent.
+   <figure class="s4-code" data-lang="js" data-lines data-mark="3-4">
+     <figcaption class="s4-code-head"><span class="s4-code-file">table.js</span></figcaption>
+     <pre><code>…</code></pre>
+   </figure>
+   code.js adds the language label, the Wrap and Copy buttons, numbers the lines, marks them and colors the code. */
+@layer s4.components {
+  .s4-code {
+    --_bg: var(--md-sys-color-surface-container);
+    --_gutter: 0px;
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    margin: 0;
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--_bg);
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden;
+  }
+  /* on a surface that is already the code color, step up so the block still reads as one */
+  :is(.s4-card, .s4-pane, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet) .s4-code { --_bg: var(--md-sys-color-surface-container-high); }
+  .s4-code-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding-block: var(--s4-space-1);
+    padding-inline: var(--s4-space-4) var(--s4-space-2);
+    border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
+  .s4-code-file {
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-mono);
+    font-size: var(--md-sys-typescale-body-small-size);
+    overflow-wrap: anywhere;
+  }
+  .s4-code-lang { color: var(--md-sys-color-on-surface-variant); }
+  .s4-code-actions { display: flex; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  /* a block with no head: the buttons float in the top end corner */
+  .s4-code > .s4-code-actions {
+    position: absolute;
+    inset-block-start: var(--s4-space-2);
+    inset-inline-end: var(--s4-space-2);
+    z-index: 1;
+    padding: var(--s4-space-1);
+    border-radius: var(--s4-shape-control);
+    background: var(--_bg);
+  }
+  .s4-code:has(> .s4-code-actions) { position: relative; }
+
+  .s4-code pre {
+    margin: 0;
+    padding-block: var(--s4-space-3);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-radius: inherit;
+    font-family: var(--md-ref-typeface-mono);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    font-variant-ligatures: none;
+    tab-size: 2;
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+  }
+  .s4-code-head + pre { border-start-start-radius: 0; border-start-end-radius: 0; }
+  /* keyboard: the scroller takes focus (code.js gives it tabindex), so long lines can be read with the arrow keys */
+  .s4-code pre:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-code code { display: block; min-inline-size: max-content; font: inherit; white-space: pre; background: none; padding: 0; }
+  .s4-code[data-wrap] code { min-inline-size: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  /* lines: a gutter with the number (generated content, so it is never copied) and the code */
+  .s4-code-line {
+    display: grid;
+    grid-template-columns: var(--_gutter) minmax(0, 1fr);
+    padding-inline-end: var(--s4-space-4);
+    border-inline-start: 3px solid var(--_bar, transparent);
+    background: var(--_line, transparent);
+    text-decoration: none;
+  }
+  .s4-code:not([data-lines]) .s4-code-line { padding-inline-start: calc(var(--s4-space-4) - 3px); }
+  .s4-code[data-lines] { --_gutter: calc(var(--_digits, 2) * 1ch + var(--s4-space-4) + var(--s4-space-3)); }
+  .s4-code-line::before {
+    content: attr(data-n);
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    padding-inline: calc(var(--s4-space-4) - 3px) var(--s4-space-3);
+    background: var(--_line-solid, var(--_bg));
+    color: var(--md-sys-color-on-surface-variant);
+    text-align: end;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-code:not([data-lines]) .s4-code-line::before { content: none; }
+  /* a marked line: a step-up fill and an accent bar at its start, so it is never color alone */
+  .s4-code-line[data-mark] {
+    --_line: var(--md-sys-color-surface-container-highest);
+    --_line-solid: var(--md-sys-color-surface-container-highest);
+    --_bar: var(--md-sys-color-primary);
+  }
+
+  /* diff: + and - lines keep their sign in its own column; the fill repeats it, never says it alone */
+  .s4-code-sign { display: inline-block; inline-size: 2ch; color: inherit; user-select: none; -webkit-user-select: none; }
+  .s4-code-line[data-diff="add"] {
+    --_line: var(--s4-color-success-container);
+    --_line-solid: var(--s4-color-success-container);
+    color: var(--s4-color-on-success-container);
+  }
+  .s4-code-line[data-diff="remove"] {
+    --_line: var(--md-sys-color-error-container);
+    --_line-solid: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+  }
+  .s4-code-line[data-diff] :is([class^="s4-syntax-"], [class*=" s4-syntax-"]),
+  .s4-code-line[data-diff]::before { color: inherit; }
+  .s4-code-line[data-diff="meta"] { color: var(--md-sys-color-on-surface-variant); }
+
+  /* syntax: tokens only; comments are also italic so they never rely on color */
+  .s4-syntax-keyword { color: var(--s4-syntax-keyword); }
+  .s4-syntax-string { color: var(--s4-syntax-string); }
+  .s4-syntax-number { color: var(--s4-syntax-number); }
+  .s4-syntax-comment { color: var(--s4-syntax-comment); font-style: italic; }
+  .s4-syntax-function { color: var(--s4-syntax-function); }
+  .s4-syntax-type { color: var(--s4-syntax-type); }
+  .s4-syntax-property { color: var(--s4-syntax-property); }
+  .s4-syntax-punctuation { color: var(--md-sys-color-on-surface-variant); }
+
+  /* inline code in running text, and a key combination (each key is a .s4-kbd) */
+  .s4-code-inline {
+    padding: 0.1em 0.35em;
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    background: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-mono);
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+  .s4-keys { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-1); vertical-align: middle; }
+
+  @media (forced-colors: active) {
+    .s4-code { border: 1px solid CanvasText; }
+    .s4-code-line[data-mark] { outline: 1px solid Highlight; outline-offset: -1px; }
+    .s4-code-inline { border: 1px solid CanvasText; }
+  }
+  @media print {
+    .s4-code pre { overflow: visible; }
+    .s4-code code { white-space: pre-wrap; overflow-wrap: anywhere; min-inline-size: 0; }
+    .s4-code-actions { display: none; }
+  }
+}

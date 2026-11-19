@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Code · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Code</h1></header>
+<main class="ex-main">
+  <p>A block of code with its file name and language, line numbers, marked lines, a Wrap toggle and Copy. The colors are fixed syntax tokens proven at 4.5:1 on every surface, in light, dark and both high-contrast modes, and on every tinted scheme, so code reads the same with any accent. A tiny built-in tokenizer colors JavaScript, TypeScript, JSON, CSS, HTML, Python and shell; anything else arrives already split into <code class="s4-code-inline">s4-syntax-*</code> spans.</p>
+
+  <section class="ex-sec">
+    <h2>File, Language, Line Numbers, Marked Lines</h2>
+    <p>The scroller takes focus, so long lines can be read with the arrow keys. Marked lines get a step-up fill and an accent bar at their start.</p>
+    <figure class="s4-code" data-lang="js" data-lines data-mark="6-8">
+      <figcaption class="s4-code-head"><span class="s4-code-file">specimens/table.js</span></figcaption>
+<pre><code>// Show the drawer's specimens, newest first
+import { fetchSpecimens } from './api.js';
+
+const table = S4.table(document.getElementById('specimens'));
+async function load(drawer) {
+  const rows = await fetchSpecimens({ drawer, sort: 'collected', order: 'desc' });
+  table.setRows(rows);
+  table.group('family', { totals: { count: 'sum' } });
+  return rows.length;
+}
+load('D-0412').then((n) =&gt; console.log(`${n} specimens in drawer D-0412`));</code></pre>
+    </figure>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Languages</h2>
+    <p>Each block is one language. Comments are italic as well as gray, so they never rely on color.</p>
+    <div class="s4-stack">
+      <figure class="s4-code" data-lang="css">
+        <figcaption class="s4-code-head"><span class="s4-code-file">records.css</span></figcaption>
+<pre><code>/* the record number column stays put */
+.records td.catalogue {
+  font-variant-numeric: tabular-nums;
+  padding-inline: var(--s4-space-4);
+  color: var(--md-sys-color-on-surface);
+}
+@media (width &lt; 600px) { .records { --s4-table-max-height: 70vh; } }</code></pre>
+      </figure>
+      <figure class="s4-code" data-lang="py">
+        <figcaption class="s4-code-head"><span class="s4-code-file">ingest.py</span></figcaption>
+<pre><code>import csv
+
+def read_ledger(path, drawer=None):
+    """Read the accession ledger and keep one drawer."""
+    with open(path, newline="") as f:
+        rows = [r for r in csv.DictReader(f) if drawer is None or r["drawer"] == drawer]
+    return sorted(rows, key=lambda r: int(r["year"]))  # oldest first</code></pre>
+      </figure>
+      <figure class="s4-code" data-lang="json">
+        <figcaption class="s4-code-head"><span class="s4-code-file">view.json</span></figcaption>
+<pre><code>{
+  "name": "Loans Due This Month",
+  "filters": { "status": ["On Loan"], "due": "2026-12" },
+  "sort": ["due", "ascending"],
+  "pinned": true
+}</code></pre>
+      </figure>
+      <figure class="s4-code" data-lang="sh">
+        <figcaption class="s4-code-head"><span class="s4-code-file">Terminal</span></figcaption>
+<pre><code># rebuild and check before committing
+npm run build &amp;&amp; npm run check
+node skill/s4-orion/scripts/check.mjs templates/data-table.html --out "$HOME/out"</code></pre>
+      </figure>
+      <figure class="s4-code" data-lang="html">
+        <figcaption class="s4-code-head"><span class="s4-code-file">index.html</span></figcaption>
+<pre><code>&lt;!-- one column of the records table --&gt;
+&lt;th scope="col" data-field="taxon" data-primary aria-sort="none"&gt;
+  &lt;button type="button" class="s4-table-sort"&gt;Taxon&lt;/button&gt;
+&lt;/th&gt;</code></pre>
+      </figure>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Wrap</h2>
+    <p>Long lines scroll sideways by default. <code class="s4-code-inline">data-wrap</code> (or the Wrap button) wraps them instead; line numbers stay with their first row.</p>
+    <figure class="s4-code" data-lang="js" data-lines data-wrap>
+      <figcaption class="s4-code-head"><span class="s4-code-file">notes.js</span></figcaption>
+<pre><code>const note = 'Collected on the north bank below the weir after the spring flood; the label is in the collector’s own hand and gives the parish, not the farm, so the locality is approximate to about two kilometres.';
+export default note;</code></pre>
+    </figure>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Diff</h2>
+    <p>Added and removed lines keep their sign in its own column and are real <code class="s4-code-inline">&lt;ins&gt;</code> and <code class="s4-code-inline">&lt;del&gt;</code> elements, so the change is never told by color alone.</p>
+    <figure class="s4-code" data-variant="diff" data-lines>
+      <figcaption class="s4-code-head"><span class="s4-code-file">records.js</span></figcaption>
+<pre><code>@@ -12,6 +12,7 @@ function columns() {
+   { field: 'catalogue', label: 'Catalogue No.', pin: true },
+-  { field: 'name', label: 'Name' },
++  { field: 'taxon', label: 'Taxon', primary: true },
++  { field: 'family', label: 'Family' },
+   { field: 'collected', label: 'Collected', format: 'date' },
+   { field: 'drawer', label: 'Drawer' },</code></pre>
+    </figure>
+  </section>
+
+  <section class="ex-sec">
+    <h2>No Head, Pre-Tokenised</h2>
+    <p>Without a head the buttons sit in the top corner. Code from another highlighter keeps its spans when they use the <code class="s4-code-inline">s4-syntax-*</code> names.</p>
+    <figure class="s4-code">
+<pre><code><span class="s4-syntax-keyword">SELECT</span> drawer, <span class="s4-syntax-function">count</span>(*) <span class="s4-syntax-keyword">AS</span> specimens
+<span class="s4-syntax-keyword">FROM</span> accessions
+<span class="s4-syntax-keyword">WHERE</span> status = <span class="s4-syntax-string">'On Loan'</span> <span class="s4-syntax-keyword">AND</span> due &lt; <span class="s4-syntax-string">'2026-12-31'</span>
+<span class="s4-syntax-keyword">GROUP BY</span> drawer <span class="s4-syntax-comment">-- one row per drawer</span>
+<span class="s4-syntax-keyword">LIMIT</span> <span class="s4-syntax-number">20</span>;</code></pre>
+    </figure>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Inline Code and Keys</h2>
+    <p>In running text: <code class="s4-code-inline">S4.table(el).setRows(rows)</code> fills a table. Keys are <code class="s4-code-inline">.s4-kbd</code>; a combination sits in <code class="s4-code-inline">.s4-keys</code>.</p>
+    <div class="ex-board">
+      <span class="s4-body-large">Find a record: <span class="s4-keys"><kbd class="s4-kbd">Ctrl</kbd><kbd class="s4-kbd">K</kbd></span></span>
+      <span class="s4-body-large">Edit the cell: <kbd class="s4-kbd">Enter</kbd>, cancel: <kbd class="s4-kbd">Esc</kbd></span>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/code/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>
