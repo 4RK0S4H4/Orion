@@ -1,142 +1,515 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-GB" data-gray="warm" data-corners="soft" data-type-display="custom" style="--md-ref-typeface-brand: Didot, 'Bodoni 72', 'Bodoni MT', 'Bodoni Moda', ui-serif, Georgia, serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Checkout · S4 Orion Template</title>
-<!-- Template: Checkout (a multi-step form). For checkout, booking, sign-up, applications and any task done in a few
-     steps. One step on screen at a time, a stepper that shows where you are, the order summary beside it (above it on
-     a phone), errors only when you leave a field, and a small reward at the end. -->
-<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<title>The Velvet · Book Tickets</title>
+<meta name="description" content="Book seats for The Quiet Hours at The Velvet, Leith: pick your seats on the plan, add a drink for your seat, pay, and get your ticket.">
+<!-- Template: Checkout (a multi-step form), as a product (issue 66). For checkout, booking, sign-up, applications and
+     any task done in a few steps. One step on screen at a time, a stepper that shows where you are, the order summary
+     beside it (under it on a phone), errors only when you leave a field, and a small reward at the end.
+     The Velvet is a three-screen independent cinema in Leith; this is its seat booking. Brand through the dials only:
+     a velvet crimson accent (variant fidelity, so it stays crimson instead of turning coral), warm grays, soft corners,
+     a Didone display face (the poster and the ticket). Its own elements, drawn from Orion's rules: the film's poster
+     set in type, the seat plan in a dark auditorium (a scoped dark theme: the lights go down), the ticket stub that
+     keeps the running total and the seat hold, and the e-ticket with its door code (a scoped light tile, so it scans). -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('velvet-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=8e522bf">
+<link rel="stylesheet" href="../components/orion.css?v=8176c8c">
 <style>
-  /* the app's own layout: tokens only */
+  /* The Velvet's own layout and elements: tokens only, nothing restyles an Orion component */
+  .vl-page { display: grid; gap: var(--s4-space-6); }
+  .vl-page > * { min-inline-size: 0; }
+  .vl-eyebrow { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); letter-spacing: var(--md-sys-typescale-label-large-tracking); font-weight: var(--md-sys-typescale-label-large-weight); }
+
+  /* ---------- the film: a poster set in type beside what you are booking ---------- */
+  .vl-film { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-4) var(--s4-space-5); align-items: start; }
+  .vl-poster {
+    position: relative; display: grid; align-content: start; gap: var(--s4-space-2); overflow: hidden;
+    inline-size: calc(var(--s4-space-16) * 1.75); aspect-ratio: 2 / 3; padding: var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
+  }
+  .vl-poster-title { margin: 0; font-family: var(--md-ref-typeface-brand); font-size: var(--md-sys-typescale-title-large-size); line-height: 1.05; font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .vl-poster-by { margin: 0; font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); letter-spacing: var(--md-sys-typescale-label-small-tracking); font-weight: var(--md-sys-typescale-label-small-weight); text-transform: uppercase; }
+  .vl-poster svg { position: absolute; inset-inline: 0; inset-block-end: 0; inline-size: 100%; block-size: auto; }
+  .vl-film-info { display: grid; gap: var(--s4-space-2); align-content: start; }
+  .vl-film-title { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight); }
+  .vl-film-meta { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .vl-film-hook { display: none; margin: 0; max-inline-size: 52ch; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .vl-showing { grid-column: 1 / -1; display: grid; gap: var(--s4-space-2); }
+  .vl-showing .s4-button-group { max-inline-size: 26rem; }
+  .vl-house-notes { display: none; }
+  @container (min-width: 600px) {
+    .vl-poster { inline-size: calc(var(--s4-space-16) * 2.5); padding: var(--s4-space-4); }
+    .vl-poster-title { font-size: var(--md-sys-typescale-headline-medium-size); }
+    .vl-film-title { font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); }
+    .vl-film-hook { display: block; }
+    .vl-poster { grid-row: 1 / span 2; }
+    .vl-showing { grid-column: 2; align-self: end; }
+  }
+  @container (min-width: 1100px) {
+    .vl-film { grid-template-columns: auto minmax(0, 1fr) minmax(0, 18rem); }
+    .vl-house-notes { display: grid; grid-row: 1 / span 2; grid-column: 3; align-self: start; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; }
+    .vl-house-notes li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-3); align-items: center; padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+    .vl-house-notes .s4-icon { color: var(--md-sys-color-primary); }
+    .vl-house-notes b { display: block; font-weight: var(--md-sys-typescale-emphasized-body-medium-weight); }
+  }
+
+  /* ---------- the auditorium: a dark room (scoped theme) with the screen and the seat plan ---------- */
+  .vl-main { display: grid; gap: var(--s4-space-5); align-content: start; }
   .co-steps { position: relative; }
-  .co-total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
-  .co-done { display: grid; justify-items: center; gap: var(--s4-space-3); padding-block: var(--s4-space-8); text-align: center; }
-  .co-done h2 { margin: 0; }
-  .co-done p { margin: 0; max-inline-size: 36ch; color: var(--md-sys-color-on-surface-variant); }
+  .vl-step { display: grid; gap: var(--s4-space-4); }
+  .vl-step[hidden] { display: none; }
+  .vl-house { display: grid; justify-items: center; gap: var(--s4-space-4); padding: var(--s4-space-5) var(--s4-space-2); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); }
+  .vl-house-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); justify-self: stretch; padding-inline: var(--s4-space-2); }
+  .vl-house-head h2 { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .vl-house-head p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .vl-screen { display: grid; justify-items: center; gap: var(--s4-space-1); inline-size: min(100%, 30rem); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); letter-spacing: 0.2em; text-transform: uppercase; }
+  .vl-screen svg { inline-size: 100%; block-size: auto; color: var(--md-sys-color-on-surface); }
+  .vl-plan { --_gap: var(--s4-space-1); display: grid; gap: calc(var(--_gap) * 1.5); inline-size: min(100%, 30rem); }
+  .vl-row { display: grid; grid-template-columns: var(--s4-space-4) repeat(5, minmax(0, 1fr)) var(--s4-space-4) repeat(5, minmax(0, 1fr)) var(--s4-space-4); gap: var(--_gap); align-items: center; }
+  .vl-row[data-kind="sofa"] { margin-block-start: var(--s4-space-3); }
+  .vl-row-label { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: 1; font-weight: var(--md-sys-typescale-label-small-weight); text-align: center; }
+  .vl-row-label:first-child { grid-column: 1; }
+  .vl-row-label:last-child { grid-column: 13; }
+  /* a seat: a filled shape, the back rounder than the front; everything you click follows the corner dial */
+  .vl-seat {
+    --_r: min(var(--s4-shape-control), 42%);
+    --_fill: var(--s4-color-control);
+    position: relative; display: grid; place-items: center; aspect-ratio: 1; min-inline-size: 0; padding: 0; border: 0; cursor: pointer;
+    border-radius: var(--_r) var(--_r) min(var(--s4-shape-control), 22%) min(var(--s4-shape-control), 22%);
+    background: var(--_fill); color: var(--md-sys-color-on-primary);
+    font: inherit; font-size: var(--md-sys-typescale-label-small-size); line-height: 1; font-weight: var(--md-sys-typescale-emphasized-label-small-weight); font-variant-numeric: tabular-nums;
+    transition: background-color var(--s4-motion-state);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .vl-seat::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--md-sys-color-on-surface); opacity: 0; transition: opacity var(--s4-motion-state); pointer-events: none; }
+  .vl-seat:hover::after { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  .vl-seat:active::after { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+  .vl-seat:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); z-index: 1; }
+  .vl-seat[aria-pressed="true"] { --_fill: var(--md-sys-color-primary); }
+  .vl-seat > span { opacity: 0; transition: opacity var(--s4-motion-state); }
+  .vl-seat[aria-pressed="true"] > span { opacity: 1; }
+  .vl-seat:disabled { --_fill: var(--md-sys-color-surface-container-highest); cursor: default; transform: scale(0.62); }
+  .vl-seat:disabled::after { display: none; }
+  /* the back row is velvet sofas for two: the pair is joined, the seam between them is narrow and square */
+  .vl-seat[data-sofa="start"] { border-start-end-radius: var(--md-sys-shape-corner-extra-small); border-end-end-radius: var(--md-sys-shape-corner-extra-small); }
+  .vl-seat[data-sofa="end"] { border-start-start-radius: var(--md-sys-shape-corner-extra-small); border-end-start-radius: var(--md-sys-shape-corner-extra-small); }
+  .vl-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s4-space-2) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .vl-legend li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .vl-key { flex: none; inline-size: var(--s4-space-4); block-size: var(--s4-space-4); border-radius: min(var(--s4-shape-control), 42%) min(var(--s4-shape-control), 42%) var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small); background: var(--s4-color-control); }
+  .vl-key[data-key="mine"] { background: var(--md-sys-color-primary); }
+  .vl-key[data-key="taken"] { background: var(--md-sys-color-surface-container-highest); transform: scale(0.62); }
+  .vl-key[data-key="sofa"] { inline-size: calc(var(--s4-space-4) * 2); }
+
+  /* ---------- who's coming: ticket types with a count each ---------- */
+  .vl-types { display: grid; gap: var(--s4-space-1); max-inline-size: 34rem; margin: 0 0 var(--s4-space-4); padding: 0; list-style: none; }
+  .vl-type { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4-space-3); align-items: center; min-block-size: var(--s4-size-touch-target); }
+  .vl-type-name { display: grid; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .vl-type-note { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .vl-count { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
+  .vl-count output { min-inline-size: 2ch; text-align: center; font-size: var(--md-sys-typescale-title-medium-size); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); font-variant-numeric: tabular-nums; }
+  .vl-glyph { font-size: var(--md-sys-typescale-title-large-size); line-height: 1; font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .vl-picked { margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); color: var(--md-sys-color-on-surface-variant); }
+  .vl-picked[data-error] { color: var(--md-sys-color-error); }
+  .vl-opt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 var(--s4-space-3); flex: 1; min-inline-size: 0; }
+  .vl-opt-price { color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; }
+
+  /* ---------- the ticket stub: the running summary ---------- */
+  .vl-ticket { display: grid; gap: var(--s4-space-1); }
+  .vl-stub-head, .vl-stub-body { position: relative; padding: var(--s4-space-5); }
+  .vl-stub-head { display: grid; gap: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-none) var(--md-sys-shape-corner-none); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .vl-stub-head h2 { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); }
+  .vl-stub-head p { margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .vl-stub-head .vl-eyebrow { color: inherit; }
+  .vl-stub-body { display: grid; gap: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-none) var(--md-sys-shape-corner-none) var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
+  /* the tear: two notches where the stub meets the ticket, cut in the page's own color */
+  .vl-stub-body::before, .vl-stub-body::after { content: ""; position: absolute; inset-block-start: calc((var(--s4-space-8) + var(--s4-space-1)) / -2); inline-size: var(--s4-space-8); block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface); }
+  .vl-stub-body::before { inset-inline-start: calc(var(--s4-space-8) / -2); }
+  .vl-stub-body::after { inset-inline-end: calc(var(--s4-space-8) / -2); }
+  .vl-seats { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .vl-seats li { display: grid; place-items: center; min-inline-size: calc(var(--s4-space-8) + var(--s4-space-2)); min-block-size: var(--s4-space-8); padding-inline: var(--s4-space-2); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-emphasized-label-large-weight); font-variant-numeric: tabular-nums; }
+  .vl-seats li[data-empty] { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface-variant); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .vl-lines { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .vl-lines li { display: flex; justify-content: space-between; gap: var(--s4-space-3); }
+  .vl-lines li > :last-child { font-variant-numeric: tabular-nums; }
+  .vl-lines li[data-note] { color: var(--md-sys-color-on-surface-variant); }
+  .vl-total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); padding-block-start: var(--s4-space-3); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .vl-hold { display: grid; gap: var(--s4-space-2); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .vl-hold[hidden] { display: none; }
+  .vl-hold b { font-variant-numeric: tabular-nums; }
+
+  /* ---------- the e-ticket: what you show at the door ---------- */
+  .vl-eticket { display: grid; gap: var(--s4-space-5); justify-items: center; padding-block: var(--s4-space-4); text-align: center; }
+  .vl-eticket h2 { margin: 0; }
+  .vl-eticket > p { margin: 0; max-inline-size: 40ch; color: var(--md-sys-color-on-surface-variant); }
+  .vl-pass { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4-space-4); align-items: center; inline-size: min(100%, 30rem); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); text-align: start; }
+  .vl-pass-title { margin: 0; font-family: var(--md-ref-typeface-brand); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); }
+  .vl-pass dl { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-5); margin: var(--s4-space-3) 0 0; }
+  .vl-pass dt { font-size: var(--md-sys-typescale-label-small-size); letter-spacing: var(--md-sys-typescale-label-small-tracking); text-transform: uppercase; }
+  .vl-pass dd { margin: 0; white-space: nowrap; font-size: var(--md-sys-typescale-title-medium-size); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); font-variant-numeric: tabular-nums; }
+  .vl-code { display: grid; gap: var(--s4-space-1); justify-items: center; padding: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); font-size: var(--md-sys-typescale-label-small-size); font-variant-numeric: tabular-nums; }
+  .vl-code svg { inline-size: calc(var(--s4-space-16) * 1.25); block-size: auto; }
+  @container (min-width: 600px) { .vl-code svg { inline-size: calc(var(--s4-space-16) * 1.5); } }
+  .vl-eticket .s4-form-actions { justify-content: center; }
+  @media (forced-colors: active) {
+    .vl-seat, .vl-key, .vl-poster, .vl-stub-head, .vl-stub-body, .vl-pass { border: 1px solid CanvasText; }
+    .vl-seat[aria-pressed="true"], .vl-key[data-key="mine"] { background: Highlight; color: HighlightText; }
+    .vl-seat:disabled { border-color: GrayText; }
+  }
+  @media print { .vl-house, .vl-step:not([data-step="3"]) { display: none; } }
 </style>
 </head>
 <body>
 <div class="s4-app">
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
-      <a class="s4-icon-button" href="index.html" aria-label="Back To The Shop"><span class="s4-icon" data-icon="back"></span></a>
-      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Checkout</h1></div>
+      <a class="s4-icon-button" href="index.html" aria-label="Back To What’s On"><span class="s4-icon" data-icon="back"></span></a>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Book Tickets</h1><p class="s4-app-bar-subtitle">The Velvet, Leith</p></div>
     </header>
     <main class="s4-content">
-      <div class="s4-stack">
-        <ol class="s4-stepper" aria-label="Checkout Progress" id="co-stepper">
-          <li data-state="current" aria-current="step"><span class="s4-step-dot">1</span><span class="s4-step-label">Shipping</span></li>
-          <li><span class="s4-step-dot">2</span><span class="s4-step-label">Payment</span></li>
-          <li><span class="s4-step-dot">3</span><span class="s4-step-label">Review</span></li>
-        </ol>
+      <div class="vl-page">
+        <!-- the film and the showing: the poster is set in type, never an image placeholder -->
+        <section class="vl-film" aria-labelledby="vl-film-title">
+          <div class="vl-poster" role="img" aria-label="Poster for The Quiet Hours: a lighthouse throwing its beam over the sea">
+            <p class="vl-poster-by" aria-hidden="true">Ines Morel</p>
+            <p class="vl-poster-title" aria-hidden="true">The Quiet Hours</p>
+            <svg viewBox="0 0 120 72" aria-hidden="true" focusable="false">
+              <polygon points="66,21 120,6 120,34" fill="currentColor" opacity=".28"/>
+              <polygon points="60,22 66,22 70,58 56,58" fill="currentColor"/>
+              <rect x="58" y="16" width="10" height="7" rx="2" fill="currentColor"/>
+              <path d="M0 60 Q 30 54 60 58 T 120 57 V72 H0Z" fill="currentColor" opacity=".55"/>
+              <path d="M0 66 Q 34 61 66 65 T 120 64 V72 H0Z" fill="currentColor"/>
+            </svg>
+          </div>
+          <div class="vl-film-info">
+            <p class="vl-eyebrow">Screen 2 · Friday 20 November</p>
+            <h2 class="vl-film-title" id="vl-film-title">The Quiet Hours</h2>
+            <p class="vl-film-meta">1h 52m · 12A · French, English subtitles</p>
+            <p class="vl-film-hook">A lighthouse keeper’s daughter and the last winter before the light goes automatic. Ines Morel’s second film, on 35mm.</p>
+          </div>
+          <div class="vl-showing">
+            <p class="vl-eyebrow" id="vl-showing-label">Showing</p>
+            <div class="s4-button-group" data-connected data-select="single" aria-labelledby="vl-showing-label" id="vl-times">
+              <button class="s4-button" type="button" value="17:40">17:40</button>
+              <button class="s4-button" type="button" value="20:15" aria-pressed="true">20:15</button>
+              <button class="s4-button" type="button" value="21:50">21:50</button>
+            </div>
+          </div>
+          <ul class="vl-house-notes" aria-label="Good To Know">
+            <li><span class="s4-icon" data-icon="schedule"></span><span><b>Doors 19:55</b>Short film first, no ads.</span></li>
+            <li><span class="s4-icon" data-icon="coffee"></span><span><b>Bar From 18:00</b>Drinks can come to your seat.</span></li>
+            <li><span class="s4-icon" data-icon="seat"></span><span><b>Step-Free To Screen 2</b>Two wheelchair spaces in row A.</span></li>
+          </ul>
+        </section>
+
         <div class="s4-split" data-layout="supporting">
-          <section class="s4-split-pane co-steps" aria-live="polite">
-            <!-- step 1 -->
-            <section class="s4-pane" data-step="0" aria-labelledby="s0-h">
-              <h2 class="s4-pane-title" id="s0-h">Where Should It Go?</h2>
-              <form class="s4-form" id="co-ship">
-                <div class="s4-text-field"><input id="co-name" name="name" autocomplete="name" required data-msg-required="Enter the name for the parcel."><label for="co-name">Full Name</label></div>
-                <div class="s4-text-field"><input id="co-street" name="street" autocomplete="street-address" required data-msg-required="Enter the street and number."><label for="co-street">Street Address</label></div>
-                <div class="s4-form-row">
-                  <div class="s4-text-field"><input id="co-city" name="city" autocomplete="address-level2" required data-msg-required="Enter the city."><label for="co-city">City</label></div>
-                  <div class="s4-text-field"><input id="co-zip" name="zip" inputmode="numeric" autocomplete="postal-code" required pattern="[0-9]{4,6}" data-msg-required="Enter the postal code." data-msg-pattern="A postal code is 4 to 6 digits."><label for="co-zip">Postal Code</label></div>
+          <section class="s4-split-pane vl-main">
+            <ol class="s4-stepper" aria-label="Booking Progress" id="co-stepper">
+              <li data-state="current" aria-current="step"><span class="s4-step-dot">1</span><span class="s4-step-label">Seats</span></li>
+              <li><span class="s4-step-dot">2</span><span class="s4-step-label">Details</span></li>
+              <li><span class="s4-step-dot">3</span><span class="s4-step-label">Payment</span></li>
+            </ol>
+            <div class="co-steps" aria-live="polite">
+            <!-- step 1: seats. The plan sits in a dark room (a scoped theme), the ticket types under it. The plan is a map of
+                 the room, so it never mirrors (dir="ltr"); the words around it do -->
+            <div class="vl-step" data-step="0">
+              <section class="vl-house" data-theme="dark" aria-labelledby="vl-house-h">
+                <div class="vl-house-head"><h2 id="vl-house-h">Choose Your Seats</h2><p id="vl-free">31 of 68 seats free</p></div>
+                <div class="vl-screen" aria-hidden="true">
+                  <svg viewBox="0 0 300 26" focusable="false"><path d="M6 20 Q150 -4 294 20 L294 24 Q150 2 6 24Z" fill="currentColor"/><path d="M30 24 Q150 8 270 24 L240 26 Q150 14 60 26Z" fill="currentColor" opacity=".12"/></svg>
+                  Screen
                 </div>
-                <fieldset>
-                  <legend>Delivery</legend>
-                  <label class="s4-radio"><input type="radio" name="speed" value="standard" checked><span class="s4-radio-ring"></span>Standard, 3 to 5 days · Free</label>
-                  <label class="s4-radio"><input type="radio" name="speed" value="express"><span class="s4-radio-ring"></span>Express, next day · $12.00</label>
+                <div class="vl-plan" id="vl-plan" dir="ltr" role="group" aria-label="Seat Plan, Screen 2. Use the arrow keys to move between seats."></div>
+                <ul class="vl-legend" aria-label="Key">
+                  <li><span class="vl-key"></span>Free, £11.50</li>
+                  <li><span class="vl-key" data-key="sofa"></span>Sofa for two, £14.00 a seat</li>
+                  <li><span class="vl-key" data-key="mine"></span>Yours</li>
+                  <li><span class="vl-key" data-key="taken"></span>Taken</li>
+                </ul>
+              </section>
+              <section class="s4-pane" aria-labelledby="vl-who-h">
+                <h2 class="s4-pane-title" id="vl-who-h">Who’s Coming</h2>
+                <form class="s4-form" id="co-seats" novalidate>
+                  <ul class="vl-types">
+                    <li class="vl-type"><span class="vl-type-name">Adult<span class="vl-type-note">Every seat you pick starts as an adult</span></span><span class="vl-count"><output id="vl-n-adult" aria-label="Adults">0</output></span></li>
+                    <li class="vl-type"><span class="vl-type-name">Concession<span class="vl-type-note">Students and over 60s, £2.50 off</span></span>
+                      <span class="vl-count"><button class="s4-icon-button" data-variant="tonal" type="button" data-type="concession" data-step-by="-1" aria-label="One Fewer Concession"><span class="vl-glyph" aria-hidden="true">−</span></button><output id="vl-n-concession" aria-label="Concessions">0</output><button class="s4-icon-button" data-variant="tonal" type="button" data-type="concession" data-step-by="1" aria-label="One More Concession"><span class="vl-glyph" aria-hidden="true">+</span></button></span></li>
+                    <li class="vl-type"><span class="vl-type-name">Under 15<span class="vl-type-note">£4.50 off, with an adult</span></span>
+                      <span class="vl-count"><button class="s4-icon-button" data-variant="tonal" type="button" data-type="child" data-step-by="-1" aria-label="One Fewer Under 15"><span class="vl-glyph" aria-hidden="true">−</span></button><output id="vl-n-child" aria-label="Under 15s">0</output><button class="s4-icon-button" data-variant="tonal" type="button" data-type="child" data-step-by="1" aria-label="One More Under 15"><span class="vl-glyph" aria-hidden="true">+</span></button></span></li>
+                  </ul>
+                  <div class="s4-form-actions"><p class="vl-picked s4-form-status" id="vl-picked" role="status">Tap a seat on the plan to start.</p><button class="s4-button" type="submit">Continue</button></div>
+                </form>
+              </section>
+            </div>
+            <!-- step 2: details -->
+            <section class="s4-pane vl-step" data-step="1" aria-labelledby="s1-h" hidden>
+              <h2 class="s4-pane-title" id="s1-h">Where Should We Send The Tickets?</h2>
+              <form class="s4-form" id="co-details">
+                <div class="s4-text-field"><input id="co-name" name="name" autocomplete="name" required data-msg-required="Enter the name the booking is under."><label for="co-name">Name For The Booking</label></div>
+                <div class="s4-text-field"><input id="co-email" name="email" type="email" autocomplete="email" required data-msg-required="Enter an email for the tickets." data-msg-type="That doesn’t look like an email address."><label for="co-email">Email</label></div>
+                <fieldset id="vl-extras">
+                  <legend>Waiting At Your Seat</legend>
+                  <label class="s4-checkbox"><input type="checkbox" name="extras" value="popcorn" data-price="4.50" data-label="Salted Popcorn"><span class="s4-checkbox-box"></span><span class="vl-opt">Salted Popcorn<span class="vl-opt-price">£4.50</span></span></label>
+                  <label class="s4-checkbox"><input type="checkbox" name="extras" value="cocoa" data-price="3.80" data-label="Velvet Hot Chocolate"><span class="s4-checkbox-box"></span><span class="vl-opt">Velvet Hot Chocolate<span class="vl-opt-price">£3.80</span></span></label>
+                  <label class="s4-checkbox"><input type="checkbox" name="extras" value="wine" data-price="7.00" data-label="Glass Of House Red"><span class="s4-checkbox-box"></span><span class="vl-opt">Glass Of House Red<span class="vl-opt-price">£7.00</span></span></label>
                 </fieldset>
-                <div class="s4-form-actions"><button class="s4-button" type="submit">Continue To Payment</button></div>
+                <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="submit">Continue To Payment</button></div>
               </form>
             </section>
-            <!-- step 2 -->
-            <section class="s4-pane" data-step="1" aria-labelledby="s1-h" hidden>
-              <h2 class="s4-pane-title" id="s1-h">How Will You Pay?</h2>
+            <!-- step 3: payment -->
+            <section class="s4-pane vl-step" data-step="2" aria-labelledby="s2-h" hidden>
+              <h2 class="s4-pane-title" id="s2-h">Pay For Your Seats</h2>
               <form class="s4-form" id="co-pay">
+                <div class="s4-banner" role="alert" data-tone="error" id="vl-declined" hidden><span class="s4-icon" data-icon="error"></span><p class="s4-banner-text">Your bank declined that card. Nothing was charged and your seats are still held; try another card.</p></div>
                 <div class="s4-text-field"><input id="co-card" name="card" inputmode="numeric" autocomplete="cc-number" required pattern="[0-9 ]{13,19}" data-msg-required="Enter the card number." data-msg-pattern="A card number is 13 to 19 digits."><label for="co-card">Card Number</label></div>
                 <div class="s4-form-row">
                   <div class="s4-text-field"><input id="co-exp" name="exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/YY" required pattern="(0[1-9]|1[0-2])/[0-9]{2}" data-msg-required="Enter the expiry date." data-msg-pattern="Use month and year, like 08/28."><label for="co-exp">Expires</label></div>
                   <div class="s4-text-field"><input id="co-cvc" name="cvc" inputmode="numeric" autocomplete="cc-csc" required pattern="[0-9]{3,4}" data-msg-required="Enter the security code." data-msg-pattern="The code is 3 or 4 digits."><label for="co-cvc">Security Code</label></div>
                 </div>
-                <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="submit">Review Order</button></div>
+                <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="submit" id="co-place">Pay £0.00</button></div>
               </form>
             </section>
-            <!-- step 3 -->
-            <section class="s4-pane" data-step="2" aria-labelledby="s2-h" hidden>
-              <h2 class="s4-pane-title" id="s2-h">Check And Place Your Order</h2>
-              <dl class="s4-dl">
-                <div class="s4-dl-row"><dt>Ship To</dt><dd id="r-ship"></dd></div>
-                <div class="s4-dl-row"><dt>Delivery</dt><dd id="r-speed"></dd></div>
-                <div class="s4-dl-row"><dt>Pay With</dt><dd id="r-card"></dd></div>
-              </dl>
-              <div class="s4-form-actions"><button class="s4-button" data-variant="text" type="button" data-prev>Back</button><button class="s4-button" type="button" id="co-place">Place Order</button></div>
+            <!-- done: the e-ticket -->
+            <section class="s4-pane vl-step" data-step="3" hidden>
+              <div class="vl-eticket">
+                <span class="s4-done-mark" data-size="l" id="co-mark"></span>
+                <h2 class="s4-headline-small">You’re Booked</h2>
+                <p id="vl-sent">Your tickets are on their way to your inbox. Show this at the door, or just give your name.</p>
+                <div class="vl-pass">
+                  <div>
+                    <p class="vl-eyebrow">The Velvet · Screen 2</p>
+                    <p class="vl-pass-title">The Quiet Hours</p>
+                    <dl><div><dt>Date</dt><dd>Fri 20 Nov</dd></div><div><dt>Time</dt><dd id="vl-pass-time">20:15</dd></div><div><dt>Seats</dt><dd id="vl-pass-seats">E5</dd></div></dl>
+                  </div>
+                  <div class="vl-code" data-theme="light"><svg id="vl-qr" viewBox="0 0 25 25" role="img" aria-label="Door code for booking VLT-48213" shape-rendering="crispEdges"></svg><span id="vl-ref">VLT-48213</span></div>
+                </div>
+                <div class="s4-form-actions"><a class="s4-button" data-variant="tonal" id="vl-ics" download="the-quiet-hours.ics" href="#">Add To Calendar</a><a class="s4-button" data-variant="text" href="checkout.html">Book Another Film</a></div>
+              </div>
             </section>
-            <!-- done -->
-            <section class="s4-pane" data-step="3" hidden>
-              <div class="co-done"><span class="s4-done-mark" data-size="l" id="co-mark"></span><h2 class="s4-headline-small">Order Placed</h2><p>We sent the receipt to your email. Your order number is <b class="s4-num">1043</b>.</p><a class="s4-button" data-variant="tonal" href="checkout.html">Start Again</a></div>
-            </section>
+            </div>
           </section>
 
-          <aside class="s4-split-pane" data-sticky aria-label="Order Summary">
-            <section class="s4-pane">
-              <h2 class="s4-pane-title">Your Order</h2>
-              <ul class="s4-list" aria-label="Items">
-                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Desk Lamp</span><span class="s4-list-supporting">Qty 1</span></span><span class="s4-list-trailing s4-num">$64.00</span></div></li>
-                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Notebook, Set Of 3</span><span class="s4-list-supporting">Qty 2</span></span><span class="s4-list-trailing s4-num">$36.00</span></div></li>
-              </ul>
-              <dl class="s4-dl">
-                <div class="s4-dl-row"><dt>Subtotal</dt><dd class="s4-num">$100.00</dd></div>
-                <div class="s4-dl-row"><dt>Delivery</dt><dd class="s4-num" id="co-ship-cost">Free</dd></div>
-              </dl>
-              <div class="co-total"><span>Total</span><span class="s4-num" id="co-total" aria-live="polite">$100.00</span></div>
-            </section>
+          <aside class="s4-split-pane" data-sticky aria-label="Your Booking">
+            <div class="vl-ticket">
+              <div class="vl-stub-head">
+                <p class="vl-eyebrow">Admit <span id="vl-admit">0</span> · Screen 2</p>
+                <h2>The Quiet Hours</h2>
+                <p>Fri 20 Nov at <b id="vl-time">20:15</b> · ends about <span id="vl-ends">22:12</span></p>
+              </div>
+              <div class="vl-stub-body">
+                <ul class="vl-seats" id="vl-seats" aria-label="Your Seats"><li data-empty>No seats yet</li></ul>
+                <ul class="vl-lines" id="vl-lines"><li data-note><span>Booking fee</span><span>None, ever</span></li></ul>
+                <div class="vl-total"><span>Total</span><span class="s4-num" id="co-total" aria-live="polite">£0.00</span></div>
+                <div class="vl-hold" id="vl-hold" role="timer" aria-live="off" hidden>
+                  <span>We’re holding your seats for <b id="vl-hold-left">10:00</b></span>
+                  <div class="s4-progress" data-value="1" aria-label="Seat Hold" id="vl-hold-bar"></div>
+                </div>
+              </div>
+            </div>
           </aside>
         </div>
       </div>
     </main>
   </div>
 </div>
-<script src="../components/assets/icons.js?v=27d8ac2"></script>
+<script src="../components/assets/icons.js?v=563180a"></script>
 <script src="../components/orion.js?v=e4024d6"></script>
-<script>S4.theme.restore('orion-template-theme', { mode: 'system' });
-var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]')), dots = Array.prototype.slice.call(document.querySelectorAll('#co-stepper li')), at = 0, axis = {}, total = 100;
-/* one step at a time; the stepper follows; moving between steps is a view switch */
-function go(to) {
-  if (to === at) return;
-  S4.transition.sharedAxis(steps[at], steps[to], to > at ? 1 : -1, axis, function () { window.scrollTo({ top: 0, behavior: 'instant' }); });
-  dots.forEach(function (d, i) {
-    var state = i < to ? 'done' : i === to ? 'current' : '';
-    if (state) d.dataset.state = state; else delete d.dataset.state;
-    if (i === to) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
-    d.querySelector('.s4-step-dot').innerHTML = i < to ? '<span class="s4-icon" data-icon="check"></span>' : String(i + 1);
+<script>
+/* The Velvet's brand: crimson (fidelity keeps it crimson), warm grays, soft corners, a Didone display face (decision 0055) */
+S4.theme.restore('velvet-theme', { mode: 'system', seed: '#8f1d2c', variant: 'fidelity', gray: 'warm', corners: 'soft', display: "Didot, 'Bodoni 72', 'Bodoni MT', 'Bodoni Moda', ui-serif, Georgia, serif" });
+
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var gbp = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+  var PRICE = { seat: 11.5, sofa: 14 }, OFF = { concession: 2.5, child: 4.5 }, RUNTIME = 117, HOLD = 600;
+  var ROWS = 'ABCDEFG'.split('');
+  /* who sat where, per showing (the Friday 20:15 is the busy one) */
+  var TAKEN = {
+    '17:40': 'A3 A4 B5 B6 C1 C2 D7 D8 D9 E4 G4 G5 H3 H4',
+    '20:15': 'A1 A2 A9 A10 B3 B4 B7 C3 C4 C5 C6 C7 C8 D2 D4 D5 D6 D7 D9 E2 E3 E8 E9 F1 F2 F3 F4 F5 F9 F10 G1 G6 G7 G10 H1 H2 H5 H6 H7 H8',
+    '21:50': 'C5 C6 D5 D6 F7 F8 H1 H2'
+  };
+  var time = '20:15', picked = [], types = { concession: 0, child: 0 }, total = 0, holdLeft = HOLD, holdTimer = null, extras = [];
+
+  /* ---------- the plan: rows A to G of ten (an aisle in the middle), sofas for two in row H ---------- */
+  var plan = $('vl-plan');
+  function seatCol(n) { return n <= 5 ? n + 1 : n + 2; }             /* grid column: 1 is the row letter, 7 the aisle */
+  function sofaCol(n) { return [0, 2, 3, 5, 6, 8, 9, 11, 12][n]; }   /* four sofas: two each side of the aisle */
+  function build() {
+    var taken = ' ' + TAKEN[time] + ' ', html = '', free = 0;
+    ROWS.concat('H').forEach(function (r) {
+      var sofa = r === 'H', count = sofa ? 8 : 10;
+      html += '<div class="vl-row"' + (sofa ? ' data-kind="sofa"' : '') + ' role="group" aria-label="Row ' + r + (sofa ? ', sofas' : '') + '"><span class="vl-row-label" aria-hidden="true">' + r + '</span>';
+      for (var n = 1; n <= count; n++) {
+        var id = r + n, gone = taken.indexOf(' ' + id + ' ') >= 0, mine = picked.indexOf(id) >= 0 && !gone;
+        if (!gone) free++;
+        html += '<button class="vl-seat" type="button" tabindex="-1" data-seat="' + id + '" style="grid-column:' + (sofa ? sofaCol(n) : seatCol(n)) + '"' +
+          (sofa ? ' data-sofa="' + (n % 2 ? 'start' : 'end') + '"' : '') + (gone ? ' disabled aria-label="' + id + ', taken"' : ' aria-pressed="' + mine + '" aria-label="' + id + ', ' + (sofa ? 'sofa, ' : '') + gbp.format(sofa ? PRICE.sofa : PRICE.seat) + '"') +
+          '><span aria-hidden="true">' + n + '</span></button>';
+      }
+      html += '<span class="vl-row-label" aria-hidden="true">' + r + '</span></div>';
+    });
+    plan.innerHTML = html;
+    $('vl-free').textContent = free + ' of 78 seats free at ' + time;
+    var first = plan.querySelector('.vl-seat[aria-pressed="true"]') || plan.querySelector('.vl-seat:not(:disabled)');
+    if (first) first.tabIndex = 0;
+  }
+
+  /* one tab stop for the plan; the arrow keys move between free seats (up and down find the nearest seat in that row) */
+  plan.addEventListener('keydown', function (e) {
+    var k = e.key, cur = e.target.closest('.vl-seat'); if (!cur) return;
+    var rtl = getComputedStyle(plan).direction === 'rtl', dir = { ArrowLeft: rtl ? 1 : -1, ArrowRight: rtl ? -1 : 1 }[k];
+    var rows = Array.prototype.slice.call(plan.querySelectorAll('.vl-row')), row = cur.closest('.vl-row'), ri = rows.indexOf(row), to = null;
+    var free = function (r) { return Array.prototype.slice.call(r.querySelectorAll('.vl-seat:not(:disabled)')); };
+    if (dir) { var list = free(row), i = list.indexOf(cur); to = list[i + dir]; }
+    else if (k === 'ArrowUp' || k === 'ArrowDown') {
+      var x = cur.getBoundingClientRect().left;
+      for (var j = ri + (k === 'ArrowUp' ? -1 : 1); j >= 0 && j < rows.length && !to; j += (k === 'ArrowUp' ? -1 : 1)) {
+        free(rows[j]).forEach(function (s) { if (!to || Math.abs(s.getBoundingClientRect().left - x) < Math.abs(to.getBoundingClientRect().left - x)) to = s; });
+      }
+    } else if (k === 'Home' || k === 'End') { var l = free(row); to = k === 'Home' ? l[0] : l[l.length - 1]; }
+    else return;
+    e.preventDefault();
+    if (to) { cur.tabIndex = -1; to.tabIndex = 0; to.focus(); }
   });
-  at = to;
-}
-document.getElementById('co-ship').addEventListener('s4-submit', function (e) { e.preventDefault(); go(1); });
-document.getElementById('co-pay').addEventListener('s4-submit', function (e) {
-  e.preventDefault();
-  var s = S4.form.values(document.getElementById('co-ship')), p = e.detail.values;
-  document.getElementById('r-ship').textContent = s.name + ', ' + s.street + ', ' + s.zip + ' ' + s.city;
-  document.getElementById('r-speed').textContent = s.speed === 'express' ? 'Express, next day' : 'Standard, 3 to 5 days';
-  document.getElementById('r-card').textContent = 'Card ending ' + String(p.card).replace(/\s/g, '').slice(-4);
-  go(2);
-});
-document.querySelectorAll('[data-prev]').forEach(function (b) { b.addEventListener('click', function () { go(at - 1); }); });
-/* the total counts to its new value when the delivery changes */
-document.getElementById('co-ship').addEventListener('change', function (e) {
-  if (e.target.name !== 'speed') return;
-  var express = e.target.value === 'express', from = total; total = express ? 112 : 100;
-  document.getElementById('co-ship-cost').textContent = express ? '$12.00' : 'Free';
-  S4.reward.count(document.getElementById('co-total'), total, { from: from, format: 'currency:USD', decimals: 2 });
-});
-document.getElementById('co-place').addEventListener('click', function () {
-  go(3); dots.forEach(function (d) { d.dataset.state = 'done'; d.removeAttribute('aria-current'); d.querySelector('.s4-step-dot').innerHTML = '<span class="s4-icon" data-icon="check"></span>'; });
-  setTimeout(function () { S4.reward.done(document.getElementById('co-mark')); }, 250);
-});
+  plan.addEventListener('click', function (e) {
+    var s = e.target.closest('.vl-seat'); if (!s || s.disabled) return;
+    var id = s.dataset.seat, on = s.getAttribute('aria-pressed') !== 'true';
+    s.setAttribute('aria-pressed', String(on));
+    plan.querySelectorAll('.vl-seat[tabindex="0"]').forEach(function (x) { x.tabIndex = -1; }); s.tabIndex = 0;
+    if (on) picked.push(id); else picked.splice(picked.indexOf(id), 1);
+    picked.sort(function (a, b) { return a[0] === b[0] ? +a.slice(1) - +b.slice(1) : a < b ? -1 : 1; });
+    fitTypes(); hold(); render();
+  });
+
+  /* ---------- ticket types: every seat is an adult until you say otherwise ---------- */
+  function fitTypes() { while (types.concession + types.child > picked.length) { if (types.child) types.child--; else types.concession--; } }
+  document.querySelectorAll('[data-step-by]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = b.dataset.type, by = +b.dataset.stepBy, adults = picked.length - types.concession - types.child;
+      if (by > 0 && adults < 1) return;
+      types[t] = Math.max(0, types[t] + by); render();
+    });
+  });
+
+  /* ---------- the stub: seats, lines, total, and the button that pays it ---------- */
+  function render() {
+    var adults = picked.length - types.concession - types.child, sofas = picked.filter(function (id) { return id[0] === 'H'; }).length;
+    $('vl-n-adult').textContent = adults; $('vl-n-concession').textContent = types.concession; $('vl-n-child').textContent = types.child;
+    document.querySelectorAll('[data-step-by]').forEach(function (b) { b.disabled = +b.dataset.stepBy > 0 ? adults < 1 : types[b.dataset.type] < 1; });
+    $('vl-admit').textContent = picked.length;
+    $('vl-seats').innerHTML = picked.length ? picked.map(function (id) { return '<li>' + id + '</li>'; }).join('') : '<li data-empty>No seats yet</li>';
+    var lines = [], sum = 0;
+    if (picked.length - sofas) { lines.push([(picked.length - sofas) + ' × seat', (picked.length - sofas) * PRICE.seat]); }
+    if (sofas) lines.push([sofas + ' × sofa seat', sofas * PRICE.sofa]);
+    if (types.concession) lines.push([types.concession + ' × concession', -types.concession * OFF.concession]);
+    if (types.child) lines.push([types.child + ' × under 15', -types.child * OFF.child]);
+    extras.forEach(function (x) { lines.push([x.label, x.price]); });
+    lines.forEach(function (l) { sum += l[1]; });
+    $('vl-lines').innerHTML = lines.map(function (l) { return '<li><span>' + l[0] + '</span><span>' + (l[1] < 0 ? '−' + gbp.format(-l[1]) : gbp.format(l[1])) + '</span></li>'; }).join('') +
+      '<li data-note><span>Booking fee</span><span>None, ever</span></li>';
+    var from = total; total = Math.round(sum * 100) / 100;
+    if (from !== total) S4.reward.count($('co-total'), total, { from: from, format: 'currency:GBP', decimals: 2, locale: 'en-GB' });
+    $('co-place').textContent = 'Pay ' + gbp.format(total);
+    var p = $('vl-picked'); p.removeAttribute('data-error');
+    p.textContent = picked.length ? picked.length + (picked.length === 1 ? ' seat, ' : ' seats, ') + picked.join(', ') : 'Tap a seat on the plan to start.';
+  }
+
+  /* ---------- the hold: picked seats are kept for ten minutes, then let go (a real state, said in words) ---------- */
+  function clock(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  function hold() {
+    $('vl-hold').hidden = !picked.length;
+    if (!picked.length) { clearInterval(holdTimer); holdTimer = null; holdLeft = HOLD; return; }
+    if (holdTimer) return;
+    holdTimer = setInterval(function () {
+      holdLeft--; $('vl-hold-left').textContent = clock(holdLeft);
+      $('vl-hold-bar').dataset.value = (holdLeft / HOLD).toFixed(3);
+      if (holdLeft > 0) return;
+      picked = []; types = { concession: 0, child: 0 }; hold(); build(); render(); go(0);
+      S4.snackbar({ text: 'Your seats were held for ten minutes and have been let go. Most are still free.', multiline: true, closable: true });
+    }, 1000);
+  }
+
+  /* ---------- changing the showing keeps the seats that are free then, lets go of the rest, and offers Undo ---------- */
+  $('vl-times').addEventListener('s4-change', function (e) {
+    var before = { time: time, picked: picked.slice(), types: { concession: types.concession, child: types.child } };
+    time = e.detail.value;
+    var taken = ' ' + TAKEN[time] + ' ', lost = picked.filter(function (id) { return taken.indexOf(' ' + id + ' ') >= 0; });
+    picked = picked.filter(function (id) { return lost.indexOf(id) < 0; }); fitTypes();
+    $('vl-time').textContent = time; $('vl-pass-time').textContent = time;
+    var m = +time.slice(0, 2) * 60 + +time.slice(3) + RUNTIME; $('vl-ends').textContent = String(Math.floor(m / 60) % 24).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
+    build(); hold(); render();
+    if (lost.length) S4.snackbar({ text: lost.join(' and ') + (lost.length === 1 ? ' is' : ' are') + ' taken at ' + time + ', so we let ' + (lost.length === 1 ? 'it' : 'them') + ' go', action: 'Undo', onAction: function () {
+      time = before.time; picked = before.picked; types = before.types;
+      document.querySelectorAll('#vl-times .s4-button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.value === time)); });
+      $('vl-time').textContent = time; $('vl-pass-time').textContent = time; build(); hold(); render();
+    } });
+  });
+
+  /* ---------- steps: one at a time, the stepper follows, moving between them is a view switch ---------- */
+  var steps = Array.prototype.slice.call(document.querySelectorAll('[data-step]')), dots = Array.prototype.slice.call(document.querySelectorAll('#co-stepper li')), at = 0, axis = {};
+  function go(to) {
+    if (to === at) return;
+    S4.transition.sharedAxis(steps[at], steps[to], to > at ? 1 : -1, axis, function () { window.scrollTo({ top: 0, behavior: 'instant' }); });
+    dots.forEach(function (d, i) {
+      var state = i < to ? 'done' : i === to ? 'current' : '';
+      if (state) d.dataset.state = state; else delete d.dataset.state;
+      if (i === to) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+      d.querySelector('.s4-step-dot').innerHTML = i < to ? '<span class="s4-icon" data-icon="check"></span>' : String(i + 1);
+    });
+    at = to;
+  }
+  $('co-seats').addEventListener('s4-submit', function (e) {
+    e.preventDefault();
+    if (!picked.length) { var p = $('vl-picked'); p.setAttribute('data-error', ''); p.textContent = 'Pick at least one seat on the plan first.'; return; }
+    go(1);
+  });
+  $('vl-extras').addEventListener('change', function () {
+    extras = Array.prototype.slice.call(document.querySelectorAll('#vl-extras input:checked')).map(function (i) { return { label: i.dataset.label, price: +i.dataset.price }; });
+    render();
+  });
+  $('co-details').addEventListener('s4-submit', function (e) { e.preventDefault(); go(2); });
+  document.querySelectorAll('[data-prev]').forEach(function (b) { b.addEventListener('click', function () { go(at - 1); }); });
+  /* a card ending 0002 is declined, so the error state can be seen: the seats stay held */
+  $('co-pay').addEventListener('s4-submit', function (e) {
+    e.preventDefault();
+    var card = String(e.detail.values.card).replace(/\s/g, ''), btn = $('co-place');
+    $('vl-declined').hidden = true; btn.disabled = true; btn.textContent = 'Paying…';
+    setTimeout(function () {
+      btn.disabled = false; btn.textContent = 'Pay ' + gbp.format(total);
+      if (/0002$/.test(card)) { $('vl-declined').hidden = false; return; }
+      done(e.detail.values);
+    }, 900);
+  });
+
+  /* ---------- done: the e-ticket, its door code and a calendar file ---------- */
+  function done() {
+    clearInterval(holdTimer); holdTimer = null; $('vl-hold').hidden = true;
+    var ref = 'VLT-' + (48000 + picked.join('').length * 37 + picked.length * 11);
+    $('vl-ref').textContent = ref; $('vl-qr').setAttribute('aria-label', 'Door code for booking ' + ref);
+    $('vl-pass-seats').textContent = picked.join(' ');
+    $('vl-sent').textContent = 'Your tickets are on their way to ' + S4.form.values($('co-details')).email + '. Show this at the door, or just give your name.';
+    drawCode(ref);
+    var start = '20261120T' + time.replace(':', '') + '00', ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'BEGIN:VEVENT', 'DTSTART:' + start, 'DURATION:PT' + RUNTIME + 'M', 'SUMMARY:The Quiet Hours at The Velvet', 'LOCATION:The Velvet, Screen 2, Leith', 'DESCRIPTION:Seats ' + picked.join(' ') + ', booking ' + ref, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    $('vl-ics').href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+    go(3);
+    dots.forEach(function (d) { d.dataset.state = 'done'; d.removeAttribute('aria-current'); d.querySelector('.s4-step-dot').innerHTML = '<span class="s4-icon" data-icon="check"></span>'; });
+    setTimeout(function () { S4.reward.done($('co-mark')); }, 250);
+  }
+  /* the door code: three finder squares and a pattern seeded by the booking reference */
+  function drawCode(ref) {
+    var n = 25, seed = 0, out = '';
+    for (var i = 0; i < ref.length; i++) seed = (seed * 31 + ref.charCodeAt(i)) >>> 0;
+    var rnd = function () { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    var finder = function (x, y) { return '<path d="M' + x + ' ' + y + 'h7v7h-7zM' + (x + 1) + ' ' + (y + 1) + 'v5h5v-5z" fill-rule="evenodd" fill="currentColor"/><rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" fill="currentColor"/>'; };
+    var inFinder = function (x, y) { return (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9); };
+    for (var y = 0; y < n; y++) for (var x = 0; x < n; x++) if (!inFinder(x, y) && rnd() < 0.48) out += 'M' + x + ' ' + y + 'h1v1h-1z';
+    $('vl-qr').innerHTML = finder(0, 0) + finder(n - 7, 0) + finder(0, n - 7) + '<path d="' + out + '" fill="currentColor"/>';
+  }
+
+  build(); render();
+})();
 </script>
 </body>
 </html>

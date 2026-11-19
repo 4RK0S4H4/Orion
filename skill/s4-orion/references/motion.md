@@ -33,7 +33,7 @@ rejects it. Live, with the scrubber: [motion page](https://4rk0s4h4.github.io/s4
 | | **Pop** | Floating glass that takes over: dialogs, floating panels | Rises 16px and fades in; leaves with a quick 8px drop and fade. The page behind dims with `S4.transition.scrim(dialog, open)` | `S4.transition.pop(el, { open })` |
 | | **Rise** | A notice arrives: snackbars, a new message; tooltips are the small rise | Rises 14px (tooltips 4px) and fades in | `S4.transition.rise(el, { open })`, `S4.transition.tip(el, { open })` |
 | **Change view** | **Switch** | Sibling views: tabs, destinations, steps, a pane on a phone, the next month | The old view slides 30px away and fades, the new one comes in from the side you are heading | `S4.transition.sharedAxis(from, to, dir)`; one view on its own: `S4.transition.enter(view, dir)` |
-| **Wait** | **Loop** | Loading: skeleton wave, progress | The only motion that repeats. One slow cycle; still under reduced motion | `animation: <name> var(--s4-…-cycle) var(--s4-motion-loop) infinite` |
+| **Wait** | **Loop** | Loading: skeleton wave, progress | The only motion that repeats. One slow cycle; still under reduced motion | `animation: <name> var(--s4-…-cycle) var(--s4-motion-loop) infinite`; an app's own loop uses `--s4-loop-cycle` |
 
 A plain fade with no movement (`S4.transition.fade(el, open)`) is State applied to something that appears, such as
 a scrim.

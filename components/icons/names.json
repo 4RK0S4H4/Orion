@@ -90,7 +90,14 @@
         "list": "list",
         "book": "book-minimalistic",
         "tune": "tuning-2",
-        "mic": "microphone"
+        "mic": "microphone",
+        "ticket": "ticket",
+        "pet": "paw",
+        "coffee": "cup-hot",
+        "seat": "armchair",
+        "route": "route",
+        "timer": "stopwatch",
+        "water": "waterdrop"
       }
     },
     "phosphor-duotone": {
@@ -181,7 +188,14 @@
         "list": "list-bullets",
         "book": "book-open",
         "tune": "sliders-horizontal",
-        "mic": "microphone"
+        "mic": "microphone",
+        "ticket": "ticket",
+        "pet": "paw-print",
+        "coffee": "coffee",
+        "seat": "armchair",
+        "route": "path",
+        "timer": "timer",
+        "water": "drop"
       }
     },
     "phosphor-bold-duotone": {
@@ -272,7 +286,14 @@
         "list": "list-bullets",
         "book": "book-open",
         "tune": "sliders-horizontal",
-        "mic": "microphone"
+        "mic": "microphone",
+        "ticket": "ticket",
+        "pet": "paw-print",
+        "coffee": "coffee",
+        "seat": "armchair",
+        "route": "path",
+        "timer": "timer",
+        "water": "drop"
       }
     }
   }
