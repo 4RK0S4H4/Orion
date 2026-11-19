@@ -6,6 +6,14 @@
 <title>Desktop Windows · S4 Orion</title>
 <link rel="stylesheet" href="../index.css">
 <link rel="stylesheet" href="../_example/example.css">
+<style>
+  .dk-frame { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .dk-insp-frame { block-size: calc(var(--s4-space-16) * 5.5); }
+  .dk-lights { position: absolute; inset-inline-start: var(--s4-space-4); display: flex; gap: var(--s4-space-2); }
+  .dk-lights > i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); }
+  .dk-bars .s4-titlebar { position: relative; }
+  .dk-bars .dk-frame::after { content: ""; display: block; block-size: var(--s4-space-8); background: var(--md-sys-color-surface); }
+</style>
 </head>
 <body>
 <header class="ex-bar"><h1><a href="../">Components</a> / Desktop Windows</h1></header>
@@ -49,6 +57,52 @@
   </section>
 
   <section class="ex-sec">
+    <h2>Title Bars</h2>
+    <p>The default centers the title. <code>data-variant="tabs"</code> makes the document tabs the title bar; <code>data-variant="unified"</code> is a taller bar that holds the window's toolbar. <code>data-controls="start"</code> keeps room for a Mac's traffic lights (drawn here only as a picture of where they go). Everything you click stays clickable; the rest drags the window.</p>
+    <div class="ex-board col dk-bars" data-density="compact">
+      <div class="dk-frame"><header class="s4-titlebar"><span class="s4-titlebar-title">Harbour Log, 2027</span></header></div>
+      <div class="dk-frame"><header class="s4-titlebar" data-variant="tabs" data-controls="start"><span class="dk-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div class="s4-doc-tabs" data-keys="off"><div class="s4-doc-tabs-list" aria-label="Open Logs">
+          <div class="s4-doc-tab"><button class="s4-doc-tab-label" type="button" aria-selected="true"><span class="s4-icon" data-icon="book"></span><span class="s4-doc-tab-text">March</span></button></div>
+          <div class="s4-doc-tab" data-modified><button class="s4-doc-tab-label" type="button"><span class="s4-icon" data-icon="book"></span><span class="s4-doc-tab-text">April</span></button></div>
+        </div><button class="s4-icon-button" type="button" aria-label="New Log"><span class="s4-icon" data-icon="add"></span></button></div>
+      </header></div>
+      <div class="dk-frame"><header class="s4-titlebar" data-variant="unified"><span class="s4-titlebar-title">Moorings</span>
+        <span class="s4-titlebar-spacer"></span>
+        <button class="s4-icon-button" type="button" aria-label="Filter" data-tooltip="Filter"><span class="s4-icon" data-icon="filter"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="Share" data-tooltip="Share"><span class="s4-icon" data-icon="share"></span></button>
+        <button class="s4-button" type="button" data-size="s"><span class="s4-icon" data-icon="add"></span>New Booking</button>
+      </header></div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Inspector</h2>
+    <p>A resizable pane at the window's end for the properties of what is selected: drag its start edge, or focus the edge and use the arrow keys. Groups fold. From 840 wide; on a phone the same properties belong in the item's own page.</p>
+    <div class="dk-frame dk-insp-frame">
+      <div class="s4-app" data-window data-density="compact" style="block-size:100%">
+        <div class="s4-app-body"><main class="s4-content"><div class="s4-page-header"><h2 class="s4-title-large">Berth 14</h2></div><p class="s4-body-medium s4-on-surface-variant">Select a berth to see its properties at the end of the window.</p></main></div>
+        <aside class="s4-inspector" aria-label="Berth properties" data-resize-key="orion-desktop-ref-inspector">
+          <header class="s4-inspector-header"><h3 class="s4-inspector-title">Berth 14</h3><button class="s4-icon-button" type="button" aria-label="Hide Inspector" id="dk-insp-hide"><span class="s4-icon" data-icon="close"></span></button></header>
+          <div class="s4-inspector-body">
+            <details class="s4-inspector-group" open><summary>Berth</summary>
+              <div class="s4-inspector-fields">
+                <div class="s4-inspector-row"><span>Length</span><span class="s4-num">14 m</span></div>
+                <div class="s4-inspector-row"><span>Depth At Low Water</span><span class="s4-num">2.4 m</span></div>
+                <div class="s4-inspector-row"><span>Power</span><span>16 A, metered</span></div>
+              </div></details>
+            <details class="s4-inspector-group" open><summary>Booking</summary>
+              <div class="s4-inspector-fields">
+                <div class="s4-text-field"><input id="dk-vessel" value="Kittiwake"><label for="dk-vessel">Vessel</label></div>
+                <div class="s4-text-field"><input id="dk-nights" value="3" inputmode="numeric"><label for="dk-nights">Nights</label></div>
+              </div></details>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
     <h2>Shortcuts</h2>
     <p><code>data-shortcut</code> clicks the element from anywhere; an empty <code>.s4-kbd</code> shows it the platform's way.</p>
     <div class="ex-board">
@@ -72,9 +126,12 @@
 <script src="../nav-bar/nav-bar.js"></script>
 <script src="../nav-rail/nav-rail.js"></script>
 <script src="../desktop/desktop.js"></script>
+<script src="../direct/direct.js"></script>
+<script src="../doc-tabs/doc-tabs.js"></script>
 <script src="../button-group/button-group.js"></script>
 <script src="../_example/example.js"></script>
 <script>
+  document.getElementById('dk-insp-hide').addEventListener('click', function () { S4.desktop.inspector(this.closest('.s4-inspector'), false); S4.snackbar && S4.snackbar({ text: 'Inspector hidden' }); });
   ['dk-save', 'dk-export'].forEach(function (id) { document.getElementById(id).addEventListener('click', function () { document.getElementById('dk-out').textContent = this.firstChild.textContent + ' ran.'; }); });
 </script>
 </body>

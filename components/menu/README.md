@@ -21,6 +21,8 @@ A short list of choices opened from a button. **Drops** 8px out of the side of i
 | `.s4-menu-item` + `.s4-menu-item-text`, `.s4-menu-item-supporting`, `.s4-menu-item-trailing` | Item, with optional second line and a shortcut or value at the end |
 | `role="menuitemradio|menuitemcheckbox"` + `aria-checked` | Choice items; checked items use secondary-container |
 | `.s4-menu-label`, `.s4-menu-divider` | Group label, separator |
+| `data-submenu="menu-id"` on an item | Opens that menu beside it (click, Enter, Space, the arrow toward it, or resting the pointer on it); the arrow back or Escape closes only the submenu, choosing in it closes them all. Add a trailing `<span class="s4-icon s4-menu-item-sub" data-icon="chevron-right"></span>` |
+| Built from commands | `S4.commands.menu('id', [...])` writes a whole menu (icons, check and radio items, shortcuts, submenus) from the app's [commands](../commands/) |
 | Events | `s4-select { value, item }` on the menu when an item is chosen; `s4-open`, `s4-close` |
 | JS | `S4.menu.open(menu, anchor)`, `S4.menu.close(menu)`, `S4.position(popup, anchor, { align, gap })` |
 
@@ -28,4 +30,5 @@ A short list of choices opened from a button. **Drops** 8px out of the side of i
 menu (use a dialog or sheet); don't color items except a destructive one.
 
 **Accessibility:** native popover (top layer, light dismiss); arrows, Home/End, type-to-jump, Escape returns focus to the
-opener; Tab closes. 48dp item targets.
+opener; Tab closes (a submenu and its parents together). Submenu items say `aria-haspopup="menu"` and `aria-expanded`.
+48dp item targets (32 in compact density). Keep submenus one level deep.

@@ -6,8 +6,8 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 ## Contents
 
 - **Actions:** [button](#button), [icon-button](#icon-button), [button-group](#button-group), [fab](#fab)
-- **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
-- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
+- **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [menubar](#menubar), [doc-tabs](#doc-tabs), [statusbar](#statusbar), [commands](#commands), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
+- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [tree](#tree), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
 - **Content:** [prose](#prose), [message](#message)
 - **Websites:** [site](#site)
 - **Inputs:** [form](#form), [text-field](#text-field), [combobox](#combobox), [tag-input](#tag-input), [number-field](#number-field), [code-field](#code-field), [upload](#upload), [time-field](#time-field), [rating](#rating), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches), [color-field](#color-field), [password](#password), [inline-edit](#inline-edit)
@@ -604,6 +604,31 @@ with an optional menu button and FAB. Uses the same `.s4-nav-item` as the [navig
 | `.s4-nav-rail-header` | Menu button and FAB slot. In the collapsed rail the FAB's label is hidden (icon FAB); expanded it shows (extended FAB). |
 | `.s4-nav-rail-items` | The destinations (`.s4-nav-item`, see nav bar). |
 
+**As a desktop source list (issue 60):** the expanded rail is the sidebar of a desktop app. It takes sections with
+titles (`.s4-nav-rail-title`), sections that fold away, a [tree](#tree), a footer for the account and Settings, a grip
+to resize it, and it still collapses to icons. There is no second sidebar component.
+
+```html
+<nav class="s4-nav-rail" aria-label="Project" data-expanded data-resizable data-resize-key="app-sidebar">
+  <div class="s4-nav-rail-items">
+    <a class="s4-nav-item" href="#strings" aria-current="page">…</a>
+    <div class="s4-nav-rail-group">
+      <button class="s4-nav-rail-title" type="button" aria-expanded="true">Languages</button>
+      <div class="s4-nav-rail-group-items"><a class="s4-nav-item" href="#fr">…</a>…</div>
+    </div>
+    <div class="s4-nav-rail-title">Files</div>
+    <ul class="s4-tree" aria-label="Files" data-density="compact">…</ul>
+  </div>
+  <div class="s4-nav-rail-footer">…account, Settings…</div>
+</nav>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-nav-rail-group` + `button.s4-nav-rail-title` + `.s4-nav-rail-group-items` | A section whose title folds it (Reveal); `aria-expanded` follows; remembered with `data-resize-key`. Collapsed to icons, a folded group still shows its icons |
+| `.s4-tree` inside | A tree in a section; its icons line up with the items; hidden while the rail is collapsed |
+| `data-resizable` (+ `data-resize-key`) | A grip on the end edge (`role="separator"`): drag, or Left / Right on it, Home / End for 200 and 400, Enter collapses or expands; dragged narrower than 150 it collapses. Fires `s4-resize { size, collapsed }` |
+
 **Behaviour (`nav-rail.js`):** item clicks move `aria-current` and fire `s4-change { item, index, value }`; the toggle
 fires `s4-toggle { expanded }`. The width animates on the spatial spring, labels fade in on effects; icons stay in place
 because the expanded pill starts where the collapsed one did. In an [app shell](#app) the rail is sticky at full
@@ -637,6 +662,11 @@ neutral indicator the nav bar and rail use, sliding from tab to tab; its label s
 **Tabs, button group or chips?** If it swaps what is on the screen, it is tabs. If it changes a value or how the same
 thing is shown (Week / Month / Year on a chart, list or grid), it is a [button group](#button-group). If it narrows a
 collection and there can be many, it is [chips](#chip).
+
+**Tabs or document tabs?** These tabs are a fixed set of views of one thing, chosen by the app: they never close, never
+move and their set does not change. The open files or records of a desktop window, which the person opens, closes and
+reorders, are [document tabs](#doc-tabs) (`.s4-doc-tabs`): each a filled pill with a close button and an
+unsaved-changes dot, no sliding indicator.
 
 ```html
 <div class="s4-tabs" role="tablist" aria-label="Bill">
@@ -792,43 +822,379 @@ carries the one focus mark: the focus ring inside its edge from the keyboard, a 
 ## Desktop Windows
 
 What an Orion app needs to live in a desktop window or ship as a desktop app (an installed web app, Electron, Tauri),
-on the same shell and components (decision 0043).
+on the same shell and components (decision 0043), and the anatomy of a desktop window (issue 60).
 
 ```html
-<div class="s4-app" data-window data-density="auto">
-  <header class="s4-titlebar"><span class="s4-titlebar-title">Ledger</span></header>
-  <nav class="s4-nav-rail" aria-label="Main">…</nav>
-  <div class="s4-app-body">…</div>
+<html lang="en" data-density="auto">
+<div class="s4-app" data-window>
+  <header class="s4-titlebar">                                        <!-- drags the window -->
+    <div class="s4-menubar" aria-label="Application" data-menus="app"></div>
+    <span class="s4-titlebar-title">Ledger</span>
+  </header>
+  <nav class="s4-nav-rail" aria-label="Main" data-resizable>…</nav>   <!-- the sidebar / source list -->
+  <div class="s4-app-body">
+    <div class="s4-doc-tabs">…</div>                                  <!-- the open documents -->
+    …
+  </div>
+  <aside class="s4-inspector" aria-label="Inspector">…</aside>        <!-- properties of the selection -->
+  <footer class="s4-statusbar" aria-label="Status">…</footer>
 </div>
-
-<button class="s4-button" data-shortcut="mod+n">New Bill <kbd class="s4-kbd"></kbd></button>
-<li data-context-menu="row-menu">…</li>
-<div class="s4-menu" id="row-menu">…</div>
 ```
+
+### The anatomy
+
+| Part | Where | What |
+|---|---|---|
+| Title bar | here, `.s4-titlebar` | Drags the window; holds the title, the menu bar, document tabs or a toolbar; room for the system's window buttons |
+| Menu bar | [`menubar/`](#menubar) | File, Edit, View… inside the window (Windows, Linux, web); hidden where the system draws it (Mac) |
+| Commands | [`commands/`](#commands) | One list of actions feeding the menu bar, menus, shortcuts, the palette and a shell's native menu |
+| Sidebar | [`nav-rail/`](#nav-rail) | The rail, expanded: destinations, folding sections, a [tree](#tree), account and Settings at the foot; resizable, collapses to icons |
+| Document tabs | [`doc-tabs/`](#doc-tabs) | The open files or records: close, reorder, reopen, unsaved dot |
+| Content | [`layout/`](#layout) | List and detail (`.s4-split[data-resizable]`), each pane scrolling on its own |
+| Inspector | here, `.s4-inspector` | A resizable pane at the window's end for the properties of the selection |
+| Status bar | [`statusbar/`](#statusbar) | Sync, selection, position, zoom, connection |
+| Palette | [`palette/`](#palette) | mod+K: every command and destination by name |
+
+On a phone the same page is the normal touch app: the title bar, menu bar, document tabs, inspector and status bar
+step out (under 600 or 840), the rail becomes the nav bar, and each list opens its detail as a page.
+
+### Classes and attributes
 
 | Class / attribute | What |
 |---|---|
 | `data-window` on `.s4-app` | The app fills the window and never scrolls as a page; the body and each pane scroll on their own. Thin scrollbars, arrow cursor on controls, chrome text can't be selected. |
-| `data-density="auto"` | Pointer-sized controls where the pointer is a mouse (see `base/density.css`); `compact` forces it. |
-| `.s4-titlebar` | A title bar that drags the window. Buttons, links and fields inside stay clickable. Leaves room for the system's window buttons (window controls overlay). Hidden under 600. |
-| `data-controls="start"` on the title bar | Room for macOS traffic lights in a frameless window. |
-| `.s4-titlebar-title` | The centered title; `data-align="start"` on the bar puts it at the start. |
-| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless shells; each click fires `s4-window { action }` on the document. Wire that to the shell. |
+| `data-density="auto"` (best on `<html>`, so menus and panels follow) | Pointer-sized controls where the pointer is a mouse (see `base/density.css`); `compact` forces it. |
+| `.s4-titlebar` | A title bar that drags the window (`app-region: drag`). Buttons, links, fields, the menu bar, tabs and anything with `data-no-drag` stay clickable. Hidden under 600. |
+| `data-variant="tabs"` on the title bar | The document tabs are the title bar (no title); the space around them drags. A browser-like document window. |
+| `data-variant="unified"` on the title bar | A taller bar (52) that holds the window's toolbar: title at the start, then search and buttons. A tool window. |
+| `.s4-titlebar-title`, `data-align="start"` | The title, centered (or at the start) |
+| `.s4-titlebar-spacer` | Pushes what follows to the end |
+| `data-controls="start"` on the title bar | Room for the Mac's traffic lights in a frameless window (also automatic with `<html data-platform="mac" data-shell="electron\|tauri">`) |
+| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless shells that do not draw their own; each click fires `s4-window { action }` on the document. Wire it to the shell. |
+| `.s4-inspector` (+ `.s4-inspector-header`, `-title`, `-body`, `details.s4-inspector-group`, `.s4-inspector-fields`, `.s4-inspector-row`) | The properties pane at the window's end: solid, resizable from its start edge (drag, arrows, Home/End, Enter hides it), `data-resize-key` remembers the width, groups fold with Reveal. From 840 wide. `S4.desktop.inspector(el, on)`; `--s4-inspector-width`. |
 | `data-shortcut="mod+k"` | That key combination clicks the element. `mod` is ⌘ on Apple platforms, Ctrl elsewhere; also `shift`, `alt`. |
-| `<kbd class="s4-kbd">` | Shows a shortcut. Empty inside a `data-shortcut` element (or with `data-for="id"`), it is filled in the platform's spelling. |
-| `data-context-menu="menu-id"` | Right-click (long press on touch) opens that menu at the pointer. The menu fires `s4-context { target }` and has `.contextTarget`. |
+| `<kbd class="s4-kbd">` | Shows a shortcut. Empty inside a `data-shortcut` or `data-cmd` element (or with `data-for="id"`), it is filled in the platform's spelling. |
+| `data-context-menu="menu-id"` | Right-click (long press on touch, Shift+F10 or the menu key) opens that menu at the pointer or under the element. The menu fires `s4-context { target }` and has `.contextTarget`. |
+| `<html data-platform>` | `mac`, `windows`, `linux`, `ios`, `android`; set once by the script unless the page set it |
+| `<html data-shell="electron\|tauri\|pwa">` | Set by your shell bridge (see `examples/`) |
+| `<html data-native-menu>` | The shell draws the native menu bar: the in-window menu bar hides (a Mac shell sets it) |
+| `<html data-window-blurred>` | Set while the window is not in front: title bar, menu bar and status bar step back to `on-surface-variant`, tree selections turn neutral |
+| `<html data-window-state="fullscreen overlay maximized">` | `fullscreen` (no room kept for the traffic lights), `overlay` (an installed web app draws into the title bar area); set by the script where the browser knows, or by the shell |
+
+Script: `S4.desktop.platform`, `S4.desktop.format('mod+k')` (⌘K or Ctrl+K), `S4.desktop.matches(event, 'mod+k')`,
+`S4.desktop.inspector(el, on)`. Events: `s4-window { action }`, `s4-context { target }`.
+
+### The window
+
+**Drag regions.** The title bar is `app-region: drag` (Electron and installed web apps; Tauri reads a
+`data-tauri-drag-region` attribute instead: see `examples/README.md`). Everything you click in it is `no-drag`. Never make content
+draggable as a window.
+
+**Window buttons.** On a Mac they are the traffic lights at the start: a frameless window keeps about 80 of room for
+them (`data-controls="start"`), full screen gives it back. On Windows and Linux they are at the end: an installed web app
+with window controls overlay draws its title bar into `env(titlebar-area-*)` (`.s4-titlebar` already reads it), and
+Electron's `titleBarOverlay` does the same. Draw `.s4-window-controls` only in a frameless shell that draws none.
+
+**In front or not.** A window that is not in front dims its chrome a step and its selections turn gray, as every
+desktop does, so you can tell which window has the keyboard. Content never dims.
+
+**Selection and cursor.** Chrome (title bar, menu bar, rail, tabs, status bar, buttons, labels) cannot be selected as
+text and keeps the arrow cursor; content (messages, documents, fields, tables) stays selectable, and links in content
+keep the pointing hand.
+
+**Full screen.** Nothing is kept for window buttons; the title bar stays (it holds the menu bar and tabs).
+
+### Platform conventions (express them in Orion, don't copy their look)
+
+| | Mac | Windows | Linux (GNOME, KDE) |
+|---|---|---|---|
+| Menu bar | The system's, at the top of the screen (shell builds it from the commands) | In the window (`.s4-menubar`), or none with everything in the palette and toolbars | In the window |
+| Window buttons | Traffic lights at the start | At the end | At the end (GNOME: close only, by default) |
+| Settings | App menu, "Settings…", ⌘, | File or Tools menu, "Settings", Ctrl+, | Main menu, "Preferences" or "Settings", Ctrl+, |
+| Quit | App menu, ⌘Q | File, Exit (Alt+F4 closes) | File, Quit, Ctrl+Q |
+| Rename | Enter | F2 | F2 |
+| Delete | ⌘⌫ | Delete | Delete |
+| Redo | ⇧⌘Z | Ctrl+Y (and Ctrl+Shift+Z) | Ctrl+Shift+Z |
+| Context menu key | none (Ctrl-click) | Shift+F10, menu key | Shift+F10, menu key |
+
+### Settings: a window, not a dialog
+
+On a desktop, settings are their own surface: a view (or, in a shell, a second window) with a sidebar of categories
+and a pane, a search box that finds a setting across categories, and every change applied at once with Undo in a
+snackbar: no Save button, no OK and Cancel. mod+comma opens it. On a phone the same settings are the
+[settings template](../../templates/settings.html)'s list, then a page per category. The
+[desktop template](../../templates/desktop-app.html) shows both from one markup: a `.s4-split` of categories and pane.
+
+### Inspector or tool panel?
+
+| | Inspector (`.s4-inspector`) | Tool panel (`.s4-side-sheet[data-modeless]`, decision 0054) |
+|---|---|---|
+| Shows | The properties of what is selected, and changes them | A tool that works on the whole page: filters, find and replace, a color picker |
+| Lives | In the window's layout, at its end, solid; the content makes room | Floats over the content (glass) and can be moved away |
+| Follows | The selection: it changes as you pick another item | Nothing: it stays as it is |
+| On a phone | Steps out; the same properties belong in the item's own page | Becomes a modal panel |
+| Use when | People edit properties of items all day (an editor, a design or data tool) | People reach for the tool now and then |
+
+### When, Do, Don't
 
 **When:** `data-window` for anything used like an application (mail, an editor, a dashboard that stays open). A page
-people read (article, landing page) keeps normal page scrolling.
+people read (article, landing page) keeps normal page scrolling. Add the menu bar, document tabs, inspector and status
+bar only when the app has those jobs: a small tool is a title bar, a sidebar and content.
 
-**Do:** give every primary action a shortcut and show it in its tooltip or menu item; keep right-click menus short and
-make every item reachable another way. **Don't:** draw `.s4-window-controls` when the system already draws its own;
-don't put the only way to do something in a context menu.
+**Do:** give every primary action a command with a shortcut and show it in its menu item and tooltip; keep right-click
+menus short and make every item reachable another way; keep chrome quiet so content leads (one weight of type, no
+fills at rest, solid surfaces).
+
+**Don't:** draw `.s4-window-controls` when the system already draws its own; don't put the only way to do something in
+a context menu, the menu bar or a shortcut; don't make the window scroll as a page; don't put glass on the title bar,
+sidebar, status bar or inspector (they don't float).
 
 **Accessibility:** shortcuts never fire while typing unless they use `mod`; context menus are normal menus (arrows,
-Escape, typeahead) and return focus to the row.
+Escape, typeahead) and return focus; the grips are separators with values and arrow keys; every landmark has a name.
 
-**Tokens:** `--s4-size-titlebar`, `--s4-density-compact-*`.
+**Tokens:** `--s4-size-titlebar`, `--s4-size-menubar-item`, `--s4-size-doc-tab`, `--s4-size-statusbar`,
+`--s4-size-tree-row`, `--s4-size-tree-indent`, `--s4-size-inspector`, `--s4-density-compact-*`.
+
+**A real shell:** [`examples/`](../../examples/) has an Electron skeleton (frameless window, drag regions, traffic
+lights or the Windows overlay, the native menu built from `S4.commands.native`, focus and full-screen states) and an
+installed web app with window controls overlay. Neither can be run in this repository's CI; they are kept small and
+follow the documented APIs.
+
+---
+
+<a id="menubar"></a>
+
+## Menu Bar
+
+The application menu inside the window: File, Edit, View, Window, Help. For Windows and Linux shells and for web apps
+in a window; on a Mac the system draws the menu bar, so a Mac shell builds the native menu from the same
+[commands](#commands) and sets `<html data-native-menu>`, which hides this one. Not shown on a phone (under 600):
+the same commands are in the palette and in each screen's own menus.
+
+```html
+<header class="s4-titlebar">
+  <div class="s4-menubar" aria-label="Application" data-menus="app"></div>
+  <span class="s4-titlebar-title">Field Notes</span>
+</header>
+<script>S4.commands.menu('app', [{ label: 'File', items: ['file.new', 'file.open', '-', 'file.save'] }, …]);</script>
+
+<!-- or by hand -->
+<div class="s4-menubar" role="menubar" aria-label="Editor">
+  <button class="s4-menubar-item" type="button" data-menu="m-file">File</button>
+</div>
+<div class="s4-menu" id="m-file" aria-label="File">…</div>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-menubar` | The bar (`role="menubar"`). In the title bar it never drags the window; or put it in its own row at the top |
+| `data-menus="name"` | Fill it from `S4.commands.menu(name, [{ label, items }])` |
+| `.s4-menubar-item` + `data-menu` | One menu's button (by hand); `data-access="x"` picks its Alt letter (default: its first letter) |
+| `<html data-native-menu>` | Hide it: the shell draws the native menu bar (a Mac shell sets this) |
+| Script | `S4.menubar.render(bar, items)`, `S4.menubar.focus(bar)` |
+
+The menus are the glass [menu](#menu), with submenus, check and radio items, disabled items and shortcut hints in the
+platform's spelling (⌘S on a Mac, Ctrl+S elsewhere).
+
+**Where things live (platform conventions):** File (New, Open, Open Recent, Save, Close; on Windows and Linux also
+Settings and Exit), Edit (Undo, Redo, Cut, Copy, Paste, Find), View (panels, zoom, full screen), the app's own menus,
+Window (on a Mac), Help (shortcuts, about). On a Mac, Settings and Quit live in the app menu the system draws; a shell
+puts them there from the same commands (see `examples/`).
+
+**Do:** keep menu names to one word; give every item a shortcut that the platform's apps use for the same thing; show
+disabled items instead of removing them. **Don't:** put the only way to do something in the menu bar; don't build a
+menu bar on a phone or a Mac shell.
+
+**Accessibility:** WAI-ARIA menubar. Left and Right move along the bar (and switch the open menu), Down, Enter or Space
+open a menu at its first item, Up at its last, Home and End, a letter jumps to a menu; inside a menu the arrow away from
+it moves to the next menu, the arrow back closes a submenu. F10 or a lone Alt moves focus to the bar and back; Alt with
+a letter opens that menu (not while typing on a Mac, where ⌥ types characters); Escape closes and returns focus. One tab
+stop for the bar.
+
+**Tokens:** `--s4-size-menubar-item`, `--s4-shape-control`, `--md-sys-color-secondary-container` (the open menu's item),
+label-large type.
+
+---
+
+<a id="doc-tabs"></a>
+
+## Document Tabs
+
+The open documents of a desktop window: files, records, conversations. Each tab is a thing you opened: it closes,
+carries a dot while it has unsaved changes, moves, and comes back after you close it by mistake.
+
+**Not the [content tabs](#tabs).** Content tabs switch between a fixed set of views of one thing (Overview,
+Activity, Settings) and belong to the navigation family (decision 0059): they never close, never move and their set
+does not change. Document tabs are made and closed by the person, as many as they like, and can be reordered. If the
+set of tabs is fixed by the app, use content tabs.
+
+```html
+<div class="s4-doc-tabs">
+  <div class="s4-doc-tabs-list" aria-label="Open Files">
+    <div class="s4-doc-tab" data-modified>
+      <button class="s4-doc-tab-label" type="button" aria-selected="true" aria-controls="doc-1">
+        <span class="s4-icon" data-icon="document"></span><span class="s4-doc-tab-text">dialogue.json</span></button>
+    </div>
+  </div>
+  <button class="s4-icon-button s4-doc-tabs-new" type="button" aria-label="New File" data-cmd="file.new"><span class="s4-icon" data-icon="add"></span></button>
+</div>
+<section id="doc-1">…</section>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-doc-tabs` | The row (on chrome). In a title bar: `.s4-titlebar[data-variant="tabs"]` |
+| `.s4-doc-tabs-list` | The tabs (`role="tablist"`); scrolls sideways when full |
+| `.s4-doc-tab` + `.s4-doc-tab-label` | One tab: the label is the `role="tab"` button; `aria-controls` names its panel |
+| `data-modified` on a tab | Unsaved changes: the close button is a dot until you point at the tab |
+| `.s4-doc-tabs-new` | Your new-tab button (wire it to a command) |
+| Added by the script | Each tab's close button, the All Tabs menu button (shown only when the tabs don't fit), the right-click menu (Close, Close Others, Close To The Right, Move Left, Move Right) |
+| `data-keys="off"` | This row ignores the window-wide keys |
+| Events on `.s4-doc-tabs` | `s4-change { tab, index, panel }`; `s4-close { tab, panel, modified }` before closing (`preventDefault()` keeps it); `s4-reorder { item, from, to }` |
+| Script | `S4.docTabs.add(bar, { label, icon, panel, modified, select, next })`, `.select(tab)`, `.close(tab)`, `.reopen(bar)`, `.move(tab, index)`, `.modified(tab, on)`, `.tabs(bar)`, `.current(bar)` |
+
+**Keys and pointer:** click selects, middle-click closes, drag reorders (a finger: hold, then drag). On a tab: Left and
+Right (move and select), Home, End, Delete (close), mod+Shift+PageUp / PageDown (move). Anywhere: mod+W closes the
+current tab, mod+Shift+T reopens the last closed one, mod+1 to mod+8 pick a tab and mod+9 the last, Ctrl+Tab and
+Ctrl+Shift+Tab (or Ctrl+PageDown / PageUp) step through them. A browser keeps mod+W, Ctrl+Tab and mod+1…9 for its own
+tabs; in an installed app or a desktop shell they all work, and each has a click or a menu item that does the same.
+
+**Closing unsaved work:** do, then offer the way back (decision 0047): close it and show a snackbar with Reopen
+(`S4.docTabs.reopen`), rather than asking first. Keep the unsaved changes with the closed tab.
+
+**Look:** the current tab takes the content's surface (it is the document under it); the others are quiet labels with
+the state layer on hover. Corners follow the dial. Labels end in an ellipsis when long (the one place besides the title
+bar title where a desktop window cuts text); the full name is in the All Tabs menu. Under 600 wide the row hides: a phone
+shows one document at a time. Switching shows the panel at once (no motion: a document is not a view to slide to).
+
+**Do:** show the file's or record's name and an icon of its kind; put a new-tab button at the end. **Don't:** use
+document tabs for a fixed set of views; don't nest them; don't close a tab with unsaved work without a way back.
+
+**Accessibility:** tabs pattern with one tab stop; close buttons are out of the tab order (Delete closes); the close
+button's name says "unsaved changes" when the dot shows; forced colors give every tab a border.
+
+**Tokens:** `--s4-size-doc-tab`, `--s4-shape-control`, `--md-sys-color-surface` (current tab),
+`--md-sys-color-surface-container-low` (the row), label-large type.
+
+---
+
+<a id="statusbar"></a>
+
+## Status Bar
+
+A slim solid bar along the bottom of a desktop window for the state of things: saved and synced, what is selected,
+where the cursor is, the zoom, the connection. Quiet chrome: small type, no fills at rest, the content leads.
+
+```html
+<footer class="s4-statusbar" aria-label="Status">
+  <span class="s4-statusbar-item"><span class="s4-statusbar-dot" data-tone="success"></span>Saved</span>
+  <span class="s4-statusbar-item" role="status" aria-live="polite">3 Selected</span>
+  <span class="s4-statusbar-spacer"></span>
+  <button class="s4-statusbar-item" type="button" data-menu="zoom-menu">100%</button>
+</footer>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-statusbar` | The bar. In a `data-window` app it spans the window's last row; shown from 840 wide |
+| `.s4-statusbar-item` | A segment: text, optionally an icon or dot before it. A `button` (or `a`) segment opens a menu (`data-menu`), a panel (`data-sheet`) or runs a command (`data-cmd`) |
+| `data-tone="error"` on an item | The words turn error colored |
+| `.s4-statusbar-dot[data-tone="success\|warning\|info\|error"]` | A dot beside words that already say the state |
+| `.s4-statusbar-spacer` | Pushes what follows to the end |
+
+**When to use:** a desktop app whose state people glance at while they work (an editor, a mail client, a data tool).
+Not for actions (use the toolbar or the menus), not on a phone (each screen shows its own state), not in a web page.
+
+**Do:** put what changes as you work on the left (sync, selection, position) and settings of the view on the right
+(language, zoom, connection); write states as words ("Saved", "Offline: 3 changes waiting"). **Don't:** make a
+segment the only way to reach what it opens; don't use color alone; don't fill it with buttons.
+
+**Accessibility:** a `footer` with a name. A segment that changes as people work gets `role="status"` and
+`aria-live="polite"` so it is announced without moving focus. Clickable segments are real buttons in the tab order.
+
+**Tokens:** `--s4-size-statusbar`, `--md-sys-color-surface-container-low`, label-medium type, `--s4-color-success`,
+`--s4-color-warning`, `--s4-color-info`.
+
+---
+
+<a id="commands"></a>
+
+## Commands
+
+One list of what an app can do, written once, and every way of doing it drawn from that list: the
+[menu bar](#menubar), menus and right-click menus, keyboard shortcuts, the [command palette](#palette), buttons,
+and a desktop shell's native menu. A command knows its label, icon, shortcut, whether it can run now and whether it is
+on, so every place shows the same words, the same shortcut and the same state.
+
+```js
+S4.commands.add([
+  { id: 'file.save', label: 'Save', group: 'File', icon: 'save', shortcut: 'mod+s',
+    enabled: function () { return doc.dirty; }, run: function (ctx) { save(); } },
+  { id: 'view.wrap', label: 'Word Wrap', group: 'View', type: 'check', shortcut: 'alt+z',
+    checked: function () { return wrap; }, run: function () { wrap = !wrap; } },
+  { id: 'zoom.100', label: '100%', type: 'radio', radio: 'zoom', palette: false,
+    checked: function () { return zoom === 100; }, run: function () { zoom = 100; } }
+]);
+S4.commands.menu('app', [                                   // the menu bar: a list of menus
+  { label: 'File', items: ['file.new', 'file.open', { label: 'Open Recent', items: ['recent.1'] }, '-', 'file.save'] },
+  { label: 'View', items: ['view.wrap', '-', { heading: 'Zoom' }, 'zoom.90', 'zoom.100'] }
+]);
+S4.commands.menu('row-menu', ['edit.copy', 'edit.rename', '-', 'edit.delete']);   // a right-click menu
+```
+
+```html
+<div class="s4-menubar" aria-label="Application" data-menus="app"></div>
+<li data-context-menu="row-menu">…</li>                     <!-- the menu is made for you -->
+<button class="s4-button" type="button" data-cmd="file.save">Save<kbd class="s4-kbd"></kbd></button>
+```
+
+| Command field | What |
+|---|---|
+| `id` | A stable name (`file.save`). Made up if missing. |
+| `label`, `icon`, `group`, `keywords` | Title Case label, icon name, palette group, extra words people type |
+| `shortcut` | `mod+s`, `mod+shift+t`, `alt+z`, `f2`. Runs from anywhere (not while typing unless it uses mod); shown the platform's way in menus, buttons and the palette |
+| `run(ctx)` | What it does. `ctx.source` is the element, `'keyboard'` or `'palette'`; `ctx.target` is what a right-click menu was opened on |
+| `enabled()` | False greys it out everywhere and stops its shortcut |
+| `type: 'check' \| 'radio'`, `checked()`, `radio` | A check item, or one of a radio group (`radio` names the group) |
+| `palette: false` | Keep it out of the palette (radio items, recent files) |
+
+| Menu item form | What |
+|---|---|
+| `'file.save'` | A command |
+| `'-'` | A divider |
+| `{ heading: 'Zoom' }` | A group label |
+| `{ label, icon, items: [...] }` | A submenu |
+| `{ id, label }` | The same command under another label in this menu |
+
+| Script | |
+|---|---|
+| `S4.commands.add(list)`, `.remove(id)`, `.get(id)`, `.list()` | The list |
+| `S4.commands.run(id, ctx)` | Run one (if enabled) |
+| `S4.commands.enabled(id)`, `.checked(id)` | Ask its state |
+| `S4.commands.menu(name, items)` / `.menu(name)` | Define or read a named menu: renders into `.s4-menubar[data-menus=name]`, else into `<div class="s4-menu" id=name>` |
+| `S4.commands.refresh()` | Ask every `enabled()` and `checked()` again (after your app's state changes; menus also refresh as they open) |
+| `S4.commands.native(name)` | The menu as plain data (`{ label, submenu }`, `{ id, label, accelerator, enabled, type, checked }`, `{ type: 'separator' }`) with Electron-style accelerators (`CmdOrCtrl+S`), for a shell's native menu (see `examples/`) |
+| `S4.commands.accelerator('mod+s')` | `CmdOrCtrl+S` |
+| `[data-cmd="id"]` | Clicking runs it; label, disabled, `aria-pressed` (check commands) and an empty `<kbd class="s4-kbd">` follow the command |
+| Events on `document` | `s4-command { command, context }` after one runs; `s4-commands` when the list or a state changed |
+
+**When to use:** every app with more than a handful of actions, and every desktop app. Write the app's actions once
+here, then decide where each appears. `S4.palette.register` still works and adds to this list.
+
+**Do**
+- Name commands as verbs in Title Case ("Archive Message", "Close Others"); keep one shortcut per command.
+- Use the standard shortcuts of the platform's apps: mod+N new, mod+O open, mod+S save, mod+W close, mod+Z undo,
+  mod+shift+Z redo, mod+F find, mod+comma settings, F2 rename.
+- Make every command reachable on screen too (a button, a menu): shortcuts and the palette are for people who know.
+
+**Don't**
+- Don't put the same action in two commands with two labels.
+- Don't hide a command (remove it) because it can't run now: disable it, so people learn where it lives.
+
+**Accessibility:** commands render as real menu items (`menuitem`, `menuitemcheckbox`, `menuitemradio`) and buttons;
+disabled items keep their place and say so (`aria-disabled`).
+
+**Tokens:** none of its own; menus, the menu bar and the palette draw it.
 
 ---
 
@@ -1593,6 +1959,81 @@ lists), Space drops, Escape puts it back, and each step is announced. Swipe acti
 Tab. Picked rows carry `aria-checked`.
 **Motion:** Morph calm for rows making room and settling; nothing animates while your finger is down.
 **Tokens:** `secondary-container`, `primary`, `surface-container-highest`, `--s4-size-touch-target`, `--s4-space-*`.
+
+---
+
+<a id="tree"></a>
+
+## Tree View
+
+Nested things you open and close: folders and files, chapters and scenes, regions and sites. In a desktop sidebar, in a
+phone's file browser, in a pane.
+
+```html
+<ul class="s4-tree" aria-label="Files" aria-multiselectable="true" data-item-menu="file-menu">
+  <li class="s4-tree-item" aria-expanded="true">
+    <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Quests</span>
+      <span class="s4-tree-trailing"><span class="s4-tree-count">412</span></span></div>
+    <ul role="group">
+      <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">dialogue.json</span></div></li>
+    </ul>
+  </li>
+  <li class="s4-tree-item" aria-expanded="false" data-lazy><div class="s4-tree-row">…</div></li>
+</ul>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-tree` | The tree (`role="tree"`); give it an `aria-label` |
+| `.s4-tree-item` + `.s4-tree-row` | An item and its row; a folder has `aria-expanded` and a `ul[role="group"]` |
+| `.s4-tree-label`, `.s4-tree-trailing`, `.s4-tree-count`, `.s4-badge` | Name, end slot, a quiet count, an attention badge |
+| `aria-selected="true"` | Selected (filled, `secondary-container`) |
+| `aria-multiselectable="true"` | Several can be selected |
+| `data-lazy` on a folder | Its children load when it first opens (`S4.tree.load`) |
+| `data-item-menu="menu-id"` | Every item gets that right-click menu (`menu.contextTarget` is the item) |
+| `data-open-on-click` | A single click on a folder row opens it too (a sidebar of groups) |
+| `data-no-drag` | No dragging rows |
+| `--s4-tree-guides` | The guide line color (`transparent` drops them) |
+
+| Script | |
+|---|---|
+| `S4.tree.render(tree, nodes)` | Build from data: `{ label, icon, count, badge, id, open, selected, children: [] | lazy: true }` |
+| `S4.tree.load(tree, fn)` | `fn(item)` returns a Promise of nodes; a loading row shows meanwhile, an error row offers Retry |
+| `.select(item, { add, range })`, `.selected(tree)`, `.open(item, on)`, `.focus(item)`, `.reveal(item)` | Selection, opening, focus |
+| `.rename(item)` | Start renaming (F2 does it) |
+| `.cut(items)`, `.paste(folder)` | Move without dragging |
+| Events on the tree | `s4-change { items, item }`, `s4-select { item }` (chosen: Enter or double-click), `s4-toggle { item, open }`, `s4-rename { item, value, old }`, `s4-move { items, target }` (both cancelable) |
+
+**Keys:** Up and Down move, Right opens or goes to the first child, Left closes or goes to the parent, Home and End,
+a letter jumps by name, `*` opens every sibling, Enter chooses (on a Mac it renames, as in the Finder), F2 renames.
+Several: Shift with the arrows or a click selects a range, Ctrl or ⌘ with a click adds one, Ctrl or ⌘ with the arrows
+moves without selecting and Space adds, mod+A selects all. mod+X then mod+V on a folder moves; Escape cancels.
+Shift+F10 or the menu key opens the item's menu.
+
+**Moving:** drag rows onto a folder with a mouse or pen (the folder fills); never drag-only: cut and paste, and the
+item's menu, do the same. A finger scrolls the tree and long-presses for the menu.
+
+**Rename** is the one time the tree puts the cursor in a field: you asked to type a name (F2, Enter on a Mac, or a
+Rename command), the same reasoning as the palette opened by a key (decision 0049). It never happens on its own.
+
+**Look:** rows are small list rows: touch size by default (48) and 28 in compact density; hover is its own box that
+leans in from where the pointer came (decision 0044); corners follow the dial. Each level steps in by
+`--s4-size-tree-indent` (20, compact 14) and past the fourth level by half, so deep paths fit a narrow sidebar; a faint
+guide line runs down each open folder. Labels wrap, never cut. Opening is Reveal and the chevron turns (Bend). In a
+window that is not in front, selected rows turn neutral.
+
+**When to use:** a hierarchy people browse and act on. For one level, use a [list](#list); for two short levels, a
+list with subheaders or the rail's groups.
+
+**Do:** put counts at the end, quietly; give folders and items different icons. **Don't:** nest deeper than people can
+follow without a breadcrumb; don't make a click on a file both select and open in a desktop app (Enter or a
+double-click opens).
+
+**Accessibility:** WAI-ARIA tree: roles, `aria-level`, `aria-expanded`, `aria-selected`, one tab stop with roving focus;
+the focused row shows the ring; loading folders are `aria-busy`. Forced colors: the selection is Highlight.
+
+**Tokens:** `--s4-size-tree-row`, `--s4-size-tree-indent`, `--s4-shape-control`, `--md-sys-color-secondary-container`,
+`--md-sys-color-outline-variant` (guides), label-large type, `--s4-motion-bend`, Reveal.
 
 ---
 
@@ -3297,6 +3738,8 @@ A short list of choices opened from a button. **Drops** 8px out of the side of i
 | `.s4-menu-item` + `.s4-menu-item-text`, `.s4-menu-item-supporting`, `.s4-menu-item-trailing` | Item, with optional second line and a shortcut or value at the end |
 | `role="menuitemradio|menuitemcheckbox"` + `aria-checked` | Choice items; checked items use secondary-container |
 | `.s4-menu-label`, `.s4-menu-divider` | Group label, separator |
+| `data-submenu="menu-id"` on an item | Opens that menu beside it (click, Enter, Space, the arrow toward it, or resting the pointer on it); the arrow back or Escape closes only the submenu, choosing in it closes them all. Add a trailing `<span class="s4-icon s4-menu-item-sub" data-icon="chevron-right"></span>` |
+| Built from commands | `S4.commands.menu('id', [...])` writes a whole menu (icons, check and radio items, shortcuts, submenus) from the app's [commands](#commands) |
 | Events | `s4-select { value, item }` on the menu when an item is chosen; `s4-open`, `s4-close` |
 | JS | `S4.menu.open(menu, anchor)`, `S4.menu.close(menu)`, `S4.position(popup, anchor, { align, gap })` |
 
@@ -3304,7 +3747,8 @@ A short list of choices opened from a button. **Drops** 8px out of the side of i
 menu (use a dialog or sheet); don't color items except a destructive one.
 
 **Accessibility:** native popover (top layer, light dismiss); arrows, Home/End, type-to-jump, Escape returns focus to the
-opener; Tab closes. 48dp item targets.
+opener; Tab closes (a submenu and its parents together). Submenu items say `aria-haspopup="menu"` and `aria-expanded`.
+48dp item targets (32 in compact density). Keep submenus one level deep.
 
 ---
 
@@ -3420,7 +3864,7 @@ S4.palette.register([
 
 | Where commands come from | How |
 |---|---|
-| The app's own | `S4.palette.register([{ label, group, icon, shortcut, keywords, run }])` |
+| The app's own | its [commands](#commands) (`S4.commands.add`), the same list that feeds the menu bar, menus and shortcuts; `palette: false` keeps one out, disabled ones are left out. `S4.palette.register([{ label, group, icon, shortcut, keywords, run }])` adds to the same list |
 | Buttons and links on the page | `data-command="Label"` (optional `data-command-group`, `data-command-keywords`); running it clicks the element; its `data-shortcut` is shown |
 | The navigation | every destination appears as "Go To …" |
 | Appearance | "Switch To Dark Mode" / "Light Mode" (turn off with `S4.palette.theme = false`) |

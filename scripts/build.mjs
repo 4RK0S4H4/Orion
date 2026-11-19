@@ -139,8 +139,8 @@ for (const page of htmlIn('templates')) {
 const refs = {};
 const GROUPS = [
   ['Actions', ['button', 'icon-button', 'button-group', 'fab']],
-  ['Navigation and shell', ['app', 'layout', 'page', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'breadcrumbs', 'pagination', 'stepper']],
-  ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state', 'states', 'direct', 'chart', 'ring', 'milestones', 'timeline', 'month']],
+  ['Navigation and shell', ['app', 'layout', 'page', 'top-app-bar', 'nav-bar', 'nav-rail', 'tabs', 'toolbar', 'search', 'desktop', 'menubar', 'doc-tabs', 'statusbar', 'commands', 'breadcrumbs', 'pagination', 'stepper']],
+  ['Containment and data', ['card', 'pane', 'list', 'table', 'stat', 'description-list', 'divider', 'avatar', 'accordion', 'expand', 'empty-state', 'states', 'direct', 'tree', 'chart', 'ring', 'milestones', 'timeline', 'month']],
   ['Content', ['prose', 'message']],
   ['Websites', ['site']],
   ['Inputs', ['form', 'text-field', 'combobox', 'tag-input', 'number-field', 'code-field', 'upload', 'time-field', 'rating', 'date-picker', 'chip', 'switch', 'checkbox', 'radio', 'slider', 'swatches', 'color-field', 'password', 'inline-edit']],
