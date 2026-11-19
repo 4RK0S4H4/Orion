@@ -305,10 +305,10 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=c1f52cf"></script>
-<script src="../components/orion.js?v=21be4ed"></script>
+<script src="../components/orion.js?v=2575d9b"></script>
 <script>
 /* Moorings' brand: tinted sea teal over the dials set on <html>. The light/dark choice follows the templates hub. */
-(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#006a6a', surfaces: 'tinted' }); })();
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#006a6a', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
 
 /* the data (a real app loads and saves this). "Today" and "now" are fixed so the template always looks the same. */
 var TODAY = '2026-11-14', NOW = 11 + 20 / 60, ME = 'Sam Teale', view = { y: 2026, m: 10 }, picked = TODAY, seq = 40;

@@ -344,7 +344,7 @@
   });
   S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
-  /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode', 'contrast'] }. Only those are read
+  /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode'] }. Only those are read
      from the saved theme and only those are saved; every other key comes from defaults on every visit, so a branded app
      keeps its fixed brand (and never writes it into a key other pages share) while the visitor's light or dark choice
      is remembered. Dials written on <html> in markup are already the starting state, so defaults need not repeat them. */
@@ -686,7 +686,15 @@ S4.register('icon-button', function (scope) {
    Connected groups (the Ink Track, decision 0059): while at most one option is pressed (any group but data-select="multi"),
    one ink pill behind the options slides to it, whoever changed aria-pressed (a click, the keyboard, a page script);
    with several pressed each option fills itself and button-group.js marks where a wrapped row starts, so a fused run of
-   selected options never joins across rows. */
+   selected options never joins across rows.
+   From script (decision 0060): S4.buttonGroup.set(group, value) presses the option with that value (an array for
+   data-select="multi"), moves the tab stop and the ink with it, and fires no s4-change (the page made the change, as
+   when a script sets an input's value), so a group can follow something else (the line type under the caret).
+   S4.buttonGroup.value(group) reads it back. */
+S4.buttonGroup = {
+  set: function (g, value) { if (g && g._s4set) g._s4set(value); },
+  value: function (g) { return g && g._s4value ? g._s4value() : null; }
+};
 S4.register('button-group', function (scope) {
   var ITEM = '.s4-button, .s4-icon-button';
   S4.util.all(scope, '.s4-button-group').forEach(function (g) {
@@ -718,6 +726,15 @@ S4.register('button-group', function (scope) {
       items().forEach(function (b) { b.tabIndex = b === target ? 0 : -1; });
     };
     stop();
+    g._s4set = function (value) {
+      var want = [].concat(value == null ? [] : value).map(String);
+      var list = items(), hit = list.filter(function (b) { return want.indexOf(String(valueOf(b))) >= 0; });
+      if (mode !== 'multi') hit = hit.slice(0, 1);
+      if (mode === 'single' && !hit.length) return;   /* a single group always has one pressed option */
+      list.forEach(function (b) { b.setAttribute('aria-pressed', hit.indexOf(b) >= 0 ? 'true' : 'false'); });
+      if (!(document.activeElement && g.contains(document.activeElement))) stop();
+    };
+    g._s4value = function () { var v = pressed().map(valueOf); return mode === 'multi' ? v : (v[0] == null ? null : v[0]); };
 
     g.addEventListener('click', function (e) {
       var b = e.target.closest(ITEM);
@@ -3006,6 +3023,7 @@ S4.register('text-field', function (scope) {
       S4.init && S4.init(menu);
       trigger.addEventListener('click', function () {
         if (c.disabled) return;
+        build();   /* the picker always shows the select as it is now */
         menu.style.minWidth = f.querySelector(':scope > .s4-text-field-select').closest('.s4-text-field').getBoundingClientRect().width + 'px';
         menu.hasAttribute('data-open') || menu.matches(':popover-open') ? S4.menu.close(menu) : S4.menu.open(menu, trigger);
       });
@@ -3016,6 +3034,13 @@ S4.register('text-field', function (scope) {
       });
       menu.addEventListener('s4-close', function () { trigger.setAttribute('aria-expanded', 'false'); });
       c.addEventListener('change', build);
+      /* a select changed from script redraws its picker and its button (decision 0060): options added, removed or
+         disabled, and value or selectedIndex set as properties (which fire no event) */
+      new MutationObserver(build).observe(c, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['disabled', 'selected', 'label'] });
+      ['value', 'selectedIndex'].forEach(function (k) {
+        var d = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, k);
+        if (d && d.set) Object.defineProperty(c, k, { configurable: true, get: function () { return d.get.call(c); }, set: function (v) { d.set.call(c, v); build(); } });
+      });
     }
 
     /* the whole container is the hit area */

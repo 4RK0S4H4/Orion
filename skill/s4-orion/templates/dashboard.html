@@ -266,7 +266,7 @@
 <script src="orion.js"></script>
 <script>
 /* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
-(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#1d6b52', variant: 'tonal' }); })();
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#1d6b52', variant: 'tonal' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
 /* the data (a real app loads this) */
 var MONTHS = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
 var IN = [18, 22, 19, 26, 24, 31, 28, 27, 33, 29, 35, 38], OUT = [20, 19, 21, 22, 23, 24, 25, 24, 26, 27, 27, 29], MAX = 40;

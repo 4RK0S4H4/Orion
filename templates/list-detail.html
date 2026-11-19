@@ -220,10 +220,10 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Discard</button><button class="s4-button" data-variant="filled" data-close="send" type="button">Create Ticket</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=c1f52cf"></script>
-<script src="../components/orion.js?v=21be4ed"></script>
+<script src="../components/orion.js?v=2575d9b"></script>
 <script>
 /* the hub's light or dark choice carries over; Relay's accent and tinted surfaces are its own, never saved over the hub's */
-(function () { var m = 'system'; try { m = (JSON.parse(localStorage.getItem('orion-template-theme') || 'null') || {}).mode || 'system'; } catch (e) {} S4.theme({ mode: m, seed: '#4f46e5', surfaces: 'tinted' }); })();
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#4f46e5', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
 
 /* the data (a real app loads this) */
 var T = {

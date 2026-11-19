@@ -341,7 +341,7 @@
   });
   S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
-  /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode', 'contrast'] }. Only those are read
+  /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode'] }. Only those are read
      from the saved theme and only those are saved; every other key comes from defaults on every visit, so a branded app
      keeps its fixed brand (and never writes it into a key other pages share) while the visitor's light or dark choice
      is remembered. Dials written on <html> in markup are already the starting state, so defaults need not repeat them. */

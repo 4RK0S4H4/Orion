@@ -156,6 +156,11 @@ on the group (`value` is the pressed button's `value` attribute, or the array of
 selecting groups are one tab stop (roving tabindex): Arrow keys move focus (RTL aware), Home / End jump, Space / Enter
 press; disabled buttons are skipped. Groups get `role="group"`.
 
+**From script:** `S4.buttonGroup.set(group, 'month')` (an array for `data-select="multi"`) presses that option, moves the
+tab stop and slides the ink, and fires no `s4-change`, so a group can follow something the page knows (the line type
+under the caret, a value restored from storage) without a loop. `S4.buttonGroup.value(group)` reads it. Setting
+`aria-pressed` yourself also moves the ink, but `set` keeps exactly one option pressed in a single group.
+
 **The ink** (connected groups while at most one option is pressed): one pill behind the options, placed by script over
 the pressed option whoever changed `aria-pressed` (a click, the keyboard, a page script). It is drawn twice, the front
 copy on Ink (`--s4-motion-ink`) and the back copy on calm Ink (`--s4-motion-ink-calm`), so the edge in the direction of
@@ -2143,7 +2148,8 @@ textarea. 48dp tall, tabular figures. There is one look: `data-variant` is ignor
 
 **Behaviour** (`text-field.js`): adds `placeholder=" "` to text controls; adds a chevron to selects and opens the picker
 when the field is clicked; grows textareas; links supporting text with `aria-describedby`; keeps `aria-invalid` and the
-error message in sync with `data-error`.
+error message in sync with `data-error`. A select's glass picker follows the select: change its options (add, remove,
+disable) or set `select.value` / `selectedIndex` from script and the button and the list redraw; no `change` event needed.
 
 **Do**
 - Title Case labels ("Due Date"), sentence-case helper and error text that says how to fix it.
