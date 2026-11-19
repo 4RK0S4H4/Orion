@@ -2422,6 +2422,12 @@ themes the app.
 | `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant: 'vibrant' })` (`data-variant` overrides); the group follows `S4.theme()` through the `s4-theme` event |
 | `--s4-swatch-color` | public knob; set from `data-seed` |
 
+**The other theme controls** live in the same script (`theme-controls`), on a connected single-select button group:
+`data-theme-mode` (values `system`, `light`, `dark`), `data-theme-contrast` (`0`, `0.5`, `1`) and
+`data-brand-dial="surfaces|gray|page|corners|display|text|energy"` (values as `S4.theme` takes them: `tinted` / `neutral`,
+`serif` / `inter`, `firm` / `soft` / `round`…). Each calls `S4.theme` when picked and follows `S4.theme()` when the theme
+changes elsewhere (restored, reset, Undo), so an app's own Appearance section needs no script (`templates/settings.html`).
+
 48dp circles: a primary half over secondary and tertiary quarters, derived from the seed with CSS relative color syntax
 (browsers without it show the plain seed). The selected swatch shrinks inside an on-surface ring with a gap (fast-spatial)
 and shows a check badge.
