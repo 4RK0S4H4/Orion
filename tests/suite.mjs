@@ -211,7 +211,7 @@ function dialAudit(opts) {
   const shown = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width >= 8 && r.height >= 8 && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0 && !el.closest('[hidden], [inert], [data-s4-skip], svg'); };
   /* (a) corners: everything you click that is meant to follow the dial must not be a pill when the dial is not round */
   if (opts.dial) {
-    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option';
+    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option, .s4-color-field-swatch, .s4-rating-star';
     const EXEMPT = '.s4-badge, .s4-avatar, .s4-chip-avatar, .s4-switch *, .s4-radio *, .s4-checkbox *, .s4-slider *, .s4-progress *, .s4-date-picker-day, .s4-status-dot, .s4-chip-remove, [data-shape="circle"]';
     const seen = new Set();
     for (const el of document.querySelectorAll(FOLLOW)) {
@@ -501,6 +501,168 @@ async function use(page, add, phone) {
       const st = await s.evaluate((x) => ({ open: x.parentElement.open, h: (x.parentElement.querySelector('.s4-accordion-body') || x).getBoundingClientRect().height }));
       if (!st.open || st.h < 4) add(`accordion "${label}" did not open`);
     }
+    /* rich inputs (issue 59): every interaction they add, with the cursor left where the person put it (decision 0049) */
+    const listFits = () => page.evaluate(() => { const p = [...document.querySelectorAll('.s4-combobox-menu')].find((x) => x.matches(':popover-open')); if (!p) return 'none'; const r = p.getBoundingClientRect(); return r.left < -1 || r.right > innerWidth + 1 || r.top < -1 || r.bottom > innerHeight + 1 ? 'off' : 'ok'; });
+    for (const f of (await visible('.s4-combobox:not([data-s4-async]):not(:has(> input:disabled))')).slice(0, 2)) {
+      const inp = f.locator(':scope > input[role="combobox"]');
+      if (!(await click(inp, 'combobox'))) continue;
+      await page.keyboard.press('ArrowDown'); await settle(420);
+      const st = await inp.evaluate((i) => { const l = document.getElementById(i.getAttribute('aria-controls') || ''), a = document.getElementById(i.getAttribute('aria-activedescendant') || ''); return { exp: i.getAttribute('aria-expanded'), n: l ? l.querySelectorAll('[role="option"]').length : 0, active: !!a && a.getAttribute('role') === 'option', kept: document.activeElement === i }; });
+      if (st.exp !== 'true' || !st.n) add('combobox: Down did not open its list of options');
+      else {
+        if (!st.active) add('combobox: Down did not make an option active (aria-activedescendant)');
+        if (!st.kept) add('combobox: the cursor left the field while moving through the options');
+        if ((await listFits()) === 'off') add('combobox list does not fit the screen');
+        (await page.evaluate(nestAudit)).forEach(add);
+      }
+      await page.keyboard.press('Escape'); await settle(380);
+      if ((await inp.getAttribute('aria-expanded')) !== 'false') add('combobox: Escape did not close its list');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-tag-input:not([data-s4-async]):not([data-full]):not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator('.s4-tag-input-row > input');
+      const count = () => f.evaluate((x) => x.querySelectorAll('.s4-chip:not([data-leaving])').length);
+      if (!(await click(inp, 'tag input'))) continue;
+      const n = await count(), create = await f.evaluate((x) => x.hasAttribute('data-create'));
+      if (create) { await page.keyboard.type('Zebra Crossing'); await page.keyboard.press('Enter'); }
+      else { await page.keyboard.press('ArrowDown'); await settle(300); await page.keyboard.press('Enter'); }
+      await settle(300);
+      if ((await count()) !== n + 1) add('tag input: Enter did not add a chip');
+      if (!(await inp.evaluate((i) => document.activeElement === i))) add('tag input: the cursor left the field after adding');
+      await page.keyboard.press('Backspace'); await settle(420);
+      if ((await count()) !== n) add('tag input: Backspace in the empty field did not remove the last chip');
+      await page.keyboard.press('Escape');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-number-field:not(:has(input:disabled))')).slice(0, 1)) {
+      const val = () => f.evaluate((x) => S4.numberField.value(x));
+      const plus = f.locator('.s4-number-field-step[data-dir="1"]'), minus = f.locator('.s4-number-field-step[data-dir="-1"]');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      const v0 = await val(), up = !(await plus.isDisabled());
+      if (!(await click(up ? plus : minus, 'number field stepper'))) continue;
+      const v1 = await val();
+      if (up ? !(v1 > v0) : !(v1 < v0)) add(`number field: ${up ? 'plus' : 'minus'} did not step the value (${v0} -> ${v1})`);
+      if (await f.evaluate((x) => x.contains(document.activeElement) && document.activeElement.tagName === 'INPUT')) add('number field: a stepper put the cursor in the field (decision 0049)');
+      if (!(await click(f.locator(':scope > input'), 'number field'))) continue;
+      await page.keyboard.press(up ? 'ArrowDown' : 'ArrowUp');
+      const v2 = await val();
+      if (v2 !== v0) add(`number field: the arrow key did not step back (${v1} -> ${v2}, expected ${v0})`);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-code-field:not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator(':scope > input');
+      if (!(await click(inp, 'one-time code'))) continue;
+      await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace');
+      await f.evaluate((x) => { x._suiteDone = ''; x.addEventListener('s4-complete', (e) => { x._suiteDone = e.detail.value; }, { once: true }); });
+      await page.keyboard.type('12');
+      const st = await f.evaluate((x) => ({ filled: x.querySelectorAll('.s4-code-field-slot[data-filled]').length, active: [...x.querySelectorAll('.s4-code-field-slot')].findIndex((s) => s.hasAttribute('data-active')) }));
+      if (st.filled !== 2 || st.active !== 2) add(`one-time code: typing did not fill the boxes in order (${st.filled} filled, box ${st.active} active)`);
+      const n = await f.evaluate((x) => x.querySelectorAll('.s4-code-field-slot').length);
+      await page.keyboard.insertText(' 3-4 5 6 7 8 9 0');
+      const st2 = await f.evaluate((x) => ({ v: x.querySelector(':scope > input').value, done: x._suiteDone }));
+      if (st2.v.length !== n || !/^\d+$/.test(st2.v)) add(`one-time code: a pasted code with spaces and dashes did not fill every box ("${st2.v}")`);
+      if (st2.done !== st2.v) add('one-time code: s4-complete did not fire when the last box filled');
+      await page.keyboard.press('Control+A'); await page.keyboard.press('Backspace');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-upload:not([data-variant]):not([data-disabled])')).slice(0, 1)) {
+      const zone = f.locator('.s4-upload-zone');
+      /* the zone is a real button that opens the file chooser (never drag-only) */
+      try {
+        if (!(await zone.evaluate((z) => z.tagName === 'BUTTON' && !z.disabled && z.tabIndex >= 0))) add('upload: the drop zone is not a real button in the Tab order');
+        await zone.scrollIntoViewIfNeeded({ timeout: 2000 });
+        const [chooser] = await Promise.all([page.waitForEvent('filechooser', { timeout: 6000 }), zone.click({ timeout: 3000 })]);
+        await chooser.setFiles({ name: 'suite-receipt.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 suite') });
+      } catch (e) { add('upload: the drop zone did not open the file chooser (' + String(e.message).split('\n')[0].slice(0, 80) + ')'); continue; }
+      await settle(400);
+      const st = await f.evaluate((x) => { const l = S4.upload.files(x); const last = l[l.length - 1]; return { name: last && last.file.name, id: last && last.id, rows: x.querySelectorAll('.s4-upload-item:not([data-leaving])').length }; });
+      if (st.name !== 'suite-receipt.pdf') { add('upload: a chosen file was not added'); continue; }
+      const row = f.locator(`.s4-upload-item[data-id="${st.id}"]`);
+      await f.evaluate((x, id) => S4.upload.progress(x, id, 0.5), st.id);
+      if ((await row.locator('.s4-upload-progress').getAttribute('data-value')) !== '0.5') add('upload: S4.upload.progress did not move the bar');
+      await f.evaluate((x, id) => S4.upload.fail(x, id, 'Couldn’t upload.'), st.id);
+      const retry = row.locator('.s4-upload-retry');
+      if (!(await retry.isVisible())) add('upload: a failed file shows no Try Again');
+      else {
+        await f.evaluate((x) => { x._suiteRetry = 0; x.addEventListener('s4-retry', () => { x._suiteRetry++; }, { once: true }); });
+        await retry.click();
+        if (!(await f.evaluate((x) => x._suiteRetry))) add('upload: Try Again did not fire s4-retry');
+      }
+      await row.locator('.s4-upload-remove').click(); await settle(450);
+      if (await f.evaluate((x, id) => S4.upload.files(x).some((e) => e.id === id), st.id)) add('upload: Remove did not remove the file');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-time-field:not([data-error]):not([data-range-start]):not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = f.locator(':scope > input:not([type="hidden"])');
+      if (!(await click(inp, 'time field'))) continue;
+      await settle(420);
+      const n = await inp.evaluate((i) => { const l = document.getElementById(i.getAttribute('aria-controls') || ''); return i.getAttribute('aria-expanded') === 'true' && l ? l.querySelectorAll('[role="option"]').length : 0; });
+      if (!n) add('time field: a tap did not open its list of times');
+      else if ((await listFits()) === 'off') add('time field list does not fit the screen');
+      await page.keyboard.press('Escape'); await settle(300);
+      await page.keyboard.press('Control+A'); await page.keyboard.type('545p');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur()); await settle(200);
+      const v = await f.evaluate((x) => S4.timeField.value(x));
+      if (v !== 17 * 60 + 45) add(`time field: "545p" was not read as 5:45 PM (got ${v})`);
+    }
+    for (const r of (await visible('.s4-rating:not([data-input])')).slice(0, 1)) {
+      const st = await r.evaluate((x) => ({ label: x.getAttribute('aria-label') || '', num: (x.querySelector('.s4-rating-value') || {}).textContent || '' }));
+      if (!/out of/.test(st.label) || !st.num.trim()) add('rating: a display has no number beside it or no spoken value');
+    }
+    for (const r of (await visible('.s4-rating[data-input]:not(:has(input:disabled))')).slice(0, 1)) {
+      const stars = r.locator('.s4-rating-star');
+      if (!(await click(stars.nth(2), 'rating star'))) continue;
+      const v = await r.evaluate((x) => { const c = x.querySelector('input:checked'); return c ? +c.value : 0; });
+      if (v !== 3) add(`rating: tapping the third star chose ${v}`);
+      await page.keyboard.press('ArrowRight');
+      const v2 = await r.evaluate((x) => ({ v: (x.querySelector('input:checked') || {}).value, on: x.querySelectorAll('.s4-rating-star[data-on]').length }));
+      if (v2.v !== '4' || v2.on !== 4) add(`rating: the arrow key did not move to four stars (${v2.v}, ${v2.on} lit)`);
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-color-field:not([data-theme-seed]):not(:has(input:disabled))')).slice(0, 1)) {
+      const sw = f.locator('.s4-color-field-swatch');
+      if (!(await click(sw, 'color swatch'))) continue;
+      await settle(420);
+      const st = await sw.evaluate((b) => { const p = document.getElementById(b.getAttribute('aria-controls')); const a = document.activeElement; const r = p.getBoundingClientRect(); return { open: p.matches(':popover-open'), exp: b.getAttribute('aria-expanded'), inside: p.contains(a) && a.classList.contains('s4-swatch'), fits: r.left >= -1 && r.right <= innerWidth + 1 && r.top >= -1 && r.bottom <= innerHeight + 1 }; });
+      if (!st.open || st.exp !== 'true') { add('color field: the swatch did not open its panel'); continue; }
+      if (!st.inside) add('color field: focus did not go to the chosen accent');
+      if (!st.fits) add('color field panel does not fit the screen');
+      const before = await f.evaluate((x) => S4.colorField.value(x));
+      await page.keyboard.press('ArrowRight'); await page.keyboard.press('Enter'); await settle(200);
+      if ((await f.evaluate((x) => S4.colorField.value(x))) === before) add('color field: choosing another accent with the keyboard did not change the value');
+      await page.keyboard.press('Escape'); await settle(380);
+      const back = await sw.evaluate((b) => ({ shut: !document.getElementById(b.getAttribute('aria-controls')).matches(':popover-open'), focus: document.activeElement === b }));
+      if (!back.shut) add('color field: Escape did not close the panel'); else if (!back.focus) add('color field: focus did not return to the swatch');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+    }
+    for (const f of (await visible('.s4-password:not(:has(input:disabled))')).slice(0, 1)) {
+      const t = f.locator('.s4-password-toggle'), inp = f.locator(':scope > input');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      if (!(await click(t, 'show password'))) continue;
+      const st = await f.evaluate((x) => ({ type: x.querySelector(':scope > input').type, pressed: x.querySelector('.s4-password-toggle').getAttribute('aria-pressed'), field: document.activeElement === x.querySelector(':scope > input') }));
+      if (st.type !== 'text' || st.pressed !== 'true') add('password: Show Password did not show the text and set aria-pressed');
+      if (st.field) add('password: Show Password put the cursor in the field (decision 0049)');
+      await t.click();
+      if ((await inp.getAttribute('type')) !== 'password' || (await t.getAttribute('aria-pressed')) !== 'false') add('password: a second press did not hide it again');
+    }
+    for (const f of (await visible('.s4-password[data-strength]')).slice(0, 1)) {
+      const w = await f.evaluate((x) => { const m = x.querySelector('.s4-password-strength'); return m && !m.hidden ? m.textContent : 'none'; });
+      if (!/Strength: /.test(w) && w !== '') add('password: the strength meter has no words');
+    }
+    for (const el of (await visible('.s4-inline-edit:not(:has(input:disabled))')).slice(0, 1)) {
+      const inp = el.locator(':scope > input');
+      const before = await inp.inputValue();
+      await el.evaluate((x) => { x._suiteChange = null; x.addEventListener('s4-change', (e) => { x._suiteChange = e.detail; }, { once: true }); });
+      if (!(await click(inp, 'inline edit'))) continue;
+      await page.keyboard.press('End'); await page.keyboard.type(' X'); await page.keyboard.press('Escape'); await settle(200);
+      if ((await inp.inputValue()) !== before) add('inline edit: Escape did not put the saved value back');
+      await inp.click(); await page.keyboard.press('End'); await page.keyboard.type(' X'); await page.keyboard.press('Enter'); await settle(300);
+      const ch = await el.evaluate((x) => x._suiteChange);
+      if (!ch || ch.previous !== before) add('inline edit: Enter did not save (no s4-change with the previous value)');
+      const undo = page.locator('.s4-snackbar button', { hasText: 'Undo' }).first();
+      if (await undo.isVisible().catch(() => false)) { await undo.click(); await settle(300); if ((await inp.inputValue()) !== before) add('inline edit: Undo did not put the previous value back'); }
+      else add('inline edit: saving offered no Undo');
+    }
     /* date fields and selects open their glass popup */
     for (const d of (await visible('.s4-date-picker-field')).slice(0, 2)) {
       if (!(await click(d, 'date field'))) continue;
@@ -595,7 +757,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker combobox tag-input number-field code-field upload time-field rating color-field password'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */

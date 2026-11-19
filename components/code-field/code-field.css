@@ -1,0 +1,70 @@
+/* One-time code: a row of boxes (each a small Quiet Box: field fill, --s4-shape-text-field corners) over one real input.
+   The label and supporting text are the text field's; the field's own box is not drawn, the boxes are. Focus marks go on
+   the box that takes the next character, behind the same selectors as the text field's (a quiet hairline after a tap,
+   the ring from the keyboard, never both). An error keeps the boxes' fill: the label and the message turn error-colored.
+   <div class="s4-text-field s4-code-field" data-length="6"><label for="otp">Code</label><input id="otp"></div> */
+@layer s4.components {
+  .s4-text-field.s4-code-field {
+    --_slot: calc(var(--_h) + var(--s4-space-2));
+    grid-template-columns: repeat(var(--_n, 6), minmax(0, var(--_slot)));
+    column-gap: var(--s4-space-2);
+    justify-content: start;
+  }
+  .s4-text-field.s4-code-field[data-many] { column-gap: var(--s4-space-1); }   /* seven or eight boxes still fit a phone */
+  .s4-text-field.s4-code-field::before { display: none; }
+  .s4-text-field.s4-code-field > :is(label, .s4-text-field-supporting, .s4-text-field-counter) { grid-column: 1 / -1; }
+  .s4-text-field.s4-code-field > input {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    z-index: 1;
+    inline-size: 100%;
+    block-size: var(--_h);
+    padding: 0;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    caret-color: transparent;
+    letter-spacing: 0;
+    cursor: text;
+  }
+  .s4-text-field.s4-code-field > input::selection { background: transparent; }
+  .s4-text-field.s4-code-field > input::placeholder { color: transparent; }
+  .s4-code-field-slot {
+    grid-row: 2;
+    display: grid;
+    place-items: center;
+    min-inline-size: 0;
+    block-size: var(--_h);
+    border-radius: var(--s4-shape-text-field);
+    background: var(--_bg);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-large-font);
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    font-weight: var(--md-sys-typescale-title-large-weight);
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--s4-motion-state), box-shadow var(--s4-motion-state);
+  }
+  /* the box that takes the next character: the field's focus marks */
+  .s4-code-field:has(> input:focus) > .s4-code-field-slot[data-active] { background: var(--md-sys-color-surface-container-high); }
+  :where([data-s4-focus="pointer"]) .s4-code-field:has(> input:focus) > .s4-code-field-slot[data-active] { box-shadow: inset 0 0 0 1.5px var(--_quiet); }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-code-field:has(> input:focus-visible) > .s4-code-field-slot[data-active] {
+    outline: var(--s4-focus-ring-width) solid var(--_ring-color);
+    outline-offset: var(--s4-focus-ring-offset);
+  }
+  /* success: the message in the success color with a check (the boxes keep their fill) */
+  .s4-code-field[data-success] { --_supporting: var(--s4-color-success); --_label: var(--md-sys-color-on-surface); }
+  .s4-code-field[data-success] > .s4-text-field-supporting { display: flex; align-items: center; gap: var(--s4-space-1); }
+  .s4-code-field[data-success] > .s4-text-field-supporting::before {
+    content: "";
+    flex: none;
+    inline-size: var(--s4-space-3);
+    block-size: var(--s4-space-3);
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill-rule='evenodd' d='M6 0a6 6 0 1 0 0 12A6 6 0 0 0 6 0Zm2.9 4.3L5.4 8.4 3.1 6.2l1-1 1.2 1.1 2.5-3 1.1 1Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .s4-code-field:has(> input:disabled) > .s4-code-field-slot { color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
+  @media (forced-colors: active) {
+    .s4-code-field-slot { border: 1px solid CanvasText; }
+    .s4-code-field:has(> input:focus) > .s4-code-field-slot[data-active] { border-color: Highlight; outline-color: Highlight; }
+  }
+}

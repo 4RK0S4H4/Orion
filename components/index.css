@@ -50,6 +50,13 @@
 @import url("site/site.css");
 /* inputs */
 @import url("text-field/text-field.css");
+@import url("combobox/combobox.css");
+@import url("tag-input/tag-input.css");
+@import url("number-field/number-field.css");
+@import url("code-field/code-field.css");
+@import url("upload/upload.css");
+@import url("time-field/time-field.css");
+@import url("rating/rating.css");
 @import url("form/form.css");
 @import url("date-picker/date-picker.css");
 @import url("switch/switch.css");
@@ -58,6 +65,9 @@
 @import url("chip/chip.css");
 @import url("slider/slider.css");
 @import url("swatches/swatches.css");
+@import url("color-field/color-field.css");
+@import url("password/password.css");
+@import url("inline-edit/inline-edit.css");
 /* feedback */
 @import url("badge/badge.css");
 @import url("status/status.css");

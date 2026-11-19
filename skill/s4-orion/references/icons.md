@@ -94,3 +94,5 @@ Arrows and chevrons are Linear, everything else Bold Duotone. Other sets: solar,
 | `route` | route |
 | `timer` | stopwatch |
 | `water` | waterdrop |
+| `minus` | minus |
+| `plus` | add |

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One-Time Code · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); gap: var(--s4-space-8) var(--s4-space-6); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / One-Time Code</h1></header>
+<main class="ex-main">
+  <p>Four to eight boxes that act as one field. Underneath is a single real input, so a phone offers the code from the message it just received and a paste fills every box at once. It never takes focus by itself: the person taps it.</p>
+
+  <section class="ex-sec">
+    <h2>Codes</h2>
+    <p><code>data-length</code> sets the number of boxes; <code>data-group</code> leaves a wider gap after every few. The app checks the code on <code>s4-complete</code>. Here 123456 is right; any other code shows the error.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-code-field" data-length="6" data-group="3" id="otp-field">
+          <label for="otp">Verification Code</label>
+          <input id="otp">
+          <div class="s4-text-field-supporting">We sent it to •••• 4021. It expires in 10 minutes.</div>
+        </div>
+        <div class="s4-text-field s4-code-field" data-length="4">
+          <label for="pin">Card PIN</label>
+          <input id="pin" autocomplete="off">
+          <div class="s4-text-field-supporting">Four digits.</div>
+        </div>
+        <div class="s4-text-field s4-code-field" data-length="8" data-group="4" data-type="alphanumeric">
+          <label for="backup">Backup Code</label>
+          <input id="backup" autocomplete="off">
+          <div class="s4-text-field-supporting">Letters and digits, from the list you saved.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Error, Success and Disabled</h2>
+    <p>An error keeps the boxes’ fill; the label and the message turn the error color. Typing again clears it.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-code-field" data-length="6" data-group="3" data-error="That code didn’t work. Check it and try again.">
+          <label for="otp-bad">Verification Code</label>
+          <input id="otp-bad" value="482913">
+          <div class="s4-text-field-supporting">We sent it to •••• 4021.</div>
+        </div>
+        <div class="s4-text-field s4-code-field" data-length="6" data-group="3" data-success>
+          <label for="otp-ok">Verification Code</label>
+          <input id="otp-ok" value="123456">
+          <div class="s4-text-field-supporting">Verified.</div>
+        </div>
+        <div class="s4-text-field s4-code-field" data-length="6" data-group="3">
+          <label for="otp-off">Verification Code</label>
+          <input id="otp-off" value="20" disabled>
+          <div class="s4-text-field-supporting">Too many tries. Wait a minute before trying again.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In a Form, Compact</h2>
+    <p><code>data-autosubmit</code> sends the form when the last box fills. In compact density the boxes are pointer-sized.</p>
+    <div class="ex-board">
+      <form class="s4-form s4-stack" id="cf-form" style="inline-size: 100%" data-density="compact">
+        <div class="s4-text-field s4-code-field" data-length="6" data-autosubmit>
+          <label for="otp-form">Sign-In Code</label>
+          <input id="otp-form" required data-msg-required="Enter the code from the email.">
+          <div class="s4-text-field-supporting">Check your email.</div>
+        </div>
+        <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" data-variant="filled" type="submit">Verify</button></div>
+      </form>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/code-field/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../code-field/code-field.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  document.getElementById('otp-field').addEventListener('s4-complete', function (e) {
+    var f = e.currentTarget;
+    setTimeout(function () {
+      if (e.detail.value === '123456') { f.setAttribute('data-success', ''); f.querySelector('.s4-text-field-supporting').textContent = 'Verified.'; }
+      else f.setAttribute('data-error', 'That code didn’t work. Check it and try again.');
+    }, 400);
+  });
+  document.getElementById('cf-form').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.form.saved(e.target, 'Signed in'); });
+</script>
+</body>
+</html>

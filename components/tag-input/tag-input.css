@@ -1,0 +1,73 @@
+/* Tag input / multi-select: input chips inside the Quiet Box, the cursor after them. The box grows a line at a time and
+   keeps its corner (--s4-shape-text-field); the chips are tonal so they stand off the field's fill in both color modes
+   and on glass. tag-input.js moves the input into .s4-tag-input-row, so the field's focus marks are repeated here
+   behind the same selectors the text field uses (a quiet hairline after a tap, the ring from the keyboard; never both). */
+@layer s4.components {
+  .s4-tag-input-row {
+    grid-row: 2;
+    grid-column: 2 / 7;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-inline-size: 0;
+    min-block-size: var(--_h);
+    padding-block: var(--s4-space-2);
+    margin-inline-start: calc(var(--s4-space-1) * -1);   /* chips sit 8 from the box's edge, as the field's text sits 12 */
+  }
+  .s4-tag-input-chips { display: contents; }
+  .s4-tag-input .s4-chip[data-type="input"] {
+    --_bg: var(--md-sys-color-secondary-container);
+    --_fg: var(--md-sys-color-on-secondary-container);
+    max-inline-size: 100%;
+    cursor: default;
+  }
+  .s4-tag-input .s4-chip[data-type="input"] > .s4-chip-remove { color: inherit; }
+  .s4-tag-input-label { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+  .s4-tag-input-row > input {
+    flex: 1 1 5ch;
+    min-inline-size: 5ch;
+    block-size: var(--s4-size-chip);
+    margin: 0;
+    padding-inline: var(--s4-space-1) 0;
+    border: 0;
+    outline: none;   /* the box carries the focus mark */
+    background: transparent;
+    color: inherit;
+    caret-color: var(--_caret);
+    font-family: var(--md-sys-typescale-body-large-font);
+    font-size: var(--md-sys-typescale-body-large-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    letter-spacing: var(--md-sys-typescale-body-large-tracking);
+    font-weight: var(--md-sys-typescale-body-large-weight);
+  }
+  .s4-tag-input-row > input:disabled { flex: 0 0 0; min-inline-size: 0; inline-size: 0; padding: 0; }
+  .s4-tag-input-row > input::placeholder { color: var(--md-sys-color-on-surface-variant); opacity: 0.85; }
+  .s4-tag-input[data-filled] .s4-tag-input-row > input::placeholder { opacity: 0; }
+
+  /* focus: the text field's own marks, for an input that is one level deeper */
+  .s4-tag-input:has(> .s4-tag-input-row > input:focus) {
+    --_bg: var(--md-sys-color-surface-container-high);
+    --_label: var(--md-sys-color-on-surface);
+  }
+  :where([data-s4-focus="pointer"]) .s4-tag-input:has(> .s4-tag-input-row > input:focus) {
+    --_outline: var(--_quiet);
+    --_outline-width: 1.5px;
+  }
+  :where(:root:not([data-s4-focus="pointer"])) .s4-tag-input:has(> .s4-tag-input-row > input:focus-visible)::before {
+    outline: var(--s4-focus-ring-width) solid var(--_ring-color);
+    outline-offset: var(--s4-focus-ring-offset);
+  }
+  /* the counter turns to the error color for a moment when the maximum stops an addition */
+  .s4-tag-input[data-max-hit] > .s4-text-field-counter { color: var(--md-sys-color-error); transition: color var(--s4-motion-state); }
+  .s4-tag-input:has(> .s4-tag-input-row > input:disabled) .s4-chip { opacity: var(--md-sys-state-disabled-content-opacity); }
+  .s4-tag-input:has(> .s4-tag-input-row > input:disabled) {
+    --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-container-opacity) * 100% / 3), transparent);
+    --_label: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
+    --_supporting: var(--_label);
+    cursor: default;
+  }
+  @media (forced-colors: active) {
+    .s4-tag-input .s4-chip[data-type="input"] { border: 1px solid CanvasText; }
+  }
+}

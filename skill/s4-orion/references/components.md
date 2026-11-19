@@ -10,7 +10,7 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 - **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
 - **Content:** [prose](#prose), [message](#message)
 - **Websites:** [site](#site)
-- **Inputs:** [form](#form), [text-field](#text-field), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches)
+- **Inputs:** [form](#form), [text-field](#text-field), [combobox](#combobox), [tag-input](#tag-input), [number-field](#number-field), [code-field](#code-field), [upload](#upload), [time-field](#time-field), [rating](#rating), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches), [color-field](#color-field), [password](#password), [inline-edit](#inline-edit)
 - **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [reward](#reward), [snackbar](#snackbar), [tooltip](#tooltip)
 - **Overlays:** [menu](#menu), [dialog](#dialog), [sheet](#sheet), [palette](#palette)
 
@@ -2164,6 +2164,395 @@ forced-colors mode draws real borders.
 
 ---
 
+<a id="combobox"></a>
+
+## Combobox
+
+A text field that suggests as you type (WAI-ARIA combobox with a listbox popup). The list opens in glass right under
+the field, or above it when there is no room (over a phone's keyboard it measures the visible part of the screen). The
+part of each option that matches is bold. The cursor never leaves the field: the active option is
+`aria-activedescendant`. One value.
+
+```html
+<div class="s4-text-field s4-combobox">
+  <label for="country">Country</label>
+  <input id="country">
+  <input type="hidden" name="country">                       <!-- optional: gets the chosen option's value -->
+  <template>
+    <optgroup label="Europe">
+      <option value="pt" data-supporting="Lisbon">Portugal</option>
+      <option value="es" data-supporting="Madrid">Spain</option>
+    </optgroup>
+  </template>
+  <div class="s4-text-field-supporting">Where the account is registered.</div>
+</div>
+```
+
+| Attribute / API | What |
+|---|---|
+| `<template>` of `<option>` / `<optgroup>` | The options. `value`, `disabled`, `data-supporting` (a second line), `data-icon` (a leading icon). |
+| `data-free` | The options are suggestions; any text is the value. Without it only an option may be chosen: other text is invalid ("Choose one of the options in the list.", or `data-msg-option`), shown when you leave the field. |
+| `<input type="hidden">` after the text input | Receives the chosen option's `value` (with `data-free`, the text). |
+| `S4.combobox.source(field, fn)` | Asynchronous options: `fn(query, signal)` returns a Promise of `[{ value, label, group, supporting, icon }]` (or strings). Shows Searching…, the results, “No matches” or an error with Try Again. |
+| `data-min-chars` | Characters before an asynchronous search starts (default 1). |
+| `data-loading-text`, `data-empty-text` (`{q}` is the query), `data-error-text` | The notes in the list. |
+| `S4.combobox.set(field, value)` | Choose a value from script (no events). |
+| Events | `input` and `change` on the input, `s4-change { value, label, item }` on the field, `s4-open` / `s4-close`. |
+
+The trailing button is **Show Options** (a chevron) while the field is empty and **Clear** once it has text: one button,
+so focus never falls off the page when it changes. A tap on the field opens a fixed list; an asynchronous one opens
+when you type.
+
+**Keyboard:** Down and Up open the list and move through it (wrapping), Alt+Down opens it without moving, Enter
+chooses, Escape closes the list (a second Escape clears the field), Tab leaves. With an error showing, Down tries again.
+
+**When to use:** more than about seven options, or options from a server (people, places, products), or a value that may
+be new (`data-free`). **Not:** up to about seven fixed options (a select, which opens the same glass list, or radios);
+several values (the [tag input](#tag-input)); a command (the [palette](#palette)); filtering a page (the [search](#search) bar).
+
+**Do** name the options as people know them and add a supporting line when two could be confused. Put the list's
+`<template>` in the order you want it shown; matches that start with the text come first. **Don't** put actions in the
+list, open it on page load or move the cursor into the field from script (decision 0049). Don't add a trailing icon to
+the field: that place belongs to the Show Options / Clear button.
+
+**Placement:** an anchored list (Follow), never a dialog. Inside a dialog the list stays inside the dialog's top layer.
+
+**Accessibility:** `role="combobox"`, `aria-autocomplete="list"`, `aria-expanded`, `aria-controls`,
+`aria-activedescendant` on the input; the list is a `listbox` labelled by the field's label, groups are `group`s named by
+their heading, each option has `aria-selected`. The number of results, Searching… and errors are announced politely.
+Inside `.s4-form` it is validated like any field (on blur, `aria-invalid`, the message in the supporting text).
+
+**Tokens:** `--s4-shape-menu`, `--s4-shape-menu-item` (follows the corner dial), `--s4-focus-ring-*`, glass tokens,
+`--md-sys-color-secondary-container`. **Motion:** Follow for the list, Bend for the chevron.
+
+---
+
+<a id="tag-input"></a>
+
+## Tag Input
+
+Several values in one field (a multi-select). Each chosen value is an input chip inside the Quiet Box and the cursor
+sits after them. The box grows a line at a time and keeps its corners; the label and supporting text never move.
+Suggestions open in the same glass list as the [combobox](#combobox).
+
+```html
+<div class="s4-text-field s4-tag-input" data-name="labels" data-values="Taxes, Household" data-max="5" data-create>
+  <label for="labels">Labels</label>
+  <input id="labels">
+  <template><option>Taxes</option><option>Household</option><option>Urgent</option></template>
+  <div class="s4-text-field-supporting">Up to five.</div>
+</div>
+```
+
+| Attribute / API | What |
+|---|---|
+| `<template>` of `<option>` | Suggestions (`value`, `data-supporting`). Already chosen ones are left out of the list. |
+| `data-create` | People may add their own values: Enter or a comma adds what was typed, and “Add “…”” is offered first in the list. Without it (and with suggestions) only suggestions can be added. A field with no suggestions always creates. |
+| `data-values` | The starting values, comma-separated. |
+| `data-name` | Each value is a hidden input with this name inside its chip (FormData gives an array). |
+| `data-max` | A counter (“2 / 5”) under the field; past it nothing is added and the reason is announced. |
+| `data-noun` | What the values are, for announcements (“Removed Taxes.”, “You can add up to 5 labels.”). |
+| `required` on the input | At least one value; the message (`data-msg-required`) shows on blur, inside `.s4-form` or not. |
+| `S4.tagInput.source(field, fn)` | Asynchronous suggestions: `fn(query)` returns a Promise of `[{ value, label, supporting }]`. |
+| `S4.tagInput.values(field)`, `S4.tagInput.set(field, list)` | Read or replace the values from script. |
+| Events | `s4-change { values }` on the field, a cancelable `s4-remove { chip, value }` on a chip before it goes, `change` on the input. |
+
+**Typing:** a comma, a semicolon or Enter adds; pasting “Rent, Car; Gifts” (commas, semicolons, tabs or new lines) adds
+each; duplicates are ignored (case and accents too). **Removing:** each chip's remove button (also Delete or Backspace on
+it), or Backspace in the empty field for the last chip. A removed chip closes up sideways (Reveal); focus moves to the
+next chip's remove button.
+
+**When to use:** labels, recipients, skills, filters someone types: several values from a long or open set. **Not:** a
+few fixed options (filter chips or checkboxes, where every option is visible); one value (the combobox).
+
+**Do** keep values short (a chip never truncates a word it can show; very long ones end in an ellipsis). Say the limit in
+the supporting text. **Don't** add a leading or trailing icon to the field (the chips and the cursor fill the box), or
+use it for free text with commas in it.
+
+**Accessibility:** the chips are a list (“Chosen labels”) before the input; each remove button is named “Remove Taxes”
+and is in the Tab order. Additions, removals, duplicates and the limit are announced politely. The input is a
+`combobox` with a multi-select `listbox` when there are suggestions. The cursor is never put in the field by script
+(decision 0049).
+
+**Focus:** the field's own marks: a quiet hairline inside the box after a tap, the focus ring outside it from the
+keyboard (repeated in `tag-input.css` for the input that sits one level deeper).
+
+**Tokens:** `--s4-shape-text-field` (the box), `--s4-shape-chip`, `--md-sys-color-secondary-container` (the chips, so they
+stand off the field in both color modes and on glass), `--s4-size-chip`. **Motion:** Reveal (a chip leaving), Follow
+(the list).
+
+---
+
+<a id="number-field"></a>
+
+## Number Field
+
+A number with minus and plus in one Quiet Box (WAI-ARIA spinbutton). Same height, label and supporting text as every
+field; the value sits in the middle in tabular figures, next to its unit. Tap to step, hold to keep stepping (faster
+after a moment), or type.
+
+```html
+<div class="s4-text-field s4-number-field">
+  <label for="guests">Guests</label>
+  <input id="guests" value="2" data-min="1" data-max="12">
+  <span class="s4-text-field-affix" data-suffix>people</span>
+  <div class="s4-text-field-supporting">Up to twelve.</div>
+</div>
+
+<!-- in a list or cart row -->
+<span class="s4-text-field s4-number-field" data-inline><input aria-label="Quantity of Oat Milk" value="2" data-min="0" data-max="20"></span>
+```
+
+| Attribute (on the input) | What |
+|---|---|
+| `data-min`, `data-max` (or `min`, `max`) | The limits. The steppers stop at them (and are disabled there); typing past them is an error on blur. |
+| `data-step` (default 1) | How far a stepper or an arrow key moves; typed values snap to it on blur. Its decimals set how the value is shown. |
+| `data-page-step` | Page Up / Page Down (default ten steps). |
+| `data-decimals` | Always show this many decimals (money: 2). |
+| `data-no-grouping` | No thousands separator (years, codes). |
+| `data-msg-min`, `data-msg-max`, `data-msg-number` | Messages; the defaults say the range (“Enter 1 to 8.”). |
+| `data-inline` (on the field) | The small quantity stepper (40 high, buttons 32, no label above: give the input an `aria-label`). |
+| Affixes | `.s4-text-field-affix[data-prefix]` / `[data-suffix]` for the unit ($, kg, people). |
+| Script | `S4.numberField.value(field)` (a number or null), `S4.numberField.set(field, n)`; `s4-change { value }` on the field, `input` and `change` on the input. |
+
+The input is `type="text"` with `role="spinbutton"` (a browser's number input has its own spinners, eats scroll and
+cannot show “1,240”); the script sets `inputmode` (numeric, decimal, or the full keyboard when negatives are allowed,
+since a phone's number pad has no minus sign), `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and `aria-valuetext`
+(“$4.50”, “2 people”). Values are read and written in the page's language (`lang`): “1.234,5” in Portuguese.
+
+**Keyboard:** Up and Down step, Page Up and Page Down by the page step, Home and End go to the minimum and maximum, Enter
+tidies what was typed. The minus and plus buttons are out of the Tab order (the field takes the keys) and never move
+the cursor into the field, so tapping them on a phone does not raise the keyboard.
+
+**When to use:** small counts and amounts people nudge (guests, quantity, retries, a tip). **Not:** long numbers people
+type but never nudge (an amount of money in a form, a card number: a plain text field with `inputmode`); a value on a
+continuous scale (a slider); a rating (the [rating](#rating)).
+
+**Do** put the unit beside the value, not in the label; keep limits real and say them in the supporting text. **Don't**
+use the inline stepper outside a row that names what it counts.
+
+**Accessibility:** spinbutton semantics on the input; the buttons are named “Increase Guests” / “Decrease Guests”; when
+a button changes the value without the field focused, the new value is announced politely. Errors follow `.s4-form`
+(on blur, `aria-invalid`, the message in the supporting text).
+
+**Tokens:** the text field's, `--s4-size-icon-button`, `--s4-size-button-small` (inline buttons).
+**Motion:** State only (the buttons' press layer).
+
+---
+
+<a id="code-field"></a>
+
+## One-Time Code
+
+Four to eight boxes that act as one field, for a verification code, a PIN or a backup code. Underneath is a single real
+input, so a phone offers the code from the message it just received (`autocomplete="one-time-code"`), a paste fills
+every box at once, and a screen reader hears one field with one label. The boxes only draw its characters.
+
+```html
+<div class="s4-text-field s4-code-field" data-length="6" data-group="3">
+  <label for="otp">Verification Code</label>
+  <input id="otp">
+  <div class="s4-text-field-supporting">We sent it to •••• 4021.</div>
+</div>
+```
+
+| Attribute / API | What |
+|---|---|
+| `data-length` | Number of boxes, 4 to 8 (default 6). |
+| `data-group` | A wider gap after every so many boxes (3 for six, 4 for eight). |
+| `data-type="alphanumeric"` | Letters and digits (upper-cased); otherwise digits only. |
+| `data-autosubmit` | Submit the form when the last box fills. |
+| `data-error="…"` / `data-success` on the field | The result of the app's check: the label and message turn the error color (boxes keep their fill), or the message turns the success color with a check. Typing again clears either. |
+| Events | `s4-complete { value }` on the field when the last box fills; `input` on the input. |
+| Script | `S4.codeField.clear(field)`. |
+
+The script sets `inputmode` (numeric, or text for letters), `autocomplete="one-time-code"` (keep `autocomplete="off"` for a
+PIN), `pattern` and a message for an unfinished code (“Enter all 6 digits.”). Spaces and dashes in a paste are dropped;
+anything past the last box is ignored. The caret always sits after the last character.
+
+**Focus:** the box that takes the next character carries the field's marks: a quiet hairline after a tap, the focus
+ring from the keyboard. **It never takes focus by itself** (decision 0049), not even on a page that is only this field:
+the person taps it, or the phone's suggestion fills it.
+
+**When to use:** a short code sent to the person, a PIN. **Not:** passwords (a text field with the password helpers);
+long codes people copy (a plain text field); anything people would want to see while typing in the middle.
+
+**Do** say where the code was sent and how long it lasts; offer “Send a New Code” beside it, not a timer that moves.
+**Don't** clear the boxes after a wrong code (people fix one digit), or check while they are still typing.
+
+**Accessibility:** one input with the field's label and supporting text (`aria-describedby`); the boxes are
+`aria-hidden`. Errors follow the text field and `.s4-form` (on blur, `aria-invalid`).
+
+**Tokens:** `--s4-shape-text-field` (each box), the field's fill and focus tokens, title-large type, `--s4-color-success`.
+**Motion:** State.
+
+---
+
+<a id="upload"></a>
+
+## File Upload
+
+A drop zone that is also a real button, then one row per file. It works with a tap, a click, the keyboard or a drag;
+dragging is an extra, never the only way. **Orion never uploads anything itself:** it checks each file (type, size,
+count), shows it and fires events; the app sends it and reports back with a small API.
+
+```html
+<div class="s4-upload" data-max-size="10 MB" data-max-files="5">
+  <span class="s4-upload-label">Receipts</span>
+  <input type="file" name="receipts" accept=".pdf,image/*" multiple>
+  <div class="s4-text-field-supporting">They are attached to this expense report.</div>
+</div>
+<script>
+  field.addEventListener('s4-upload', (e) => {               // start sending e.detail.file
+    send(e.detail.file, (p) => S4.upload.progress(field, e.detail.id, p))
+      .then(() => S4.upload.done(field, e.detail.id), () => S4.upload.fail(field, e.detail.id, 'Couldn’t upload. Try again.'));
+  });
+  field.addEventListener('s4-retry', (e) => { /* send e.detail.file again */ });
+</script>
+```
+
+| Attribute | What |
+|---|---|
+| `accept`, `multiple`, `required`, `disabled`, `name` on the input | As usual. The chosen files are put back into the input, so a plain form post and `required` work. |
+| `data-max-size` (“10 MB”) | Bigger files are refused with the reason (“Too large: 14.2 MB. The limit is 10 MB.”). |
+| `data-max-files` | More files are refused. |
+| `data-msg-type`, `data-msg-size` | Your own wording for a refusal. |
+| `data-variant="compact"` | One file in a row the size of a field (for forms), with Remove once chosen. |
+| `data-variant="avatar"` | A round photo with a camera badge; `data-initials`, `data-photo` (current photo URL); a `[data-upload-remove]` button inside removes it. Put the label and supporting text in a `.s4-upload-avatar-text` beside it. |
+| `data-error="…"` on the field | An error (the zone keeps its fill; the label and message turn the error color). |
+
+The hint under the zone's title is written from `accept`, `data-max-size` and `data-max-files` (“PDF or images, up to
+10 MB each, 5 at most”). On a touch screen the zone just says “Choose Files”.
+
+**Events** (on the field): `s4-upload { id, file }` per accepted file; `s4-change { files }`; `s4-retry { id, file }`;
+a cancelable `s4-remove { id, file }`; `s4-reject { file, reason }`.
+**API:** `S4.upload.progress(field, id, 0..1)` (or `null` for “Uploading…”), `S4.upload.done(field, id, text?)`,
+`S4.upload.fail(field, id, message)`, `S4.upload.files(field)`, `S4.upload.add(field, files)`, `S4.upload.clear(field)`.
+
+**Rows:** a thumbnail (the picture itself for images, a file icon otherwise), the name (it wraps, never cut), its size
+and state, a progress bar while sending, Try Again after a failure, Remove. Refused files stay as a row with the reason
+until removed, so people see what happened. Rows open and close in place (Reveal).
+
+**When to use:** attachments, documents for a form, a profile photo. **Not:** pasting text, picking from files the app
+already has (a list or a gallery), or a big media library (a page of its own).
+
+**Do** say the types and the limit before people choose; let the form go on while files send. **Don't** make the zone
+the only way in on a phone (it isn't: it is a button), hide refused files, or upload before the person chose.
+
+**Accessibility:** the zone is a `<button>` described by the label and the supporting text; the file input is hidden
+(the button opens it). Additions, refusals, finished uploads and failures are announced politely; each row's buttons
+are named with the file (“Remove march.pdf”, “Try Again: taxi.pdf”); the progress bar is a `progressbar`.
+
+**Tokens:** `--md-sys-shape-corner-extra-large` (the zone, rounder with the corner dial), `--md-sys-shape-corner-large`
+and `-small` (rows and thumbnails, concentric), `--md-sys-color-secondary-container`, `--s4-color-success`,
+`--md-sys-color-error`. **Motion:** State (the zone), Reveal (rows), the progress bar's Ink.
+
+---
+
+<a id="time-field"></a>
+
+## Time Field
+
+Type a time any way you like (“9”, “930”, “9:30 pm”, “21.30”) or pick one from a short list in the glass menu. Times
+are shown in the page's language (“9:30 AM” or “09:30”) and stored as `HH:MM`. Pairs with the
+[date picker](#date-picker) for a date and time, and with itself for a range. **No clock dial:** typing and a short
+list are quicker with a finger, a mouse or a keyboard.
+
+```html
+<div class="s4-text-field s4-time-field" data-step="30" data-min="08:00" data-max="18:00">
+  <label for="slot">Delivery Slot</label>
+  <input id="slot" value="09:30">
+  <input type="hidden" name="slot">                          <!-- gets "HH:MM" -->
+  <div class="s4-text-field-supporting">Between 8 AM and 6 PM.</div>
+</div>
+
+<!-- date and time -->
+<div class="s4-date-time">
+  <div class="s4-text-field"><label for="d">Meeting Date</label><input id="d" type="date"></div>
+  <div class="s4-text-field s4-time-field"><label for="t">Time</label><input id="t"></div>
+</div>
+
+<!-- a range: the end names its start -->
+<div class="s4-time-range">
+  <div class="s4-text-field s4-time-field" id="from-field"><label for="from">From</label><input id="from"></div>
+  <div class="s4-text-field s4-time-field" data-range-start="from-field"><label for="until">Until</label><input id="until"></div>
+</div>
+```
+
+| Attribute | What |
+|---|---|
+| `value` on the input | A starting time, `HH:MM` (or anything the field can read). |
+| `data-step` | Minutes between times in the list (default 30, at least 5). Typed times need not be on a step. |
+| `data-min`, `data-max` | `HH:MM`. The list keeps inside them; a typed time outside is an error. |
+| `data-hour-cycle="12"` / `"24"` | Force 12 or 24 hours; otherwise the page's language decides. |
+| `data-range-start="id"` | On an end field: its list starts after the start time, each choice says how long (“1 h 30 min”), and an end at or before the start is an error. |
+| `data-msg-time`, `data-msg-range` | Messages (defaults: “Enter a time like 9:30 AM.”, “Choose a time from 8:00 AM to 6:00 PM.”). |
+| Script | `S4.timeField.value(field)` (minutes since midnight or null), `S4.timeField.set(field, 'HH:MM')`, `S4.timeField.parse(text)`; `s4-change { value, minutes }` on the field. |
+
+**Typing:** “9” is 9:00, “930” is 9:30, “9:30 pm”, “9p”, “21.30” and “21h30” all work. Typing narrows the list (“93” shows
+9:30 AM and 9:30 PM) and a typed time that is not on the list is offered first. On blur or Enter the text is tidied into
+the page's format.
+
+**Keyboard:** Down and Up open the list at the current time and move through it, Enter chooses, Escape closes, Tab
+leaves. The clock button opens the list for a pointer and is out of the Tab order.
+
+**When to use:** a time of day: reminders, slots, opening hours, a meeting. **Not:** a duration (a number field with a
+unit); a date and time far apart in a list of events (show them as text).
+
+**Accessibility:** a `combobox` with a `listbox` of times (the combobox's list), labelled by the field's label; the cursor
+stays in the field (`aria-activedescendant`). Errors follow the text field and `.s4-form`.
+
+**Tokens:** the text field's and the combobox list's. **Motion:** Follow (the list).
+
+---
+
+<a id="rating"></a>
+
+## Rating
+
+Stars in the accent, always with their number beside them: the picture alone is never the only way to read a rating.
+A **display** is read-only and shows half steps; an **input** is a group of real radio buttons.
+
+```html
+<span class="s4-rating" data-value="4.5" data-count="128"></span>
+
+<fieldset class="s4-rating" data-input data-name="service" data-value="4" data-labels="Poor,Fair,Good,Very Good,Excellent">
+  <legend>Rate the Service</legend>
+</fieldset>
+```
+
+| Attribute | What |
+|---|---|
+| `data-value` | Display: any number (stars round to halves, the number beside them is the real value). Input: the starting choice (whole). |
+| `data-max` | Number of stars (default 5). |
+| `data-count` | Display: the number of reviews, shown as “(128)” and spoken. |
+| `data-size="l"` | Display: bigger, for a heading. |
+| `data-input` on a `<fieldset>` | The input; give it a `<legend>` (shown like a field's label). |
+| `data-name` | The radios' name (form value 1 to max). |
+| `data-labels` | Words for each value (“Poor,Fair,Good,Very Good,Excellent”), shown beside the stars and spoken. Otherwise “4 of 5”. |
+| `data-required`, `data-msg-required` | A rating must be chosen; inside `.s4-form` the message shows under the stars. |
+| `disabled` on the fieldset | Locked (a past rating). |
+| Script | `S4.rating.set(el, n)`; the input fires `s4-change { value }` (0 when cleared). |
+
+**Input:** hover previews (mouse only), a tap chooses, a tap on the chosen star clears it (unless required). Arrow keys
+move through the stars as in any radio group; the stars are 48 wide touch targets, the first lines up with the legend.
+
+**When to use:** reviews and quick feedback. Display: lists of places, products, vendors (beside the name, small).
+**Not:** a score that is not a rating (a number, a [stat](#stat), a [progress ring](#ring)); a choice between named
+options (radios or a button group); half-star input (people cannot aim at half a star on a phone).
+
+**Do** show the count with an average; use words for the input when the scale means something specific.
+**Don't** color stars yellow or by score: a star is the accent, empty stars are the 3:1 control gray.
+
+**Accessibility:** the display is `role="img"` named “Rated 4.5 out of 5, 128 reviews”; the input is a `fieldset` of
+radios named “Very Good, 4 stars”, with the focus ring on the star. Not color alone: the number or the words are always
+beside the stars.
+
+**Tokens:** `--md-sys-color-primary` (filled), `--s4-color-control` (empty), `--s4-size-icon-large` (input stars),
+`--s4-size-touch-target`, `--s4-shape-control` (the focus ring's corner). **Motion:** State (a star filling).
+
+---
+
 <a id="date-picker"></a>
 
 ## Date Picker
@@ -2443,6 +2832,141 @@ focus ring; forced-colors mode draws borders and a Highlight outline on the sele
 
 **Tokens:** `--s4-size-touch-target`, `--md-sys-color-on-surface`, `surface-container-highest`,
 `--md-sys-motion-spring-fast-spatial`, `--md-sys-state-*`.
+
+---
+
+<a id="color-field"></a>
+
+## Color Field
+
+A swatch and its hex code in one Quiet Box. The swatch opens a small glass panel with the named accents (the
+[swatches](#swatches)) and a hue slider; the code can be typed. Made for “pick your accent” settings: with
+`data-theme-seed` it themes the page as people choose.
+
+```html
+<div class="s4-text-field s4-color-field" data-theme-seed>
+  <label for="accent">Accent Color</label>
+  <input id="accent" name="accent" value="#4f46e5">
+  <div class="s4-text-field-supporting">Used for buttons, selection and focus.</div>
+</div>
+
+<!-- your own accents -->
+<div class="s4-text-field s4-color-field">
+  <label for="c">Project Color</label><input id="c" value="#00796b">
+  <template>
+    <button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button>
+    <button class="s4-swatch" type="button" data-seed="#c2185b" aria-label="Rose"></button>
+  </template>
+</div>
+```
+
+| Attribute / API | What |
+|---|---|
+| `value` on the input | A hex code (`#4f46e5`, `4F46E5`, `#46e`). Shown upper-case. |
+| `data-theme-seed` | Choosing a color calls `S4.theme({ seed })` (Mono is `seed: null`), and the field follows the theme when it changes elsewhere. |
+| `<template>` of `.s4-swatch` | The accents in the panel (named with `aria-label`); otherwise Mono, Indigo, Blue, Teal, Green, Amber, Rose, Purple. |
+| `data-msg` on the input | The message for a code that is not a color (default “Enter a color like #4F46E5.”). |
+| Script | `S4.colorField.value(field)`, `S4.colorField.set(field, '#hex')`; `s4-change { value }` on the field, `input` and `change` on the input. |
+
+**The panel** is anchored glass that follows the swatch (Follow): focus goes to the chosen accent (arrow keys move
+between accents, as in any swatch group), Tab reaches the hue slider, Escape or a tap outside closes it and gives
+focus back to the swatch. The hue slider keeps the color's saturation and lightness and turns its hue (a gray starts
+from a middle tone).
+
+**When to use:** an app's accent, a label or project color. **Not:** choosing from a few fixed colors only (the swatches
+alone); a full color editor with alpha and spaces (out of scope); the theme of the whole system in Orion's showcase
+(the brand dials).
+
+**Do** name every accent; keep 4 to 8 of them. **Don't** use the field for status (status colors are fixed tokens) or let
+people pick text colors that fail contrast: with `data-theme-seed`, `S4.theme` keeps every role readable.
+
+**Accessibility:** the swatch is a button named with the field and the color (“Choose Accent Color: Indigo”), with
+`aria-haspopup="dialog"` and `aria-expanded`; the panel is a labelled dialog; the slider says its degrees. The code is
+the text equivalent of the color. Errors follow the text field and `.s4-form`.
+
+**Tokens:** `--s4-shape-control` (the swatch), `--s4-shape-menu` (the panel), glass tokens, `--s4-size-touch-target`.
+**Motion:** Follow (the panel), State.
+
+---
+
+<a id="password"></a>
+
+## Password Field
+
+Helpers for a [text field](#text-field) that holds a password: a **Show Password** button, a **strength meter** that
+says in words how strong the password is, and a **Caps Lock** notice. The form's own rules (`minlength`, `pattern`,
+`required`) decide what is accepted; the meter only helps.
+
+```html
+<div class="s4-text-field s4-password" data-strength>
+  <label for="pw">New Password</label>
+  <input id="pw" type="password" autocomplete="new-password" minlength="12" required>
+  <div class="s4-text-field-supporting">At least 12 characters. A few words work well.</div>
+</div>
+```
+
+| Part | What |
+|---|---|
+| `.s4-password` on the field | Adds the Show Password button at the end of the box (no other trailing icon there). |
+| `data-strength` | Four segments and a sentence under the supporting text: “Strength: Weak, add numbers or symbols”. Read out politely after a pause. |
+| Caps Lock | “Caps Lock is on” under the field while it is on and you type there (on keyboards that report it). |
+| Script | `S4.password.score(text)` → 0 (too short) to 4 (strong). |
+
+**Show Password** is a toggle: `aria-pressed="true"` while the text shows, and its name (“Show Password”) never changes,
+as the pattern asks; the icon changes from an eye to a closed eye. It never moves the cursor (and does not take it away
+from the field while you type). The password is hidden again before the form is sent, so the browser offers to save it.
+
+**The score** counts length (8, 12, 16), kinds of characters, and drops common and repeated passwords to Weak. The
+segments' colors (error, warning, success) only repeat the words.
+
+**When to use:** sign up, change password, sign in (the toggle only, no meter). **Not:** a PIN or a code (the
+[one-time code](#code-field)); a field that is not secret.
+
+**Do** say the rule in the supporting text; use `autocomplete="new-password"` or `"current-password"`. **Don't** block
+paste, show the meter on sign in, or make the meter the rule.
+
+**Accessibility:** the toggle is a named button with `aria-pressed` and `aria-controls`; the strength sentence is a
+polite live region; the Caps Lock notice is a status. Errors follow the text field and `.s4-form`.
+
+**Tokens:** `--md-sys-color-error`, `--s4-color-warning`, `--s4-color-success`, `--md-sys-shape-corner-full` (segments).
+**Motion:** State.
+
+---
+
+<a id="inline-edit"></a>
+
+## Inline Edit
+
+A value you change where it is: a name, a title, an amount on a detail page. It reads as plain text and is a real input
+underneath, so the person's own tap puts the cursor in it (no script ever does, decision 0049). Pointing at it shows the
+field's fill and a pencil; on a touch screen the pencil always shows. Enter or leaving saves, Escape puts it back, and a
+snackbar offers **Undo**. No Edit button, no dialog, no Save button (the placement ladder, decision 0047).
+
+```html
+<div class="s4-inline-edit"><label for="owner">Owner</label><input id="owner" value="Ana Ribeiro" required></div>
+
+<!-- a heading that can be renamed: it keeps the heading's type -->
+<div class="s4-inline-edit s4-headline-small"><input aria-label="Project Name" value="Kitchen Renovation" required></div>
+```
+
+| Attribute / API | What |
+|---|---|
+| `<label>` or `aria-label` | Its name (the label is shown small above, like a field's). |
+| `required`, `pattern`, `maxlength` on the input | An empty or rejected value is not saved: the saved one comes back with a short message (`data-msg` for your own words). |
+| `data-undo-text` | The snackbar's words (default “Owner changed”). `data-no-undo` for no snackbar. |
+| Events | `s4-change { value, previous }` on save and again on Undo. |
+| Script | `S4.inlineEdit.set(el, value)` (no events). |
+
+**When to use:** one value on a detail page or a list row that people change now and then. **Not:** a form with several
+related values (a [form](#form) with autosave); anything that needs a choice from a list (a select or a
+[combobox](#combobox)); long text (a page or an expand with a textarea).
+
+**Do** keep it to short values; give each a label. **Don't** put two inline edits on one line, or ask “Are you sure?”
+(Undo is enough).
+
+**Focus:** the text field's marks: a quiet hairline after a tap, the focus ring from the keyboard.
+**Accessibility:** a real `<input>` with its label; the message is tied with `aria-describedby` and announced.
+**Tokens:** `--s4-shape-text-field`, `--md-sys-color-surface-container-high` (hover), the focus tokens. **Motion:** State.
 
 ---
 

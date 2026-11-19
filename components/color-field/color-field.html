@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Color Field · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Color Field</h1></header>
+<main class="ex-main">
+  <p>A swatch and its hex code in one field. Tap the swatch for a small glass panel with the named accents and a hue slider, or type a code. Made for “pick your accent” settings: with <code>data-theme-seed</code> it themes the page as you choose.</p>
+
+  <section class="ex-sec">
+    <h2>Fields</h2>
+    <p>The first field themes this page. The second keeps its own value (a label color for a project) with its own accents from a <code>&lt;template&gt;</code>.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-color-field" data-theme-seed>
+          <label for="accent">Accent Color</label>
+          <input id="accent" value="#000000">
+          <div class="s4-text-field-supporting">Used for buttons, selection and focus.</div>
+        </div>
+        <div class="s4-text-field s4-color-field">
+          <label for="tag-color">Project Color</label>
+          <input id="tag-color" name="project-color" value="#00796b">
+          <template>
+            <button class="s4-swatch" type="button" data-seed="#00796b" aria-label="Teal"></button>
+            <button class="s4-swatch" type="button" data-seed="#2e7d32" aria-label="Green"></button>
+            <button class="s4-swatch" type="button" data-seed="#b26a00" aria-label="Amber"></button>
+            <button class="s4-swatch" type="button" data-seed="#c2185b" aria-label="Rose"></button>
+          </template>
+          <div class="s4-text-field-supporting">Shown beside the project’s name.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Error, Disabled and Compact</h2>
+    <p>A code that isn’t a color is an error when you leave the field.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-color-field" data-error="Enter a color like #4F46E5.">
+          <label for="bad">Brand Color</label>
+          <input id="bad" value="#4F46">
+          <div class="s4-text-field-supporting">Six hex digits.</div>
+        </div>
+        <div class="s4-text-field s4-color-field">
+          <label for="locked">Workspace Color</label>
+          <input id="locked" value="#0b57d0" disabled>
+          <div class="s4-text-field-supporting">Set by your administrator.</div>
+        </div>
+        <div class="s4-text-field s4-color-field" data-density="compact">
+          <label for="hl">Highlight (Compact)</label>
+          <input id="hl" value="#7b1fa2">
+        </div>
+      </div>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/color-field/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../swatches/swatches.js"></script>
+<script src="../color-field/color-field.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>

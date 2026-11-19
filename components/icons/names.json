@@ -97,7 +97,9 @@
         "seat": "armchair",
         "route": "route",
         "timer": "stopwatch",
-        "water": "waterdrop"
+        "water": "waterdrop",
+        "minus": "minus",
+        "plus": "add"
       }
     },
     "phosphor-duotone": {
@@ -195,7 +197,9 @@
         "seat": "armchair",
         "route": "path",
         "timer": "timer",
-        "water": "drop"
+        "water": "drop",
+        "minus": "minus",
+        "plus": "plus"
       }
     },
     "phosphor-bold-duotone": {
@@ -293,7 +297,9 @@
         "seat": "armchair",
         "route": "path",
         "timer": "timer",
-        "water": "drop"
+        "water": "drop",
+        "minus": "minus",
+        "plus": "plus"
       }
     }
   }

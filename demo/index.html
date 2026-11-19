@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=38d3849">
+<link rel="stylesheet" href="orion.css?v=3f87b9f">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -228,6 +228,58 @@
               <div class="s4-text-field"><label for="f-kind">Category</label><select id="f-kind"><option>Personal</option><option>Work</option><option>Travel</option></select></div>
               <div class="s4-text-field"><label for="f-note">Notes</label><textarea id="f-note" rows="3" placeholder="Anything else"></textarea></div>
               <div class="s4-text-field" data-error="Enter a valid email address."><label for="f-mail">Email</label><input id="f-mail" type="email" value="maya@" aria-invalid="true"></div>
+            </div>
+          </section>
+
+          <section class="s4-pane" aria-labelledby="h-rich">
+            <h2 class="s4-pane-title" id="h-rich">Rich Inputs</h2>
+            <p class="s4-pane-supporting">Each sits on the same field: same height, label and supporting text.</p>
+            <div class="demo-form">
+              <div class="s4-text-field s4-combobox">
+                <label for="ri-city">City</label>
+                <input id="ri-city">
+                <template>
+                  <optgroup label="Europe"><option data-supporting="Portugal">Lisbon</option><option data-supporting="Portugal">Porto</option><option data-supporting="Spain">Madrid</option><option data-supporting="France">Paris</option><option data-supporting="Germany">Berlin</option></optgroup>
+                  <optgroup label="Americas"><option data-supporting="Canada">Toronto</option><option data-supporting="Mexico">Mexico City</option><option data-supporting="United States">New York</option></optgroup>
+                </template>
+                <div class="s4-text-field-supporting">Type to search.</div>
+              </div>
+              <div class="s4-text-field s4-tag-input" data-name="ri-labels" data-values="Travel, Family" data-max="5" data-create data-noun="labels">
+                <label for="ri-labels">Labels</label>
+                <input id="ri-labels">
+                <template><option>Travel</option><option>Family</option><option>Work</option><option>Health</option><option>Ideas</option></template>
+                <div class="s4-text-field-supporting">Up to five.</div>
+              </div>
+              <div class="s4-text-field s4-number-field">
+                <label for="ri-guests">Guests</label>
+                <input id="ri-guests" value="2" data-min="1" data-max="12">
+                <span class="s4-text-field-affix" data-suffix>people</span>
+              </div>
+              <div class="s4-date-time">
+                <div class="s4-text-field"><label for="ri-day">Date</label><input id="ri-day" type="date" value="2026-11-24"></div>
+                <div class="s4-text-field s4-time-field" data-step="30"><label for="ri-time">Time</label><input id="ri-time" value="18:30"></div>
+              </div>
+              <div class="s4-text-field s4-code-field" data-length="6" data-group="3">
+                <label for="ri-code">Verification Code</label>
+                <input id="ri-code">
+                <div class="s4-text-field-supporting">We sent it to your phone.</div>
+              </div>
+              <div class="s4-text-field s4-password" data-strength>
+                <label for="ri-pw">New Password</label>
+                <input id="ri-pw" type="password" autocomplete="new-password" minlength="12">
+                <div class="s4-text-field-supporting">At least 12 characters.</div>
+              </div>
+              <div class="s4-text-field s4-color-field">
+                <label for="ri-color">Label Color</label>
+                <input id="ri-color" value="#00796b">
+              </div>
+              <div class="s4-upload" data-variant="compact" data-max-size="10 MB">
+                <span class="s4-upload-label">Attachment</span>
+                <input type="file" accept=".pdf,image/*">
+                <div class="s4-text-field-supporting">A PDF or a picture, up to 10 MB.</div>
+              </div>
+              <fieldset class="s4-rating" data-input data-name="ri-rating" data-value="4" data-labels="Poor,Fair,Good,Very Good,Excellent"><legend>Rate the Trip</legend></fieldset>
+              <div class="s4-inline-edit"><label for="ri-trip">Trip Name</label><input id="ri-trip" value="Lisbon in Spring" required></div>
             </div>
           </section>
 
@@ -495,7 +547,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=5127ce8"></script>
+<script src="orion.js?v=326e153"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

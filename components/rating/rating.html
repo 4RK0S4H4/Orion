@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rating · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+  .ri-list { inline-size: 100%; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Rating</h1></header>
+<main class="ex-main">
+  <p>Stars in the accent, always with their number beside them: the picture alone is never the only way to read it. A display shows half steps; the input is a group of real radio buttons you tap or move through with the arrow keys.</p>
+
+  <section class="ex-sec">
+    <h2>Display</h2>
+    <p><code>data-value</code> (rounded to halves), <code>data-max</code> (5), <code>data-count</code> for the number of reviews. <code>data-size="l"</code> for a heading.</p>
+    <div class="ex-board">
+      <ul class="s4-list ri-list">
+        <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Northwind Plumbing</span><span class="s4-list-supporting"><span class="s4-rating" data-value="4.5" data-count="128"></span></span></span></div></li>
+        <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Bright Spark Electric</span><span class="s4-list-supporting"><span class="s4-rating" data-value="3.8" data-count="42"></span></span></span></div></li>
+        <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Greenway Gardens</span><span class="s4-list-supporting"><span class="s4-rating" data-value="1" data-count="1"></span></span></span></div></li>
+      </ul>
+      <span class="s4-rating" data-size="l" data-value="4" data-count="2310"></span>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Input</h2>
+    <p>Hover to preview, tap to choose; tap the chosen star again to clear. <code>data-labels</code> puts a word beside the stars. Inside <code>.s4-form</code>, <code>data-required</code> means a rating must be chosen.</p>
+    <div class="ex-board">
+      <form class="s4-form s4-stack" id="rt-form" style="inline-size: 100%">
+        <div class="ri-grid">
+          <fieldset class="s4-rating" data-input data-name="service" data-value="4" data-labels="Poor,Fair,Good,Very Good,Excellent">
+            <legend>Rate the Service</legend>
+          </fieldset>
+          <fieldset class="s4-rating" data-input data-name="value" data-required>
+            <legend>Value for Money</legend>
+          </fieldset>
+          <fieldset class="s4-rating" data-input data-name="past" data-value="2" disabled>
+            <legend>Your Earlier Rating (Locked)</legend>
+          </fieldset>
+        </div>
+        <div class="s4-form-actions"><span class="s4-form-status"></span><button class="s4-button" data-variant="filled" type="submit">Send Review</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Compact</h2>
+    <p>In compact density the input’s stars keep their size but take pointer-sized space.</p>
+    <div class="ex-board" data-density="compact">
+      <fieldset class="s4-rating" data-input data-name="quick" data-value="3"><legend>Quick Rating</legend></fieldset>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/rating/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../form/form.js"></script>
+<script src="../rating/rating.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>document.getElementById('rt-form').addEventListener('s4-submit', function (e) { e.preventDefault(); S4.form.saved(e.target, 'Thanks for the review'); });</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Time Field · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .ex-board:has(> .ri-grid) { display: block; }
+  .ri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: var(--s4-space-6) var(--s4-space-4); align-items: start; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Time Field</h1></header>
+<main class="ex-main">
+  <p>Type a time any way you like (<q>9</q>, <q>930</q>, <q>9:30 pm</q>, <q>21.30</q>) or pick one from a short list. Times are shown in the page’s language, with 12 or 24 hours, and stored as <code>HH:MM</code>. No clock dial: typing and a short list are quicker on every device.</p>
+
+  <section class="ex-sec">
+    <h2>Times</h2>
+    <p><code>data-step</code> sets the list’s spacing; <code>data-min</code> and <code>data-max</code> its ends. The hours follow the page’s language unless <code>data-hour-cycle</code> says 12 or 24.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-time-field" data-step="30">
+          <label for="remind">Remind Me At</label>
+          <input id="remind" value="09:30">
+          <input type="hidden" name="remind">
+          <div class="s4-text-field-supporting">Try typing “545p”.</div>
+        </div>
+        <div class="s4-text-field s4-time-field" data-step="15" data-min="08:00" data-max="18:00">
+          <label for="slot">Delivery Slot</label>
+          <input id="slot">
+          <div class="s4-text-field-supporting">Between 8 AM and 6 PM.</div>
+        </div>
+        <div class="s4-text-field s4-time-field" data-hour-cycle="24" data-step="60">
+          <label for="sync">Daily Sync (24 Hours)</label>
+          <input id="sync" value="21:00">
+          <div class="s4-text-field-supporting">Runs every night.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Date and Time, Time Range</h2>
+    <p>A time pairs with the date picker in <code>.s4-date-time</code>. For a range, the end field names its start with <code>data-range-start</code>: its list begins after the start and says how long each choice is.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-date-time">
+          <div class="s4-text-field">
+            <label for="meet-day">Meeting Date</label>
+            <input id="meet-day" type="date" value="2026-11-24">
+          </div>
+          <div class="s4-text-field s4-time-field" data-step="15">
+            <label for="meet-time">Time</label>
+            <input id="meet-time" value="14:00">
+          </div>
+        </div>
+        <div class="s4-time-range">
+          <div class="s4-text-field s4-time-field" id="from-field" data-step="30">
+            <label for="from">From</label>
+            <input id="from" value="09:00">
+          </div>
+          <div class="s4-text-field s4-time-field" data-step="30" data-range-start="from-field">
+            <label for="until">Until</label>
+            <input id="until" value="10:30">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Error, Disabled and Compact</h2>
+    <p>A time that can’t be read, or one outside the limits, is an error when you leave the field.</p>
+    <div class="ex-board">
+      <div class="ri-grid">
+        <div class="s4-text-field s4-time-field" data-min="08:00" data-max="18:00" data-error="Choose a time from 8:00 AM to 6:00 PM.">
+          <label for="late">Pickup</label>
+          <input id="late" value="22:15">
+          <div class="s4-text-field-supporting">The shop is open 8 to 6.</div>
+        </div>
+        <div class="s4-text-field s4-time-field">
+          <label for="fixed">Payroll Runs At</label>
+          <input id="fixed" value="06:00" disabled>
+          <div class="s4-text-field-supporting">Set by your accountant.</div>
+        </div>
+        <div class="s4-text-field s4-time-field" data-density="compact" data-step="30">
+          <label for="quiet">Quiet Hours From (Compact)</label>
+          <input id="quiet" value="22:00">
+        </div>
+      </div>
+    </div>
+  </section>
+  <p class="ex-foot">Source: <code>components/time-field/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../menu/menu.js"></script>
+<script src="../text-field/text-field.js"></script>
+<script src="../form/form.js"></script>
+<script src="../date-picker/date-picker.js"></script>
+<script src="../combobox/combobox.js"></script>
+<script src="../time-field/time-field.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+</body>
+</html>
