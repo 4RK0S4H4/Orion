@@ -7,7 +7,15 @@
    Connected groups (the Ink Track, decision 0059): while at most one option is pressed (any group but data-select="multi"),
    one ink pill behind the options slides to it, whoever changed aria-pressed (a click, the keyboard, a page script);
    with several pressed each option fills itself and button-group.js marks where a wrapped row starts, so a fused run of
-   selected options never joins across rows. */
+   selected options never joins across rows.
+   From script (decision 0060): S4.buttonGroup.set(group, value) presses the option with that value (an array for
+   data-select="multi"), moves the tab stop and the ink with it, and fires no s4-change (the page made the change, as
+   when a script sets an input's value), so a group can follow something else (the line type under the caret).
+   S4.buttonGroup.value(group) reads it back. */
+S4.buttonGroup = {
+  set: function (g, value) { if (g && g._s4set) g._s4set(value); },
+  value: function (g) { return g && g._s4value ? g._s4value() : null; }
+};
 S4.register('button-group', function (scope) {
   var ITEM = '.s4-button, .s4-icon-button';
   S4.util.all(scope, '.s4-button-group').forEach(function (g) {
@@ -39,6 +47,15 @@ S4.register('button-group', function (scope) {
       items().forEach(function (b) { b.tabIndex = b === target ? 0 : -1; });
     };
     stop();
+    g._s4set = function (value) {
+      var want = [].concat(value == null ? [] : value).map(String);
+      var list = items(), hit = list.filter(function (b) { return want.indexOf(String(valueOf(b))) >= 0; });
+      if (mode !== 'multi') hit = hit.slice(0, 1);
+      if (mode === 'single' && !hit.length) return;   /* a single group always has one pressed option */
+      list.forEach(function (b) { b.setAttribute('aria-pressed', hit.indexOf(b) >= 0 ? 'true' : 'false'); });
+      if (!(document.activeElement && g.contains(document.activeElement))) stop();
+    };
+    g._s4value = function () { var v = pressed().map(valueOf); return mode === 'multi' ? v : (v[0] == null ? null : v[0]); };
 
     g.addEventListener('click', function (e) {
       var b = e.target.closest(ITEM);

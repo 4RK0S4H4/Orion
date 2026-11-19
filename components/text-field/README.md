@@ -38,7 +38,8 @@ textarea. 48dp tall, tabular figures. There is one look: `data-variant` is ignor
 
 **Behaviour** (`text-field.js`): adds `placeholder=" "` to text controls; adds a chevron to selects and opens the picker
 when the field is clicked; grows textareas; links supporting text with `aria-describedby`; keeps `aria-invalid` and the
-error message in sync with `data-error`.
+error message in sync with `data-error`. A select's glass picker follows the select: change its options (add, remove,
+disable) or set `select.value` / `selectedIndex` from script and the button and the list redraw; no `change` event needed.
 
 **Do**
 - Title Case labels ("Due Date"), sentence-case helper and error text that says how to fix it.
