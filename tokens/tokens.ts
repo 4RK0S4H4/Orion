@@ -946,6 +946,36 @@ export const tokens = {
     "value": "40px",
     "description": "Desktop app title bar (window controls overlay, Electron, Tauri)."
   },
+  "--s4-size-statusbar": {
+    "type": "dimension",
+    "value": "28px",
+    "description": "Desktop window status bar (desktop only, from 840)."
+  },
+  "--s4-size-menubar-item": {
+    "type": "dimension",
+    "value": "28px",
+    "description": "A top-level item of the in-window menu bar."
+  },
+  "--s4-size-doc-tab": {
+    "type": "dimension",
+    "value": "40px",
+    "description": "A document tab (open files, records) in a desktop window."
+  },
+  "--s4-size-tree-row": {
+    "type": "dimension",
+    "value": "48px",
+    "description": "A tree view row: touch size; compact density takes it to 28."
+  },
+  "--s4-size-tree-indent": {
+    "type": "dimension",
+    "value": "20px",
+    "description": "How far each tree level steps in (compact 14); deep levels step in by half."
+  },
+  "--s4-size-inspector": {
+    "type": "dimension",
+    "value": "288px",
+    "description": "Default width of the desktop inspector pane at the window end."
+  },
   "--s4-layout-margin-compact": {
     "type": "dimension",
     "value": "var(--s4-space-4)",
@@ -1122,6 +1152,18 @@ export const tokens = {
   "--s4-density-compact-layout-gap": {
     "type": "dimension",
     "value": "12px"
+  },
+  "--s4-density-compact-doc-tab": {
+    "type": "dimension",
+    "value": "32px"
+  },
+  "--s4-density-compact-tree-row": {
+    "type": "dimension",
+    "value": "28px"
+  },
+  "--s4-density-compact-tree-indent": {
+    "type": "dimension",
+    "value": "14px"
   },
   "--s4-density-roomy-layout-margin": {
     "type": "dimension",

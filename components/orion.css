@@ -194,6 +194,12 @@
     --s4-size-badge: 16px;
     --s4-size-nav-row: 48px;
     --s4-size-titlebar: 40px;
+    --s4-size-statusbar: 28px;
+    --s4-size-menubar-item: 28px;
+    --s4-size-doc-tab: 40px;
+    --s4-size-tree-row: 48px;
+    --s4-size-tree-indent: 20px;
+    --s4-size-inspector: 288px;
     --s4-layout-margin-compact: var(--s4-space-4);
     --s4-layout-margin: var(--s4-space-6);
     --s4-layout-pane-gap: var(--s4-space-6);
@@ -237,6 +243,9 @@
     --s4-density-compact-icon: 20px;
     --s4-density-compact-layout-margin: 20px;
     --s4-density-compact-layout-gap: 12px;
+    --s4-density-compact-doc-tab: 32px;
+    --s4-density-compact-tree-row: 28px;
+    --s4-density-compact-tree-indent: 14px;
     --s4-density-roomy-layout-margin: 40px;
     --s4-density-roomy-layout-margin-compact: 20px;
     --s4-density-roomy-layout-gap: 24px;
@@ -1465,14 +1474,14 @@
      Every interactive S4 component is listed here once, so hover, focus and press look identical everywhere.
      A component can tint its layer with --_state-color (defaults to the content color).
      Table rows draw their own layer on the cells (an absolutely positioned ::before on a <tr> breaks table layout). */
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card, .s4-nav-item) {
     position: relative;
     isolation: isolate;
     -webkit-tap-highlight-color: transparent;
   }
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card)::before {
     content: "";
@@ -1486,27 +1495,27 @@
     transition: opacity var(--s4-motion-state);
   }
   @media (hover: hover) {
-    :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+    :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
            a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
            a.s4-card, button.s4-card):hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
   }
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card):focus-visible::before,
   label.s4-list-item:has(:focus-visible)::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card):active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card):is(:disabled, [aria-disabled="true"]) { cursor: default; pointer-events: none; }
-  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+  :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
          a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex],
          a.s4-card, button.s4-card):is(:disabled, [aria-disabled="true"])::before { display: none; }
 
   /* Windows high contrast and other forced-color modes: drop decorative layers, keep real borders and focus. */
   @media (forced-colors: active) {
-    :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link,
+    :where(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-menu-item, .s4-tab, .s4-swatch, .s4-segment, .s4-page, .s4-breadcrumb-link, .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab,
            a.s4-list-item, button.s4-list-item, label.s4-list-item, .s4-list-item[tabindex], a.s4-card, button.s4-card)::before { display: none; }
     :where(:focus-visible) { outline-color: Highlight; }
   }
@@ -1589,6 +1598,9 @@
     --s4-size-toolbar: var(--s4-density-compact-toolbar);
     --s4-size-avatar: var(--s4-density-compact-avatar);
     --s4-size-icon: var(--s4-density-compact-icon);
+    --s4-size-doc-tab: var(--s4-density-compact-doc-tab);
+    --s4-size-tree-row: var(--s4-density-compact-tree-row);
+    --s4-size-tree-indent: var(--s4-density-compact-tree-indent);
     --s4-layout-margin: var(--s4-density-compact-layout-margin);
     --s4-layout-gap: var(--s4-density-compact-layout-gap);
     --md-sys-typescale-body-large-size: var(--md-sys-typescale-body-medium-size);
@@ -1619,6 +1631,9 @@
       --s4-size-toolbar: var(--s4-density-compact-toolbar);
       --s4-size-avatar: var(--s4-density-compact-avatar);
       --s4-size-icon: var(--s4-density-compact-icon);
+      --s4-size-doc-tab: var(--s4-density-compact-doc-tab);
+      --s4-size-tree-row: var(--s4-density-compact-tree-row);
+      --s4-size-tree-indent: var(--s4-density-compact-tree-indent);
       --s4-layout-margin: var(--s4-density-compact-layout-margin);
       --s4-layout-gap: var(--s4-density-compact-layout-gap);
       --md-sys-typescale-body-large-size: var(--md-sys-typescale-body-medium-size);
@@ -3485,7 +3500,16 @@
    The header's .s4-fab is the rail's main action: a solid primary button here (never glass), round when collapsed.
    [data-rail-toggle] flips the rail (nav-rail.js); data-expand="auto" expands it on large windows.
    Shares .s4-nav-item with the nav bar (nav-bar.css).
-   Public knob: --s4-nav-rail-expanded-width (default 240). */
+   Public knob: --s4-nav-rail-expanded-width (default 240).
+
+   As a desktop source list (issue 60), the same rail also takes:
+     <div class="s4-nav-rail-group">                       a section that folds away (its title is a button)
+       <button class="s4-nav-rail-title" type="button" aria-expanded="true">Languages</button>
+       <div class="s4-nav-rail-group-items">…items…</div></div>
+     <ul class="s4-tree" role="tree" aria-label="Files">…   a tree in a section (components/tree/); hidden while collapsed
+     data-resizable (+ data-resize-key="name")             a grip on its end edge: drag it, or arrow keys on it; drag it
+                                                           narrow and the rail collapses to icons; Enter flips it
+   Collapsed, a folded group still shows its icons (there is nothing to fold in a column of icons). */
 @layer s4.components {
   .s4-nav-rail:dir(rtl) { --_notch: env(safe-area-inset-right, 0px); }
   .s4-nav-rail {
@@ -3509,6 +3533,7 @@
     transition: inline-size var(--s4-motion-morph-calm);
   }
   .s4-nav-rail[data-expanded] { --_w: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
+  .s4-nav-rail[data-resizing] { transition: none; }
 
   .s4-nav-rail-header,
   .s4-nav-rail-items,
@@ -3596,6 +3621,63 @@
     font-weight: var(--md-sys-typescale-label-medium-weight);
     white-space: nowrap;
   }
+
+  /* ---------- source list: groups that fold, a tree, a grip (issue 60) ---------- */
+  .s4-nav-rail-group { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .s4-nav-rail-group-items { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .s4-nav-rail[data-expanded] .s4-nav-rail-group[data-collapsed] > .s4-nav-rail-group-items { display: none; }
+  button.s4-nav-rail-title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    inline-size: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: min(calc(var(--s4-size-button-small) / 2), var(--s4-shape-control));
+    background: none;
+    text-align: start;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+  }
+  button.s4-nav-rail-title::after {
+    content: "";
+    inline-size: calc(var(--s4-space-1) * 1.5);
+    block-size: calc(var(--s4-space-1) * 1.5);
+    margin-inline-start: var(--s4-space-1);
+    border-block-end: 2px solid currentColor;
+    border-inline-end: 2px solid currentColor;
+    opacity: 0;
+    transform: translateY(-25%) rotate(45deg);
+    transition: transform var(--s4-motion-bend), opacity var(--s4-motion-state);
+  }
+  .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title::after { transform: rotate(-45deg); }
+  .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title:dir(rtl)::after { transform: rotate(135deg); }
+  .s4-nav-rail[data-expanded] button.s4-nav-rail-title:is(:hover, :focus-visible)::after,
+  .s4-nav-rail[data-expanded] .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title::after { opacity: 1; }
+  .s4-nav-rail:not([data-expanded]) button.s4-nav-rail-title { pointer-events: none; }
+  /* a tree in the rail lines its icons up with the items' icons; collapsed it steps out (a tree is not icons) */
+  .s4-nav-rail .s4-tree { --_pad: calc((var(--_row) - var(--s4-size-icon)) / 2 - var(--s4-size-icon-small) + var(--s4-space-1)); }
+  .s4-nav-rail:not([data-expanded]) .s4-tree { display: none; }
+  .s4-nav-rail-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .s4-nav-rail-grip::before { content: ""; position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: 2px; background: var(--md-sys-color-primary); opacity: 0; transition: opacity var(--s4-motion-state); }
+  @media (hover: hover) { .s4-nav-rail-grip:hover::before { opacity: 0.6; } }
+  .s4-nav-rail-grip:is(:focus-visible, [data-dragging])::before { opacity: 1; }
+  .s4-nav-rail-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-nav-rail[data-resizable] { position: relative; }
+  .s4-app:not([data-window]) > .s4-nav-rail[data-resizable] { position: sticky; }
 
   /* ---------- labels: beside the icon, shown when the rail is expanded ---------- */
   .s4-nav-rail .s4-nav-label,
@@ -3956,6 +4038,26 @@
   }
 }
 
+/* ---- commands/commands.css ---- */
+/* Commands (issue 60): S4.commands has no look of its own; what it renders is the menu, the menu bar and the palette.
+   These are the few parts a command menu adds to the glass menu:
+     .s4-menu-item [data-slot]       an empty icon column, so labels line up when some items have icons
+     .s4-menu-item[data-check]       a check or radio item: its check mark shows only when aria-checked="true"
+     .s4-menu-item-sub               the chevron of an item that opens a submenu */
+@layer s4.components {
+  .s4-menu-item > .s4-icon[data-slot] { visibility: hidden; }
+  .s4-menu-item[data-check][aria-checked="true"] { background: transparent; }
+  .s4-menu-item[data-check][aria-checked="true"]:not([aria-disabled="true"]) { color: inherit; }
+  .s4-menu-item[data-check] > .s4-icon:first-child { opacity: 0; color: inherit; transition: opacity var(--s4-motion-state); }
+  .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { opacity: 1; }
+  .s4-menu-item[data-check][aria-checked="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  .s4-menu-item > .s4-menu-item-text { flex: 1 1 auto; min-inline-size: 0; }
+  .s4-menu-item > .s4-menu-item-sub { margin-inline-start: auto; --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-menu-item[aria-expanded="true"]::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  .s4-menu-item > .s4-kbd { background: transparent; padding-inline-end: 0; }
+  @media (forced-colors: active) { .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { forced-color-adjust: auto; } }
+}
+
 /* ---- desktop/desktop.css ---- */
 /* Desktop windows (decision 0043): what an Orion app needs to live in a desktop window or be packaged as a desktop app
    (an installed PWA with window controls overlay, Electron, Tauri), on top of the same shell and components.
@@ -3974,7 +4076,17 @@
    cursor, as desktop apps do. Pair it with data-density="auto" (base/density.css) for pointer-sized controls.
    .s4-titlebar: drags the window (app-region), leaves room for the system's window buttons (window controls overlay
    env(), or data-controls="start" for macOS traffic lights in a frameless window), and anything interactive inside it
-   stays clickable. <kbd class="s4-kbd"> shows a keyboard shortcut. desktop.js adds data-shortcut and data-context-menu. */
+   stays clickable. <kbd class="s4-kbd"> shows a keyboard shortcut. desktop.js adds data-shortcut and data-context-menu.
+
+   Issue 60 adds the rest of a desktop window's anatomy (each has its own folder: menubar, statusbar, doc-tabs, tree,
+   commands) and, here:
+     .s4-titlebar[data-variant="tabs"]       the document tabs are the title bar (no title; the space around them drags)
+     .s4-titlebar[data-variant="unified"]    a taller bar that holds the window's toolbar (title at the start)
+     .s4-inspector                           a resizable pane at the window's end for the properties of the selection
+     <html data-window-blurred>              set while the window is not in front: chrome dims, selections go neutral
+     <html data-window-state="fullscreen">   set by a shell (or display-mode: fullscreen): no room kept for traffic lights
+     <html data-shell="electron|tauri|pwa">  set by a shell bridge; with data-platform="mac" the title bar keeps room for
+                                             the traffic lights by itself */
 @layer s4.components {
   .s4-app[data-window] {
     grid-template-rows: auto minmax(0, 1fr) auto;
@@ -3987,10 +4099,16 @@
   .s4-app[data-window] > .s4-nav-rail { grid-row: 2 / -1; position: relative; top: auto; align-self: stretch; block-size: auto; }
   .s4-app[data-window] > .s4-app-body { grid-row: 2; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; }
   .s4-app[data-window] > .s4-nav-bar { grid-row: 3; position: relative; bottom: auto; }
+  .s4-app[data-window]:has(> .s4-inspector) { grid-template-columns: auto minmax(0, 1fr) auto; }
   .s4-app[data-window],
   .s4-app[data-window] * { scrollbar-width: thin; scrollbar-color: var(--md-sys-color-outline-variant) transparent; }
-  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-top-app-bar, .s4-toolbar, .s4-tabs, .s4-list-subheader, label) { user-select: none; -webkit-user-select: none; }
-  .s4-app[data-window] :is(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-tab, .s4-segment, .s4-nav-item, .s4-list-item, .s4-checkbox, .s4-radio, .s4-switch, .s4-table-sort, summary) { cursor: default; }
+  /* chrome is not text to select; content is (desktop apps do the same). Controls keep the arrow: the pointing hand
+     is for links in content */
+  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-top-app-bar, .s4-toolbar, .s4-tabs, .s4-list-subheader, label,
+    .s4-menubar, .s4-statusbar, .s4-doc-tabs, .s4-tree, .s4-inspector-header, .s4-inspector-group > summary, .s4-button, .s4-chip, .s4-status) { user-select: none; -webkit-user-select: none; }
+  .s4-app[data-window] :is(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-tab, .s4-segment, .s4-nav-item, .s4-list-item, .s4-checkbox, .s4-radio, .s4-switch, .s4-table-sort, summary,
+    .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab-label, .s4-tree-row) { cursor: default; }
+  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-menubar, .s4-statusbar, .s4-doc-tabs) :is(img, a, svg) { -webkit-user-drag: none; }
 
   /* ---------- title bar ---------- */
   .s4-titlebar {
@@ -4019,7 +4137,32 @@
   /* frameless macOS window: room for the traffic lights at the start */
   /* the bar sits against the window's top edge: rings are drawn inside the control so they are never cut off */
   .s4-titlebar :is(.s4-icon-button, .s4-button):focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
-  .s4-titlebar[data-controls="start"] { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
+  .s4-titlebar[data-controls="start"],
+  :root[data-platform="mac"][data-shell]:not([data-shell="pwa"]) .s4-titlebar { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
+  /* full screen: the system hides its window buttons, so the bar stops keeping room for them */
+  :root[data-window-state~="fullscreen"] .s4-titlebar { padding-inline: var(--s4-space-3); }
+  @media (display-mode: fullscreen) { .s4-titlebar { padding-inline: var(--s4-space-3); } }
+
+  /* variants: tabs in the title bar (a browser-like document window), a unified toolbar (a tool window) */
+  .s4-titlebar[data-variant="tabs"] { gap: var(--s4-space-1); }
+  .s4-titlebar[data-variant="tabs"] > .s4-titlebar-title { display: none; }
+  .s4-titlebar[data-variant="unified"] {
+    block-size: max(calc(var(--s4-size-titlebar) + var(--s4-space-3)), env(titlebar-area-height, 0px));
+    gap: var(--s4-space-3);
+  }
+  .s4-titlebar[data-variant="unified"] > .s4-titlebar-title {
+    flex: 0 1 auto;
+    text-align: start;
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  }
+  /* what sits after the title fills the bar; a spacer pushes the rest to the end */
+  .s4-titlebar-spacer { flex: 1 1 auto; align-self: stretch; min-inline-size: var(--s4-space-4); }
+  .s4-titlebar > .s4-search { flex: 0 1 calc(var(--s4-space-16) * 5); min-inline-size: 0; }
+  .s4-titlebar .s4-search { --s4-size-text-field: calc(var(--s4-size-titlebar) - var(--s4-space-2)); }
   .s4-titlebar-title {
     flex: 1 1 auto;
     min-inline-size: 0;
@@ -4058,6 +4201,128 @@
   }
   .s4-window-control:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
 
+  /* ---------- inspector: the properties of the selection, a pane at the window's end ----------
+     <aside class="s4-inspector" aria-label="Inspector" data-density="compact" data-resize-key="app-inspector">
+       <header class="s4-inspector-header"><h2 class="s4-inspector-title">Line</h2>…</header>
+       <div class="s4-inspector-body">
+         <details class="s4-inspector-group" open><summary>Context</summary><div class="s4-inspector-fields">…</div></details>
+       </div>
+     </aside>
+     Solid (it is content about content, not something floating), resizable from its start edge (drag, or the arrow
+     keys on the grip; Enter hides it), hidden with the hidden attribute or S4.desktop.inspector(el, false). From 840
+     wide only; on a phone the same properties belong in the item's own page. For a tool that works on the page behind
+     it (filters, find) on any window size, use a floating tool panel instead (data-modeless, decision 0054). */
+  .s4-inspector {
+    --_w: var(--s4-inspector-width, var(--s4-size-inspector));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    inline-size: var(--_w);
+    min-block-size: 0;
+    overflow: hidden;
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-app[data-window] > .s4-inspector { grid-column: 3; grid-row: 2; }
+  @container s4-app (width < 840px) { .s4-app > .s4-inspector { display: none; } }
+  .s4-inspector-header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-size-top-app-bar);
+    padding-inline: var(--s4-space-4) var(--s4-space-2);
+  }
+  .s4-inspector-title {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-inspector-body { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--s4-space-2) var(--s4-space-4); }
+  .s4-inspector-group { margin: 0; padding: 0; }
+  .s4-inspector-group + .s4-inspector-group { margin-block-start: var(--s4-space-1); }
+  .s4-inspector-group > summary {
+    --_h: var(--s4-size-button-small);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--_h);
+    padding-inline: var(--s4-space-2);
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-medium-weight);
+    list-style: none;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-inspector-group > summary::-webkit-details-marker { display: none; }
+  .s4-inspector-group > summary::after {
+    content: "";
+    order: -1;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline: var(--s4-space-1);
+    border-block-end: 2px solid currentColor;
+    border-inline-end: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--s4-motion-bend);
+  }
+  .s4-inspector-group > summary:dir(rtl)::after { transform: rotate(135deg); }
+  .s4-inspector-group[open]:not([data-closing]) > summary::after { transform: rotate(45deg); }
+  .s4-inspector-group > summary::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: currentColor; opacity: 0; transition: opacity var(--s4-motion-state); }
+  @media (hover: hover) { .s4-inspector-group > summary:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); } }
+  .s4-inspector-fields { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-2) var(--s4-space-3); }
+  /* a label and a value side by side: the dense row of an inspector */
+  .s4-inspector-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: center; gap: var(--s4-space-3); min-block-size: var(--s4-size-button-small); }
+  .s4-inspector-row > :first-child { color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-small-font); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); letter-spacing: var(--md-sys-typescale-body-small-tracking); }
+  .s4-inspector-row > :last-child { min-inline-size: 0; overflow-wrap: anywhere; }
+  /* the grip on its start edge */
+  .s4-inspector-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .s4-inspector-grip::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 2px;
+    background: var(--md-sys-color-primary);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state);
+  }
+  @media (hover: hover) { .s4-inspector-grip:hover::before { opacity: 0.6; } }
+  .s4-inspector-grip:is(:focus-visible, [data-dragging])::before { opacity: 1; }
+  .s4-inspector-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* ---------- a window that is not in front: its chrome steps back and selections go neutral (as every desktop does) ---------- */
+  :root[data-window-blurred] :is(.s4-titlebar, .s4-menubar-item, .s4-statusbar, .s4-titlebar-title) { color: var(--md-sys-color-on-surface-variant); }
+  :root[data-window-blurred] .s4-titlebar .s4-icon { color: var(--md-sys-color-on-surface-variant); }
+  :root[data-window-blurred] .s4-app[data-window] .s4-tree-item[aria-selected="true"] > .s4-tree-row { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); }
+  :root[data-window-blurred] .s4-app[data-window] .s4-doc-tab { color: var(--md-sys-color-on-surface-variant); }
+  .s4-titlebar, .s4-titlebar-title, .s4-statusbar { transition: color var(--s4-motion-state); }
+
   /* ---------- keyboard shortcut ---------- */
   .s4-kbd {
     display: inline-flex;
@@ -4083,6 +4348,460 @@
   @media (forced-colors: active) {
     .s4-titlebar { border-block-end: 1px solid CanvasText; }
     .s4-kbd { border: 1px solid CanvasText; }
+  }
+}
+
+/* ---- menubar/menubar.css ---- */
+/* Menu bar (issue 60): the application menu inside the window, for Windows and Linux shells and web apps in a window.
+   <div class="s4-menubar" role="menubar" aria-label="Application" data-menus="app"></div>
+   Its menus are the glass menu (Follow). The items are quiet labels on the chrome: no fill at rest, the state layer on
+   hover, a filled pill while their menu is open. The corner follows the dial (decision 0055). It sits in the title bar
+   (never dragging the window) or in its own row at the top of the window. Hidden on a phone (no menu bar there: the
+   same commands are in the palette and the screens' own menus) and when the shell draws the native menu bar
+   (<html data-native-menu>, set by a Mac shell). */
+@layer s4.components {
+  .s4-menubar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    min-inline-size: 0;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-menubar-item {
+    --_h: var(--s4-size-menubar-item);
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--_h);
+    margin: 0;
+    padding: 0 var(--s4-space-3);
+    border: 0;
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    background: transparent;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    white-space: nowrap;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-menubar-item[aria-expanded="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .s4-menubar-item:disabled { color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
+  .s4-titlebar > .s4-menubar { flex: 0 1 auto; }
+
+  /* no menu bar where there is no window to have one, or where the system draws it */
+  :root[data-native-menu] .s4-menubar { display: none; }
+  @container s4-app (width < 600px) { .s4-menubar { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-menubar-item[aria-expanded="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  }
+}
+
+/* ---- statusbar/statusbar.css ---- */
+/* Status bar (issue 60): a slim solid bar along the bottom of a desktop window for the state of things: sync, the
+   selection, the cursor's position, zoom, the connection. Quiet: chrome color, small type, no fill at rest.
+   <footer class="s4-statusbar" aria-label="Status">
+     <span class="s4-statusbar-item"><span class="s4-statusbar-dot" data-tone="success"></span>Synced</span>
+     <button class="s4-statusbar-item" type="button" data-menu="zoom-menu">100%</button>    a segment that opens a menu
+     <span class="s4-statusbar-spacer"></span>                                              what follows sits at the end
+     <span class="s4-statusbar-item" role="status" aria-live="polite">3 Selected</span>     announced when it changes
+   </footer>
+   Segments are text first (an icon only beside words). Clickable segments are buttons that open a menu (data-menu) or
+   a panel (data-sheet), or run a command (data-cmd): never the only way to reach what they open. In a data-window app
+   it spans the window's last row; it shows from 840 wide (on a phone the screens show their own state). */
+@layer s4.components {
+  .s4-statusbar {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    box-sizing: border-box;
+    min-block-size: var(--s4-size-statusbar);
+    padding-block: calc(var(--s4-space-1) / 2);
+    padding-inline: max(var(--s4-space-2), env(safe-area-inset-left, 0px)) max(var(--s4-space-2), env(safe-area-inset-right, 0px));
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+    -webkit-user-select: none;
+    --s4-icon-size: var(--s4-space-4);
+  }
+  .s4-statusbar::-webkit-scrollbar { display: none; }
+  .s4-statusbar-item {
+    --_h: calc(var(--s4-size-statusbar) - var(--s4-space-1));
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-block-size: var(--_h);
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+  }
+  /* a segment you can click reads a step stronger, so it is findable without a box around it */
+  :is(button, a).s4-statusbar-item { color: var(--md-sys-color-on-surface); text-decoration: none; }
+  .s4-statusbar-item[aria-expanded="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .s4-statusbar-item > .s4-icon { flex: none; }
+  .s4-statusbar-item[data-tone="error"] { color: var(--md-sys-color-error); }
+  /* a dot beside the words that already say the state (never the only sign) */
+  .s4-statusbar-dot { flex: none; inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
+  .s4-statusbar-dot[data-tone="success"] { background: var(--s4-color-success); }
+  .s4-statusbar-dot[data-tone="warning"] { background: var(--s4-color-warning); }
+  .s4-statusbar-dot[data-tone="info"] { background: var(--s4-color-info); }
+  .s4-statusbar-dot[data-tone="error"] { background: var(--md-sys-color-error); }
+  .s4-statusbar-spacer { flex: 1 1 auto; min-inline-size: var(--s4-space-2); }
+
+  /* in a desktop window: the last row, under everything */
+  .s4-app[data-window] > .s4-statusbar { grid-column: 1 / -1; grid-row: 3; z-index: var(--s4-z-navigation); }
+  @container s4-app (width < 840px) { .s4-app > .s4-statusbar { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-statusbar { border-block-start: 1px solid CanvasText; }
+    .s4-statusbar-dot { background: CanvasText; forced-color-adjust: none; }
+    :is(button, a).s4-statusbar-item { border: 1px solid ButtonText; }
+  }
+}
+
+/* ---- doc-tabs/doc-tabs.css ---- */
+/* Document tabs (issue 60): the open documents of a desktop window. Not the content tabs (components/tabs/), which
+   switch between fixed views of one thing and keep a sliding indicator: a document tab is a thing you opened, so each
+   is its own filled pill that comes and goes, closes, carries an unsaved-changes dot and can be dragged to a new place.
+   <div class="s4-doc-tabs">
+     <div class="s4-doc-tabs-list" role="tablist" aria-label="Open Files">
+       <div class="s4-doc-tab" data-modified><button class="s4-doc-tab-label" role="tab" aria-selected="true" aria-controls="p1">…</button></div>
+     </div>
+     <button class="s4-icon-button s4-doc-tabs-new" type="button" aria-label="New File">…</button>
+   </div>
+   The current tab takes the content's own surface (it is the document below it); the others are quiet labels on the
+   chrome with the state layer on hover. Corners follow the dial (decision 0055). Under 600 wide the row hides: a phone
+   shows one document at a time and opens them from the list. In a title bar (.s4-titlebar[data-variant="tabs"]) the
+   tabs are the title bar's content and the empty space around them still drags the window. */
+@layer s4.components {
+  .s4-doc-tabs {
+    --_h: var(--s4-size-doc-tab);
+    --_r: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    --_current: var(--md-sys-color-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-inline-size: 0;
+    padding-block: var(--s4-space-1);
+    padding-inline: var(--s4-space-2);
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface-variant);
+    user-select: none;
+    -webkit-user-select: none;
+    --s4-size-icon-button: var(--_h);
+  }
+  .s4-doc-tabs-list {
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    min-inline-size: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+  .s4-doc-tabs-list::-webkit-scrollbar { display: none; }
+  .s4-doc-tabs > .s4-icon-button { flex: none; -webkit-app-region: no-drag; app-region: no-drag; }
+
+  .s4-doc-tab {
+    display: flex;
+    flex: none;
+    align-items: center;
+    max-inline-size: calc(var(--s4-space-16) * 3.5);
+    min-block-size: var(--_h);
+    border-radius: var(--_r);
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: default;
+    --s4-icon-size: var(--s4-space-4);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) {
+    background: var(--_current);
+    color: var(--md-sys-color-on-surface);
+    --_weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
+  .s4-doc-tab-label {
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-inline-size: 0;
+    min-block-size: var(--_h);
+    margin: 0;
+    padding-block: 0;
+    padding-inline: var(--s4-space-3) var(--s4-space-1);
+    border: 0;
+    border-radius: var(--_r);
+    background: none;
+    color: inherit;
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--_weight, var(--md-sys-typescale-label-large-weight));
+    white-space: nowrap;
+    cursor: default;
+    outline: none;
+  }
+  .s4-doc-tab-label > .s4-icon { flex: none; }
+  .s4-doc-tab-text { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* the ring sits on the whole pill, label and close button together */
+  .s4-doc-tab:has(> .s4-doc-tab-label:focus-visible) { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* close: an icon button inside the pill; with unsaved changes it is a dot until you point at the tab or focus it */
+  .s4-doc-tab-close {
+    --_c: calc(var(--_h) - var(--s4-space-2));
+    position: relative;
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: var(--_c);
+    block-size: var(--_c);
+    margin: 0 var(--s4-space-1) 0 0;
+    margin-inline: 0 var(--s4-space-1);
+    padding: 0;
+    border: 0;
+    border-radius: min(calc(var(--_c) / 2), calc(var(--_r) - var(--s4-space-1)));
+    background: transparent;
+    color: inherit;
+    cursor: default;
+    opacity: 0;
+    --s4-icon-size: var(--s4-space-3);
+    transition: opacity var(--s4-motion-state), background-color var(--s4-motion-state);
+  }
+  .s4-doc-tab:is(:hover, :focus-within) > .s4-doc-tab-close,
+  .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) > .s4-doc-tab-close { opacity: 1; }
+  @media (hover: hover) { .s4-doc-tab-close:hover { background: color-mix(in srgb, currentColor calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent); } }
+  @media (hover: none) { .s4-doc-tab-close { opacity: 1; } }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close { opacity: 1; }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close > .s4-icon { opacity: 0; transition: opacity var(--s4-motion-state); }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: currentColor;
+    transition: opacity var(--s4-motion-state);
+  }
+  .s4-doc-tab[data-modified]:is(:hover, :focus-within) > .s4-doc-tab-close > .s4-icon { opacity: 1; }
+  .s4-doc-tab[data-modified]:is(:hover, :focus-within) > .s4-doc-tab-close::after { opacity: 0; }
+
+  .s4-doc-tabs[data-empty] > .s4-doc-tabs-list { display: none; }
+
+  /* in the title bar: the tabs are its content; the bar keeps dragging the window around them */
+  .s4-titlebar > .s4-doc-tabs { flex: 1 1 auto; align-self: stretch; padding: 0; background: transparent; }
+  .s4-titlebar > .s4-doc-tabs { --_current: var(--md-sys-color-surface); }
+
+  @container s4-app (width < 600px) { .s4-doc-tabs { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+    .s4-doc-tab { border: 1px solid ButtonText; }
+    .s4-doc-tab[data-modified] > .s4-doc-tab-close::after { background: ButtonText; }
+  }
+}
+
+/* ---- tree/tree.css ---- */
+/* Tree view (issue 60): nested things you open and close. A file tree in a sidebar, chapters in an editor, groups of
+   records. Rows are the list's rows made small: filled selection (secondary-container), the hover box that leans in
+   from where the pointer came (Edges Lean, decision 0044), corners from the dial (decision 0055), nothing outlined.
+   <ul class="s4-tree" role="tree" aria-label="Files">
+     <li class="s4-tree-item" aria-expanded="true">
+       <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Quests</span>
+         <span class="s4-tree-trailing"><span class="s4-tree-count">48</span></span></div>
+       <ul role="group">…</ul></li>
+   </ul>
+   Each level steps in by --s4-size-tree-indent (20, compact 14); past the fourth level only by half, so a deep path
+   still fits a narrow sidebar, and a faint guide line runs down each open folder so you can see whose child a row is.
+   Labels wrap instead of being cut. Rows are touch sized by default (48) and 28 in compact density. Opening a folder is
+   Reveal; the chevron turns (Bend). Public knob: --s4-tree-guides (set to transparent to drop the guide lines). */
+@layer s4.components {
+  .s4-tree {
+    --_row: var(--s4-size-tree-row);
+    --_step: var(--s4-size-tree-indent);
+    --_pad: var(--s4-space-2);
+    --_toggle: var(--s4-size-icon-small);
+    --s4-tree-cycle: 1200ms;
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-tree [role="group"] { position: relative; margin: 0; padding: 0; list-style: none; }
+  .s4-tree-item { --_depth: 0; display: block; margin: 0; padding: 0; outline: none; }
+  .s4-tree-item + .s4-tree-item { margin-block-start: calc(var(--s4-space-1) / 4); }
+
+  /* depth: full steps for four levels, half steps after that */
+  .s4-tree-row {
+    --_indent: calc(min(var(--_depth), 4) * var(--_step) + max(var(--_depth) - 4, 0) * var(--_step) / 2);
+    --_h: var(--_row);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--_row);
+    padding-block: calc(var(--s4-space-1) / 2);
+    padding-inline: calc(var(--_pad) + var(--_indent)) var(--s4-space-3);
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    color: var(--md-sys-color-on-surface);
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+    --s4-icon-size: var(--s4-size-icon-small);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-tree-row > .s4-icon { flex: none; color: var(--md-sys-color-on-surface-variant); }
+  .s4-tree-label { flex: 1 1 auto; min-inline-size: 0; overflow-wrap: anywhere; }
+  .s4-tree-trailing { display: inline-flex; flex: none; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  .s4-tree-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the open / close chevron (leaves keep the same space, so labels line up) */
+  .s4-tree-toggle {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: var(--_toggle);
+    block-size: var(--_toggle);
+    margin-inline-end: calc(var(--s4-space-1) * -1);
+    color: var(--md-sys-color-on-surface-variant);
+    --s4-icon-size: var(--s4-size-icon-small);
+    transition: transform var(--s4-motion-bend);
+  }
+  .s4-tree-item[aria-expanded="true"]:not([data-closing]) > .s4-tree-row > .s4-tree-toggle { transform: rotate(90deg); }
+  .s4-tree-item[aria-expanded="true"]:not([data-closing]) > .s4-tree-row > .s4-tree-toggle:dir(rtl) { transform: rotate(-90deg); }
+
+  /* hover: its own box, leaning in from where the pointer came (decision 0044); never a travelling highlight */
+  .s4-tree-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.985, 0.84);
+    transform-origin: 50% var(--_lean, 50%);
+    transition: opacity var(--s4-motion-state), transform var(--s4-motion-ink);
+  }
+  @media (hover: hover) {
+    .s4-tree-row:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); transform: none; }
+  }
+  .s4-tree-row:active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); transform: none; }
+
+  /* selected: filled, like every selection; in a window that is not in front it turns neutral (desktop.css) */
+  .s4-tree-item[aria-selected="true"] > .s4-tree-row {
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+  .s4-tree-item[aria-selected="true"] > .s4-tree-row :is(.s4-icon, .s4-tree-toggle, .s4-tree-count) { color: inherit; }
+  .s4-tree-item:focus-visible > .s4-tree-row { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* guide lines: a hairline down each open folder, under its chevron */
+  .s4-tree [role="group"]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--_pad) + min(var(--_depth), 4) * var(--_step) + max(var(--_depth) - 4, 0) * var(--_step) / 2 + var(--_toggle) / 2);
+    inline-size: 1px;
+    background: var(--s4-tree-guides, var(--md-sys-color-outline-variant));
+    pointer-events: none;
+  }
+  .s4-tree:not(:hover, :focus-within) [role="group"]::before { opacity: 0.6; }
+
+  /* moving: what you carry dims; the folder under it fills */
+  .s4-tree-item[data-cut] > .s4-tree-row,
+  .s4-tree-item[data-dragging] > .s4-tree-row { opacity: 0.55; }
+  .s4-tree-row[data-drop] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .s4-tree-row[data-drop] :is(.s4-icon, .s4-tree-toggle) { color: inherit; }
+
+  /* loading children: a quiet row while they come */
+  .s4-tree-loading > .s4-tree-row { color: var(--md-sys-color-on-surface-variant); }
+  .s4-tree-loading > .s4-tree-row::before { content: none; }
+  .s4-tree-spinner {
+    flex: none;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline: calc((var(--s4-size-icon-small) - var(--s4-space-2)) / 2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary);
+    animation: s4-tree-pulse var(--s4-tree-cycle) ease-in-out infinite;
+  }
+  @keyframes s4-tree-pulse { 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .s4-tree-spinner { animation: none; } }
+  :root[data-motion="reduced"] .s4-tree-spinner { animation: none; }
+
+  /* rename: a small field in place of the label */
+  .s4-tree-rename {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    block-size: calc(var(--_row) - var(--s4-space-2));
+    min-block-size: var(--s4-space-6);
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--md-sys-shape-corner-small);
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+    font: inherit;
+    letter-spacing: inherit;
+    outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
+    outline-offset: 0;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  @media (forced-colors: active) {
+    .s4-tree-item[aria-selected="true"] > .s4-tree-row { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+    .s4-tree-row[data-drop] { outline: 2px solid Highlight; }
+    .s4-tree [role="group"]::before { background: GrayText; }
   }
 }
 

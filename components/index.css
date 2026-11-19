@@ -22,7 +22,12 @@
 @import url("tabs/tabs.css");
 @import url("toolbar/toolbar.css");
 @import url("search/search.css");
+@import url("commands/commands.css");
 @import url("desktop/desktop.css");
+@import url("menubar/menubar.css");
+@import url("statusbar/statusbar.css");
+@import url("doc-tabs/doc-tabs.css");
+@import url("tree/tree.css");
 /* containment and data */
 @import url("card/card.css");
 @import url("pane/pane.css");

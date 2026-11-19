@@ -1,0 +1,147 @@
+/* Document tabs (issue 60): the open documents of a desktop window. Not the content tabs (components/tabs/), which
+   switch between fixed views of one thing and keep a sliding indicator: a document tab is a thing you opened, so each
+   is its own filled pill that comes and goes, closes, carries an unsaved-changes dot and can be dragged to a new place.
+   <div class="s4-doc-tabs">
+     <div class="s4-doc-tabs-list" role="tablist" aria-label="Open Files">
+       <div class="s4-doc-tab" data-modified><button class="s4-doc-tab-label" role="tab" aria-selected="true" aria-controls="p1">…</button></div>
+     </div>
+     <button class="s4-icon-button s4-doc-tabs-new" type="button" aria-label="New File">…</button>
+   </div>
+   The current tab takes the content's own surface (it is the document below it); the others are quiet labels on the
+   chrome with the state layer on hover. Corners follow the dial (decision 0055). Under 600 wide the row hides: a phone
+   shows one document at a time and opens them from the list. In a title bar (.s4-titlebar[data-variant="tabs"]) the
+   tabs are the title bar's content and the empty space around them still drags the window. */
+@layer s4.components {
+  .s4-doc-tabs {
+    --_h: var(--s4-size-doc-tab);
+    --_r: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    --_current: var(--md-sys-color-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-inline-size: 0;
+    padding-block: var(--s4-space-1);
+    padding-inline: var(--s4-space-2);
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface-variant);
+    user-select: none;
+    -webkit-user-select: none;
+    --s4-size-icon-button: var(--_h);
+  }
+  .s4-doc-tabs-list {
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    min-inline-size: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+  .s4-doc-tabs-list::-webkit-scrollbar { display: none; }
+  .s4-doc-tabs > .s4-icon-button { flex: none; -webkit-app-region: no-drag; app-region: no-drag; }
+
+  .s4-doc-tab {
+    display: flex;
+    flex: none;
+    align-items: center;
+    max-inline-size: calc(var(--s4-space-16) * 3.5);
+    min-block-size: var(--_h);
+    border-radius: var(--_r);
+    background: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: default;
+    --s4-icon-size: var(--s4-space-4);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) {
+    background: var(--_current);
+    color: var(--md-sys-color-on-surface);
+    --_weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
+  .s4-doc-tab-label {
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-inline-size: 0;
+    min-block-size: var(--_h);
+    margin: 0;
+    padding-block: 0;
+    padding-inline: var(--s4-space-3) var(--s4-space-1);
+    border: 0;
+    border-radius: var(--_r);
+    background: none;
+    color: inherit;
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--_weight, var(--md-sys-typescale-label-large-weight));
+    white-space: nowrap;
+    cursor: default;
+    outline: none;
+  }
+  .s4-doc-tab-label > .s4-icon { flex: none; }
+  .s4-doc-tab-text { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; }
+  /* the ring sits on the whole pill, label and close button together */
+  .s4-doc-tab:has(> .s4-doc-tab-label:focus-visible) { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* close: an icon button inside the pill; with unsaved changes it is a dot until you point at the tab or focus it */
+  .s4-doc-tab-close {
+    --_c: calc(var(--_h) - var(--s4-space-2));
+    position: relative;
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: var(--_c);
+    block-size: var(--_c);
+    margin: 0 var(--s4-space-1) 0 0;
+    margin-inline: 0 var(--s4-space-1);
+    padding: 0;
+    border: 0;
+    border-radius: min(calc(var(--_c) / 2), calc(var(--_r) - var(--s4-space-1)));
+    background: transparent;
+    color: inherit;
+    cursor: default;
+    opacity: 0;
+    --s4-icon-size: var(--s4-space-3);
+    transition: opacity var(--s4-motion-state), background-color var(--s4-motion-state);
+  }
+  .s4-doc-tab:is(:hover, :focus-within) > .s4-doc-tab-close,
+  .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) > .s4-doc-tab-close { opacity: 1; }
+  @media (hover: hover) { .s4-doc-tab-close:hover { background: color-mix(in srgb, currentColor calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent); } }
+  @media (hover: none) { .s4-doc-tab-close { opacity: 1; } }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close { opacity: 1; }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close > .s4-icon { opacity: 0; transition: opacity var(--s4-motion-state); }
+  .s4-doc-tab[data-modified] > .s4-doc-tab-close::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: currentColor;
+    transition: opacity var(--s4-motion-state);
+  }
+  .s4-doc-tab[data-modified]:is(:hover, :focus-within) > .s4-doc-tab-close > .s4-icon { opacity: 1; }
+  .s4-doc-tab[data-modified]:is(:hover, :focus-within) > .s4-doc-tab-close::after { opacity: 0; }
+
+  .s4-doc-tabs[data-empty] > .s4-doc-tabs-list { display: none; }
+
+  /* in the title bar: the tabs are its content; the bar keeps dragging the window around them */
+  .s4-titlebar > .s4-doc-tabs { flex: 1 1 auto; align-self: stretch; padding: 0; background: transparent; }
+  .s4-titlebar > .s4-doc-tabs { --_current: var(--md-sys-color-surface); }
+
+  @container s4-app (width < 600px) { .s4-doc-tabs { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-doc-tab:has(> .s4-doc-tab-label[aria-selected="true"]) { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+    .s4-doc-tab { border: 1px solid ButtonText; }
+    .s4-doc-tab[data-modified] > .s4-doc-tab-close::after { background: ButtonText; }
+  }
+}

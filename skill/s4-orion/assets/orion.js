@@ -1214,7 +1214,12 @@ S4.navPill = function (box) {
      on the rail (value = data-view, else href). preventDefault() on the click vetoes it.
    - [data-rail-toggle]: expands / collapses the rail (data-expanded), keeps aria-expanded in sync, swaps the button's
      aria-label between data-label-expand / data-label-collapse if given, and fires s4-toggle { expanded }.
-     Items are rows in both states, so only the rail's edge moves; the labels fade in CSS (decision 0043). */
+     Items are rows in both states, so only the rail's edge moves; the labels fade in CSS (decision 0043).
+   - .s4-nav-rail-group with a button.s4-nav-rail-title: the title folds the group (data-collapsed, aria-expanded) and
+     fires s4-toggle { group, open }; remembered per rail with data-resize-key.
+   - data-resizable: a grip on the end edge (role="separator"): drag it, or Left / Right on it (Home / End for the
+     limits, Enter to collapse or expand); dragged narrow, the rail collapses. Width remembered with data-resize-key.
+     Fires s4-resize { size, collapsed }. (issue 60) */
 S4.register('nav-rail', function (scope) {
   S4.util.all(scope, '.s4-nav-rail').forEach(function (rail) {
     if (!S4.util.once(rail, 'navrail')) return;
@@ -1279,6 +1284,74 @@ S4.register('nav-rail', function (scope) {
       S4.util.emit(rail, 's4-change', { item: item, index: items.indexOf(item), value: item.dataset.view || item.getAttribute('href') });
     });
     sync();
+
+    /* ---------- folding groups ---------- */
+    var key = rail.dataset.resizeKey;
+    function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function write(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+    var folded = (key && read(key + '-folded') || '').split('|').filter(Boolean);
+    rail.querySelectorAll('.s4-nav-rail-group').forEach(function (g, i) {
+      var t = g.querySelector(':scope > button.s4-nav-rail-title'), items = g.querySelector(':scope > .s4-nav-rail-group-items'); if (!t || !items) return;
+      if (!items.id) items.id = (rail.id || 's4-rail') + '-group-' + i;
+      t.setAttribute('aria-controls', items.id);
+      var name = t.textContent.trim();
+      if (folded.indexOf(name) >= 0) g.setAttribute('data-collapsed', '');
+      t.setAttribute('aria-expanded', String(!g.hasAttribute('data-collapsed')));
+      t.addEventListener('click', function () {
+        var open = g.hasAttribute('data-collapsed');
+        if (open) { g.removeAttribute('data-collapsed'); S4.transition.reveal(items, { open: true }); }
+        else { S4.transition.reveal(items, { open: false }).then(function (done) { if (done) { g.setAttribute('data-collapsed', ''); S4.transition.restore(items); } }); }
+        t.setAttribute('aria-expanded', String(open));
+        if (key) { var all = Array.prototype.map.call(rail.querySelectorAll('.s4-nav-rail-group'), function (x) { var b = x.querySelector(':scope > button.s4-nav-rail-title'); return b && b.getAttribute('aria-expanded') === 'false' ? b.textContent.trim() : ''; }).filter(Boolean); write(key + '-folded', all.join('|')); }
+        S4.util.emit(rail, 's4-toggle', { group: g, open: open });
+      });
+    });
+
+    /* ---------- resizable ---------- */
+    if (!rail.hasAttribute('data-resizable')) return;
+    var MIN = 200, MAX = 400, SNAP = 150;
+    var saved = key && parseFloat(read(key + '-width'));
+    if (saved) rail.style.setProperty('--s4-nav-rail-expanded-width', saved + 'px');
+    var grip = document.createElement('button');
+    grip.type = 'button'; grip.className = 's4-nav-rail-grip';
+    grip.setAttribute('role', 'separator'); grip.setAttribute('aria-orientation', 'vertical');
+    grip.setAttribute('aria-label', 'Resize ' + (rail.getAttribute('aria-label') || 'Sidebar'));
+    grip.setAttribute('aria-valuemin', String(MIN)); grip.setAttribute('aria-valuemax', String(MAX));
+    rail.appendChild(grip);
+    function now() { return Math.round(rail.getBoundingClientRect().width); }
+    function setOpen(on) { chosen = true; rail.toggleAttribute('data-expanded', on); sync(); S4.util.emit(rail, 's4-toggle', { expanded: on }); }
+    function size(px) {
+      px = Math.round(Math.max(MIN, Math.min(MAX, px)));
+      rail.style.setProperty('--s4-nav-rail-expanded-width', px + 'px');
+      grip.setAttribute('aria-valuenow', String(px));
+      if (key) write(key + '-width', String(px));
+      S4.util.emit(rail, 's4-resize', { size: px, collapsed: false });
+    }
+    grip.setAttribute('aria-valuenow', String(now()));
+    grip.addEventListener('keydown', function (e) {
+      var rtl = getComputedStyle(rail).direction === 'rtl', grow = rtl ? 'ArrowLeft' : 'ArrowRight', shrink = rtl ? 'ArrowRight' : 'ArrowLeft';
+      if (e.key === 'Enter') setOpen(!rail.hasAttribute('data-expanded'));
+      else if (!rail.hasAttribute('data-expanded')) { if (e.key === grow) setOpen(true); else return; }
+      else if (e.key === grow) size(now() + 16);
+      else if (e.key === shrink) { if (now() - 16 < MIN) setOpen(false); else size(now() - 16); }
+      else if (e.key === 'Home') size(MIN); else if (e.key === 'End') size(MAX);
+      else return;
+      e.preventDefault();
+    });
+    grip.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      e.preventDefault();
+      var x0 = e.clientX, w0 = now(), rtl = getComputedStyle(rail).direction === 'rtl';
+      rail.setAttribute('data-resizing', ''); grip.setAttribute('data-dragging', ''); grip.setPointerCapture(e.pointerId);
+      function mv(ev) {
+        var w = w0 + (rtl ? x0 - ev.clientX : ev.clientX - x0);
+        if (w < SNAP) { if (rail.hasAttribute('data-expanded')) setOpen(false); }
+        else { if (!rail.hasAttribute('data-expanded')) setOpen(true); size(w); }
+      }
+      function up() { rail.removeAttribute('data-resizing'); grip.removeAttribute('data-dragging'); grip.removeEventListener('pointermove', mv); grip.removeEventListener('pointerup', up); grip.removeEventListener('pointercancel', up); }
+      grip.addEventListener('pointermove', mv); grip.addEventListener('pointerup', up); grip.addEventListener('pointercancel', up);
+    });
+    grip.addEventListener('dblclick', function () { setOpen(!rail.hasAttribute('data-expanded')); });
   });
 });
 
@@ -1501,6 +1574,163 @@ S4.register('search', function (scope) {
   });
 });
 
+/* ---- commands/commands.js ---- */
+/* Commands (issue 60): one list of what an app can do, written once, feeding every way of doing it: the menu bar,
+   menus and right-click menus, keyboard shortcuts, the command palette, buttons, and a desktop shell's native menu.
+     S4.commands.add([{ id: 'file.save', label: 'Save', group: 'File', icon: 'save', shortcut: 'mod+s',
+                        run: function (ctx) {…}, enabled: function () { return dirty; },
+                        type: 'check' | 'radio', checked: function () { return on; }, radio: 'zoom',
+                        keywords: 'store write', palette: true }])
+     S4.commands.menu('app', [ { label: 'File', items: ['file.new', 'file.open', '-', { label: 'Open Recent', items: […] }] }, … ])
+     S4.commands.menu('row-menu', ['edit.copy', 'edit.rename', '-', 'edit.delete'])   a named menu: renders into
+       .s4-menubar[data-menus="app"] and into <div class="s4-menu" id="row-menu"> (made if missing), so
+       data-context-menu="row-menu" and data-menu="row-menu" just work.
+     <button data-cmd="file.save">…</button>   clicking runs the command; label, disabled, pressed and its <kbd> follow it.
+   Item forms in a menu: 'id', '-' (divider), { heading: 'Label' }, { label, icon, items: [...] } (a submenu),
+   { id, label } (another label for the same command here).
+   State: enabled() and checked() are asked again whenever S4.commands.refresh() runs (after every command, on every
+   menu open, and when the app calls it). Nothing here draws: menus are the glass menu, the palette is the palette.
+   S4.commands.native('app') returns the menu as plain data with Electron-style accelerators, for a desktop shell.
+   Events on document: s4-command { command, context } after a command runs; s4-commands when the list or a state
+   changes (a shell listens to rebuild its native menu). */
+(function () {
+  var S4 = window.S4, list = [], byId = {}, menus = {}, seq = 0, queued = false;
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function call(f, c, ctx) { try { return typeof f === 'function' ? f.call(c, ctx) : f; } catch (e) { console.error('S4.commands ' + c.id, e); return undefined; } }
+  function enabled(c) { return c.enabled == null ? true : call(c.enabled, c) !== false; }
+  function checked(c) { return !!call(c.checked, c); }
+
+  function add(cmds) {
+    (Array.isArray(cmds) ? cmds : [cmds]).forEach(function (c) {
+      if (!c) return;
+      if (!c.id) c.id = 'cmd-' + (++seq);
+      if (byId[c.id]) list.splice(list.indexOf(byId[c.id]), 1);
+      byId[c.id] = c; list.push(c);
+    });
+    schedule();
+    return (Array.isArray(cmds) ? cmds : [cmds]).map(function (c) { return c && c.id; });
+  }
+  function remove(id) { var c = byId[id]; if (!c) return; list.splice(list.indexOf(c), 1); delete byId[id]; schedule(); }
+  function run(id, ctx) {
+    var c = typeof id === 'string' ? byId[id] : id;
+    if (!c || !enabled(c)) return false;
+    call(c.run, c, ctx);
+    S4.util.emit(document, 's4-command', { command: c, context: ctx });
+    refresh();
+    return true;
+  }
+
+  /* ---------- named menus ---------- */
+  function itemHtml(it, withSlot, owner, n) {
+    if (it === '-' || it === '|') return '<hr class="s4-menu-divider">';
+    if (it && it.heading) return '<div class="s4-menu-label" role="presentation">' + esc(it.heading) + '</div>';
+    if (it && it.items) {
+      var sub = owner + '-' + n;   /* the same id every render, so a submenu is rebuilt in place */
+      makeMenu(sub, it.items, it.label);
+      return '<button class="s4-menu-item" type="button" role="menuitem" tabindex="-1" data-submenu="' + sub + '" aria-haspopup="menu" aria-expanded="false" aria-controls="' + sub + '">' +
+        (withSlot ? (it.icon ? '<span class="s4-icon" data-icon="' + esc(it.icon) + '"></span>' : '<span class="s4-icon" data-slot></span>') : '') +
+        '<span class="s4-menu-item-text">' + esc(it.label) + '</span><span class="s4-icon s4-menu-item-sub" data-icon="chevron-right"></span></button>';
+    }
+    var id = typeof it === 'string' ? it : it.id, c = byId[id] || {};
+    var role = c.type === 'check' ? 'menuitemcheckbox' : c.type === 'radio' ? 'menuitemradio' : 'menuitem';
+    var icon = c.type === 'check' || c.type === 'radio' ? 'check' : c.icon;
+    return '<button class="s4-menu-item" type="button" tabindex="-1" role="' + role + '" data-cmd="' + esc(id) + '"' + (c.type ? ' data-check' : '') + '>' +
+      (withSlot ? (icon ? '<span class="s4-icon" data-icon="' + esc(icon) + '"></span>' : '<span class="s4-icon" data-slot></span>') : '') +
+      '<span class="s4-menu-item-text">' + esc((it && it.label) || c.label || id) + '</span><kbd class="s4-kbd"></kbd></button>';
+  }
+  /* an icon column for the whole menu when any item has an icon or a check, so labels line up */
+  function slotted(items) { return items.some(function (it) { var c = typeof it === 'string' ? byId[it] : it && it.id ? byId[it.id] : null; return (it && it.icon) || (c && (c.icon || c.type)); }); }
+  function makeMenu(id, items, label) {
+    var m = document.getElementById(id);
+    if (!m) { m = document.createElement('div'); m.className = 's4-menu'; m.id = id; document.body.appendChild(m); }
+    if (label && !m.getAttribute('aria-label')) m.setAttribute('aria-label', label);
+    m.classList.add('s4-command-menu');
+    var slot = slotted(items);
+    m.innerHTML = items.map(function (it, n) { return itemHtml(it, slot, id, n); }).join('');
+    if (S4.init) S4.init(m);   /* wires a new menu once; draws the icons of a rebuilt one */
+    sync(m);
+    return m;
+  }
+  function menu(name, items) {
+    if (items === undefined) return menus[name];
+    menus[name] = items;
+    render(name);
+    return menus[name];
+  }
+  function render(name) {
+    var items = menus[name]; if (!items) return;
+    var bars = document.querySelectorAll('.s4-menubar[data-menus="' + name + '"]');
+    if (bars.length) { if (S4.menubar) bars.forEach(function (b) { S4.menubar.render(b, items); }); }
+    else makeMenu(name, items);
+  }
+
+  /* ---------- keep every [data-cmd] element in step with its command ---------- */
+  function sync(scope) {
+    S4.util.all(scope || document, '[data-cmd]').forEach(function (el) {
+      var c = byId[el.dataset.cmd]; if (!c) return;
+      var on = enabled(c), chk = c.type ? checked(c) : null;
+      if (el.matches('.s4-menu-item, [role^="menuitem"]')) { if (on) el.removeAttribute('aria-disabled'); else el.setAttribute('aria-disabled', 'true'); }
+      else if ('disabled' in el && el.tagName === 'BUTTON') el.disabled = !on;
+      else if (on) el.removeAttribute('aria-disabled'); else el.setAttribute('aria-disabled', 'true');
+      if (chk !== null) {
+        if (el.matches('[role="menuitemcheckbox"], [role="menuitemradio"]')) el.setAttribute('aria-checked', String(chk));
+        else if (el.tagName === 'BUTTON') el.setAttribute('aria-pressed', String(chk));
+      }
+      var k = el.querySelector(':scope > .s4-kbd');
+      if (k && c.shortcut && S4.desktop) k.textContent = S4.desktop.format(c.shortcut);
+      if (!el.textContent.trim() && !el.getAttribute('aria-label') && c.label) el.setAttribute('aria-label', c.label);
+    });
+  }
+  function refresh() { sync(document); S4.util.emit(document, 's4-commands', {}); }
+  function schedule() { if (queued) return; queued = true; Promise.resolve().then(function () { queued = false; Object.keys(menus).forEach(render); refresh(); }); }
+
+  /* ---------- a shell's native menu (Electron, Tauri): the same menu as plain data ---------- */
+  function accel(s) {
+    if (!s) return undefined;
+    var NAMES = { comma: ',', space: 'Space', enter: 'Return', escape: 'Esc', arrowup: 'Up', arrowdown: 'Down', arrowleft: 'Left', arrowright: 'Right', delete: 'Delete', backspace: 'Backspace', pageup: 'PageUp', pagedown: 'PageDown' };
+    return String(s).toLowerCase().split('+').map(function (p) {
+      p = p.trim();
+      if (p === 'mod') return 'CmdOrCtrl'; if (p === 'shift') return 'Shift'; if (p === 'alt') return 'Alt';
+      return NAMES[p] || (p.length === 1 ? p.toUpperCase() : p.charAt(0).toUpperCase() + p.slice(1));
+    }).join('+');
+  }
+  function plain(items) {
+    return items.map(function (it) {
+      if (it === '-' || it === '|') return { type: 'separator' };
+      if (it && it.heading) return { label: it.heading, enabled: false };
+      if (it && it.items) return { label: it.label, submenu: plain(it.items) };
+      var id = typeof it === 'string' ? it : it.id, c = byId[id]; if (!c) return null;
+      var o = { id: id, label: (it && it.label) || c.label, enabled: enabled(c), accelerator: accel(c.shortcut) };
+      if (c.type === 'check') { o.type = 'checkbox'; o.checked = checked(c); }
+      if (c.type === 'radio') { o.type = 'radio'; o.checked = checked(c); }
+      return o;
+    }).filter(Boolean);
+  }
+  function native(name) {
+    var items = menus[name] || [];
+    return items.some(function (it) { return it && it.items; }) && items.every(function (it) { return it && it.items; })
+      ? items.map(function (m) { return { label: m.label, submenu: plain(m.items) }; }) : plain(items);
+  }
+
+  S4.commands = { add: add, remove: remove, run: run, get: function (id) { return byId[id]; }, list: function () { return list.slice(); },
+    enabled: function (id) { var c = byId[id]; return !!c && enabled(c); }, checked: function (id) { var c = byId[id]; return !!c && checked(c); },
+    menu: menu, menus: function () { return Object.keys(menus); }, refresh: refresh, native: native, accelerator: accel,
+    build: makeMenu   /* build(id, items, label): one .s4-menu from items (the menu bar uses it for each of its menus) */ };
+
+  /* clicking anything that names a command runs it (menu items, buttons, links) */
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-cmd]'); if (!el || !byId[el.dataset.cmd]) return;
+    if (el.matches(':disabled, [aria-disabled="true"]')) return;
+    if (el.tagName === 'A') e.preventDefault();
+    var menuEl = el.closest('.s4-menu'), ctx = { source: el, target: menuEl && menuEl.contextTarget || null };
+    run(el.dataset.cmd, ctx);
+    if (menuEl && el.hasAttribute('data-check') && S4.menu) S4.menu.close(menuEl, true);   /* menu.js keeps a checkbox menu open; a command menu closes like a native one */
+  });
+  /* menus show the state of the moment they open */
+  document.addEventListener('s4-open', function (e) { if (e.target.classList && e.target.classList.contains('s4-menu')) sync(e.target); });
+  S4.register('commands', function (scope) { if (list.length) sync(scope); });
+})();
+
 /* ---- desktop/desktop.js ---- */
 /* Desktop behaviour (decision 0043).
    - <html data-platform="mac|windows|linux|ios|android"> is set once (unless the page set it), so CSS and apps can adapt.
@@ -1513,7 +1743,14 @@ S4.register('search', function (scope) {
      before it opens; choosing an item fires the menu's usual s4-select.
    - [data-window-action="minimize|maximize|close"] fires s4-window { action } on the document: wire it to the shell
      (Electron ipc, Tauri window API). Orion never talks to a shell itself.
-   S4.desktop.platform, S4.desktop.format('mod+k'). */
+   - Commands (S4.commands, components/commands/) with a shortcut run on it from anywhere, with the same rules.
+   - Shift+F10 or the menu key opens an element's data-context-menu from the keyboard, under the element.
+   - <html data-window-blurred> while the window is not in front; <html data-window-state="fullscreen"> in full
+     screen; <html data-window-state="overlay"> while an installed web app draws into the title bar area (window
+     controls overlay). A shell may set data-window-state itself (Electron and Tauri know the real state).
+   - .s4-inspector: a grip on its start edge (drag, arrows, Home/End, Enter to hide), the width remembered with
+     data-resize-key; its .s4-inspector-group sections open and close with Reveal. S4.desktop.inspector(el, on).
+   S4.desktop.platform, S4.desktop.format('mod+k'), S4.desktop.matches(event, 'mod+k'). */
 (function () {
   var S4 = window.S4, root = document.documentElement;
   var ua = navigator.userAgent || '', plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
@@ -1526,13 +1763,18 @@ S4.register('search', function (scope) {
     var p = String(s).toLowerCase().split('+').map(function (x) { return x.trim(); });
     return { mod: p.indexOf('mod') >= 0, shift: p.indexOf('shift') >= 0, alt: p.indexOf('alt') >= 0, key: p[p.length - 1] };
   }
-  var NAMES = { enter: '↵', escape: 'Esc', backspace: '⌫', delete: 'Del', arrowup: '↑', arrowdown: '↓', arrowleft: '←', arrowright: '→', comma: ',', space: 'Space' };
+  var NAMES = { enter: '↵', escape: 'Esc', backspace: '⌫', delete: 'Del', pageup: 'PgUp', pagedown: 'PgDn', tab: 'Tab', arrowup: '↑', arrowdown: '↓', arrowleft: '←', arrowright: '→', comma: ',', space: 'Space' };
   function format(s) {
     var c = parse(s), key = NAMES[c.key] || (c.key.length === 1 ? c.key.toUpperCase() : c.key.charAt(0).toUpperCase() + c.key.slice(1));
     if (apple) return (c.alt ? '⌥' : '') + (c.shift ? '⇧' : '') + (c.mod ? '⌘' : '') + key;
     return (c.mod ? 'Ctrl+' : '') + (c.alt ? 'Alt+' : '') + (c.shift ? 'Shift+' : '') + key;
   }
-  S4.desktop = { platform: platform, format: format };
+  function matches(e, s) {
+    var c = parse(s), mod = apple ? e.metaKey : e.ctrlKey, key = (e.key || '').toLowerCase();
+    if (key === ',') key = 'comma'; if (key === ' ') key = 'space';
+    return c.key === key && c.mod === mod && c.shift === e.shiftKey && c.alt === e.altKey && (apple ? !e.ctrlKey : !e.metaKey);
+  }
+  S4.desktop = { platform: platform, format: format, matches: matches };
 
   document.addEventListener('keydown', function (e) {
     if (e.defaultPrevented || e.repeat) return;
@@ -1546,6 +1788,15 @@ S4.register('search', function (scope) {
       if (typing && !c.mod && key !== 'escape') continue;
       if (el.matches(':disabled, [aria-disabled="true"]') || !el.getClientRects().length && !el.closest('.s4-menu')) continue;
       e.preventDefault(); el.click(); return;
+    }
+    /* then the app's commands */
+    if (!S4.commands || document.querySelector('dialog[open]:not(.s4-palette)')) return;
+    var list = S4.commands.list();
+    for (var j = 0; j < list.length; j++) {
+      var cmd = list[j]; if (!cmd.shortcut || !matches(e, cmd.shortcut)) continue;
+      if (typing && !parse(cmd.shortcut).mod && key !== 'escape') continue;
+      if (!S4.commands.enabled(cmd.id)) continue;
+      e.preventDefault(); S4.commands.run(cmd.id, { source: 'keyboard', target: document.activeElement }); return;
     }
   });
 
@@ -1561,8 +1812,17 @@ S4.register('search', function (scope) {
     return true;
   }
   document.addEventListener('contextmenu', function (e) {
-    var host = e.target.closest && e.target.closest('[data-context-menu]');
-    if (host && openContext(host, e.clientX, e.clientY)) e.preventDefault();
+    var host = e.target.closest && e.target.closest('[data-context-menu]'); if (!host) return;
+    var x = e.clientX, y = e.clientY;
+    if (!x && !y || e.button === -1) { var r = host.getBoundingClientRect(); x = r.left + Math.min(24, r.width / 2); y = r.bottom; }   /* from the keyboard */
+    if (openContext(host, x, y)) e.preventDefault();
+  });
+  /* Shift+F10 and the menu key: the same menu from the keyboard, under the focused element */
+  document.addEventListener('keydown', function (e) {
+    if (!(e.key === 'ContextMenu' || (e.key === 'F10' && e.shiftKey))) return;
+    var host = document.activeElement && document.activeElement.closest && document.activeElement.closest('[data-context-menu]'); if (!host) return;
+    var r = (host.querySelector(':scope > .s4-tree-row') || host).getBoundingClientRect();
+    if (openContext(host, r.left + Math.min(24, r.width / 2), r.bottom)) e.preventDefault();
   });
   /* touch: a long press opens the same menu */
   var press = null;
@@ -1585,11 +1845,799 @@ S4.register('search', function (scope) {
     if (b) S4.util.emit(document, 's4-window', { action: b.dataset.windowAction });
   });
 
+  /* ---------- the window: in front or not, full screen, drawing into the title bar ---------- */
+  window.addEventListener('blur', function () { root.setAttribute('data-window-blurred', ''); });
+  window.addEventListener('focus', function () { root.removeAttribute('data-window-blurred'); });
+  function state(word, on) {
+    var set = (root.dataset.windowState || '').split(/\s+/).filter(function (w) { return w && w !== word; });
+    if (on) set.push(word);
+    if (set.length) root.dataset.windowState = set.join(' '); else delete root.dataset.windowState;
+  }
+  document.addEventListener('fullscreenchange', function () { state('fullscreen', !!document.fullscreenElement); });
+  if (window.matchMedia) { var fs = matchMedia('(display-mode: fullscreen)'); state('fullscreen', fs.matches || !!document.fullscreenElement); if (fs.addEventListener) fs.addEventListener('change', function () { state('fullscreen', fs.matches); }); }
+  var wco = navigator.windowControlsOverlay;
+  if (wco) { state('overlay', wco.visible); wco.addEventListener('geometrychange', function (e) { state('overlay', e.visible); }); }
+
+  /* ---------- the inspector ---------- */
+  function store(key, v) { try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, String(v)); } catch (e) {} }
+  function stored(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function inspector(el, on) {
+    if (on == null) on = el.hidden;
+    el.hidden = !on;
+    S4.util.emit(el, 's4-toggle', { open: !!on });
+    return !!on;
+  }
+  S4.desktop.inspector = inspector;
+  function wireInspector(el) {
+    var key = el.dataset.resizeKey, min = 220, max = 520;
+    var w = key && parseFloat(stored(key + '-width'));
+    if (w) el.style.setProperty('--s4-inspector-width', w + 'px');
+    var grip = document.createElement('button');
+    grip.type = 'button'; grip.className = 's4-inspector-grip';
+    grip.setAttribute('role', 'separator'); grip.setAttribute('aria-orientation', 'vertical');
+    grip.setAttribute('aria-label', 'Resize ' + (el.getAttribute('aria-label') || 'Inspector'));
+    grip.setAttribute('aria-valuemin', min); grip.setAttribute('aria-valuemax', max);
+    el.insertBefore(grip, el.firstChild);
+    function size(px) {
+      px = Math.round(Math.max(min, Math.min(max, px)));
+      el.style.setProperty('--s4-inspector-width', px + 'px'); grip.setAttribute('aria-valuenow', px);
+      if (key) store(key + '-width', px);
+    }
+    grip.setAttribute('aria-valuenow', Math.round(el.getBoundingClientRect().width) || 288);
+    grip.addEventListener('keydown', function (e) {
+      var rtl = getComputedStyle(el).direction === 'rtl', cur = el.getBoundingClientRect().width, grow = rtl ? 'ArrowRight' : 'ArrowLeft', shrink = rtl ? 'ArrowLeft' : 'ArrowRight';
+      if (e.key === grow) size(cur + 16); else if (e.key === shrink) size(cur - 16);
+      else if (e.key === 'Home') size(min); else if (e.key === 'End') size(max);
+      else if (e.key === 'Enter') inspector(el, false);
+      else return;
+      e.preventDefault();
+    });
+    grip.addEventListener('pointerdown', function (e) {
+      if (e.button) return;
+      e.preventDefault();
+      var x0 = e.clientX, w0 = el.getBoundingClientRect().width, rtl = getComputedStyle(el).direction === 'rtl';
+      grip.setAttribute('data-dragging', ''); grip.setPointerCapture(e.pointerId);
+      function mv(ev) { size(w0 + (rtl ? ev.clientX - x0 : x0 - ev.clientX)); }
+      function up() { grip.removeAttribute('data-dragging'); grip.removeEventListener('pointermove', mv); grip.removeEventListener('pointerup', up); grip.removeEventListener('pointercancel', up); }
+      grip.addEventListener('pointermove', mv); grip.addEventListener('pointerup', up); grip.addEventListener('pointercancel', up);
+    });
+    grip.addEventListener('dblclick', function () { el.style.removeProperty('--s4-inspector-width'); if (key) store(key + '-width', null); });
+    /* groups open and close in place (Reveal), like the accordion */
+    el.addEventListener('click', function (e) {
+      var sum = e.target.closest('.s4-inspector-group > summary'); if (!sum) return;
+      var d = sum.parentElement, body = d.querySelector(':scope > :not(summary)'); if (!body) return;
+      e.preventDefault();
+      if (!d.open) { d.removeAttribute('data-closing'); d.open = true; S4.transition.reveal(body, { open: true }); }
+      else { d.setAttribute('data-closing', ''); S4.transition.reveal(body, { open: false }).then(function (done) { if (!done || !d.hasAttribute('data-closing')) return; d.open = false; d.removeAttribute('data-closing'); S4.transition.restore(body); }); }
+      S4.util.emit(d, 's4-toggle', { open: !d.hasAttribute('data-closing') });
+    });
+  }
+
   S4.register('desktop', function (scope) {
+    S4.util.all(scope, '.s4-inspector').forEach(function (el) { if (S4.util.once(el, 'inspector')) wireInspector(el); });
     S4.util.all(scope, '.s4-kbd').forEach(function (k) {
       if (k.textContent.trim()) return;
       var host = k.dataset.for ? document.getElementById(k.dataset.for) : k.closest('[data-shortcut]');
       if (host && host.dataset.shortcut) k.textContent = format(host.dataset.shortcut);
+    });
+  });
+})();
+
+/* ---- menubar/menubar.js ---- */
+/* Menu bar (issue 60): the application menu inside the window (File, Edit, View, …), for Windows and Linux shells and
+   for web apps in a window. On a Mac shell that builds the native menu bar from the same commands, <html
+   data-native-menu> hides it. WAI-ARIA menubar pattern:
+     <div class="s4-menubar" role="menubar" aria-label="Application" data-menus="app"></div>
+       filled from S4.commands.menu('app', [{ label: 'File', items: ['file.new', …] }, …]); or written by hand:
+     <div class="s4-menubar" role="menubar" aria-label="Application">
+       <button class="s4-menubar-item" type="button" data-menu="m-file">File</button> …
+     </div>
+   Keys: Left and Right move along the bar (and switch the open menu), Down, Enter or Space open a menu at its first
+   item, Up at its last, Home and End, a letter jumps to the menu that starts with it. Inside a menu, the arrow away from
+   a submenu moves to the next menu of the bar. F10, or Alt pressed and let go, puts focus on the bar; Alt with a
+   letter opens that menu; Escape gives focus back to where it was. With one menu open, pointing at another opens it.
+   S4.menubar.render(bar, items), S4.menubar.focus(bar). */
+(function () {
+  var S4 = window.S4, uid = 0;
+  function barItems(bar) { return Array.prototype.slice.call(bar.querySelectorAll('.s4-menubar-item')).filter(function (b) { return !b.disabled; }); }
+  function menuOf(item) { return document.getElementById(item.dataset.menu); }
+  function isOpen(m) { return !!m && (m.matches(':popover-open') || m.hasAttribute('data-open')) && !m._s4closing; }
+  function openOf(bar) { return barItems(bar).filter(function (i) { return isOpen(menuOf(i)); })[0] || null; }
+  function shown(bar) { return !!bar.getClientRects().length && getComputedStyle(bar).visibility !== 'hidden'; }
+  function rove(bar, item) { barItems(bar).forEach(function (i) { i.tabIndex = i === item ? 0 : -1; }); }
+  function openAt(bar, item, last) {
+    var m = menuOf(item); if (!m) return;
+    rove(bar, item);
+    if (!isOpen(m)) S4.menu.open(m, item);
+    var list = Array.prototype.filter.call(m.querySelectorAll('.s4-menu-item'), function (x) { return x.getAttribute('aria-disabled') !== 'true' && !x.disabled; });
+    var to = last ? list[list.length - 1] : list[0];
+    if (to) to.focus({ preventScroll: true });
+  }
+
+  function render(bar, items) {
+    if (!bar.id) bar.id = 's4-menubar-' + (++uid);
+    var html = '';
+    items.forEach(function (top, i) {
+      var id = bar.id + '-m' + i;
+      S4.commands.build(id, top.items || [], top.label);
+      html += '<button class="s4-menubar-item" type="button" data-menu="' + id + '">' + String(top.label).replace(/[&<>"]/g, '') + '</button>';
+    });
+    bar.innerHTML = html;
+    setup(bar);
+    S4.init(bar);   /* menu.js wires the new items as openers */
+  }
+  function setup(bar) {
+    var all = barItems(bar);
+    all.forEach(function (i) { i.setAttribute('role', 'menuitem'); });
+    rove(bar, all[0]);
+  }
+
+  var before = null;   /* where focus was when the keyboard went to the bar */
+  function focusBar(bar) {
+    if (!bar || !shown(bar)) return false;
+    if (!bar.contains(document.activeElement)) before = document.activeElement;
+    var item = barItems(bar).filter(function (i) { return i.tabIndex === 0; })[0] || barItems(bar)[0];
+    if (item) item.focus();
+    return true;
+  }
+  function leave(bar) { var b = before; before = null; if (b && b.isConnected && b !== document.body && b.focus) b.focus({ preventScroll: true }); else if (document.activeElement) document.activeElement.blur(); }
+  function activeBar() { return Array.prototype.filter.call(document.querySelectorAll('.s4-menubar'), shown)[0] || null; }
+  /* which bar a menu (or a submenu of one) belongs to, and its item there */
+  function rootItem(menu) {
+    var m = menu, guard = 0;
+    while (m && m._s4parent && guard++ < 10) m = m._s4parent;
+    var a = m && m._s4anchor;
+    return a && a.classList && a.classList.contains('s4-menubar-item') ? a : null;
+  }
+
+  S4.menubar = { render: render, focus: function (bar) { return focusBar(bar || activeBar()); } };
+
+  S4.register('menubar', function (scope) {
+    S4.util.all(scope, '.s4-menubar').forEach(function (bar) {
+      if (!S4.util.once(bar, 'menubar')) return;
+      if (!bar.getAttribute('role')) bar.setAttribute('role', 'menubar');
+      if (bar.dataset.menus && S4.commands && S4.commands.menu(bar.dataset.menus) && !bar.querySelector('.s4-menubar-item')) render(bar, S4.commands.menu(bar.dataset.menus));
+      else setup(bar);
+      var typed = '', typedAt = 0;
+      bar.addEventListener('keydown', function (e) {
+        var item = e.target.closest('.s4-menubar-item'); if (!item) return;
+        var list = barItems(bar), i = list.indexOf(item), rtl = getComputedStyle(bar).direction === 'rtl';
+        var next = rtl ? 'ArrowLeft' : 'ArrowRight', prev = rtl ? 'ArrowRight' : 'ArrowLeft', to = null;
+        if (e.key === next) to = list[(i + 1) % list.length];
+        else if (e.key === prev) to = list[(i - 1 + list.length) % list.length];
+        else if (e.key === 'Home') to = list[0];
+        else if (e.key === 'End') to = list[list.length - 1];
+        else if (e.key === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); openAt(bar, item, true); return; }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); e.stopImmediatePropagation(); openAt(bar, item, false); return; }
+        else if (e.key === 'Escape') { e.preventDefault(); leave(bar); return; }
+        else if (e.key.length === 1 && /\S/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey) {
+          typed = (Date.now() - typedAt > 600 ? '' : typed) + e.key.toLowerCase(); typedAt = Date.now();
+          to = list.filter(function (x) { return x.textContent.trim().toLowerCase().indexOf(typed) === 0; })[0] || null;
+          if (!to) return;
+        }
+        if (!to) return;
+        e.preventDefault();
+        rove(bar, to); to.focus();
+      }, true);
+      /* with one menu open, pointing at another item of the bar switches to its menu */
+      bar.addEventListener('pointerover', function (e) {
+        var item = e.target.closest('.s4-menubar-item'); if (!item || e.pointerType === 'touch') return;
+        var cur = openOf(bar); if (!cur || cur === item) return;
+        rove(bar, item); S4.menu.open(menuOf(item), item);
+      });
+      bar.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-menubar-item'); if (item) rove(bar, item); });
+    });
+  });
+
+  /* inside a menu of the bar: the arrows that point away from it move along the bar */
+  document.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented) return;
+    var menu = e.target.closest && e.target.closest('.s4-menu'); if (!menu) return;
+    var item = rootItem(menu); if (!item) return;
+    var bar = item.closest('.s4-menubar'), rtl = getComputedStyle(bar).direction === 'rtl';
+    var list = barItems(bar), i = list.indexOf(item), d = 0;
+    if (e.key === (rtl ? 'ArrowLeft' : 'ArrowRight')) d = 1;
+    else if (e.key === (rtl ? 'ArrowRight' : 'ArrowLeft') && !menu._s4parent) d = -1;
+    if (!d) return;
+    e.preventDefault();
+    openAt(bar, list[(i + d + list.length) % list.length], false);
+  });
+
+  /* F10 or a lone Alt: to the bar and back; Alt + a letter opens that menu (Windows and Linux) */
+  var altAlone = false;
+  document.addEventListener('keydown', function (e) {
+    var bar = activeBar(); if (!bar) { altAlone = false; return; }
+    if (e.key === 'Alt') { altAlone = !e.repeat && !e.ctrlKey && !e.metaKey && !e.shiftKey; return; }
+    altAlone = false;
+    if (e.key === 'F10' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      if (bar.contains(document.activeElement)) leave(bar); else focusBar(bar);
+      return;
+    }
+    if (e.altKey && !e.ctrlKey && !e.metaKey && e.key.length === 1 && /[a-z]/i.test(e.code ? e.code.replace(/^Key/, '') : e.key)) {
+      if (S4.util.typable(e.target) && document.documentElement.dataset.platform === 'mac') return;   /* ⌥ + a letter types a character on a Mac */
+      var letter = (e.code && /^Key[A-Z]$/.test(e.code) ? e.code.slice(3) : e.key).toLowerCase();
+      var hit = barItems(bar).filter(function (x) { var k = (x.dataset.access || x.textContent.trim().charAt(0)).toLowerCase(); return k === letter; })[0];
+      if (!hit) return;
+      e.preventDefault();
+      if (!bar.contains(document.activeElement)) before = document.activeElement;
+      openAt(bar, hit, false);
+    }
+  }, true);
+  document.addEventListener('keyup', function (e) {
+    if (e.key !== 'Alt' || !altAlone) return;
+    altAlone = false;
+    var bar = activeBar(); if (!bar) return;
+    if (document.querySelector('.s4-menu:popover-open')) return;
+    e.preventDefault();
+    if (bar.contains(document.activeElement)) leave(bar); else focusBar(bar);
+  }, true);
+  document.addEventListener('pointerdown', function () { altAlone = false; }, true);
+})();
+
+/* ---- doc-tabs/doc-tabs.js ---- */
+/* Document tabs (issue 60): the open documents of a desktop window (files, records, conversations), each closable,
+   reorderable and remembered. Not the content tabs (components/tabs/): those switch between fixed views of one thing;
+   these come and go as documents are opened and closed.
+     <div class="s4-doc-tabs" id="docs">
+       <div class="s4-doc-tabs-list" role="tablist" aria-label="Open Files">
+         <div class="s4-doc-tab" data-modified>
+           <button class="s4-doc-tab-label" type="button" role="tab" aria-selected="true" aria-controls="doc-1">
+             <span class="s4-icon" data-icon="document"></span>dialogue.json</button>
+         </div> …
+       </div>
+       <button class="s4-icon-button s4-doc-tabs-new" type="button" aria-label="New File" data-cmd="file.new">…</button>
+     </div>
+   The script adds each tab's close button (a dot while it has unsaved changes), the All Tabs menu when the tabs no
+   longer fit, and a right-click menu (Close, Close Others, Close To The Right, Move Left, Move Right).
+   Pointer: click selects, middle-click closes, drag reorders (with a finger: hold, then drag). Keys on a tab: Left and
+   Right move and select, Home and End, Delete closes, mod+Shift+PageUp / PageDown move it. Anywhere in the window:
+   mod+W closes the current tab, mod+Shift+T opens the last closed one again, mod+1 to mod+8 pick a tab and mod+9 the
+   last, Ctrl+Tab and Ctrl+Shift+Tab (or Ctrl+PageDown / PageUp) step through them. A browser keeps some of these for
+   itself (mod+W, Ctrl+Tab, mod+1…9); in an installed app or a desktop shell they all reach the page, and every one
+   has a menu or a click that does the same.
+   Events on .s4-doc-tabs: s4-change { tab, index, panel } on select; s4-close { tab, panel, modified } before a tab
+   closes (preventDefault keeps it open); s4-reorder { item, from, to } (from components/direct/).
+   S4.docTabs.add(bar, { label, icon, panel, modified, id, next, select }), .select(tab), .close(tab), .reopen(bar), .move(tab, index),
+   .modified(tab, on), .tabs(bar), .current(bar). */
+(function () {
+  var S4 = window.S4, uid = 0, lastBar = null;
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function barOf(el) { return el && el.closest ? el.closest('.s4-doc-tabs') : null; }
+  function listOf(bar) { return bar.querySelector('.s4-doc-tabs-list'); }
+  function tabs(bar) { return Array.prototype.slice.call(listOf(bar).querySelectorAll(':scope > .s4-doc-tab')); }
+  function labelOf(tab) { return tab.querySelector('.s4-doc-tab-label'); }
+  function textOf(tab) { var l = labelOf(tab); return l ? l.textContent.replace(/\s+/g, ' ').trim() : ''; }
+  function current(bar) { var l = listOf(bar).querySelector('.s4-doc-tab-label[aria-selected="true"]'); return l ? l.closest('.s4-doc-tab') : null; }
+  function panelOf(tab) { var id = labelOf(tab) && labelOf(tab).getAttribute('aria-controls'); return id ? document.getElementById(id) : null; }
+  function shown(el) { return !!el && !!el.getClientRects().length; }
+
+  function prepare(bar, tab) {
+    if (!bar.id) bar.id = 's4-doc-tabs-' + (++uid);
+    var label = labelOf(tab); if (!label) return;
+    if (!label.id) label.id = 's4-doc-tab-' + (++uid);
+    label.setAttribute('role', 'tab');
+    if (label.tagName === 'BUTTON' && !label.type) label.type = 'button';
+    tab.setAttribute('role', 'presentation');
+    var close = tab.querySelector('.s4-doc-tab-close');
+    if (!close) {
+      close = document.createElement('button');
+      close.className = 's4-doc-tab-close'; close.type = 'button'; close.tabIndex = -1;
+      close.innerHTML = '<span class="s4-icon" data-icon="close"></span>';
+      tab.appendChild(close);
+    }
+    close.setAttribute('aria-label', 'Close ' + textOf(tab) + (tab.hasAttribute('data-modified') ? ' (unsaved changes)' : ''));
+    tab.dataset.contextMenu = bar.id + '-tab-menu';
+    var p = panelOf(tab);
+    if (p) { if (!p.getAttribute('role')) p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', label.id); if (!p.hasAttribute('tabindex')) p.tabIndex = 0; }
+  }
+
+  function select(tab, focus) {
+    var bar = barOf(tab); if (!bar) return;
+    var old = current(bar);
+    tabs(bar).forEach(function (t) {
+      var on = t === tab, l = labelOf(t), p = panelOf(t);
+      l.setAttribute('aria-selected', String(on)); l.tabIndex = on ? 0 : -1;
+      if (p) p.hidden = !on;
+    });
+    if (focus) labelOf(tab).focus({ preventScroll: true });
+    reveal(tab);
+    lastBar = bar;
+    if (old !== tab) S4.util.emit(bar, 's4-change', { tab: tab, index: tabs(bar).indexOf(tab), panel: panelOf(tab) });
+  }
+  function reveal(tab) {
+    var list = tab.parentElement, lr = list.getBoundingClientRect(), tr = tab.getBoundingClientRect();
+    if (tr.left < lr.left) list.scrollLeft -= lr.left - tr.left + 8;
+    else if (tr.right > lr.right) list.scrollLeft += tr.right - lr.right + 8;
+  }
+
+  var closed = new WeakMap();   /* per bar: the tabs closed, newest last, so mod+Shift+T and Undo bring them back */
+  function close(tab) {
+    var bar = barOf(tab); if (!bar) return false;
+    var panel = panelOf(tab), all = tabs(bar), i = all.indexOf(tab), wasCurrent = current(bar) === tab;
+    var ev = new CustomEvent('s4-close', { bubbles: true, cancelable: true, detail: { tab: tab, panel: panel, modified: tab.hasAttribute('data-modified') } });
+    if (!bar.dispatchEvent(ev)) return false;
+    var hadFocus = bar.contains(document.activeElement);
+    var stack = closed.get(bar) || []; stack.push({ tab: tab, panel: panel, index: i, next: panel ? panel.nextElementSibling : null, parent: panel ? panel.parentElement : null }); closed.set(bar, stack.slice(-20));
+    tab.remove(); if (panel) panel.remove();
+    var rest = tabs(bar);
+    if (wasCurrent && rest.length) select(rest[Math.min(i, rest.length - 1)], hadFocus);
+    else if (hadFocus && rest.length) labelOf(current(bar) || rest[0]).focus({ preventScroll: true });
+    bar.toggleAttribute('data-empty', !rest.length);
+    fit(bar);
+    return true;
+  }
+  function reopen(bar) {
+    var stack = closed.get(bar) || [], last = stack.pop(); if (!last) return null;
+    var list = listOf(bar), all = tabs(bar);
+    list.insertBefore(last.tab, all[last.index] || null);
+    if (last.panel && last.parent) last.parent.insertBefore(last.panel, last.next && last.next.parentElement === last.parent ? last.next : null);
+    bar.removeAttribute('data-empty');
+    select(last.tab, bar.contains(document.activeElement));
+    fit(bar);
+    return last.tab;
+  }
+  function add(bar, o) {
+    o = o || {};
+    var tab = document.createElement('div');
+    tab.className = 's4-doc-tab';
+    if (o.modified) tab.setAttribute('data-modified', '');
+    tab.innerHTML = '<button class="s4-doc-tab-label" type="button" role="tab" aria-selected="false" tabindex="-1"' + (o.id ? ' id="' + esc(o.id) + '"' : '') + (o.panel ? ' aria-controls="' + esc(o.panel) + '"' : '') + '>' +
+      (o.icon ? '<span class="s4-icon" data-icon="' + esc(o.icon) + '"></span>' : '') + '<span class="s4-doc-tab-text">' + esc(o.label) + '</span></button>';
+    var after = o.next ? current(bar) : null;   /* at the end, or right after the current tab with next: true */
+    listOf(bar).insertBefore(tab, after ? after.nextElementSibling : null);
+    prepare(bar, tab);
+    bar.removeAttribute('data-empty');
+    if (S4.init) S4.init(tab);
+    if (o.select !== false) select(tab);
+    fit(bar);
+    return tab;
+  }
+  function move(tab, to) {
+    var bar = barOf(tab); if (!bar || !S4.reorder) return;
+    var n = tabs(bar).length; to = Math.max(0, Math.min(n - 1, to));
+    S4.reorder.move(tab, to);
+    reveal(tab);
+  }
+  function modified(tab, on) {
+    tab.toggleAttribute('data-modified', !!on);
+    var c = tab.querySelector('.s4-doc-tab-close');
+    if (c) c.setAttribute('aria-label', 'Close ' + textOf(tab) + (on ? ' (unsaved changes)' : ''));
+  }
+
+  /* ---------- the All Tabs menu, shown when the tabs no longer fit ---------- */
+  function fit(bar) {
+    var list = listOf(bar), more = bar.querySelector('.s4-doc-tabs-all'); if (!more) return;
+    more.hidden = list.scrollWidth <= list.clientWidth + 1;
+  }
+  function fillAll(bar) {
+    var m = document.getElementById(bar.id + '-all'); if (!m) return;
+    var cur = current(bar);
+    m.innerHTML = tabs(bar).map(function (t, i) {
+      return '<button class="s4-menu-item" type="button" role="menuitemradio" tabindex="-1" data-check data-index="' + i + '" aria-checked="' + (t === cur) + '"><span class="s4-icon" data-icon="check"></span><span class="s4-menu-item-text">' + esc(textOf(t)) + (t.hasAttribute('data-modified') ? ' •' : '') + '</span></button>';
+    }).join('');
+    if (S4.init) S4.init(m);
+  }
+
+  S4.docTabs = { add: add, select: function (t) { select(t, false); }, close: close, reopen: reopen, move: move, modified: modified,
+    tabs: tabs, current: current };
+
+  S4.register('doc-tabs', function (scope) {
+    S4.util.all(scope, '.s4-doc-tabs').forEach(function (bar) {
+      if (!S4.util.once(bar, 'doctabs')) return;
+      if (!bar.id) bar.id = 's4-doc-tabs-' + (++uid);
+      var list = listOf(bar); if (!list) return;
+      list.setAttribute('role', 'tablist');
+      list.setAttribute('data-reorder', 'horizontal');
+      /* the right-click menu, one per bar */
+      var menu = document.createElement('div');
+      menu.className = 's4-menu'; menu.id = bar.id + '-tab-menu'; menu.setAttribute('aria-label', 'Tab Actions');
+      var k = function (s) { return S4.desktop ? '<kbd class="s4-kbd">' + S4.desktop.format(s) + '</kbd>' : ''; };
+      menu.innerHTML = '<button class="s4-menu-item" type="button" data-value="close"><span class="s4-menu-item-text">Close</span>' + k('mod+w') + '</button>' +
+        '<button class="s4-menu-item" type="button" data-value="others"><span class="s4-menu-item-text">Close Others</span></button>' +
+        '<button class="s4-menu-item" type="button" data-value="right"><span class="s4-menu-item-text">Close To The Right</span></button>' +
+        '<hr class="s4-menu-divider">' +
+        '<button class="s4-menu-item" type="button" data-value="left"><span class="s4-menu-item-text">Move Left</span>' + k('mod+shift+pageup') + '</button>' +
+        '<button class="s4-menu-item" type="button" data-value="later"><span class="s4-menu-item-text">Move Right</span>' + k('mod+shift+pagedown') + '</button>';
+      document.body.appendChild(menu);
+      menu.addEventListener('s4-context', function () {
+        var t = menu.contextTarget, all = tabs(bar), i = all.indexOf(t), set = function (v, off) { var b = menu.querySelector('[data-value="' + v + '"]'); if (off) b.setAttribute('aria-disabled', 'true'); else b.removeAttribute('aria-disabled'); };
+        set('others', all.length < 2); set('right', i === all.length - 1); set('left', i === 0); set('later', i === all.length - 1);
+      });
+      menu.addEventListener('s4-select', function (e) {
+        var t = menu.contextTarget; if (!t || !t.isConnected) return;
+        var v = e.detail.item.dataset.value, all = tabs(bar), i = all.indexOf(t);
+        if (v === 'close') close(t);
+        else if (v === 'others') { select(t); all.forEach(function (x) { if (x !== t) close(x); }); }
+        else if (v === 'right') all.slice(i + 1).forEach(close);
+        else if (v === 'left') move(t, i - 1);
+        else if (v === 'later') move(t, i + 1);
+        setTimeout(function () { var c = current(bar); if (c) labelOf(c).focus({ preventScroll: true }); });
+      });
+      /* the All Tabs menu button */
+      var all = document.createElement('div');
+      all.className = 's4-menu'; all.id = bar.id + '-all'; all.setAttribute('aria-label', 'All Tabs'); all.dataset.align = 'end';
+      document.body.appendChild(all);
+      var more = document.createElement('button');
+      more.className = 's4-icon-button s4-doc-tabs-all'; more.type = 'button'; more.hidden = true;
+      more.setAttribute('aria-label', 'All Tabs'); more.dataset.tooltip = 'All Tabs'; more.dataset.menu = all.id;
+      more.innerHTML = '<span class="s4-icon" data-icon="chevron-down"></span>';
+      list.insertAdjacentElement('afterend', more);
+      more.addEventListener('click', function () { fillAll(bar); }, true);
+      all.addEventListener('s4-select', function (e) { var t = tabs(bar)[+e.detail.item.dataset.index]; if (t) select(t, true); });
+
+      tabs(bar).forEach(function (t) { prepare(bar, t); });
+      select(current(bar) || tabs(bar)[0] || null, false);
+      if (!tabs(bar).length) bar.setAttribute('data-empty', '');
+      if (S4.init) { S4.init(menu); S4.init(all); }
+
+      list.addEventListener('click', function (e) {
+        var c = e.target.closest('.s4-doc-tab-close'); if (c) { e.preventDefault(); close(c.closest('.s4-doc-tab')); return; }
+        var l = e.target.closest('.s4-doc-tab-label'); if (l) select(l.closest('.s4-doc-tab'));
+      });
+      list.addEventListener('mousedown', function (e) { if (e.button === 1 && e.target.closest('.s4-doc-tab')) e.preventDefault(); });   /* no autoscroll */
+      list.addEventListener('auxclick', function (e) { var t = e.target.closest('.s4-doc-tab'); if (t && e.button === 1) { e.preventDefault(); close(t); } });
+      list.addEventListener('keydown', function (e) {
+        var t = e.target.closest('.s4-doc-tab'); if (!t || !e.target.matches('.s4-doc-tab-label')) return;
+        var all = tabs(bar), i = all.indexOf(t), rtl = getComputedStyle(bar).direction === 'rtl';
+        var next = rtl ? 'ArrowLeft' : 'ArrowRight', prev = rtl ? 'ArrowRight' : 'ArrowLeft', mod = S4.desktop && /mac|ios/.test(S4.desktop.platform) ? e.metaKey : e.ctrlKey, to = null;
+        if (mod && e.shiftKey && (e.key === 'PageUp' || e.key === 'PageDown')) { e.preventDefault(); move(t, i + (e.key === 'PageUp' ? -1 : 1)); labelOf(t).focus({ preventScroll: true }); return; }
+        if (e.key === next) to = all[(i + 1) % all.length];
+        else if (e.key === prev) to = all[(i - 1 + all.length) % all.length];
+        else if (e.key === 'Home') to = all[0];
+        else if (e.key === 'End') to = all[all.length - 1];
+        else if (e.key === 'Delete' || (e.key === 'Backspace' && e.metaKey)) { e.preventDefault(); close(t); return; }
+        if (!to) return;
+        e.preventDefault(); select(to, true);
+      });
+      list.addEventListener('s4-reorder', function (e) { reveal(e.detail.item); fit(bar); });
+      list.addEventListener('scroll', function () { fit(bar); }, { passive: true });
+      bar.addEventListener('focusin', function () { lastBar = bar; });
+      if ('ResizeObserver' in window) new ResizeObserver(function () { fit(bar); }).observe(list);
+      fit(bar);
+    });
+  });
+
+  /* window-wide keys act on the tabs you last used (or the first ones on screen) */
+  function active() {
+    if (lastBar && lastBar.isConnected && shown(lastBar)) return lastBar;
+    return Array.prototype.filter.call(document.querySelectorAll('.s4-doc-tabs:not([data-keys="off"])'), shown)[0] || null;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented || e.altKey) return;
+    var apple = S4.desktop && /mac|ios/.test(S4.desktop.platform), mod = apple ? e.metaKey : e.ctrlKey;
+    var tabStep = e.ctrlKey && (e.key === 'Tab' || e.key === 'PageDown' || e.key === 'PageUp') && !(e.key !== 'Tab' && e.shiftKey);
+    if (!mod && !tabStep) return;
+    if (document.querySelector('dialog[open]')) return;
+    var bar = active(); if (!bar) return;
+    var all = tabs(bar), cur = current(bar), i = all.indexOf(cur), k = e.key.toLowerCase();
+    if (tabStep) { if (!all.length) return; e.preventDefault(); var d = e.key === 'PageUp' || (e.key === 'Tab' && e.shiftKey) ? -1 : 1; select(all[(i + d + all.length) % all.length], bar.contains(document.activeElement)); return; }
+    if (k === 'w' && !e.shiftKey) { if (cur) { e.preventDefault(); close(cur); } return; }
+    if (k === 't' && e.shiftKey) { e.preventDefault(); reopen(bar); return; }
+    if (!e.shiftKey && /^[1-9]$/.test(e.key)) { var t = e.key === '9' ? all[all.length - 1] : all[+e.key - 1]; if (t) { e.preventDefault(); select(t, bar.contains(document.activeElement)); } }
+  });
+})();
+
+/* ---- tree/tree.js ---- */
+/* Tree view (issue 60): nested things you open and close (folders and files, groups and records, chapters and scenes).
+   WAI-ARIA tree pattern:
+     <ul class="s4-tree" role="tree" aria-label="Files" [aria-multiselectable="true"] [data-item-menu="menu-id"]>
+       <li class="s4-tree-item" aria-expanded="true">
+         <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Quests</span>
+           <span class="s4-tree-trailing"><span class="s4-tree-count">48</span></span></div>
+         <ul role="group">…</ul>
+       </li>
+       <li class="s4-tree-item" aria-expanded="false" data-lazy>…<ul role="group"></ul></li>   children load when it opens
+     </ul>
+   The script adds roles, levels, the open/close chevron and one tab stop for the whole tree.
+   Keys: Up and Down move, Right opens (or goes to the first child), Left closes (or goes to the parent), Home and End,
+   a letter jumps by name, * opens every sibling, Enter (or a double-click) chooses the item, F2 renames it (Enter too
+   on a Mac, as in the Finder). With aria-multiselectable: Shift with arrows or a click selects a range, Ctrl or ⌘ with a
+   click adds or removes one, Ctrl or ⌘ with arrows moves without selecting and Space then adds the item, mod+A selects
+   every shown item. Moving things: drag rows onto a folder with a mouse or pen, or mod+X then mod+V on the folder (the
+   app's menu can offer the same: S4.tree.cut / S4.tree.paste); nothing is drag-only.
+   Rename is the one time the tree puts the cursor in a field: you asked to type a name (F2, Enter on a Mac, or a Rename
+   command), the way the palette takes typing when opened by a key (decision 0049). It never happens on load.
+   Events on the tree: s4-change { items, item } when the selection changes; s4-select { item } when an item is chosen;
+   s4-toggle { item, open }; s4-rename { item, value, old } (preventDefault keeps the old name); s4-move { items, target }
+   (preventDefault cancels; otherwise the rows move into the target).
+   Lazy children: S4.tree.load(tree, function (item) { return Promise.resolve([{ label, icon, count, children | lazy, id }]) }).
+   S4.tree.render(tree, nodes), .select(item, { add, range }), .open(item, on), .rename(item), .selected(tree),
+   .cut(items), .paste(target), .reveal(item). */
+(function () {
+  var S4 = window.S4, uid = 0, loaders = new WeakMap(), clip = null;
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function treeOf(el) { return el && el.closest ? el.closest('.s4-tree') : null; }
+  function rowOf(item) { return item.querySelector(':scope > .s4-tree-row'); }
+  function groupOf(item) { return item.querySelector(':scope > [role="group"]'); }
+  function labelText(item) { var l = item.querySelector(':scope > .s4-tree-row .s4-tree-label'); return l ? l.textContent.trim() : ''; }
+  function parentItem(item) { var g = item.parentElement; return g && g.getAttribute('role') === 'group' ? g.closest('.s4-tree-item') : null; }
+  function isOpen(item) { return item.getAttribute('aria-expanded') === 'true'; }
+  function multi(tree) { return tree.getAttribute('aria-multiselectable') === 'true'; }
+  /* the items you can see, in order */
+  function visible(tree) {
+    var out = [];
+    (function walk(list) {
+      Array.prototype.forEach.call(list.children, function (li) {
+        if (!li.classList.contains('s4-tree-item') || li.hasAttribute('data-loading')) return;
+        out.push(li);
+        if (isOpen(li) && !li.hasAttribute('data-closing')) { var g = groupOf(li); if (g) walk(g); }
+      });
+    })(tree);
+    return out;
+  }
+  function focused(tree) { return tree.querySelector('.s4-tree-item[tabindex="0"]'); }
+  function focus(item, scroll) {
+    var tree = treeOf(item);
+    tree.querySelectorAll('.s4-tree-item[tabindex="0"]').forEach(function (i) { if (i !== item) i.tabIndex = -1; });
+    item.tabIndex = 0; item.focus({ preventScroll: true });
+    if (scroll !== false) reveal(item);
+  }
+  function reveal(item) { var r = rowOf(item); if (r && r.scrollIntoView) r.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+
+  /* ---------- structure ---------- */
+  function prepare(tree) {
+    if (!tree.getAttribute('role')) tree.setAttribute('role', 'tree');
+    var menu = tree.dataset.itemMenu;
+    (function walk(list, level) {
+      Array.prototype.forEach.call(list.children, function (li) {
+        if (!li.classList.contains('s4-tree-item')) return;
+        if (li.hasAttribute('data-loading')) { li.setAttribute('role', 'none'); return; }
+        li.setAttribute('role', 'treeitem');
+        li.setAttribute('aria-level', String(level));
+        if (!li.hasAttribute('tabindex')) li.tabIndex = -1;
+        if (!li.hasAttribute('aria-selected')) li.setAttribute('aria-selected', 'false');
+        if (menu) li.dataset.contextMenu = menu;
+        var row = rowOf(li); if (!row) return;
+        li.style.setProperty('--_depth', String(level - 1));
+        var g = groupOf(li);
+        if (g || li.hasAttribute('data-lazy')) {
+          if (!li.hasAttribute('aria-expanded')) li.setAttribute('aria-expanded', 'false');
+          if (!g) { g = document.createElement('ul'); g.setAttribute('role', 'group'); li.appendChild(g); }
+          g.hidden = !isOpen(li);
+          if (!row.querySelector(':scope > .s4-tree-toggle')) row.insertAdjacentHTML('afterbegin', '<span class="s4-tree-toggle" aria-hidden="true"><span class="s4-icon" data-icon="chevron-right"></span></span>');
+          walk(g, level + 1);
+        } else {
+          li.removeAttribute('aria-expanded');
+          if (!row.querySelector(':scope > .s4-tree-toggle')) row.insertAdjacentHTML('afterbegin', '<span class="s4-tree-toggle" aria-hidden="true"></span>');
+        }
+      });
+    })(tree, 1);
+    if (!focused(tree)) { var first = tree.querySelector('.s4-tree-item[aria-selected="true"]') || tree.querySelector('.s4-tree-item[role="treeitem"]'); if (first) first.tabIndex = 0; }
+    if (S4.init) S4.init(tree);
+  }
+  function nodeHtml(n) {
+    var kids = n.children && n.children.length, lazy = n.lazy && !kids, folder = Array.isArray(n.children) || lazy;
+    return '<li class="s4-tree-item"' + (n.id ? ' data-id="' + esc(n.id) + '"' : '') + (folder ? ' aria-expanded="' + (n.open ? 'true' : 'false') + '"' : '') + (lazy ? ' data-lazy' : '') + (n.selected ? ' aria-selected="true"' : '') + '>' +
+      '<div class="s4-tree-row">' + (n.icon ? '<span class="s4-icon" data-icon="' + esc(n.icon) + '"></span>' : '') +
+      '<span class="s4-tree-label">' + esc(n.label) + '</span>' +
+      (n.count != null || n.badge != null ? '<span class="s4-tree-trailing">' + (n.count != null ? '<span class="s4-tree-count">' + esc(n.count) + '</span>' : '') + (n.badge != null ? '<span class="s4-badge">' + esc(n.badge) + '</span>' : '') + '</span>' : '') +
+      '</div>' + (folder ? '<ul role="group">' + (kids ? n.children.map(nodeHtml).join('') : '') + '</ul>' : '') + '</li>';
+  }
+  function render(tree, nodes, into) {
+    (into || tree).innerHTML = nodes.map(nodeHtml).join('');
+    prepare(tree);
+  }
+
+  /* ---------- open and close ---------- */
+  function open(item, on) {
+    var g = groupOf(item); if (!g) return;
+    on = on == null ? !isOpen(item) : !!on;
+    if (on === isOpen(item) && !item.hasAttribute('data-closing')) return;
+    var tree = treeOf(item);
+    item.setAttribute('aria-expanded', String(on));
+    if (on) {
+      item.removeAttribute('data-closing');
+      g.hidden = false;
+      if (item.hasAttribute('data-lazy')) load(item);
+      S4.transition.reveal(g, { open: true });
+    } else {
+      item.setAttribute('data-closing', '');
+      if (g.contains(document.activeElement)) focus(item);
+      S4.transition.reveal(g, { open: false }).then(function (done) {
+        if (!done || !item.hasAttribute('data-closing')) return;
+        item.removeAttribute('data-closing'); g.hidden = true; S4.transition.restore(g);
+      });
+    }
+    S4.util.emit(tree, 's4-toggle', { item: item, open: on });
+  }
+  function load(item) {
+    var tree = treeOf(item), fn = loaders.get(tree), g = groupOf(item);
+    if (!fn) return;
+    item.removeAttribute('data-lazy');
+    item.setAttribute('aria-busy', 'true');
+    g.innerHTML = '<li class="s4-tree-item s4-tree-loading" data-loading role="none"><div class="s4-tree-row" style="--_depth:' + (+item.getAttribute('aria-level')) + '"><span class="s4-tree-toggle" aria-hidden="true"></span><span class="s4-tree-spinner" aria-hidden="true"></span><span class="s4-tree-label">Loading…</span></div></li>';
+    Promise.resolve().then(function () { return fn(item); }).then(function (nodes) {
+      item.removeAttribute('aria-busy');
+      render(tree, nodes || [], g);
+      if (!(nodes || []).length) g.innerHTML = '<li class="s4-tree-item s4-tree-loading" data-loading role="none"><div class="s4-tree-row" style="--_depth:' + (+item.getAttribute('aria-level')) + '"><span class="s4-tree-toggle" aria-hidden="true"></span><span class="s4-tree-label">Empty</span></div></li>';
+      if (S4.transition && isOpen(item)) S4.transition.reveal(g, { open: true });
+    }, function () {
+      item.removeAttribute('aria-busy');
+      item.setAttribute('data-lazy', '');
+      g.innerHTML = '<li class="s4-tree-item s4-tree-loading" data-loading role="none"><div class="s4-tree-row" style="--_depth:' + (+item.getAttribute('aria-level')) + '"><span class="s4-tree-toggle" aria-hidden="true"></span><span class="s4-tree-label">Could not load.</span><button class="s4-button" data-variant="text" data-size="xs" type="button" data-tree-retry>Retry</button></div></li>';
+      if (S4.init) S4.init(g);
+    });
+  }
+
+  /* ---------- selection ---------- */
+  var anchors = new WeakMap();
+  function selected(tree) { return Array.prototype.slice.call(tree.querySelectorAll('.s4-tree-item[aria-selected="true"]')); }
+  function select(item, opts) {
+    opts = opts || {};
+    var tree = treeOf(item), many = multi(tree), before = selected(tree);
+    if (opts.range && many) {
+      var all = visible(tree), a = anchors.get(tree) || item, i = all.indexOf(a), j = all.indexOf(item);
+      if (i < 0) i = j;
+      var lo = Math.min(i, j), hi = Math.max(i, j);
+      if (!opts.add) before.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
+      all.slice(lo, hi + 1).forEach(function (x) { x.setAttribute('aria-selected', 'true'); });
+    } else if (opts.add && many) {
+      item.setAttribute('aria-selected', String(item.getAttribute('aria-selected') !== 'true'));
+      anchors.set(tree, item);
+    } else {
+      before.forEach(function (x) { if (x !== item) x.setAttribute('aria-selected', 'false'); });
+      item.setAttribute('aria-selected', 'true');
+      anchors.set(tree, item);
+    }
+    var now = selected(tree);
+    if (now.length !== before.length || now.some(function (x, k) { return x !== before[k]; })) S4.util.emit(tree, 's4-change', { items: now, item: item });
+  }
+
+  /* ---------- rename (F2, Enter on a Mac, or a command) ---------- */
+  function rename(item) {
+    var tree = treeOf(item), l = item.querySelector(':scope > .s4-tree-row .s4-tree-label'); if (!l || item.querySelector(':scope > .s4-tree-row .s4-tree-rename')) return;
+    var old = l.textContent.trim(), input = document.createElement('input');
+    input.className = 's4-tree-rename'; input.type = 'text'; input.value = old; input.spellcheck = false;
+    input.setAttribute('aria-label', 'Rename ' + old);
+    l.hidden = true; l.insertAdjacentElement('afterend', input);
+    input.focus();   /* you asked to type a name: the one time the tree puts the cursor in a field (see the header) */
+    var dot = old.lastIndexOf('.'); input.setSelectionRange(0, dot > 0 && !groupOf(item) ? dot : old.length);
+    var done = false;
+    function finish(save) {
+      if (done) return; done = true;
+      var v = input.value.trim();
+      input.remove(); l.hidden = false;
+      if (save && v && v !== old) {
+        var ev = new CustomEvent('s4-rename', { bubbles: true, cancelable: true, detail: { item: item, value: v, old: old } });
+        if (tree.dispatchEvent(ev)) l.textContent = v;
+      }
+      focus(item);
+    }
+    input.addEventListener('keydown', function (e) {
+      e.stopPropagation();
+      if (e.key === 'Enter') { e.preventDefault(); finish(true); }
+      else if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    });
+    input.addEventListener('blur', function () { finish(true); });
+    input.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
+
+  /* ---------- moving: drag, or cut and paste ---------- */
+  function folderOf(item) { return item && groupOf(item) ? item : parentItem(item); }
+  function moveInto(items, target) {
+    var tree = treeOf(target);
+    items = items.filter(function (x) { return x !== target && !x.contains(target); });
+    if (!items.length) return false;
+    var ev = new CustomEvent('s4-move', { bubbles: true, cancelable: true, detail: { items: items, target: target } });
+    if (!tree.dispatchEvent(ev)) return false;
+    var g = groupOf(target); if (!g) return false;
+    items.forEach(function (x) { g.appendChild(x); });
+    prepare(tree);
+    open(target, true);
+    return true;
+  }
+  function cut(items) {
+    document.querySelectorAll('.s4-tree-item[data-cut]').forEach(function (x) { x.removeAttribute('data-cut'); });
+    clip = items.slice(); clip.forEach(function (x) { x.setAttribute('data-cut', ''); });
+  }
+  function paste(target) {
+    if (!clip || !clip.length) return false;
+    var f = folderOf(target); if (!f) return false;
+    var ok = moveInto(clip.filter(function (x) { return x.isConnected; }), f);
+    clip.forEach(function (x) { x.removeAttribute('data-cut'); }); clip = null;
+    return ok;
+  }
+
+  S4.tree = { render: render, load: function (tree, fn) { loaders.set(tree, fn); }, select: select, open: open, rename: rename,
+    selected: selected, cut: cut, paste: paste, reveal: reveal, focus: focus, refresh: prepare };
+
+  S4.register('tree', function (scope) {
+    S4.util.all(scope, '.s4-tree').forEach(function (tree) {
+      if (!S4.util.once(tree, 'tree')) { return; }
+      prepare(tree);
+      var typed = '', typedAt = 0, apple = S4.desktop && /mac|ios/.test(S4.desktop.platform);
+
+      tree.addEventListener('click', function (e) {
+        if (e.target.closest('.s4-tree-rename')) return;
+        var retry = e.target.closest('[data-tree-retry]');
+        if (retry) { var it = retry.closest('[role="group"]').closest('.s4-tree-item'); focus(it, false); load(it); return; }
+        var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || item.hasAttribute('data-loading')) return;
+        var mod = apple ? e.metaKey : e.ctrlKey;
+        if (e.target.closest('.s4-tree-toggle') && groupOf(item)) { open(item); focus(item, false); return; }
+        select(item, { add: mod, range: e.shiftKey });
+        focus(item, false);
+        /* a folder in a single-select tree opens and closes with a click on its row, as in a sidebar */
+        if (!multi(tree) && !mod && !e.shiftKey && groupOf(item) && tree.hasAttribute('data-open-on-click')) open(item);
+      });
+      tree.addEventListener('dblclick', function (e) {
+        var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || e.target.closest('.s4-tree-rename, .s4-tree-toggle')) return;
+        if (groupOf(item)) open(item); else S4.util.emit(tree, 's4-select', { item: item });
+      });
+      /* right-click acts on what is under the pointer: it joins the selection unless it is already in it */
+      tree.addEventListener('contextmenu', function (e) {
+        var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || item.hasAttribute('data-loading')) return;
+        if (item.getAttribute('aria-selected') !== 'true') select(item);
+        focus(item, false);
+      }, true);
+      /* the row the pointer comes from leans in first (decision 0044) */
+      tree.addEventListener('pointerover', function (e) {
+        var row = e.target.closest('.s4-tree-row'); if (!row || row.contains(e.relatedTarget)) return;
+        var r = row.getBoundingClientRect(); row.style.setProperty('--_lean', e.clientY < r.top + r.height / 2 ? '0%' : '100%');
+      });
+
+      tree.addEventListener('keydown', function (e) {
+        var item = e.target.closest('.s4-tree-item'); if (!item || e.target.closest('.s4-tree-rename') || e.target !== item) return;
+        var all = visible(tree), i = all.indexOf(item), rtl = getComputedStyle(tree).direction === 'rtl';
+        var mod = apple ? e.metaKey : e.ctrlKey, many = multi(tree), to = null;
+        var inward = rtl ? 'ArrowLeft' : 'ArrowRight', outward = rtl ? 'ArrowRight' : 'ArrowLeft';
+        if (e.key === 'ArrowDown') to = all[i + 1];
+        else if (e.key === 'ArrowUp') to = all[i - 1];
+        else if (e.key === 'Home') to = all[0];
+        else if (e.key === 'End') to = all[all.length - 1];
+        else if (e.key === inward) { e.preventDefault(); if (groupOf(item)) { if (!isOpen(item)) open(item, true); else { var c = visible(tree)[i + 1]; if (c && parentItem(c) === item) to = c; } } if (!to) return; }
+        else if (e.key === outward) { e.preventDefault(); if (groupOf(item) && isOpen(item)) { open(item, false); return; } to = parentItem(item); if (!to) return; }
+        else if (e.key === 'Enter' && !mod) { e.preventDefault(); if (apple && !e.shiftKey) rename(item); else if (groupOf(item)) open(item); else S4.util.emit(tree, 's4-select', { item: item }); return; }
+        else if (e.key === 'F2') { e.preventDefault(); rename(item); return; }
+        else if (e.key === ' ' && many) { e.preventDefault(); select(item, { add: true }); return; }
+        else if (e.key === '*') { e.preventDefault(); var p = item.parentElement; Array.prototype.forEach.call(p.children, function (s) { if (s.classList.contains('s4-tree-item') && groupOf(s)) open(s, true); }); return; }
+        else if (mod && !e.shiftKey && e.key.toLowerCase() === 'a' && many) { e.preventDefault(); all.forEach(function (x) { x.setAttribute('aria-selected', 'true'); }); S4.util.emit(tree, 's4-change', { items: selected(tree), item: item }); return; }
+        else if (mod && !e.shiftKey && e.key.toLowerCase() === 'x') { e.preventDefault(); cut(selected(tree).length ? selected(tree) : [item]); return; }
+        else if (mod && !e.shiftKey && e.key.toLowerCase() === 'v' && clip) { e.preventDefault(); paste(item); return; }
+        else if (e.key === 'Escape' && clip) { e.preventDefault(); cut([]); clip = null; return; }
+        else if (e.key.length === 1 && /\S/.test(e.key) && !mod && !e.altKey) {
+          typed = (Date.now() - typedAt > 600 ? '' : typed) + e.key.toLowerCase(); typedAt = Date.now();
+          var order = all.slice(i + (typed.length === 1 ? 1 : 0)).concat(all.slice(0, i + (typed.length === 1 ? 1 : 0)));
+          to = order.filter(function (x) { return labelText(x).toLowerCase().indexOf(typed) === 0; })[0];
+          if (!to) return;
+          e.preventDefault(); focus(to); if (!many) select(to); return;
+        } else return;
+        if (!to) { e.preventDefault(); return; }
+        e.preventDefault();
+        focus(to);
+        if (many && mod) return;                       /* move without selecting */
+        select(to, { range: many && e.shiftKey });
+      });
+      tree.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-tree-item'); if (item && e.target === item) { tree.querySelectorAll('.s4-tree-item[tabindex="0"]').forEach(function (x) { if (x !== item) x.tabIndex = -1; }); item.tabIndex = 0; } });
+
+      /* drag rows onto a folder (mouse and pen; a finger scrolls, and uses the menu or cut and paste instead) */
+      tree.addEventListener('pointerdown', function (e) {
+        if (e.button || e.pointerType === 'touch' || tree.hasAttribute('data-no-drag')) return;
+        var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || item.hasAttribute('data-loading') || e.target.closest('.s4-tree-rename, .s4-tree-toggle, button')) return;
+        var sx = e.clientX, sy = e.clientY, drag = null, over = null;
+        function moveH(ev) {
+          if (!drag) {
+            if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) < 6) return;
+            var items = item.getAttribute('aria-selected') === 'true' ? selected(tree) : [item];
+            drag = { items: items };
+            items.forEach(function (x) { x.setAttribute('data-dragging', ''); });
+            document.documentElement.setAttribute('data-s4-dragging', '');
+          }
+          ev.preventDefault();
+          var hit = document.elementFromPoint(ev.clientX, ev.clientY), r = hit && hit.closest && hit.closest('.s4-tree-row'), t = r && r.parentElement;
+          var f = t && treeOf(t) === tree ? folderOf(t) : null;
+          if (f && drag.items.some(function (x) { return x === f || x.contains(f); })) f = null;
+          if (f !== over) { if (over) rowOf(over).removeAttribute('data-drop'); over = f; if (over) rowOf(over).setAttribute('data-drop', ''); }
+        }
+        function upH() {
+          window.removeEventListener('pointermove', moveH, true); window.removeEventListener('pointerup', upH, true); window.removeEventListener('pointercancel', upH, true);
+          if (!drag) return;
+          drag.items.forEach(function (x) { x.removeAttribute('data-dragging'); });
+          if (over) { rowOf(over).removeAttribute('data-drop'); moveInto(drag.items, over); }
+          setTimeout(function () { document.documentElement.removeAttribute('data-s4-dragging'); });
+        }
+        window.addEventListener('pointermove', moveH, true); window.addEventListener('pointerup', upH, true); window.addEventListener('pointercancel', upH, true);
+      });
     });
   });
 })();
@@ -5519,7 +6567,10 @@ S4.register('skeleton', function (scope) {
 /* Menus: [data-menu="id"] opens <div class="s4-menu" id popover role="menu">. Unfold motion (decision 0001), positioning
    against the anchor (flips above when there's no room), keyboard (arrows, Home/End, Escape, typeahead), radio/checkbox
    items, and light dismiss from the popover API. Choosing an item fires s4-select { value, item } on the menu and closes it.
-   S4.menu.open(menu, anchor) / S4.menu.close(menu) / S4.position(popup, anchor, { align, gap }). */
+   Submenus (issue 60): an item with data-submenu="id" opens that menu beside it (on click, Enter, Space, the arrow
+   toward it, or resting the pointer on it); the arrow back, or Escape, closes only the submenu. A submenu keeps its
+   parent menus open, and choosing in it closes the whole chain.
+   S4.menu.open(menu, anchor) / S4.menu.close(menu) / S4.position(popup, anchor, { align, gap, side }). */
 (function () {
   var S4 = window.S4;
   function items(menu) { return Array.prototype.filter.call(menu.querySelectorAll('.s4-menu-item'), function (i) { return !i.disabled && i.getAttribute('aria-disabled') !== 'true'; }); }
@@ -5529,6 +6580,14 @@ S4.register('skeleton', function (scope) {
     opts = opts || {};
     var gap = opts.gap != null ? opts.gap : 4, m = 8, a = anchor.getBoundingClientRect(), p = popup.getBoundingClientRect();
     var vw = document.documentElement.clientWidth, vh = document.documentElement.clientHeight;
+    if (opts.side) {   /* beside the anchor (a submenu): at its inline end, flipped to the other side when there is no room */
+      var rtl = getComputedStyle(anchor).direction === 'rtl', pad = opts.inset || 0;
+      var after = rtl ? a.left - gap - p.width >= m : a.right + gap + p.width <= vw - m;
+      var x = (rtl ? !after : after) ? a.right + gap : a.left - gap - p.width;
+      var y = Math.max(m, Math.min(a.top - pad, vh - m - p.height));
+      popup.style.left = Math.max(m, Math.min(x, vw - m - p.width)) + 'px'; popup.style.top = y + 'px';
+      return 'top';
+    }
     var below = a.bottom + gap + p.height <= vh - m || a.top - gap - p.height < m;
     var top = below ? a.bottom + gap : a.top - gap - p.height;
     /* start and end are inline: in right-to-left the start edge is the right one */
@@ -5542,13 +6601,20 @@ S4.register('skeleton', function (scope) {
   };
 
   function isOpen(menu) { return menu.matches(':popover-open') || menu.hasAttribute('data-open'); }
+  /* a submenu's chain: the menus it was opened from */
+  function ancestors(menu) { var out = []; for (var p = menu._s4parent; p && out.indexOf(p) < 0; p = p._s4parent) out.push(p); return out; }
+  function openChildren(menu) { return Array.prototype.filter.call(document.querySelectorAll('.s4-menu'), function (o) { return o !== menu && isOpen(o) && !o._s4closing && ancestors(o).indexOf(menu) >= 0; }); }
   function open(menu, anchor) {
     if (isOpen(menu) && !menu._s4closing) return;
     menu._s4closing = false;
     menu._s4anchor = anchor;
+    var parent = anchor && anchor.closest ? anchor.closest('.s4-menu') : null;
+    menu._s4parent = parent && parent !== menu ? parent : null;
     try { menu.showPopover(); } catch (e) { menu.setAttribute('data-open', ''); }
-    var from = menu._s4from = S4.position(menu, anchor, { align: menu.dataset.align });
-    Array.prototype.forEach.call(document.querySelectorAll('.s4-menu'), function (o) { if (o !== menu && isOpen(o)) close(o, false); });
+    var pad = parseFloat(getComputedStyle(menu).paddingTop) || 0;
+    var from = menu._s4from = menu._s4parent ? S4.position(menu, anchor, { side: true, gap: 0, inset: pad }) : S4.position(menu, anchor, { align: menu.dataset.align });
+    var keep = ancestors(menu);
+    Array.prototype.forEach.call(document.querySelectorAll('.s4-menu'), function (o) { if (o !== menu && isOpen(o) && keep.indexOf(o) < 0) close(o, false); });
     if (anchor) anchor.setAttribute('aria-expanded', 'true');
     S4.transition.follow(menu, { from: from });
     var first = menu.querySelector('.s4-menu-item[aria-checked="true"]') || items(menu)[0];
@@ -5559,6 +6625,7 @@ S4.register('skeleton', function (scope) {
     var anchor = menu._s4anchor;
     if (anchor) anchor.setAttribute('aria-expanded', 'false');
     if (!isOpen(menu) || menu._s4closing) return;
+    openChildren(menu).forEach(function (c) { close(c, false); });
     menu._s4closing = true;
     S4.transition.follow(menu, { open: false, from: menu._s4from }).then(function () {
       if (!menu._s4closing) return;   /* reopened meanwhile */
@@ -5570,6 +6637,25 @@ S4.register('skeleton', function (scope) {
     S4.util.emit(menu, 's4-close', {});
   }
   S4.menu = { open: open, close: close };
+
+  /* submenus: the item names its menu with data-submenu="id" */
+  function openSub(item, focusFirst) {
+    var sub = document.getElementById(item.dataset.submenu); if (!sub) return;
+    if (isOpen(sub) && !sub._s4closing) { if (focusFirst) { var f = items(sub)[0]; if (f) f.focus({ preventScroll: true }); } return; }
+    open(sub, item);
+    if (!focusFirst) item.focus({ preventScroll: true });   /* by pointer: the submenu shows, the pointer decides */
+  }
+  var hoverT = null;
+  document.addEventListener('pointerover', function (e) {
+    if (e.pointerType === 'touch') return;
+    var item = e.target.closest && e.target.closest('.s4-menu .s4-menu-item'); if (!item) return;
+    var menu = item.closest('.s4-menu'); clearTimeout(hoverT);
+    hoverT = setTimeout(function () {
+      if (!isOpen(menu) || menu._s4closing) return;
+      openChildren(menu).forEach(function (c) { if (c._s4anchor !== item) close(c, false); });
+      if (item.dataset.submenu && !item.matches('[aria-disabled="true"]')) openSub(item, false);
+    }, 160);
+  });
 
   S4.register('menu', function (scope) {
     S4.util.all(scope, '[data-menu]').forEach(function (anchor) {
@@ -5587,26 +6673,36 @@ S4.register('skeleton', function (scope) {
       /* manual: we close it ourselves (animated), so a click on the open menu's own button toggles instead of reopening */
       menu.setAttribute('popover', 'manual');
       if (!menu.getAttribute('role')) menu.setAttribute('role', 'menu');
-      items(menu).forEach(function (i) { if (!i.getAttribute('role')) i.setAttribute('role', 'menuitem'); i.tabIndex = -1; });
+      items(menu).forEach(function (i) {
+        if (!i.getAttribute('role')) i.setAttribute('role', 'menuitem'); i.tabIndex = -1;
+        if (i.dataset.submenu) { i.setAttribute('aria-haspopup', 'menu'); i.setAttribute('aria-expanded', 'false'); i.setAttribute('aria-controls', i.dataset.submenu); }
+      });
       /* light dismiss (click outside) closes through the popover API: keep aria-expanded in sync */
       menu.addEventListener('toggle', function (e) { if (e.newState === 'closed' && menu._s4anchor) menu._s4anchor.setAttribute('aria-expanded', 'false'); });
       menu.addEventListener('click', function (e) {
         var item = e.target.closest('.s4-menu-item'); if (!item || !menu.contains(item)) return;
+        if (item.dataset.submenu) { openSub(item, false); return; }
         var role = item.getAttribute('role');
         if (role === 'menuitemradio') menu.querySelectorAll('[role="menuitemradio"]').forEach(function (r) { r.setAttribute('aria-checked', r === item); });
         if (role === 'menuitemcheckbox') { item.setAttribute('aria-checked', item.getAttribute('aria-checked') !== 'true'); return; }
         S4.util.emit(menu, 's4-select', { value: item.value || item.dataset.value || item.textContent.trim(), item: item });
-        close(menu);
+        var top = ancestors(menu).pop();
+        close(menu, !top);
+        if (top) close(top);   /* chose in a submenu: the whole chain closes, focus goes back to where it all started */
       });
       var typed = '', typedAt = 0;
       menu.addEventListener('keydown', function (e) {
         var list = items(menu), i = list.indexOf(document.activeElement);
+        var rtl = getComputedStyle(menu).direction === 'rtl', toward = rtl ? 'ArrowLeft' : 'ArrowRight', back = rtl ? 'ArrowRight' : 'ArrowLeft';
+        var cur = document.activeElement;
+        if ((e.key === toward || e.key === 'Enter' || e.key === ' ') && cur && cur.dataset && cur.dataset.submenu && menu.contains(cur)) { e.preventDefault(); openSub(cur, true); return; }
+        if (e.key === back && menu._s4parent) { e.preventDefault(); close(menu); return; }
         if (e.key === 'ArrowDown') { e.preventDefault(); list[(i + 1) % list.length].focus(); }
         else if (e.key === 'ArrowUp') { e.preventDefault(); list[(i - 1 + list.length) % list.length].focus(); }
         else if (e.key === 'Home') { e.preventDefault(); list[0].focus(); }
         else if (e.key === 'End') { e.preventDefault(); list[list.length - 1].focus(); }
         else if (e.key === 'Escape') { e.preventDefault(); close(menu); }
-        else if (e.key === 'Tab') { close(menu, false); }
+        else if (e.key === 'Tab') { close(ancestors(menu).pop() || menu, false); }
         else if (e.key.length === 1 && /\S/.test(e.key)) {
           typed = (Date.now() - typedAt > 600 ? '' : typed) + e.key.toLowerCase(); typedAt = Date.now();
           var hit = list.find(function (x) { return x.textContent.trim().toLowerCase().indexOf(typed) === 0; }); if (hit) hit.focus();
@@ -5617,12 +6713,13 @@ S4.register('skeleton', function (scope) {
   document.addEventListener('pointerdown', function (e) {
     document.querySelectorAll('.s4-menu').forEach(function (m) {
       if (!isOpen(m) || m._s4closing || m.contains(e.target)) return;
+      if (openChildren(m).some(function (c) { return c.contains(e.target); })) return;   /* inside one of its submenus */
       if (m._s4anchor && m._s4anchor.contains(e.target)) return;   /* the anchor's own click toggles */
       close(m, false);
     });
   }, true);
   window.addEventListener('resize', function () {
-    document.querySelectorAll('.s4-menu:popover-open').forEach(function (m) { if (m._s4anchor) S4.position(m, m._s4anchor, { align: m.dataset.align }); });
+    document.querySelectorAll('.s4-menu:popover-open').forEach(function (m) { if (m._s4anchor && !m._s4parent) S4.position(m, m._s4anchor, { align: m.dataset.align }); else if (m._s4parent) close(m, false); });
   });
 })();
 
@@ -5725,7 +6822,8 @@ S4.register('skeleton', function (scope) {
    navigation bar; on a phone it is a full-width panel.
    - Opens with mod+K anywhere, or from any [data-palette] button. No markup needed: the palette builds itself.
    - Commands come from three places, in this order:
-       S4.palette.register([{ label, group?, icon?, shortcut?, keywords?, run() }])        the app's own
+       S4.commands (components/commands/): every command the app registered, unless palette: false; the same list
+       feeds the menu bar, menus and shortcuts. S4.palette.register([...]) adds to it (the older name).
        [data-command="Label"] on any button or link                                        runs by clicking it (its data-shortcut is shown)
        the app's navigation                                                                 "Go To Inbox", one per destination
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
@@ -5735,7 +6833,7 @@ S4.register('skeleton', function (scope) {
    click it is not, so no keyboard jumps up on a phone; the first key you press goes into the box anyway.
    Motion: Pop. */
 (function () {
-  var S4 = window.S4, own = [], dlg, input, list, empty, shown = [], active = -1;
+  var S4 = window.S4, dlg, input, list, empty, shown = [], active = -1;
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function text(el) { return (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function build() {
@@ -5760,7 +6858,10 @@ S4.register('skeleton', function (scope) {
   }
   /* everything that can be run right now */
   function commands() {
-    var out = own.slice();
+    var out = S4.commands ? S4.commands.list().filter(function (c) { return c.palette !== false && c.label && S4.commands.enabled(c.id); }).map(function (c) {
+      var label = c.type && c.paletteLabel ? (typeof c.paletteLabel === 'function' ? c.paletteLabel() : c.paletteLabel) : c.label;
+      return { id: c.id, label: label, group: c.group || 'Commands', icon: c.icon || '', shortcut: c.shortcut || '', keywords: c.keywords || '', registered: true };
+    }) : [];
     document.querySelectorAll('[data-command]').forEach(function (el) {
       if (el.disabled || el.closest('.s4-palette')) return;
       var icon = el.querySelector('.s4-icon[data-icon]');
@@ -5803,8 +6904,8 @@ S4.register('skeleton', function (scope) {
   function move(d) { if (shown.length) mark((active + d + shown.length) % shown.length); }
   function run(c) {
     close().then(function () {
-      S4.util.emit(document, 's4-command', { command: c });
-      if (c.run) c.run(); else if (c.el) c.el.click();
+      if (!c.registered) S4.util.emit(document, 's4-command', { command: c });   /* registered commands announce themselves */
+      if (c.registered) S4.commands.run(c.id, { source: 'palette' }); else if (c.run) c.run(); else if (c.el) c.el.click();
     });
   }
   function open(opts) {
@@ -5816,8 +6917,8 @@ S4.register('skeleton', function (scope) {
   function close() { return dlg && dlg.open ? Promise.resolve(S4.dialog.close(dlg, '')) : Promise.resolve(); }
   S4.palette = {
     open: open, close: close, commands: commands,
-    register: function (cmds) { own = own.concat(cmds || []); },
-    clear: function () { own = []; }
+    register: function (cmds) { (cmds || []).forEach(function (c) { if (!c.group) c.group = 'Commands'; }); return S4.commands.add(cmds || []); },
+    clear: function () { S4.commands.list().forEach(function (c) { S4.commands.remove(c.id); }); }
   };
 
   document.addEventListener('keydown', function (e) {

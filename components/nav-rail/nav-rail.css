@@ -19,7 +19,16 @@
    The header's .s4-fab is the rail's main action: a solid primary button here (never glass), round when collapsed.
    [data-rail-toggle] flips the rail (nav-rail.js); data-expand="auto" expands it on large windows.
    Shares .s4-nav-item with the nav bar (nav-bar.css).
-   Public knob: --s4-nav-rail-expanded-width (default 240). */
+   Public knob: --s4-nav-rail-expanded-width (default 240).
+
+   As a desktop source list (issue 60), the same rail also takes:
+     <div class="s4-nav-rail-group">                       a section that folds away (its title is a button)
+       <button class="s4-nav-rail-title" type="button" aria-expanded="true">Languages</button>
+       <div class="s4-nav-rail-group-items">…items…</div></div>
+     <ul class="s4-tree" role="tree" aria-label="Files">…   a tree in a section (components/tree/); hidden while collapsed
+     data-resizable (+ data-resize-key="name")             a grip on its end edge: drag it, or arrow keys on it; drag it
+                                                           narrow and the rail collapses to icons; Enter flips it
+   Collapsed, a folded group still shows its icons (there is nothing to fold in a column of icons). */
 @layer s4.components {
   .s4-nav-rail:dir(rtl) { --_notch: env(safe-area-inset-right, 0px); }
   .s4-nav-rail {
@@ -43,6 +52,7 @@
     transition: inline-size var(--s4-motion-morph-calm);
   }
   .s4-nav-rail[data-expanded] { --_w: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
+  .s4-nav-rail[data-resizing] { transition: none; }
 
   .s4-nav-rail-header,
   .s4-nav-rail-items,
@@ -130,6 +140,63 @@
     font-weight: var(--md-sys-typescale-label-medium-weight);
     white-space: nowrap;
   }
+
+  /* ---------- source list: groups that fold, a tree, a grip (issue 60) ---------- */
+  .s4-nav-rail-group { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .s4-nav-rail-group-items { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .s4-nav-rail[data-expanded] .s4-nav-rail-group[data-collapsed] > .s4-nav-rail-group-items { display: none; }
+  button.s4-nav-rail-title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-1);
+    inline-size: 100%;
+    margin: 0;
+    border: 0;
+    border-radius: min(calc(var(--s4-size-button-small) / 2), var(--s4-shape-control));
+    background: none;
+    text-align: start;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+  }
+  button.s4-nav-rail-title::after {
+    content: "";
+    inline-size: calc(var(--s4-space-1) * 1.5);
+    block-size: calc(var(--s4-space-1) * 1.5);
+    margin-inline-start: var(--s4-space-1);
+    border-block-end: 2px solid currentColor;
+    border-inline-end: 2px solid currentColor;
+    opacity: 0;
+    transform: translateY(-25%) rotate(45deg);
+    transition: transform var(--s4-motion-bend), opacity var(--s4-motion-state);
+  }
+  .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title::after { transform: rotate(-45deg); }
+  .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title:dir(rtl)::after { transform: rotate(135deg); }
+  .s4-nav-rail[data-expanded] button.s4-nav-rail-title:is(:hover, :focus-visible)::after,
+  .s4-nav-rail[data-expanded] .s4-nav-rail-group[data-collapsed] > button.s4-nav-rail-title::after { opacity: 1; }
+  .s4-nav-rail:not([data-expanded]) button.s4-nav-rail-title { pointer-events: none; }
+  /* a tree in the rail lines its icons up with the items' icons; collapsed it steps out (a tree is not icons) */
+  .s4-nav-rail .s4-tree { --_pad: calc((var(--_row) - var(--s4-size-icon)) / 2 - var(--s4-size-icon-small) + var(--s4-space-1)); }
+  .s4-nav-rail:not([data-expanded]) .s4-tree { display: none; }
+  .s4-nav-rail-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .s4-nav-rail-grip::before { content: ""; position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: 2px; background: var(--md-sys-color-primary); opacity: 0; transition: opacity var(--s4-motion-state); }
+  @media (hover: hover) { .s4-nav-rail-grip:hover::before { opacity: 0.6; } }
+  .s4-nav-rail-grip:is(:focus-visible, [data-dragging])::before { opacity: 1; }
+  .s4-nav-rail-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-nav-rail[data-resizable] { position: relative; }
+  .s4-app:not([data-window]) > .s4-nav-rail[data-resizable] { position: sticky; }
 
   /* ---------- labels: beside the icon, shown when the rail is expanded ---------- */
   .s4-nav-rail .s4-nav-label,

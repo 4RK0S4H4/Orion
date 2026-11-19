@@ -1,0 +1,77 @@
+/* Status bar (issue 60): a slim solid bar along the bottom of a desktop window for the state of things: sync, the
+   selection, the cursor's position, zoom, the connection. Quiet: chrome color, small type, no fill at rest.
+   <footer class="s4-statusbar" aria-label="Status">
+     <span class="s4-statusbar-item"><span class="s4-statusbar-dot" data-tone="success"></span>Synced</span>
+     <button class="s4-statusbar-item" type="button" data-menu="zoom-menu">100%</button>    a segment that opens a menu
+     <span class="s4-statusbar-spacer"></span>                                              what follows sits at the end
+     <span class="s4-statusbar-item" role="status" aria-live="polite">3 Selected</span>     announced when it changes
+   </footer>
+   Segments are text first (an icon only beside words). Clickable segments are buttons that open a menu (data-menu) or
+   a panel (data-sheet), or run a command (data-cmd): never the only way to reach what they open. In a data-window app
+   it spans the window's last row; it shows from 840 wide (on a phone the screens show their own state). */
+@layer s4.components {
+  .s4-statusbar {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    box-sizing: border-box;
+    min-block-size: var(--s4-size-statusbar);
+    padding-block: calc(var(--s4-space-1) / 2);
+    padding-inline: max(var(--s4-space-2), env(safe-area-inset-left, 0px)) max(var(--s4-space-2), env(safe-area-inset-right, 0px));
+    overflow-x: auto;
+    scrollbar-width: none;
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+    user-select: none;
+    -webkit-user-select: none;
+    --s4-icon-size: var(--s4-space-4);
+  }
+  .s4-statusbar::-webkit-scrollbar { display: none; }
+  .s4-statusbar-item {
+    --_h: calc(var(--s4-size-statusbar) - var(--s4-space-1));
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: var(--s4-space-1);
+    min-block-size: var(--_h);
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+  }
+  /* a segment you can click reads a step stronger, so it is findable without a box around it */
+  :is(button, a).s4-statusbar-item { color: var(--md-sys-color-on-surface); text-decoration: none; }
+  .s4-statusbar-item[aria-expanded="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .s4-statusbar-item > .s4-icon { flex: none; }
+  .s4-statusbar-item[data-tone="error"] { color: var(--md-sys-color-error); }
+  /* a dot beside the words that already say the state (never the only sign) */
+  .s4-statusbar-dot { flex: none; inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
+  .s4-statusbar-dot[data-tone="success"] { background: var(--s4-color-success); }
+  .s4-statusbar-dot[data-tone="warning"] { background: var(--s4-color-warning); }
+  .s4-statusbar-dot[data-tone="info"] { background: var(--s4-color-info); }
+  .s4-statusbar-dot[data-tone="error"] { background: var(--md-sys-color-error); }
+  .s4-statusbar-spacer { flex: 1 1 auto; min-inline-size: var(--s4-space-2); }
+
+  /* in a desktop window: the last row, under everything */
+  .s4-app[data-window] > .s4-statusbar { grid-column: 1 / -1; grid-row: 3; z-index: var(--s4-z-navigation); }
+  @container s4-app (width < 840px) { .s4-app > .s4-statusbar { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-statusbar { border-block-start: 1px solid CanvasText; }
+    .s4-statusbar-dot { background: CanvasText; forced-color-adjust: none; }
+    :is(button, a).s4-statusbar-item { border: 1px solid ButtonText; }
+  }
+}

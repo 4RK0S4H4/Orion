@@ -2,7 +2,8 @@
    navigation bar; on a phone it is a full-width panel.
    - Opens with mod+K anywhere, or from any [data-palette] button. No markup needed: the palette builds itself.
    - Commands come from three places, in this order:
-       S4.palette.register([{ label, group?, icon?, shortcut?, keywords?, run() }])        the app's own
+       S4.commands (components/commands/): every command the app registered, unless palette: false; the same list
+       feeds the menu bar, menus and shortcuts. S4.palette.register([...]) adds to it (the older name).
        [data-command="Label"] on any button or link                                        runs by clicking it (its data-shortcut is shown)
        the app's navigation                                                                 "Go To Inbox", one per destination
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
@@ -12,7 +13,7 @@
    click it is not, so no keyboard jumps up on a phone; the first key you press goes into the box anyway.
    Motion: Pop. */
 (function () {
-  var S4 = window.S4, own = [], dlg, input, list, empty, shown = [], active = -1;
+  var S4 = window.S4, dlg, input, list, empty, shown = [], active = -1;
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function text(el) { return (el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim(); }
   function build() {
@@ -37,7 +38,10 @@
   }
   /* everything that can be run right now */
   function commands() {
-    var out = own.slice();
+    var out = S4.commands ? S4.commands.list().filter(function (c) { return c.palette !== false && c.label && S4.commands.enabled(c.id); }).map(function (c) {
+      var label = c.type && c.paletteLabel ? (typeof c.paletteLabel === 'function' ? c.paletteLabel() : c.paletteLabel) : c.label;
+      return { id: c.id, label: label, group: c.group || 'Commands', icon: c.icon || '', shortcut: c.shortcut || '', keywords: c.keywords || '', registered: true };
+    }) : [];
     document.querySelectorAll('[data-command]').forEach(function (el) {
       if (el.disabled || el.closest('.s4-palette')) return;
       var icon = el.querySelector('.s4-icon[data-icon]');
@@ -80,8 +84,8 @@
   function move(d) { if (shown.length) mark((active + d + shown.length) % shown.length); }
   function run(c) {
     close().then(function () {
-      S4.util.emit(document, 's4-command', { command: c });
-      if (c.run) c.run(); else if (c.el) c.el.click();
+      if (!c.registered) S4.util.emit(document, 's4-command', { command: c });   /* registered commands announce themselves */
+      if (c.registered) S4.commands.run(c.id, { source: 'palette' }); else if (c.run) c.run(); else if (c.el) c.el.click();
     });
   }
   function open(opts) {
@@ -93,8 +97,8 @@
   function close() { return dlg && dlg.open ? Promise.resolve(S4.dialog.close(dlg, '')) : Promise.resolve(); }
   S4.palette = {
     open: open, close: close, commands: commands,
-    register: function (cmds) { own = own.concat(cmds || []); },
-    clear: function () { own = []; }
+    register: function (cmds) { (cmds || []).forEach(function (c) { if (!c.group) c.group = 'Commands'; }); return S4.commands.add(cmds || []); },
+    clear: function () { S4.commands.list().forEach(function (c) { S4.commands.remove(c.id); }); }
   };
 
   document.addEventListener('keydown', function (e) {

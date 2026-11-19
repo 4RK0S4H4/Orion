@@ -1,0 +1,52 @@
+/* Menu bar (issue 60): the application menu inside the window, for Windows and Linux shells and web apps in a window.
+   <div class="s4-menubar" role="menubar" aria-label="Application" data-menus="app"></div>
+   Its menus are the glass menu (Follow). The items are quiet labels on the chrome: no fill at rest, the state layer on
+   hover, a filled pill while their menu is open. The corner follows the dial (decision 0055). It sits in the title bar
+   (never dragging the window) or in its own row at the top of the window. Hidden on a phone (no menu bar there: the
+   same commands are in the palette and the screens' own menus) and when the shell draws the native menu bar
+   (<html data-native-menu>, set by a Mac shell). */
+@layer s4.components {
+  .s4-menubar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: calc(var(--s4-space-1) / 2);
+    min-inline-size: 0;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-menubar-item {
+    --_h: var(--s4-size-menubar-item);
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--_h);
+    margin: 0;
+    padding: 0 var(--s4-space-3);
+    border: 0;
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    background: transparent;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    white-space: nowrap;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-menubar-item[aria-expanded="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .s4-menubar-item:disabled { color: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent); }
+  .s4-titlebar > .s4-menubar { flex: 0 1 auto; }
+
+  /* no menu bar where there is no window to have one, or where the system draws it */
+  :root[data-native-menu] .s4-menubar { display: none; }
+  @container s4-app (width < 600px) { .s4-menubar { display: none; } }
+
+  @media (forced-colors: active) {
+    .s4-menubar-item[aria-expanded="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  }
+}

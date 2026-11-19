@@ -2,7 +2,6 @@
   "$description": "4dp spacing grid, component sizes (M3), layout and stacking.",
   "s4": {
     "space": {
-      "$type": "dimension",
       "0": {
         "$value": {
           "value": 0,
@@ -68,7 +67,8 @@
           "value": 64,
           "unit": "px"
         }
-      }
+      },
+      "$type": "dimension"
     },
     "size": {
       "$type": "dimension",
@@ -229,7 +229,7 @@
           "value": 240,
           "unit": "px"
         },
-        "$description": "Expanded navigation rail (M3 Expressive allows 220\u2013360)."
+        "$description": "Expanded navigation rail (M3 Expressive allows 220–360)."
       },
       "toolbar": {
         "$value": {
@@ -276,6 +276,48 @@
           "unit": "px"
         },
         "$description": "Desktop app title bar (window controls overlay, Electron, Tauri)."
+      },
+      "statusbar": {
+        "$value": {
+          "value": 28,
+          "unit": "px"
+        },
+        "$description": "Desktop window status bar (desktop only, from 840)."
+      },
+      "menubar-item": {
+        "$value": {
+          "value": 28,
+          "unit": "px"
+        },
+        "$description": "A top-level item of the in-window menu bar."
+      },
+      "doc-tab": {
+        "$value": {
+          "value": 40,
+          "unit": "px"
+        },
+        "$description": "A document tab (open files, records) in a desktop window."
+      },
+      "tree-row": {
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        },
+        "$description": "A tree view row: touch size; compact density takes it to 28."
+      },
+      "tree-indent": {
+        "$value": {
+          "value": 20,
+          "unit": "px"
+        },
+        "$description": "How far each tree level steps in (compact 14); deep levels step in by half."
+      },
+      "inspector": {
+        "$value": {
+          "value": 288,
+          "unit": "px"
+        },
+        "$description": "Default width of the desktop inspector pane at the window end."
       }
     },
     "layout": {
@@ -286,7 +328,7 @@
       },
       "margin": {
         "$value": "{s4.space.6}",
-        "$description": "Side margin from medium windows (\u2265 600)."
+        "$description": "Side margin from medium windows (≥ 600)."
       },
       "pane-gap": {
         "$value": "{s4.space.6}"
@@ -508,6 +550,24 @@
         "layout-gap": {
           "$value": {
             "value": 12,
+            "unit": "px"
+          }
+        },
+        "doc-tab": {
+          "$value": {
+            "value": 32,
+            "unit": "px"
+          }
+        },
+        "tree-row": {
+          "$value": {
+            "value": 28,
+            "unit": "px"
+          }
+        },
+        "tree-indent": {
+          "$value": {
+            "value": 14,
             "unit": "px"
           }
         }

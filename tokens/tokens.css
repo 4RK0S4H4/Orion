@@ -191,6 +191,12 @@
     --s4-size-badge: 16px;
     --s4-size-nav-row: 48px;
     --s4-size-titlebar: 40px;
+    --s4-size-statusbar: 28px;
+    --s4-size-menubar-item: 28px;
+    --s4-size-doc-tab: 40px;
+    --s4-size-tree-row: 48px;
+    --s4-size-tree-indent: 20px;
+    --s4-size-inspector: 288px;
     --s4-layout-margin-compact: var(--s4-space-4);
     --s4-layout-margin: var(--s4-space-6);
     --s4-layout-pane-gap: var(--s4-space-6);
@@ -234,6 +240,9 @@
     --s4-density-compact-icon: 20px;
     --s4-density-compact-layout-margin: 20px;
     --s4-density-compact-layout-gap: 12px;
+    --s4-density-compact-doc-tab: 32px;
+    --s4-density-compact-tree-row: 28px;
+    --s4-density-compact-tree-indent: 14px;
     --s4-density-roomy-layout-margin: 40px;
     --s4-density-roomy-layout-margin-compact: 20px;
     --s4-density-roomy-layout-gap: 24px;

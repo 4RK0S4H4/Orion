@@ -257,6 +257,12 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-size-badge` | 16px |  |  |
 | `--s4-size-nav-row` | 48px |  | A navigation row in the rail: icon and label side by side. |
 | `--s4-size-titlebar` | 40px |  | Desktop app title bar (window controls overlay, Electron, Tauri). |
+| `--s4-size-statusbar` | 28px |  | Desktop window status bar (desktop only, from 840). |
+| `--s4-size-menubar-item` | 28px |  | A top-level item of the in-window menu bar. |
+| `--s4-size-doc-tab` | 40px |  | A document tab (open files, records) in a desktop window. |
+| `--s4-size-tree-row` | 48px |  | A tree view row: touch size; compact density takes it to 28. |
+| `--s4-size-tree-indent` | 20px |  | How far each tree level steps in (compact 14); deep levels step in by half. |
+| `--s4-size-inspector` | 288px |  | Default width of the desktop inspector pane at the window end. |
 
 ## Layout
 

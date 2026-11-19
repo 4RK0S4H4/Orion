@@ -15,7 +15,17 @@
    cursor, as desktop apps do. Pair it with data-density="auto" (base/density.css) for pointer-sized controls.
    .s4-titlebar: drags the window (app-region), leaves room for the system's window buttons (window controls overlay
    env(), or data-controls="start" for macOS traffic lights in a frameless window), and anything interactive inside it
-   stays clickable. <kbd class="s4-kbd"> shows a keyboard shortcut. desktop.js adds data-shortcut and data-context-menu. */
+   stays clickable. <kbd class="s4-kbd"> shows a keyboard shortcut. desktop.js adds data-shortcut and data-context-menu.
+
+   Issue 60 adds the rest of a desktop window's anatomy (each has its own folder: menubar, statusbar, doc-tabs, tree,
+   commands) and, here:
+     .s4-titlebar[data-variant="tabs"]       the document tabs are the title bar (no title; the space around them drags)
+     .s4-titlebar[data-variant="unified"]    a taller bar that holds the window's toolbar (title at the start)
+     .s4-inspector                           a resizable pane at the window's end for the properties of the selection
+     <html data-window-blurred>              set while the window is not in front: chrome dims, selections go neutral
+     <html data-window-state="fullscreen">   set by a shell (or display-mode: fullscreen): no room kept for traffic lights
+     <html data-shell="electron|tauri|pwa">  set by a shell bridge; with data-platform="mac" the title bar keeps room for
+                                             the traffic lights by itself */
 @layer s4.components {
   .s4-app[data-window] {
     grid-template-rows: auto minmax(0, 1fr) auto;
@@ -28,10 +38,16 @@
   .s4-app[data-window] > .s4-nav-rail { grid-row: 2 / -1; position: relative; top: auto; align-self: stretch; block-size: auto; }
   .s4-app[data-window] > .s4-app-body { grid-row: 2; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; }
   .s4-app[data-window] > .s4-nav-bar { grid-row: 3; position: relative; bottom: auto; }
+  .s4-app[data-window]:has(> .s4-inspector) { grid-template-columns: auto minmax(0, 1fr) auto; }
   .s4-app[data-window],
   .s4-app[data-window] * { scrollbar-width: thin; scrollbar-color: var(--md-sys-color-outline-variant) transparent; }
-  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-top-app-bar, .s4-toolbar, .s4-tabs, .s4-list-subheader, label) { user-select: none; -webkit-user-select: none; }
-  .s4-app[data-window] :is(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-tab, .s4-segment, .s4-nav-item, .s4-list-item, .s4-checkbox, .s4-radio, .s4-switch, .s4-table-sort, summary) { cursor: default; }
+  /* chrome is not text to select; content is (desktop apps do the same). Controls keep the arrow: the pointing hand
+     is for links in content */
+  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-top-app-bar, .s4-toolbar, .s4-tabs, .s4-list-subheader, label,
+    .s4-menubar, .s4-statusbar, .s4-doc-tabs, .s4-tree, .s4-inspector-header, .s4-inspector-group > summary, .s4-button, .s4-chip, .s4-status) { user-select: none; -webkit-user-select: none; }
+  .s4-app[data-window] :is(.s4-button, .s4-icon-button, .s4-fab, .s4-chip, .s4-tab, .s4-segment, .s4-nav-item, .s4-list-item, .s4-checkbox, .s4-radio, .s4-switch, .s4-table-sort, summary,
+    .s4-menubar-item, .s4-statusbar-item, .s4-doc-tab-label, .s4-tree-row) { cursor: default; }
+  .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-menubar, .s4-statusbar, .s4-doc-tabs) :is(img, a, svg) { -webkit-user-drag: none; }
 
   /* ---------- title bar ---------- */
   .s4-titlebar {
@@ -60,7 +76,32 @@
   /* frameless macOS window: room for the traffic lights at the start */
   /* the bar sits against the window's top edge: rings are drawn inside the control so they are never cut off */
   .s4-titlebar :is(.s4-icon-button, .s4-button):focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
-  .s4-titlebar[data-controls="start"] { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
+  .s4-titlebar[data-controls="start"],
+  :root[data-platform="mac"][data-shell]:not([data-shell="pwa"]) .s4-titlebar { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
+  /* full screen: the system hides its window buttons, so the bar stops keeping room for them */
+  :root[data-window-state~="fullscreen"] .s4-titlebar { padding-inline: var(--s4-space-3); }
+  @media (display-mode: fullscreen) { .s4-titlebar { padding-inline: var(--s4-space-3); } }
+
+  /* variants: tabs in the title bar (a browser-like document window), a unified toolbar (a tool window) */
+  .s4-titlebar[data-variant="tabs"] { gap: var(--s4-space-1); }
+  .s4-titlebar[data-variant="tabs"] > .s4-titlebar-title { display: none; }
+  .s4-titlebar[data-variant="unified"] {
+    block-size: max(calc(var(--s4-size-titlebar) + var(--s4-space-3)), env(titlebar-area-height, 0px));
+    gap: var(--s4-space-3);
+  }
+  .s4-titlebar[data-variant="unified"] > .s4-titlebar-title {
+    flex: 0 1 auto;
+    text-align: start;
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-title-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  }
+  /* what sits after the title fills the bar; a spacer pushes the rest to the end */
+  .s4-titlebar-spacer { flex: 1 1 auto; align-self: stretch; min-inline-size: var(--s4-space-4); }
+  .s4-titlebar > .s4-search { flex: 0 1 calc(var(--s4-space-16) * 5); min-inline-size: 0; }
+  .s4-titlebar .s4-search { --s4-size-text-field: calc(var(--s4-size-titlebar) - var(--s4-space-2)); }
   .s4-titlebar-title {
     flex: 1 1 auto;
     min-inline-size: 0;
@@ -98,6 +139,128 @@
     .s4-window-control[data-window-action="close"]:hover { background: var(--s4-color-badge); color: var(--s4-color-on-badge); }
   }
   .s4-window-control:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* ---------- inspector: the properties of the selection, a pane at the window's end ----------
+     <aside class="s4-inspector" aria-label="Inspector" data-density="compact" data-resize-key="app-inspector">
+       <header class="s4-inspector-header"><h2 class="s4-inspector-title">Line</h2>…</header>
+       <div class="s4-inspector-body">
+         <details class="s4-inspector-group" open><summary>Context</summary><div class="s4-inspector-fields">…</div></details>
+       </div>
+     </aside>
+     Solid (it is content about content, not something floating), resizable from its start edge (drag, or the arrow
+     keys on the grip; Enter hides it), hidden with the hidden attribute or S4.desktop.inspector(el, false). From 840
+     wide only; on a phone the same properties belong in the item's own page. For a tool that works on the page behind
+     it (filters, find) on any window size, use a floating tool panel instead (data-modeless, decision 0054). */
+  .s4-inspector {
+    --_w: var(--s4-inspector-width, var(--s4-size-inspector));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    inline-size: var(--_w);
+    min-block-size: 0;
+    overflow: hidden;
+    background: var(--md-sys-color-surface-container-low);
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-app[data-window] > .s4-inspector { grid-column: 3; grid-row: 2; }
+  @container s4-app (width < 840px) { .s4-app > .s4-inspector { display: none; } }
+  .s4-inspector-header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-size-top-app-bar);
+    padding-inline: var(--s4-space-4) var(--s4-space-2);
+  }
+  .s4-inspector-title {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    margin: 0;
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+  }
+  .s4-inspector-body { flex: 1 1 auto; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--s4-space-2) var(--s4-space-4); }
+  .s4-inspector-group { margin: 0; padding: 0; }
+  .s4-inspector-group + .s4-inspector-group { margin-block-start: var(--s4-space-1); }
+  .s4-inspector-group > summary {
+    --_h: var(--s4-size-button-small);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--_h);
+    padding-inline: var(--s4-space-2);
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-medium-weight);
+    list-style: none;
+    cursor: default;
+    outline-offset: calc(var(--s4-focus-ring-width) * -1);
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-inspector-group > summary::-webkit-details-marker { display: none; }
+  .s4-inspector-group > summary::after {
+    content: "";
+    order: -1;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline: var(--s4-space-1);
+    border-block-end: 2px solid currentColor;
+    border-inline-end: 2px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform var(--s4-motion-bend);
+  }
+  .s4-inspector-group > summary:dir(rtl)::after { transform: rotate(135deg); }
+  .s4-inspector-group[open]:not([data-closing]) > summary::after { transform: rotate(45deg); }
+  .s4-inspector-group > summary::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: currentColor; opacity: 0; transition: opacity var(--s4-motion-state); }
+  @media (hover: hover) { .s4-inspector-group > summary:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); } }
+  .s4-inspector-fields { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-2) var(--s4-space-3); }
+  /* a label and a value side by side: the dense row of an inspector */
+  .s4-inspector-row { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: center; gap: var(--s4-space-3); min-block-size: var(--s4-size-button-small); }
+  .s4-inspector-row > :first-child { color: var(--md-sys-color-on-surface-variant); font-family: var(--md-sys-typescale-body-small-font); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); letter-spacing: var(--md-sys-typescale-body-small-tracking); }
+  .s4-inspector-row > :last-child { min-inline-size: 0; overflow-wrap: anywhere; }
+  /* the grip on its start edge */
+  .s4-inspector-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: col-resize;
+    touch-action: none;
+  }
+  .s4-inspector-grip::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: 2px;
+    background: var(--md-sys-color-primary);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state);
+  }
+  @media (hover: hover) { .s4-inspector-grip:hover::before { opacity: 0.6; } }
+  .s4-inspector-grip:is(:focus-visible, [data-dragging])::before { opacity: 1; }
+  .s4-inspector-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* ---------- a window that is not in front: its chrome steps back and selections go neutral (as every desktop does) ---------- */
+  :root[data-window-blurred] :is(.s4-titlebar, .s4-menubar-item, .s4-statusbar, .s4-titlebar-title) { color: var(--md-sys-color-on-surface-variant); }
+  :root[data-window-blurred] .s4-titlebar .s4-icon { color: var(--md-sys-color-on-surface-variant); }
+  :root[data-window-blurred] .s4-app[data-window] .s4-tree-item[aria-selected="true"] > .s4-tree-row { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); }
+  :root[data-window-blurred] .s4-app[data-window] .s4-doc-tab { color: var(--md-sys-color-on-surface-variant); }
+  .s4-titlebar, .s4-titlebar-title, .s4-statusbar { transition: color var(--s4-motion-state); }
 
   /* ---------- keyboard shortcut ---------- */
   .s4-kbd {

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Document Tabs · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .dt-window { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .dt-doc { padding: var(--s4-space-6); min-block-size: calc(var(--s4-space-16) * 2); }
+  .dt-doc h3 { margin: 0 0 var(--s4-space-2); }
+  .dt-doc p { margin: 0; max-inline-size: 60ch; color: var(--md-sys-color-on-surface-variant); }
+  .dt-empty { padding: var(--s4-space-6); color: var(--md-sys-color-on-surface-variant); }
+  .dt-window:has(.s4-doc-tabs:not([data-empty])) .dt-empty { display: none; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Document Tabs</h1></header>
+<main class="ex-main">
+  <p>The open documents of a desktop window. Each tab is a thing you opened: it closes (the button, a middle-click, <kbd class="s4-kbd" id="dt-k-w"></kbd>), keeps a dot while it has unsaved changes, and moves (drag it, <kbd class="s4-kbd" id="dt-k-move"></kbd>, or Move Left and Move Right in its right-click menu). When they no longer fit, All Tabs lists them. Not the <a href="../tabs/tabs.html">content tabs</a>: those switch between fixed views of one thing and never close.</p>
+
+  <section class="ex-sec">
+    <h2>A Row Of Open Files</h2>
+    <p>Left and Right walk the tabs, Delete closes one, <kbd class="s4-kbd" id="dt-k-t"></kbd> opens the last closed tab again; New File adds one. In a browser some of these keys belong to the browser; in an installed app they all work.</p>
+    <div class="dt-window">
+      <div class="s4-doc-tabs" id="dt-a" data-density="compact">
+        <div class="s4-doc-tabs-list" aria-label="Open Files">
+          <div class="s4-doc-tab"><button class="s4-doc-tab-label" type="button" aria-selected="true" aria-controls="dt-p1"><span class="s4-icon" data-icon="document"></span><span class="s4-doc-tab-text">dialogue.json</span></button></div>
+          <div class="s4-doc-tab" data-modified><button class="s4-doc-tab-label" type="button" aria-controls="dt-p2"><span class="s4-icon" data-icon="document"></span><span class="s4-doc-tab-text">journal.json</span></button></div>
+          <div class="s4-doc-tab"><button class="s4-doc-tab-label" type="button" aria-controls="dt-p3"><span class="s4-icon" data-icon="book"></span><span class="s4-doc-tab-text">glossary.csv</span></button></div>
+          <div class="s4-doc-tab"><button class="s4-doc-tab-label" type="button" aria-controls="dt-p4"><span class="s4-icon" data-icon="document"></span><span class="s4-doc-tab-text">menus.json</span></button></div>
+        </div>
+        <button class="s4-icon-button s4-doc-tabs-new" type="button" aria-label="New File" data-tooltip="New File" id="dt-new"><span class="s4-icon" data-icon="add"></span></button>
+      </div>
+      <div id="dt-panels">
+        <section class="dt-doc" id="dt-p1"><h3 class="s4-title-medium">dialogue.json</h3><p>412 lines, 96 in this quest. The keeper's lines are the longest in the game.</p></section>
+        <section class="dt-doc" id="dt-p2" hidden><h3 class="s4-title-medium">journal.json</h3><p>Two entries changed and not saved yet: the dot in the tab says so.</p></section>
+        <section class="dt-doc" id="dt-p3" hidden><h3 class="s4-title-medium">glossary.csv</h3><p>Terms that are never translated: Saltreach, the Lamp, the Tidewright.</p></section>
+        <section class="dt-doc" id="dt-p4" hidden><h3 class="s4-title-medium">menus.json</h3><p>Every label in the pause and settings menus.</p></section>
+      </div>
+      <p class="dt-empty">No files open. Press New File, or reopen the last one with <kbd class="s4-kbd" id="dt-k-t2"></kbd>.</p>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>More Than Fit</h2>
+    <p>The row scrolls sideways and the All Tabs button appears at its end. Comfortable density (touch) on the left of a narrow window.</p>
+    <div class="dt-window" style="max-inline-size:calc(var(--s4-space-16) * 7)">
+      <div class="s4-doc-tabs" id="dt-b">
+        <div class="s4-doc-tabs-list" aria-label="Open Records"></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/doc-tabs/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  [['dt-k-w', 'mod+w'], ['dt-k-move', 'mod+shift+pagedown'], ['dt-k-t', 'mod+shift+t'], ['dt-k-t2', 'mod+shift+t']].forEach(function (k) { document.getElementById(k[0]).textContent = S4.desktop.format(k[1]); });
+  var bar = document.getElementById('dt-a'), n = 0;
+  document.getElementById('dt-new').addEventListener('click', function () {
+    n++;
+    var sec = document.createElement('section'); sec.className = 'dt-doc'; sec.id = 'dt-new-' + n; sec.hidden = true;
+    sec.innerHTML = '<h3 class="s4-title-medium">untitled-' + n + '.json</h3><p>A new, empty file.</p>';
+    document.getElementById('dt-panels').appendChild(sec);
+    S4.docTabs.add(bar, { label: 'untitled-' + n + '.json', icon: 'document', panel: sec.id, modified: true });
+  });
+  bar.addEventListener('s4-close', function (e) { if (e.detail.modified) S4.snackbar({ text: 'Closed ' + e.detail.tab.textContent.trim() + ' with unsaved changes', action: 'Reopen', onAction: function () { S4.docTabs.reopen(bar); } }); });
+  var b = document.getElementById('dt-b');
+  ['Mara Lindqvist', 'Okafor Bros. Joinery', 'St Brendan\'s Primary', 'Hollow Pine Campsite', 'Ferry Timetable 2027', 'Harbour Dues', 'Lifeboat Rota', 'Ice Plant Lease'].forEach(function (t, i) { S4.docTabs.add(b, { label: t, icon: 'person', select: i === 0 }); });
+</script>
+</body>
+</html>

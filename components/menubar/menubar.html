@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Menu Bar · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .mb-window { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .mb-page { padding: var(--s4-space-6); min-block-size: calc(var(--s4-space-16) * 2.5); }
+  .mb-page > p { margin: 0 0 var(--s4-space-3); max-inline-size: 60ch; }
+  .mb-row { display: flex; align-items: center; gap: var(--s4-space-2); padding: var(--s4-space-1) var(--s4-space-3); background: var(--md-sys-color-surface-container-low); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Menu Bar</h1></header>
+<main class="ex-main">
+  <p>The application menu inside the window: File, Edit, View and the rest, for Windows and Linux and for web apps in a window. Every item is a command (<code>S4.commands</code>), so the same list feeds the shortcuts, right-click menus and the palette. On a Mac shell that draws the native menu bar, <code>&lt;html data-native-menu&gt;</code> hides it; on a phone it is not shown.</p>
+
+  <section class="ex-sec">
+    <h2>In A Title Bar</h2>
+    <p>Press <kbd class="s4-kbd">F10</kbd> (or Alt alone) to move to the bar, the arrow keys to walk it, Alt with a letter to open a menu. With one menu open, point at another to switch. Open Recent and Line Spacing are submenus; Word Wrap and Show Ruler are check items; the zoom items are a radio group; Paste is off until something is copied.</p>
+    <div class="mb-window">
+      <div class="s4-app" data-window data-density="compact" style="block-size:auto;min-block-size:0">
+        <header class="s4-titlebar">
+          <div class="s4-menubar" aria-label="Application" data-menus="mb-app"></div>
+          <span class="s4-titlebar-title">Field Notes, Spring.txt</span>
+        </header>
+      </div>
+      <div class="mb-page s4-body-large">
+        <p id="mb-out" aria-live="polite">Choose something from the menus.</p>
+        <p class="s4-body-medium s4-on-surface-variant">Wrap is <span id="mb-wrap">on</span>, zoom is <span id="mb-zoom">100%</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>In Its Own Row</h2>
+    <p>Written by hand: buttons with <code>data-menu</code> and ordinary menus. Useful when the title bar holds the document tabs.</p>
+    <div class="mb-window">
+      <div class="mb-row">
+        <div class="s4-menubar" role="menubar" aria-label="Editor">
+          <button class="s4-menubar-item" type="button" data-menu="mb-hand-file">File</button>
+          <button class="s4-menubar-item" type="button" data-menu="mb-hand-view">View</button>
+          <button class="s4-menubar-item" type="button" disabled>Plugins</button>
+        </div>
+      </div>
+      <div class="mb-page s4-body-medium s4-on-surface-variant">Plugins is disabled: the bar skips it.</div>
+    </div>
+    <div class="s4-menu" id="mb-hand-file" aria-label="File">
+      <button class="s4-menu-item" type="button"><span class="s4-menu-item-text">New Note</span><kbd class="s4-kbd">Ctrl+N</kbd></button>
+      <button class="s4-menu-item" type="button"><span class="s4-menu-item-text">Export As PDF</span></button>
+      <hr class="s4-menu-divider">
+      <button class="s4-menu-item" type="button" aria-disabled="true"><span class="s4-menu-item-text">Print</span></button>
+    </div>
+    <div class="s4-menu" id="mb-hand-view" aria-label="View">
+      <button class="s4-menu-item" type="button" role="menuitemradio" aria-checked="true"><span class="s4-menu-item-text">Reading</span></button>
+      <button class="s4-menu-item" type="button" role="menuitemradio" aria-checked="false"><span class="s4-menu-item-text">Writing</span></button>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/menubar/</code>, <code>components/commands/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  var wrap = true, zoom = 100, copied = false;
+  function say(t) { document.getElementById('mb-out').textContent = t; }
+  S4.commands.add([
+    { id: 'note.new', label: 'New Note', group: 'File', icon: 'add', shortcut: 'mod+alt+n', run: function () { say('New note started.'); } },
+    { id: 'note.open', label: 'Open…', group: 'File', icon: 'folder', shortcut: 'mod+o', run: function () { say('Open: pick a file.'); } },
+    { id: 'recent.1', label: 'Field Notes, Spring.txt', palette: false, run: function () { say('Opened Field Notes, Spring.txt.'); } },
+    { id: 'recent.2', label: 'Moth Count, June.txt', palette: false, run: function () { say('Opened Moth Count, June.txt.'); } },
+    { id: 'note.save', label: 'Save', group: 'File', icon: 'save', shortcut: 'mod+s', run: function () { say('Saved.'); } },
+    { id: 'note.export', label: 'Export As PDF', group: 'File', icon: 'export', run: function () { say('Exported as PDF.'); } },
+    { id: 'edit.undo', label: 'Undo', group: 'Edit', icon: 'undo', shortcut: 'mod+z', run: function () { say('Undone.'); } },
+    { id: 'edit.copy', label: 'Copy', group: 'Edit', icon: 'copy', shortcut: 'mod+c', run: function () { copied = true; say('Copied. Paste is on now.'); } },
+    { id: 'edit.paste', label: 'Paste', group: 'Edit', icon: 'copy', shortcut: 'mod+v', enabled: function () { return copied; }, run: function () { say('Pasted.'); } },
+    { id: 'edit.find', label: 'Find…', group: 'Edit', icon: 'search', shortcut: 'mod+f', run: function () { say('Find.'); } },
+    { id: 'view.wrap', label: 'Word Wrap', group: 'View', type: 'check', shortcut: 'alt+z', checked: function () { return wrap; }, run: function () { wrap = !wrap; document.getElementById('mb-wrap').textContent = wrap ? 'on' : 'off'; say('Word wrap ' + (wrap ? 'on.' : 'off.')); } },
+    { id: 'view.ruler', label: 'Show Ruler', group: 'View', type: 'check', checked: function () { return false; }, enabled: function () { return false; } },
+    { id: 'zoom.90', label: '90%', type: 'radio', radio: 'zoom', palette: false, checked: function () { return zoom === 90; }, run: function () { zoom = 90; document.getElementById('mb-zoom').textContent = '90%'; } },
+    { id: 'zoom.100', label: '100%', type: 'radio', radio: 'zoom', palette: false, checked: function () { return zoom === 100; }, run: function () { zoom = 100; document.getElementById('mb-zoom').textContent = '100%'; } },
+    { id: 'zoom.125', label: '125%', type: 'radio', radio: 'zoom', palette: false, checked: function () { return zoom === 125; }, run: function () { zoom = 125; document.getElementById('mb-zoom').textContent = '125%'; } },
+    { id: 'space.single', label: 'Single', palette: false, run: function () { say('Line spacing single.'); } },
+    { id: 'space.relaxed', label: 'Relaxed', palette: false, run: function () { say('Line spacing relaxed.'); } },
+    { id: 'help.keys', label: 'Keyboard Shortcuts', group: 'Help', icon: 'help', shortcut: 'mod+/', run: function () { say('Every shortcut is listed in the menus beside its item.'); } }
+  ]);
+  S4.commands.menu('mb-app', [
+    { label: 'File', items: ['note.new', 'note.open', { label: 'Open Recent', icon: 'history', items: ['recent.1', 'recent.2'] }, '-', 'note.save', 'note.export'] },
+    { label: 'Edit', items: ['edit.undo', '-', 'edit.copy', 'edit.paste', '-', 'edit.find'] },
+    { label: 'View', items: ['view.wrap', 'view.ruler', '-', { heading: 'Zoom' }, 'zoom.90', 'zoom.100', 'zoom.125', '-', { label: 'Line Spacing', items: ['space.single', 'space.relaxed'] }] },
+    { label: 'Help', items: ['help.keys'] }
+  ]);
+</script>
+</body>
+</html>
