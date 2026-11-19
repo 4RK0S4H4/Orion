@@ -55,6 +55,36 @@ export const tokens = {
       "dark-high-contrast": "#0ca30c"
     }
   },
+  "--s4-category-1": {
+    "type": "color",
+    "value": "var(--s4-chart-1)",
+    "description": "Category 1 (blue), decision 0060: the same color as chart series 1, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
+  "--s4-category-2": {
+    "type": "color",
+    "value": "var(--s4-chart-2)",
+    "description": "Category 2 (orange), decision 0060: the same color as chart series 2, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
+  "--s4-category-3": {
+    "type": "color",
+    "value": "var(--s4-chart-3)",
+    "description": "Category 3 (green), decision 0060: the same color as chart series 3, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
+  "--s4-category-4": {
+    "type": "color",
+    "value": "var(--s4-chart-4)",
+    "description": "Category 4 (amber), decision 0060: the same color as chart series 4, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
+  "--s4-category-5": {
+    "type": "color",
+    "value": "var(--s4-chart-5)",
+    "description": "Category 5 (pink), decision 0060: the same color as chart series 5, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
+  "--s4-category-6": {
+    "type": "color",
+    "value": "var(--s4-chart-6)",
+    "description": "Category 6 (deep green), decision 0060: the same color as chart series 6, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
+  },
   "--s4-glass-tint-float": {
     "type": "color",
     "value": "var(--md-sys-color-surface-container)",
