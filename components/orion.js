@@ -112,7 +112,12 @@
      tokens.css, so device dark mode and high contrast keep working. */
   /* Decision 0045: Orion takes any color as its accent (S4.theme({ seed: '#0b57d0' }) or a named one from
      S4.theme.accents, e.g. 'blue'); 'mono' (black and white) is one choice among them, not the rule. */
-  var state = { seed: null, variant: 'vibrant', mode: 'system', contrast: 0, surfaces: 'neutral' };
+  var state = { seed: null, variant: 'auto', mode: 'system', contrast: 0, surfaces: 'neutral' };
+  /* Decision 0060: a seed given without a variant keeps its own color when it is muted or deep (a brand color such as
+     plum, terracotta, navy or espresso: 'fidelity'), and takes M3's 'vibrant' when it is already vivid (blue, magenta,
+     orange). 'vibrant' raises a muted seed's chroma to about 74 and turns it neon. Tinted mode keeps 'tonal'.
+     scripts/check-accent.mjs reads AUTO_VARIANT, so the proof follows this rule. */
+  var AUTO_VARIANT = { chroma: 60, tone: 35 };
   /* m3color.js sits next to orion.js (skill assets) or in components/assets/ (repo); <script data-m3color="..."> overrides. */
   var m3src = (document.currentScript && document.currentScript.dataset.m3color) ||
     (scriptSrc.indexOf('/components/') >= 0 ? scriptSrc.slice(0, scriptSrc.indexOf('/components/')) + '/components/assets/m3color.js'
@@ -135,19 +140,56 @@
        a whole screen in a vivid tint is tiring. Controls that are a fixed neutral gray take the scheme's outline. */
     cfg = cfg || state;
     var M = window.M3Color, tinted = cfg.surfaces === 'tinted';
-    var s = M.scheme(cfg.seed, tinted && !cfg.variantSet ? 'tonal' : cfg.variant, dark, c);
-    if (tinted) { s['--s4-color-control'] = s.outline; return s; }
-    var pal = M.palettes(cfg.seed, cfg.variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
+    var variant = cfg.variantSet && cfg.variant && cfg.variant !== 'auto' ? cfg.variant : tinted ? 'tonal' : S4.theme.variantFor(cfg.seed);
+    var s = M.scheme(cfg.seed, variant, dark, c);
+    var pal = M.palettes(cfg.seed, variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
+    if (tinted) { s['--s4-color-control'] = s.outline; return fabTints(s, c, tone); }
     var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
     o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
     o['on-secondary-container'] = tone(dark ? 90 : 10);
     o['--s4-focus-ring-color'] = s.primary;
+    return fabTints(o, c, tone);
+  }
+  /* Glass FABs with a seed (decision 0060, extends 0032): a floating button is glass tinted with its own color, and its
+     label must read at 4.5:1 over anything behind it (a pure black or white backdrop after the glass's filter). The
+     default FAB's icon and label (--s4-color-on-fab) are on-primary-container, or white or the accent's darkest tone
+     when that keeps more of the glass (a 'fidelity' container is the seed itself, paired at exactly 4.5:1 when solid).
+     The owner's tint (75%, 90% for a colored FAB) stays where that allows and rises only as far as the label needs.
+     Roles the seed does not write (neutral mode: secondary, tertiary) keep the monochrome values and the token tint.
+     The vibrant toolbar keeps its recorded exception (decision 0032). scripts/check-glass.mjs proves the same rule. */
+  var glassBase = null;
+  var hexRgb = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); };
+  var lumOf = function (c) { var v = c.map(function (x) { x = Math.min(255, Math.max(0, x)) / 255; return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  var ratioOf = function (a, b) { var x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  function fabTint(bg, fg, from, lo, hi) {
+    var b = hexRgb(bg), f = hexRgb(fg), at = function (t, k) { return b.map(function (v) { return v * t + k * (1 - t); }); };
+    for (var t = from; t < 1; t = Math.round((t + 0.01) * 100) / 100) if (Math.min(ratioOf(f, at(t, lo)), ratioOf(f, at(t, hi))) >= 4.5) return t;
+    return 1;
+  }
+  function fabTints(o, c, tone) {
+    if (!glassBase) {
+      var n = function (name, d) { var v = parseFloat(S4.util.css(name)); return isNaN(v) ? d : v; };
+      var k = n('--s4-glass-backdrop-contrast-float', 1), br = n('--s4-glass-backdrop-brightness-float', 1);
+      var filt = function (v) { return Math.min(255, Math.max(0, ((v - 127.5) * k + 127.5) * br)); };
+      glassBase = { fab: n('--s4-glass-tint-opacity-fab', 0.75), color: n('--s4-glass-tint-opacity-fab-color', 0.9), lo: filt(0), hi: filt(255) };
+    }
+    if (c >= 1) { o['--s4-glass-tint-opacity-fab'] = 1; o['--s4-glass-tint-opacity-fab-color'] = 1; o['--s4-color-on-fab'] = o['on-primary-container']; return o; }   /* high contrast: solid, as in the tokens */
+    var g = glassBase, tint = function (bg, fg, from) { var f = fg && fg.charAt(0) === '#' ? fg : o[fg]; return o[bg] && f ? fabTint(o[bg], f, from, g.lo, g.hi) : from; };
+    var best = null;
+    [o['on-primary-container'], tone(100), tone(10)].forEach(function (fg) { var t = tint('primary-container', fg, g.fab); if (!best || t < best.t) best = { t: t, fg: fg }; });
+    o['--s4-glass-tint-opacity-fab'] = best.t;
+    o['--s4-color-on-fab'] = best.fg;
+    o['--s4-glass-tint-opacity-fab-color'] = Math.max.apply(null, [['secondary-container', 'on-secondary-container'], ['tertiary-container', 'on-tertiary-container'],
+      ['primary', 'on-primary'], ['secondary', 'on-secondary'], ['tertiary', 'on-tertiary']].map(function (p) { return tint(p[0], p[1], g.color); }));
     return o;
   }
   /* one role list as light-dark(light, dark): the element's own color-scheme (set by the token blocks for every light
      or dark scope) picks the value, so a scoped scheme follows whatever mode the element is in */
   function rolesLD(L, D) {
-    var css = Object.keys(L).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')'; }).join(';');
+    var css = Object.keys(L).map(function (k) {
+      if (typeof L[k] === 'number') return k + ':' + Math.max(L[k], D[k]);   /* a FAB tint is a number: light-dark() takes colors only, so the larger one serves both */
+      return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')';
+    }).join(';');
     /* tinted: the glass tints follow the tinted surfaces (a light or dark scope gets them as plain values in tokens.css) */
     if (L['surface-container']) css += ';--s4-glass-tint-float:light-dark(' + L['surface-container'] + ',' + D['surface-container'] + ')' +
       ';--s4-glass-tint-fill:light-dark(' + L['surface-container-highest'] + ',' + D['surface-container-highest'] + ')';
@@ -195,7 +237,7 @@
     var raw = node.getAttribute('data-accent'), seed = raw && (S4.theme.accents[raw.toLowerCase()] || raw);
     if (!seed || !/^#[0-9a-f]{6}$/i.test(seed)) return null;
     var v = node.getAttribute('data-accent-variant');
-    return { seed: seed, variant: v || 'vibrant', variantSet: !!v, surfaces: node.getAttribute('data-surfaces') === 'tinted' ? 'tinted' : 'neutral' };
+    return { seed: seed, variant: v || 'auto', variantSet: !!v && v !== 'auto', surfaces: node.getAttribute('data-surfaces') === 'tinted' ? 'tinted' : 'neutral' };
   }
   function writeScoped() {
     var nodes = Array.prototype.slice.call(document.querySelectorAll('[data-accent]:not(html)'));
@@ -224,13 +266,14 @@
       m.content = S4.util.css('--md-sys-color-surface');
     });
   }
-  var FACES = ['serif', 'rounded', 'mono', 'system'];
+  var FACES = ['serif', 'rounded', 'mono', 'system', 'geometric', 'humanist'];
   var BRAND = [
     { key: 'corners', attr: 'data-corners', base: 'round' },
     { key: 'gray', attr: 'data-gray', base: 'pure' },
     { key: 'page', attr: 'data-page', base: 'plain' },
     { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
     { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' },
+    { key: 'displayWeight', attr: 'data-type-display-weight', base: 'semibold' },   /* regular, medium: for a display face lighter than Inter (decision 0060) */
     { key: 'energy', attr: 'data-energy', base: 'standard' }   /* motion energy: calm, standard, lively (motion.css, motion.js) */
   ];
   /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
@@ -260,14 +303,14 @@
   }
   S4.theme = function (opts, el) {
     if (el && el !== root) return themeElement(el, opts);
-    if (!opts) return { seed: state.seed, variant: state.variant, mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
-      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard' };
+    if (!opts) return { seed: state.seed, variant: state.variantSet ? state.variant : 'auto', mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
+      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold' };
     var colorChanged = false;
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
       state.seed = seed && String(seed).toLowerCase() !== '#000000' ? seed : null; colorChanged = true;
     }
-    if (opts.variant) { state.variant = opts.variant; state.variantSet = true; colorChanged = true; }
+    if (opts.variant) { state.variant = opts.variant; state.variantSet = opts.variant !== 'auto'; colorChanged = true; }
     if (opts.surfaces) { state.surfaces = opts.surfaces === 'tinted' ? 'tinted' : 'neutral'; colorChanged = true; }
     if (opts.mode) { state.mode = opts.mode; if (opts.mode === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', opts.mode); }
     if ('contrast' in opts) {
@@ -290,7 +333,7 @@
     });
     if (colorChanged) { writeColor(); writeScoped(); } else { metaThemeColor(); S4.util.emit(document, 's4-theme', S4.theme()); }
     var key = opts.save || S4.theme.key;
-    if (key) { S4.theme.key = key; try { localStorage.setItem(key, JSON.stringify(S4.theme())); } catch (e) {} }
+    if (key) { S4.theme.key = key; save(key); }
     return S4.theme();
   };
   /* the dials written in the page's own markup (<html data-energy="calm">) are the starting state, so a saved theme
@@ -301,17 +344,47 @@
   });
   S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
-  S4.theme.restore = function (key, defaults) {
-    var saved = null; try { saved = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
-    S4.theme.key = key;
-    var t = saved || defaults || {};
-    var o = {}; for (var k in t) o[k] = t[k];
+  /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode', 'contrast'] }. Only those are read
+     from the saved theme and only those are saved; every other key comes from defaults on every visit, so a branded app
+     keeps its fixed brand (and never writes it into a key other pages share) while the visitor's light or dark choice
+     is remembered. Dials written on <html> in markup are already the starting state, so defaults need not repeat them. */
+  S4.theme.restore = function (key, defaults, opts) {
+    var saved = read(key), only = opts && opts.only ? [].concat(opts.only) : null;
+    S4.theme.key = key; S4.theme.only = only;
+    var o = {}, k;
+    if (only) {
+      for (k in defaults) o[k] = defaults[k];
+      if (saved) only.forEach(function (n) { if (n in saved) o[n] = saved[n]; });
+    } else { var t = saved || defaults || {}; for (k in t) o[k] = t[k]; }
     S4.theme(o);
     return !!saved;
   };
+  function read(key) { try { return JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return null; } }
+  function save(key) {
+    var t = S4.theme(), only = S4.theme.only;
+    if (only) { var o = read(key) || {}; only.forEach(function (n) { o[n] = t[n]; }); t = o; }   /* other keys in a shared save stay as they were */
+    try { localStorage.setItem(key, JSON.stringify(t)); } catch (e) {}
+  }
+  /* the variant a seed gets when none is named (see AUTO_VARIANT); needs m3color.js, so it answers 'vibrant' until that has loaded */
+  S4.theme.variantFor = function (seed) {
+    if (!window.M3Color || !seed) return 'vibrant';
+    var h = window.M3Color.hct(seed);
+    return h.chroma < AUTO_VARIANT.chroma || h.tone < AUTO_VARIANT.tone ? 'fidelity' : 'vibrant';
+  };
   if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', metaThemeColor);
-  /* declarative scoped accents: data-accent on any element added to the page */
+  /* declarative scoped accents: data-accent on any element added to the page, and (decision 0060) a data-accent,
+     data-accent-variant or data-surfaces changed later with setAttribute, so a region's color follows its markup */
   S4.register('scoped-accent', function (scope) { if (S4.util.all(scope, '[data-accent]:not(html)').length) writeScoped(); });
+  var scopedQueued = false;
+  new MutationObserver(function (list) {
+    var hit = false;
+    list.forEach(function (m) {
+      if (m.target === root) return;
+      hit = true;
+      if (!m.target.hasAttribute('data-accent')) m.target.removeAttribute('data-s4-accent-id');
+    });
+    if (hit && !scopedQueued) { scopedQueued = true; Promise.resolve().then(function () { scopedQueued = false; writeScoped(); }); }
+  }).observe(root, { attributes: true, subtree: true, attributeFilter: ['data-accent', 'data-accent-variant', 'data-surfaces'] });
 })();
 
 /* ---- motion/motion.js ---- */
@@ -5011,8 +5084,9 @@ S4.register('slider', function (scope) {
 /* Swatches behaviour.
    Single choice: a click presses one swatch (aria-pressed) and fires s4-change { seed } on the group (seed null for
    the mono swatch, data-seed="#000000" or empty). One tab stop with arrow keys, Home and End (roving tabindex).
-   data-theme-seed: the click also calls S4.theme({ seed, variant: 'vibrant' }), and the group follows S4.theme() via the
-   s4-theme event, so it stays right when the theme changes elsewhere. */
+   data-theme-seed: the click also calls S4.theme({ seed, variant }), and the group follows S4.theme() via the
+   s4-theme event, so it stays right when the theme changes elsewhere. variant is the group's data-variant, or else the
+   page's own (an app that set 'fidelity' keeps it; with none, 'auto' picks per seed, decision 0060). */
 S4.register('swatches', function (scope) {
   var norm = function (s) { return !s || String(s).toLowerCase() === '#000000' ? null : String(s).toLowerCase(); };
   S4.util.all(scope, '.s4-swatches').forEach(function (g) {
@@ -5051,7 +5125,7 @@ S4.register('swatches', function (scope) {
       select(seed); stop(b);
       if (was) return;
       S4.util.emit(g, 's4-change', { seed: seed, swatch: b });
-      if (theme) S4.theme({ seed: seed, variant: g.dataset.variant || 'vibrant' });
+      if (theme) S4.theme({ seed: seed, variant: g.dataset.variant || S4.theme().variant || 'auto' });
     });
     g.addEventListener('focusin', function (e) { var b = e.target.closest('.s4-swatch'); if (b) stop(b); });
     g.addEventListener('keydown', function (e) {
@@ -5067,11 +5141,11 @@ S4.register('swatches', function (scope) {
 });
 
 /* Theme controls without app code: a connected button group with data-theme-mode (values system|light|dark),
-   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy" (values as
+   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight" (values as
    S4.theme takes them, e.g. tinted|neutral, serif|inter) calls S4.theme when picked and follows S4.theme() (restored
    or changed elsewhere). So an app's own Appearance section needs no script. */
 S4.register('theme-controls', function (scope) {
-  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy'];
+  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight'];
   S4.util.all(scope, '[data-theme-mode], [data-theme-contrast], [data-brand-dial]').forEach(function (g) {
     if (!S4.util.once(g, 'themectl')) return;
     var key = g.hasAttribute('data-theme-mode') ? 'mode' : g.hasAttribute('data-theme-contrast') ? 'contrast' : g.getAttribute('data-brand-dial');

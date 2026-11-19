@@ -2046,11 +2046,15 @@
 
      data-corners="round | soft | firm"       what you click: pills (default), 14, 10. Never sharp (the soft range).
                                               A custom value: --s4-shape-control on :root, 10px or more.
-     data-type-display="serif | rounded | mono | system | custom"   the display face (display, headline, title-large)
-     data-type-text="serif | rounded | mono | system | custom"      the text face (title, body, label)
+     data-type-display="serif | rounded | mono | system | geometric | humanist | custom"   the display face (display, headline, title-large)
+     data-type-text="serif | rounded | mono | system | geometric | humanist | custom"      the text face (title, body, label)
                                               custom: also set --md-ref-typeface-brand / --md-ref-typeface-plain.
                                               Inter's letter spacing is dropped for any other face; set your own
                                               --md-sys-typescale-<role>-tracking if the face needs it.
+                                              Every preset is a system stack (nothing is downloaded), with fallbacks
+                                              on Windows, Android and Linux, so it degrades to a near face, not Inter.
+     data-type-display-weight="medium | regular"   the weight of the display face's roles (default semibold, 600): a
+                                              Didone, a book serif or a geometric face is drawn lighter than Inter.
      data-page="soft"                         page tone: white cards on a soft gray page (light mode; dark already
                                               has cards lighter than the page)
      data-gray="warm | cool"                  gray temperature: see gray.css (generated)
@@ -2076,16 +2080,54 @@
   }
 
   /* ---------- typefaces ---------- */
+  /* the stacks: Apple's own face first, then what Windows (and Office), Android and Linux ship that is closest to it.
+     rounded: SF Rounded; Hiragino Maru Gothic on a Mac outside Safari; Nunito, Quicksand or Comfortaa where installed;
+     Arial Rounded (display only: it has one weight, bold); Calibri, whose ends are rounded, on Windows.
+     geometric: Futura (Apple); Century Gothic (Windows with Office); URW Gothic (Linux); Avenir Next; Corbel.
+     humanist: Seravek and Gill Sans (Apple); Gill Sans MT, Calibri and Candara (Windows); Ubuntu; Noto Sans (Android). */
   :where([data-type-display="serif"]) { --md-ref-typeface-brand: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where([data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Nunito, Quicksand, Comfortaa, "Arial Rounded MT", "Arial Rounded MT Bold", Calibri, system-ui, sans-serif; }
   :where([data-type-display="mono"]) { --md-ref-typeface-brand: var(--md-ref-typeface-mono); }
   :where([data-type-display="system"]) { --md-ref-typeface-brand: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-display="geometric"]) { --md-ref-typeface-brand: Futura, "Futura PT", "Century Gothic", "URW Gothic", "URW Gothic L", "Avenir Next", Avenir, Corbel, system-ui, sans-serif; }
+  :where([data-type-display="humanist"]) { --md-ref-typeface-brand: Seravek, "Gill Sans Nova", "Gill Sans", "Gill Sans MT", Calibri, Candara, Ubuntu, "Noto Sans", system-ui, sans-serif; }
   :where([data-type-text="serif"]) { --md-ref-typeface-plain: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where([data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Nunito, Quicksand, Comfortaa, Calibri, system-ui, sans-serif; }
   :where([data-type-text="mono"]) { --md-ref-typeface-plain: var(--md-ref-typeface-mono); }
   :where([data-type-text="system"]) { --md-ref-typeface-plain: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-text="geometric"]) { --md-ref-typeface-plain: "Avenir Next", Avenir, "Century Gothic", "URW Gothic", "URW Gothic L", Futura, Corbel, system-ui, sans-serif; }
+  :where([data-type-text="humanist"]) { --md-ref-typeface-plain: Seravek, "Gill Sans Nova", "Gill Sans", "Gill Sans MT", Calibri, Candara, Ubuntu, "Noto Sans", system-ui, sans-serif; }
+  /* display weight: every role on the display face (display, headline, title-large) one or two steps lighter; its
+     emphasized roles stay a step above it */
+  :where([data-type-display-weight="medium"]) {
+    --md-sys-typescale-display-large-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-display-medium-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-display-small-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-large-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-medium-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-small-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-title-large-weight: var(--md-ref-typeface-weight-medium);
+  }
+  :where([data-type-display-weight="regular"]) {
+    --md-sys-typescale-display-large-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-display-medium-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-display-small-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-large-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-medium-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-small-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-title-large-weight: var(--md-ref-typeface-weight-regular);
+  }
+  :where(:is([data-type-display-weight="medium"], [data-type-display-weight="regular"])) {
+    --md-sys-typescale-emphasized-display-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-display-medium-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-display-small-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-medium-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-small-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-title-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+  }
   /* the letter spacing in the tokens is tuned for Inter (and suits the system face); any other face starts from its own */
-  :where(:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="custom"])) {
+  :where(:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="geometric"], [data-type-display="humanist"], [data-type-display="custom"])) {
     --md-sys-typescale-display-large-tracking: 0px;
     --md-sys-typescale-display-medium-tracking: 0px;
     --md-sys-typescale-display-small-tracking: 0px;
@@ -2094,7 +2136,7 @@
     --md-sys-typescale-headline-small-tracking: 0px;
     --md-sys-typescale-title-large-tracking: 0px;
   }
-  :where(:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="custom"])) {
+  :where(:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="geometric"], [data-type-text="humanist"], [data-type-text="custom"])) {
     --md-sys-typescale-title-medium-tracking: 0px;
     --md-sys-typescale-title-small-tracking: 0px;
     --md-sys-typescale-body-large-tracking: 0px;
@@ -2684,7 +2726,7 @@
     --_track: var(--md-sys-typescale-title-medium-tracking);
     --_weight: var(--md-sys-typescale-title-medium-weight);
     --_bg: var(--md-sys-color-primary-container);
-    --_fg: var(--md-sys-color-on-primary-container);
+    --_fg: var(--s4-color-on-fab, var(--md-sys-color-on-primary-container));   /* with a seed, core.js may pick white or the accent's darkest tone so the glass stays (decision 0060) */
     --_elevation: var(--md-sys-elevation-level3);
 
     display: inline-flex;

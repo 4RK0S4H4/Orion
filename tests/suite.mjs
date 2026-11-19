@@ -238,7 +238,7 @@ function dialAudit(opts) {
 /* (c) text contrast as rendered, AA: 4.5, or 3 for large text; text on glass is checked against the worst backdrop
    after the glass's own filter and tint (the same method as skill/s4-orion/scripts/check.mjs) */
 function contrastAudit(seeded) {
-  const out = [];      /* seeded: colored FABs and the vibrant toolbar are glass in the accent's own color: the recorded exception (decisions 0028 and 0032) */
+  const out = [];      /* seeded: the vibrant toolbar is glass in the accent's own color, the recorded exception (decision 0032); FABs are proven (decision 0060: core.js keeps their labels at 4.5:1) */
   const cv = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
   const parse = (c) => {
     let m = c.match(/^rgba?\(([^)]+)\)/);
@@ -258,7 +258,7 @@ function contrastAudit(seeded) {
   const seen = new Set();
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.nodeValue.trim() ? 1 : 2 });
   for (let t; (t = walker.nextNode());) {
-    const el = t.parentElement; if (!el || seen.has(el) || off(el) || (seeded && el.closest('.s4-fab, .s4-toolbar[data-color="vibrant"]')) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(el.tagName)) continue;
+    const el = t.parentElement; if (!el || seen.has(el) || off(el) || (seeded && el.closest('.s4-toolbar[data-color="vibrant"]')) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(el.tagName)) continue;
     seen.add(el);
     const cs = getComputedStyle(el), r = el.getBoundingClientRect();
     if (!r.width || !r.height || cs.visibility !== 'visible' || +cs.opacity === 0) continue;
@@ -753,6 +753,8 @@ const PRESETS = [
   { key: 'page-soft', theme: { page: 'soft' }, modes: ['desktop-light'] },   /* the soft page is a light-mode tone */
   { key: 'type-serif-rounded', theme: { display: 'serif', text: 'rounded' }, modes: ['phone-dark'] },   /* faces change widths, not colors: the phone is the tight case */
   { key: 'type-mono', theme: { display: 'mono', text: 'mono' }, modes: ['phone-dark'] },
+  { key: 'type-geometric-humanist', theme: { display: 'geometric', text: 'humanist', displayWeight: 'regular' }, modes: ['phone-dark'] },   /* decision 0060 */
+  { key: 'seed-muted', theme: { seed: '#6e2a5e' } },   /* a muted brand seed: 'auto' picks fidelity; every FAB label still reads (decision 0060) */
   { key: 'combo-firm-cool-soft-mono', theme: { corners: 'firm', gray: 'cool', page: 'soft', display: 'mono' }, dial: true },
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];

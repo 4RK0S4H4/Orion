@@ -56,23 +56,52 @@ for (const mode of ['light', 'dark']) {
     }
   }
   console.log(`Items on glass ${mode} (fill ${fo}, selected ${so}): worst ${fillWorst.r.toFixed(2)}:1 (${fillWorst.seed} ${fillWorst.v}, ${fillWorst.surfaces} surfaces)`);
-  /* floating action buttons are glass tinted with their own color (decision 0025): icon and label in the FAB's on-color */
+  /* floating action buttons are glass tinted with their own color (decision 0025): icon and label in the FAB's on-color.
+     Monochrome: every FAB color keeps 3:1 for its icon and the default FAB 4.5:1 for its label at the owner's tint.
+     With a seed (decision 0060): components/core/core.js gives the default FAB the label that keeps the most glass
+     (on-primary-container, white or the accent's tone 10) and raises a FAB's tint, per scheme, only as far as its label
+     needs to reach 4.5:1 over a black or white backdrop; this proves that a tint at or below 1 exists for every scheme,
+     in neutral mode (the roles the seed writes) and tinted mode (every role), and reports how far it had to rise. */
   const fabPairs = [['primary-container', 'on-primary-container'], ['secondary-container', 'on-secondary-container'], ['tertiary-container', 'on-tertiary-container'], ['primary', 'on-primary'], ['secondary', 'on-secondary'], ['tertiary', 'on-tertiary']];
   const tfDefault = val('--s4-glass-tint-opacity-fab', mode), tfColor = val('--s4-glass-tint-opacity-fab-color', mode);
-  let fabWorst = { r: Infinity }, fabMono = Infinity, fabMonoDefault = Infinity;
+  const onGlass = (bg, fg, tf) => { const tint = rgb(bg), text = rgb(fg); return Math.min(ratio(text, mix(tint, [lo, lo, lo], tf)), ratio(text, mix(tint, [hi, hi, hi], tf))); };
+  const fabTint = (bg, fg, from) => { for (let t = from; t < 1; t = Math.round((t + 0.01) * 100) / 100) if (onGlass(bg, fg, t) >= 4.5) return t; return 1; };   /* the same rule as core.js */
+  let fabMono = Infinity, fabMonoDefault = Infinity, monoLabel = { r: Infinity };
+  for (const [bg, fg] of fabPairs) {
+    const tf = bg === 'primary-container' ? tfDefault : tfColor, r = onGlass(mono[bg], mono[fg], tf);
+    fabMono = Math.min(fabMono, r);
+    if (bg === 'primary-container') fabMonoDefault = r;
+    else if (r < monoLabel.r) monoLabel = { r, pair: bg };
+    if (r < 3) { failures++; console.error(`  x ${mode}: monochrome ${fg} on ${bg} FAB glass is ${r.toFixed(2)}:1`); }
+  }
+  if (fabMonoDefault < 4.5) { failures++; console.error(`  x ${mode}: the default FAB's label in monochrome is ${fabMonoDefault.toFixed(2)}:1 on glass`); }
+  const toneOf = (seed, v) => { const pal = M3.palettes(seed, v); return (x) => pal.rows.Primary[pal.tones.indexOf(x)]; };
+  const accentRoles = (seed, v, dark) => {   /* neutral mode, as core.js writes it: the accent roles from the seed, the selection from the primary palette */
+    const s = M3.scheme(seed, v, dark, 0), tone = toneOf(seed, v);
+    const o = { 'primary-container': s['primary-container'], 'on-primary-container': s['on-primary-container'], primary: s.primary, 'on-primary': s['on-primary'] };
+    o['secondary-container'] = tone(dark ? 20 : 90); o['on-secondary-container'] = tone(dark ? 90 : 10);
+    return o;
+  };
+  let fabSeeded = { t: 0 }, fabSeededColor = { t: 0 }, seededSchemes = 0; const fabTints = {};
   for (const [seed, variants] of seeds) for (const v of variants) {
-    const s = schemeOf(seed, v, mode);
-    for (const [bg, fg] of fabPairs) {
-      const tf = bg === 'primary-container' ? tfDefault : tfColor;   /* the default FAB, or a data-color FAB */
-      const tint = rgb(s[bg]), text = rgb(s[fg]);
-      const r = Math.min(ratio(text, mix(tint, [lo, lo, lo], tf)), ratio(text, mix(tint, [hi, hi, hi], tf)));
-      if (seed === '#000000') fabMono = Math.min(fabMono, r);
-      if (r < fabWorst.r) fabWorst = { r, seed, v, pair: bg };
-      if (seed === '#000000' && bg === 'primary-container') fabMonoDefault = Math.min(fabMonoDefault, r);
-      if (seed === '#000000' && r < 3) { failures++; console.error(`  x ${mode}: monochrome ${fg} on ${bg} FAB glass is ${r.toFixed(2)}:1`); }
+    if (seed === '#000000') continue;
+    for (const surfaces of ['neutral', 'tinted']) {
+      seededSchemes++;
+      const s = surfaces === 'tinted' ? M3.scheme(seed, v, mode === 'dark', 0) : accentRoles(seed, v, mode === 'dark');
+      const tone = toneOf(seed, v);
+      for (const [bg, fg] of fabPairs) {
+        if (!s[bg]) continue;   /* neutral mode: secondary and tertiary stay monochrome (above) */
+        const isDefault = bg === 'primary-container', from = isDefault ? tfDefault : tfColor;
+        const labels = isDefault ? [s[fg], tone(100), tone(10)] : [s[fg]];
+        const pick = labels.map((l) => ({ l, t: fabTint(s[bg], l, from) })).reduce((a, b) => (b.t < a.t ? b : a));
+        const r = onGlass(s[bg], pick.l, pick.t), worst = isDefault ? fabSeeded : fabSeededColor;
+        if (pick.t > worst.t) Object.assign(worst, { t: pick.t, seed, v, surfaces, pair: bg });
+        if (isDefault) fabTints[v] = Math.max(fabTints[v] || 0, pick.t);
+        if (r < 4.5) { failures++; console.error(`  x ${mode}: ${seed} ${v} (${surfaces}): a ${bg} FAB's label is ${r.toFixed(2)}:1 even solid`); }
+      }
     }
   }
-  console.log(`FAB glass ${mode} (tint ${tfDefault}, other colors ${tfColor}): default FAB in monochrome ${fabMonoDefault.toFixed(2)}:1 (any monochrome FAB color ${fabMono.toFixed(2)}:1), worst ${fabWorst.r.toFixed(2)}:1 (${fabWorst.seed} ${fabWorst.v} ${fabWorst.pair}, owner's 75%; every monochrome FAB must keep 3:1) over ${seeds.reduce((n, x) => n + x[1].length, 0)} schemes x ${fabPairs.length} colors`);
+  console.log(`FAB glass ${mode} (tint ${tfDefault}, other colors ${tfColor}): monochrome default FAB label ${fabMonoDefault.toFixed(2)}:1, every monochrome FAB icon ${fabMono.toFixed(2)}:1 or more (3 needed; worst label ${monoLabel.r.toFixed(2)}:1 on ${monoLabel.pair}). With a seed, over ${seededSchemes} schemes (neutral and tinted) every label reaches 4.5:1: the default FAB's tint rises to at most ${fabSeeded.t.toFixed(2)} (${fabSeeded.seed} ${fabSeeded.v}, ${fabSeeded.surfaces}), a colored FAB's to ${fabSeededColor.t.toFixed(2)} (${fabSeededColor.seed} ${fabSeededColor.v} ${fabSeededColor.pair}, ${fabSeededColor.surfaces}); default FAB tint at most per variant: ${Object.entries(fabTints).map(([k, t]) => k + ' ' + t.toFixed(2)).join(', ')}`);
   console.log(`Glass ${mode}: tint ${t}, backdrop contrast ${c} brightness ${b} -> worst ${worst.r.toFixed(2)}:1 (${worst.seed} ${worst.v}) over 97 schemes`);
 }
 if (failures) { console.error(`${failures} scheme(s) below 4.5:1. Raise the tint or the backdrop compression in tokens/src/glass.tokens.json.`); process.exit(1); }
