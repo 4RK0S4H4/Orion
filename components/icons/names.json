@@ -99,7 +99,9 @@
         "timer": "stopwatch",
         "water": "waterdrop",
         "minus": "minus",
-        "plus": "add"
+        "plus": "add",
+        "columns": "columns-3",
+        "pin": "pin"
       }
     },
     "phosphor-duotone": {
@@ -199,7 +201,9 @@
         "timer": "timer",
         "water": "drop",
         "minus": "minus",
-        "plus": "plus"
+        "plus": "plus",
+        "columns": "columns",
+        "pin": "push-pin"
       }
     },
     "phosphor-bold-duotone": {
@@ -299,7 +303,9 @@
         "timer": "timer",
         "water": "drop",
         "minus": "minus",
-        "plus": "plus"
+        "plus": "plus",
+        "columns": "columns",
+        "pin": "push-pin"
       }
     }
   }

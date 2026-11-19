@@ -1,0 +1,309 @@
+{
+  "$description": "Syntax colors for code blocks (round 0056): fixed hues, like the status colors, so code reads the same with any accent and in tinted mode. Every color is proven at 4.5:1 (6:1 in high contrast) on every surface in light, dark and both high-contrast modes by build-tokens, and on the tinted surfaces of every accent by check-accent. Plain code text and punctuation use on-surface and on-surface-variant.",
+  "s4": {
+    "syntax": {
+      "$type": "color",
+      "keyword": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.4431,
+            0.251,
+            0.6902
+          ],
+          "hex": "#7140b0"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.7333,
+                0.5765,
+                0.9961
+              ],
+              "hex": "#bb93fe"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.3059,
+                0.0824,
+                0.5255
+              ],
+              "hex": "#4e1586"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.8941,
+                0.851,
+                0.9922
+              ],
+              "hex": "#e4d9fd"
+            }
+          }
+        },
+        "$description": "Keywords and operators that are words (if, return, const, def)."
+      },
+      "string": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0235,
+            0.4118,
+            0.1059
+          ],
+          "hex": "#06691b"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.3961,
+                0.7255,
+                0.4118
+              ],
+              "hex": "#65b969"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.0118,
+                0.2549,
+                0.0549
+              ],
+              "hex": "#03410e"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.6157,
+                0.949,
+                0.6235
+              ],
+              "hex": "#9df29f"
+            }
+          }
+        },
+        "$description": "Strings and template text."
+      },
+      "number": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5529,
+            0.2824,
+            0.0275
+          ],
+          "hex": "#8d4807"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.949,
+                0.5569,
+                0.2588
+              ],
+              "hex": "#f28e42"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.3529,
+                0.1686,
+                0.0039
+              ],
+              "hex": "#5a2b01"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.9922,
+                0.8431,
+                0.7412
+              ],
+              "hex": "#fdd7bd"
+            }
+          }
+        },
+        "$description": "Numbers, booleans and other literal constants."
+      },
+      "comment": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.3216,
+            0.3569,
+            0.4118
+          ],
+          "hex": "#525b69"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.6196,
+                0.6588,
+                0.7176
+              ],
+              "hex": "#9ea8b7"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.1922,
+                0.2196,
+                0.2706
+              ],
+              "hex": "#313845"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.8353,
+                0.8745,
+                0.9373
+              ],
+              "hex": "#d5dfef"
+            }
+          }
+        },
+        "$description": "Comments (also set in italic, so they never rely on color alone)."
+      },
+      "function": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0039,
+            0.349,
+            0.6863
+          ],
+          "hex": "#0159af"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.4039,
+                0.6667,
+                0.9922
+              ],
+              "hex": "#67aafd"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.0078,
+                0.2157,
+                0.4392
+              ],
+              "hex": "#023770"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.7961,
+                0.8824,
+                0.9922
+              ],
+              "hex": "#cbe1fd"
+            }
+          }
+        },
+        "$description": "Function and method names."
+      },
+      "type": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.0471,
+            0.3922,
+            0.3961
+          ],
+          "hex": "#0c6465"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.2,
+                0.7216,
+                0.7216
+              ],
+              "hex": "#33b8b8"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.0118,
+                0.2431,
+                0.2471
+              ],
+              "hex": "#033e3f"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.4667,
+                0.9451,
+                0.9451
+              ],
+              "hex": "#77f1f1"
+            }
+          }
+        },
+        "$description": "Types, classes, tag names."
+      },
+      "property": {
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.6314,
+            0.1843,
+            0.298
+          ],
+          "hex": "#a12f4c"
+        },
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": {
+              "colorSpace": "srgb",
+              "components": [
+                0.9882,
+                0.5059,
+                0.5922
+              ],
+              "hex": "#fc8197"
+            },
+            "high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.451,
+                0.0157,
+                0.1725
+              ],
+              "hex": "#73042c"
+            },
+            "dark-high-contrast": {
+              "colorSpace": "srgb",
+              "components": [
+                0.9882,
+                0.8353,
+                0.851
+              ],
+              "hex": "#fcd5d9"
+            }
+          }
+        },
+        "$description": "Properties, attributes, keys and CSS properties."
+      }
+    }
+  }
+}
