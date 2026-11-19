@@ -646,8 +646,14 @@ async function use(page, add, phone) {
       if ((await inp.getAttribute('type')) !== 'password' || (await t.getAttribute('aria-pressed')) !== 'false') add('password: a second press did not hide it again');
     }
     for (const f of (await visible('.s4-password[data-strength]')).slice(0, 1)) {
+      /* empty, the meter may hide; once something is typed it must say the strength in words */
+      const inp = f.locator(':scope > input');
+      await inp.fill('correct horse battery');
+      await settle(120);
       const w = await f.evaluate((x) => { const m = x.querySelector('.s4-password-strength'); return m && !m.hidden ? m.textContent : 'none'; });
-      if (!/Strength: /.test(w) && w !== '') add('password: the strength meter has no words');
+      if (!/Strength: /.test(w)) add('password: the strength meter has no words');
+      await inp.fill('');
+      await page.evaluate(() => document.activeElement && document.activeElement.blur());
     }
     for (const el of (await visible('.s4-inline-edit:not(:has(input:disabled))')).slice(0, 1)) {
       const inp = el.locator(':scope > input');
