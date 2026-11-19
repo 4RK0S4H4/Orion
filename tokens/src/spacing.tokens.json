@@ -9,6 +9,13 @@
           "unit": "px"
         }
       },
+      "hairline": {
+        "$value": {
+          "value": 2,
+          "unit": "px"
+        },
+        "$description": "Decision 0060: the 2dp gap, half a grid step: the seam between joined or paired shapes (paired bars, segmented bars, keys on a drawn keyboard), a hairline inset. Never a layout gap."
+      },
       "1": {
         "$value": {
           "value": 4,

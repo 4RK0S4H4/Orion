@@ -49,7 +49,7 @@
   .s4-nav-rail-footer {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--s4-space-1) / 2);
+    gap: var(--s4-space-hairline);
     padding-inline: var(--_pad);
   }
   .s4-nav-rail-header { gap: var(--s4-space-3); }

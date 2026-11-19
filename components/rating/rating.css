@@ -22,7 +22,7 @@
     font-variant-numeric: tabular-nums;
   }
   .s4-rating[data-size="l"] { --_size: var(--s4-size-icon); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); }
-  .s4-rating-stars { display: inline-flex; align-items: center; gap: calc(var(--s4-space-1) / 2); }
+  .s4-rating-stars { display: inline-flex; align-items: center; gap: var(--s4-space-hairline); }
   .s4-rating-mark { position: relative; display: inline-grid; inline-size: var(--_size); block-size: var(--_size); flex: none; }
   .s4-rating-mark > span { grid-area: 1 / 1; display: block; }
   .s4-rating-mark svg { display: block; inline-size: 100%; block-size: 100%; overflow: visible; }
