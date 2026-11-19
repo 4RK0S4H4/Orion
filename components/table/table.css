@@ -275,3 +275,286 @@
     .s4-table tbody tr:has(> [data-check] input:checked) { outline: var(--s4-focus-ring-width) solid Highlight; outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   }
 }
+
+/* ---------- tables at scale (round 0056): resize, pinned columns, virtual rows, groups, details, editing ----------
+   All opt-in (see README): data-resizable, th[data-pin], S4.table(el).setRows(rows). Pinned cells are solid (the
+   table's own surface, the row's selection or state color mixed in), with a tonal edge while something is under them:
+   never a shadow, never glass. */
+@layer s4.components {
+  .s4-table-wrap { --_table-bg: var(--md-sys-color-surface-container-low); overflow-anchor: none; }
+  .s4-table tbody tr { --_row-bg: var(--_table-bg, var(--md-sys-color-surface-container-low)); }
+  .s4-table tbody tr[data-picked] {
+    --_row-bg: var(--md-sys-color-secondary-container);
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+  .s4-table tbody tr:has(> [data-check] input:checked) { --_row-bg: var(--md-sys-color-secondary-container); }
+  /* the state layer is mixed into the cell's own color, so a pinned (opaque) cell shows it too */
+  .s4-table tr[tabindex] > :is(td, th) { background-color: color-mix(in srgb, currentColor calc(var(--_state) * 100%), var(--_cell-bg, transparent)); }
+
+  /* a data table or a sideways-scrolling one: a wrap with a height scrolls in both directions */
+  .s4-table-wrap[data-virtual] {
+    max-height: var(--s4-table-max-height, calc(var(--s4-size-table-header) + var(--s4-size-table-row) * 10));
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+  }
+  .s4-table-wrap[data-virtual] thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    background: var(--_table-bg);
+  }
+  .s4-table tbody tr.s4-table-spacer,
+  .s4-table tbody tr.s4-table-spacer > td { padding: 0; border: 0; block-size: auto; min-block-size: 0; background: none; }
+
+  /* fixed widths from the column grips (table.js writes a colgroup and the table's width) */
+  .s4-table[data-fixed] { table-layout: fixed; inline-size: auto; }
+  .s4-table[data-fixed] :is(th, td) { overflow: hidden; text-overflow: ellipsis; }
+  .s4-table[data-fixed] :is(th, td)[data-wrap] { min-inline-size: 0; }
+  .s4-table[data-fixed] :is(th, td):has(> .s4-table-input, > label, > .s4-icon-button, > .s4-status) { overflow: visible; }
+
+  /* ---------- pinned columns ---------- */
+  .s4-table[data-fixed] :is(th, td)[data-pin] {
+    position: sticky;
+    z-index: 1;
+    --_cell-bg: var(--_row-bg, var(--_table-bg));
+    background-color: color-mix(in srgb, currentColor calc(var(--_state, 0) * 100%), var(--_cell-bg));
+  }
+  .s4-table[data-fixed] [data-pin="start"] { inset-inline-start: var(--_pin-at, 0px); }
+  .s4-table[data-fixed] [data-pin="end"] { inset-inline-end: var(--_pin-at, 0px); }
+  .s4-table[data-fixed] thead th[data-pin] { z-index: 3; background: var(--_table-bg); }
+  .s4-table[data-fixed] tfoot :is(th, td)[data-pin] { z-index: 3; }
+  .s4-table[data-fixed] :is(th, td)[data-pin="start"][data-pin-edge] { border-inline-end: var(--s4-size-divider) solid transparent; }
+  .s4-table[data-fixed] :is(th, td)[data-pin="end"][data-pin-edge] { border-inline-start: var(--s4-size-divider) solid transparent; }
+  .s4-table-wrap[data-scrolled-start] .s4-table[data-fixed] [data-pin="start"][data-pin-edge],
+  .s4-table-wrap[data-scrolled-end] .s4-table[data-fixed] [data-pin="end"][data-pin-edge] { border-inline-color: var(--md-sys-color-outline-variant); }
+  .s4-table-wrap[data-scrolled-start] .s4-table[data-fixed] [data-pin="start"][data-pin-edge] { --_edge: var(--md-sys-color-outline-variant); }
+
+  /* ---------- column grips ---------- */
+  .s4-table[data-resizable] thead th { position: relative; }
+  .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-resizable] thead th { position: sticky; }
+  .s4-table-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-4);
+    margin-inline-end: calc(var(--s4-space-2) * -1);
+    cursor: col-resize;
+    touch-action: none;
+    border-radius: var(--md-sys-shape-corner-small);
+  }
+  .s4-table thead th:last-child .s4-table-grip { margin-inline-end: 0; }
+  .s4-table-grip::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--s4-space-4);
+    inset-inline-start: calc(50% - 1px);
+    inline-size: 2px;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-outline-variant);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state), background-color var(--s4-motion-state);
+  }
+  .s4-table-grip::after { content: ""; position: absolute; inset-block: 0; inset-inline: calc(var(--s4-space-1) * -1); }
+  @media (hover: hover) { .s4-table thead th:hover > .s4-table-grip::before { opacity: 1; } .s4-table-grip:hover::before { background: var(--md-sys-color-outline); } }
+  @media (hover: none) { .s4-table-grip::before { opacity: 1; } }
+  .s4-table-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-table-grip:is(:focus-visible, [data-active])::before { opacity: 1; background: var(--md-sys-color-primary); }
+
+  /* ---------- a column's menu button: there for touch and the keyboard, quiet until pointed at ---------- */
+  .s4-table-col-menu { vertical-align: middle; margin-inline-start: var(--s4-space-1); }
+  .s4-table th.num .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
+  /* with a pointer it floats over the header's end (start for numbers) and shows on hover or focus */
+  @media (hover: hover) {
+    .s4-table-col-menu {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: var(--s4-space-2);
+      z-index: 1;
+      margin: 0;
+      translate: 0 -50%;
+      background: var(--_table-bg, var(--md-sys-color-surface-container-low));
+    }
+    .s4-table th.num .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
+    .s4-table thead th:not(:hover, :focus-within) .s4-table-col-menu:not([aria-expanded="true"]) { opacity: 0; }
+    .s4-table[data-column-menu] thead th { position: relative; }
+    .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-column-menu] thead th { position: sticky; }
+  }
+
+  /* ---------- rows: expand, actions, editing ---------- */
+  .s4-table :is(th, td):is([data-row-expand], [data-row-actions]) { inline-size: var(--s4-size-touch-target); padding-inline: var(--s4-space-2); text-align: center; }
+  .s4-table-expand .s4-icon, .s4-table-group-toggle .s4-icon { transition: transform var(--s4-motion-bend); }
+  .s4-table-expand[aria-expanded="true"] .s4-icon { transform: rotate(180deg); }
+  .s4-table-group-toggle[aria-expanded="false"] .s4-icon { transform: rotate(-90deg); }
+  .s4-table-group-toggle[aria-expanded="false"] .s4-icon:dir(rtl) { transform: rotate(90deg); }
+
+  .s4-table td[data-edit] { padding-inline: var(--s4-space-2); }
+  .s4-table td[data-edit]:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -2); }
+  .s4-table-input {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: var(--s4-space-12);
+    min-block-size: calc(var(--s4-space-8) + var(--s4-space-1));
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--s4-shape-text-field);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    transition: background-color var(--s4-motion-state);
+  }
+  td.num > .s4-table-input { text-align: end; }
+  @media (hover: hover) { .s4-table-input:hover { background: var(--md-sys-color-surface-container-high); cursor: text; } }
+  @media (hover: none) { .s4-table-input { background: var(--md-sys-color-surface-container); } }
+  .s4-table-input:focus { background: var(--md-sys-color-surface-container-highest); outline: 0; }
+  .s4-table-input:focus-visible, .s4-table td[data-edit]:focus-within .s4-table-input:focus { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: 0; }
+
+  /* a link-like name that opens the row's page */
+  .s4-table-link {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  @media (hover: hover) { .s4-table-link:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+  .s4-table-link:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); border-radius: var(--md-sys-shape-corner-extra-small); }
+
+  /* ---------- groups ---------- */
+  .s4-table tbody tr.s4-table-group { --_row-bg: var(--md-sys-color-surface-container); background: var(--md-sys-color-surface-container); cursor: pointer; }
+  .s4-table tr.s4-table-group > :is(th, td) {
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-table tr.s4-table-group > th { overflow: visible; }
+  .s4-table-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-table-group-count, .s4-table-foot-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-table-foot-count { display: block; }
+
+  /* ---------- details in place (the placement ladder's first rung) ---------- */
+  .s4-table tbody tr.s4-table-detail > td { block-size: auto; padding: 0; white-space: normal; }
+  .s4-table-detail-body {
+    position: sticky;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    max-inline-size: 100cqi;
+    padding: var(--s4-space-2) var(--s4-space-4) var(--s4-space-4);
+  }
+  .s4-table tbody tr.s4-table-detail + tr > :is(td, th) { border-block-start-color: var(--md-sys-color-outline-variant); }
+  .s4-table tbody tr:has(+ tr.s4-table-detail) > :is(td, th) { border-block-end: 0; }
+  .s4-table tbody tr.s4-table-detail > td { border-block-start: 0; }
+
+  /* ---------- totals footer that stays at the bottom of a data table ---------- */
+  .s4-table-wrap[data-virtual] tfoot :is(td, th) {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 2;
+    background: var(--_table-bg);
+    block-size: auto;
+    padding-block: var(--s4-space-2);
+  }
+
+  /* ---------- loading: skeleton rows shaped like the table ---------- */
+  .s4-table-skeleton {
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-surface-container-low);
+    padding-block-end: var(--s4-space-2);
+    overflow: hidden;
+  }
+  .s4-table-skeleton > div {
+    display: grid;
+    grid-template-columns: repeat(var(--_cols, 4), minmax(0, 1fr));
+    gap: var(--s4-space-6);
+    align-items: center;
+    block-size: var(--s4-size-table-row);
+    padding-inline: var(--s4-space-4);
+  }
+  .s4-table-skeleton-head { block-size: var(--s4-size-table-header); border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+  .s4-table-skeleton-head .s4-skeleton { inline-size: 50%; }
+  .s4-table-skeleton > div + div + div { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+
+  /* ---------- phones: stacked by default; data-layout="scroll" keeps a real table that scrolls sideways ---------- */
+  .s4-table-wrap[data-layout="scroll"] { container-name: s4-table-scroll; }
+  @container s4-table (width < 600px) {
+    .s4-table tbody tr.s4-table-spacer { padding: 0; border: 0; }
+    .s4-table tbody tr.s4-table-spacer + tr { border-block-start: 0; }
+    .s4-table tbody tr.s4-table-group { display: flex; align-items: center; justify-content: space-between; padding-block: var(--s4-space-2); }
+    .s4-table tbody tr.s4-table-group > :is(td, th) { display: inline-flex; min-block-size: 0; }
+    .s4-table tbody tr.s4-table-group > td:empty { display: none; }
+    .s4-table tbody tr.s4-table-detail { padding: 0; }
+    .s4-table tbody tr.s4-table-detail > td { display: block; }
+    .s4-table tbody td:is([data-row-expand], [data-row-actions]) {
+      position: absolute;
+      inset-block-start: var(--s4-space-2);
+      inset-inline-end: var(--s4-space-2);
+      display: grid;
+      place-items: center;
+      inline-size: var(--s4-size-touch-target);
+      block-size: var(--s4-size-touch-target);
+      padding: 0;
+    }
+    /* details sit under the checkbox, at the block's bottom start; actions at its top end */
+    .s4-table tbody td[data-row-expand] { inset-block: auto var(--s4-space-2); inset-inline: var(--s4-space-2) auto; }
+    .s4-table tbody tr:has(> td[data-row-expand]) { padding-inline-start: calc(var(--s4-space-4) + var(--s4-size-touch-target)); min-block-size: calc(var(--s4-size-touch-target) * 2 + var(--s4-space-4)); }
+    .s4-table tbody tr:has(> td[data-row-actions]) > td[data-primary] { padding-inline-end: var(--s4-size-touch-target); }
+    .s4-table td[data-edit] { padding-inline: 0; }
+    .s4-table td[data-edit] > .s4-table-input { inline-size: auto; flex: 1; max-inline-size: 60%; margin-inline-end: calc(var(--s4-space-2) * -1); text-align: end; }
+    .s4-table td[data-edit][data-primary] > .s4-table-input { max-inline-size: none; margin-inline: calc(var(--s4-space-2) * -1) 0; text-align: start; }
+    /* the headline comes first however the columns are ordered */
+    .s4-table tbody tr:has(> [data-primary]) { display: flex; flex-direction: column; }
+    .s4-table tbody tr > [data-primary] { order: -1; }
+    .s4-table tbody tr:has(> td:is([data-row-expand], [data-row-actions])) > [data-primary] { min-block-size: calc(var(--s4-size-touch-target) - var(--s4-space-1)); align-items: center; }
+    /* a data table's sort buttons: one row that scrolls sideways, never a wall of buttons */
+    .s4-table-wrap[data-virtual] .s4-table thead tr { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .s4-table-wrap[data-virtual] .s4-table thead th { flex: none; }
+    .s4-table-col-menu, .s4-table-grip { display: none; }
+  }
+
+  @media (forced-colors: active) {
+    .s4-table[data-fixed] [data-pin][data-pin-edge] { border-inline-color: CanvasText; }
+    .s4-table tbody tr[data-picked] { outline: var(--s4-focus-ring-width) solid Highlight; outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+    .s4-table-grip::before { background: CanvasText; opacity: 1; }
+    .s4-table-skeleton { border: 1px solid CanvasText; }
+  }
+  @media print {
+    .s4-table-wrap[data-virtual] { max-height: none; overflow: visible; }
+    .s4-table-grip, .s4-table-col-menu { display: none; }
+  }
+}
