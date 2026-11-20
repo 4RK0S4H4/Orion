@@ -76,6 +76,7 @@ function measure(T) {
     const t = n.nodeValue.trim(); if (!t) continue;
     const e = n.parentElement; if (!shown(e) || inOverlay(e) || e.closest('.s4-stat-value, [data-hero], .s4-icon, .s4-avatar, h1, h2, h3, .s4-subpage-title')) continue;
     if (/^[\d\s$€£%.,:+\-−–/KMBkmohdw]+$/.test(t)) continue;      /* numbers rank by size on purpose */
+    if (/^[$€£]?\s*\d[\d\s.,:+\-−–/]*\s?(°[CF]?|[A-Za-zµ]{1,2})$/.test(t)) continue;   /* and a number with a short unit: 3.4 GB, 12 km, 18 °C (decision 0060) */
     const fs = parseFloat(getComputedStyle(e).fontSize);
     if (fs > titleSize + 0.5) { out.push(`title: "${t.slice(0, 30)}" (${fs}px) is larger than the page title (${titleSize}px)`); break; }
   }
@@ -86,7 +87,8 @@ function measure(T) {
     const start = vr.left + parseFloat(cs.paddingLeft);
     /* the bar's first thing sits on the column's edge: the title, or a leading Back or menu button, whose box hangs 8
        outside the column so its glyph sits just inside it (the same offset as at the default 24 margin) */
-    const first = [...bar.closest('.s4-top-app-bar').querySelectorAll('.s4-icon-button, .s4-app-bar-title')].filter(shown)[0];
+    /* a leading avatar (a chat with one person) sits on the edge like the title (decision 0060) */
+    const first = [...bar.closest('.s4-top-app-bar').querySelectorAll('.s4-icon-button, .s4-app-bar-title, .s4-avatar')].filter((e) => shown(e) && !e.closest('.s4-icon-button'))[0];
     const fr = first.getBoundingClientRect(), icon = first.classList.contains('s4-icon-button');
     const off = icon ? Math.abs(fr.left + 8 - start) : Math.abs(fr.left - start);
     if (off > T.alignPx) out.push(`align: the top app bar starts at ${Math.round(fr.left)}, the content at ${Math.round(start)}`);

@@ -22,6 +22,7 @@ optional change or note. The loudest thing on a dashboard should be the numbers,
 | `.s4-stat-value` | display-small, emphasized weight, tabular figures | — |
 | `.s4-stat-meta` | body-small, on-surface-variant; holds a `.s4-status` for the change | — |
 | `data-size="small"` | value on headline-small, for dense dashboards | — |
+| `data-size="hero"` | value on display-medium: the one number the screen exists for (cash on hand, a calculator's result). One a screen; the layout pass lets it outrank the page title | — |
 | `.s4-stat-row` | as many stats per row as fit, at least two on a phone; `--s4-stat-min` sets the column floor | 160 |
 
 **Do**
