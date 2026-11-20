@@ -57,11 +57,13 @@
   function select(tab, focus) {
     var bar = barOf(tab); if (!bar) return;
     var old = current(bar);
+    var mine = panelOf(tab);
     tabs(bar).forEach(function (t) {
       var on = t === tab, l = labelOf(t), p = panelOf(t);
       l.setAttribute('aria-selected', String(on)); l.tabIndex = on ? 0 : -1;
-      if (p) p.hidden = !on;
+      if (p && p !== mine) p.hidden = true;
     });
+    if (mine) mine.hidden = false;   /* tabs may share one panel (a list that shows the chosen file) */
     if (focus) labelOf(tab).focus({ preventScroll: true });
     reveal(tab);
     lastBar = bar;
@@ -81,7 +83,9 @@
     if (!bar.dispatchEvent(ev)) return false;
     var hadFocus = bar.contains(document.activeElement);
     var stack = closed.get(bar) || []; stack.push({ tab: tab, panel: panel, index: i, next: panel ? panel.nextElementSibling : null, parent: panel ? panel.parentElement : null }); closed.set(bar, stack.slice(-20));
-    tab.remove(); if (panel) panel.remove();
+    tab.remove();
+    if (panel && !tabs(bar).some(function (t) { return panelOf(t) === panel; })) panel.remove();
+    else panel = null;
     var rest = tabs(bar);
     if (wasCurrent && rest.length) select(rest[Math.min(i, rest.length - 1)], hadFocus);
     else if (hadFocus && rest.length) labelOf(current(bar) || rest[0]).focus({ preventScroll: true });
