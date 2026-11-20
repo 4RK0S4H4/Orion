@@ -5589,7 +5589,7 @@
   .s4-table tbody tr.s4-table-spacer > td { padding: 0; border: 0; block-size: auto; min-block-size: 0; background: none; }
 
   /* fixed widths from the column grips (table.js writes a colgroup and the table's width) */
-  .s4-table[data-fixed] { table-layout: fixed; inline-size: auto; }
+  .s4-table[data-fixed] { table-layout: fixed; inline-size: var(--_table-w, 100%); }
   .s4-table[data-fixed] :is(th, td) { overflow: hidden; text-overflow: ellipsis; }
   .s4-table[data-fixed] :is(th, td)[data-wrap] { min-inline-size: 0; }
   .s4-table[data-fixed] :is(th, td):has(> .s4-table-input, > label, > .s4-icon-button, > .s4-status) { overflow: visible; }
@@ -5834,6 +5834,14 @@
   }
   @media print {
     .s4-table-wrap[data-virtual] { max-height: none; overflow: visible; }
+    /* paper has its own width: the columns share it, and nothing is pinned */
+    .s4-table[data-fixed] { table-layout: auto; inline-size: 100%; }
+    .s4-table[data-fixed] :is(th, td) { white-space: normal; }
+    .s4-table[data-fixed] :is(th, td)[data-pin] { position: static; }
+    .s4-table[data-fixed] > colgroup { display: none; }
+    .s4-table :is(th, td):is([data-check], [data-row-expand], [data-row-actions]) { display: none; }
+    .s4-table th, .s4-table-sort { white-space: normal; }
+    .s4-table-input { min-inline-size: 0; }
     .s4-table-grip, .s4-table-col-menu { display: none; }
   }
 }

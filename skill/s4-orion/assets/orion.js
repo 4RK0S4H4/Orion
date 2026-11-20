@@ -2574,7 +2574,7 @@ S4.register('accordion', function (scope) {
     /* measure the widths the browser chose once, then hold them: table-layout fixed from here on */
     layout: function () {
       var t = this.table, self = this, vis = this.visible();
-      if (!this.wrap || getComputedStyle(t).display !== 'table') { t.removeAttribute('data-fixed'); t.style.inlineSize = ''; return; }
+      if (!this.wrap || getComputedStyle(t).display !== 'table') { t.removeAttribute('data-fixed'); return; }
       if (t._s4data && !t._s4data.sized) return;   /* a data table takes its first widths from its data */
       if (!this.measured) {
         var w = vis.map(function (c) { return c.width || c.th.getBoundingClientRect().width; });
@@ -2587,7 +2587,7 @@ S4.register('accordion', function (scope) {
       var extra = Math.max(0, room - total);
       var html = vis.map(function (c) { return '<col style="width:' + (c.width + (c === fill ? extra : 0)) + 'px">'; }).join('');
       if (this.colgroup.innerHTML !== html) this.colgroup.innerHTML = html;
-      t.style.inlineSize = (total + extra) + 'px';
+      t.style.setProperty('--_table-w', (total + extra) + 'px');
       t.setAttribute('data-fixed', '');
       this.pins();
       if (this.onLayout) this.onLayout();
@@ -2960,6 +2960,8 @@ S4.register('accordion', function (scope) {
       for (var k = 0; k < vis.length; k++) cells.push(this.cell(vis[k], row, id, name));
       tr.innerHTML = cells.join('');
       if (this.opts.row) this.opts.row(tr, row);
+      /* one Tab stop for the whole table (the current row): what is inside a row is reached with the arrow keys */
+      tr.querySelectorAll('a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])').forEach(function (x) { x.tabIndex = -1; });
       return tr;
     },
     name: function (row) {
