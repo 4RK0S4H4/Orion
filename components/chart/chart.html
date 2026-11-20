@@ -40,6 +40,28 @@
   </section>
 
   <section class="ex-sec">
+    <h2>Time Range and Series</h2>
+    <p>A range control above the chart: the ranges are a button group (they change how the same chart is shown), Custom opens a date range in place. With <code>data-legend="toggle"</code> each name in the legend is a button that shows or hides its series (one always stays); the Table keeps every series.</p>
+    <section class="s4-pane">
+      <div class="s4-stack">
+        <div class="s4-chart-range" data-for="#ch-visits" data-today="2026-11-16">
+          <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Range">
+            <button class="s4-button" type="button" value="7">Week</button>
+            <button class="s4-button" type="button" value="30" aria-pressed="true">Month</button>
+            <button class="s4-button" type="button" value="90">Quarter</button>
+            <button class="s4-button" type="button" value="custom">Custom</button>
+          </div>
+          <div class="s4-chart-range-custom" hidden>
+            <div class="s4-text-field"><label for="ch-from">Dates</label><input id="ch-from" type="date" data-range-end="ch-to" min="2025-01-01" max="2026-11-16"></div>
+            <input id="ch-to" type="date" hidden aria-label="End date">
+          </div>
+        </div>
+        <figure class="s4-chart" id="ch-visits" data-type="line" data-legend="toggle"><figcaption class="s4-chart-title">Gallery Visits <span class="s4-chart-subtitle" id="ch-visits-sub">Last 30 days</span></figcaption></figure>
+      </div>
+    </section>
+  </section>
+
+  <section class="ex-sec">
     <h2>Parts Of A Whole</h2>
     <p>A ring, for five parts at most. The total sits in the middle and the parts are named beside it.</p>
     <div class="ch-grid">
@@ -61,5 +83,24 @@
 <script src="../assets/icons.js"></script>
 <script src="../orion.js"></script>
 <script src="../_example/example.js"></script>
+<script>
+  (function () {
+    var fig = document.getElementById('ch-visits'), sub = document.getElementById('ch-visits-sub');
+    function data(days, endIso) {
+      var end = new Date(endIso || '2026-11-16'), labels = [], a = [], b = [], c = [], step = days > 120 ? 7 : 1;
+      for (var i = days - 1; i >= 0; i -= step) {
+        var d = new Date(end.getTime() - i * 864e5), k = d.getUTCDay(), wk = k === 0 || k === 6, t = (days - i) / days;
+        labels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }));
+        a.push(Math.round((wk ? 1400 : 900) + 300 * Math.sin(i / 3) + 200 * t)); b.push(Math.round((wk ? 520 : 310) + 90 * Math.cos(i / 4))); c.push(Math.round((wk ? 260 : 120) + 40 * Math.sin(i / 2)));
+      }
+      return { labels: labels, series: [{ name: 'Main Galleries', values: a }, { name: 'Special Exhibition', values: b }, { name: 'Learning Centre', values: c }] };
+    }
+    S4.chart(fig, data(30));
+    fig.addEventListener('s4-range', function (e) {
+      var r = e.detail; S4.chart(fig, data(r.days, r.to));
+      sub.textContent = r.value === 'custom' ? r.from + ' to ' + r.to : 'Last ' + r.days + ' days';
+    });
+  })();
+</script>
 </body>
 </html>

@@ -6,7 +6,7 @@
 <title>S4 Orion</title>
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="components/orion.css?v=40ef6f7">
+<link rel="stylesheet" href="components/orion.css?v=ea6e914">
 <style>
   .hub { display: grid; gap: var(--s4-space-12); padding-block: var(--s4-space-6) var(--s4-space-16); }
   .hub-hero { display: grid; gap: var(--s4-space-3); justify-items: start; }
@@ -133,7 +133,7 @@
   <button class="s4-menu-item" type="button" role="menuitemradio" data-mode="dark"><span class="s4-icon" data-icon="dark-mode"></span>Dark</button>
 </div>
 <script src="components/assets/icons.js?v=bfe722b"></script>
-<script src="components/orion.js?v=a7a6069"></script>
+<script src="components/orion.js?v=02556bb"></script>
 <script>
 S4.theme.restore('orion-template-theme', { mode: 'system' });
 function markMode() { var m = S4.theme().mode || 'system'; document.querySelectorAll('[data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === m)); }); }

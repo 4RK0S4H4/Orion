@@ -2138,7 +2138,13 @@ S4.register('accordion', function (scope) {
 
   function draw(el, data) {
     if (data) el._s4data = data;
-    var d = read(el), type = el.getAttribute('data-type') || 'column', n = d.series.length;
+    var all = read(el), type = el.getAttribute('data-type') || 'column', nAll = all.series.length;
+    /* series the legend has switched off are not drawn; each keeps its own color, and the table keeps them all */
+    var off = el._s4off || {};
+    var d = { labels: all.labels, series: all.series.map(function (s, i) { s.ci = i; return s; }).filter(function (s) { return !off[s.name]; }) };
+    if (!d.series.length) d.series = all.series.slice(0, 1);
+    var n = d.series.length;
+    var colorOf = function (si) { return color(d.series[si].ci, nAll); };
     var fmt = formatter(el.getAttribute('data-format')), short = formatter(el.getAttribute('data-format'), true);
     var plot = el.querySelector(':scope > .s4-chart-plot');
     if (!plot) {
@@ -2169,7 +2175,7 @@ S4.register('accordion', function (scope) {
       legend(el, d.labels.slice(0, 5).map(function (l, i) { return { name: l + ' · ' + fmt(vals[i]), color: color(i, Math.max(2, vals.length)) }; }));
       svg.addEventListener('pointermove', function (e) { var t = e.target.closest('.s4-chart-arc'); if (t) show(el, tipEl, d.labels[t.dataset.i], [{ name: '', value: fmt(vals[t.dataset.i]) + ' · ' + Math.round(vals[t.dataset.i] / total * 100) + '%', color: color(+t.dataset.i, Math.max(2, vals.length)) }], e); else hide(tipEl); });
       svg.addEventListener('pointerleave', function () { hide(tipEl); });
-      table(el, d, fmt, name);
+      table(el, all, fmt, name);
       return;
     }
 
@@ -2207,7 +2213,7 @@ S4.register('accordion', function (scope) {
         var gw = Math.min(24 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
         d.series.forEach(function (s, si) { s.values.forEach(function (v, i) {
           var h = Math.max(1, (top ? v / top : 0) * ph), x = X(i) - gw / 2 + si * (bw + 2);
-          svgEl('path', { d: column(x, padT + ph - h, bw, h, 4), class: 's4-chart-mark', style: 'fill:' + color(si, n), 'data-i': i }, svg);
+          svgEl('path', { d: column(x, padT + ph - h, bw, h, 4), class: 's4-chart-mark', style: 'fill:' + colorOf(si), 'data-i': i }, svg);
         }); });
         /* one value on the cap: the tallest column of a single series */
         if (n === 1) { var vs = d.series[0].values, hi = vs.indexOf(Math.max.apply(null, vs)); var vt = svgEl('text', { x: X(hi), y: Y(vs[hi]) - 6, class: 's4-chart-value', 'text-anchor': 'middle' }, svg); vt.textContent = short(vs[hi]); }
@@ -2215,10 +2221,10 @@ S4.register('accordion', function (scope) {
       } else {
         d.series.forEach(function (s, si) {
           var pts = s.values.map(function (v, i) { return X(i).toFixed(1) + ' ' + Y(v).toFixed(1); });
-          if (type === 'area' && n === 1) svgEl('path', { d: 'M' + pts.join('L') + 'L' + X(s.values.length - 1) + ' ' + (padT + ph) + 'L' + X(0) + ' ' + (padT + ph) + 'Z', class: 's4-chart-area', style: 'fill:' + color(si, n) }, svg);
-          svgEl('path', { d: 'M' + pts.join('L'), class: 's4-chart-line', style: 'stroke:' + color(si, n) }, svg);
+          if (type === 'area' && n === 1) svgEl('path', { d: 'M' + pts.join('L') + 'L' + X(s.values.length - 1) + ' ' + (padT + ph) + 'L' + X(0) + ' ' + (padT + ph) + 'Z', class: 's4-chart-area', style: 'fill:' + colorOf(si) }, svg);
+          svgEl('path', { d: 'M' + pts.join('L'), class: 's4-chart-line', style: 'stroke:' + colorOf(si) }, svg);
           var last = s.values.length - 1;
-          svgEl('circle', { cx: X(last), cy: Y(s.values[last]), r: spark ? 3 : 4, class: 's4-chart-dot', style: 'fill:' + color(si, n) }, svg);
+          svgEl('circle', { cx: X(last), cy: Y(s.values[last]), r: spark ? 3 : 4, class: 's4-chart-dot', style: 'fill:' + colorOf(si) }, svg);
           if (!spark && n === 1) { var et = svgEl('text', { x: X(last) - 8, y: Y(s.values[last]) - 10, class: 's4-chart-value', 'text-anchor': 'end' }, svg); et.textContent = short(s.values[last]); }
         });
         for (var j = 0; j < count; j++) hits.push({ x: X(j) - band2 / 2, y: padT, w: band2, h: ph, i: j, ax: X(j), ay: Y(Math.max.apply(null, d.series.map(function (s) { return s.values[j] || 0; }))) });
@@ -2233,7 +2239,7 @@ S4.register('accordion', function (scope) {
       if (type !== 'bar') { cross.setAttribute('x1', h.ax); cross.setAttribute('x2', h.ax); cross.style.display = type === 'column' ? 'none' : ''; }
       svg.querySelectorAll('.s4-chart-mark').forEach(function (m) { m.toggleAttribute('data-dim', +m.dataset.i !== h.i); });
       var r = svg.getBoundingClientRect(), at = ev || { clientX: r.left + h.ax, clientY: r.top + h.ay };
-      show(el, tipEl, d.labels[h.i] || '', d.series.map(function (s, si) { return { name: n > 1 ? s.name : '', value: fmt(s.values[h.i] || 0), color: color(si, n) }; }), at);
+      show(el, tipEl, d.labels[h.i] || '', d.series.map(function (s, si) { return { name: nAll > 1 ? s.name : '', value: fmt(s.values[h.i] || 0), color: colorOf(si) }; }), at);
     }
     function leave() { cur = -1; cross.style.display = 'none'; svg.querySelectorAll('[data-dim]').forEach(function (m) { m.removeAttribute('data-dim'); }); hide(tipEl); }
     svg.addEventListener('pointermove', function (e) {
@@ -2250,8 +2256,8 @@ S4.register('accordion', function (scope) {
       else if (e.key === 'Home') { e.preventDefault(); point(0); } else if (e.key === 'End') { e.preventDefault(); point(hits.length - 1); }
       else if (e.key === 'Escape') leave();
     });
-    legend(el, n > 1 ? d.series.map(function (s, si) { return { name: s.name, color: color(si, n) }; }) : []);
-    table(el, d, fmt, name);
+    legend(el, nAll > 1 ? all.series.map(function (s) { return { name: s.name, color: color(s.ci, nAll), off: !!off[s.name] }; }) : []);
+    table(el, all, fmt, name);
   }
   function summary(d, fmt) {
     return d.series.map(function (s) { var v = s.values; if (!v.length) return ''; return (s.name ? s.name + ': ' : '') + 'from ' + fmt(v[0]) + ' to ' + fmt(v[v.length - 1]) + ', highest ' + fmt(Math.max.apply(null, v)); }).join('; ');
@@ -2260,7 +2266,25 @@ S4.register('accordion', function (scope) {
     var lg = el.querySelector(':scope > .s4-chart-legend');
     if (!items.length) { if (lg) lg.remove(); return; }
     if (!lg) { lg = document.createElement('ul'); lg.className = 's4-chart-legend'; el.appendChild(lg); }
-    lg.innerHTML = items.map(function (it) { return '<li><span class="s4-chart-key" style="background:' + it.color + '"></span>' + esc(it.name) + '</li>'; }).join('');
+    var toggle = el.getAttribute('data-legend') === 'toggle' && el.getAttribute('data-type') !== 'donut';
+    lg.toggleAttribute('data-toggle', toggle);
+    if (toggle) lg.setAttribute('aria-label', 'Series shown'); else lg.removeAttribute('aria-label');
+    lg.innerHTML = items.map(function (it) {
+      var key = '<span class="s4-chart-key" style="background:' + it.color + '"></span>';
+      return toggle ? '<li><button type="button" class="s4-chart-series" aria-pressed="' + !it.off + '" data-series="' + esc(it.name) + '">' + key + esc(it.name) + '</button></li>' : '<li>' + key + esc(it.name) + '</li>';
+    }).join('');
+    if (toggle && !lg._s4wired) {
+      lg._s4wired = true;
+      lg.addEventListener('click', function (e) {
+        var b = e.target.closest('.s4-chart-series'); if (!b) return;
+        var off = el._s4off = el._s4off || {}, name = b.dataset.series, shown = lg.querySelectorAll('[aria-pressed="true"]').length;
+        if (!off[name] && shown <= 1) return;   /* one series always stays */
+        off[name] = !off[name];
+        draw(el);
+        var again = lg.querySelector('[data-series="' + name.replace(/"/g, '\\"') + '"]'); if (again) again.focus();
+        S4.util.emit(el, 's4-change', { type: 'series', name: name, shown: !off[name] });
+      });
+    }
   }
   function show(el, tip, head, rows, ev) {
     tip.innerHTML = (head ? '<b>' + esc(head) + '</b>' : '') + rows.map(function (r) { return '<span><i style="background:' + r.color + '"></i>' + (r.name ? esc(r.name) + ' ' : '') + '<em>' + esc(r.value) + '</em></span>'; }).join('');
@@ -2288,6 +2312,43 @@ S4.register('accordion', function (scope) {
       d.labels.map(function (l, i) { return '<tr><th scope="row">' + esc(l) + '</th>' + d.series.map(function (s) { return '<td class="num">' + esc(fmt(s.values[i] || 0)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   S4.chart = function (el, data) { draw(el, data); };
+
+  /* ---------- a time range control for a chart: a button group of ranges plus Custom (a date range) ----------
+     <div class="s4-chart-range" data-for="#visits">
+       <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Range">…buttons with value="7"…, value="custom"</div>
+       <div class="s4-chart-range-custom" hidden>…a date field with data-range-end…</div>
+     </div>
+     Fires s4-range { from, to, days, value } on the control (and on the chart named in data-for); the app redraws the
+     chart with S4.chart(el, data). Custom opens its date range in place (Reveal). */
+  function day(d) { return d.toISOString().slice(0, 10); }
+  function rangeOf(ctl, value) {
+    if (value === 'custom') {
+      var a = ctl.querySelector('.s4-chart-range-custom input[type="date"][data-range-end]'), b = a && document.getElementById(a.getAttribute('data-range-end'));
+      if (!a || !a.value) return null;
+      var to = b && b.value || a.value, days = Math.round((new Date(to) - new Date(a.value)) / 864e5) + 1;
+      return { from: a.value, to: to, days: days, value: 'custom' };
+    }
+    var n = +value || 30, end = ctl.getAttribute('data-today') ? new Date(ctl.getAttribute('data-today')) : new Date(), start = new Date(end.getTime() - (n - 1) * 864e5);
+    return { from: day(start), to: day(end), days: n, value: value };
+  }
+  S4.register('chart-range', function (scope) {
+    S4.util.all(scope, '.s4-chart-range').forEach(function (ctl) {
+      if (!S4.util.once(ctl, 'chartRange')) return;
+      var custom = ctl.querySelector('.s4-chart-range-custom'), target = ctl.getAttribute('data-for') && document.querySelector(ctl.getAttribute('data-for'));
+      var send = function (r) { if (!r) return; S4.util.emit(ctl, 's4-range', r); if (target) S4.util.emit(target, 's4-range', r); };
+      ctl.addEventListener('s4-change', function (e) {
+        if (!e.target.matches('.s4-button-group')) return;
+        var v = e.detail.value;
+        if (custom) {
+          var open = v === 'custom';
+          if (open && custom.hidden) { custom.hidden = false; S4.transition.reveal(custom, { open: true }).then(function () { S4.transition.restore(custom); custom.style.overflow = ''; }); }
+          else if (!open && !custom.hidden) S4.transition.reveal(custom, { open: false }).then(function (done) { if (done) { custom.hidden = true; S4.transition.restore(custom); } });
+        }
+        send(rangeOf(ctl, v));
+      });
+      if (custom) custom.addEventListener('change', function () { send(rangeOf(ctl, 'custom')); });
+    });
+  });
 
   var ro = window.ResizeObserver ? new ResizeObserver(function (list) {
     /* redraw on the next frame, never inside the observer: drawing changes the figure's height, and doing that here
