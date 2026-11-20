@@ -645,9 +645,13 @@ async function use(page, add, phone) {
       await t.click();
       if ((await inp.getAttribute('type')) !== 'password' || (await t.getAttribute('aria-pressed')) !== 'false') add('password: a second press did not hide it again');
     }
-    for (const f of (await visible('.s4-password[data-strength]')).slice(0, 1)) {
+    for (const f of (await visible('.s4-password[data-strength]:not(:has(input:disabled))')).slice(0, 1)) {
+      /* an empty field hides its meter: type a password the way a person would, read the words, then put it back */
+      const inp = f.locator(':scope > input'), was = await inp.inputValue();
+      if (!was) { try { await inp.fill('maple7'); } catch (e) { add('password: could not type into the strength field'); continue; } }
       const w = await f.evaluate((x) => { const m = x.querySelector('.s4-password-strength'); return m && !m.hidden ? m.textContent : 'none'; });
-      if (!/Strength: /.test(w) && w !== '') add('password: the strength meter has no words');
+      if (!/Strength: /.test(w)) add('password: the strength meter has no words');
+      if (!was) { await inp.fill(''); await page.evaluate(() => document.activeElement && document.activeElement.blur()); }
     }
     for (const el of (await visible('.s4-inline-edit:not(:has(input:disabled))')).slice(0, 1)) {
       const inp = el.locator(':scope > input');
