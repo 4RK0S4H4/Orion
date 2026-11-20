@@ -89,6 +89,8 @@
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
   .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  /* collapsed, the hidden label must not wrap into a tall column */
+  .s4-nav-rail:not([data-expanded]) .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { white-space: nowrap; }
   .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
@@ -125,6 +127,8 @@
     border-radius: min(calc(var(--_row) / 2), var(--s4-shape-nav-indicator));
     transform: translateY(var(--_y, 0));
   }
+  /* the current destination is elsewhere (the footer's Settings): no highlight left behind in the list */
+  .s4-nav-rail-items:not(:has(.s4-nav-item[aria-current]:not([aria-current="false"]))) > .s4-nav-pill { opacity: 0; }
   .s4-nav-rail-items > .s4-nav-pill[data-animate] {
     transition:
       transform var(--s4-motion-ink), block-size var(--s4-motion-ink);

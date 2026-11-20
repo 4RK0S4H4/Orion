@@ -22,8 +22,7 @@
      game's dialogue box, which shows when a translation is too long for it), the length meter, placeholder pills,
      translation-memory matches with their percentage, language progress. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('parley-theme');</script>
-<link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=e95309f">
+<link rel="stylesheet" href="../components/orion.css?v=3a51940">
 <style>
   /* Parley's own elements and layout: tokens only; nothing here restyles an Orion component */
   .pl-mono { font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-label-medium-size); letter-spacing: 0; }
@@ -99,9 +98,9 @@
   .pl-set-sec + .pl-set-sec { margin-block-start: var(--s4-space-6); }
   .pl-set-sec > h2 { margin: 0; }
   .pl-set-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); align-items: start; gap: var(--s4-space-2) var(--s4-space-6); padding-block: var(--s4-space-3); }
-  .pl-set-row + .pl-set-row { border-block-start: 1px solid var(--md-sys-color-outline-variant); }
-  .pl-set-row > div:first-child > p { margin: var(--s4-space-1) 0 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
-  .pl-set-row > div:first-child > b { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .pl-set-row > :first-child > :is(p, .pl-set-help) { margin: var(--s4-space-1) 0 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .pl-set-row > :first-child > .pl-set-help { display: block; }
+  .pl-set-row > :first-child > b { font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
   @container s4-app (width < 600px) { .pl-set-row { grid-template-columns: minmax(0, 1fr); } }
   .pl-set-none { color: var(--md-sys-color-on-surface-variant); }
 
@@ -109,7 +108,7 @@
   .pl-screen { position: relative; }
   .pl-box-text[data-measure] { display: block; -webkit-line-clamp: unset; overflow: visible; }
   /* only the strings view has open files */
-  .s4-app:has(.s4-view[data-view="strings"][hidden]) .pl-files { display: none; }
+  .s4-app:has(.s4-view[data-view="strings"][hidden]) :is(.pl-files, .s4-inspector) { display: none; }
 </style>
 </head>
 <body>
@@ -281,7 +280,7 @@
                 <div class="s4-text-field s4-number-field"><label for="set-size">Text Size</label><input id="set-size" value="15" data-min="12" data-max="22" data-setting="Text size"><span class="s4-text-field-affix" data-suffix>pt</span></div></div>
               <div class="pl-set-row" data-words="highlight placeholder color colour"><div><b>Placeholder Color</b><p>Placeholders the game fills in, like {player}, are drawn in this color.</p></div>
                 <div class="s4-text-field s4-color-field"><label for="set-ph">Placeholder Color</label><input id="set-ph" value="#e4572e" data-setting="Placeholder color"></div></div>
-              <label class="pl-set-row" data-words="next jump approve move"><span><b>Move On After Approving</b><p>Go to the next untranslated line when you approve one.</p></span>
+              <label class="pl-set-row" data-words="next jump approve move"><span><b>Move On After Approving</b><span class="pl-set-help">Go to the next untranslated line when you approve one.</span></span>
                 <span class="s4-switch"><input type="checkbox" role="switch" checked data-setting="Move on after approving"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>
             </div>
             <div class="pl-set-sec" data-cat="languages" hidden>
@@ -293,9 +292,9 @@
             </div>
             <div class="pl-set-sec" data-cat="quality" hidden>
               <h2 class="s4-title-large">Quality Checks</h2>
-              <label class="pl-set-row" data-words="placeholder missing check warn"><span><b>Warn About Missing Placeholders</b><p>A line that drops {player} or {count} cannot be approved.</p></span>
+              <label class="pl-set-row" data-words="placeholder missing check warn"><span><b>Warn About Missing Placeholders</b><span class="pl-set-help">A line that drops {player} or {count} cannot be approved.</span></span>
                 <span class="s4-switch"><input type="checkbox" role="switch" checked data-setting="Placeholder check"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>
-              <label class="pl-set-row" data-words="length box too long overflow"><span><b>Warn When A Line Is Too Long</b><p>Uses each line's limit and the game's dialogue box.</p></span>
+              <label class="pl-set-row" data-words="length box too long overflow"><span><b>Warn When A Line Is Too Long</b><span class="pl-set-help">Uses each line's limit and the game's dialogue box.</span></span>
                 <span class="s4-switch"><input type="checkbox" role="switch" checked data-setting="Length check"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>
               <div class="pl-set-row" data-words="quiet hours notifications time"><div><b>Quiet From</b><p>No review requests after this time.</p></div>
                 <div class="s4-text-field s4-time-field" data-step="30"><label for="set-quiet">Quiet From</label><input id="set-quiet" value="19:00" data-setting="Quiet hours"></div></div>
@@ -304,7 +303,7 @@
               <h2 class="s4-title-large">Account And Machine Translation</h2>
               <div class="pl-set-row" data-words="api key token machine translation service"><div><b>Machine Translation Key</b><p>Suggestions come from your own service; the key stays on this computer.</p></div>
                 <div class="s4-text-field s4-password"><label for="set-key">Service Key</label><input id="set-key" type="password" value="pk-lantern-2027-saltreach" autocomplete="off" data-setting="Service key"></div></div>
-              <label class="pl-set-row" data-words="suggest machine translation memory"><span><b>Show Machine Suggestions</b><p>Under translation memory, marked as machine.</p></span>
+              <label class="pl-set-row" data-words="suggest machine translation memory"><span><b>Show Machine Suggestions</b><span class="pl-set-help">Under translation memory, marked as machine.</span></span>
                 <span class="s4-switch"><input type="checkbox" role="switch" data-setting="Machine suggestions"><span class="s4-switch-track"><span class="s4-switch-handle"></span></span></span></label>
             </div>
             <p class="pl-set-none" id="set-none" hidden>No setting matches that. Try another word.</p>
