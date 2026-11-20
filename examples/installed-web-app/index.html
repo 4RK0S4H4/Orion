@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" data-density="auto" data-shell="pwa">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parley (Installed Web App Example)</title>
+<!-- An installed web app with window controls overlay (issue 60). Install it from Chrome or Edge on Windows, Linux or
+     macOS (the install button in the address bar); the manifest asks for "window-controls-overlay", so the window has
+     no title bar of its own and the page's .s4-titlebar takes its place. .s4-titlebar already reads
+     env(titlebar-area-x / -width / -height), so it stays clear of the system's buttons wherever they are, and it drags
+     the window (app-region: drag). The person can switch the overlay off from the window's menu; the page then keeps
+     its own bar under the system's, and <html data-window-state> loses "overlay". Older Chrome versions also want a
+     service worker before they offer to install; add one if yours does. -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .ex-page { display: flex; flex-direction: column; gap: var(--s4-space-4); max-inline-size: 64ch; }
+  .ex-page p { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+</style>
+</head>
+<body>
+<div class="s4-app" data-window>
+  <header class="s4-titlebar">
+    <span class="s4-titlebar-title">Parley</span>
+    <button class="s4-icon-button" type="button" aria-label="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button>
+  </header>
+  <div class="s4-app-body">
+    <main class="s4-content" data-width="reading">
+      <div class="ex-page">
+        <h1 class="s4-headline-medium">An Installed Web App</h1>
+        <p id="state">This page is open in a browser tab. Install it to see the title bar take the window's own.</p>
+        <p>The full app is the <a href="../../templates/desktop-app.html">desktop app template</a>; link this manifest from it to install that instead.</p>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+<script>
+  var o = navigator.windowControlsOverlay, out = document.getElementById('state');
+  function say() {
+    if (!o) return;
+    out.textContent = o.visible ? 'Installed, drawing into the title bar: the system’s buttons sit over the bar’s ' + (o.getTitlebarAreaRect().x > 0 ? 'start' : 'end') + '.' : 'Installed, with the system’s own title bar (the overlay is off).';
+  }
+  if (o) { o.addEventListener('geometrychange', say); say(); }
+</script>
+</body>
+</html>

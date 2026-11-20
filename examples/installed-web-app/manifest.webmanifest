@@ -1,0 +1,11 @@
+{
+  "name": "Parley (example)",
+  "short_name": "Parley",
+  "description": "An S4 Orion desktop app installed from the browser, drawing into the title bar area (window controls overlay).",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay"],
+  "theme_color": "#f4f5f7",
+  "background_color": "#ffffff"
+}
