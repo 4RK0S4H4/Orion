@@ -6084,6 +6084,31 @@
   /* a new speaker gets a little more room */
   .s4-message:not([data-from="me"]) + .s4-message[data-from="me"],
   .s4-message[data-from="me"] + .s4-message:not([data-from="me"]) { margin-block-start: var(--s4-space-2); }
+  /* kinds (decision 0060).
+     note: an internal note in a thread people outside it also read (a support desk, a shared document): the warning
+       container across the thread, square to neither side, so it never reads as a message to the other person. Say
+       who can see it in the meta ("Only your team sees this").
+     card: rich content the thread carries (a live order, a walk report, a booking): no bubble of its own; put a card,
+       a pane or the app's own element inside, on the speaker's side. */
+  .s4-message[data-kind="note"] {
+    --_bg: var(--s4-color-warning-container);
+    --_fg: var(--s4-color-on-warning-container);
+    --_meta: var(--s4-color-on-warning-container);
+    align-self: stretch;
+    max-inline-size: none;
+    margin-block: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  .s4-message[data-kind="card"] {
+    --_bg: transparent;
+    --_fg: var(--md-sys-color-on-surface);
+    padding: 0;
+    border-radius: 0;
+    max-inline-size: min(100%, var(--s4-layout-content-reading));
+    inline-size: 100%;
+  }
+  .s4-message[data-kind="card"] > .s4-message-meta { padding-inline: var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); }
+  .s4-message[data-kind="card"][data-from="me"] > .s4-message-meta { align-self: flex-end; }
   .s4-message-meta {
     color: var(--_meta);
     font-family: var(--md-sys-typescale-label-small-font);

@@ -1883,6 +1883,8 @@ floats at the bottom over the thread, so it is glass.
 | `.s4-thread-day` | a day divider ("Today"), label-medium, centered | — |
 | `.s4-message` | a bubble: body-large, large corners, a small corner on the speaker's side | theirs: surface-container-high, start side |
 | `data-from="me"` | primary, on-primary, end side | — |
+| `data-kind="note"` | an internal note in a thread others also read: warning container across the whole thread, never a bubble; say who sees it in the meta | — |
+| `data-kind="card"` | rich content the thread carries (a live order, a report, a booking): no bubble, put a card or the app's own element inside, on the speaker's side | — |
 | `.s4-message-meta` | sender and time, label-small | — |
 | `.s4-composer` | sticks to the bottom above the nav bar; add `s4-glass` | surface-container |
 
