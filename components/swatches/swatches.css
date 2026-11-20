@@ -6,7 +6,8 @@
    Each 48dp swatch previews the palette its seed makes: a primary top half over secondary and tertiary quarters
    (computed with relative color syntax; browsers without it show the plain seed). The selected one (aria-pressed)
    shrinks inside a ring with a gap and shows a check. swatches.js manages aria-pressed, arrow keys and s4-change;
-   with data-theme-seed a click themes the page with S4.theme({ seed, variant: 'vibrant' }) and stays in sync with it.
+   with data-theme-seed a click themes the page with S4.theme({ seed, variant }) and stays in sync with it.
+   data-size="s": 40dp swatches for a picker inside a pane.
    --s4-swatch-color (set from data-seed by swatches.js) is the public knob. */
 @layer s4.components {
   .s4-swatches {
@@ -46,6 +47,13 @@
     --_ring: var(--md-sys-color-on-surface);
     --_gap: calc(var(--s4-space-1) * 1.5);
   }
+  /* small (decision 0060): 40dp swatches (an icon button's size) for a picker inside a pane or a card, so six fit a
+     phone's row; with the 8dp gap each still owns a 48dp stretch of the row */
+  .s4-swatches[data-size="s"] .s4-swatch {
+    width: calc(var(--s4-size-touch-target) - var(--s4-space-2));
+    height: calc(var(--s4-size-touch-target) - var(--s4-space-2));
+  }
+  .s4-swatches[data-size="s"] .s4-swatch[aria-pressed="true"] { --_gap: var(--s4-space-1); }
   /* the check badge (added by swatches.js) */
   .s4-swatch-check {
     position: absolute;

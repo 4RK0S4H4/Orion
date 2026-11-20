@@ -40,12 +40,7 @@
   $('#contrast').addEventListener('s4-change', function (e) { S4.theme({ contrast: +e.detail.value }); });
   /* decision 0052: off = neutral surfaces with the color as an accent; on = every surface takes the color (M3 Expressive) */
   $('#tinted').addEventListener('change', function () { S4.theme({ surfaces: this.checked ? 'tinted' : 'neutral' }); });
-  /* the brand dials (decision 0055): each group sets one key of S4.theme and shows the saved choice */
-  document.querySelectorAll('[data-brand-dial]').forEach(function (g) {
-    var key = g.dataset.brandDial, now = S4.theme()[key];
-    g.querySelectorAll('[value]').forEach(function (b) { b.setAttribute('aria-pressed', b.value === now); });
-    g.addEventListener('s4-change', function (e) { var o = {}; o[key] = e.detail.value; S4.theme(o); });
-  });
+  /* the brand dials (decision 0055): data-brand-dial groups set and follow S4.theme by themselves (swatches.js, theme-controls) */
   /* themes on any container (issue 52): the navigation alone in dark mode, whatever the page is in */
   function darkNav(on) {
     $$('.s4-nav-rail, .s4-nav-bar').forEach(function (n) { S4.theme({ mode: on ? 'dark' : null }, n); });
