@@ -134,6 +134,8 @@
     .s4-table-sort:hover .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
   }
   .s4-table-sort:focus-visible .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
+  /* the header sits flush with the top of a scrolling wrap: its ring is drawn inside so the wrap never cuts it */
+  .s4-table-sort:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) { color: var(--md-sys-color-on-surface); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) .s4-table-sort .s4-icon { opacity: 1; }
   .s4-table th[aria-sort="ascending"] .s4-table-sort .s4-icon { transform: rotate(180deg); }

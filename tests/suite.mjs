@@ -676,6 +676,127 @@ async function use(page, add, phone) {
       const tip = (await visible('[data-tooltip]'))[0];
       if (tip) { try { await tip.scrollIntoViewIfNeeded({ timeout: 1000 }); await tip.hover({ timeout: 1500 }); await settle(700); await page.mouse.move(1, 1); await settle(300); } catch (e) {} }
     }
+    /* data at scale (issue 59, round 0056): data tables, filters and views, code blocks, chart ranges and legends */
+    for (const t of (await visible('table.s4-table[data-s4-cols]')).slice(0, 1)) {
+      const info = await t.evaluate((x) => { const c = x._s4data; if (!c || !c.loaded) return null; const rows = [...x.tBodies[0].rows].filter((r) => !r.classList.contains('s4-table-spacer')); return { items: c.items.length, total: c.rows.length, count: +x.getAttribute('aria-rowcount'), foot: x.tFoot ? 1 : 0, drawn: rows.length, indexed: rows.every((r) => +r.getAttribute('aria-rowindex') >= 2) }; });
+      if (!info) continue;
+      if (info.count !== info.items + 1 + info.foot) add(`data table: aria-rowcount is ${info.count}, the rows are ${info.items + 1 + info.foot}`);
+      if (!info.indexed) add('data table: a drawn row has no aria-rowindex');
+      if (info.total > 200 && info.drawn > 120) add(`data table: ${info.drawn} rows are in the page for ${info.total} (rows off screen must not be drawn)`);
+      /* scrolling far keeps the page small and the row numbers right */
+      if (info.total > 200) {
+        const far = await t.evaluate(async (x) => { const w = x.closest('.s4-table-wrap'); w.scrollTop = w.scrollHeight / 2; x._s4data.paint(); await new Promise((r) => requestAnimationFrame(r)); const rows = [...x.tBodies[0].rows].filter((r) => !r.classList.contains('s4-table-spacer')); const out = { drawn: rows.length, first: +rows[0].getAttribute('aria-rowindex') }; w.scrollTop = 0; x._s4data.paint(); return out; });
+        if (far.drawn > 120 || far.first < 20) add(`data table: after scrolling halfway ${far.drawn} rows are drawn, the first is row ${far.first}`);
+      }
+      /* sort from the header */
+      const sortBtn = t.locator('thead .s4-table-sort').first();
+      if (await sortBtn.isVisible().catch(() => false) && await click(sortBtn, 'data table sort')) {
+        await settle(200);
+        const st = await t.evaluate((x) => { const th = x.querySelector('thead .s4-table-sort').closest('th'), c = x._s4data, f = c.sortBy && c.sortBy.field, v = c.view.map((i) => c.rows[i][f]); return { aria: th.getAttribute('aria-sort'), ok: !!f && v.every((a, i) => i === 0 || a == null || v[i - 1] == null || (typeof a === 'number' ? a >= v[i - 1] : String(a).localeCompare(String(v[i - 1]), undefined, { numeric: true, sensitivity: 'base' }) >= 0)) }; });
+        if (st.aria !== 'ascending' || !st.ok) add(`data table: sorting did not order the rows (aria-sort ${st.aria})`);
+        await t.evaluate((x) => x._s4data.sort(null));
+      }
+      /* the keyboard: one row in the Tab order, arrows move, Space picks, Escape clears */
+      const row0 = t.locator('tbody tr[tabindex="0"]').first();
+      if (await row0.isVisible().catch(() => false)) {
+        await row0.focus(); const i0 = +(await row0.getAttribute('aria-rowindex'));
+        await page.keyboard.press('ArrowDown');
+        const i1 = await page.evaluate(() => +(document.activeElement.getAttribute('aria-rowindex') || 0));
+        if (i1 !== i0 + 1) add(`data table: ArrowDown moved from row ${i0} to ${i1}`);
+        if (await t.evaluate((x) => !!x.querySelector('thead [data-check]'))) {
+          await page.keyboard.press(' ');
+          const n = await t.evaluate((x) => x._s4data.selected.size);
+          if (n !== 1) add(`data table: Space on a row picked ${n} rows`);
+          const bar = await t.evaluate((x) => { const b = x.getAttribute('data-selection-bar') && document.querySelector(x.getAttribute('data-selection-bar')); return b ? !b.hidden : null; });
+          if (bar === false) add('data table: the selection bar did not show when a row was picked');
+          await page.keyboard.press('Escape'); await settle(200);
+          if (await t.evaluate((x) => x._s4data.selected.size)) add('data table: Escape did not clear the picked rows');
+        }
+        /* Right moves into the row's cells; Enter on a cell that edits puts the cursor in it (a key press), Escape puts it back */
+        if (await t.evaluate((x) => !!x.querySelector('tbody td[data-edit]'))) {
+          let hops = 0, onEdit = false;
+          while (hops++ < 12 && !(onEdit = await page.evaluate(() => document.activeElement.matches('td[data-edit]')))) await page.keyboard.press('ArrowRight');
+          if (!onEdit) add('data table: Right never reached a cell that edits');
+          else {
+            await page.keyboard.press('Enter');
+            const typing = await page.evaluate(() => document.activeElement.matches('.s4-table-input'));
+            if (!typing) add('data table: Enter on a cell that edits did not start editing');
+            const before = await page.evaluate(() => document.activeElement.value);
+            await page.keyboard.type('9'); await page.keyboard.press('Escape');
+            const back = await page.evaluate(() => ({ cell: document.activeElement.matches('td[data-edit]'), value: document.activeElement.querySelector('input') && document.activeElement.querySelector('input').value }));
+            if (!back.cell || back.value !== before) add('data table: Escape did not cancel the edit and return to the cell');
+            await page.keyboard.press('Enter'); await page.keyboard.type('7'); await page.keyboard.press('Enter'); await settle(300);
+            const saved = await page.evaluate(() => ({ snack: !!document.querySelector('.s4-snackbar'), undo: [...document.querySelectorAll('.s4-snackbar button')].some((b) => /undo/i.test(b.textContent)) }));
+            if (!saved.undo) add('data table: saving an edit offered no Undo');
+            else { await page.locator('.s4-snackbar button', { hasText: 'Undo' }).first().click().catch(() => {}); await settle(300); }
+          }
+        }
+      }
+      /* details in place */
+      const ex = t.locator('tbody .s4-table-expand').first();
+      if (await ex.isVisible().catch(() => false) && await click(ex, 'row details')) {
+        await settle(500);
+        const open = await t.evaluate((x) => { const b = x.querySelector('tbody .s4-table-expand[aria-expanded="true"]'); return !!b && !!document.getElementById(b.getAttribute('aria-controls')); });
+        if (!open) add('data table: the details button did not open the row details in place');
+        await click(t.locator('tbody .s4-table-expand[aria-expanded="true"]').first(), 'row details (close)'); await settle(500);
+      }
+      /* a column grip: arrows widen */
+      const grip = t.locator('thead .s4-table-grip').first();
+      if (await grip.isVisible().catch(() => false)) {
+        await grip.focus(); const w0 = +(await grip.getAttribute('aria-valuenow'));
+        await page.keyboard.press('ArrowRight');
+        const w1 = +(await grip.getAttribute('aria-valuenow'));
+        if (!(w1 !== w0)) add('data table: a column grip did not resize with the arrow keys');
+        await page.keyboard.press('ArrowLeft');
+      }
+    }
+    for (const f of (await visible('.s4-filter')).slice(0, 1)) {
+      const search = f.locator('.s4-filter-bar input[type="search"]').first();
+      const has = await f.evaluate((x) => !!x._s4filter && !!x._s4filter.target);
+      if (!has) continue;
+      if (await search.isVisible().catch(() => false)) {
+        const before = await f.evaluate((x) => x._s4filter.target.view.length);
+        await search.fill('zzzz-nothing'); await settle(500);
+        const st = await f.evaluate((x) => ({ n: x._s4filter.target.view.length, chip: !!x.querySelector('.s4-filter-active .s4-chip'), url: location.search }));
+        if (st.n !== 0) add('filter: a search that matches nothing left rows showing');
+        if (!st.chip) add('filter: the search did not show as a chip among the filters in force');
+        if (f.evaluate && await f.evaluate((x) => x.hasAttribute('data-url')) && !/q=/.test(st.url)) add('filter: the search is not in the address');
+        await search.fill(''); await settle(500);
+        const after = await f.evaluate((x) => x._s4filter.target.view.length);
+        if (after !== before) add(`filter: clearing the search left ${after} of ${before} rows`);
+      }
+      const views = await f.locator('.s4-filter-views .s4-chip[aria-pressed="false"]').all();
+      if (views.length && await click(views[0], 'saved view')) {
+        await settle(300);
+        if ((await views[0].getAttribute('aria-pressed').catch(() => 'true')) === 'false' && !(await f.evaluate((x) => x.querySelector('.s4-filter-views .s4-chip[aria-pressed="true"]') !== x.querySelector('.s4-filter-views .s4-chip')))) add('filter: choosing a saved view did not select it');
+        await click(f.locator('.s4-filter-views .s4-chip').first(), 'first saved view'); await settle(300);
+      }
+    }
+    for (const c of (await visible('.s4-code .s4-code-actions')).slice(0, 1)) {
+      const wrap = c.locator('button[aria-pressed]').first();
+      if (await click(wrap, 'code Wrap')) {
+        const on = await c.evaluate((x) => x.closest('.s4-code').hasAttribute('data-wrap'));
+        const pressed = await wrap.getAttribute('aria-pressed');
+        await click(wrap, 'code Wrap again');
+        if (on !== (pressed === 'true')) add('code: the Wrap button and the block disagree');
+      }
+    }
+    for (const lg of (await visible('.s4-chart-legend[data-toggle]')).slice(0, 1)) {
+      const b = lg.locator('.s4-chart-series').first();
+      const marks = () => b.evaluate((x) => x.closest('.s4-chart').querySelectorAll('.s4-chart-line, .s4-chart-mark').length);
+      const m0 = await marks();
+      if (await click(b, 'chart legend')) {
+        await settle(200);
+        const st = { pressed: await lg.locator('.s4-chart-series').first().getAttribute('aria-pressed'), m: await marks() };
+        if (st.pressed !== 'false' || !(st.m < m0)) add('chart: switching a series off in the legend did not hide it');
+        await click(lg.locator('.s4-chart-series').first(), 'chart legend again'); await settle(200);
+      }
+    }
+    for (const r of (await visible('.s4-chart-range')).slice(0, 1)) {
+      const off = r.locator('.s4-button-group button:not([aria-pressed="true"]):not([value="custom"])').first();
+      await r.evaluate((x) => { x._s4got = null; x.addEventListener('s4-range', (e) => { x._s4got = e.detail; }, { once: true }); });
+      if (await click(off, 'chart range')) { await settle(200); if (!(await r.evaluate((x) => !!x._s4got && !!x._s4got.from))) add('chart: choosing a range sent no s4-range'); }
+    }
     await closeAll();
   }
   /* nothing may be left open or stuck mid-animation */
@@ -757,7 +878,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker combobox tag-input number-field code-field upload time-field rating color-field password'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */

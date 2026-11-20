@@ -2711,6 +2711,7 @@ S4.register('accordion', function (scope) {
     return (FMT[spec] = f);
   }
   var collator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+  function title(t) { return String(t).replace(/(^|\s)\S/g, function (c) { return c.toUpperCase(); }); }
   function compare(a, b) {
     var an = a == null || a === '', bn = b == null || b === '';
     if (an || bn) return an && bn ? 0 : an ? 1 : -1;                     /* empty values last */
@@ -2765,15 +2766,15 @@ S4.register('accordion', function (scope) {
     /* first widths from the data itself (a sample of it), never from whichever rows happen to be drawn */
     size: function () {
       var self = this, sample = this.rows.length > 400 ? this.rows.filter(function (r, i) { return i % Math.ceil(self.rows.length / 400) === 0; }) : this.rows;
-      var body = this.table.tHead.rows[0].cells[0], pad = 32;
+      var body = this.table.tHead.rows[0].cells[0], pad = 28;
       this.c.cols.forEach(function (c) {
         if (c.width) return;
-        if (c.kind !== 'field') { c.width = c.kind === 'check' ? 56 : 56; return; }
+        if (c.kind !== 'field') { c.width = 52; return; }
         var f = formatter(c.th.getAttribute('data-format')), custom = self.opts.cell && self.opts.cell[c.field];
         var data = textWidth(sample.map(function (r) { return f(r[c.field]); }), self.table) + (custom ? 24 : 0) + (c.th.hasAttribute('data-edit') ? 16 : 0);
         var touch = window.matchMedia && matchMedia('(hover: none)').matches;
         var head = textWidth([c.label], c.th) + (c.th.hasAttribute('aria-sort') ? 24 : 0) + (touch && self.table.hasAttribute('data-column-menu') ? 36 : 0);
-        c.width = Math.round(Math.min(360, Math.max(self.c.min(c), data, head) + pad));
+        c.width = Math.round(Math.min(320, Math.max(self.c.min(c), data, head) + pad));
       });
       this.c.measured = true; this.sized = true;
       this.c.layout(); this.c.syncGrips && this.c.syncGrips();
@@ -2991,7 +2992,7 @@ S4.register('accordion', function (scope) {
       var vis = this.c.visible(), rows = this.rows, view = this.view, self = this, first = vis.filter(function (c) { return c.kind === 'field'; })[0];
       foot.innerHTML = '<tr aria-rowindex="' + (this.items.length + 2) + '">' + vis.map(function (c) {
         var pin = self.c.style(c), agg = c.th.getAttribute('data-total');
-        if (c === first) return '<th scope="row"' + pin + '>Total<span class="s4-table-foot-count">' + view.length.toLocaleString() + ' ' + (view.length === 1 ? (self.opts.noun || 'row') : (self.opts.nouns || 'rows')) + '</span></th>';
+        if (c === first) return '<th scope="row"' + pin + '>Total <span class="s4-table-foot-count">' + view.length.toLocaleString() + ' ' + title(view.length === 1 ? (self.opts.noun || 'row') : (self.opts.nouns || 'rows')) + '</span></th>';
         if (agg && AGG[agg]) { var v = AGG[agg](view.map(function (i) { return rows[i][c.field]; })); return '<td class="num"' + pin + ' data-label="' + esc((agg === 'avg' ? 'Average ' : agg === 'count' ? 'Count of ' : '') + c.label) + '">' + esc(formatter(agg === 'count' ? 'integer' : c.th.getAttribute('data-format'))(v)) + '</td>'; }
         return '<td' + pin + ' data-label=""></td>';
       }).join('') + '</tr>';
@@ -3242,7 +3243,8 @@ S4.register('accordion', function (scope) {
           var again = colsMenu.querySelector('[value="' + f + '"]'); if (again) again.focus();
           self.say(self.c.col(f).label + ' moved to position ' + (self.fields().indexOf(self.c.col(f)) + 1) + ' of ' + self.fields().length);
         }, true);
-        colsMenu.addEventListener('s4-open', fill);
+        /* fill it before menu.js opens it (it focuses the first item), never after */
+        document.querySelectorAll('[data-menu="' + colsMenu.id + '"]').forEach(function (b) { b.addEventListener('click', fill, true); b.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') fill(); }, true); });
       }
       if (!t.hasAttribute('data-column-menu')) return;
       var m = document.getElementById(t.id + '-column-menu');

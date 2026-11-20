@@ -5411,6 +5411,8 @@
     .s4-table-sort:hover .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
   }
   .s4-table-sort:focus-visible .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
+  /* the header sits flush with the top of a scrolling wrap: its ring is drawn inside so the wrap never cuts it */
+  .s4-table-sort:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) { color: var(--md-sys-color-on-surface); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) .s4-table-sort .s4-icon { opacity: 1; }
   .s4-table th[aria-sort="ascending"] .s4-table-sort .s4-icon { transform: rotate(180deg); }
@@ -5911,8 +5913,8 @@
 
   /* on a phone the views and the chips are one row each that scrolls sideways */
   @media (width < 600px) {
-    .s4-filter-views, .s4-filter-active { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-block: var(--s4-space-1); margin-block: calc(var(--s4-space-1) * -1); }
-    .s4-filter-views > *, .s4-filter-active > * { flex: none; }
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1); }
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) > * { flex: none; }
     .s4-filter-bar > .s4-search { flex-basis: 100%; }
   }
   @media print { .s4-filter-bar, .s4-filter-views { display: none; } }

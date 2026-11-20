@@ -72,8 +72,8 @@
 
   /* on a phone the views and the chips are one row each that scrolls sideways */
   @media (width < 600px) {
-    .s4-filter-views, .s4-filter-active { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-block: var(--s4-space-1); margin-block: calc(var(--s4-space-1) * -1); }
-    .s4-filter-views > *, .s4-filter-active > * { flex: none; }
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1); }
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) > * { flex: none; }
     .s4-filter-bar > .s4-search { flex-basis: 100%; }
   }
   @media print { .s4-filter-bar, .s4-filter-views { display: none; } }
