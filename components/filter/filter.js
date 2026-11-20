@@ -102,12 +102,15 @@
       }
       if (this.activeEl) {
         this.activeEl.classList.add('s4-chip-set'); this.activeEl.setAttribute('role', 'group');
-        this.activeEl.addEventListener('click', function (e) {
-          var r = e.target.closest('.s4-chip-remove'); if (r) { self.drop(r.dataset.field, r.dataset.value, r); return; }
-          if (e.target.closest('[data-filter-clear]')) self.clear();
+        /* chip.js asks before it removes a chip (s4-remove): we take the filter away and draw the chips again */
+        this.activeEl.addEventListener('s4-remove', function (e) {
+          var r = e.detail.chip.querySelector('.s4-chip-remove'); if (!r) return;
+          e.preventDefault();
+          if (r.dataset.field === '__q') { self.state.q = ''; self.after(); var n = self.activeEl.querySelector('.s4-chip-remove, [data-filter-clear]') || self.$('[data-filter-add]'); if (n) n.focus(); return; }
+          self.drop(r.dataset.field, r.dataset.value, r);
         });
       }
-      el.addEventListener('click', function (e) { if (e.target.closest('[data-filter-clear]') && !(self.activeEl && self.activeEl.contains(e.target))) self.clear(); });
+      el.addEventListener('click', function (e) { if (e.target.closest('[data-filter-clear]')) self.clear(); });
     },
     sorts: function () {
       if (this.opts.sorts) return this.opts.sorts;
@@ -212,12 +215,14 @@
     drop: function (field, value, btn) {
       var v = this.state.f[field];
       if (Array.isArray(v)) this.state.f[field] = v.filter(function (x) { return x !== value; }); else delete this.state.f[field];
-      var next = btn && btn.closest('.s4-chip'), to = next && (next.nextElementSibling || next.previousElementSibling);
+      var chips = this.activeEl ? Array.prototype.slice.call(this.activeEl.querySelectorAll('.s4-chip-remove')) : [], at = btn ? chips.indexOf(btn) : -1;
       this.after();
-      /* focus goes to the neighbouring chip's remove button (or Add Filter), never lost */
-      var target = to && this.activeEl.querySelector('[data-field="' + (to.querySelector('[data-field]') || {}).dataset?.field + '"]');
-      var fallback = this.activeEl.querySelector('.s4-chip-remove, [data-filter-clear]') || this.$('[data-filter-add]');
-      if (btn) (target || fallback || this.el).focus();
+      /* focus goes to the neighbouring chip's remove button (or Clear All, or Add Filter), never lost */
+      if (btn) {
+        var now = this.activeEl ? this.activeEl.querySelectorAll('.s4-chip-remove') : [];
+        var to = now[Math.min(Math.max(0, at), now.length - 1)] || (this.activeEl && this.activeEl.querySelector('[data-filter-clear]')) || this.$('[data-filter-add]') || this.search;
+        if (to && !S4.util.typable(to)) to.focus();
+      }
     },
     /* ---------- drawing ---------- */
     label: function (f, v) { return f.format ? f.format(v) : v; },
@@ -236,7 +241,6 @@
       if (html) html += '<button class="s4-button" data-variant="text" data-size="xs" type="button" data-filter-clear>Clear All</button>';
       this.activeEl.innerHTML = html;
       this.activeEl.hidden = !html;
-      this.activeEl.querySelectorAll('[data-field="__q"]').forEach(function (b) { b.addEventListener('click', function (e) { e.stopPropagation(); self.state.q = ''; self.after(); var n = self.activeEl.querySelector('.s4-chip-remove, [data-filter-clear]'); (n || self.search || self.el).focus && (n || self.$('[data-filter-add]')) && (n || self.$('[data-filter-add]')).focus(); }); });
       S4.init(this.activeEl);
       var badge = this.$('[data-filter-panel] .s4-badge'), n = Object.keys(clean(this.state).f).length;
       if (badge) { badge.textContent = n ? String(n) : ''; badge.hidden = !n; }

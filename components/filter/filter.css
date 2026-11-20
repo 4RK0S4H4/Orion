@@ -1,0 +1,80 @@
+/* Filters and saved views (round 0056): a bar to narrow a collection, the filters in force as chips, named views,
+   and a tool panel with every facet and its counts. Content, never glass (the panel is the floating panel's glass).
+   filter.js fills the views, chips, sort menu and facets; see README. */
+@layer s4.components {
+  .s4-filter { display: flex; flex-direction: column; gap: var(--s4-space-3); min-inline-size: 0; }
+  .s4-filter[hidden] { display: none; }
+
+  /* named views: single-select chips; a dot says the view was changed since it was chosen */
+  .s4-filter-views { min-inline-size: 0; }
+  .s4-filter-modified {
+    display: inline-block;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline-start: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: currentColor;
+    flex: none;
+  }
+
+  .s4-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-filter-bar > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 4); min-inline-size: 0; max-inline-size: none; }
+  .s4-filter-bar .s4-badge { margin-inline-start: var(--s4-space-1); }
+  .s4-filter-bar .s4-badge[hidden] { display: none; }
+  .s4-filter-sort-label { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .s4-filter-bar .s4-icon[data-descending] { transform: scaleY(-1); }
+  .s4-filter-bar .s4-icon { transition: transform var(--s4-motion-bend); }
+
+  /* the filters in force: input chips, then Clear All */
+  .s4-filter-active { min-inline-size: 0; }
+  .s4-filter-active[hidden] { display: none; }
+  .s4-filter-chip-key { margin-inline-end: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+
+  .s4-filter-count {
+    margin: 0;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* rename a view in place */
+  .s4-filter-rename { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s4-space-2); }
+  .s4-filter-rename[hidden] { display: none; }
+  .s4-filter-rename > .s4-text-field { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
+
+  /* the panel: every facet with what each choice would give */
+  .s4-filter-facets { display: flex; flex-direction: column; gap: var(--s4-space-5); }
+  .s4-filter-facet { display: flex; flex-direction: column; gap: var(--s4-space-1); scroll-margin-block: var(--s4-space-4); }
+  .s4-filter-facet-title {
+    margin: 0;
+    padding-inline: var(--s4-space-1);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-filter-options { margin: 0; }
+  .s4-filter-options .s4-list-item[data-zero] .s4-list-headline { color: var(--md-sys-color-on-surface-variant); }
+  .s4-filter-option-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-filter-range { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(var(--s4-space-16) * 2), 1fr)); gap: var(--s4-space-3); }
+
+  /* on a phone the views and the chips are one row each that scrolls sideways */
+  @media (width < 600px) {
+    .s4-filter-views, .s4-filter-active { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-block: var(--s4-space-1); margin-block: calc(var(--s4-space-1) * -1); }
+    .s4-filter-views > *, .s4-filter-active > * { flex: none; }
+    .s4-filter-bar > .s4-search { flex-basis: 100%; }
+  }
+  @media print { .s4-filter-bar, .s4-filter-views { display: none; } }
+}
