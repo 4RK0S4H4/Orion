@@ -35,6 +35,8 @@ accessible scheme and no component changes.
 - **Categories** (decision 0060): `--s4-category-1…6` are the chart palette under names for things that are not charts
   (tags, desks, revision colors, kinds of booking, drawn artwork). Fixed in both modes, never text color, always named
   in words beside the mark. Many categories, or a category that matters more than the others, is a hint to use words.
+  "Mine against everyone else's" is the accent against `outline` used as a fill, not a container role (tinted dark
+  containers are bright tones).
 - **Artwork and illustration** (decision 0060): draw real objects (a sleeve, a product, a plant pot) on the M3 *fixed*
   roles (`primary-fixed`, `secondary-fixed`, `on-secondary-fixed`…): they stay the same in light and dark, so a drawing
   does not change ground with the mode. A tinted scope tints them too; keep artwork in a neutral region.
