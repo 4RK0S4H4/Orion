@@ -14,6 +14,7 @@ component are in `components.md`. Live demo app: https://4rk0s4h4.github.io/s4-o
 - Theme controls
 - Saving data
 - Theming API
+- From the product templates
 
 ## Layout helpers
 
@@ -147,6 +148,9 @@ An app that offers appearance settings uses exactly these, so every app feels th
 - Mono is always the first swatch. Offer 3–6 seeds; the app's own seed (if it has one) is second.
 - `S4.theme.restore(key, defaults)` at start-up (see the page shape in SKILL.md) makes every change save under that key.
   Use the same key in the head script that sets `data-theme` before first paint.
+- Present the theme controls as the app's own Appearance section (ideally beside a small preview drawn in color roles);
+  every control is declarative: `data-theme-mode`, `data-theme-contrast`, `.s4-swatches[data-theme-seed]` (40dp with
+  `data-size="s"` inside a pane), `data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight"`.
 - Template: `templates/settings.html`.
 
 ## Saving data
@@ -160,13 +164,16 @@ An app that offers appearance settings uses exactly these, so every app feels th
 ## Theming API
 
 ```js
-S4.theme()                                     // → { seed, variant, mode, contrast }
-S4.theme({ seed: '#2e7d32' })                  // generate every role from a seed (variant 'vibrant' by default)
-S4.theme({ seed: '#e4002b', variant: 'fidelity' })   // brand color shown as is: 'fidelity' | 'tonal' | 'vibrant' | 'expressive'
+S4.theme()                                     // → { seed, variant, mode, contrast, … }
+S4.theme({ seed: '#2e7d32' })                  // every accent role from a seed; variant 'auto': fidelity for a muted or deep seed, vibrant for a vivid one
+S4.theme({ seed: '#e4002b', variant: 'fidelity' })   // or name it: 'fidelity' | 'tonal' | 'vibrant' | 'expressive' | 'auto'
+S4.theme.variantFor('#6e2a5e')                 // → 'fidelity': what auto picks for a seed
 S4.theme({ seed: null })                       // back to monochrome
 S4.theme({ mode: 'system' | 'light' | 'dark' })
 S4.theme({ contrast: 0 | 0.5 | 1 })            // standard, medium, high
 S4.theme.restore('app-theme', { mode: 'system' })   // apply the saved theme or defaults, keep saving under the key
+S4.theme.restore('app-theme', { mode: 'system', seed: '#a3482a', display: 'serif' }, { only: ['mode'] })
+                                               // a fixed brand: only the visitor's light/dark choice is read and saved
 document.addEventListener('s4-theme', (e) => redrawCharts(e.detail))   // after any change
 S4.util.css('--md-sys-color-primary')          // read a token's current value (for canvas, charts)
 ```
@@ -179,12 +186,42 @@ A region can carry its own theme (decision 0056): any dial works on any element 
 ```
 ```js
 S4.theme({ mode: 'dark', corners: 'firm' }, el)    // the same at runtime on one element; nothing is saved
+el.setAttribute('data-accent', '#0b6e4f')          // also works: a data-accent changed later recolors its element
 S4.theme({ energy: 'calm' })                       // motion energy: calm | standard | lively
 ```
 
 Set the seed once at start-up for an app with a brand color: `S4.theme.restore('app-theme', { seed: '#2e7d32', mode: 'system' })`.
+If the brand is fixed (the visitor never picks a color), pass `{ only: ['mode'] }` so the brand is never saved and
+never leaks into another page that shares the key. Dials written on `<html>` in markup are already the starting state.
+Put `data-theme` (a scoped theme) on the rounded block itself: the element that carries it paints its own surface, so a
+scope on a square wrapper shows a square patch behind a rounded child.
 Color is generated with Material Color Utilities (`m3color.js`, loaded on demand from next to `orion.js`); it writes
 the same zero-specificity blocks as the token file, so dark mode, high contrast and glass keep working.
+
+## From the product templates
+
+Lessons from building the templates as real products (decision 0060).
+
+- **One-task screen on a desktop** (onboarding, sign-in, a calculator's input): from 960 make the step a split, the
+  picture or preview on one side on a square tile, the words and controls beside it, the step dots and buttons under both.
+  On a phone, the picture on top.
+- **An article head** above `.s4-prose`: a kicker (`label-large`, often the date or section), the title on
+  `display-small` or larger in the display face, a lead in `body-large`, the byline with avatar. The prose `h1` is a
+  section heading, too small for a magazine title.
+- **A structured writing format** (a screenplay, a recipe, a poem, a contract) is the app's own element on the mono or
+  serif token, with its own indents and numbering, never `.s4-prose` restyled.
+- **Artwork and drawings of real objects** (a product, a record sleeve, a plant pot) sit on the fixed roles
+  (`primary-fixed`, `secondary-fixed`, `on-secondary-fixed`), which stay the same in light and dark. Kinds of things
+  (tags, desks, revision colors) take `--s4-category-1…6`, always named in words.
+- **Words over a picture:** stack them (the picture, then the words, or a grid area each); never keep them apart with
+  a fixed margin, which collides at 200% text. A label centered on a point uses `inset-inline-start: 50%` plus a grid or
+  a wrapper, not `translate`, so it mirrors in right-to-left.
+- **A scrolling chip row** (`data-scroll`) takes the whole row; a sort or view switch beside it goes on its own row.
+- **A number the screen exists for** is `.s4-stat[data-size="hero"]`, once.
+- **A group that follows something else** (the line type under the caret) is set with `S4.buttonGroup.set(group, v)`;
+  a select whose options change is changed in place, its picker follows.
+- **In a thread:** an internal note is `.s4-message[data-kind="note"]`; a card the thread carries (an order, a report)
+  is `.s4-message[data-kind="card"]` with the card inside.
 
 ## Build notes (from the Phase 6 demo)
 
