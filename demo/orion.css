@@ -4100,6 +4100,8 @@
   .s4-app[data-window] > .s4-app-body { grid-row: 2; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; }
   .s4-app[data-window] > .s4-nav-bar { grid-row: 3; position: relative; bottom: auto; }
   .s4-app[data-window]:has(> .s4-inspector) { grid-template-columns: auto minmax(0, 1fr) auto; }
+  /* a status bar takes the last row from end to end: the sidebar stops above it */
+  .s4-app[data-window]:has(> .s4-statusbar) > .s4-nav-rail { grid-row: 2; }
   .s4-app[data-window],
   .s4-app[data-window] * { scrollbar-width: thin; scrollbar-color: var(--md-sys-color-outline-variant) transparent; }
   /* chrome is not text to select; content is (desktop apps do the same). Controls keep the arrow: the pointing hand
@@ -4343,6 +4345,8 @@
     white-space: nowrap;
   }
   .s4-kbd:empty { display: none; }
+  /* on a filled control the hint takes the control's own color, so it keeps its contrast on any fill */
+  :is(.s4-button, .s4-fab, .s4-chip) > .s4-kbd { background: color-mix(in srgb, currentColor 14%, transparent); color: inherit; }
   .s4-menu-item > .s4-kbd { margin-inline-start: auto; }
 
   @media (forced-colors: active) {

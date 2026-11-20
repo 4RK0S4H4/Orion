@@ -35,6 +35,7 @@
   .pl-lang-pct { color: var(--md-sys-color-on-surface-variant); }
 
   /* the strings view fills the window's body: list and detail each scroll on their own */
+  #split { --s4-split-list: calc(var(--s4-space-16) * 5); }
   .pl-strings { display: flex; flex-direction: column; gap: var(--s4-space-3); }
   .pl-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .pl-filters > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
@@ -77,7 +78,7 @@
   .pl-portrait { inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); display: grid; place-items: center; font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); }
   .pl-box-name { display: block; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-emphasized-label-medium-weight); }
   /* three lines is all the game's box holds: what does not fit shows faded under the edge, with the count in words */
-  .pl-box-text { margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); overflow-wrap: anywhere; }
+  .pl-box-text { max-inline-size: 40ch; margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); overflow-wrap: anywhere; }
   .pl-stage figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-4) var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); }
   .pl-stage figcaption [data-over] { color: var(--md-sys-color-error); }
 
@@ -104,6 +105,9 @@
   @container s4-app (width < 600px) { .pl-set-row { grid-template-columns: minmax(0, 1fr); } }
   .pl-set-none { color: var(--md-sys-color-on-surface-variant); }
 
+  @container s4-app (width >= 600px) { .pl-phone-only { display: none; } }
+  .pl-screen { position: relative; }
+  .pl-box-text[data-measure] { display: block; -webkit-line-clamp: unset; overflow: visible; }
   /* only the strings view has open files */
   .s4-app:has(.s4-view[data-view="strings"][hidden]) .pl-files { display: none; }
 </style>
@@ -155,7 +159,7 @@
     </div>
     <header class="s4-top-app-bar">
       <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Strings</h1></div>
-      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button pl-phone-only" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
     </header>
     <main class="s4-content" data-width="full">
       <section class="s4-view pl-strings" data-view="strings" data-title="Strings" id="strings-panel">
@@ -168,7 +172,7 @@
                 <button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Filter" hidden><span class="s4-icon" data-icon="close"></span></button>
               </div>
             </div>
-            <div class="s4-chip-set" data-select="single" aria-label="Status" id="status-chips">
+            <div class="s4-chip-set" data-select="single" data-scroll aria-label="Status" id="status-chips">
               <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" value="all">All</button>
               <button class="s4-chip" data-type="filter" type="button" value="new">Untranslated</button>
               <button class="s4-chip" data-type="filter" type="button" value="review">Needs Review</button>
@@ -203,6 +207,7 @@
               </div>
               <!-- how it looks in the game: the night scene is always dark, in light mode too (a scoped theme) -->
               <figure class="pl-stage" data-theme="dark">
+                <div class="pl-screen">
                 <svg class="pl-scene" viewBox="0 0 640 280" role="img" aria-label="The lighthouse on Saltreach point at night">
                   <rect class="sky" width="640" height="280"/>
                   <circle class="star" cx="60" cy="40" r="1.6"/><circle class="star" cx="140" cy="22" r="1.2"/><circle class="star" cx="230" cy="58" r="1.4"/><circle class="star" cx="520" cy="30" r="1.6"/><circle class="star" cx="590" cy="74" r="1.1"/><circle class="star" cx="380" cy="18" r="1.3"/>
@@ -216,6 +221,7 @@
                   <path class="tower" d="M448 80 Q456 68 464 80 Z"/>
                 </svg>
                 <div class="pl-box"><span class="pl-portrait" aria-hidden="true" id="d-portrait">K</span><div><span class="pl-box-name" id="d-speaker">The Keeper</span><p class="pl-box-text" id="d-box"></p></div></div>
+                </div>
                 <figcaption><span>In the game: the dialogue box holds three lines.</span><span id="d-fit">Fits</span></figcaption>
               </figure>
               <div class="pl-block">
@@ -353,7 +359,7 @@
 <script src="../components/assets/icons.js"></script>
 <script src="../components/orion.js"></script>
 <script>
-/* Parley's look: vermilion on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
+/* Parley's look: vermilion (fidelity: the signal color itself, not a muted cousin) on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
 S4.theme.restore('parley-theme', { mode: 'system', seed: '#e4572e', variant: 'fidelity' });
 var $ = function (id) { return document.getElementById(id); };
 var app = document.querySelector('.s4-app');
@@ -460,8 +466,9 @@ function measure() {
   var missing = placeholders(l.src).filter(function (p) { return v.indexOf(p) < 0; });
   $('d-ph-note').innerHTML = !placeholders(l.src).length ? '' : missing.length ? 'Missing: ' + missing.map(function (p) { return '<span class="pl-ph" data-missing>' + esc(p) + '</span>'; }).join(' ') : 'Every placeholder is there.';
   $('d-box').innerHTML = v ? pills(v.replace(/\{player\}/g, 'Sam').replace(/\{count\}/g, '40').replace(/\{place\}/g, 'Saltreach')) : '<span class="s4-on-surface-variant">Your translation shows here, in the game’s own box.</span>';
-  requestAnimationFrame(function () { var b = $('d-box'), fits = b.scrollHeight <= b.clientHeight + 1; $('d-fit').textContent = fits ? 'Fits the box' : 'Too long for the box: cut a few words'; $('d-fit').toggleAttribute('data-over', !fits); });
+  requestAnimationFrame(function () { var b = $('d-box'); b.setAttribute('data-measure', ''); var lines = Math.round(b.getBoundingClientRect().height / (parseFloat(getComputedStyle(b).lineHeight) || 20)); b.removeAttribute('data-measure'); var fits = lines <= 3; $('d-fit').textContent = fits ? 'Fits the box' : 'Too long for the box: cut a few words'; $('d-fit').toggleAttribute('data-over', !fits); });
 }
+if ('ResizeObserver' in window) new ResizeObserver(function () { if (current) measure(); }).observe($('d-box').parentElement);
 $('d-target').addEventListener('input', function () {
   current.tr[lang] = this.value; if (current.status === 'new') current.status = 'draft';
   $('sb-saved').textContent = 'Saving…'; setDirty(true); measure();
