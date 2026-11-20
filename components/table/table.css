@@ -521,7 +521,7 @@
     .s4-table tbody tr.s4-table-group > :is(td, th) { display: inline-flex; min-block-size: 0; }
     .s4-table tbody tr.s4-table-group > td:empty { display: none; }
     .s4-table tbody tr.s4-table-detail { padding: 0; }
-    .s4-table tbody tr.s4-table-detail > td { display: block; }
+    .s4-table tbody tr.s4-table-detail > td { display: block; text-align: start; }
     .s4-table tbody td:is([data-row-expand], [data-row-actions]) {
       position: absolute;
       inset-block-start: var(--s4-space-2);

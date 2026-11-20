@@ -301,7 +301,7 @@
     /* first widths from the data itself (a sample of it), never from whichever rows happen to be drawn */
     size: function () {
       var self = this, sample = this.rows.length > 400 ? this.rows.filter(function (r, i) { return i % Math.ceil(self.rows.length / 400) === 0; }) : this.rows;
-      var body = this.table.tHead.rows[0].cells[0], pad = 28;
+      var body = this.table.tHead.rows[0].cells[0], pad = 36;
       this.c.cols.forEach(function (c) {
         if (c.width) return;
         if (c.kind !== 'field') { c.width = 52; return; }

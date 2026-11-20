@@ -158,7 +158,7 @@
         catalogue: function (v, r) { return '<span class="s4-num">' + v + '</span>'; },
         status: function (v) { return '<span class="s4-status"' + (TONE[v] ? ' data-tone="' + TONE[v] + '"' : '') + '>' + v + '</span>'; }
       },
-      detail: function (r) { return '<dl class="s4-description-list" data-layout="inline"><div><dt>Drawer</dt><dd>' + r.drawer + '</dd></div><div><dt>Collected by</dt><dd>' + r.collector + ', ' + r.year + '</dd></div><div><dt>Specimens</dt><dd>' + r.count + '</dd></div></dl>'; }
+      detail: function (r) { return '<p class="s4-body-medium" style="margin:0">Drawer <b>' + r.drawer + '</b> · collected by ' + r.collector + ' in ' + r.year + ' · ' + r.count + (r.count === 1 ? ' specimen' : ' specimens') + '. Details open in place: the row stays where it was and everything below moves down.</p>'; }
     });
     var states = document.getElementById('sc-states'), out = document.getElementById('sc-out');
     var show = function (kind) {
