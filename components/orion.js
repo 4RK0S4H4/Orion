@@ -2049,7 +2049,7 @@ S4.register('search', function (scope) {
     var bar = activeBar(); if (!bar) { altAlone = false; return; }
     if (e.key === 'Alt') { altAlone = !e.repeat && !e.ctrlKey && !e.metaKey && !e.shiftKey; return; }
     altAlone = false;
-    if (e.key === 'F10' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (e.key === 'F10' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
       e.preventDefault();
       if (bar.contains(document.activeElement)) leave(bar); else focusBar(bar);
       return;
@@ -2129,7 +2129,7 @@ S4.register('search', function (scope) {
     close.setAttribute('aria-label', 'Close ' + textOf(tab) + (tab.hasAttribute('data-modified') ? ' (unsaved changes)' : ''));
     tab.dataset.contextMenu = bar.id + '-tab-menu';
     var p = panelOf(tab);
-    if (p) { if (!p.getAttribute('role')) p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', label.id); if (!p.hasAttribute('tabindex')) p.tabIndex = 0; }
+    if (p) { p.classList.add('s4-doc-tab-panel'); if (!p.getAttribute('role')) p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', label.id); if (!p.hasAttribute('tabindex')) p.tabIndex = 0; }
   }
 
   function select(tab, focus) {
@@ -2273,7 +2273,7 @@ S4.register('search', function (scope) {
       tabs(bar).forEach(function (t) { prepare(bar, t); });
       select(current(bar) || tabs(bar)[0] || null, false);
       if (!tabs(bar).length) bar.setAttribute('data-empty', '');
-      if (S4.init) { S4.init(menu); S4.init(all); }
+      if (S4.init) { S4.init(menu); S4.init(all); S4.init(more); }   /* the button may be added after menu.js ran */
 
       list.addEventListener('click', function (e) {
         var c = e.target.closest('.s4-doc-tab-close'); if (c) { e.preventDefault(); close(c.closest('.s4-doc-tab')); return; }

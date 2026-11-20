@@ -123,7 +123,7 @@
     var bar = activeBar(); if (!bar) { altAlone = false; return; }
     if (e.key === 'Alt') { altAlone = !e.repeat && !e.ctrlKey && !e.metaKey && !e.shiftKey; return; }
     altAlone = false;
-    if (e.key === 'F10' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (e.key === 'F10' && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
       e.preventDefault();
       if (bar.contains(document.activeElement)) leave(bar); else focusBar(bar);
       return;

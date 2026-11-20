@@ -35,13 +35,14 @@
   .pl-lang-pct { color: var(--md-sys-color-on-surface-variant); }
 
   /* the strings view fills the window's body: list and detail each scroll on their own */
+  #split { --s4-split-list: calc(var(--s4-space-16) * 5); }
   .pl-strings { display: flex; flex-direction: column; gap: var(--s4-space-3); }
   .pl-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .pl-filters > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
   .pl-key { color: var(--md-sys-color-on-surface-variant); }
 
   /* detail: source, target, the game, suggestions */
-  .pl-detail { display: flex; flex-direction: column; gap: var(--s4-space-4); }
+  .pl-detail { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-2); }
   .pl-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2) var(--s4-space-3); }
   .pl-head > :first-child { flex: 1 1 auto; min-inline-size: 0; margin: 0; overflow-wrap: anywhere; }
   .pl-block { display: flex; flex-direction: column; gap: var(--s4-space-2); }
@@ -77,7 +78,7 @@
   .pl-portrait { inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); display: grid; place-items: center; font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); }
   .pl-box-name { display: block; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-medium-size); font-weight: var(--md-sys-typescale-emphasized-label-medium-weight); }
   /* three lines is all the game's box holds: what does not fit shows faded under the edge, with the count in words */
-  .pl-box-text { margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); overflow-wrap: anywhere; }
+  .pl-box-text { max-inline-size: 40ch; margin: 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); overflow-wrap: anywhere; }
   .pl-stage figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-4) var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); }
   .pl-stage figcaption [data-over] { color: var(--md-sys-color-error); }
 
@@ -358,8 +359,8 @@
 <script src="../components/assets/icons.js"></script>
 <script src="../components/orion.js"></script>
 <script>
-/* Parley's look: vermilion (its tonal scheme, so selections are calm and the accent stays for actions) on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
-S4.theme.restore('parley-theme', { mode: 'system', seed: '#e4572e', variant: 'tonal' });
+/* Parley's look: vermilion (fidelity: the signal color itself, not a muted cousin) on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
+S4.theme.restore('parley-theme', { mode: 'system', seed: '#e4572e', variant: 'fidelity' });
 var $ = function (id) { return document.getElementById(id); };
 var app = document.querySelector('.s4-app');
 

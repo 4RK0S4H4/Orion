@@ -43,6 +43,8 @@
   }
   .s4-doc-tabs-list::-webkit-scrollbar { display: none; }
   .s4-doc-tabs > .s4-icon-button { flex: none; -webkit-app-region: no-drag; app-region: no-drag; }
+  /* rings are drawn inside: the row is short and scrolls sideways, so a ring outside would be cut */
+  .s4-doc-tabs > .s4-icon-button:focus-visible, .s4-doc-tab-close:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
 
   .s4-doc-tab {
     display: flex;
@@ -132,6 +134,7 @@
   .s4-doc-tab[data-modified]:is(:hover, :focus-within) > .s4-doc-tab-close::after { opacity: 0; }
 
   .s4-doc-tabs[data-empty] > .s4-doc-tabs-list { display: none; }
+  .s4-doc-tab-panel:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
 
   /* in the title bar: the tabs are its content; the bar keeps dragging the window around them */
   .s4-titlebar > .s4-doc-tabs { flex: 1 1 auto; align-self: stretch; padding: 0; background: transparent; }
