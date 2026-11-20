@@ -1167,6 +1167,101 @@ its column name on the left and the value on the right. The header row becomes a
 buttons; plain column names are hidden (each cell carries its own). A selectable row's checkbox sits at the block's top
 start.
 
+### At scale (round 0056)
+
+Everything below is opt-in; markup without these attributes behaves exactly as above.
+
+### Columns (any table, markup or data)
+
+| Attribute | What |
+|---|---|
+| `data-resizable` on the table | a grip at the end of each header: drag it (mouse or finger), or Tab to it and use Left / Right (Shift for bigger steps), Home for the narrowest; double-click or Enter fits the column to its content. The grip is a `role="separator"` with `aria-valuenow`. |
+| `th[data-pin]`, `th[data-pin="end"]` | the column stays while the table scrolls sideways. Pinned cells are solid (the table's surface, the row's selection or state mixed in) with a tonal edge only while something is under them; never a shadow, never glass. The checkbox and details columns travel with the start pins. |
+| `data-key="name"` on the table | widths, order, hidden and pinned columns are kept in this browser under that name |
+| `th[data-fill]` | the column that takes the spare width when the columns are narrower than the table (default: the `data-primary` one) |
+| `data-column-menu` on a data table | a menu on every column header: Sort Ascending, Sort Descending, Group by (with `th[data-groupable]`), Pin, Fit to Content, Move Left, Move Right, Hide. Never drag-only. With a pointer the button shows on hover or focus; on touch it is always there. |
+| `.s4-menu[data-table-columns="#table-id"]` | a Columns menu for that table: a check item per column to show or hide it; Alt and Up / Down move the focused column |
+
+### Data (`S4.table`)
+
+```html
+<div class="s4-states" data-state="loading">
+  <div data-when="loading" data-table-skeleton="8"></div>
+  <div class="s4-table-wrap" data-when="ready" data-sticky style="--s4-table-max-height: 70vh">
+    <table class="s4-table" id="records" data-key="records" data-resizable data-column-menu
+           data-row-menu="#row-menu" data-selection-bar="#bar">
+      <thead><tr>
+        <th scope="col" data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Shown Records"><span class="s4-checkbox-box"></span></label></th>
+        <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
+        <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+        <th scope="col" data-field="taxon" data-primary data-edit>Taxon</th>
+        <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum">Specimens</th>
+        <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div data-when="no-results" class="s4-empty">…Clear Filters…</div>
+  <div data-when="empty" class="s4-empty">…</div>
+  <div data-when="error" class="s4-empty">…<button data-retry>Try Again</button></div>
+</div>
+```
+```js
+const t = S4.table(document.getElementById('records'), {
+  id: 'id', noun: 'record', nouns: 'records',
+  cell: { status: (v, row) => `<span class="s4-status">${v}</span>` },   // optional HTML per column
+  detail: (row) => `<p>…</p>`                                            // what a row's details show
+});
+t.setRows(rows);                      // 10,000 rows: only what is on screen is drawn
+```
+
+| Header attribute | What |
+|---|---|
+| `data-field` | the row property the column shows |
+| `data-format` | `number`, `integer`, `currency:EUR`, `percent`, `date` (or a `cell` function) |
+| `data-edit`, `data-edit="number"` | the cell is a real input that reads as text: tap it to type; with the keyboard, Right to the cell and Enter. Enter or leaving saves, Escape puts it back, a snackbar offers Undo. Never focused for you (decision 0049). `data-required` refuses an empty value. |
+| `data-total="sum|avg|min|max|count"` | a sticky totals footer (over the rows that pass the filters) and a subtotal on each group's row |
+| `data-groupable` | offered in the column menu as Group by |
+| `th[data-row-expand]` | a details button per row: the details open in place under it (Reveal), the first rung of the placement ladder |
+| `th[data-row-actions]` + `data-row-menu="#menu"` | a row menu button; choosing an item fires `s4-row-action { action, row, id }` on the table |
+| `data-selection-bar="#bar"` on the table | the `.s4-selection-bar` that shows the count and bulk actions while rows are picked |
+
+Script: `setRows(rows)`, `filter(fn)`, `search(text, fields)`, `sort(field, 'ascending'|'descending'|null)`,
+`group(field|null)`, `expand(id, open)`, `update(id, patch)`, `remove(ids)` (returns the removed rows, for Undo),
+`selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown), `.selected`. Columns: `S4.tableColumns(table)`:
+`width(field, px)`, `fit(field)`, `hide(field, on)`, `move(field, index)`, `pin(field, 'start'|'end'|'')`.
+Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `count`), `edit`
+(`field`, `value`, `previous`, `undo`), `update`, `resize`, `columns`; `s4-select { row, data }` when a row opens;
+`s4-toggle { id, open }` for details; `s4-row-action`. The [filter](#filter) component drives `filter`, `search` and
+`sort` and writes them into the address.
+
+**Rows on screen only.** The body holds the rows in view plus a few either side, between two spacer rows whose height
+is the rest of the table, so the scrollbar is the real length from the start and never jumps. Each frame reads the
+scroll position once, draws, then measures the new rows together (no reading inside a loop). Measured on the reference
+page (10,000 rows, Chromium in this sandbox): first draw of the data 25 ms, sorting 10,000 rows 43 ms, about 20 rows in
+the page at any time (under 830 elements in the table while scrolling from top to bottom), a smooth scroll at 60 frames a
+second with the median frame at 16.7 ms. Every drawn row carries `aria-rowindex`; the table carries `aria-rowcount`, so a
+screen reader says "row 4,812 of 5,002".
+
+**Keyboard (data tables):** the table is one Tab stop (the current row). Up and Down move a row, Page Up and Page Down a
+screen, Home and End (or Ctrl with them) the first and last; Right and Left move through the row's controls and cells
+that edit; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
+extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
+On a group row, Enter or Right and Left open and close the group.
+
+**Phones:** the stacked layout stays the default for data tables too (rows are measured as they are drawn): headline,
+then one line per value, details under the checkbox, the row menu in the top corner, the sort buttons in one row that
+scrolls sideways. Use `data-layout="scroll"` on the wrap instead when people compare numbers across a row (a price grid,
+a timetable, a register of loans): the real table stays, scrolls sideways, and its pinned first column keeps every row
+named.
+
+**States:** inside a `.s4-states`, `setRows` shows `ready` (or `empty` for no rows), and a filter that leaves nothing
+shows a `no-results` part when there is one (a Clear Filters button there). `data-table-skeleton="8"` on the loading part
+draws skeleton rows shaped like the table's columns.
+
+**Print:** the table takes the sheet's width, nothing is pinned, the checkbox, details and menu columns are left out.
+A data table prints the rows that are drawn: print from a report view of the rows that matter.
+
 **When to use what:** a table when people compare values across columns or sort; a [list](#list) when each item is
 read on its own. Keep tables to the columns that matter; put the rest on the detail page.
 
@@ -1187,7 +1282,7 @@ column and sort order. Sorting is a native button in the header. Clickable rows 
 open on Enter; the link inside stays the accessible way in. Forced-colors mode draws the wrap's border and outlines
 checked rows.
 
-**Tokens:** `--s4-size-table-header`, `--s4-size-table-row`, `--s4-size-touch-target`, `--md-sys-shape-corner-large`,
+**Tokens:** `--s4-size-table-header` (and with the scale additions `--s4-shape-text-field` for cells that edit, `surface-container`, `surface-container-high`, `surface-container-highest`, `outline`, `primary` for the active grip, `--s4-motion-bend`, Reveal for details), `--s4-size-table-row`, `--s4-size-touch-target`, `--md-sys-shape-corner-large`,
 `--md-sys-color-surface-container-low`, `--md-sys-color-secondary-container`, `--md-sys-color-on-secondary-container`,
 `--md-sys-color-outline-variant`, `--md-sys-typescale-title-small-*`, `-body-medium-*`, `-title-medium-*`,
 `-label-large-*`, `--md-sys-state-*`, `--md-sys-motion-spring-spatial` (rows slide into their sorted place),
