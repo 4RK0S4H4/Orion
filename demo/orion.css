@@ -3033,9 +3033,14 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, var(--s4-split-support, var(--s4-layout-inspector-width)));
     }
     .s4-split > .s4-split-pane[data-sticky] {
+      /* it scrolls inside itself, so it keeps room for a focus ring at its edges and gives that room back with a
+         negative margin: nothing moves, and a button in its top corner shows its whole ring (decision 0060) */
+      --_ring: calc(var(--s4-focus-ring-width) + var(--s4-focus-ring-offset));
+      padding: var(--_ring);
+      margin: calc(-1 * var(--_ring));
       position: sticky;
-      inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2));
-      max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-6));
+      inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2) - var(--_ring));
+      max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-6) + 2 * var(--_ring));
       overflow: auto;
       overscroll-behavior: contain;
     }
@@ -5515,7 +5520,8 @@
      <span class="s4-stat-meta"><span class="s4-status" data-tone="error">+12%</span>vs. September</span>
    </div>
    The value is display-small on the M3 Expressive emphasized weight, tabular. data-size="small" drops it to
-   headline-small for dense dashboards. Put stats in a pane, a card or an .s4-stat-row (wraps, 2 per row on phones). */
+   headline-small for dense dashboards; data-size="hero" raises the one number a screen exists for to display-medium
+   (one a screen, decision 0060). Put stats in a pane, a card or an .s4-stat-row (wraps, 2 per row on phones). */
 @layer s4.components {
   .s4-stat { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
   .s4-stat :where(.s4-stat-label, .s4-stat-value, .s4-stat-meta) { overflow-wrap: anywhere; }
@@ -5543,6 +5549,13 @@
     line-height: var(--md-sys-typescale-headline-small-line-height);
     letter-spacing: var(--md-sys-typescale-headline-small-tracking);
     font-weight: var(--md-sys-typescale-emphasized-headline-small-weight);
+  }
+  .s4-stat[data-size="hero"] .s4-stat-value {
+    font-family: var(--md-sys-typescale-display-medium-font);
+    font-size: var(--md-sys-typescale-display-medium-size);
+    line-height: var(--md-sys-typescale-display-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-display-medium-weight);
   }
   .s4-stat-meta {
     display: flex;
