@@ -369,10 +369,11 @@ async function keysAudit(page, add, rtl) {
       const info = window.__ringInfo();
       const h = window.__h; let fixed = false; for (let p = el; p && p !== document.body; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.position === 'fixed' || cs.position === 'sticky') fixed = true; }
       const r = el.getBoundingClientRect(); let off = 0; for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) { off = p.scrollTop; break; } } let offX = 0; for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowX) && p.scrollWidth > p.clientWidth + 1) { offX = p.scrollLeft; break; } }   /* positions in the content of a sideways scroller (a board), like scrollTop for a tall one */ const sc = (() => { for (let p = el.parentElement; p; p = p.parentElement) { const cs = getComputedStyle(p); if (/auto|scroll/.test(cs.overflowY) && p.scrollHeight > p.clientHeight + 1) return h.tag(p); } return ''; })();
-      return { native: el.matches('.s4-date-picker-field, input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]'), scrub: !!el.closest('.rv-scrub'), tag: h.tag(el), kx: el.hasAttribute('data-kx'), info, fixed, sc, rect: { l: r.left + scrollX + offX, r: r.right + scrollX + offX, t: r.top + scrollY + off, b: r.bottom + scrollY + off }, inDialog: !!el.closest('dialog, [popover]') };
+      const again = el.hasAttribute('data-kv'); el.setAttribute('data-kv', '');   /* the same element again is a loop; the same words on another control (Status in two tables) are not */
+      return { again, native: el.matches('.s4-date-picker-field, input[type="date"], input[type="time"], input[type="datetime-local"], input[type="month"], input[type="week"]'), scrub: !!el.closest('.rv-scrub'), tag: h.tag(el), kx: el.hasAttribute('data-kx'), info, fixed, sc, rect: { l: r.left + scrollX + offX, r: r.right + scrollX + offX, t: r.top + scrollY + off, b: r.bottom + scrollY + off }, inDialog: !!el.closest('dialog, [popover]') };
     });
     if (st.done) break;
-    if (reached.has(st.tag) && i > expected.length && !st.native) break;   /* a native time or date field takes one Tab per part (hours, minutes, AM/PM): not a loop */
+    if (st.again && i > expected.length && !st.native) break;   /* a native time or date field takes one Tab per part (hours, minutes, AM/PM): not a loop */
     reached.add(st.tag);
     if (st.kx || true) {
       const i2 = st.info;
@@ -396,7 +397,7 @@ async function keysAudit(page, add, rtl) {
   /* a roving group or a control inside a collapsed region is reached another way; only report plain controls */
   if (miss.length) add(`keys: Tab never reached ${miss.length} control(s): ${miss.slice(0, 4).join('; ')}`);
   backJumps.slice(0, 3).forEach((m) => add('keys: focus order: ' + m));
-  await page.evaluate(() => { document.querySelectorAll('[data-kx]').forEach((e) => e.removeAttribute('data-kx')); });
+  await page.evaluate(() => { document.querySelectorAll('[data-kx], [data-kv]').forEach((e) => { e.removeAttribute('data-kx'); e.removeAttribute('data-kv'); }); });
 }
 
 /* ---------- running ---------- */
