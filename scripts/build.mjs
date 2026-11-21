@@ -108,6 +108,18 @@ if (existsSync(join(root, 'demo/index.html'))) { outputs['demo/orion.css'] = dem
    and phones never need a hard refresh (the HTML pages themselves are opened through links that carry the commit, see CLAUDE.md) */
 const htmlIn = (d) => (existsSync(join(root, d)) ? readdirSync(join(root, d)).filter((f) => f.endsWith('.html')).map((f) => d + '/' + f) : []);
 const pages = ['index.html', 'demo/index.html', 'tokens/index.html'].concat(htmlIn('explore'), htmlIn('templates')).filter((f) => existsSync(join(root, f)));
+/* brand files (decision 0063): a template with a fixed brand links brand/<name>.css right after its stylesheet; the
+   file is written here from the seed, variant and surfaces in its own S4.theme.restore(…) call, by the same engine the
+   browser runs (scripts/brand.mjs), so its brand paints on the first frame and the stale check keeps it current */
+const { brandCss } = await import('./brand.mjs');
+outputs['skill/s4-orion/scripts/brand.mjs'] = readFileSync(join(root, 'scripts/brand.mjs'), 'utf8');
+for (const page of htmlIn('templates')) {
+  const src = readFileSync(join(root, page), 'utf8'), link = src.match(/href="(brand\/[\w-]+\.css)\?v=/);
+  if (!link) continue;
+  const call = src.match(/\{[^{}]*\bseed:\s*'#[0-9a-fA-F]{6}'[^{}]*\}/), get = (k) => call && (call[0].match(new RegExp(k + ":\\s*'([^']+)'")) || [])[1];   /* the brand's own object: its S4.theme.restore(…) defaults */
+  if (!get('seed')) { problems.push(`${page}: links ${link[1]} but names no seed ({ seed: '#rrggbb', … } in its script)`); continue; }
+  outputs['templates/' + link[1]] = brandCss({ seed: get('seed'), variant: get('variant') || 'auto', surfaces: get('surfaces') || 'neutral' });
+}
 const fileText = (rel) => (rel in outputs ? outputs[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
 for (const page of pages) {
   const dir = page.includes('/') ? page.slice(0, page.lastIndexOf('/')) : '';
@@ -135,6 +147,7 @@ for (const page of htmlIn('templates')) {
       ? '<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). '
       : '<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). ');
 }
+for (const f of Object.keys(outputs).filter((f) => /^templates\/brand\//.test(f))) outputs['skill/s4-orion/' + f] = outputs[f];
 /* ---------- skill references (generated, so they can't drift from the repo) ---------- */
 const refs = {};
 const GROUPS = [

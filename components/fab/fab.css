@@ -99,11 +99,13 @@
   }
 
   /* ---------- colors ---------- */
-  .s4-fab[data-color="secondary-container"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
-  .s4-fab[data-color="tertiary-container"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); }
-  .s4-fab[data-color="primary"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
-  .s4-fab[data-color="secondary"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
-  .s4-fab[data-color="tertiary"] { --_bg: var(--md-sys-color-tertiary); --_fg: var(--md-sys-color-on-tertiary); }
+  /* decision 0063: each color has its own glass tint, the owner's 90% raised only as far as its label needs (tokens for
+     monochrome, computed by the build; core.js writes them for a seed); glass/glass.css reads --s4-glass-tint-opacity-fab-color */
+  .s4-fab[data-color="secondary-container"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-secondary-container); }
+  .s4-fab[data-color="tertiary-container"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-tertiary-container); }
+  .s4-fab[data-color="primary"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-primary); }
+  .s4-fab[data-color="secondary"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-secondary); }
+  .s4-fab[data-color="tertiary"] { --_bg: var(--md-sys-color-tertiary); --_fg: var(--md-sys-color-on-tertiary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-tertiary); }
 
   /* ---------- pinned to the bottom end corner of the window ---------- */
   .s4-fab[data-fixed] {

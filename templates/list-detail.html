@@ -13,7 +13,8 @@
      (data-join="extra-large"); below that it opens in place from the ticket. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=d4701ca">
+<link rel="stylesheet" href="../components/orion.css?v=cc950aa">
+<link rel="stylesheet" href="brand/list-detail.css?v=9b3a52d">
 <style>
   /* Relay's own layout and elements: tokens only, nothing restyles an Orion component */
   .rl-queue-head { display: flex; flex-direction: column; gap: var(--s4-space-3); padding-block-end: var(--s4-space-2); }
@@ -220,7 +221,7 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Discard</button><button class="s4-button" data-variant="filled" data-close="send" type="button">Create Ticket</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=ea7ed9f"></script>
+<script src="../components/orion.js?v=47c8c10"></script>
 <script>
 /* the hub's light or dark choice carries over; Relay's accent and tinted surfaces are its own, never saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#4f46e5', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

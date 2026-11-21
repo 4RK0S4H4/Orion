@@ -2,7 +2,7 @@
 /* Make one self-contained HTML file from a page that links the S4 Orion assets.
    Usage: node inline.mjs page.html [out.html]   (default out: page.single.html next to the page)
    Inlines orion.css (with Inter as a base64 font), icons.js, orion.js and m3color.js (only when the page sets a seed or
-   has theme swatches), looked up next to the page first, then in this skill's assets/. Removes the font preload.
+   has theme swatches, and not for a fixed brand that links its brand file from brand.mjs), looked up next to the page first, then in this skill's assets/. Removes the font preload.
    Other local stylesheets and scripts are inlined too; remote URLs are left alone. Run it again after every edit. */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join, basename } from 'node:path';
@@ -19,6 +19,8 @@ const find = (ref) => {
 };
 const isRemote = (u) => /^(https?:)?\/\/|^data:/.test(u);
 let html = readFileSync(resolve(src), 'utf8');
+const page = html;   /* the page's own markup and scripts, before anything is inlined */
+let hasBrand = false;
 const missing = [];
 
 /* font preload: the font is inlined into the CSS */
@@ -34,18 +36,22 @@ html = html.replace(/<link\b[^>]*rel=["']?stylesheet["']?[^>]*>/gi, (tag) => {
     if (!font) { if (!isRemote(u)) missing.push(u); return m; }
     return `url("data:font/woff2;base64,${readFileSync(font).toString('base64')}")`;
   });
+  if (/--s4-brand:/.test(css)) hasBrand = true;
   return `<style>\n${css.replace(/<\/style/gi, '<\\/style')}\n</style>`;
 });
 
 /* scripts */
 const usesSeed = /S4\.theme\s*\(\s*\{[^}]*seed\s*:\s*['"#]|S4\.theme\.restore\([^)]*seed|data-theme-seed/.test(html);
+/* a brand file (brand.mjs, decision 0063) already holds a fixed brand's scheme: color generation is only needed when the
+   visitor can pick a color (swatches), a region has its own accent, or the script sets a seed of its own */
+const brandOnly = hasBrand && !/data-theme-seed|data-accent=|S4\.theme\s*\(\s*\{[^}]*seed\s*:/.test(page);
 let m3inlined = false;
 html = html.replace(/<script\b([^>]*)\bsrc=["']?([^"'\s>]+)["']?([^>]*)><\/script>/gi, (tag, a, href, b) => {
   if (isRemote(href)) return tag;
   const f = find(href); if (!f) { missing.push(href); return tag; }
   let js = readFileSync(f, 'utf8').replace(/<\/script/gi, '<\\/script');
   let pre = '';
-  if (/(^|\/)orion(\.min)?\.js$/.test(href.split(/[?#]/)[0]) && usesSeed) {
+  if (/(^|\/)orion(\.min)?\.js$/.test(href.split(/[?#]/)[0]) && usesSeed && !brandOnly) {
     const m3 = find('m3color.js');
     if (m3) { pre = `<script>\n${readFileSync(m3, 'utf8').replace(/<\/script/gi, '<\\/script')}\n</script>\n`; m3inlined = true; }
     else missing.push('m3color.js');

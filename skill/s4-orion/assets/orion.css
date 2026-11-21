@@ -25,13 +25,19 @@
     --s4-category-4: var(--s4-chart-4);
     --s4-category-5: var(--s4-chart-5);
     --s4-category-6: var(--s4-chart-6);
-    --s4-glass-tint-float: var(--md-sys-color-surface-container);
-    --s4-glass-tint-fill: var(--md-sys-color-surface-container-highest);
+    --s4-glass-tint-opacity-fab-secondary-container: 0.9;
+    --s4-glass-tint-opacity-fab-tertiary-container: 0.99;
+    --s4-glass-tint-opacity-fab-primary: 0.9;
+    --s4-glass-tint-opacity-fab-secondary: 0.9;
+    --s4-glass-tint-opacity-fab-tertiary: 0.9;
+    --s4-glass-tint-opacity-toolbar-vibrant: 0.9;
     --s4-glass-tint-opacity-float: 0.75;
     --s4-glass-tint-opacity-fab: 0.75;
     --s4-glass-tint-opacity-fill: 0.56;
     --s4-glass-tint-opacity-medium-contrast: 0.86;
     --s4-glass-tint-opacity-fab-color: 0.9;
+    --s4-glass-tint-float: var(--md-sys-color-surface-container);
+    --s4-glass-tint-fill: var(--md-sys-color-surface-container-highest);
     --s4-glass-blur-float: 8px;
     --s4-glass-saturation-float: 1.5;
     --s4-glass-backdrop-contrast-float: 1;
@@ -501,6 +507,7 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-tertiary-container: 0.9;
       --s4-glass-tint-opacity-fill: 0.64;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -591,6 +598,7 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-tertiary-container: 0.9;
       --s4-glass-tint-opacity-fill: 0.64;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -680,6 +688,7 @@
     --s4-chart-4: #eda100;
     --s4-chart-5: #e87ba4;
     --s4-chart-6: #008300;
+    --s4-glass-tint-opacity-fab-tertiary-container: 0.99;
     --s4-glass-tint-opacity-fill: 0.56;
     --s4-glass-backdrop-contrast-float: 1;
     --s4-glass-backdrop-brightness-float: 1;
@@ -861,6 +870,12 @@
   }
   @media (prefers-contrast: more) {
     :where(:root:not([data-contrast]), :root:not([data-contrast]) [data-theme="light"]) {
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -934,6 +949,12 @@
     }
     }
   :where(:root[data-contrast="high"], :root[data-contrast="high"] [data-theme="light"]) {
+    --s4-glass-tint-opacity-fab-secondary-container: 1;
+    --s4-glass-tint-opacity-fab-tertiary-container: 1;
+    --s4-glass-tint-opacity-fab-primary: 1;
+    --s4-glass-tint-opacity-fab-secondary: 1;
+    --s4-glass-tint-opacity-fab-tertiary: 1;
+    --s4-glass-tint-opacity-toolbar-vibrant: 1;
     --s4-glass-tint-opacity-float: 1;
     --s4-glass-tint-opacity-fab: 1;
     --s4-glass-tint-opacity-fill: 1;
@@ -1023,6 +1044,12 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -1116,6 +1143,12 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -1209,6 +1242,12 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -1302,6 +1341,12 @@
       --s4-chart-4: #c98500;
       --s4-chart-5: #d55181;
       --s4-chart-6: #0ca30c;
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -1447,6 +1492,12 @@
   }
   @media (prefers-reduced-transparency: reduce) {
     :where(:root, [data-theme]) {
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -1460,6 +1511,12 @@
     }
     }
   :where(:root[data-glass="off"], :root[data-glass="off"] [data-theme]) {
+    --s4-glass-tint-opacity-fab-secondary-container: 1;
+    --s4-glass-tint-opacity-fab-tertiary-container: 1;
+    --s4-glass-tint-opacity-fab-primary: 1;
+    --s4-glass-tint-opacity-fab-secondary: 1;
+    --s4-glass-tint-opacity-fab-tertiary: 1;
+    --s4-glass-tint-opacity-toolbar-vibrant: 1;
     --s4-glass-tint-opacity-float: 1;
     --s4-glass-tint-opacity-fab: 1;
     --s4-glass-tint-opacity-fill: 1;
@@ -1473,6 +1530,12 @@
   }
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     :where(:root, [data-theme]) {
+      --s4-glass-tint-opacity-fab-secondary-container: 1;
+      --s4-glass-tint-opacity-fab-tertiary-container: 1;
+      --s4-glass-tint-opacity-fab-primary: 1;
+      --s4-glass-tint-opacity-fab-secondary: 1;
+      --s4-glass-tint-opacity-fab-tertiary: 1;
+      --s4-glass-tint-opacity-toolbar-vibrant: 1;
       --s4-glass-tint-opacity-float: 1;
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
@@ -2904,11 +2967,13 @@
   }
 
   /* ---------- colors ---------- */
-  .s4-fab[data-color="secondary-container"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
-  .s4-fab[data-color="tertiary-container"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); }
-  .s4-fab[data-color="primary"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
-  .s4-fab[data-color="secondary"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); }
-  .s4-fab[data-color="tertiary"] { --_bg: var(--md-sys-color-tertiary); --_fg: var(--md-sys-color-on-tertiary); }
+  /* decision 0063: each color has its own glass tint, the owner's 90% raised only as far as its label needs (tokens for
+     monochrome, computed by the build; core.js writes them for a seed); glass/glass.css reads --s4-glass-tint-opacity-fab-color */
+  .s4-fab[data-color="secondary-container"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-secondary-container); }
+  .s4-fab[data-color="tertiary-container"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-tertiary-container); }
+  .s4-fab[data-color="primary"] { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-primary); }
+  .s4-fab[data-color="secondary"] { --_bg: var(--md-sys-color-secondary); --_fg: var(--md-sys-color-on-secondary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-secondary); }
+  .s4-fab[data-color="tertiary"] { --_bg: var(--md-sys-color-tertiary); --_fg: var(--md-sys-color-on-tertiary); --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-fab-tertiary); }
 
   /* ---------- pinned to the bottom end corner of the window ---------- */
   .s4-fab[data-fixed] {
@@ -4015,6 +4080,7 @@
     --_bg: var(--md-sys-color-primary-container);
     --_fg: var(--md-sys-color-on-primary-container);
     --s4-focus-ring-color: var(--md-sys-color-on-primary-container);   /* the default ring is too close to a tinted fill */
+    --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-toolbar-vibrant);   /* decision 0063: its glass tint rises only as far as its labels need */
   }
   /* standard icon buttons and text buttons take the toolbar's content color (on vibrant they'd otherwise vanish) */
   .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-icon-button[data-variant="tonal"], .s4-button[data-variant="text"], .s4-button[data-variant="tonal"]):not(:disabled, [aria-disabled="true"]) {

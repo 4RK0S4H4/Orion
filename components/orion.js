@@ -113,11 +113,6 @@
   /* Decision 0045: Orion takes any color as its accent (S4.theme({ seed: '#0b57d0' }) or a named one from
      S4.theme.accents, e.g. 'blue'); 'mono' (black and white) is one choice among them, not the rule. */
   var state = { seed: null, variant: 'auto', mode: 'system', contrast: 0, surfaces: 'neutral' };
-  /* Decision 0060: a seed given without a variant keeps its own color when it is muted or deep (a brand color such as
-     plum, terracotta, navy or espresso: 'fidelity'), and takes M3's 'vibrant' when it is already vivid (blue, magenta,
-     orange). 'vibrant' raises a muted seed's chroma to about 74 and turns it neon. Tinted mode keeps 'tonal'.
-     scripts/check-accent.mjs reads AUTO_VARIANT, so the proof follows this rule. */
-  var AUTO_VARIANT = { chroma: 60, tone: 35 };
   /* m3color.js sits next to orion.js (skill assets) or in components/assets/ (repo); <script data-m3color="..."> overrides. */
   var m3src = (document.currentScript && document.currentScript.dataset.m3color) ||
     (scriptSrc.indexOf('/components/') >= 0 ? scriptSrc.slice(0, scriptSrc.indexOf('/components/')) + '/components/assets/m3color.js'
@@ -128,89 +123,96 @@
     s.onerror = function () { console.error('S4: could not load ' + m3src + ' (set data-m3color on the orion.js script tag)'); };
     document.head.appendChild(s);
   }
-  function rolesCss(scheme) { return Object.keys(scheme).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':' + scheme[k]; }).join(';'); }
-  /* Decision 0043: by default a seed colors only the accents (primary and its container, the FAB, selection, focus);
-     surfaces, text, outlines and status keep the neutral values in tokens.css. surfaces: 'tinted' is stock M3 (every
-     role from the seed). */
-  var ACCENT = ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary', 'surface-tint',
-    'primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant'];
-  function schemeFor(dark, c, cfg) {
-    /* Tinted (decision 0052): every role from the seed. Unless the app asked for a variant, tinted uses M3's calm
-       "tonal" scheme (surfaces carry a little of the color, like stock Material You), not the vivid accent variant:
-       a whole screen in a vivid tint is tiring. Controls that are a fixed neutral gray take the scheme's outline. */
-    cfg = cfg || state;
-    var M = window.M3Color, tinted = cfg.surfaces === 'tinted';
-    var variant = cfg.variantSet && cfg.variant && cfg.variant !== 'auto' ? cfg.variant : tinted ? 'tonal' : S4.theme.variantFor(cfg.seed);
-    var s = M.scheme(cfg.seed, variant, dark, c);
-    var pal = M.palettes(cfg.seed, variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
-    if (tinted) { s['--s4-color-control'] = s.outline; return fabTints(s, c, tone); }
-    var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
-    o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
-    o['on-secondary-container'] = tone(dark ? 90 : 10);
-    o['--s4-focus-ring-color'] = s.primary;
-    return fabTints(o, c, tone);
-  }
-  /* Glass FABs with a seed (decision 0060, extends 0032): a floating button is glass tinted with its own color, and its
-     label must read at 4.5:1 over anything behind it (a pure black or white backdrop after the glass's filter). The
-     default FAB's icon and label (--s4-color-on-fab) are on-primary-container, or white or the accent's darkest tone
-     when that keeps more of the glass (a 'fidelity' container is the seed itself, paired at exactly 4.5:1 when solid).
-     The owner's tint (75%, 90% for a colored FAB) stays where that allows and rises only as far as the label needs.
-     Roles the seed does not write (neutral mode: secondary, tertiary) keep the monochrome values and the token tint.
-     The vibrant toolbar keeps its recorded exception (decision 0032). scripts/check-glass.mjs proves the same rule. */
-  var glassBase = null;
-  var hexRgb = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); };
-  var lumOf = function (c) { var v = c.map(function (x) { x = Math.min(255, Math.max(0, x)) / 255; return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
-  var ratioOf = function (a, b) { var x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
-  function fabTint(bg, fg, from, lo, hi) {
-    var b = hexRgb(bg), f = hexRgb(fg), at = function (t, k) { return b.map(function (v) { return v * t + k * (1 - t); }); };
-    for (var t = from; t < 1; t = Math.round((t + 0.01) * 100) / 100) if (Math.min(ratioOf(f, at(t, lo)), ratioOf(f, at(t, hi))) >= 4.5) return t;
-    return 1;
-  }
-  function fabTints(o, c, tone) {
-    if (!glassBase) {
-      var n = function (name, d) { var v = parseFloat(S4.util.css(name)); return isNaN(v) ? d : v; };
-      var k = n('--s4-glass-backdrop-contrast-float', 1), br = n('--s4-glass-backdrop-brightness-float', 1);
-      var filt = function (v) { return Math.min(255, Math.max(0, ((v - 127.5) * k + 127.5) * br)); };
-      glassBase = { fab: n('--s4-glass-tint-opacity-fab', 0.75), color: n('--s4-glass-tint-opacity-fab-color', 0.9), lo: filt(0), hi: filt(255) };
+  /* color-kit:begin. The pure part of the color engine: no DOM, no S4. scripts/brand.mjs runs exactly this block in Node
+     to write a brand file (decision 0063), so a fixed brand paints its color on the first frame and the runtime below
+     recognises it instead of painting it again. M is M3Color; glass is { fab, color, lo, hi } (the FAB tints and the
+     black and white backdrop after the glass's filter). */
+  function colorKit(M, glass) {
+    /* Decision 0060: a seed given without a variant keeps its own color when it is muted or deep (a brand color such as
+       plum, terracotta, navy or espresso: 'fidelity'), and takes M3's 'vibrant' when it is already vivid (blue, magenta,
+       orange). 'vibrant' raises a muted seed's chroma to about 74 and turns it neon. Tinted mode keeps 'tonal'.
+       scripts/check-accent.mjs reads AUTO_VARIANT, so the proof follows this rule. */
+    var AUTO_VARIANT = { chroma: 60, tone: 35 };
+    function variantFor(seed) { var h = M.hct(seed); return h.chroma < AUTO_VARIANT.chroma || h.tone < AUTO_VARIANT.tone ? 'fidelity' : 'vibrant'; }
+    function rolesCss(scheme) { return Object.keys(scheme).map(function (k) { return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':' + scheme[k]; }).join(';'); }
+    /* Decision 0043: by default a seed colors only the accents (primary and its container, the FAB, selection, focus);
+       surfaces, text, outlines and status keep the neutral values in tokens.css. surfaces: 'tinted' is stock M3 (every
+       role from the seed). */
+    var ACCENT = ['primary', 'on-primary', 'primary-container', 'on-primary-container', 'inverse-primary', 'surface-tint',
+      'primary-fixed', 'primary-fixed-dim', 'on-primary-fixed', 'on-primary-fixed-variant'];
+    function schemeFor(dark, c, cfg) {
+      /* Tinted (decision 0052): every role from the seed. Unless the app asked for a variant, tinted uses M3's calm
+         "tonal" scheme (surfaces carry a little of the color, like stock Material You), not the vivid accent variant:
+         a whole screen in a vivid tint is tiring. Controls that are a fixed neutral gray take the scheme's outline. */
+      var tinted = cfg.surfaces === 'tinted';
+      var variant = cfg.variantSet && cfg.variant && cfg.variant !== 'auto' ? cfg.variant : tinted ? 'tonal' : variantFor(cfg.seed);
+      var s = M.scheme(cfg.seed, variant, dark, c);
+      var pal = M.palettes(cfg.seed, variant), tone = function (t) { return pal.rows.Primary[pal.tones.indexOf(t)]; };
+      if (tinted) { s['--s4-color-control'] = s.outline; return fabTints(s, c, tone); }
+      var o = {}; ACCENT.forEach(function (k) { o[k] = s[k]; });
+      o['secondary-container'] = tone(dark ? 20 : 90);       /* selection: a soft tint of the accent (a deep one in dark mode, so it never competes with the main button) */
+      o['on-secondary-container'] = tone(dark ? 90 : 10);
+      o['--s4-focus-ring-color'] = s.primary;
+      return fabTints(o, c, tone);
     }
-    if (c >= 1) { o['--s4-glass-tint-opacity-fab'] = 1; o['--s4-glass-tint-opacity-fab-color'] = 1; o['--s4-color-on-fab'] = o['on-primary-container']; return o; }   /* high contrast: solid, as in the tokens */
-    var g = glassBase, tint = function (bg, fg, from) { var f = fg && fg.charAt(0) === '#' ? fg : o[fg]; return o[bg] && f ? fabTint(o[bg], f, from, g.lo, g.hi) : from; };
-    var best = null;
-    [o['on-primary-container'], tone(100), tone(10)].forEach(function (fg) { var t = tint('primary-container', fg, g.fab); if (!best || t < best.t) best = { t: t, fg: fg }; });
-    o['--s4-glass-tint-opacity-fab'] = best.t;
-    o['--s4-color-on-fab'] = best.fg;
-    o['--s4-glass-tint-opacity-fab-color'] = Math.max.apply(null, [['secondary-container', 'on-secondary-container'], ['tertiary-container', 'on-tertiary-container'],
-      ['primary', 'on-primary'], ['secondary', 'on-secondary'], ['tertiary', 'on-tertiary']].map(function (p) { return tint(p[0], p[1], g.color); }));
-    return o;
-  }
-  /* one role list as light-dark(light, dark): the element's own color-scheme (set by the token blocks for every light
-     or dark scope) picks the value, so a scoped scheme follows whatever mode the element is in */
-  function rolesLD(L, D) {
-    var css = Object.keys(L).map(function (k) {
-      if (typeof L[k] === 'number') return k + ':' + Math.max(L[k], D[k]);   /* a FAB tint is a number: light-dark() takes colors only, so the larger one serves both */
-      return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')';
-    }).join(';');
-    /* tinted: the glass tints follow the tinted surfaces (a light or dark scope gets them as plain values in tokens.css) */
-    if (L['surface-container']) css += ';--s4-glass-tint-float:light-dark(' + L['surface-container'] + ',' + D['surface-container'] + ')' +
-      ';--s4-glass-tint-fill:light-dark(' + L['surface-container-highest'] + ',' + D['surface-container-highest'] + ')';
-    return css;
-  }
-  /* Scoped rules (issue 52) inside @scope: the nearest scope root wins, whatever the order. sel lists the subjects
-     relative to :scope; the high-contrast copies put the page-wide contrast in front of each. */
-  function scopedCss(scopeSel, subjects, L, D, LH, DH) {
-    var pre = function (p) { return subjects.map(function (x) { return p + ' ' + x; }).join(','); };
-    return '@scope (' + scopeSel + '){:where(' + subjects.join(',') + '){' + rolesLD(L, D) + '}}' +
-      '@media (prefers-contrast: more){@scope (' + scopeSel + '){:where(' + pre(':root:not([data-contrast])') + '){' + rolesLD(LH, DH) + '}}}' +
-      '@scope (' + scopeSel + '){:where(' + pre(':root[data-contrast="high"]') + '){' + rolesLD(LH, DH) + '}}';
-  }
-  function writeColor() {
-    var el = document.getElementById('s4-dynamic-color');
-    if (!state.seed) { if (el) el.remove(); return; }
-    loadColor(function () {
-      var c = state.contrast >= 1 ? 1 : state.contrast;
-      var L = schemeFor(false, c), D = schemeFor(true, c), LH = schemeFor(false, 1), DH = schemeFor(true, 1);
+    /* Glass in its own color (decisions 0060 and 0063, extends 0032): a floating button, or the vibrant toolbar, is glass
+       tinted with its own color, and its label must read at 4.5:1 over anything behind it (a pure black or white
+       backdrop after the glass's filter). The default FAB's icon and label (--s4-color-on-fab) are on-primary-container,
+       or white or the accent's darkest tone when that keeps more of the glass. Every tint starts at the owner's (75% for
+       the default FAB, 90% for a colored one and the vibrant toolbar) and rises only as far as its own label needs, one
+       tint per color. Roles the seed does not write (neutral mode: secondary, tertiary) keep the monochrome values and
+       the token tints (computed by the build with the same rule). scripts/check-glass.mjs proves the same rule. */
+    var hexRgb = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16); }); };
+    var lumOf = function (c) { var v = c.map(function (x) { x = Math.min(255, Math.max(0, x)) / 255; return x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+    var ratioOf = function (a, b) { var x = lumOf(a), y = lumOf(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    function fabTint(bg, fg, from) {
+      var b = hexRgb(bg), f = hexRgb(fg), at = function (t, k) { return b.map(function (v) { return v * t + k * (1 - t); }); };
+      for (var t = from; t < 1; t = Math.round((t + 0.01) * 100) / 100) if (Math.min(ratioOf(f, at(t, glass.lo)), ratioOf(f, at(t, glass.hi))) >= 4.5) return t;
+      return 1;
+    }
+    var COLORED = [['secondary-container', 'on-secondary-container', 'fab-secondary-container'], ['tertiary-container', 'on-tertiary-container', 'fab-tertiary-container'],
+      ['primary', 'on-primary', 'fab-primary'], ['secondary', 'on-secondary', 'fab-secondary'], ['tertiary', 'on-tertiary', 'fab-tertiary'],
+      ['primary-container', 'on-primary-container', 'toolbar-vibrant']];
+    function fabTints(o, c, tone) {
+      if (c >= 1) {   /* high contrast: solid, as in the tokens */
+        o['--s4-glass-tint-opacity-fab'] = 1; o['--s4-color-on-fab'] = o['on-primary-container'];
+        COLORED.forEach(function (p) { if (o[p[0]]) o['--s4-glass-tint-opacity-' + p[2]] = 1; });
+        return o;
+      }
+      var best = null;
+      [o['on-primary-container'], tone(100), tone(10)].forEach(function (fg) { var t = fabTint(o['primary-container'], fg, glass.fab); if (!best || t < best.t) best = { t: t, fg: fg }; });
+      o['--s4-glass-tint-opacity-fab'] = best.t;
+      o['--s4-color-on-fab'] = best.fg;
+      COLORED.forEach(function (p) { if (o[p[0]] && o[p[1]]) o['--s4-glass-tint-opacity-' + p[2]] = fabTint(o[p[0]], o[p[1]], glass.color); });
+      return o;
+    }
+    /* one role list as light-dark(light, dark): the element's own color-scheme (set by the token blocks for every light
+       or dark scope) picks the value, so a scoped scheme follows whatever mode the element is in */
+    function rolesLD(L, D) {
+      var css = Object.keys(L).map(function (k) {
+        if (typeof L[k] === 'number') return k + ':' + Math.max(L[k], D[k]);   /* a glass tint is a number: light-dark() takes colors only, so the larger one serves both */
+        return (k.charAt(0) === '-' ? k : '--md-sys-color-' + k) + ':light-dark(' + L[k] + ',' + D[k] + ')';
+      }).join(';');
+      /* tinted: the glass tints follow the tinted surfaces (a light or dark scope gets them as plain values in tokens.css) */
+      if (L['surface-container']) css += ';--s4-glass-tint-float:light-dark(' + L['surface-container'] + ',' + D['surface-container'] + ')' +
+        ';--s4-glass-tint-fill:light-dark(' + L['surface-container-highest'] + ',' + D['surface-container-highest'] + ')';
+      return css;
+    }
+    /* Scoped rules (issue 52) inside @scope: the nearest scope root wins, whatever the order. sel lists the subjects
+       relative to :scope; the high-contrast copies put the page-wide contrast in front of each. */
+    function scopedCss(scopeSel, subjects, L, D, LH, DH) {
+      var pre = function (p) { return subjects.map(function (x) { return p + ' ' + x; }).join(','); };
+      return '@scope (' + scopeSel + '){:where(' + subjects.join(',') + '){' + rolesLD(L, D) + '}}' +
+        '@media (prefers-contrast: more){@scope (' + scopeSel + '){:where(' + pre(':root:not([data-contrast])') + '){' + rolesLD(LH, DH) + '}}}' +
+        '@scope (' + scopeSel + '){:where(' + pre(':root[data-contrast="high"]') + '){' + rolesLD(LH, DH) + '}}';
+    }
+    /* the page's whole scheme for one seed, in the same zero-specificity blocks as tokens.css (light, dark, high contrast,
+       and light or dark scopes inside the page), so device dark mode and high contrast keep working */
+    function pageCss(cfg, contrast) {
+      var c = contrast >= 1 ? 1 : contrast || 0;
+      var L = schemeFor(false, c, cfg), D = schemeFor(true, c, cfg), LH = schemeFor(false, 1, cfg), DH = schemeFor(true, 1, cfg);
       var W = function (s) { return ':where(' + s + ')'; };
-      var css = '@layer s4.tokens{' +
+      return '@layer s4.tokens{' +
         W(':root') + '{' + rolesCss(L) + '}' +
         '@media screen and (prefers-color-scheme: dark){' + W(':root:not([data-theme="light"])') + '{' + rolesCss(D) + '}}' +
         '@media screen{' + W(':root[data-theme="dark"]') + '{' + rolesCss(D) + '}}' +
@@ -222,11 +224,56 @@
         /* a light or dark scope (or a gray scope) inside the page keeps the page's accent; one inside a scoped accent takes that one
            (scoped roles use light-dark(), so they follow color-scheme, which is light in print) */
         scopedCss(':not(:root):is([data-theme], [data-gray]):not([data-accent], [data-accent] *)', [':scope'], L, D, LH, DH) + '}';
+    }
+    /* the names a brand file answers to: the seed, how its variant was asked for, and the color mode. A brand written for
+       'auto' also answers to the variant auto resolves to, so variant: 'fidelity' and no variant meet the same file. */
+    function brandKeys(cfg) {
+      var seed = String(cfg.seed).toLowerCase(), surf = cfg.surfaces === 'tinted' ? 'tinted' : 'neutral';
+      var asked = cfg.variantSet && cfg.variant && cfg.variant !== 'auto' ? cfg.variant : 'auto';
+      var auto = surf === 'tinted' ? 'tonal' : variantFor(cfg.seed);
+      return [seed + '/' + asked + '/' + surf].concat(asked === 'auto' ? [seed + '/' + auto + '/' + surf] : asked === auto ? [seed + '/auto/' + surf] : []);
+    }
+    return { AUTO_VARIANT: AUTO_VARIANT, variantFor: variantFor, schemeFor: schemeFor, scopedCss: scopedCss, pageCss: pageCss, brandKeys: brandKeys };
+  }
+  /* color-kit:end */
+  var kit = null;
+  function K() {
+    if (kit) return kit;
+    var n = function (name, d) { var v = parseFloat(S4.util.css(name)); return isNaN(v) ? d : v; };
+    /* a brand file raises the default FAB's tint at :root, so it also carries the owner's floors it started from */
+    var floors = S4.util.css('--s4-brand-floors').replace(/["']/g, '').split(/\s+/).map(parseFloat);
+    var k = n('--s4-glass-backdrop-contrast-float', 1), br = n('--s4-glass-backdrop-brightness-float', 1);
+    var filt = function (v) { return Math.min(255, Math.max(0, ((v - 127.5) * k + 127.5) * br)); };
+    return (kit = colorKit(window.M3Color, { fab: floors[0] || n('--s4-glass-tint-opacity-fab', 0.75), color: floors[1] || n('--s4-glass-tint-opacity-fab-color', 0.9), lo: filt(0), hi: filt(255) }));
+  }
+  function schemeFor(dark, c, cfg) { return K().schemeFor(dark, c, cfg || state); }
+  /* Brand files (decision 0063): a page that links the CSS scripts/brand.mjs wrote (after orion.css) already paints its
+     brand on the first frame. The file names the schemes it holds in --s4-brand ("seed/variant/surfaces", the variant
+     as asked, and as auto would resolve it); when the page's seed matches one, nothing is generated, loaded or repainted. Medium contrast (0.5) is
+     not in the file, so it is generated as before. */
+  function brandFile() {
+    if (!state.seed || (state.contrast > 0 && state.contrast < 1)) return false;
+    var names = S4.util.css('--s4-brand').replace(/["']/g, '').toLowerCase().split(/\s+/);
+    var asked = state.variantSet && state.variant !== 'auto' ? state.variant : 'auto';
+    return names.indexOf(String(state.seed).toLowerCase() + '/' + asked + '/' + (state.surfaces === 'tinted' ? 'tinted' : 'neutral')) >= 0;
+  }
+  /* Visitor-picked colors (decision 0063): with a save key, the generated scheme is kept under key + ':color', and the
+     head snippet in the skill puts it back before the first paint (a color the visitor picked cannot be in a brand file). */
+  function cacheColor(css) {
+    if (!S4.theme.key) return;
+    try { if (css) localStorage.setItem(S4.theme.key + ':color', css); else localStorage.removeItem(S4.theme.key + ':color'); } catch (e) {}
+  }
+  function writeColor() {
+    var el = document.getElementById('s4-dynamic-color');
+    var done = function () { writeScoped(); metaThemeColor(); S4.util.emit(document, 's4-theme', S4.theme()); };
+    if (!state.seed || brandFile()) { if (el) el.remove(); cacheColor(null); return done(); }
+    loadColor(function () {
+      var css = K().pageCss(state, state.contrast);
+      el = document.getElementById('s4-dynamic-color');
       if (!el) { el = document.createElement('style'); el.id = 's4-dynamic-color'; document.head.appendChild(el); }
       el.textContent = css;
-      writeScoped();
-      metaThemeColor();
-      S4.util.emit(document, 's4-theme', S4.theme());
+      cacheColor(css);
+      done();
     });
   }
   /* Scoped accents (issue 52): data-accent="blue | #0b57d0" on any element (optional data-accent-variant and
@@ -249,7 +296,7 @@
         if (!cfg) { node.removeAttribute('data-s4-accent-id'); return; }
         var key = (cfg.seed + '-' + (cfg.variantSet ? cfg.variant : '') + '-' + cfg.surfaces + '-' + c).toLowerCase().replace(/[^a-z0-9-]/g, '');
         node.setAttribute('data-s4-accent-id', key);
-        if (!scoped[key]) scoped[key] = scopedCss('[data-s4-accent-id="' + key + '"]', [':scope', ':scope [data-theme]', ':scope [data-gray]'],
+        if (!scoped[key]) scoped[key] = K().scopedCss('[data-s4-accent-id="' + key + '"]', [':scope', ':scope [data-theme]', ':scope [data-gray]'],
           schemeFor(false, c, cfg), schemeFor(true, c, cfg), schemeFor(false, 1, cfg), schemeFor(true, 1, cfg));
       });
       var used = {}; nodes.forEach(function (n) { var k = n.getAttribute('data-s4-accent-id'); if (k) used[k] = scoped[k]; });
@@ -368,8 +415,7 @@
   /* the variant a seed gets when none is named (see AUTO_VARIANT); needs m3color.js, so it answers 'vibrant' until that has loaded */
   S4.theme.variantFor = function (seed) {
     if (!window.M3Color || !seed) return 'vibrant';
-    var h = window.M3Color.hct(seed);
-    return h.chroma < AUTO_VARIANT.chroma || h.tone < AUTO_VARIANT.tone ? 'fidelity' : 'vibrant';
+    return K().variantFor(seed);
   };
   if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', metaThemeColor);
   /* declarative scoped accents: data-accent on any element added to the page, and (decision 0060) a data-accent,

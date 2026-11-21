@@ -16,7 +16,8 @@
      the cast count. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=d4701ca">
+<link rel="stylesheet" href="../components/orion.css?v=cc950aa">
+<link rel="stylesheet" href="brand/editor.css?v=676fd7b">
 <style>
   /* Slugline's own layout and elements: tokens only; nothing here restyles an Orion component */
   .sl-kicker { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
@@ -185,7 +186,7 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=ea7ed9f"></script>
+<script src="../components/orion.js?v=47c8c10"></script>
 <script>
 /* Slugline's brand: a plum accent over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#6e2a5e', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

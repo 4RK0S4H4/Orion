@@ -1,0 +1,40 @@
+{
+  "$description": "Decision 0063: one label rule for everything floating in its own color. A FAB in a color other than the default, and the vibrant toolbar, are glass tinted with their color at the owner's 90% (decision 0032) where their label reads at 4.5:1 over a pure black or white backdrop; the build raises a tint one step at a time only as far as the label needs, per mode (scripts/build-tokens.mjs, com.s4.label-tint). core.js applies the same rule to every seed; scripts/check-glass.mjs proves it.",
+  "s4": {
+    "glass": {
+      "tint-opacity": {
+        "$type": "number",
+        "fab-secondary-container": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.secondary-container}", "label": "{md.sys.color.on-secondary-container}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "A secondary-container FAB's tint: the floor (fab-color) raised only as far as its label needs."
+        },
+        "fab-tertiary-container": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.tertiary-container}", "label": "{md.sys.color.on-tertiary-container}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "A tertiary-container FAB's tint: the floor (fab-color) raised only as far as its label needs (monochrome light mode was 3.85:1 at 90%)."
+        },
+        "fab-primary": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.primary}", "label": "{md.sys.color.on-primary}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "A primary FAB's tint: the floor (fab-color) raised only as far as its label needs."
+        },
+        "fab-secondary": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.secondary}", "label": "{md.sys.color.on-secondary}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "A secondary FAB's tint: the floor (fab-color) raised only as far as its label needs."
+        },
+        "fab-tertiary": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.tertiary}", "label": "{md.sys.color.on-tertiary}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "A tertiary FAB's tint: the floor (fab-color) raised only as far as its label needs."
+        },
+        "toolbar-vibrant": {
+          "$value": "auto",
+          "$extensions": { "com.s4.label-tint": { "surface": "{md.sys.color.primary-container}", "label": "{md.sys.color.on-primary-container}", "floor": "{s4.glass.tint-opacity.fab-color}" } },
+          "$description": "The vibrant toolbar's tint (decision 0063 ends its exception): the floor raised only as far as its labels need."
+        }
+      }
+    }
+  }
+}

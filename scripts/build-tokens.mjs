@@ -51,7 +51,7 @@ const MODES = ['dark', 'high-contrast', 'dark-high-contrast', 'reduced-motion', 
     if (!type) fail(`${path.join('.')} has no $type`);
     const modes = node.$extensions?.['com.s4.modes'] || {};
     for (const m of Object.keys(modes)) if (!MODES.includes(m)) fail(`${path.join('.')}: unknown mode "${m}"`);
-    tokens.set(path.join('.'), { path, type, value: node.$value, modes, description: node.$description });
+    tokens.set(path.join('.'), { path, type, value: node.$value, modes, description: node.$description, labelTint: node.$extensions?.['com.s4.label-tint'] });
     return;
   }
   if (node.$extensions?.['com.s4.spring']) springs.push(path.join('.'));
@@ -73,6 +73,39 @@ function resolve(value, seen = []) {
   return value;
 }
 const cssName = (path) => '--' + path.join('-');
+
+/* ---------- label tints (decision 0063) ----------
+   A token with $extensions["com.s4.label-tint"] = { surface, label, floor } is the glass tint of a floating thing in
+   its own color (a FAB in a color, the vibrant toolbar): the owner's floor where the label reads at 4.5:1 over a pure
+   black or white backdrop (after the glass's backdrop filter), raised one step at a time only as far as the label
+   needs, per mode. The same rule core.js applies to every seed and scripts/check-glass.mjs proves. */
+const modeValue = (t, mode) => (mode === 'light' ? t.value : t.modes[mode] ?? (mode === 'dark-high-contrast' ? t.modes.dark ?? t.modes['high-contrast'] : undefined) ?? t.value);
+function inMode(value, mode, seen = 0) {
+  if (typeof value === 'string' && ALIAS.test(value) && seen < 9) { const t = tokens.get(value.match(ALIAS)[1]); return t ? inMode(modeValue(t, mode), mode, seen + 1) : null; }
+  return value && typeof value === 'object' && value.hex ? value.hex : value;
+}
+{
+  const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const L = (c) => { const v = c.map((x) => { x = Math.min(255, Math.max(0, x)) / 255; return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; }); return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2]; };
+  const R = (a, b) => { const [x, y] = [L(a), L(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+  for (const t of tokens.values()) {
+    if (!t.labelTint) continue;
+    const { surface, label, floor } = t.labelTint, out = {};
+    for (const mode of ['light', 'dark', 'high-contrast', 'dark-high-contrast', 'reduced-transparency']) {
+      const m = mode === 'reduced-transparency' ? 'light' : mode;
+      const from = +inMode(floor, mode), bg = inMode(surface, m), fg = inMode(label, m);
+      const k = +inMode('{s4.glass.backdrop-contrast.float}', m), br = +inMode('{s4.glass.backdrop-brightness.float}', m);
+      if (!bg || !fg || isNaN(from)) { fail(`${t.path.join('.')}: label-tint needs a surface, a label and a floor`); break; }
+      const filt = (v) => Math.min(255, Math.max(0, ((v - 127.5) * k + 127.5) * br)), lo = filt(0), hi = filt(255), b = hex(bg), f = hex(fg);
+      const at = (x, back) => b.map((v) => v * x + back * (1 - x));
+      let x = from;
+      while (x < 1 && Math.min(R(f, at(x, lo)), R(f, at(x, hi))) < 4.5) x = Math.round((x + 0.01) * 100) / 100;
+      out[mode] = Math.min(1, x);
+    }
+    t.value = out.light;
+    t.modes = Object.fromEntries(Object.entries(out).filter(([m, v]) => m !== 'light' && v !== out.light));
+  }
+}
 
 /* ---------- values -> CSS ---------- */
 const round = (n, d = 4) => +n.toFixed(d);
