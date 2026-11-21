@@ -28,6 +28,17 @@ accessible scheme and no component changes.
   magenta, a chartreuse) gets **vibrant**. `vibrant` raises a muted seed's chroma to about 74 and turns it neon (a coral
   terracotta, a mint green, a hot pink plum), so name it only when the user asks for a bright version. **Tonal** is for
   subtle or photo-sampled colors; tinted mode uses it by default. `S4.theme.variantFor(seed)` says what auto will pick.
+- **A fixed brand paints on the first frame** (decision 0063): a seed is generated in the browser by default, so a
+  branded page would paint monochrome for a moment. An app whose brand is fixed writes a brand file once,
+  `node scripts/brand.mjs --seed '#4c7a2a' [--variant fidelity] [--surfaces tinted] --out brand.css` (the skill carries
+  the same script), and links it right after `orion.css`. It is exactly the scheme the browser would write; `core.js`
+  sees it (`--s4-brand`) and loads, generates and repaints nothing. Regenerate it when the brand changes or after
+  updating Orion. A color the visitor picks (swatches) is kept under the save key (`key + ':color'`) and put back before
+  the first paint by this line after the stylesheets:
+  `<script>(function (k) { try { var c = localStorage.getItem(k + ':color'); if (c) { var s = document.createElement('style'); s.id = 's4-dynamic-color'; s.textContent = c; document.head.appendChild(s); } } catch (e) {} })('app-key');</script>`
+- **Selection is quiet in any accent** (decision 0063): the selection container a seed writes is never more colorful than
+  M3's tonal palette for that hue (dark mode: the quiet secondary tone 25; light mode: the accent's tone 90, its chroma
+  capped), so a vivid accent selects a row clearly without painting it a saturated block.
 - **Glass FABs with a seed** (decision 0060): the default FAB's icon and label take on-primary-container, or white or the
   accent's darkest tone when that keeps more of the glass, and its tint rises above the owner's 75% only as far as the
   label needs for 4.5:1 over any backdrop (a fidelity FAB on a mid-tone seed is nearly solid). `npm run check:glass`

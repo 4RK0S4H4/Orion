@@ -24,7 +24,7 @@ your judgement", 2026-11-16). Round 0056 built all of it in workstreams and merg
   editing in place; filters and saved views in the address; code blocks and syntax tokens; chart ranges; Linnea.
 - **Desktop anatomy** (0062, issue 60): `S4.commands`, menu bar, status bar, document tabs, tree, the rail as a source
   list, inspector, settings as a view, window states, `examples/` shells; Parley.
-79 components, 20 templates (15 app, five site).
+79 components, 20 templates (15 app, five site); 81 components after round 0057 (0063).
 
 **Needs the owner's look on an iPhone:**
 1. `templates/data-table.html` (Linnea): stacked rows, scrolling the 5,000, details, tapping a Drawer cell to edit, the
@@ -50,26 +50,15 @@ your judgement", 2026-11-16). Round 0056 built all of it in workstreams and merg
 (60 fps median measured only in this sandbox); the Electron and installed-app examples (cannot run here; Tauri is notes
 only); the rail's resize and the inspector grip (by hand only, not in the suite); print pagination; real system faces.
 
-**Decisions waiting for the owner** (each with our recommendation; details in the notes):
-1. The brand color arrives late (a branded page paints monochrome first). **Recommend** a brand CSS file written at build
-   time for fixed brands, a runtime cache later for apps where the visitor picks a color.
-2. Editorial type. **Recommend** a `.s4-kicker` role with real small capitals; no old-style figures dial until a second
-   editorial template asks.
-3. A meter (the labelled track five templates drew). **Recommend** building `.s4-meter`.
-4. A board with lanes (counts, limits, add in place). **Recommend** building `.s4-board` after the meter.
-5. Dense map-like pickers (seats). **Recommend** an opt-in `data-dense` checked against the 24px spacing rule, only for
-   maps of real things.
-6. One bundled brand face. **Recommend** no: Inter stays the only bundled face; document how an app ships its own.
-7. Monochrome colored FAB labels (3.85:1 for `tertiary-container` over white). **Recommend** the per-scheme FAB rule of
-   0060 computed at build time for the monochrome FABs too.
-8. The vibrant toolbar on glass with a seed. **Recommend** the same rule (tint rises only as far as the text needs).
-9. Desktop (0062): rename taking the cursor (F2 is the person asking), the sixth truncation place (document tab labels),
-   a selection-strength dial for vivid accents. **Recommend** keeping rename and the tab ellipsis as built; the dial
-   only if the owner finds vivid selected rows too loud.
-10. Data (0061): a quieter resting checkbox in dense tables, and whether table cells may truncate. **Recommend** a
-    quieter checkbox inside tables; cells keep wrapping (0058) unless the owner prefers truncation with the full value
-    on hover.
-11. Wide windows: centred (built) or start-aligned capped content. **Recommend** centred.
+**Decided in 0063 (2026-11-21):** the owner handed us the lead on the eleven waiting decisions ("I'll let you take the
+lead on this … do anything you feel like it is for the best"); we took every recommendation and built it in round 0057
+(branch `round57/decisions`; record [0063](decisions/0063-the-eleven-calls.md)): brand files so a fixed brand paints on
+the first frame (and a cache for visitor-picked colors), `.s4-kicker` and `figure.s4-figure`, the meter, the board,
+quiet resting checkboxes in tables, one label rule for colored FABs and the vibrant toolbar, `data-dense` for maps of
+real things, calmer selection in vivid accents; Inter stays the only bundled face; rename, the tab ellipsis and centred
+wide content as built. 81 components. **Needs the owner's look on an iPhone:** the meter in Tally, Relay, Pressroom,
+Moorings and Larkline; Pressroom's board (lanes snapping, hold-to-drag, add in place); The Velvet's seat plan; Linnea's
+quiet checkboxes; Parley's selected row in dark mode; Tidewater's kicker and byline in Safari's serif (real small caps).
 
 **Order from here (left to us):** the owner's looks first (device-only bugs before anything new), then the meter and the
 board if the owner agrees, then Horizon 1's real apps built end to end with the skill, skill evals, and release 1.2.
@@ -197,6 +186,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-21 (round 0057, decisions): the eleven calls taken as recommended and built (0063): brand files, kicker and figure, meter, board, quiet table checkboxes, one label rule, dense maps, calmer selection, small lessons 38, 39, 42, 43, Parley's phone bar. Next: merge with round57/calm, then the owner's looks.
 - 2026-11-21 (round 0056, last merge): lessons (0060), data at scale (0061), desktop anatomy (0062) merged and fixed together; all templates are products (issue 66); decisions, docs, skill and hub updated; check and test green. Next: the owner's looks and the eleven decisions under Now.
 - 2026-11-16 (round 0056, wave 1): themes on any container, energy, app defaults, roomy (0056); website kit (0057); reach and proven dial presets (0058); four workstreams merged, check and test green. Next: the owner's looks, then wave 2 (issues 54, 56), 59, 60.
 - 2026-11-16 (brand dials): the owner's answers recorded as 0055; type retuned, first dials built, drift fixed. Next: the order above.

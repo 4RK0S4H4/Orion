@@ -1,6 +1,6 @@
 ---
 name: s4-orion
-description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 79 components (app shell, nav bar/rail, buttons, FAB, cards, lists, data tables, filters, stats, fields, chips, menus, dialogs, sheets, code, chat, desktop menu bar and tree…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates (landing, pricing, blog, docs), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
+description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 81 components (app shell, nav bar/rail, buttons, FAB, cards, lists, data tables, filters, stats, meters, boards, fields, chips, menus, dialogs, sheets, code, chat, desktop menu bar and tree…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates (landing, pricing, blog, docs), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
 ---
 
 # S4 Orion
@@ -27,6 +27,10 @@ Everything ships in this skill's `assets/` folder: `orion.css` (tokens, every co
 - **App or repo:** copy the five files next to the page (or into the project's static folder) and link them as below.
 - **One self-contained HTML file** (only when asked for a single file): build the page with the normal links, then run
   `node <skill>/scripts/inline.mjs page.html` to inline the CSS, JS, icons and font. Run it again after edits.
+- **A fixed brand color** (decision 0063): write its brand file once, `node <skill>/scripts/brand.mjs --seed '#4c7a2a'
+  [--variant fidelity] [--surfaces tinted] --out brand.css`, and link it right after `orion.css` (it needs the same
+  `S4.theme` seed). The page then paints its brand on the first frame and loads no `m3color.js`. Regenerate it when the
+  brand changes or Orion is updated. Templates with a brand carry theirs in `templates/brand/`.
 - **Never edit `orion.css` for one app.** Everything sits in `@layer s4.*`, so the app's own unlayered CSS wins; override
   with tokens and documented attributes instead. The source of truth is the repo (github.com/4rk0s4h4/s4-orion).
 
@@ -192,7 +196,9 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   muted color (it turns terracotta coral and navy cyan); `tonal` for subtle or photo-derived colors (tinted mode's default).
 - A fixed brand that the visitor never changes: `S4.theme.restore(key, brand, { only: ['mode'] })`, so only light or dark
   is saved. Never hand-write a mode-only restore. Glass FAB labels are proven for every seed: never switch a FAB to
-  `data-color` to get contrast.
+  `data-color` to get contrast. Every FAB color and the vibrant toolbar follow one label rule; no exemptions (0063).
+- A color the visitor picks (swatches): keep a save key and add the one-line cache snippet after the stylesheets
+  (`references/color.md`, "A fixed brand paints on the first frame"), so it is back before the first paint.
 - Use roles, never hex: page `surface`; cards and panes `surface-container-low`; menus and nav `surface-container`;
   dialogs `surface-container-high`; fields `surface` (Quiet Box); text `on-surface`, secondary text
   `on-surface-variant`; selection `secondary-container`; the one main action `primary`; standout container (FAB)
@@ -213,6 +219,14 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - State of a thing: a **status** pill with a tone and a word ("Overdue"), never color alone.
 - Numbers people check over time (KPIs): **stats** (`.s4-stat`) in one pane's `.s4-stat-row`, not a pane per number.
 - An item's fields on a detail screen: a **description list** (`.s4-dl`).
+- A reading against a whole, a limit or a target (storage, time left, words, runway): a **meter** (`.s4-meter`,
+  `data-value`/`data-max`, `data-state="near|over"`, `data-segmented` with a legend, `data-steps`); never a hand-drawn bar.
+- Things moving through stages: a **board** (`.s4-board` > `.s4-lane`, `data-limit`, `[data-lane-add]` for add in
+  place, `data-reorder-group` to drag; Alt and the arrow keys move a card). Never a dialog to add a card.
+- A map of real things too dense for 48px targets (seats, keys, calendar cells): `data-dense` on the map, each target
+  drawn 18px or more and 24px apart, arrow keys between them. Never for ordinary controls.
+- A slider whose number is what people read: `.s4-slider[data-value="heading"]` (label and value above the track; add
+  an `<input inputmode="numeric">` inside for an exact value).
 - Long text (articles, help, AI answers): **prose** (`.s4-prose`) on a reading-width page. Conversations: **messages**
   (`.s4-thread`, `.s4-message[data-from="me"]`) with a glass `.s4-composer`.
 - Charts: draw them in the app (SVG or divs) from role colors: past values `surface-container-highest`, the current or
@@ -266,6 +280,10 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - Use the type scale classes (`.s4-headline-small`, `.s4-title-medium`, `.s4-body-medium`, `.s4-label-large`…) or the
   `--md-sys-typescale-*` tokens; add `.s4-emphasized` for the M3 Expressive weight on a key number or title.
 - Numbers people compare (amounts, counts, dates, IDs) get `.s4-num` (tabular figures). Tables and inputs already do.
+- Editorial pages: `.s4-kicker` above a title or as a post's section (real small capitals where the face has them,
+  never faked), `figure.s4-figure` for a picture with its caption, `.s4-post-byline` under a post.
+- Inter is the only bundled face. A brand face is one `@font-face` file with `font-display: swap`, named first in a
+  `custom` stack: `S4.theme({ display: '"Brand Display", Didot, ui-serif, serif' })`.
 - **Title Case** for labels: buttons, tabs, headings, column headers, menu items, field labels, chips, nav labels.
   Sentence case for sentences: helper and error text, snackbars, dialog questions ("Delete this bill?"), empty states.
 - Name actions by what happens ("Pay Bill", "Export to Excel"), and keep the same word through the flow (Archive → "Bill archived").
@@ -275,7 +293,8 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   console). Common: home, search, bills, wallet, settings, add, edit, delete, more, more-vert,
   close, check, chevron-down/up/left/right, back, forward, notifications, account, calendar, filter, sort, export,
   download, upload, copy, share, info, warning, error, star, favorite, chart, dashboard, document, card, history, lock,
-  visible, hidden, light-mode, dark-mode, menu, refresh, undo, sparkle, mail, chat. Unknown names log a console warning.
+  visible, hidden, light-mode, dark-mode, menu, refresh, undo, sparkle, mail, chat; weather and outdoors: wind, sun,
+  moon, night-sky, cloud, rain, sunrise, sunset, temperature, compass, hike. Unknown names log a console warning.
 - Need another Solar icon: `S4.icon.add({ name: '<svg body>' })`. Credit "Solar icons by 480 Design (CC BY 4.0)" in the
   page footer or about screen.
 

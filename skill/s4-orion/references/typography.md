@@ -17,10 +17,18 @@
   back to Hiragino Maru Gothic, Nunito, Quicksand, Arial Rounded for display, then Calibri), so it degrades to a near
   face, never to Inter. The display face covers display, headline and title-large; the text face everything else. Any
   face but Inter and system drops Inter's letter spacing; set `--md-sys-typescale-<role>-tracking` if the face needs its
-  own. Load a custom font file in the app; keep Inter for text unless the brand truly has a text face. Stacks worth
+  own. Inter is the only face Orion bundles (decision 0063). An app that ships its own face loads **one** file with
+  `@font-face { font-family: "Brand Display"; src: url(brand-display.woff2) format("woff2"); font-weight: 100 900;
+  font-display: swap; }` (preload it like Inter), and names it first in a `custom` stack with system fallbacks:
+  `S4.theme({ display: '"Brand Display", Didot, ui-serif, serif' })`. Keep Inter for text unless the brand truly has a
+  text face. Stacks worth
   knowing for `custom`: Didone `Didot, "Bodoni 72", "Bodoni MT", "Bodoni Moda", ui-serif, serif`; condensed
   `"DIN Condensed", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", sans-serif`; classical humanist
   `Optima, Candara, "Noto Sans", sans-serif`.
+- **Kicker** (decision 0063): the short label above an editorial title or a post's section is `.s4-kicker`: the accent,
+  real small capitals where the text face has them (`font-variant-caps: all-small-caps`, synthesis off, a size up and
+  `--s4-type-caps-tracking` apart), the emphasized label in Title Case in Inter, which has none. Never faked. There is
+  no old-style figures dial; an editorial page that wants them sets `font-variant-numeric: oldstyle-nums` on its prose.
 - **Display weight** (decision 0060): `S4.theme({ displayWeight: 'medium' | 'regular' })` (`data-type-display-weight`)
   draws the display face's roles at 500 or 400 instead of 600, with emphasized at 600. A Didone, a book serif or a
   geometric face is drawn lighter than Inter and loses its contrast at 600; Inter and system stay at the default.

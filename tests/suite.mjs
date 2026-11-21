@@ -1105,7 +1105,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker menubar doc-tabs statusbar tree desktop combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart meter'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker menubar doc-tabs statusbar tree desktop combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart meter board'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */

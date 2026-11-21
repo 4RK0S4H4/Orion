@@ -8,6 +8,23 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+Round 0057: the eleven calls (decision 0063, the owner handed us the lead):
+
+- Added: brand files (`scripts/brand.mjs`, also in the skill): a fixed brand's scheme as CSS linked after `orion.css`, so it paints on the first frame; `core.js` recognises it (`--s4-brand`) and loads, generates and repaints nothing. Every branded template links `templates/brand/<name>.css`, written by `npm run build` and covered by the stale check. A visitor-picked color is cached under the save key and put back before the first paint by a head snippet (Larkline, Puck). `inline.mjs` leaves out `m3color.js` when a brand file holds the page's only color.
+- Added: meter (`.s4-meter`): a label, the value in words, a filled track, target and now marks, tone by state, segments with a legend, counted steps, ranges, four sizes, `role="meter"`. Tally, Relay, Pressroom, Moorings and Larkline use it.
+- Added: board (`.s4-board`, `.s4-lane`): lane counts and limits, add in place (`s4-lane-add`), Alt and the arrow keys to move a card, lanes that snap on a phone; a page with a board starts with its rail collapsed. Pressroom runs on it. 81 components.
+- Added: `.s4-kicker` (real small capitals, never faked), `figure.s4-figure`, `.s4-post-byline`, token `--s4-type-caps-tracking`; Tidewater, Penumbra and Hollis & Vane use them.
+- Added: `data-dense` for maps of real things, held to WCAG 2.5.8's spacing rule by the suite (The Velvet's seat plan).
+- Added: `.s4-slider[data-value="heading"]` with an optional paired exact-value field; swatches `data-show-name`; icons `wind`, `sun`, `moon`, `night-sky`, `cloud`, `rain`, `sunrise`, `sunset`, `temperature`, `compass`, `hike` in all three sets.
+- Added: glass tint tokens per FAB color and for the vibrant toolbar (`--s4-glass-tint-opacity-fab-<color>`, `-toolbar-vibrant`), computed by the token build with the label rule (`com.s4.label-tint`).
+- Changed: one label rule for everything floating in its own color: monochrome colored FABs (tertiary-container 0.99 in light mode) and the vibrant toolbar with any seed; the suite's vibrant-toolbar exemption is gone.
+- Changed: in tables an empty resting checkbox is a quiet half-size dot in the same 3:1 color, full on row hover, focus or while anything is selected (amends 0044 inside tables).
+- Changed: the selection a seed writes is never more colorful than the tonal palette for its hue (dark mode: secondary tone 25), so vivid accents select quietly.
+- Changed: `core.js`'s color engine is a pure block (`colorKit`) shared with `brand.mjs`.
+- Fixed: Parley's phone title bar showed a search button right above its filter field.
+- Docs: how an app ships its own face (one `@font-face`, `font-display: swap`, first in `custom`); two trailing statuses in a list row.
+
+
 Round 0056: themes on any container, the website kit, reach, lessons from the templates, data at scale, desktop anatomy (decisions 0056 to 0062):
 
 - Added: tables at scale (decision 0061): `data-resizable` column grips, `th[data-pin]` pinned columns, `data-column-menu`, a Columns menu (`.s4-menu[data-table-columns]`), saved layout (`data-key`), `S4.tableColumns`.
