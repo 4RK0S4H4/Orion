@@ -13,7 +13,7 @@
      (data-join="extra-large"); below that it opens in place from the ticket. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=61f4a87">
+<link rel="stylesheet" href="../components/orion.css?v=3d4d020">
 <link rel="stylesheet" href="brand/list-detail.css?v=9b3a52d">
 <style>
   /* Relay's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -85,11 +85,11 @@
               <li role="none"><div class="s4-list-item" role="option" aria-selected="true" data-value="t2" data-split-open>
                 <span class="s4-list-leading"><span class="s4-avatar">GO</span></span>
                 <span class="s4-list-content"><span class="s4-list-overline">Grace Okafor · Business</span><span class="s4-list-headline">Charged twice for November</span><span class="s4-list-supporting">Two charges of $249 on the same day. Please refund one.</span></span>
-                <span class="s4-list-trailing"><span class="s4-status" data-tone="error">Late 20m</span></span></div></li>
+                <span class="s4-list-trailing"><span class="s4-status" data-tone="error">Late 20m</span><span class="s4-status" data-dot>High</span></span></div></li>
               <li role="none"><div class="s4-list-item" role="option" aria-selected="false" data-value="t0" data-split-open>
                 <span class="s4-list-leading"><span class="s4-avatar">AR</span></span>
                 <span class="s4-list-content"><span class="s4-list-overline">Ana Ribeiro · Pro</span><span class="s4-list-headline">Labels print upside down</span><span class="s4-list-supporting">Since this morning every label on our Zebra comes out flipped.</span></span>
-                <span class="s4-list-trailing"><span class="s4-status" data-tone="warning">1h 12m</span></span></div></li>
+                <span class="s4-list-trailing"><span class="s4-status" data-tone="warning">1h 12m</span><span class="s4-status" data-dot>High</span></span></div></li>
               <li role="none"><div class="s4-list-item" role="option" aria-selected="false" data-value="t1" data-split-open>
                 <span class="s4-list-leading"><span class="s4-avatar">TV</span></span>
                 <span class="s4-list-content"><span class="s4-list-overline">Tomás Vidal · Free</span><span class="s4-list-headline">Can’t connect my Shopify store</span><span class="s4-list-supporting">The connect button spins and then nothing happens.</span></span>
@@ -212,8 +212,8 @@
   </div>
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Discard</button><button class="s4-button" data-variant="filled" data-close="send" type="button">Create Ticket</button></div>
 </dialog>
-<script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=876d0e3"></script>
+<script src="../components/assets/icons.js?v=9b1efac"></script>
+<script src="../components/orion.js?v=9345a60"></script>
 <script>
 /* the hub's light or dark choice carries over; Relay's accent and tinted surfaces are its own, never saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#4f46e5', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

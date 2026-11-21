@@ -27,6 +27,28 @@ inactive track, secondary-container on the active one). The value label is an in
 `s4-change { value }` on `.s4-slider` for every change (native `input` / `change` still fire). The native thumb is sized
 to match the drawing, so the handle stays exactly under the pointer.
 
+## Value as a heading (decision 0063)
+
+```html
+<div class="s4-slider" data-value="heading" data-suffix="%">
+  <label for="hyd">Water</label>
+  <input type="range" id="hyd" min="55" max="90" value="78">
+</div>
+<!-- with an exact-value field for big numbers -->
+<div class="s4-slider" data-value="heading">
+  <label for="jobs">Jobs a Month</label>
+  <input type="text" inputmode="numeric" aria-label="Jobs a Month, Exact">
+  <input type="range" id="jobs" min="100000" max="20000000" step="100000" value="2400000">
+</div>
+```
+
+`data-value="heading"` puts the label and the value on one row above the track (the label at the start, the value in
+title-large at the end), for a tool where the number is what people read: a recipe's hydration, a calculator's input.
+An `<output>` you write yourself is kept; without one, slider.js adds it and fills it with the formatted value. An
+`<input type="number">` (or a text input with `inputmode="numeric"`, which shows the number grouped, "2,400,000",
+while it is not being typed in) in the slider becomes a paired exact-value field (filled, medium corners) that stays in step
+with the range both ways: use it when the range is too large to land on an exact value by dragging.
+
 **Do:** pair with a visible label and, for money, a text field for exact entry; use `data-stops` when only a few values
 are valid.
 **Don't:** use a slider for precise values or very large ranges.

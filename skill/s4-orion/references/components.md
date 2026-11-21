@@ -1450,7 +1450,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | `.s4-list-item` element | `div` (static), `a` / `button` (opens or does something), `label` (toggles the checkbox or switch inside it), `[role=option]` in a listbox | — |
 | `.s4-list-leading` | icon (24, on-surface-variant), `.s4-avatar` (40 circle, initials, primary-container), image (56), checkbox | — |
 | `.s4-list-content` | `.s4-list-overline` (label-small), `.s4-list-headline` (body-large, one line), `.s4-list-supporting` (body-medium, on-surface-variant) | — |
-| `.s4-list-trailing` | supporting text (label-small, tabular), icon, switch, `.s4-list-amount` (body-large, tabular) with a note or status under it | — |
+| `.s4-list-trailing` | supporting text (label-small, tabular), icon, switch, `.s4-list-amount` (body-large, tabular) with a note or status under it; two `.s4-status` stack, end-aligned (a desk's time left over its priority: the one that changes first on top, at most one in a tone) | — |
 | height | automatic: 56 one line; 72 with supporting text or overline; 88 with both (leading and trailing align to the top) | — |
 | `data-lines` (list or item) | `2` (72, supporting text clamped to 1 line), `3` (88, clamped to 2 lines) | automatic |
 | `aria-current` / `aria-selected="true"` | on the item (or its `li`): secondary-container, on-secondary-container | — |
@@ -3649,6 +3649,28 @@ inactive track, secondary-container on the active one). The value label is an in
 `s4-change { value }` on `.s4-slider` for every change (native `input` / `change` still fire). The native thumb is sized
 to match the drawing, so the handle stays exactly under the pointer.
 
+### Value as a heading (decision 0063)
+
+```html
+<div class="s4-slider" data-value="heading" data-suffix="%">
+  <label for="hyd">Water</label>
+  <input type="range" id="hyd" min="55" max="90" value="78">
+</div>
+<!-- with an exact-value field for big numbers -->
+<div class="s4-slider" data-value="heading">
+  <label for="jobs">Jobs a Month</label>
+  <input type="text" inputmode="numeric" aria-label="Jobs a Month, Exact">
+  <input type="range" id="jobs" min="100000" max="20000000" step="100000" value="2400000">
+</div>
+```
+
+`data-value="heading"` puts the label and the value on one row above the track (the label at the start, the value in
+title-large at the end), for a tool where the number is what people read: a recipe's hydration, a calculator's input.
+An `<output>` you write yourself is kept; without one, slider.js adds it and fills it with the formatted value. An
+`<input type="number">` (or a text input with `inputmode="numeric"`, which shows the number grouped, "2,400,000",
+while it is not being typed in) in the slider becomes a paired exact-value field (filled, medium corners) that stays in step
+with the range both ways: use it when the range is too large to land on an exact value by dragging.
+
 **Do:** pair with a visible label and, for money, a text field for exact entry; use `data-stops` when only a few values
 are valid.
 **Don't:** use a slider for precise values or very large ranges.
@@ -3684,6 +3706,7 @@ themes the app.
 | `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant })`; the group follows `S4.theme()` through the `s4-theme` event |
 | `data-variant` on `.s4-swatches` | the scheme variant a picked seed gets (`vibrant`, `fidelity`, `tonal`, `auto`). Without it the page's own variant is kept: an app that set `fidelity` (a brown or caramel brand) keeps it for every swatch, and `auto` (the default) picks per seed (decision 0060) |
 | `data-size="s"` on `.s4-swatches` | 40dp swatches for a picker inside a pane or a card (six fit a phone's row in a pane) |
+| `data-show-name` on `.s4-swatches` | writes the pressed swatch's name (its `aria-label`) after the swatches; `data-show-name="id"` writes it into that element instead (an `<output>` in the group's label). Decision 0063 |
 | `--s4-swatch-color` | public knob; set from `data-seed` |
 
 **The other theme controls** live in the same script (`theme-controls`), on a connected single-select button group:

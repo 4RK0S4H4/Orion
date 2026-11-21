@@ -101,7 +101,18 @@
         "minus": "minus",
         "plus": "add",
         "columns": "columns-3",
-        "pin": "pin"
+        "pin": "pin",
+        "wind": "wind",
+        "sun": "sun",
+        "moon": "moon",
+        "night-sky": "moon-stars",
+        "cloud": "cloud",
+        "rain": "cloud-rain",
+        "sunrise": "sunrise",
+        "sunset": "sunset",
+        "temperature": "thermometer",
+        "compass": "compass",
+        "hike": "hiking"
       }
     },
     "phosphor-duotone": {
@@ -203,7 +214,18 @@
         "minus": "minus",
         "plus": "plus",
         "columns": "columns",
-        "pin": "push-pin"
+        "pin": "push-pin",
+        "wind": "wind",
+        "sun": "sun",
+        "moon": "moon",
+        "night-sky": "moon-stars",
+        "cloud": "cloud",
+        "rain": "cloud-rain",
+        "sunrise": "sun-horizon",
+        "sunset": "sun-horizon",
+        "temperature": "thermometer",
+        "compass": "compass",
+        "hike": "person-simple-hike"
       }
     },
     "phosphor-bold-duotone": {
@@ -305,7 +327,18 @@
         "minus": "minus",
         "plus": "plus",
         "columns": "columns",
-        "pin": "push-pin"
+        "pin": "push-pin",
+        "wind": "wind",
+        "sun": "sun",
+        "moon": "moon",
+        "night-sky": "moon-stars",
+        "cloud": "cloud",
+        "rain": "cloud-rain",
+        "sunrise": "sun-horizon",
+        "sunset": "sun-horizon",
+        "temperature": "thermometer",
+        "compass": "compass",
+        "hike": "person-simple-hike"
       }
     }
   }

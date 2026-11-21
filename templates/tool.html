@@ -15,7 +15,7 @@
      timetable. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=61f4a87">
+<link rel="stylesheet" href="../components/orion.css?v=3d4d020">
 <link rel="stylesheet" href="brand/tool.css?v=ca4c7d2">
 <style>
   /* Proof's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -25,9 +25,7 @@
   @container s4-app (width >= 840px) { .pf-title { font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); } }
   /* a slider row: its name and value on one line, the slider under it, a note under that */
   .pf-dial { display: grid; gap: var(--s4-space-1); }
-  .pf-dial-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4-space-3); }
-  .pf-dial-head label { font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
-  .pf-dial-head output { font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); font-variant-numeric: tabular-nums; }
+  /* each dial is an Orion slider with its value as a heading (decision 0063) */
   .pf-dial .pf-sub { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
 
   /* ---------- the result: a tinted region ---------- */
@@ -101,21 +99,16 @@
           <section class="s4-pane" aria-labelledby="pct-h">
             <h2 class="s4-pane-title" id="pct-h">Baker’s Percentages</h2>
             <p class="pf-sub">Everything is a share of the flour’s weight.</p>
-            <div class="pf-dial"><div class="pf-dial-head"><label for="hyd">Water</label><output for="hyd" id="hyd-out">78%</output></div>
-              <div class="s4-slider" data-suffix="%"><input type="range" id="hyd" min="55" max="90" step="1" value="78"></div>
+            <div class="pf-dial"><div class="s4-slider" data-value="heading" data-suffix="%"><label for="hyd">Water</label><output for="hyd" id="hyd-out">78%</output><input type="range" id="hyd" min="55" max="90" step="1" value="78"></div>
               <p class="pf-sub" id="hyd-note">Open and glossy. Wet hands for shaping.</p></div>
-            <div class="pf-dial"><div class="pf-dial-head"><label for="lev">Levain</label><output for="lev" id="lev-out">20%</output></div>
-              <div class="s4-slider" data-suffix="%"><input type="range" id="lev" min="5" max="35" step="1" value="20"></div></div>
-            <div class="pf-dial"><div class="pf-dial-head"><label for="whole">Whole Grain</label><output for="whole" id="whole-out">15%</output></div>
-              <div class="s4-slider" data-suffix="%"><input type="range" id="whole" min="0" max="100" step="5" value="15"></div></div>
-            <div class="pf-dial"><div class="pf-dial-head"><label for="salt">Salt</label><output for="salt" id="salt-out">2.0%</output></div>
-              <div class="s4-slider" data-stops data-suffix="%"><input type="range" id="salt" min="1.6" max="2.6" step="0.2" value="2"></div></div>
+            <div class="pf-dial"><div class="s4-slider" data-value="heading" data-suffix="%"><label for="lev">Levain</label><output for="lev" id="lev-out">20%</output><input type="range" id="lev" min="5" max="35" step="1" value="20"></div></div>
+            <div class="pf-dial"><div class="s4-slider" data-value="heading" data-suffix="%"><label for="whole">Whole Grain</label><output for="whole" id="whole-out">15%</output><input type="range" id="whole" min="0" max="100" step="5" value="15"></div></div>
+            <div class="pf-dial"><div class="s4-slider" data-value="heading" data-stops data-suffix="%"><label for="salt">Salt</label><output for="salt" id="salt-out">2.0%</output><input type="range" id="salt" min="1.6" max="2.6" step="0.2" value="2"></div></div>
           </section>
 
           <section class="s4-pane" aria-labelledby="kitchen-h">
             <h2 class="s4-pane-title" id="kitchen-h">Your Kitchen</h2>
-            <div class="pf-dial"><div class="pf-dial-head"><label for="temp">Room Temperature</label><output for="temp" id="temp-out">23 °C</output></div>
-              <div class="s4-slider" data-stops data-suffix=" °C"><input type="range" id="temp" min="18" max="28" step="1" value="23"></div>
+            <div class="pf-dial"><div class="s4-slider" data-value="heading" data-stops data-suffix=" °C"><label for="temp">Room Temperature</label><output for="temp" id="temp-out">23 °C</output><input type="range" id="temp" min="18" max="28" step="1" value="23"></div>
               <p class="pf-sub">Warmer rises faster: every degree is about 15 minutes of bulk.</p></div>
             <div class="s4-text-field"><input id="start" type="time" value="09:00" step="900"><label for="start">Mix At</label></div>
           </section>
@@ -136,8 +129,8 @@
     </main>
   </div>
 </div>
-<script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=876d0e3"></script>
+<script src="../components/assets/icons.js?v=9b1efac"></script>
+<script src="../components/orion.js?v=9345a60"></script>
 <script>
 /* Proof's brand: a bakery navy over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#24406b', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

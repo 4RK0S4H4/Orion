@@ -19,6 +19,7 @@ themes the app.
 | `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant })`; the group follows `S4.theme()` through the `s4-theme` event |
 | `data-variant` on `.s4-swatches` | the scheme variant a picked seed gets (`vibrant`, `fidelity`, `tonal`, `auto`). Without it the page's own variant is kept: an app that set `fidelity` (a brown or caramel brand) keeps it for every swatch, and `auto` (the default) picks per seed (decision 0060) |
 | `data-size="s"` on `.s4-swatches` | 40dp swatches for a picker inside a pane or a card (six fit a phone's row in a pane) |
+| `data-show-name` on `.s4-swatches` | writes the pressed swatch's name (its `aria-label`) after the swatches; `data-show-name="id"` writes it into that element instead (an `<output>` in the group's label). Decision 0063 |
 | `--s4-swatch-color` | public knob; set from `data-seed` |
 
 **The other theme controls** live in the same script (`theme-controls`), on a connected single-select button group:

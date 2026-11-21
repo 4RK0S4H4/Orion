@@ -184,7 +184,7 @@
             <div class="lk-dial" role="group" aria-labelledby="d-plumage">
               <span class="lk-dial-name"><span id="d-plumage">Plumage</span><output id="plumage-out">Wren</output></span>
               <!-- each swatch is a bird; fidelity keeps a muted brown instead of turning it vivid -->
-              <div class="s4-swatches" data-theme-seed data-variant="fidelity" aria-label="Plumage">
+              <div class="s4-swatches" data-theme-seed data-variant="fidelity" data-show-name="plumage-out" aria-label="Plumage">
                 <button class="s4-swatch" type="button" data-seed="#7c4f24" aria-label="Wren"></button>
                 <button class="s4-swatch" type="button" data-seed="#00658f" aria-label="Kingfisher"></button>
                 <button class="s4-swatch" type="button" data-seed="#b5431b" aria-label="Robin"></button>
@@ -313,7 +313,7 @@ var BIRDS = {
 function bird() { var s = (S4.theme().seed || '').toLowerCase(); return BIRDS[s] || BIRDS[s ? LOOK.seed : 'mono'] || BIRDS[LOOK.seed]; }
 function drawCard() {
   var b = bird();
-  $('pv-name').textContent = b.name; $('pv-latin').textContent = b.latin; $('plumage-out').textContent = b.name;
+  $('pv-name').textContent = b.name; $('pv-latin').textContent = b.latin;
   $('pv-match').textContent = b.match + '% Match';
   $('pv-play').setAttribute('aria-label', 'Play the ' + b.name + '’s Song');
   $('pv-gram').setAttribute('aria-label', 'Sonogram: ' + b.song);

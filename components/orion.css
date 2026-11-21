@@ -10909,7 +10909,7 @@
   .s4-slider::after {
     content: "";
     position: absolute;
-    top: 50%;
+    top: var(--_mid, 50%);
     height: var(--_track-h);
     transform: translateY(-50%);
     pointer-events: none;
@@ -10937,7 +10937,7 @@
     position: absolute;
     left: 0;
     right: 0;
-    top: 50%;
+    top: var(--_mid, 50%);
     z-index: 1;
     height: var(--s4-space-1);
     transform: translateY(-50%);
@@ -10967,7 +10967,7 @@
   .s4-slider-handle {
     position: absolute;
     inset-inline-start: var(--_x);
-    top: 50%;
+    top: var(--_mid, 50%);
     z-index: 1;
     width: var(--_handle-w);
     height: var(--_handle-h);
@@ -10977,6 +10977,64 @@
     pointer-events: none;
     transition: width var(--s4-motion-morph);
   }
+  /* ---------- data-value="heading" (decision 0063): the label and the value on one row above the track ----------
+     <div class="s4-slider" data-value="heading" data-suffix="%"><label for="hyd">Water</label><input type="range" id="hyd" …></div>
+     slider.js puts the label and an <output> (the formatted value) in a .s4-slider-head; an <input type="number"> in the
+     slider is a paired exact-value field (big numbers), kept in step both ways. */
+  .s4-slider[data-value="heading"] {
+    --_mid: calc(100% - var(--s4-size-touch-target) / 2);
+    height: auto;
+    padding-block-end: var(--s4-size-touch-target);
+  }
+  .s4-slider[data-value="heading"] > input[type="range"] { inset: auto 0 0; height: var(--s4-size-touch-target); }
+  .s4-slider-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-inline-size: 0;
+  }
+  .s4-slider-head > label {
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
+  .s4-slider-head > output {
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-large-font);
+    font-size: var(--md-sys-typescale-title-large-size);
+    line-height: var(--md-sys-typescale-title-large-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-title-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  /* the paired exact-value field: something you type into, so medium corners (decision 0024), filled, never outlined */
+  .s4-slider-head > :is(input[type="number"], input[inputmode]) {
+    box-sizing: border-box;
+    inline-size: calc(var(--s4-space-16) * 2);
+    min-block-size: var(--s4-space-10);
+    padding: 0 var(--s4-space-3);
+    border: 0;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+    font-variant-numeric: tabular-nums;
+    text-align: end;
+    appearance: textfield;
+  }
+  .s4-slider-head > input[type="number"]::-webkit-inner-spin-button { appearance: none; }
+  /* a tap into the field is quiet (the caret shows it); the keyboard gets the full ring (issues 62, 64) */
+  :root:not([data-s4-focus="pointer"]) .s4-slider-head > :is(input[type="number"], input[inputmode]):focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  @media (forced-colors: active) { .s4-slider-head > :is(input[type="number"], input[inputmode]) { border: 1px solid CanvasText; } }
+
   /* value label */
   .s4-slider-label {
     position: absolute;
@@ -11065,6 +11123,16 @@
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s4-space-2);
+  }
+  /* data-show-name: the pressed swatch's name after the swatches (decision 0063) */
+  .s4-swatches-name {
+    margin-inline-start: var(--s4-space-2);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
   }
   .s4-swatch {
     --_c: var(--s4-swatch-color, var(--md-sys-color-primary));

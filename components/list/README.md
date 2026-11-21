@@ -31,7 +31,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | `.s4-list-item` element | `div` (static), `a` / `button` (opens or does something), `label` (toggles the checkbox or switch inside it), `[role=option]` in a listbox | — |
 | `.s4-list-leading` | icon (24, on-surface-variant), `.s4-avatar` (40 circle, initials, primary-container), image (56), checkbox | — |
 | `.s4-list-content` | `.s4-list-overline` (label-small), `.s4-list-headline` (body-large, one line), `.s4-list-supporting` (body-medium, on-surface-variant) | — |
-| `.s4-list-trailing` | supporting text (label-small, tabular), icon, switch, `.s4-list-amount` (body-large, tabular) with a note or status under it | — |
+| `.s4-list-trailing` | supporting text (label-small, tabular), icon, switch, `.s4-list-amount` (body-large, tabular) with a note or status under it; two `.s4-status` stack, end-aligned (a desk's time left over its priority: the one that changes first on top, at most one in a tone) | — |
 | height | automatic: 56 one line; 72 with supporting text or overline; 88 with both (leading and trailing align to the top) | — |
 | `data-lines` (list or item) | `2` (72, supporting text clamped to 1 line), `3` (88, clamped to 2 lines) | automatic |
 | `aria-current` / `aria-selected="true"` | on the item (or its `li`): secondary-container, on-secondary-container | — |

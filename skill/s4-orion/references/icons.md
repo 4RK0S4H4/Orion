@@ -98,3 +98,14 @@ Arrows and chevrons are Linear, everything else Bold Duotone. Other sets: solar,
 | `plus` | add |
 | `columns` | columns-3 |
 | `pin` | pin |
+| `wind` | wind |
+| `sun` | sun |
+| `moon` | moon |
+| `night-sky` | moon-stars |
+| `cloud` | cloud |
+| `rain` | cloud-rain |
+| `sunrise` | sunrise |
+| `sunset` | sunset |
+| `temperature` | thermometer |
+| `compass` | compass |
+| `hike` | hiking |

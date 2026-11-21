@@ -27,12 +27,25 @@ S4.register('swatches', function (scope) {
       items().forEach(function (b) { var on = norm(b.getAttribute('data-seed')) === norm(seed); if (on && !hit) hit = b; });
       items().forEach(function (b) { b.setAttribute('aria-pressed', b === hit ? 'true' : 'false'); });
       if (document.activeElement && g.contains(document.activeElement)) stop(document.activeElement); else stop();
+      showName(hit);
     };
+    /* data-show-name (decision 0063): the pressed swatch's name, written beside the group (or into the element whose id
+       the attribute names, such as an <output> in the group's own label) */
+    var nameEl = null;
+    function showName(hit) {
+      if (!g.hasAttribute('data-show-name')) return;
+      var id = g.getAttribute('data-show-name');
+      if (!nameEl) {
+        nameEl = id && document.getElementById(id);
+        if (!nameEl) { nameEl = document.createElement('span'); nameEl.className = 's4-swatches-name'; nameEl.setAttribute('aria-hidden', 'true'); g.appendChild(nameEl); }
+      }
+      nameEl.textContent = hit ? (hit.getAttribute('aria-label') || hit.title || '').trim() : '';
+    }
     var theme = g.hasAttribute('data-theme-seed');
     if (theme) {
       select(S4.theme().seed);
       document.addEventListener('s4-theme', function (e) { select((e.detail || S4.theme()).seed); });
-    } else stop();
+    } else { stop(); showName(items().filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; })[0] || null); }
 
     g.addEventListener('click', function (e) {
       var b = e.target.closest('.s4-swatch');

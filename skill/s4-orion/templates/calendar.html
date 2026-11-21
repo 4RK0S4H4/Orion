@@ -87,7 +87,7 @@
   .mr-tide-scale { display: flex; justify-content: space-between; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
   .mr-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3) var(--s4-space-4); margin: 0; }
   .mr-facts div { display: grid; gap: var(--s4-space-1); }
-  .mr-facts dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .mr-facts dt { display: flex; align-items: center; gap: var(--s4-space-1); --s4-icon-size: var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
   .mr-facts dd { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; }
 
   /* the fleet board: one track a boat across the sailing day (08:00 to 20:00); a booking is a filled block */
@@ -200,10 +200,10 @@
                 <figcaption class="mr-sub" id="mr-tide-cap">Tide</figcaption>
               </figure>
               <dl class="mr-facts">
-                <div><dt>High Water</dt><dd id="mr-high">10:42</dd></div>
-                <div><dt>Low Water</dt><dd id="mr-low">16:55</dd></div>
-                <div><dt>Sunset</dt><dd id="mr-sunset">19:58</dd></div>
-                <div><dt>Water</dt><dd id="mr-water">16 °C</dd></div>
+                <div><dt><span class="s4-icon" data-icon="water" aria-hidden="true"></span>High Water</dt><dd id="mr-high">10:42</dd></div>
+                <div><dt><span class="s4-icon" data-icon="water" aria-hidden="true"></span>Low Water</dt><dd id="mr-low">16:55</dd></div>
+                <div><dt><span class="s4-icon" data-icon="sunset" aria-hidden="true"></span>Sunset</dt><dd id="mr-sunset">19:58</dd></div>
+                <div><dt><span class="s4-icon" data-icon="temperature" aria-hidden="true"></span>Water</dt><dd id="mr-water">16 °C</dd></div>
               </dl>
             </section>
 

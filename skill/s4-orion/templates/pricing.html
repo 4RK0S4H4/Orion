@@ -39,9 +39,7 @@
   @container s4-site-section (width >= 840px) { .sl-calc { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
   .sl-inputs { display: grid; gap: var(--s4-space-8); }
   .sl-inputs > div { display: grid; gap: var(--s4-space-3); }
-  .sl-input-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--s4-space-2); }
-  .sl-input-head label { font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); }
-  .sl-input-head output { color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: 600; }
+  /* the two inputs are Orion sliders with their value as a heading; Jobs a Month pairs an exact-value field (decision 0063) */
   .sl-input-hint { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
   .sl-answer { display: grid; gap: var(--s4-space-5); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-lowest); }
   .sl-answer > * { margin: 0; }
@@ -179,13 +177,11 @@
     <div class="sl-calc">
       <div class="sl-inputs">
         <div>
-          <div class="sl-input-head"><label for="calc-jobs">Jobs a Month</label><output class="sl-mono" for="calc-jobs" id="out-jobs">2,400,000</output></div>
-          <div class="s4-slider"><input type="range" id="calc-jobs" min="100000" max="20000000" step="100000" value="2400000" aria-describedby="hint-jobs"></div>
+          <div class="s4-slider" data-value="heading"><label for="calc-jobs">Jobs a Month</label><input type="text" id="calc-jobs-exact" inputmode="numeric" autocomplete="off" aria-label="Jobs a Month, Exact"><input type="range" id="calc-jobs" min="100000" max="20000000" step="100000" value="2400000" aria-describedby="hint-jobs"></div>
           <p class="sl-input-hint" id="hint-jobs">A job is one run of one function, however many steps it has. Retries are free.</p>
         </div>
         <div>
-          <div class="sl-input-head"><label for="calc-secs">Average Run Time</label><output class="sl-mono" for="calc-secs" id="out-secs">4 s</output></div>
-          <div class="s4-slider"><input type="range" id="calc-secs" min="1" max="120" step="1" value="4" aria-describedby="hint-secs"></div>
+          <div class="s4-slider" data-value="heading" data-suffix=" s"><label for="calc-secs">Average Run Time</label><output class="sl-mono" for="calc-secs" id="out-secs">4 s</output><input type="range" id="calc-secs" min="1" max="120" step="1" value="4" aria-describedby="hint-secs"></div>
           <p class="sl-input-hint" id="hint-secs">Sending an email takes about 1 s; resizing a photo, 3 to 6 s; a nightly report, a minute or more.</p>
         </div>
       </div>
@@ -346,7 +342,6 @@ addEventListener('DOMContentLoaded', function () {
   }
   function update() {
     var jobs = +jobsIn.value, secs = +secsIn.value, mins = jobs * secs / 60;
-    $('out-jobs').textContent = jobs.toLocaleString('en-US');
     $('out-secs').textContent = secs + ' s';
     var best = null, bi = 0;
     PLANS.forEach(function (p, i) { var c = price(p, jobs, mins); if (c && (!best || c.total < best.total)) { best = c; bi = i; } });
