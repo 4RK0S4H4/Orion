@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-rail="auto">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=be88e15">
+<link rel="stylesheet" href="orion.css?v=7a8b165">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -22,6 +22,7 @@
     </div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#home" data-view="home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+    <a class="s4-nav-item" href="#board" data-view="board"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="columns"></span></span><span class="s4-nav-label">Board</span></a>
     <a class="s4-nav-item" href="#controls" data-view="controls"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Controls</span></a>
     <a class="s4-nav-item" href="#forms" data-view="forms"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="edit"></span></span><span class="s4-nav-label">Forms</span></a>
     <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
@@ -32,7 +33,15 @@
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
       <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Home</h1></div>
+      <!-- picking several notes (hold one, or tap its picture) swaps the bar for this one -->
+      <div class="s4-selection-bar" id="note-bar" hidden>
+        <button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button>
+        <span class="s4-selection-count" data-selection-count></span>
+        <button class="s4-icon-button" type="button" aria-label="Star Selected" id="star-selected"><span class="s4-icon" data-icon="star"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="Archive Selected" id="archive-selected"><span class="s4-icon" data-icon="archive"></span></button>
+      </div>
       <div class="s4-app-bar-actions">
+        <button class="s4-icon-button" type="button" data-palette aria-label="Search And Commands" data-tooltip="Search and Commands (Ctrl K)"><span class="s4-icon" data-icon="search"></span></button>
         <button class="s4-icon-button" type="button" aria-label="Notifications, 3 new" data-tooltip="Notifications" id="notify-btn">
           <span class="s4-badge-host"><span class="s4-icon" data-icon="notifications"></span><span class="s4-badge" aria-hidden="true">3</span></span>
         </button>
@@ -42,9 +51,10 @@
 
     <main class="s4-content">
 
-      <!-- Home -->
+      <!-- Home: on a wide window the notes and a glance at the week sit side by side (the list keeps a reading width) -->
       <section class="s4-view demo-pad-bottom" data-view="home" data-title="Home">
-        <div class="s4-stack">
+        <div class="demo-home">
+        <div class="s4-stack demo-home-main">
           <div class="s4-search" role="search" data-filter="#note-list" data-filter-empty="#note-empty">
             <span class="s4-icon" data-icon="search"></span>
             <input class="s4-search-input" type="search" placeholder="Search Notes" aria-label="Search notes">
@@ -69,33 +79,124 @@
           <div class="s4-grid demo-cards">
             <article class="s4-card" data-variant="filled">
               <div class="s4-card-body"><h3 class="s4-card-title">Weekend Plans</h3><p class="s4-card-supporting">Three things to finish before Saturday.</p></div>
-              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs">Open</button></div>
+              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs" data-page-open="note" data-page-id="weekend" data-page-title="Weekend Plans">Open</button></div>
             </article>
             <article class="s4-card" data-variant="filled">
               <div class="s4-card-body"><h3 class="s4-card-title">Reading List</h3><p class="s4-card-supporting">Nine articles saved from this week.</p></div>
-              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs">Open</button></div>
+              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs" data-page-open="note" data-page-id="reading" data-page-title="Reading List">Open</button></div>
             </article>
           </div>
-          <ul class="s4-list" data-style="segmented" id="note-list" aria-label="Notes">
-            <li class="s4-list-subheader">This Week</li>
-            <li data-tag="shared"><button class="s4-list-item" type="button"><span class="s4-list-leading"><span class="s4-avatar">MC</span></span><span class="s4-list-content"><span class="s4-list-headline">Design review notes</span><span class="s4-list-supporting">Maya Chen · Today</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="primary">Shared</span></span></button></li>
-            <li data-tag="recent"><button class="s4-list-item" type="button"><span class="s4-list-leading"><span class="s4-avatar">JW</span></span><span class="s4-list-content"><span class="s4-list-headline">Trip itinerary</span><span class="s4-list-supporting">Jonas Weber · Yesterday</span></span><span class="s4-list-trailing"><span class="s4-status">Recent</span></span></button></li>
-            <li data-tag="starred"><button class="s4-list-item" type="button"><span class="s4-list-leading"><span class="s4-avatar">PN</span></span><span class="s4-list-content"><span class="s4-list-headline">Launch checklist</span><span class="s4-list-supporting">Priya Nair · Mon</span></span><span class="s4-list-trailing"><span class="s4-status">Starred</span></span></button></li>
-            <li data-tag="recent"><button class="s4-list-item" type="button"><span class="s4-list-leading"><span class="s4-avatar">SO</span></span><span class="s4-list-content"><span class="s4-list-headline">Budget draft</span><span class="s4-list-supporting">Sam Ortiz · Sun</span></span><span class="s4-list-trailing"><span class="s4-status">Recent</span></span></button></li>
-            <li data-tag="shared"><button class="s4-list-item" type="button"><span class="s4-list-leading"><span class="s4-avatar">LF</span></span><span class="s4-list-content"><span class="s4-list-headline">Photo album</span><span class="s4-list-supporting">Lena Fischer · Oct 28</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="primary">Shared</span></span></button></li>
-          </ul>
+          <div class="demo-section-head">
+            <h2 class="s4-title-medium" id="week-h">This Week</h2>
+            <button class="s4-button" data-variant="text" type="button" data-page-open="library" data-page-title="All Notes">See All 480 Notes</button>
+          </div>
+          <!-- every list has its states (decision 0051): loading first, then the notes; swipe a row to archive it, hold one (or tap its picture) to pick several -->
+          <div class="s4-states" id="note-states" data-state="loading" data-offline="auto">
+            <div data-when="loading" data-rows="5"></div>
+            <div data-when="offline" class="s4-banner" role="status"><span class="s4-icon" data-icon="cloud"></span><span class="s4-banner-text">You’re offline. Notes you change are kept and sent when you’re back.</span></div>
+            <ul class="s4-list" data-style="segmented" id="note-list" aria-labelledby="week-h" data-when="ready offline" data-selectable data-selection-bar="#note-bar">
+              <li data-tag="shared" data-swipe><button class="s4-list-item" type="button" data-page-open="note" data-page-id="design-review" data-page-title="Design review notes"><span class="s4-list-leading"><span class="s4-avatar" data-select-toggle>MC</span></span><span class="s4-list-content"><span class="s4-list-headline">Design review notes</span><span class="s4-list-supporting">Maya Chen · Today</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="primary">Shared</span></span></button>
+                <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Design review notes" data-swipe-primary data-archive><span class="s4-icon" data-icon="archive"></span></button></div></li>
+              <li data-tag="recent" data-swipe><button class="s4-list-item" type="button" data-page-open="note" data-page-id="trip" data-page-title="Trip itinerary"><span class="s4-list-leading"><span class="s4-avatar" data-select-toggle>JW</span></span><span class="s4-list-content"><span class="s4-list-headline">Trip itinerary</span><span class="s4-list-supporting">Jonas Weber · Yesterday</span></span><span class="s4-list-trailing"><span class="s4-status">Recent</span></span></button>
+                <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Trip itinerary" data-swipe-primary data-archive><span class="s4-icon" data-icon="archive"></span></button></div></li>
+              <li data-tag="starred" data-swipe><button class="s4-list-item" type="button" data-page-open="note" data-page-id="launch" data-page-title="Launch checklist"><span class="s4-list-leading"><span class="s4-avatar" data-select-toggle>PN</span></span><span class="s4-list-content"><span class="s4-list-headline">Launch checklist</span><span class="s4-list-supporting">Priya Nair · Mon</span></span><span class="s4-list-trailing"><span class="s4-status">Starred</span></span></button>
+                <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Launch checklist" data-swipe-primary data-archive><span class="s4-icon" data-icon="archive"></span></button></div></li>
+              <li data-tag="recent" data-swipe><button class="s4-list-item" type="button" data-page-open="note" data-page-id="budget" data-page-title="Budget draft"><span class="s4-list-leading"><span class="s4-avatar" data-select-toggle>SO</span></span><span class="s4-list-content"><span class="s4-list-headline">Budget draft</span><span class="s4-list-supporting">Sam Ortiz · Sun</span></span><span class="s4-list-trailing"><span class="s4-status">Recent</span></span></button>
+                <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Budget draft" data-swipe-primary data-archive><span class="s4-icon" data-icon="archive"></span></button></div></li>
+              <li data-tag="shared" data-swipe><button class="s4-list-item" type="button" data-page-open="note" data-page-id="photos" data-page-title="Photo album"><span class="s4-list-leading"><span class="s4-avatar" data-select-toggle>LF</span></span><span class="s4-list-content"><span class="s4-list-headline">Photo album</span><span class="s4-list-supporting">Lena Fischer · Oct 28</span></span><span class="s4-list-trailing"><span class="s4-status" data-tone="primary">Shared</span></span></button>
+                <div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Photo album" data-swipe-primary data-archive><span class="s4-icon" data-icon="archive"></span></button></div></li>
+            </ul>
+            <div data-when="empty" class="s4-empty">
+              <span class="s4-empty-icon"><span class="s4-icon" data-icon="archive"></span></span>
+              <h2 class="s4-empty-title">All Caught Up</h2>
+              <p class="s4-empty-text">Notes you write this week show up here.</p>
+              <button class="s4-button" data-variant="tonal" type="button" data-expand="new-note">New Note</button>
+            </div>
+            <div data-when="error" class="s4-empty">
+              <span class="s4-empty-icon"><span class="s4-icon" data-icon="error"></span></span>
+              <h2 class="s4-empty-title">Couldn’t Load Your Notes</h2>
+              <p class="s4-empty-text">The connection dropped while loading. Nothing was lost.</p>
+              <button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button>
+            </div>
+          </div>
           <div id="note-empty" class="s4-empty" hidden>
             <span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span>
             <h2 class="s4-empty-title">Nothing Found</h2>
             <p class="s4-empty-text">Try a different word, or clear the search.</p>
           </div>
         </div>
+
+        <!-- a glance at the week: one number per stat, a chart with its table, a meter for storage -->
+        <aside class="s4-stack demo-home-aside" aria-label="Your Week">
+          <section class="s4-pane" aria-labelledby="glance-h">
+            <h2 class="s4-pane-title" id="glance-h">Your Week</h2>
+            <div class="s4-stat-row">
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Notes</span><span class="s4-stat-value">23</span><span class="s4-stat-meta">6 more than last week</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Words</span><span class="s4-stat-value">8,410</span><span class="s4-stat-meta">Most on Tuesday</span></div>
+            </div>
+            <figure class="s4-chart" data-type="column" data-labels="Mon,Tue,Wed,Thu,Fri,Sat,Sun" data-values="4,7,3,5,2,1,1" data-name="Notes">
+              <figcaption class="s4-chart-title">Notes Written</figcaption>
+            </figure>
+          </section>
+          <section class="s4-pane" aria-labelledby="storage-h">
+            <h2 class="s4-pane-title" id="storage-h">Storage</h2>
+            <div class="s4-meter" data-segmented data-max="5" data-size="l">
+              <div class="s4-meter-head"><span class="s4-meter-label">In This Browser</span><span class="s4-meter-value"><strong>2.1 GB</strong> of 5 GB</span></div>
+              <div class="s4-meter-track">
+                <i class="s4-meter-fill" data-value="1.2" data-category="1"></i>
+                <i class="s4-meter-fill" data-value="0.6" data-category="2"></i>
+                <i class="s4-meter-fill" data-value="0.3" data-category="3"></i>
+              </div>
+              <ul class="s4-meter-legend"><li data-category="1">Photos <b>1.2 GB</b></li><li data-category="2">Voice Notes <b>0.6 GB</b></li><li data-category="3">Text <b>0.3 GB</b></li><li data-track>Free <b>2.9 GB</b></li></ul>
+            </div>
+          </section>
+        </aside>
+        </div>
         <button class="s4-fab" data-fixed data-expand="new-note" type="button"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Note</span></button>
+      </section>
+
+      <!-- Board: notes as projects that move from stage to stage (drag, or Alt and the arrow keys; never drag-only) -->
+      <section class="s4-view demo-pad-bottom" data-view="board" data-title="Board" hidden>
+        <p class="s4-body-medium s4-on-surface-variant demo-lede">Writing projects by stage. Drag a card, or focus it and press Alt with an arrow key.</p>
+        <div class="s4-board" id="demo-board" aria-label="Writing Projects">
+          <section class="s4-lane" aria-labelledby="lane-ideas">
+            <header class="s4-lane-head"><h2 class="s4-lane-title" id="lane-ideas">Ideas</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="projects" aria-label="Ideas">
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="podcast" data-page-title="Podcast episode outline" data-reorder-label>Podcast episode outline</button><span class="demo-card-meta"><span>Maya Chen</span><span>Idea</span></span></li>
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="garden" data-page-title="Community garden zine" data-reorder-label>Community garden zine</button><span class="demo-card-meta"><span>Lena Fischer</span><span>Idea</span></span></li>
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="recipes" data-page-title="Grandma’s recipes" data-reorder-label>Grandma’s recipes</button><span class="demo-card-meta"><span>Sam Ortiz</span><span>Idea</span></span></li>
+            </ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Project name"><span class="s4-icon" data-icon="add"></span>Add Project</button></footer>
+          </section>
+          <section class="s4-lane" data-limit="3" aria-labelledby="lane-writing">
+            <header class="s4-lane-head"><h2 class="s4-lane-title" id="lane-writing">Writing</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="projects" aria-label="Writing">
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="launch" data-page-title="Launch checklist" data-reorder-label>Launch checklist</button><span class="demo-card-meta"><span>Priya Nair</span><span>Due Fri</span></span></li>
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="design-review" data-page-title="Design review notes" data-reorder-label>Design review notes</button><span class="demo-card-meta"><span>Maya Chen</span><span>Due today</span></span></li>
+            </ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Project name"><span class="s4-icon" data-icon="add"></span>Add Project</button></footer>
+          </section>
+          <section class="s4-lane" aria-labelledby="lane-editing">
+            <header class="s4-lane-head"><h2 class="s4-lane-title" id="lane-editing">Editing</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="projects" aria-label="Editing">
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="trip" data-page-title="Trip itinerary" data-reorder-label>Trip itinerary</button><span class="demo-card-meta"><span>Jonas Weber</span><span>Due Mon</span></span></li>
+            </ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Project name"><span class="s4-icon" data-icon="add"></span>Add Project</button></footer>
+          </section>
+          <section class="s4-lane" aria-labelledby="lane-done">
+            <header class="s4-lane-head"><h2 class="s4-lane-title" id="lane-done">Done</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="projects" aria-label="Done">
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="budget" data-page-title="Budget draft" data-reorder-label>Budget draft</button><span class="demo-card-meta"><span>Sam Ortiz</span><span>Done Sun</span></span></li>
+              <li class="demo-card" data-reorder-surface><button class="demo-card-title" type="button" data-page-open="note" data-page-id="photos" data-page-title="Photo album" data-reorder-label>Photo album</button><span class="demo-card-meta"><span>Lena Fischer</span><span>Done Oct 28</span></span></li>
+            </ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Project name"><span class="s4-icon" data-icon="add"></span>Add Project</button></footer>
+          </section>
+        </div>
       </section>
 
       <!-- Controls -->
       <section class="s4-view demo-pad-bottom" data-view="controls" data-title="Controls" hidden>
-        <div class="s4-stack">
+        <div class="demo-panes">
           <section class="s4-pane" aria-labelledby="h-buttons">
             <h2 class="s4-pane-title" id="h-buttons">Buttons</h2>
             <div class="s4-stack">
@@ -473,11 +574,73 @@
         </div>
       </section>
 
+      <!-- Pages (decision 0050): going into one thing, with Back in the bar, a title and a link of its own -->
+      <section class="s4-subpage" data-page="note" data-title="Note" hidden>
+        <div class="demo-note">
+          <article class="demo-note-main">
+            <header class="s4-subpage-header">
+              <h2 class="s4-subpage-title" id="note-title">Design review notes</h2>
+              <div class="s4-subpage-meta"><span id="note-by">Maya Chen</span><span id="note-when">Today</span></div>
+            </header>
+            <div class="s4-prose" id="note-body"></div>
+          </article>
+          <aside class="s4-stack demo-note-aside" aria-label="About This Note">
+            <section class="s4-pane">
+              <dl class="s4-dl" id="note-facts"></dl>
+              <div class="s4-chip-set" aria-label="Tags" id="note-tags"></div>
+            </section>
+            <div class="s4-row">
+              <button class="s4-button" type="button" data-sheet="share-note"><span class="s4-icon" data-icon="share"></span>Share</button>
+              <button class="s4-button" data-variant="tonal" type="button" id="note-archive"><span class="s4-icon" data-icon="archive"></span>Archive</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- All notes: a table at scale (S4.table draws only the rows on screen) narrowed by the filter pattern -->
+      <section class="s4-subpage" data-page="library" data-title="All Notes" hidden>
+        <div class="s4-stack">
+          <div class="s4-filter" id="lib-filter" data-for="#lib-table" data-key="showcase-notes" aria-label="Filter notes">
+            <div class="s4-filter-views" aria-label="Saved Views"></div>
+            <div class="s4-filter-bar">
+              <div class="s4-search" role="search"><span class="s4-icon" data-icon="search"></span><input class="s4-search-input" type="search" placeholder="Search All Notes" aria-label="Search all notes"><button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Search" hidden><span class="s4-icon" data-icon="close"></span></button></div>
+              <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="lib-filters"><span class="s4-icon" data-icon="filter"></span>Filters<span class="s4-badge" hidden></span></button>
+              <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="lib-sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+              <div class="s4-menu" id="lib-sort" aria-label="Sort"></div>
+            </div>
+            <div class="s4-filter-active" aria-label="Active Filters" hidden></div>
+            <p class="s4-filter-count"></p>
+          </div>
+          <div class="s4-states" id="lib-states" data-state="loading">
+            <div data-when="loading" data-table-skeleton="8"></div>
+            <div class="s4-table-wrap" data-when="ready" data-sticky style="--s4-table-max-height: 70vh">
+              <table class="s4-table" id="lib-table" aria-label="All notes">
+                <thead><tr>
+                  <th scope="col" data-field="title" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Title<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                  <th scope="col" data-field="folder" aria-sort="none"><button type="button" class="s4-table-sort">Folder<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                  <th scope="col" data-field="author">Written By</th>
+                  <th scope="col" data-field="words" class="num" data-format="integer" aria-sort="none"><button type="button" class="s4-table-sort">Words<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                  <th scope="col" data-field="updated" data-format="date" aria-sort="none"><button type="button" class="s4-table-sort">Changed<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <div data-when="no-results" class="s4-empty">
+              <span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span>
+              <h2 class="s4-empty-title">No Notes Match</h2>
+              <p class="s4-empty-text">Try fewer filters, or a different word.</p>
+              <button class="s4-button" data-variant="tonal" type="button" data-filter-clear>Clear Filters</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
   <nav class="s4-nav-bar" aria-label="Main">
     <a class="s4-nav-item" href="#home" data-view="home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+    <a class="s4-nav-item" href="#board" data-view="board"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="columns"></span></span><span class="s4-nav-label">Board</span></a>
     <a class="s4-nav-item" href="#controls" data-view="controls"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Controls</span></a>
     <a class="s4-nav-item" href="#forms" data-view="forms"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="edit"></span></span><span class="s4-nav-label">Forms</span></a>
     <a class="s4-nav-item" href="#settings" data-view="settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
@@ -526,6 +689,13 @@
   </div>
 </dialog>
 
+<!-- All Notes filters: a tool panel with counts; every change applies at once (decisions 0054, 0061) -->
+<dialog class="s4-side-sheet" id="lib-filters" data-modeless aria-labelledby="lf-h">
+  <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="lf-h">Filters</h2><button class="s4-icon-button" data-close type="button" aria-label="Close Filters"><span class="s4-icon" data-icon="close"></span></button></div>
+  <div class="s4-sheet-content"><div class="s4-filter-facets"></div></div>
+  <div class="s4-sheet-actions"><button class="s4-button" type="button" data-filter-done>Show Notes</button></div>
+</dialog>
+
 <!-- Filters: a tool panel (decision 0054): the page stays live and every change applies at once, so there is no Apply -->
 <dialog class="s4-side-sheet" id="filters" data-modeless aria-labelledby="fl-h">
   <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="fl-h">Filters</h2><button class="s4-icon-button" data-close type="button" aria-label="Close"><span class="s4-icon" data-icon="close"></span></button></div>
@@ -546,7 +716,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=ec29292"></script>
+<script src="orion.js?v=86a8f11"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

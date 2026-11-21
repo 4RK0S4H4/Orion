@@ -11,3 +11,29 @@
 .demo-empty .s4-icon { --s4-icon-size: var(--s4-size-icon-large); }
 .demo-footer { margin-block: var(--s4-space-6); text-align: center; }
 .s4-switch-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-4); }
+
+/* ---------- Home (decision 0066): the notes and a glance at the week side by side on a wide window ---------- */
+.demo-home { display: grid; gap: var(--s4-layout-pane-gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.demo-home > * { min-inline-size: 0; }
+@container s4-app (width >= 1000px) {
+  .demo-home { grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem); }
+  .demo-home-aside { position: sticky; inset-block-start: var(--s4-space-4); }
+}
+.demo-section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-2); margin-block-end: calc(var(--s4-space-2) * -1); padding-inline-start: var(--s4-space-4); }
+.demo-section-head h2 { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+.demo-lede { margin: 0 0 var(--s4-space-4); max-inline-size: var(--s4-layout-content-reading); }
+
+/* ---------- Board: a project card (its title opens the note as a page) ---------- */
+.demo-card { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-lowest); cursor: grab; touch-action: manipulation; }
+.demo-card-title { border: 0; padding: 0; background: none; color: inherit; font: inherit; font-weight: var(--md-sys-typescale-label-large-weight); text-align: start; cursor: pointer; overflow-wrap: anywhere; border-radius: var(--md-sys-shape-corner-extra-small); }
+.demo-card-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+@media (forced-colors: active) { .demo-card { border: 1px solid CanvasText; } }
+
+/* ---------- a note, as a page: the text at reading width, its facts beside it on a wide window ---------- */
+.demo-note { display: grid; gap: var(--s4-layout-pane-gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.demo-note-main { display: flex; flex-direction: column; gap: var(--s4-space-4); min-inline-size: 0; max-inline-size: var(--s4-layout-content-reading); }
+@container s4-app (width >= 1000px) { .demo-note { grid-template-columns: minmax(0, var(--s4-layout-content-reading)) minmax(16rem, 20rem); justify-content: start; column-gap: var(--s4-space-10); } }
+
+/* ---------- Controls: the panes flow in two columns on a wide window instead of one long strip ---------- */
+.demo-panes { columns: 2 30rem; column-gap: var(--s4-layout-gap); }
+.demo-panes > * { break-inside: avoid; margin-block-end: var(--s4-layout-gap); }

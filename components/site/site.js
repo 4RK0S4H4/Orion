@@ -7,7 +7,8 @@
    - [data-site-panel="id"] on a button: the same for another panel (the docs sidebar on a phone).
    - [data-period] on a joined capsule group: each element with data-period-<value> in the same section shows that text.
    - .s4-compare: its button group (values 1..4) picks the plan column shown under 600.
-   - .s4-toc: the link of the section being read gets aria-current="location". */
+   - .s4-toc: the link of the section being read gets aria-current="location".
+   - .s4-site-nav links to sections of this page: the same, never while the hero is in view (decision 0066). */
 S4.register('site', function (scope) {
   var wide = window.matchMedia('(width >= 840px)');
 
@@ -136,6 +137,32 @@ S4.register('site', function (scope) {
     var on = group.querySelector('[aria-pressed="true"][value]');
     if (on && !c.dataset.show) c.dataset.show = on.value;
     group.addEventListener('s4-change', function (e) { if (e.detail && e.detail.value) c.dataset.show = e.detail.value; });
+  });
+
+  /* ---------- the header on a one-page site (decision 0066) ----------
+     Links to sections of this page mark the section being read (aria-current="location"), and nothing while the
+     first section (the hero) fills the top: the home page never opens with a nav item already selected. A link to
+     another page keeps the aria-current="page" the markup gives it. */
+  S4.util.all(scope, '.s4-site-header').forEach(function (header) {
+    if (!S4.util.once(header, 'sitespy')) return;
+    var links = Array.prototype.filter.call(header.querySelectorAll('.s4-site-nav a[href^="#"]'), function (a) { return a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1))); });
+    if (!links.length) return;
+    links.forEach(function (a) { if (a.getAttribute('aria-current') === 'page') a.removeAttribute('aria-current'); });
+    var first = document.querySelector('main .s4-site-section');
+    var queued = false;
+    function update() {
+      queued = false;
+      var line = window.innerHeight * 0.4, current = null;
+      links.forEach(function (a) {
+        var t = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+        if (!t || t === first || t.contains(first) || (first && first.contains(t))) return;
+        var r = t.getBoundingClientRect(); if (r.top <= line && r.bottom > line) current = a;
+      });
+      links.forEach(function (a) { if (a === current) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    }
+    window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
   });
 
   /* ---------- on this page ---------- */

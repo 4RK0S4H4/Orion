@@ -163,10 +163,33 @@ for (const page of htmlIn('templates')) {
   if (!get('seed')) { problems.push(`${page}: links ${link[1]} but names no seed ({ seed: '#rrggbb', … } in its script)`); continue; }
   outputs['templates/' + link[1]] = brandCss({ seed: get('seed'), variant: get('variant') || 'auto', surfaces: get('surfaces') || 'neutral' });
 }
+/* ---------- the hub (index.html, decision 0066): counts, version, the component groups and the labs come from the repo,
+   so the front page can never state a stale number ---------- */
+{
+  const page = 'index.html', src0 = existsSync(join(root, page)) ? (outputs[page] || readFileSync(join(root, page), 'utf8')) : null;
+  if (src0 && src0.includes('<!-- HUB:COMPONENTS -->')) {
+    const GROUPS_ = (await import('node:fs')).readFileSync(join(root, 'scripts/build.mjs'), 'utf8').match(/const GROUPS = \[([\s\S]*?)\n\];/)[1];
+    const groups = [...GROUPS_.matchAll(/\['([^']+)', \[([^\]]*)\]\]/g)].map((m) => [m[1], m[2].match(/'[^']+'/g).map((x) => x.slice(1, -1))]);
+    const nComp = groups.reduce((n, [, v]) => n + v.length, 0);
+    const tpl = htmlIn('templates').filter((f) => !f.endsWith('/index.html')).length;
+    const title = (n) => { const f = join(comp, n, 'README.md'); const t = existsSync(f) ? (readFileSync(f, 'utf8').match(/^# (.+)$/m) || [])[1] : n; return (t || n).replace(/\s*\(.*\)$/, ''); };
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const cards = groups.map(([g, names]) => `<section class="s4-card" aria-labelledby="hc-${g.toLowerCase().replace(/[^a-z]+/g, '-')}"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-${g.toLowerCase().replace(/[^a-z]+/g, '-')}">${esc(g)} <span class="hb-count">${names.length}</span></h3><div class="s4-chip-set">` +
+      names.map((n) => `<a class="s4-chip" href="components/${n}/${n}.html?v=0">${esc(title(n))}</a>`).join('') + `</div></div></section>`).join('');
+    const labs = htmlIn('explore').filter((f) => !/-frame\.html$|\/index\.html$/.test(f)).map((f) => {
+      const t = (readFileSync(join(root, f), 'utf8').match(/<title>([^<]*)<\/title>/) || [])[1] || f;
+      return [t.replace(/\s*[·|–-]\s*S4 Orion.*$/i, '').trim(), f];
+    }).sort((a, b) => a[0].localeCompare(b[0])).map(([t, f]) => `<li><a class="s4-list-item" href="${f}?v=0"><span class="s4-list-content"><span class="s4-list-headline">${esc(t)}</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>`).join('');
+    let src = src0.replace(/(<!-- HUB:COMPONENTS -->)[\s\S]*?(<!-- \/HUB:COMPONENTS -->)/, `$1${cards}$2`).replace(/(<!-- HUB:LABS -->)[\s\S]*?(<!-- \/HUB:LABS -->)/, `$1${labs}$2`);
+    const vals = { components: String(nComp), templates: String(tpl), version: pkg.version };
+    src = src.replace(/(<[^>]+data-hub="(\w+)"[^>]*>)[^<]*(<)/g, (m, a, k, c) => (k in vals ? a + vals[k] + c : m));
+    if (src !== src0) outputs[page] = src;
+  }
+}
 const fileText = (rel) => (rel in outputs ? outputs[rel] : rel in binaries ? binaries[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
 for (const page of pages) {
   const dir = page.includes('/') ? page.slice(0, page.lastIndexOf('/')) : '';
-  const src = readFileSync(join(root, page), 'utf8');
+  const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   const out = src.replace(/((?:src|href)=")([^"?#:]+)\?v=[\w.-]*(")/g, (m, a, path, c) => {
     const rel = join(dir, path).split('\\').join('/'), t = fileText(rel);
     return t == null ? m : a + path + '?v=' + hash(t) + c;
@@ -259,9 +282,9 @@ const siteClasses = new Set([...siteMinCss.matchAll(/\.(s4-[a-z0-9-]+)/g)].map((
 const scriptDirs = new Set(jsOrder.map((f) => f.split('/')[0])), siteDirs = new Set(SITE_JS.map((f) => f.split('/')[0]));
 const classDir = new Map();
 for (const rel of imports) { const d = rel.split('/')[0]; for (const m of readFileSync(join(comp, rel), 'utf8').matchAll(/\.(s4-[a-z0-9-]+)/g)) if (!classDir.has(m[1]) && m[1].startsWith('s4-' + d)) classDir.set(m[1], d); }
-const sitePages = htmlIn('templates').filter((p) => /orion\.site\.min\.css/.test(readFileSync(join(root, p), 'utf8')));
+const sitePages = ['index.html'].concat(htmlIn('templates')).filter((p) => /orion\.site\.min\.css/.test(readFileSync(join(root, p), 'utf8')));
 for (const page of sitePages) {
-  const src = readFileSync(join(root, page), 'utf8'), own = (src.match(/<style>[\s\S]*?<\/style>/g) || []).join('');
+  const src = outputs[page] || readFileSync(join(root, page), 'utf8'), own = (src.match(/<style>[\s\S]*?<\/style>/g) || []).join('');
   for (const m of src.matchAll(/class="([^"]*)"/g)) for (const c of m[1].split(/\s+/)) {
     if (!c.startsWith('s4-')) continue;
     if (!siteClasses.has(c) && !own.includes('.' + c)) problems.push(`${page}: .${c} is not in the site bundle (add its component to SITE_CSS in scripts/build.mjs, or load orion.min.css)`);
@@ -274,7 +297,7 @@ const iconsGz = gz(outputs['components/assets/icons-solar.js'] || '');
 siteSize.total = siteSize.css + siteSize.js + siteSize.font + iconsGz;
 for (const k of ['css', 'js', 'font', 'total']) if (siteSize[k] > SITE_BUDGET[k]) problems.push(`site bundle over budget: ${k} ${siteSize[k].toFixed(1)} KB > ${SITE_BUDGET[k]} KB`);
 const siteReport = `site bundle ${siteSize.css.toFixed(1)} KB css + ${siteSize.js.toFixed(1)} KB js (gzip) + ${siteSize.font.toFixed(1)} KB font + ${iconsGz.toFixed(1)} KB icons = ${siteSize.total.toFixed(1)} KB (budgets ${SITE_BUDGET.css}/${SITE_BUDGET.js}/${SITE_BUDGET.font}/${SITE_BUDGET.total})`;
-if (sitePages.length < 5) problems.push(`site bundle: only ${sitePages.length} templates load it (expected the five site templates)`);
+if (sitePages.filter((p) => p.startsWith('templates/')).length < 5) problems.push(`site bundle: only ${sitePages.length} templates load it (expected the five site templates)`);
 
 if (problems.length) { console.error(problems.map((p) => '  x ' + p).join('\n')); process.exit(1); }
 if (CHECK) {
