@@ -319,6 +319,7 @@ function tabbables() {
   return [...document.querySelectorAll('button, a[href], input:not([type="hidden"]), select, textarea, summary, [tabindex]:not([tabindex="-1"]), [contenteditable="true"]')].filter((e) => {
     if (e.disabled || e.tabIndex < 0 || !h.vis(e) && !e.matches('input')) return false;
     if (e.closest('[hidden], [inert], dialog:not([open]), [popover]:not(:popover-open)')) return false;
+    if (!e.getClientRects().length) return false;   /* no box at all (inside a display: none region, like a desktop inspector on a phone): Tab cannot reach it; a visually hidden input still has a box */
     if (e.matches('input[type="radio"]')) { const k = e.name || e.id; if (e.name) { const grp = document.querySelectorAll(`input[type="radio"][name="${e.name}"]`); const stop = [...grp].find((r) => r.checked) || grp[0]; if (e !== stop) return false; } else if (seenRadio.has(k)) return false; seenRadio.add(k); }
     const r = e.getBoundingClientRect(), cs = getComputedStyle(e);
     if (cs.visibility === 'hidden' || cs.display === 'none') return false;

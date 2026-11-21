@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="../index.css">
 <link rel="stylesheet" href="../_example/example.css">
 <style>
-  .cm-out { margin: 0; padding: var(--s4-space-4); max-block-size: calc(var(--s4-space-16) * 4); overflow: auto; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
   .cm-list { display: flex; flex-direction: column; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; inline-size: 100%; }
   .cm-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
 </style>
@@ -36,7 +35,7 @@
   <section class="ex-sec">
     <h2>The Same Menu For A Shell</h2>
     <p><code>S4.commands.native('row')</code> gives the menu as plain data with Electron-style accelerators, for a desktop shell to draw its own native menu from. It is rebuilt here whenever a command changes (<code>s4-commands</code>).</p>
-    <pre class="cm-out" id="cm-native"></pre>
+    <figure class="s4-code" data-lang="json" id="cm-native-code"><figcaption class="s4-code-head"><span class="s4-code-file">S4.commands.native('cm-row-menu')</span></figcaption><pre><code id="cm-native"></code></pre></figure>
   </section>
 
   <p class="ex-foot">Source: <code>components/commands/</code></p>
@@ -57,7 +56,7 @@
   ]);
   S4.commands.menu('cm-row-menu', ['cm.pin', '-', 'cm.copy', 'cm.archive']);
   document.getElementById('cm-row-menu').addEventListener('s4-context', function (e) { picked = e.detail.target; S4.commands.refresh(); });
-  function show() { document.getElementById('cm-native').textContent = JSON.stringify(S4.commands.native('cm-row-menu'), null, 2); }
+  function show() { document.getElementById('cm-native').textContent = JSON.stringify(S4.commands.native('cm-row-menu'), null, 2); if (S4.code) S4.code.render(document.getElementById('cm-native-code')); }
   document.addEventListener('s4-commands', show); show();
 </script>
 </body>

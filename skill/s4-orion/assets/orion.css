@@ -4479,8 +4479,10 @@
     white-space: nowrap;
   }
   .s4-kbd:empty { display: none; }
-  /* on a filled control the hint takes the control's own color, so it keeps its contrast on any fill */
-  :is(.s4-button, .s4-fab, .s4-chip) > .s4-kbd { background: color-mix(in srgb, currentColor 14%, transparent); color: inherit; }
+  .s4-kbd { flex-shrink: 0; }   /* a hint keeps its width beside a long label (its min-inline-size replaces the automatic minimum) */
+  /* on a control the hint is the label's own color on the control's own fill (the label's proven pair): any tint of its
+     own moves it toward the text and costs contrast (4.42:1 on a tinted blue filled button) */
+  :is(.s4-button, .s4-fab, .s4-chip) > .s4-kbd { background: transparent; color: inherit; padding-inline: 0; min-inline-size: 0; }
   .s4-menu-item > .s4-kbd { margin-inline-start: auto; }
 
   @media (forced-colors: active) {

@@ -5249,7 +5249,7 @@ S4.register('month', function (scope) {
   }
   function render(fig) {
     var code = fig.querySelector('pre > code'); if (!code) return;
-    if (!fig._s4src) fig._s4src = { text: code.textContent, html: code.innerHTML, tokens: !!code.querySelector('[class*="s4-syntax-"]') };
+    if (!fig._s4src || !code.querySelector('.s4-code-line')) fig._s4src = {   /* new code written into it since the last render is read afresh */ text: code.textContent, html: code.innerHTML, tokens: !!code.querySelector('[class*="s4-syntax-"]') };
     var src = fig._s4src, lang = (fig.getAttribute('data-lang') || '').toLowerCase(), diff = fig.getAttribute('data-variant') === 'diff';
     var text = src.text.replace(/\n$/, '');
     var html = diff ? esc(text) : src.tokens || fig.hasAttribute('data-plain') ? src.html.replace(/\n$/, '') : tokenize(text, lang).map(function (t) { return t[0] ? '<span class="s4-syntax-' + t[0] + '">' + esc(t[1]) + '</span>' : esc(t[1]); }).join('');

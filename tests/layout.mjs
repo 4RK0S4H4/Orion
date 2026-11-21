@@ -88,7 +88,7 @@ function measure(T) {
     /* the bar's first thing sits on the column's edge: the title, or a leading Back or menu button, whose box hangs 8
        outside the column so its glyph sits just inside it (the same offset as at the default 24 margin) */
     /* a leading avatar (a chat with one person) sits on the edge like the title (decision 0060) */
-    const first = [...bar.closest('.s4-top-app-bar').querySelectorAll('.s4-icon-button, .s4-app-bar-title, .s4-avatar')].filter((e) => shown(e) && !e.closest('.s4-icon-button'))[0];
+    const first = [...bar.closest('.s4-top-app-bar').querySelectorAll('.s4-icon-button, .s4-app-bar-title, .s4-avatar')].filter((e) => shown(e) && !(e.matches('.s4-avatar') && e.closest('.s4-icon-button')))[0];   /* an avatar inside an icon button is that button's picture, not a first thing of its own */
     const fr = first.getBoundingClientRect(), icon = first.classList.contains('s4-icon-button');
     const off = icon ? Math.abs(fr.left + 8 - start) : Math.abs(fr.left - start);
     if (off > T.alignPx) out.push(`align: the top app bar starts at ${Math.round(fr.left)}, the content at ${Math.round(start)}`);
