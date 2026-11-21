@@ -267,6 +267,13 @@
     --s4-color-badge: #d93025;
     --s4-color-on-badge: #ffffff;
     --s4-color-control: #858585;
+    --s4-syntax-keyword: #7140b0;
+    --s4-syntax-string: #06691b;
+    --s4-syntax-number: #8d4807;
+    --s4-syntax-comment: #525b69;
+    --s4-syntax-function: #0159af;
+    --s4-syntax-type: #0c6465;
+    --s4-syntax-property: #a12f4c;
     --md-sys-color-primary: #000000;
     --md-sys-color-on-primary: #e2e2e2;
     --md-sys-color-primary-container: #3b3b3b;
@@ -508,6 +515,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #787878;
+      --s4-syntax-keyword: #bb93fe;
+      --s4-syntax-string: #65b969;
+      --s4-syntax-number: #f28e42;
+      --s4-syntax-comment: #9ea8b7;
+      --s4-syntax-function: #67aafd;
+      --s4-syntax-type: #33b8b8;
+      --s4-syntax-property: #fc8197;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #1b1b1b;
       --md-sys-color-primary-container: #d4d4d4;
@@ -591,6 +605,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #787878;
+      --s4-syntax-keyword: #bb93fe;
+      --s4-syntax-string: #65b969;
+      --s4-syntax-number: #f28e42;
+      --s4-syntax-comment: #9ea8b7;
+      --s4-syntax-function: #67aafd;
+      --s4-syntax-type: #33b8b8;
+      --s4-syntax-property: #fc8197;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #1b1b1b;
       --md-sys-color-primary-container: #d4d4d4;
@@ -673,6 +694,13 @@
     --s4-color-badge: #d93025;
     --s4-color-on-badge: #ffffff;
     --s4-color-control: #858585;
+    --s4-syntax-keyword: #7140b0;
+    --s4-syntax-string: #06691b;
+    --s4-syntax-number: #8d4807;
+    --s4-syntax-comment: #525b69;
+    --s4-syntax-function: #0159af;
+    --s4-syntax-type: #0c6465;
+    --s4-syntax-property: #a12f4c;
     --md-sys-color-primary: #000000;
     --md-sys-color-on-primary: #e2e2e2;
     --md-sys-color-primary-container: #3b3b3b;
@@ -838,6 +866,13 @@
       --s4-color-warning: #4d3200;
       --s4-color-info: #0a376f;
       --s4-color-control: #5e5e5e;
+      --s4-syntax-keyword: #4e1586;
+      --s4-syntax-string: #03410e;
+      --s4-syntax-number: #5a2b01;
+      --s4-syntax-comment: #313845;
+      --s4-syntax-function: #023770;
+      --s4-syntax-type: #033e3f;
+      --s4-syntax-property: #73042c;
       --md-sys-color-primary: #000000;
       --md-sys-color-on-primary: #ffffff;
       --md-sys-color-primary-container: #3b3b3b;
@@ -904,6 +939,13 @@
     --s4-color-warning: #4d3200;
     --s4-color-info: #0a376f;
     --s4-color-control: #5e5e5e;
+    --s4-syntax-keyword: #4e1586;
+    --s4-syntax-string: #03410e;
+    --s4-syntax-number: #5a2b01;
+    --s4-syntax-comment: #313845;
+    --s4-syntax-function: #023770;
+    --s4-syntax-type: #033e3f;
+    --s4-syntax-property: #73042c;
     --md-sys-color-primary: #000000;
     --md-sys-color-on-primary: #ffffff;
     --md-sys-color-primary-container: #3b3b3b;
@@ -999,6 +1041,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #ababab;
+      --s4-syntax-keyword: #e4d9fd;
+      --s4-syntax-string: #9df29f;
+      --s4-syntax-number: #fdd7bd;
+      --s4-syntax-comment: #d5dfef;
+      --s4-syntax-function: #cbe1fd;
+      --s4-syntax-type: #77f1f1;
+      --s4-syntax-property: #fcd5d9;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #000000;
       --md-sys-color-primary-container: #d4d4d4;
@@ -1085,6 +1134,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #ababab;
+      --s4-syntax-keyword: #e4d9fd;
+      --s4-syntax-string: #9df29f;
+      --s4-syntax-number: #fdd7bd;
+      --s4-syntax-comment: #d5dfef;
+      --s4-syntax-function: #cbe1fd;
+      --s4-syntax-type: #77f1f1;
+      --s4-syntax-property: #fcd5d9;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #000000;
       --md-sys-color-primary-container: #d4d4d4;
@@ -1171,6 +1227,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #ababab;
+      --s4-syntax-keyword: #e4d9fd;
+      --s4-syntax-string: #9df29f;
+      --s4-syntax-number: #fdd7bd;
+      --s4-syntax-comment: #d5dfef;
+      --s4-syntax-function: #cbe1fd;
+      --s4-syntax-type: #77f1f1;
+      --s4-syntax-property: #fcd5d9;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #000000;
       --md-sys-color-primary-container: #d4d4d4;
@@ -1257,6 +1320,13 @@
       --s4-color-badge: #d93025;
       --s4-color-on-badge: #ffffff;
       --s4-color-control: #ababab;
+      --s4-syntax-keyword: #e4d9fd;
+      --s4-syntax-string: #9df29f;
+      --s4-syntax-number: #fdd7bd;
+      --s4-syntax-comment: #d5dfef;
+      --s4-syntax-function: #cbe1fd;
+      --s4-syntax-type: #77f1f1;
+      --s4-syntax-property: #fcd5d9;
       --md-sys-color-primary: #ffffff;
       --md-sys-color-on-primary: #000000;
       --md-sys-color-primary-container: #d4d4d4;
@@ -5030,6 +5100,37 @@
   .s4-chart-legend > li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
   .s4-chart-key { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); flex: none; }
 
+  /* a legend that switches series (data-legend="toggle"): each name is a button; a switched-off key is a faded key and a struck-through name */
+  .s4-chart-legend[data-toggle] { gap: var(--s4-space-1) var(--s4-space-1); margin-inline-start: calc(var(--s4-space-2) * -1); }
+  .s4-chart-series {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-space-8);
+    margin: 0;
+    padding: 0 var(--s4-space-3) 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--s4-shape-control);
+    background: transparent;
+    color: var(--md-sys-color-on-surface);
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-chart-series::after { content: ""; position: absolute; inset: 50% auto auto 50%; inline-size: 100%; min-inline-size: var(--s4-size-touch-target); block-size: var(--s4-size-touch-target); translate: -50% -50%; }
+  .s4-chart-series { position: relative; }
+  @media (hover: hover) { .s4-chart-series:hover { background: var(--md-sys-color-surface-container-high); } }
+  .s4-chart-series:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  .s4-chart-series[aria-pressed="false"] { color: var(--md-sys-color-on-surface-variant); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .s4-chart-series[aria-pressed="false"] .s4-chart-key { opacity: var(--md-sys-state-disabled-content-opacity); }
+
+  /* the time range control above a chart: ranges as a button group, Custom opens a date range in place */
+  .s4-chart-range { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s4-space-2) var(--s4-space-3); min-inline-size: 0; }
+  .s4-chart-range-custom { display: flex; align-items: end; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-chart-range-custom[hidden] { display: none; }
+  .s4-chart-range-custom > .s4-text-field { min-inline-size: calc(var(--s4-space-16) * 4); }
+
   .s4-chart-toggle { position: absolute; inset-block-start: calc(var(--s4-space-1) * -1); inset-inline-end: 0; }
   .s4-chart-table { overflow-x: auto; }
   .s4-chart-table[hidden] { display: none; }
@@ -5059,7 +5160,7 @@
   /* spark: a small line beside a number; no axes, no table */
   .s4-chart[data-type="spark"] { display: inline-flex; inline-size: var(--s4-chart-spark-width, 6rem); }
   .s4-chart[data-type="spark"] > .s4-chart-plot { block-size: var(--s4-space-8); }
-  @media (forced-colors: active) { .s4-chart-mark, .s4-chart-arc, .s4-chart-line { forced-color-adjust: none; } }
+  @media (forced-colors: active) { .s4-chart-mark, .s4-chart-arc, .s4-chart-line { forced-color-adjust: none; } .s4-chart-series { border: 1px solid ButtonText; } }
 }
 
 /* ---- expand/expand.css ---- */
@@ -5370,6 +5471,8 @@
     .s4-table-sort:hover .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
   }
   .s4-table-sort:focus-visible .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
+  /* the header sits flush with the top of a scrolling wrap: its ring is drawn inside so the wrap never cuts it */
+  .s4-table-sort:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) { color: var(--md-sys-color-on-surface); }
   .s4-table th:is([aria-sort="ascending"], [aria-sort="descending"]) .s4-table-sort .s4-icon { opacity: 1; }
   .s4-table th[aria-sort="ascending"] .s4-table-sort .s4-icon { transform: rotate(180deg); }
@@ -5510,6 +5613,379 @@
     .s4-table tr[tabindex]::before { display: none; }
     .s4-table tbody tr:has(> [data-check] input:checked) { outline: var(--s4-focus-ring-width) solid Highlight; outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   }
+}
+
+/* ---------- tables at scale (round 0056): resize, pinned columns, virtual rows, groups, details, editing ----------
+   All opt-in (see README): data-resizable, th[data-pin], S4.table(el).setRows(rows). Pinned cells are solid (the
+   table's own surface, the row's selection or state color mixed in), with a tonal edge while something is under them:
+   never a shadow, never glass. */
+@layer s4.components {
+  .s4-table-wrap { --_table-bg: var(--md-sys-color-surface-container-low); overflow-anchor: none; }
+  .s4-table tbody tr { --_row-bg: var(--_table-bg, var(--md-sys-color-surface-container-low)); }
+  .s4-table tbody tr[data-picked] {
+    --_row-bg: var(--md-sys-color-secondary-container);
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+  .s4-table tbody tr:has(> [data-check] input:checked) { --_row-bg: var(--md-sys-color-secondary-container); }
+  /* the state layer is mixed into the cell's own color, so a pinned (opaque) cell shows it too */
+  .s4-table tr[tabindex] > :is(td, th) { background-color: color-mix(in srgb, currentColor calc(var(--_state) * 100%), var(--_cell-bg, transparent)); }
+
+  /* a data table or a sideways-scrolling one: a wrap with a height scrolls in both directions */
+  .s4-table-wrap[data-virtual] {
+    max-height: var(--s4-table-max-height, calc(var(--s4-size-table-header) + var(--s4-size-table-row) * 10));
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+  }
+  .s4-table-wrap[data-virtual] thead th {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    background: var(--_table-bg);
+  }
+  .s4-table tbody tr.s4-table-spacer,
+  .s4-table tbody tr.s4-table-spacer > td { padding: 0; border: 0; block-size: auto; min-block-size: 0; background: none; }
+
+  /* fixed widths from the column grips (table.js writes a colgroup and the table's width) */
+  .s4-table[data-fixed] { table-layout: fixed; inline-size: var(--_table-w, 100%); }
+  .s4-table[data-fixed] :is(th, td) { overflow: hidden; text-overflow: ellipsis; }
+  .s4-table[data-fixed] :is(th, td)[data-wrap] { min-inline-size: 0; }
+  .s4-table[data-fixed] :is(th, td):has(> .s4-table-input, > label, > .s4-icon-button, > .s4-status) { overflow: visible; }
+
+  /* ---------- pinned columns ---------- */
+  .s4-table[data-fixed] :is(th, td)[data-pin] {
+    position: sticky;
+    z-index: 1;
+    --_cell-bg: var(--_row-bg, var(--_table-bg));
+    background-color: color-mix(in srgb, currentColor calc(var(--_state, 0) * 100%), var(--_cell-bg));
+  }
+  .s4-table[data-fixed] [data-pin="start"] { inset-inline-start: var(--_pin-at, 0px); }
+  .s4-table[data-fixed] [data-pin="end"] { inset-inline-end: var(--_pin-at, 0px); }
+  .s4-table[data-fixed] thead th[data-pin] { z-index: 3; background: var(--_table-bg); }
+  .s4-table[data-fixed] tfoot :is(th, td)[data-pin] { z-index: 3; }
+  .s4-table[data-fixed] :is(th, td)[data-pin="start"][data-pin-edge] { border-inline-end: var(--s4-size-divider) solid transparent; }
+  .s4-table[data-fixed] :is(th, td)[data-pin="end"][data-pin-edge] { border-inline-start: var(--s4-size-divider) solid transparent; }
+  .s4-table-wrap[data-scrolled-start] .s4-table[data-fixed] [data-pin="start"][data-pin-edge],
+  .s4-table-wrap[data-scrolled-end] .s4-table[data-fixed] [data-pin="end"][data-pin-edge] { border-inline-color: var(--md-sys-color-outline-variant); }
+  .s4-table-wrap[data-scrolled-start] .s4-table[data-fixed] [data-pin="start"][data-pin-edge] { --_edge: var(--md-sys-color-outline-variant); }
+
+  /* ---------- column grips ---------- */
+  .s4-table[data-resizable] thead th { position: relative; }
+  .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-resizable] thead th { position: sticky; }
+  .s4-table-grip {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0;
+    z-index: 1;
+    inline-size: var(--s4-space-4);
+    margin-inline-end: calc(var(--s4-space-2) * -1);
+    cursor: col-resize;
+    touch-action: none;
+    border-radius: var(--md-sys-shape-corner-small);
+  }
+  .s4-table thead th:last-child .s4-table-grip { margin-inline-end: 0; }
+  .s4-table-grip::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--s4-space-4);
+    inset-inline-start: calc(50% - 1px);
+    inline-size: 2px;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-outline-variant);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state), background-color var(--s4-motion-state);
+  }
+  .s4-table-grip::after { content: ""; position: absolute; inset-block: 0; inset-inline: calc(var(--s4-space-1) * -1); }
+  @media (hover: hover) { .s4-table thead th:hover > .s4-table-grip::before { opacity: 1; } .s4-table-grip:hover::before { background: var(--md-sys-color-outline); } }
+  @media (hover: none) { .s4-table-grip::before { opacity: 1; } }
+  .s4-table-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-table-grip:is(:focus-visible, [data-active])::before { opacity: 1; background: var(--md-sys-color-primary); }
+
+  /* ---------- a column's menu button: there for touch and the keyboard, quiet until pointed at ---------- */
+  .s4-table-col-menu { vertical-align: middle; margin-inline-start: var(--s4-space-1); }
+  .s4-table th.num .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
+  /* with a pointer it floats over the header's end (start for numbers) and shows on hover or focus */
+  @media (hover: hover) {
+    .s4-table-col-menu {
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-end: var(--s4-space-2);
+      z-index: 1;
+      margin: 0;
+      translate: 0 -50%;
+      background: var(--_table-bg, var(--md-sys-color-surface-container-low));
+    }
+    .s4-table th.num .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
+    .s4-table thead th:not(:hover, :focus-within) .s4-table-col-menu:not([aria-expanded="true"]) { opacity: 0; }
+    .s4-table[data-column-menu] thead th { position: relative; }
+    .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-column-menu] thead th { position: sticky; }
+  }
+
+  /* ---------- rows: expand, actions, editing ---------- */
+  .s4-table :is(th, td):is([data-row-expand], [data-row-actions]) { inline-size: var(--s4-size-touch-target); padding-inline: var(--s4-space-2); text-align: center; }
+  .s4-table-expand .s4-icon, .s4-table-group-toggle .s4-icon { transition: transform var(--s4-motion-bend); }
+  .s4-table-expand[aria-expanded="true"] .s4-icon { transform: rotate(180deg); }
+  .s4-table-group-toggle[aria-expanded="false"] .s4-icon { transform: rotate(-90deg); }
+  .s4-table-group-toggle[aria-expanded="false"] .s4-icon:dir(rtl) { transform: rotate(90deg); }
+
+  .s4-table td[data-edit] { padding-inline: var(--s4-space-2); }
+  .s4-table td[data-edit]:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -2); }
+  .s4-table-input {
+    box-sizing: border-box;
+    inline-size: 100%;
+    min-inline-size: var(--s4-space-12);
+    min-block-size: calc(var(--s4-space-8) + var(--s4-space-1));
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--s4-shape-text-field);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    transition: background-color var(--s4-motion-state);
+  }
+  td.num > .s4-table-input { text-align: end; }
+  @media (hover: hover) { .s4-table-input:hover { background: var(--md-sys-color-surface-container-high); cursor: text; } }
+  @media (hover: none) { .s4-table-input { background: var(--md-sys-color-surface-container); } }
+  .s4-table-input:focus { background: var(--md-sys-color-surface-container-highest); outline: 0; }
+  .s4-table-input:focus-visible, .s4-table td[data-edit]:focus-within .s4-table-input:focus { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: 0; }
+
+  /* a link-like name that opens the row's page */
+  .s4-table-link {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-align: inherit;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  @media (hover: hover) { .s4-table-link:hover { text-decoration: underline; text-underline-offset: 0.2em; } }
+  .s4-table-link:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); border-radius: var(--md-sys-shape-corner-extra-small); }
+
+  /* ---------- groups ---------- */
+  .s4-table tbody tr.s4-table-group { --_row-bg: var(--md-sys-color-surface-container); background: var(--md-sys-color-surface-container); cursor: pointer; }
+  .s4-table tr.s4-table-group > :is(th, td) {
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-table tr.s4-table-group > th { overflow: visible; }
+  .s4-table-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    --s4-icon-size: var(--s4-size-icon-small);
+  }
+  .s4-table-group-count, .s4-table-foot-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-table-foot-count { display: block; }
+
+  /* ---------- details in place (the placement ladder's first rung) ---------- */
+  .s4-table tbody tr.s4-table-detail > td { block-size: auto; padding: 0; white-space: normal; }
+  .s4-table-detail-body {
+    position: sticky;
+    inset-inline-start: 0;
+    box-sizing: border-box;
+    max-inline-size: 100cqi;
+    padding: var(--s4-space-2) var(--s4-space-4) var(--s4-space-4);
+  }
+  .s4-table tbody tr.s4-table-detail + tr > :is(td, th) { border-block-start-color: var(--md-sys-color-outline-variant); }
+  .s4-table tbody tr:has(+ tr.s4-table-detail) > :is(td, th) { border-block-end: 0; }
+  .s4-table tbody tr.s4-table-detail > td { border-block-start: 0; }
+
+  /* ---------- totals footer that stays at the bottom of a data table ---------- */
+  .s4-table-wrap[data-virtual] tfoot :is(td, th) {
+    position: sticky;
+    inset-block-end: 0;
+    z-index: 2;
+    background: var(--_table-bg);
+    block-size: auto;
+    padding-block: var(--s4-space-2);
+  }
+
+  /* ---------- loading: skeleton rows shaped like the table ---------- */
+  .s4-table-skeleton {
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-surface-container-low);
+    padding-block-end: var(--s4-space-2);
+    overflow: hidden;
+  }
+  .s4-table-skeleton > div {
+    display: grid;
+    grid-template-columns: repeat(var(--_cols, 4), minmax(0, 1fr));
+    gap: var(--s4-space-6);
+    align-items: center;
+    block-size: var(--s4-size-table-row);
+    padding-inline: var(--s4-space-4);
+  }
+  .s4-table-skeleton-head { block-size: var(--s4-size-table-header); border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+  .s4-table-skeleton-head .s4-skeleton { inline-size: 50%; }
+  .s4-table-skeleton > div + div + div { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
+
+  /* ---------- phones: stacked by default; data-layout="scroll" keeps a real table that scrolls sideways ---------- */
+  .s4-table-wrap[data-layout="scroll"] { container-name: s4-table-scroll; }
+  @container s4-table (width < 600px) {
+    .s4-table tbody tr.s4-table-spacer { padding: 0; border: 0; }
+    .s4-table tbody tr.s4-table-spacer + tr { border-block-start: 0; }
+    .s4-table tbody tr.s4-table-group { display: flex; align-items: center; justify-content: space-between; padding-block: var(--s4-space-2); }
+    .s4-table tbody tr.s4-table-group > :is(td, th) { display: inline-flex; min-block-size: 0; }
+    .s4-table tbody tr.s4-table-group > td:empty { display: none; }
+    .s4-table tbody tr.s4-table-detail { padding: 0; }
+    .s4-table tbody tr.s4-table-detail > td { display: block; text-align: start; }
+    .s4-table tbody td:is([data-row-expand], [data-row-actions]) {
+      position: absolute;
+      inset-block-start: var(--s4-space-2);
+      inset-inline-end: var(--s4-space-2);
+      display: grid;
+      place-items: center;
+      inline-size: var(--s4-size-touch-target);
+      block-size: var(--s4-size-touch-target);
+      padding: 0;
+    }
+    /* details sit under the checkbox, at the block's bottom start; actions at its top end */
+    .s4-table tbody td[data-row-expand] { inset-block: auto var(--s4-space-2); inset-inline: var(--s4-space-2) auto; }
+    .s4-table tbody tr:has(> td[data-row-expand]) { padding-inline-start: calc(var(--s4-space-4) + var(--s4-size-touch-target)); min-block-size: calc(var(--s4-size-touch-target) * 2 + var(--s4-space-4)); }
+    .s4-table tbody tr:has(> td[data-row-actions]) > td[data-primary] { padding-inline-end: var(--s4-size-touch-target); }
+    .s4-table td[data-edit] { padding-inline: 0; }
+    .s4-table td[data-edit] > .s4-table-input { inline-size: auto; flex: 1; max-inline-size: 60%; margin-inline-end: calc(var(--s4-space-2) * -1); text-align: end; }
+    .s4-table td[data-edit][data-primary] > .s4-table-input { max-inline-size: none; margin-inline: calc(var(--s4-space-2) * -1) 0; text-align: start; }
+    /* the headline comes first however the columns are ordered */
+    .s4-table tbody tr:has(> [data-primary]) { display: flex; flex-direction: column; }
+    .s4-table tbody tr > [data-primary] { order: -1; }
+    .s4-table tbody tr:has(> td:is([data-row-expand], [data-row-actions])) > [data-primary] { min-block-size: calc(var(--s4-size-touch-target) - var(--s4-space-1)); align-items: center; }
+    /* a data table's sort buttons: one row that scrolls sideways, never a wall of buttons */
+    .s4-table-wrap[data-virtual] .s4-table thead tr { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .s4-table-wrap[data-virtual] .s4-table thead th { flex: none; }
+    .s4-table-col-menu, .s4-table-grip { display: none; }
+  }
+
+  @media (forced-colors: active) {
+    .s4-table[data-fixed] [data-pin][data-pin-edge] { border-inline-color: CanvasText; }
+    .s4-table tbody tr[data-picked] { outline: var(--s4-focus-ring-width) solid Highlight; outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+    .s4-table-grip::before { background: CanvasText; opacity: 1; }
+    .s4-table-skeleton { border: 1px solid CanvasText; }
+  }
+  @media print {
+    .s4-table-wrap[data-virtual] { max-height: none; overflow: visible; }
+    /* paper has its own width: the columns share it, and nothing is pinned */
+    .s4-table[data-fixed] { table-layout: auto; inline-size: 100%; }
+    .s4-table[data-fixed] :is(th, td) { white-space: normal; }
+    .s4-table[data-fixed] :is(th, td)[data-pin] { position: static; }
+    .s4-table[data-fixed] > colgroup { display: none; }
+    .s4-table :is(th, td):is([data-check], [data-row-expand], [data-row-actions]) { display: none; }
+    .s4-table th, .s4-table-sort { white-space: normal; }
+    .s4-table-input { min-inline-size: 0; }
+    .s4-table-grip, .s4-table-col-menu { display: none; }
+  }
+}
+
+/* ---- filter/filter.css ---- */
+/* Filters and saved views (round 0056): a bar to narrow a collection, the filters in force as chips, named views,
+   and a tool panel with every facet and its counts. Content, never glass (the panel is the floating panel's glass).
+   filter.js fills the views, chips, sort menu and facets; see README. */
+@layer s4.components {
+  .s4-filter { display: flex; flex-direction: column; gap: var(--s4-space-3); min-inline-size: 0; }
+  .s4-filter[hidden] { display: none; }
+
+  /* named views: single-select chips; a dot says the view was changed since it was chosen */
+  .s4-filter-views { min-inline-size: 0; }
+  .s4-filter-modified {
+    display: inline-block;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline-start: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: currentColor;
+    flex: none;
+  }
+
+  .s4-filter-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-filter-bar > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 4); min-inline-size: 0; max-inline-size: none; }
+  .s4-filter-bar .s4-badge { margin-inline-start: var(--s4-space-1); }
+  .s4-filter-bar .s4-badge[hidden] { display: none; }
+  .s4-filter-sort-label { min-inline-size: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .s4-filter-bar .s4-icon[data-descending] { transform: scaleY(-1); }
+  .s4-filter-bar .s4-icon { transition: transform var(--s4-motion-bend); }
+
+  /* the filters in force: input chips, then Clear All */
+  .s4-filter-active { min-inline-size: 0; }
+  .s4-filter-active[hidden] { display: none; }
+  .s4-filter-chip-key { margin-inline-end: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); }
+
+  .s4-filter-count {
+    margin: 0;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* rename a view in place */
+  .s4-filter-rename { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s4-space-2); }
+  .s4-filter-rename[hidden] { display: none; }
+  .s4-filter-rename > .s4-text-field { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
+
+  /* the panel: every facet with what each choice would give */
+  .s4-filter-facets { display: flex; flex-direction: column; gap: var(--s4-space-5); }
+  .s4-filter-facet { display: flex; flex-direction: column; gap: var(--s4-space-1); scroll-margin-block: var(--s4-space-4); }
+  .s4-filter-facet-title {
+    margin: 0;
+    padding-inline: var(--s4-space-1);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-title-small-weight);
+  }
+  .s4-filter-options { margin: 0; }
+  .s4-filter-options .s4-list-item[data-zero] .s4-list-headline { color: var(--md-sys-color-on-surface-variant); }
+  .s4-filter-option-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-filter-range { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(var(--s4-space-16) * 2), 1fr)); gap: var(--s4-space-3); }
+
+  /* on a phone the views and the chips are one row each that scrolls sideways */
+  @media (width < 600px) {
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1); }
+    .s4-filter > :is(.s4-filter-views, .s4-filter-active) > * { flex: none; }
+    .s4-filter-bar > .s4-search { flex-basis: 100%; }
+  }
+  @media print { .s4-filter-bar, .s4-filter-views { display: none; } }
 }
 
 /* ---- stat/stat.css ---- */
@@ -6259,6 +6735,169 @@
     line-height: var(--md-sys-typescale-title-large-line-height);
   }
   @media (forced-colors: active) { .s4-prose :where(blockquote, pre) { border: 1px solid CanvasText; } }
+}
+
+/* ---- code/code.css ---- */
+/* Code (round 0056): a block of code with its file name and language, line numbers, marked lines, a wrap toggle and a
+   copy button; inline code; a diff. Solid content (never glass). The syntax colors are tokens (--s4-syntax-*), fixed
+   hues proven at 4.5:1 on every surface in light, dark, both high-contrast modes and on every tinted scheme, so code
+   reads the same with any accent.
+   <figure class="s4-code" data-lang="js" data-lines data-mark="3-4">
+     <figcaption class="s4-code-head"><span class="s4-code-file">table.js</span></figcaption>
+     <pre><code>…</code></pre>
+   </figure>
+   code.js adds the language label, the Wrap and Copy buttons, numbers the lines, marks them and colors the code. */
+@layer s4.components {
+  .s4-code {
+    --_bg: var(--md-sys-color-surface-container);
+    --_gutter: 0px;
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+    margin: 0;
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--_bg);
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden;
+  }
+  /* on a surface that is already the code color, step up so the block still reads as one */
+  :is(.s4-card, .s4-pane, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet) .s4-code { --_bg: var(--md-sys-color-surface-container-high); }
+  .s4-code-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-block-size: var(--s4-size-touch-target);
+    padding-block: var(--s4-space-1);
+    padding-inline: var(--s4-space-4) var(--s4-space-2);
+    border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+  }
+  .s4-code-file {
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-mono);
+    font-size: var(--md-sys-typescale-body-small-size);
+    overflow-wrap: anywhere;
+  }
+  .s4-code-lang { color: var(--md-sys-color-on-surface-variant); }
+  .s4-code-actions { display: flex; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  /* a block with no head: the buttons float in the top end corner */
+  .s4-code > .s4-code-actions {
+    position: absolute;
+    inset-block-start: var(--s4-space-2);
+    inset-inline-end: var(--s4-space-2);
+    z-index: 1;
+    padding: var(--s4-space-1);
+    border-radius: var(--s4-shape-control);
+    background: var(--_bg);
+  }
+  .s4-code:has(> .s4-code-actions) { position: relative; }
+
+  .s4-code pre {
+    margin: 0;
+    padding-block: var(--s4-space-3);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    border-radius: inherit;
+    font-family: var(--md-ref-typeface-mono);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-large-line-height);
+    font-variant-ligatures: none;
+    tab-size: 2;
+    scrollbar-width: thin;
+    scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+  }
+  .s4-code-head + pre { border-start-start-radius: 0; border-start-end-radius: 0; }
+  /* keyboard: the scroller takes focus (code.js gives it tabindex), so long lines can be read with the arrow keys */
+  .s4-code pre:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-code code { display: block; min-inline-size: max-content; font: inherit; white-space: pre; background: none; padding: 0; }
+  .s4-code[data-wrap] code { min-inline-size: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  /* lines: a gutter with the number (generated content, so it is never copied) and the code */
+  .s4-code-line {
+    display: grid;
+    grid-template-columns: var(--_gutter) minmax(0, 1fr);
+    padding-inline-end: var(--s4-space-4);
+    border-inline-start: 3px solid var(--_bar, transparent);
+    background: var(--_line, transparent);
+    text-decoration: none;
+  }
+  .s4-code:not([data-lines]) .s4-code-line { padding-inline-start: calc(var(--s4-space-4) - 3px); }
+  .s4-code[data-lines] { --_gutter: calc(var(--_digits, 2) * 1ch + var(--s4-space-4) + var(--s4-space-3)); }
+  .s4-code-line::before {
+    content: attr(data-n);
+    position: sticky;
+    inset-inline-start: 0;
+    z-index: 1;
+    padding-inline: calc(var(--s4-space-4) - 3px) var(--s4-space-3);
+    background: var(--_line-solid, var(--_bg));
+    color: var(--md-sys-color-on-surface-variant);
+    text-align: end;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-code:not([data-lines]) .s4-code-line::before { content: none; }
+  /* a marked line: a step-up fill and an accent bar at its start, so it is never color alone */
+  .s4-code-line[data-mark] {
+    --_line: var(--md-sys-color-surface-container-highest);
+    --_line-solid: var(--md-sys-color-surface-container-highest);
+    --_bar: var(--md-sys-color-primary);
+  }
+
+  /* diff: + and - lines keep their sign in its own column; the fill repeats it, never says it alone */
+  .s4-code-sign { display: inline-block; inline-size: 2ch; color: inherit; user-select: none; -webkit-user-select: none; }
+  .s4-code-line[data-diff="add"] {
+    --_line: var(--s4-color-success-container);
+    --_line-solid: var(--s4-color-success-container);
+    color: var(--s4-color-on-success-container);
+  }
+  .s4-code-line[data-diff="remove"] {
+    --_line: var(--md-sys-color-error-container);
+    --_line-solid: var(--md-sys-color-error-container);
+    color: var(--md-sys-color-on-error-container);
+  }
+  .s4-code-line[data-diff] :is([class^="s4-syntax-"], [class*=" s4-syntax-"]),
+  .s4-code-line[data-diff]::before { color: inherit; }
+  .s4-code-line[data-diff="meta"] { color: var(--md-sys-color-on-surface-variant); }
+
+  /* syntax: tokens only; comments are also italic so they never rely on color */
+  .s4-syntax-keyword { color: var(--s4-syntax-keyword); }
+  .s4-syntax-string { color: var(--s4-syntax-string); }
+  .s4-syntax-number { color: var(--s4-syntax-number); }
+  .s4-syntax-comment { color: var(--s4-syntax-comment); font-style: italic; }
+  .s4-syntax-function { color: var(--s4-syntax-function); }
+  .s4-syntax-type { color: var(--s4-syntax-type); }
+  .s4-syntax-property { color: var(--s4-syntax-property); }
+  .s4-syntax-punctuation { color: var(--md-sys-color-on-surface-variant); }
+
+  /* inline code in running text, and a key combination (each key is a .s4-kbd) */
+  .s4-code-inline {
+    padding: 0.1em 0.35em;
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    background: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-mono);
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+  .s4-keys { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-1); vertical-align: middle; }
+
+  @media (forced-colors: active) {
+    .s4-code { border: 1px solid CanvasText; }
+    .s4-code-line[data-mark] { outline: 1px solid Highlight; outline-offset: -1px; }
+    .s4-code-inline { border: 1px solid CanvasText; }
+  }
+  @media print {
+    .s4-code pre { overflow: visible; }
+    .s4-code code { white-space: pre-wrap; overflow-wrap: anywhere; min-inline-size: 0; }
+    .s4-code-actions { display: none; }
+  }
 }
 
 /* ---- site/site.css ---- */

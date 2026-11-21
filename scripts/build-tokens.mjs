@@ -166,6 +166,8 @@ const PAIRS = [
   ...['success', 'warning', 'info'].flatMap((r) => [...SURFACES.map((s) => [`--s4-color-${r}`, s, 4.5]), [`--s4-color-on-${r}-container`, `--s4-color-${r}-container`, 4.5]]),
   ...['surface', 'surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high'].map((s) => ['--s4-color-control', s, 3]),
   ...SURFACES.map((s) => ['error', s, 4.5]), ['--s4-color-on-badge', '--s4-color-badge', 4.5],
+  /* syntax colors (code blocks, round 0056): text on every surface */
+  ...['keyword', 'string', 'number', 'comment', 'function', 'type', 'property'].flatMap((r) => SURFACES.map((s) => [`--s4-syntax-${r}`, s, 4.5])),
 ];
 const contrastReport = [];
 for (const mode of ['light', 'dark', 'high-contrast', 'dark-high-contrast']) {

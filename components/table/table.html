@@ -57,13 +57,80 @@
     </div>
     <p class="ex-foot" id="table-out" aria-live="polite">Select rows, sort a column, or open a bill.</p>
   </section>
+
+  <section class="ex-sec">
+    <h2>At Scale: 10,000 Rows</h2>
+    <p>A data table: <code>S4.table(el).setRows(rows)</code> draws only the rows on screen, so ten thousand scroll as smoothly as ten, with a scrollbar that never jumps and every row's place announced (<code>aria-rowcount</code>, <code>aria-rowindex</code>). Pinned first column, column grips (drag, or focus a grip and use the arrow keys; double-click or Enter fits), a menu on every column (sort, group, pin, fit, move, hide), a Columns menu, details in place, inline editing with Undo, a row menu, the selection bar and a totals footer that stays at the bottom. Arrow keys move between rows; Right and Left move through a row's cells; Enter on an editable cell edits it.</p>
+    <div class="ex-board col">
+      <div class="s4-row" style="flex-wrap: wrap; gap: var(--s4-space-2)">
+        <div class="s4-chip-set" data-select="single" aria-label="Show">
+          <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" data-demo="ready">Data</button>
+          <button class="s4-chip" data-type="filter" type="button" data-demo="loading">Loading</button>
+          <button class="s4-chip" data-type="filter" type="button" data-demo="none">No Results</button>
+          <button class="s4-chip" data-type="filter" type="button" data-demo="empty">Empty</button>
+          <button class="s4-chip" data-type="filter" type="button" data-demo="error">Error</button>
+        </div>
+        <span style="flex: 1"></span>
+        <button class="s4-button" data-variant="tonal" data-size="xs" type="button" id="sc-group" aria-pressed="false">Group by Family</button>
+        <button class="s4-button" data-variant="tonal" data-size="xs" type="button" data-menu="sc-columns"><span class="s4-icon" data-icon="columns"></span>Columns</button>
+        <div class="s4-menu" id="sc-columns" data-table-columns="#specimens" data-align="end" aria-label="Columns"></div>
+      </div>
+      <div class="s4-selection-bar" id="sc-bar" hidden><button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button><span class="s4-selection-count" data-selection-count>0 Selected</span><button class="s4-icon-button" type="button" aria-label="Move Selected to Conservation" id="sc-conserve"><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" type="button" aria-label="Delete Selected" id="sc-delete"><span class="s4-icon" data-icon="delete"></span></button></div>
+      <div class="s4-states" id="sc-states" data-state="loading">
+        <div data-when="loading" data-table-skeleton="8"></div>
+        <div class="s4-table-wrap" data-when="ready" data-sticky style="--s4-table-max-height: 34rem">
+          <table class="s4-table" id="specimens" data-key="ref-specimens" data-resizable data-column-menu data-row-menu="#sc-row-menu" data-selection-bar="#sc-bar">
+            <caption class="s4-visually-hidden">Specimens in the collection</caption>
+            <thead><tr>
+              <th scope="col" data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Specimens"><span class="s4-checkbox-box"></span></label></th>
+              <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
+              <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="taxon" data-primary data-edit data-required aria-sort="none"><button type="button" class="s4-table-sort">Taxon<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="family" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Family<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="collector" aria-sort="none"><button type="button" class="s4-table-sort">Collector<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="year" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Collected<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="status" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Status<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum" aria-sort="none"><button type="button" class="s4-table-sort">Specimens<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div data-when="no-results" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span><h3 class="s4-empty-title">No Specimens Match</h3><p class="s4-empty-text">Nothing in the collection fits these filters.</p><button class="s4-button" data-variant="tonal" type="button" data-demo-clear>Clear Filters</button></div>
+        <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="folder"></span></span><h3 class="s4-empty-title">No Specimens Yet</h3><p class="s4-empty-text">Accessioned specimens appear here.</p></div>
+        <div data-when="error" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="error"></span></span><h3 class="s4-empty-title">Couldn’t Load the Collection</h3><p class="s4-empty-text">The catalogue server did not answer.</p><button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button></div>
+      </div>
+      <div class="s4-menu" id="sc-row-menu" aria-label="Specimen actions">
+        <button class="s4-menu-item" type="button" value="open"><span class="s4-icon" data-icon="visible"></span>Open Record</button>
+        <button class="s4-menu-item" type="button" value="duplicate"><span class="s4-icon" data-icon="copy"></span>Duplicate</button>
+        <button class="s4-menu-item" type="button" value="conserve"><span class="s4-icon" data-icon="archive"></span>Send to Conservation</button>
+        <hr class="s4-menu-divider">
+        <button class="s4-menu-item" type="button" value="delete" data-color="error"><span class="s4-icon" data-icon="delete"></span>Delete</button>
+      </div>
+    </div>
+    <p class="ex-foot" id="sc-out" aria-live="polite">Scroll, sort, resize, edit a taxon or a count, or pick rows.</p>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Pinned and Resizable, From Markup</h2>
+    <p>Plain markup takes the column features too: <code>data-resizable</code> on the table, <code>data-pin</code> on a header (<code>data-pin="end"</code> for the last). Pinned cells stay solid and get a tonal edge only while something scrolls under them. <code>data-layout="scroll"</code> keeps the real table on a phone instead of stacked rows: right for numbers people compare across a row.</p>
+    <div class="s4-table-wrap" data-layout="scroll">
+      <table class="s4-table" data-resizable data-key="ref-loans">
+        <caption>Loans Out This Year</caption>
+        <thead><tr><th scope="col" data-pin data-primary>Borrower</th><th scope="col">Exhibition</th><th scope="col" class="num">Objects</th><th scope="col">Out</th><th scope="col">Due Back</th><th scope="col">Courier</th><th scope="col" data-pin="end">Status</th></tr></thead>
+        <tbody>
+          <tr><td>Hunterian, Glasgow</td><td>Birds of the Clyde Estuary</td><td class="num">42</td><td>12 Feb</td><td>30 Nov</td><td>Ana Ribeiro</td><td><span class="s4-status" data-tone="tertiary">Due Soon</span></td></tr>
+          <tr><td>Manchester Museum</td><td>After the Ice: Mammals of Northern England</td><td class="num">17</td><td>3 Mar</td><td>15 Jan</td><td>Tom Okafor</td><td><span class="s4-status">On Loan</span></td></tr>
+          <tr><td>Oxford University Museum</td><td>Darwin’s Beetles</td><td class="num">118</td><td>21 Apr</td><td>2 Mar</td><td>Ana Ribeiro</td><td><span class="s4-status">On Loan</span></td></tr>
+          <tr><td>National Museum Cardiff</td><td>Shells of the Severn</td><td class="num">64</td><td>9 Jun</td><td>9 Oct</td><td>Priya Nair</td><td><span class="s4-status" data-tone="error">Overdue</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
   <p class="ex-foot">Source: <code>components/table/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
 </main>
 <script src="../assets/icons.js"></script>
-<script src="../core/core.js"></script>
-<script src="../motion/motion.js"></script>
-<script src="../table/table.js"></script>
-<script src="../button-group/button-group.js"></script>
+<script src="../orion.js"></script>
 <script src="../_example/example.js"></script>
 <script>
   var out = document.getElementById('table-out');
@@ -75,6 +142,57 @@
   document.getElementById('bills').addEventListener('s4-select', function (e) {
     out.textContent = 'Open ' + e.detail.row.cells[1].textContent + ' ' + e.detail.row.cells[3].textContent;
   });
+
+  /* ---------- 10,000 specimens, made up but plausible (the same seed every time) ---------- */
+  (function () {
+    var seed = 20261116, rnd = function () { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }, pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
+    var FAM = [['Strigidae', ['Strix aluco', 'Asio otus', 'Athene noctua', 'Bubo bubo']], ['Corvidae', ['Corvus corax', 'Pica pica', 'Garrulus glandarius', 'Corvus monedula']], ['Carabidae', ['Carabus violaceus', 'Pterostichus niger', 'Nebria brevicollis']], ['Nymphalidae', ['Vanessa atalanta', 'Aglais io', 'Polygonia c-album']], ['Mustelidae', ['Meles meles', 'Lutra lutra', 'Mustela erminea']], ['Helicidae', ['Cepaea nemoralis', 'Cornu aspersum']], ['Salmonidae', ['Salmo trutta', 'Salmo salar']], ['Fringillidae', ['Fringilla coelebs', 'Carduelis carduelis', 'Pyrrhula pyrrhula']]];
+    var WHO = ['A. Ribeiro', 'T. Okafor', 'P. Nair', 'M. Lindqvist', 'E. Hartley', 'J. Mbeki', 'R. Sato', 'C. Duarte', 'H. Whitlow', 'S. Kowalczyk'];
+    var STATUS = ['In Store', 'In Store', 'In Store', 'On Display', 'On Loan', 'Conservation'];
+    var rows = [];
+    for (var i = 1; i <= 10000; i++) { var f = pick(FAM); rows.push({ id: i, catalogue: 'NH-' + String(i).padStart(5, '0'), taxon: pick(f[1]), family: f[0], collector: pick(WHO), year: 1840 + Math.floor(rnd() * 186), status: pick(STATUS), count: 1 + Math.floor(rnd() * rnd() * 40), drawer: 'D-' + String(100 + Math.floor(rnd() * 600)) }); }
+    var TONE = { 'On Loan': 'tertiary', Conservation: 'error', 'On Display': '' };
+    var t = S4.table(document.getElementById('specimens'), {
+      noun: 'record', nouns: 'records',
+      cell: {
+        catalogue: function (v, r) { return '<span class="s4-num">' + v + '</span>'; },
+        status: function (v) { return '<span class="s4-status"' + (TONE[v] ? ' data-tone="' + TONE[v] + '"' : '') + '>' + v + '</span>'; }
+      },
+      detail: function (r) { return '<p class="s4-body-medium" style="margin:0">Drawer <b>' + r.drawer + '</b> · collected by ' + r.collector + ' in ' + r.year + ' · ' + r.count + (r.count === 1 ? ' specimen' : ' specimens') + '. Details open in place: the row stays where it was and everything below moves down.</p>'; }
+    });
+    var states = document.getElementById('sc-states'), out = document.getElementById('sc-out');
+    var show = function (kind) {
+      t.filter(null);
+      if (kind === 'loading') return S4.states.set(states, 'loading');
+      if (kind === 'error') return S4.states.set(states, 'error');
+      if (kind === 'empty') return t.setRows([]);
+      t.setRows(rows);
+      if (kind === 'none') t.filter(function () { return false; });
+    };
+    setTimeout(function () { show('ready'); }, 600);
+    document.querySelectorAll('[data-demo]').forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.demo); }); });
+    document.querySelector('[data-demo-clear]').addEventListener('click', function () { t.filter(null); });
+    states.addEventListener('s4-retry', function () { S4.states.set(states, 'loading'); setTimeout(function () { show('ready'); }, 700); });
+    var g = document.getElementById('sc-group');
+    g.addEventListener('click', function () { var on = g.getAttribute('aria-pressed') !== 'true'; g.setAttribute('aria-pressed', String(on)); t.group(on ? 'family' : null); });
+    var table = document.getElementById('specimens');
+    table.addEventListener('s4-change', function (e) {
+      var d = e.detail;
+      if (d.type === 'sort') out.textContent = 'Sorted by ' + d.label + ' (' + d.direction + ')';
+      else if (d.type === 'select') out.textContent = d.count + ' selected';
+      else if (d.type === 'edit') out.textContent = (d.undo ? 'Undid: ' : 'Saved: ') + d.field + ' is now ' + d.value;
+      else if (d.type === 'resize') out.textContent = d.field + ' is ' + d.width + ' wide';
+    });
+    table.addEventListener('s4-select', function (e) { out.textContent = 'Open ' + e.detail.data.catalogue + ' ' + e.detail.data.taxon; });
+    table.addEventListener('s4-row-action', function (e) {
+      var r = e.detail.row;
+      if (e.detail.action === 'delete') { var gone = t.remove([e.detail.id]); S4.snackbar({ text: r.catalogue + ' deleted', action: 'Undo', onAction: function () { rows = rows.concat(gone); t.setRows(t.rows.concat(gone)); } }); }
+      else if (e.detail.action === 'conserve') { var before = r.status; t.update(e.detail.id, { status: 'Conservation' }); S4.snackbar({ text: r.catalogue + ' sent to conservation', action: 'Undo', onAction: function () { t.update(e.detail.id, { status: before }); } }); }
+      else out.textContent = e.detail.action + ' ' + r.catalogue;
+    });
+    document.getElementById('sc-delete').addEventListener('click', function () { var ids = t.selectedRows().map(function (r) { return String(r.id); }); var gone = t.remove(ids); S4.snackbar({ text: gone.length + ' specimen records deleted', action: 'Undo', onAction: function () { t.setRows(t.rows.concat(gone)); } }); });
+    document.getElementById('sc-conserve').addEventListener('click', function () { var sel = t.selectedRows(); var before = sel.map(function (r) { return [String(r.id), r.status]; }); sel.forEach(function (r) { t.update(String(r.id), { status: 'Conservation' }, true); }); t.clear(); S4.snackbar({ text: sel.length + ' sent to conservation', action: 'Undo', onAction: function () { before.forEach(function (b) { t.update(b[0], { status: b[1] }, true); }); } }); });
+  })();
 </script>
 </body>
 </html>

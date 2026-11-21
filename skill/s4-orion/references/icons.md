@@ -96,3 +96,5 @@ Arrows and chevrons are Linear, everything else Bold Duotone. Other sets: solar,
 | `water` | waterdrop |
 | `minus` | minus |
 | `plus` | add |
+| `columns` | columns-3 |
+| `pin` | pin |

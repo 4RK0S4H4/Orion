@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en" data-gray="cool" data-page="soft" data-corners="firm" data-type-display="serif" data-energy="calm" data-density="auto" data-buttons="tonal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Linnea · Collections Register</title>
+<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Data Table, as a product (issue 66). Linnea is the collections register of the Whitlow Museum of Natural
+     History in Norwich. A registrar or curator works in it all day: find specimens among 5,000 records, check a label
+     against the drawer, fix a name in place, send a batch to conservation, see what is out on loan, and link a colleague
+     straight to a view ("everything on loan, oldest first"). Brand through the dials: a bottle-glass green accent
+     (fidelity), cool grays, a soft page with white panes, firm corners, a serif display face like a printed specimen
+     label, calm motion, compact rows under a mouse, tonal buttons by default. Its own elements, drawn from Orion's rules:
+     the decade strip (when the collection was gathered), the specimen label on each record's page, the record's history.
+     Orion's parts that carry the job: the data table at scale (virtual rows, pinned catalogue number, column grips and
+     menus, groups, details in place, inline editing with Undo, the selection bar), filters and saved views with the
+     state in the address, the filters tool panel (decision 0054), pages for a record (decision 0050), states, charts. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.css">
+<style>
+  /* Linnea's own layout and elements: tokens only, nothing restyles an Orion component */
+  .ln-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-4); align-items: end; }
+  @container s4-app (width >= 1000px) { .ln-head { grid-template-columns: minmax(0, 1fr) minmax(0, 26rem); } }
+  .ln-title { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
+  .ln-title h2 { margin: 0; }
+  .ln-title p { margin: 0; }
+  .ln-facts { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-6); margin: var(--s4-space-2) 0 0; }
+  .ln-facts > div { display: flex; flex-direction: column; min-inline-size: 0; }
+  .ln-facts dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .ln-facts dd { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); font-variant-numeric: tabular-nums; }
+
+  /* the decade strip: how many specimens were gathered in each decade, oldest at the start. Text beside the picture. */
+  .ln-decades { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); }
+  .ln-decades-head { display: flex; justify-content: space-between; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .ln-decades-bars { display: flex; align-items: end; gap: 2px; block-size: var(--s4-space-12); margin: 0; padding: 0; list-style: none; }
+  .ln-decades-bars > li { flex: 1; min-inline-size: 0; block-size: var(--h); min-block-size: 2px; border-radius: var(--md-sys-shape-corner-extra-small) var(--md-sys-shape-corner-extra-small) 0 0; background: var(--md-sys-color-primary); opacity: 0.85; }
+  .ln-decades-bars > li[data-peak] { opacity: 1; }
+  .ln-decades-axis { display: flex; justify-content: space-between; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+
+  .ln-records { display: flex; flex-direction: column; gap: var(--s4-space-3); }
+  .ln-records .s4-table-wrap { --s4-table-max-height: max(24rem, calc(100dvh - 22rem)); }
+  .ln-taxon i { font-style: italic; }
+  .ln-common { color: var(--md-sys-color-on-surface-variant); }
+  .ln-type { margin-inline-start: var(--s4-space-2); }
+  .ln-detail { display: flex; flex-direction: column; gap: var(--s4-space-2); padding-block: var(--s4-space-1); }
+  .ln-detail .ln-label-lines dd { font-family: var(--md-sys-typescale-body-medium-font); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .ln-detail p { margin: 0; max-inline-size: 60ch; color: var(--md-sys-color-on-surface-variant); }
+
+  /* the specimen label: the record's identity, set like the printed card pinned in the drawer */
+  .ln-label { display: grid; gap: var(--s4-space-3); padding: var(--s4-space-5) var(--s4-space-6); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); }
+  .ln-label-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); letter-spacing: 0.04em; text-transform: uppercase; }
+  .ln-label-name { margin: 0; font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-headline-medium-weight); font-style: italic; overflow-wrap: anywhere; }
+  .ln-label-rule { block-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); inline-size: var(--s4-space-12); }
+  .ln-label-lines { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: var(--s4-space-2) var(--s4-space-6); margin: 0; }
+  .ln-label-lines dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .ln-label-lines dd { margin: 0; font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); overflow-wrap: anywhere; }
+  .ln-cat { font-family: var(--md-ref-typeface-mono); font-variant-numeric: tabular-nums; }
+
+  /* the record's history: what happened to the specimen, newest first */
+  .ln-history { display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ln-history > li { display: grid; grid-template-columns: var(--s4-space-4) minmax(0, 1fr); column-gap: var(--s4-space-3); padding-block-end: var(--s4-space-4); }
+  .ln-history > li::before { content: ""; grid-column: 1; grid-row: 1 / span 2; justify-self: center; inline-size: 2px; margin-block-start: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); }
+  .ln-history > li:last-child::before { background: transparent; }
+  .ln-history b { grid-column: 2; font-weight: var(--md-sys-typescale-title-small-weight); }
+  .ln-history span { grid-column: 2; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .ln-history > li > i { grid-column: 1; grid-row: 1; justify-self: center; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); margin-block-start: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); }
+
+  .ln-record { display: grid; gap: var(--s4-space-6); }
+  @container s4-app (width >= 1000px) { .ln-record { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; } }
+  .ln-record > * { min-inline-size: 0; }
+  .ln-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--s4-space-4); }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-header"><button class="s4-fab" type="button" aria-label="Accession" data-sheet="ln-new"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Accession</span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#records" data-view="records" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-nav-label">Records</span></a>
+      <a class="s4-nav-item" href="#loans" data-view="loans"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="transfer"></span></span><span class="s4-nav-label">Loans</span></a>
+      <a class="s4-nav-item" href="#insights" data-view="insights"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Insights</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Linnea</h1></div>
+      <div class="s4-selection-bar" id="ln-bar" hidden>
+        <button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button>
+        <span class="s4-selection-count" data-selection-count>0 Selected</span>
+        <button class="s4-icon-button" type="button" aria-label="Send Selected to Conservation" data-tooltip="Send to Conservation" id="ln-conserve"><span class="s4-icon" data-icon="archive"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="Export Selected" data-tooltip="Export" id="ln-export"><span class="s4-icon" data-icon="export"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="Delete Selected" data-tooltip="Delete" id="ln-delete"><span class="s4-icon" data-icon="delete"></span></button>
+      </div>
+      <div class="s4-app-bar-actions">
+        <button class="s4-icon-button" type="button" aria-label="Help" data-tooltip="Help"><span class="s4-icon" data-icon="help"></span></button>
+      </div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <!-- Records: the register itself. Views, the filter bar, the filters in force, the count, then the table. -->
+      <section class="s4-view" data-view="records" data-title="Records">
+        <div class="s4-stack">
+          <div class="ln-head">
+            <div class="ln-title">
+              <h2 class="s4-headline-medium">Collections Register</h2>
+              <p class="s4-body-medium s4-on-surface-variant">Whitlow Museum of Natural History, Norwich · natural sciences</p>
+              <dl class="ln-facts">
+                <div><dt>Specimen Records</dt><dd id="ln-f-records">5,000</dd></div>
+                <div><dt>On Loan</dt><dd id="ln-f-loan">0</dd></div>
+                <div><dt>In Conservation</dt><dd id="ln-f-cons">0</dd></div>
+              </dl>
+            </div>
+            <figure class="ln-decades" aria-labelledby="ln-dec-cap" style="margin:0">
+              <figcaption class="ln-decades-head" id="ln-dec-cap"><span>Gathered by decade</span><span id="ln-dec-peak"></span></figcaption>
+              <ul class="ln-decades-bars" id="ln-decades" aria-hidden="true"></ul>
+              <div class="ln-decades-axis" aria-hidden="true"><span>1830s</span><span>1920s</span><span>2020s</span></div>
+            </figure>
+          </div>
+
+          <div class="ln-records">
+            <div class="s4-filter" id="ln-filter" data-for="#ln-table" data-key="linnea-records" data-url aria-label="Filter specimen records">
+              <div class="s4-filter-views" aria-label="Saved Views"></div>
+              <div class="s4-filter-bar">
+                <div class="s4-search" role="search">
+                  <span class="s4-icon" data-icon="search"></span>
+                  <input class="s4-search-input" type="search" placeholder="Search Taxon, Collector, Place" aria-label="Search specimen records">
+                  <button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Search" hidden><span class="s4-icon" data-icon="close"></span></button>
+                </div>
+                <button class="s4-button" data-variant="tonal" type="button" data-filter-add data-menu="ln-add"><span class="s4-icon" data-icon="add"></span>Add Filter</button>
+                <div class="s4-menu" id="ln-add" aria-label="Add a filter"></div>
+                <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="ln-panel"><span class="s4-icon" data-icon="filter"></span>All Filters<span class="s4-badge" hidden></span></button>
+                <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="ln-sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+                <div class="s4-menu" id="ln-sort" aria-label="Sort"></div>
+                <button class="s4-button" data-variant="tonal" type="button" data-menu="ln-columns"><span class="s4-icon" data-icon="columns"></span>Columns</button>
+                <div class="s4-menu" id="ln-columns" data-table-columns="#ln-table" data-align="end" aria-label="Columns"></div>
+                <button class="s4-icon-button" data-variant="tonal" type="button" data-filter-views data-menu="ln-views" aria-label="View Options" data-tooltip="View Options"><span class="s4-icon" data-icon="bookmark"></span></button>
+                <div class="s4-menu" id="ln-views" data-align="end" aria-label="View options"></div>
+              </div>
+              <div class="s4-filter-active" aria-label="Active Filters" hidden></div>
+              <p class="s4-filter-count"></p>
+            </div>
+
+            <div class="s4-states" id="ln-states" data-state="loading">
+              <div data-when="loading" data-table-skeleton="10"></div>
+              <div class="s4-table-wrap" data-when="ready" data-sticky>
+                <table class="s4-table" id="ln-table" data-key="linnea-records" data-resizable data-column-menu data-row-menu="#ln-row-menu" data-selection-bar="#ln-bar">
+                  <caption class="s4-visually-hidden">Specimen records</caption>
+                  <thead><tr>
+                    <th scope="col" data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Shown Records"><span class="s4-checkbox-box"></span></label></th>
+                    <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
+                    <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="taxon" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Taxon<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="family" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Family<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="collector" aria-sort="none"><button type="button" class="s4-table-sort">Collector<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="year" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Collected<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="locality" aria-sort="none"><button type="button" class="s4-table-sort">Locality<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="drawer" data-edit data-required>Drawer</th>
+                    <th scope="col" data-field="status" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Status<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum" aria-sort="none"><button type="button" class="s4-table-sort">Specimens<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
+                  </tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div data-when="no-results" class="s4-empty">
+                <span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span>
+                <h3 class="s4-empty-title">No Records Match</h3>
+                <p class="s4-empty-text">Nothing in the register fits these filters. Take one away, or clear them all.</p>
+                <button class="s4-button" type="button" id="ln-clear">Clear Filters</button>
+              </div>
+              <div data-when="empty" class="s4-empty">
+                <span class="s4-empty-icon"><span class="s4-icon" data-icon="folder"></span></span>
+                <h3 class="s4-empty-title">The Register Is Empty</h3>
+                <p class="s4-empty-text">Accession the first specimen and it appears here with its catalogue number.</p>
+                <button class="s4-button" data-variant="filled" type="button" data-sheet="ln-new">Accession a Specimen</button>
+              </div>
+              <div data-when="error" class="s4-empty">
+                <span class="s4-empty-icon"><span class="s4-icon" data-icon="warning"></span></span>
+                <h3 class="s4-empty-title">Couldn’t Open the Register</h3>
+                <p class="s4-empty-text">The collections server did not answer. Nothing you changed is lost.</p>
+                <button class="s4-button" type="button" data-retry>Try Again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- A record as a page (decision 0050): its own URL (#records/record/NHM-01234), Back in the bar -->
+      <section class="s4-subpage" data-page="record" data-title="Record" hidden>
+        <div class="ln-record">
+          <div class="s4-stack">
+            <article class="ln-label" aria-labelledby="r-name">
+              <div class="ln-label-top"><span class="ln-cat" id="r-cat"></span><span id="r-type"></span></div>
+              <h2 class="ln-label-name" id="r-name">Record</h2>
+              <span class="ln-label-rule" aria-hidden="true"></span>
+              <dl class="ln-label-lines">
+                <div><dt>Family</dt><dd id="r-family"></dd></div>
+                <div><dt>Locality</dt><dd id="r-loc"></dd></div>
+                <div><dt>Collected</dt><dd id="r-coll"></dd></div>
+                <div><dt>Drawer</dt><dd id="r-drawer"></dd></div>
+              </dl>
+            </article>
+            <section class="s4-pane" aria-labelledby="r-notes-h">
+              <h3 class="s4-title-medium" id="r-notes-h" style="margin:0 0 var(--s4-space-2)">Label Transcription</h3>
+              <p class="s4-body-large" id="r-notes" style="margin:0"></p>
+            </section>
+            <section class="s4-pane" aria-labelledby="r-same-h">
+              <h3 class="s4-title-medium" id="r-same-h" style="margin:0 0 var(--s4-space-2)">Same Species in the Register</h3>
+              <ul class="s4-list" id="r-same" aria-labelledby="r-same-h"></ul>
+            </section>
+          </div>
+          <section class="s4-pane" aria-labelledby="r-hist-h">
+            <h3 class="s4-title-medium" id="r-hist-h" style="margin:0 0 var(--s4-space-4)">History</h3>
+            <ol class="ln-history" id="r-history"></ol>
+            <div class="s4-row" style="flex-wrap: wrap"><button class="s4-button" type="button" id="r-conserve">Send to Conservation</button><button class="s4-button" data-variant="text" type="button" data-page-back>Back to Records</button></div>
+          </section>
+        </div>
+      </section>
+
+      <!-- Loans: a short register people compare across a row, so on a phone it stays a real table that scrolls sideways
+           with the borrower pinned (data-layout="scroll") instead of stacking -->
+      <section class="s4-view" data-view="loans" data-title="Loans" hidden>
+        <div class="s4-stack">
+          <h2 class="s4-headline-medium" style="margin:0">Out on Loan</h2>
+          <div class="s4-table-wrap" data-layout="scroll">
+            <table class="s4-table" data-resizable data-key="linnea-loans">
+              <caption>Eight loans, 312 specimens</caption>
+              <thead><tr><th scope="col" data-pin data-primary>Borrower</th><th scope="col">Exhibition</th><th scope="col" class="num">Specimens</th><th scope="col">Went Out</th><th scope="col">Due Back</th><th scope="col">Courier</th><th scope="col">Status</th></tr></thead>
+              <tbody>
+                <tr><td>Hunterian, Glasgow</td><td>Birds of the Clyde Estuary</td><td class="num">42</td><td data-value="2026-02-12">12 Feb 2026</td><td data-value="2026-11-30">30 Nov 2026</td><td>Ana Ribeiro</td><td><span class="s4-status" data-tone="tertiary">Due in 10 Days</span></td></tr>
+                <tr><td>Manchester Museum</td><td>After the Ice: Mammals of the North</td><td class="num">17</td><td data-value="2026-03-03">3 Mar 2026</td><td data-value="2027-01-15">15 Jan 2027</td><td>Tom Okafor</td><td><span class="s4-status">On Loan</span></td></tr>
+                <tr><td>Oxford University Museum</td><td>Darwin’s Beetles</td><td class="num">118</td><td data-value="2026-04-21">21 Apr 2026</td><td data-value="2027-03-02">2 Mar 2027</td><td>Ana Ribeiro</td><td><span class="s4-status">On Loan</span></td></tr>
+                <tr><td>National Museum Cardiff</td><td>Shells of the Severn</td><td class="num">64</td><td data-value="2026-06-09">9 Jun 2026</td><td data-value="2026-10-09">9 Oct 2026</td><td>Priya Nair</td><td><span class="s4-status" data-tone="error">Overdue 41 Days</span></td></tr>
+                <tr><td>Ipswich Museum</td><td>Suffolk Owls</td><td class="num">9</td><td data-value="2026-07-01">1 Jul 2026</td><td data-value="2027-07-01">1 Jul 2027</td><td>Tom Okafor</td><td><span class="s4-status">On Loan</span></td></tr>
+                <tr><td>Cambridge Zoology Museum</td><td>Fen Butterflies, 1850 to Now</td><td class="num">33</td><td data-value="2026-08-14">14 Aug 2026</td><td data-value="2027-02-14">14 Feb 2027</td><td>Priya Nair</td><td><span class="s4-status">On Loan</span></td></tr>
+                <tr><td>Natural History Museum, Tring</td><td>Research loan: corvid skulls</td><td class="num">21</td><td data-value="2026-09-02">2 Sep 2026</td><td data-value="2026-12-02">2 Dec 2026</td><td>Ana Ribeiro</td><td><span class="s4-status" data-tone="tertiary">Due in 12 Days</span></td></tr>
+                <tr><td>Lynn Museum</td><td>The Wash and Its Waders</td><td class="num">8</td><td data-value="2026-10-20">20 Oct 2026</td><td data-value="2027-04-20">20 Apr 2027</td><td>Tom Okafor</td><td><span class="s4-status">On Loan</span></td></tr>
+              </tbody>
+              <tfoot><tr><th scope="row" colspan="2">Total</th><td class="num">312</td><td colspan="4"></td></tr></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Insights: the work on the register, with a time range and series you can switch -->
+      <section class="s4-view" data-view="insights" data-title="Insights" hidden>
+        <div class="s4-stack">
+          <h2 class="s4-headline-medium" style="margin:0">Work on the Register</h2>
+          <div class="ln-grid">
+            <section class="s4-pane" aria-label="Records worked on">
+              <div class="s4-stack">
+                <div class="s4-chart-range" data-for="#ln-work" data-today="2026-11-20">
+                  <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Range">
+                    <button class="s4-button" type="button" value="7">Week</button>
+                    <button class="s4-button" type="button" value="30" aria-pressed="true">Month</button>
+                    <button class="s4-button" type="button" value="90">Quarter</button>
+                    <button class="s4-button" type="button" value="custom">Custom</button>
+                  </div>
+                  <div class="s4-chart-range-custom" hidden>
+                    <div class="s4-text-field"><label for="ln-from">Dates</label><input id="ln-from" type="date" data-range-end="ln-to" min="2025-01-01" max="2026-11-20"></div>
+                    <input id="ln-to" type="date" hidden aria-label="End date">
+                  </div>
+                </div>
+                <figure class="s4-chart" id="ln-work" data-type="line" data-legend="toggle"><figcaption class="s4-chart-title">Records Worked On <span class="s4-chart-subtitle" id="ln-work-sub">Last 30 days</span></figcaption></figure>
+              </div>
+            </section>
+            <section class="s4-pane" aria-label="Largest families">
+              <figure class="s4-chart" id="ln-families" data-type="bar"><figcaption class="s4-chart-title">Largest Families <span class="s4-chart-subtitle">Specimen records</span></figcaption></figure>
+            </section>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#records" data-view="records" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-nav-label">Records</span></a>
+    <a class="s4-nav-item" href="#loans" data-view="loans"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="transfer"></span></span><span class="s4-nav-label">Loans</span></a>
+    <a class="s4-nav-item" href="#insights" data-view="insights"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Insights</span></a>
+  </nav>
+</div>
+
+<!-- the filters: a tool panel (decision 0054). From 600 wide the register stays live beside it; on a phone it covers the screen -->
+<dialog class="s4-side-sheet" id="ln-panel" data-modeless aria-labelledby="ln-panel-h">
+  <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="ln-panel-h">Filters</h2><button class="s4-icon-button" type="button" data-close aria-label="Close Filters"><span class="s4-icon" data-icon="close"></span></button></div>
+  <div class="s4-sheet-content"><div class="s4-filter-facets"></div></div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" type="button" id="ln-panel-clear">Clear All</button><button class="s4-button" data-variant="filled" type="button" data-filter-done>Show Records</button></div>
+</dialog>
+
+<div class="s4-menu" id="ln-row-menu" aria-label="Record actions">
+  <button class="s4-menu-item" type="button" value="open"><span class="s4-icon" data-icon="document"></span>Open Record</button>
+  <button class="s4-menu-item" type="button" value="conserve"><span class="s4-icon" data-icon="archive"></span>Send to Conservation</button>
+  <button class="s4-menu-item" type="button" value="copy"><span class="s4-icon" data-icon="copy"></span>Copy Catalogue No.</button>
+  <hr class="s4-menu-divider">
+  <button class="s4-menu-item" type="button" value="delete" data-color="error"><span class="s4-icon" data-icon="delete"></span>Delete Record</button>
+</div>
+
+<!-- accessioning a specimen is a short task you save or cancel: a modal floating panel (decisions 0047 and 0054) -->
+<dialog class="s4-bottom-sheet" id="ln-new" aria-labelledby="ln-new-h">
+  <h2 class="s4-sheet-title" id="ln-new-h">Accession a Specimen</h2>
+  <div class="s4-sheet-content s4-stack">
+    <div class="s4-text-field"><input id="nw-taxon" type="text" autocomplete="off"><label for="nw-taxon">Taxon</label></div>
+    <div class="s4-text-field"><input id="nw-loc" type="text" autocomplete="off"><label for="nw-loc">Locality</label></div>
+    <div class="s4-text-field s4-number-field"><label for="nw-count">Specimens</label><input id="nw-count" value="1" data-min="1" data-max="500"></div>
+  </div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Accession</button></div>
+</dialog>
+
+<script src="icons.js"></script>
+<script src="orion.js"></script>
+<script>
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#24573f', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
+
+/* ---------- the register: 5,000 records, made up but plausible (a real app loads this from its server) ---------- */
+var FAMILIES = [
+  ['Strigidae', 'Birds', [['Strix aluco', 'tawny owl'], ['Asio otus', 'long-eared owl'], ['Athene noctua', 'little owl'], ['Tyto alba', 'barn owl']]],
+  ['Corvidae', 'Birds', [['Corvus corax', 'raven'], ['Pica pica', 'magpie'], ['Garrulus glandarius', 'jay'], ['Corvus monedula', 'jackdaw']]],
+  ['Scolopacidae', 'Birds', [['Numenius arquata', 'curlew'], ['Limosa limosa', 'black-tailed godwit'], ['Calidris alpina', 'dunlin']]],
+  ['Carabidae', 'Insects', [['Carabus violaceus', 'violet ground beetle'], ['Pterostichus niger', 'black clock'], ['Nebria brevicollis', '']]],
+  ['Nymphalidae', 'Insects', [['Vanessa atalanta', 'red admiral'], ['Aglais io', 'peacock'], ['Papilio machaon', 'swallowtail']]],
+  ['Odonata', 'Insects', [['Aeshna isoceles', 'Norfolk hawker'], ['Libellula fulva', 'scarce chaser']]],
+  ['Mustelidae', 'Mammals', [['Meles meles', 'badger'], ['Lutra lutra', 'otter'], ['Mustela erminea', 'stoat']]],
+  ['Cervidae', 'Mammals', [['Muntiacus reevesi', 'muntjac'], ['Capreolus capreolus', 'roe deer']]],
+  ['Helicidae', 'Molluscs', [['Cepaea nemoralis', 'brown-lipped snail'], ['Cornu aspersum', 'garden snail']]],
+  ['Unionidae', 'Molluscs', [['Unio pictorum', 'painter’s mussel'], ['Anodonta cygnea', 'swan mussel']]]
+];
+var PLACES = ['Cley next the Sea', 'Hickling Broad', 'Wheatfen', 'Scolt Head Island', 'Thetford Forest', 'Mousehold Heath', 'Ranworth Broad', 'Holme Dunes', 'Foulden Common', 'Wells-next-the-Sea', 'Blakeney Point', 'Strumpshaw Fen', 'Breckland, Weeting', 'Catfield Fen'];
+var COLLECTORS = ['J. H. Gurney', 'E. A. Ellis', 'M. Lindqvist', 'A. Ribeiro', 'T. Okafor', 'R. Sato', 'H. Whitlow', 'C. Duarte', 'P. Nair', 'S. Kowalczyk', 'E. Hartley', 'F. Norgate'];
+var STATUS = ['In Store', 'In Store', 'In Store', 'In Store', 'On Display', 'On Loan', 'Conservation'];
+var seed = 1859, rnd = function () { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }, pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
+var rows = [];
+for (var i = 1; i <= 5000; i++) {
+  var fam = pick(FAMILIES), sp = pick(fam[2]), y = Math.round(1832 + Math.pow(rnd(), 0.8) * 194);
+  rows.push({ id: 'NHM-' + String(i).padStart(5, '0'), catalogue: 'NHM-' + String(i).padStart(5, '0'), taxon: sp[0], common: sp[1], family: fam[0], group: fam[1],
+    collector: pick(COLLECTORS), year: Math.min(2026, y), locality: pick(PLACES), drawer: 'C' + (1 + Math.floor(rnd() * 48)) + ' · D' + (1 + Math.floor(rnd() * 24)),
+    status: pick(STATUS), count: 1 + Math.floor(rnd() * rnd() * 30), type: rnd() < 0.02 ? (rnd() < 0.3 ? 'Holotype' : 'Paratype') : '' });
+}
+function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var TONE = { 'On Loan': 'tertiary', Conservation: 'error', 'On Display': 'primary' };
+function status(v) { return '<span class="s4-status"' + (TONE[v] ? ' data-tone="' + TONE[v] + '"' : '') + '>' + esc(v) + '</span>'; }
+
+var table = S4.table(document.getElementById('ln-table'), {
+  noun: 'record', nouns: 'records',
+  cell: {
+    catalogue: function (v) { return '<span class="ln-cat">' + esc(v) + '</span>'; },
+    taxon: function (v, r) { return '<button type="button" class="s4-table-link ln-taxon" data-page-open="record" data-page-id="' + esc(r.id) + '" data-page-title="' + esc(r.catalogue) + '"><i>' + esc(v) + '</i></button>' + (r.type ? '<span class="s4-status ln-type" data-tone="tertiary">' + r.type + '</span>' : ''); },
+    status: status
+  },
+  detail: function (r) {
+    return '<div class="ln-detail"><dl class="ln-label-lines"><div><dt>Common Name</dt><dd>' + esc(r.common || 'None recorded') + '</dd></div><div><dt>Group</dt><dd>' + esc(r.group) + '</dd></div>' +
+      '<div><dt>Collected By</dt><dd>' + esc(r.collector) + ', ' + r.year + '</dd></div><div><dt>Where</dt><dd>' + esc(r.locality) + ', Norfolk</dd></div></dl>' +
+      '<p>' + esc(note(r)) + '</p></div>';
+  }
+});
+function note(r) { return (r.count > 1 ? r.count + ' specimens' : 'One specimen') + ', ' + (r.group === 'Insects' ? 'pinned and set' : r.group === 'Molluscs' ? 'shells, dry' : 'skins, study preparation') + '. Label in ' + r.collector + '’s hand: “' + r.locality + ', ' + r.year + '”.'; }
+
+/* the decade strip and the facts above the register follow the data */
+function facts() {
+  var by = {}, max = 0, peak = '';
+  table.rows.forEach(function (r) { var d = Math.floor(r.year / 10) * 10; by[d] = (by[d] || 0) + 1; });
+  for (var d = 1830; d <= 2020; d += 10) if ((by[d] || 0) > max) { max = by[d]; peak = d; }
+  var html = ''; for (d = 1830; d <= 2020; d += 10) html += '<li style="--h:' + Math.round((by[d] || 0) / max * 100) + '%"' + (d === peak ? ' data-peak' : '') + '></li>';
+  document.getElementById('ln-decades').innerHTML = html;
+  document.getElementById('ln-dec-peak').textContent = 'Most in the ' + peak + 's (' + max.toLocaleString() + ')';
+  var n = function (s) { return table.rows.filter(function (r) { return r.status === s; }).length.toLocaleString(); };
+  document.getElementById('ln-f-records').textContent = table.rows.length.toLocaleString();
+  document.getElementById('ln-f-loan').textContent = n('On Loan');
+  document.getElementById('ln-f-cons').textContent = n('Conservation');
+}
+
+var states = document.getElementById('ln-states'), filter;
+function load() {
+  S4.states.set(states, 'loading');
+  setTimeout(function () {
+    table.setRows(rows); facts();
+    if (!filter) {
+      filter = S4.filter(document.getElementById('ln-filter'), {
+        noun: 'record', nouns: 'records', searchFields: ['catalogue', 'taxon', 'common', 'collector', 'locality', 'family'],
+        facets: [
+          { field: 'status', label: 'Status', type: 'choice', icon: 'info' },
+          { field: 'group', label: 'Group', type: 'choice', icon: 'tag' },
+          { field: 'family', label: 'Family', type: 'choice', icon: 'list' },
+          { field: 'collector', label: 'Collector', type: 'tags', icon: 'person', noun: 'collectors' },
+          { field: 'locality', label: 'Locality', type: 'tags', icon: 'location', noun: 'places' },
+          { field: 'year', label: 'Collected', type: 'range', icon: 'calendar', min: 1830, max: 2026, grouping: false }
+        ],
+        views: [
+          { id: 'all', name: 'All Records' },
+          { id: 'on-loan', name: 'On Loan', state: { f: { status: ['On Loan'] }, sort: { field: 'year', dir: 'ascending' } } },
+          { id: 'conservation', name: 'In Conservation', state: { f: { status: ['Conservation'] } } },
+          { id: 'victorian-birds', name: 'Victorian Birds', state: { f: { group: ['Birds'], year: { min: 1837, max: 1901 } }, sort: { field: 'year', dir: 'ascending' } } }
+        ]
+      });
+    }
+  }, 450);
+}
+load();
+states.addEventListener('s4-retry', load);
+document.getElementById('ln-clear').addEventListener('click', function () { filter.clear(); });
+document.getElementById('ln-panel-clear').addEventListener('click', function () { filter.clear(); });
+
+/* ---------- acting on records: do it, then offer Undo (decision 0047) ---------- */
+var tableEl = document.getElementById('ln-table');
+tableEl.addEventListener('s4-change', function (e) { if (e.detail.type === 'edit' || e.detail.type === 'update') facts(); });
+function conserve(list) {
+  var before = list.map(function (r) { return [r.id, r.status]; });
+  list.forEach(function (r) { table.update(r.id, { status: 'Conservation' }, true); });
+  facts();
+  S4.snackbar({ text: (list.length === 1 ? list[0].catalogue : list.length.toLocaleString() + ' records') + ' sent to conservation', action: 'Undo', onAction: function () { before.forEach(function (b) { table.update(b[0], { status: b[1] }, true); }); facts(); } });
+}
+function remove(ids) {
+  var gone = table.remove(ids); rows = table.rows; facts();
+  S4.snackbar({ text: (gone.length === 1 ? gone[0].catalogue : gone.length.toLocaleString() + ' records') + ' deleted', action: 'Undo', onAction: function () { table.setRows(table.rows.concat(gone)); rows = table.rows; facts(); } });
+}
+tableEl.addEventListener('s4-row-action', function (e) {
+  var r = e.detail.row, a = e.detail.action;
+  if (a === 'open') S4.pages.open(document.querySelector('.s4-app'), 'record', { id: r.id, title: r.catalogue });
+  else if (a === 'conserve') conserve([r]);
+  else if (a === 'copy') { if (navigator.clipboard) navigator.clipboard.writeText(r.catalogue).catch(function () {}); S4.snackbar(r.catalogue + ' copied'); }
+  else if (a === 'delete') remove([r.id]);
+});
+document.getElementById('ln-conserve').addEventListener('click', function () { var sel = table.selectedRows(); table.clear(); conserve(sel); });
+document.getElementById('ln-delete').addEventListener('click', function () { var ids = table.selectedRows().map(function (r) { return r.id; }); remove(ids); });
+document.getElementById('ln-export').addEventListener('click', function () { S4.snackbar(table.selected.size.toLocaleString() + ' records ready as a spreadsheet in Downloads'); });
+document.getElementById('ln-new').addEventListener('s4-close', function (e) {
+  if (e.detail && e.detail.value !== 'save') return;
+  var taxon = document.getElementById('nw-taxon').value.trim() || 'Unidentified', n = table.rows.length + 1, id = 'NHM-' + String(n).padStart(5, '0');
+  var r = { id: id, catalogue: id, taxon: taxon, common: '', family: '—', group: 'Unsorted', collector: 'H. Whitlow', year: 2026, locality: document.getElementById('nw-loc').value.trim() || 'Norfolk', drawer: 'Intake', status: 'In Store', count: +document.getElementById('nw-count').value || 1, type: '' };
+  table.setRows([r].concat(table.rows)); rows = table.rows; facts();
+  S4.snackbar({ text: id + ' accessioned', action: 'Undo', onAction: function () { table.remove([id]); rows = table.rows; facts(); } });
+});
+
+/* ---------- a record's page: filled from its id, so a link or a reload shows the same record ---------- */
+var recordPage = document.querySelector('.s4-subpage[data-page="record"]'), currentId = null;
+recordPage.addEventListener('s4-open', function (e) {
+  var r = table.rows.filter(function (x) { return x.id === e.detail.id; })[0] || rows.filter(function (x) { return x.id === e.detail.id; })[0]; if (!r) return;
+  currentId = r.id;
+  document.getElementById('r-cat').textContent = r.catalogue;
+  document.getElementById('r-type').textContent = r.type || r.group;
+  document.getElementById('r-name').textContent = r.taxon + (r.common ? '' : '');
+  document.getElementById('r-family').textContent = r.family + (r.common ? ' · ' + r.common : '');
+  document.getElementById('r-loc').textContent = r.locality + ', Norfolk';
+  document.getElementById('r-coll').textContent = r.collector + ', ' + r.year;
+  document.getElementById('r-drawer').textContent = 'Cabinet ' + r.drawer.replace(' · D', ', drawer ').replace('C', '');
+  document.getElementById('r-notes').textContent = note(r);
+  var h = [['Collected', r.collector + ' at ' + r.locality + ', ' + r.year], ['Accessioned', 'Register entry ' + r.catalogue + ', ' + Math.max(r.year, 1840 + (r.year % 7))]];
+  if (r.year < 1950) h.push(['Re-housed', 'Moved to acid-free trays in the 1987 survey']);
+  if (r.status === 'On Loan') h.push(['Lent', 'Out on loan, due back next year']);
+  if (r.status === 'Conservation') h.push(['In conservation', 'Sent for cleaning and a new label, November 2026']);
+  var same = table.rows.filter(function (x) { return x.taxon === r.taxon && x.id !== r.id; }).sort(function (a, b) { return a.year - b.year; });
+  document.getElementById('r-same-h').textContent = same.length.toLocaleString() + ' More of This Species in the Register';
+  document.getElementById('r-same').innerHTML = same.slice(0, 4).map(function (x) { return '<li><button class="s4-list-item" type="button" data-page-open="record" data-page-id="' + esc(x.id) + '" data-page-title="' + esc(x.catalogue) + '"><span class="s4-list-content"><span class="s4-list-headline"><span class="ln-cat">' + esc(x.catalogue) + '</span> · ' + esc(x.locality) + '</span><span class="s4-list-supporting">' + esc(x.collector) + ', ' + x.year + '</span></span><span class="s4-list-trailing">' + status(x.status) + '</span></button></li>'; }).join('');
+  document.getElementById('r-history').innerHTML = h.reverse().map(function (x) { return '<li><i></i><b>' + esc(x[0]) + '</b><span>' + esc(x[1]) + '</span></li>'; }).join('');
+});
+document.getElementById('r-conserve').addEventListener('click', function () { var r = table.rows.filter(function (x) { return x.id === currentId; })[0]; if (r) conserve([r]); });
+
+/* ---------- insights ---------- */
+var work = document.getElementById('ln-work'), workSub = document.getElementById('ln-work-sub');
+function workData(days, endIso) {
+  var end = new Date(endIso || '2026-11-20'), labels = [], a = [], b = [], c = [];
+  for (var i = days - 1; i >= 0; i--) {
+    var d = new Date(end.getTime() - i * 864e5), k = d.getUTCDay(), off = k === 0 || k === 6;
+    labels.push(d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }));
+    a.push(off ? 0 : Math.round(38 + 14 * Math.sin(i / 2.3))); b.push(off ? 0 : Math.round(22 + 9 * Math.cos(i / 3.1))); c.push(off ? 0 : Math.round(9 + 5 * Math.sin(i / 1.7)));
+  }
+  return { labels: labels, series: [{ name: 'Checked', values: a }, { name: 'Edited', values: b }, { name: 'Photographed', values: c }] };
+}
+S4.chart(work, workData(30));
+work.addEventListener('s4-range', function (e) { var r = e.detail; S4.chart(work, workData(Math.min(r.days, 366), r.to)); workSub.textContent = r.value === 'custom' ? r.from + ' to ' + r.to : 'Last ' + r.days + ' days'; });
+(function () {
+  var by = {}; rows.forEach(function (r) { by[r.family] = (by[r.family] || 0) + 1; });
+  var top = Object.keys(by).sort(function (a, b) { return by[b] - by[a]; }).slice(0, 6);
+  S4.chart(document.getElementById('ln-families'), { labels: top, series: [{ name: 'Records', values: top.map(function (k) { return by[k]; }) }] });
+})();
+</script>
+</body>
+</html>

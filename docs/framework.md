@@ -37,6 +37,7 @@ touch laptop keeps touch sizes in a wide layout, a narrow desktop window keeps p
 |---|---|---|
 | Numbers and trends | `dashboard.html` | a list-detail view for the records behind the numbers |
 | Records people pick and act on | `list-detail.html` | a dashboard view if people ask "how are we doing" |
+| Hundreds or thousands of records compared, filtered and changed in bulk | `data-table.html` | a page per record (`S4.pages`), saved views for the questions people ask every week |
 | One calculation or transformation | `tool.html` | nothing; keep it one screen |
 | Reading | `article.html` | a list of articles (list-detail) for a help center |
 | Talking | `chat.html` | a list-detail of conversations on wide screens |

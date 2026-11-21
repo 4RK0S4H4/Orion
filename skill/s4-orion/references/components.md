@@ -7,8 +7,8 @@ Every component has a live reference page at https://4rk0s4h4.github.io/s4-orion
 
 - **Actions:** [button](#button), [icon-button](#icon-button), [button-group](#button-group), [fab](#fab)
 - **Navigation and shell:** [app](#app), [layout](#layout), [page](#page), [top-app-bar](#top-app-bar), [nav-bar](#nav-bar), [nav-rail](#nav-rail), [tabs](#tabs), [toolbar](#toolbar), [search](#search), [desktop](#desktop), [breadcrumbs](#breadcrumbs), [pagination](#pagination), [stepper](#stepper)
-- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
-- **Content:** [prose](#prose), [message](#message)
+- **Containment and data:** [card](#card), [pane](#pane), [list](#list), [table](#table), [stat](#stat), [description-list](#description-list), [divider](#divider), [avatar](#avatar), [accordion](#accordion), [expand](#expand), [empty-state](#empty-state), [states](#states), [direct](#direct), [filter](#filter), [chart](#chart), [ring](#ring), [milestones](#milestones), [timeline](#timeline), [month](#month)
+- **Content:** [prose](#prose), [message](#message), [code](#code)
 - **Websites:** [site](#site)
 - **Inputs:** [form](#form), [text-field](#text-field), [combobox](#combobox), [tag-input](#tag-input), [number-field](#number-field), [code-field](#code-field), [upload](#upload), [time-field](#time-field), [rating](#rating), [date-picker](#date-picker), [chip](#chip), [switch](#switch), [checkbox](#checkbox), [radio](#radio), [slider](#slider), [swatches](#swatches), [color-field](#color-field), [password](#password), [inline-edit](#inline-edit)
 - **Feedback:** [badge](#badge), [status](#status), [progress](#progress), [banner](#banner), [skeleton](#skeleton), [reward](#reward), [snackbar](#snackbar), [tooltip](#tooltip)
@@ -1172,6 +1172,101 @@ its column name on the left and the value on the right. The header row becomes a
 buttons; plain column names are hidden (each cell carries its own). A selectable row's checkbox sits at the block's top
 start.
 
+### At scale (round 0056)
+
+Everything below is opt-in; markup without these attributes behaves exactly as above.
+
+### Columns (any table, markup or data)
+
+| Attribute | What |
+|---|---|
+| `data-resizable` on the table | a grip at the end of each header: drag it (mouse or finger), or Tab to it and use Left / Right (Shift for bigger steps), Home for the narrowest; double-click or Enter fits the column to its content. The grip is a `role="separator"` with `aria-valuenow`. |
+| `th[data-pin]`, `th[data-pin="end"]` | the column stays while the table scrolls sideways. Pinned cells are solid (the table's surface, the row's selection or state mixed in) with a tonal edge only while something is under them; never a shadow, never glass. The checkbox and details columns travel with the start pins. |
+| `data-key="name"` on the table | widths, order, hidden and pinned columns are kept in this browser under that name |
+| `th[data-fill]` | the column that takes the spare width when the columns are narrower than the table (default: the `data-primary` one) |
+| `data-column-menu` on a data table | a menu on every column header: Sort Ascending, Sort Descending, Group by (with `th[data-groupable]`), Pin, Fit to Content, Move Left, Move Right, Hide. Never drag-only. With a pointer the button shows on hover or focus; on touch it is always there. |
+| `.s4-menu[data-table-columns="#table-id"]` | a Columns menu for that table: a check item per column to show or hide it; Alt and Up / Down move the focused column |
+
+### Data (`S4.table`)
+
+```html
+<div class="s4-states" data-state="loading">
+  <div data-when="loading" data-table-skeleton="8"></div>
+  <div class="s4-table-wrap" data-when="ready" data-sticky style="--s4-table-max-height: 70vh">
+    <table class="s4-table" id="records" data-key="records" data-resizable data-column-menu
+           data-row-menu="#row-menu" data-selection-bar="#bar">
+      <thead><tr>
+        <th scope="col" data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Shown Records"><span class="s4-checkbox-box"></span></label></th>
+        <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
+        <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+        <th scope="col" data-field="taxon" data-primary data-edit>Taxon</th>
+        <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum">Specimens</th>
+        <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div data-when="no-results" class="s4-empty">…Clear Filters…</div>
+  <div data-when="empty" class="s4-empty">…</div>
+  <div data-when="error" class="s4-empty">…<button data-retry>Try Again</button></div>
+</div>
+```
+```js
+const t = S4.table(document.getElementById('records'), {
+  id: 'id', noun: 'record', nouns: 'records',
+  cell: { status: (v, row) => `<span class="s4-status">${v}</span>` },   // optional HTML per column
+  detail: (row) => `<p>…</p>`                                            // what a row's details show
+});
+t.setRows(rows);                      // 10,000 rows: only what is on screen is drawn
+```
+
+| Header attribute | What |
+|---|---|
+| `data-field` | the row property the column shows |
+| `data-format` | `number`, `integer`, `currency:EUR`, `percent`, `date` (or a `cell` function) |
+| `data-edit`, `data-edit="number"` | the cell is a real input that reads as text: tap it to type; with the keyboard, Right to the cell and Enter. Enter or leaving saves, Escape puts it back, a snackbar offers Undo. Never focused for you (decision 0049). `data-required` refuses an empty value. |
+| `data-total="sum|avg|min|max|count"` | a sticky totals footer (over the rows that pass the filters) and a subtotal on each group's row |
+| `data-groupable` | offered in the column menu as Group by |
+| `th[data-row-expand]` | a details button per row: the details open in place under it (Reveal), the first rung of the placement ladder |
+| `th[data-row-actions]` + `data-row-menu="#menu"` | a row menu button; choosing an item fires `s4-row-action { action, row, id }` on the table |
+| `data-selection-bar="#bar"` on the table | the `.s4-selection-bar` that shows the count and bulk actions while rows are picked |
+
+Script: `setRows(rows)`, `filter(fn)`, `search(text, fields)`, `sort(field, 'ascending'|'descending'|null)`,
+`group(field|null)`, `expand(id, open)`, `update(id, patch)`, `remove(ids)` (returns the removed rows, for Undo),
+`selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown), `.selected`. Columns: `S4.tableColumns(table)`:
+`width(field, px)`, `fit(field)`, `hide(field, on)`, `move(field, index)`, `pin(field, 'start'|'end'|'')`.
+Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `count`), `edit`
+(`field`, `value`, `previous`, `undo`), `update`, `resize`, `columns`; `s4-select { row, data }` when a row opens;
+`s4-toggle { id, open }` for details; `s4-row-action`. The [filter](#filter) component drives `filter`, `search` and
+`sort` and writes them into the address.
+
+**Rows on screen only.** The body holds the rows in view plus a few either side, between two spacer rows whose height
+is the rest of the table, so the scrollbar is the real length from the start and never jumps. Each frame reads the
+scroll position once, draws, then measures the new rows together (no reading inside a loop). Measured on the reference
+page (10,000 rows, Chromium in this sandbox): first draw of the data 25 ms, sorting 10,000 rows 43 ms, about 20 rows in
+the page at any time (under 830 elements in the table while scrolling from top to bottom), a smooth scroll at 60 frames a
+second with the median frame at 16.7 ms. Every drawn row carries `aria-rowindex`; the table carries `aria-rowcount`, so a
+screen reader says "row 4,812 of 5,002".
+
+**Keyboard (data tables):** the table is one Tab stop (the current row). Up and Down move a row, Page Up and Page Down a
+screen, Home and End (or Ctrl with them) the first and last; Right and Left move through the row's controls and cells
+that edit; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
+extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
+On a group row, Enter or Right and Left open and close the group.
+
+**Phones:** the stacked layout stays the default for data tables too (rows are measured as they are drawn): headline,
+then one line per value, details under the checkbox, the row menu in the top corner, the sort buttons in one row that
+scrolls sideways. Use `data-layout="scroll"` on the wrap instead when people compare numbers across a row (a price grid,
+a timetable, a register of loans): the real table stays, scrolls sideways, and its pinned first column keeps every row
+named.
+
+**States:** inside a `.s4-states`, `setRows` shows `ready` (or `empty` for no rows), and a filter that leaves nothing
+shows a `no-results` part when there is one (a Clear Filters button there). `data-table-skeleton="8"` on the loading part
+draws skeleton rows shaped like the table's columns.
+
+**Print:** the table takes the sheet's width, nothing is pinned, the checkbox, details and menu columns are left out.
+A data table prints the rows that are drawn: print from a report view of the rows that matter.
+
 **When to use what:** a table when people compare values across columns or sort; a [list](#list) when each item is
 read on its own. Keep tables to the columns that matter; put the rest on the detail page.
 
@@ -1192,7 +1287,7 @@ column and sort order. Sorting is a native button in the header. Clickable rows 
 open on Enter; the link inside stays the accessible way in. Forced-colors mode draws the wrap's border and outlines
 checked rows.
 
-**Tokens:** `--s4-size-table-header`, `--s4-size-table-row`, `--s4-size-touch-target`, `--md-sys-shape-corner-large`,
+**Tokens:** `--s4-size-table-header` (and with the scale additions `--s4-shape-text-field` for cells that edit, `surface-container`, `surface-container-high`, `surface-container-highest`, `outline`, `primary` for the active grip, `--s4-motion-bend`, Reveal for details), `--s4-size-table-row`, `--s4-size-touch-target`, `--md-sys-shape-corner-large`,
 `--md-sys-color-surface-container-low`, `--md-sys-color-secondary-container`, `--md-sys-color-on-secondary-container`,
 `--md-sys-color-outline-variant`, `--md-sys-typescale-title-small-*`, `-body-medium-*`, `-title-medium-*`,
 `-label-large-*`, `--md-sys-state-*`, `--md-sys-motion-spring-spatial` (rows slide into their sorted place),
@@ -1602,6 +1697,95 @@ Tab. Picked rows carry `aria-checked`.
 
 ---
 
+<a id="filter"></a>
+
+## Filters and Views
+
+One pattern for narrowing a collection (records, orders, specimens, tickets): a **search** that filters as you type,
+the **filters in force** as chips (each removable, and Clear All), **Add Filter**, a **filters panel** with every facet
+and what each choice would give, a **sort** control and **saved views** (named sets of filters, search and sort) that
+can be saved, updated, renamed and deleted with Undo. The state is in the address, so a view can be linked.
+
+```html
+<div class="s4-filter" id="records-filter" data-for="#records" data-key="records" data-url aria-label="Filter records">
+  <div class="s4-filter-views" aria-label="Saved Views"></div>
+  <div class="s4-filter-bar">
+    <div class="s4-search" role="search">…<input class="s4-search-input" type="search" aria-label="Search records">…</div>
+    <button class="s4-button" data-variant="tonal" type="button" data-filter-add data-menu="add-filter">Add Filter</button>
+    <div class="s4-menu" id="add-filter" aria-label="Add a filter"></div>
+    <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="filters">All Filters<span class="s4-badge" hidden></span></button>
+    <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+    <div class="s4-menu" id="sort" aria-label="Sort"></div>
+    <button class="s4-icon-button" type="button" data-filter-views data-menu="view-options" aria-label="View Options">…</button>
+    <div class="s4-menu" id="view-options" data-align="end" aria-label="View options"></div>
+  </div>
+  <div class="s4-filter-active" aria-label="Active Filters" hidden></div>
+  <p class="s4-filter-count"></p>
+</div>
+<dialog class="s4-side-sheet" id="filters" data-modeless aria-labelledby="filters-h">
+  <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="filters-h">Filters</h2><button class="s4-icon-button" data-close aria-label="Close Filters">…</button></div>
+  <div class="s4-sheet-content"><div class="s4-filter-facets"></div></div>
+  <div class="s4-sheet-actions"><button class="s4-button" type="button" data-filter-done>Show Records</button></div>
+</dialog>
+```
+
+```js
+const filter = S4.filter(document.getElementById('records-filter'), {
+  noun: 'record', nouns: 'records',
+  facets: [
+    { field: 'family', label: 'Family', type: 'choice', icon: 'tag' },          // checkboxes with counts
+    { field: 'collector', label: 'Collector', type: 'tags' },                   // many values: a tag input with suggestions
+    { field: 'year', label: 'Collected', type: 'range', min: 1800, max: 2026, grouping: false }   // two number fields
+  ],
+  views: [{ id: 'all', name: 'All Records' }, { id: 'on-loan', name: 'On Loan', state: { f: { status: ['On Loan'] } } }]
+});
+```
+
+| Part / attribute | What |
+|---|---|
+| `data-for="#table"` | the [data table](#table) it narrows (`S4.table`); or pass `{ table }`, or `{ rows, onChange(state) }` for anything else |
+| `data-key` | saved views and the chosen view are kept in this browser under that name |
+| `data-url` | the state is written to the address query and read back on load: `?q=owl&family=Strigidae|Corvidae&year=1900..1950&sort=year:descending&view=on-loan`. It uses `replaceState` and keeps the hash, so `S4.pages` links (`#view/page/id`) still work |
+| `.s4-filter-views` | the views as single-select filter chips; a dot on the chosen one says it was changed since |
+| `[data-filter-add]` + its menu | Add Filter: one item per facet; choosing one opens the panel at that facet |
+| `[data-filter-panel]` (`data-sheet`) | All Filters, with a badge counting the filters in force |
+| `[data-filter-sort]` + its menu | the sortable columns and the direction (follows the table's own header sort) |
+| `[data-filter-views]` + its menu | Save as New View, Update, Rename (in place), Delete (with Undo) |
+| `.s4-filter-active` | the filters in force as input chips (Delete or Backspace on a chip's remove button works), and Clear All |
+| `.s4-filter-count` | “1,204 of 5,000 records”: changes at once, announced politely when typing pauses |
+| `.s4-filter-facets` in a `data-modeless` panel | every facet: choices with counts (what you would get with every other filter kept), a tag input for long lists, a range |
+| `[data-filter-done]` | the panel's Show button: closes it (on a phone the panel covers the list); there is nothing to apply |
+
+Script: `S4.filter(el, options)` returns the controller: `.state` (`{ q, f, sort }`), `.clear()` (with Undo),
+`.useView(id)`, `.views`. Event: `s4-change { state, count, total, view }` on the element.
+
+**When to use what**
+- A search alone when people look for one thing by name; the full bar when they narrow by several properties.
+- Choice facets for a handful of values (status, type); a tag input for long lists (people, places); a range for numbers
+  and years. Five or six facets at most in the bar's Add Filter; the panel can hold more.
+- Views for the questions people ask every week (“On Loan”, “Needs Conservation”). Not for one-off searches.
+- Chips are right here because views and filters narrow a collection and there can be many (decision 0059); a button
+  group is for one value that changes how the same thing is shown, and tabs are for swapping what is on the screen.
+
+**Do**
+- Keep the count next to the results; show the no-results state (`.s4-states` with a `no-results` part) with Clear Filters.
+- Name views after the question they answer, in Title Case.
+
+**Don't**
+- Don't add an Apply button: filters act at once (decision 0054).
+- Don't hide the filters in force behind the panel; the chips are how people see why something is missing.
+- Don't focus the search when anything opens (decision 0049); the person taps it.
+
+**Accessibility:** the bar is a `role="search"` field and real buttons; the views and the filters in force are labelled
+groups; each chip's remove button names the filter (“Remove Family Strigidae”) and focus moves to the next chip when one
+goes; facets are sections headed by their name, choices are real checkboxes with their count; the count is a polite
+status that waits for typing to pause.
+**Motion:** Reveal for renaming a view in place; Follow for the menus; Pop for the panel; State elsewhere.
+**Tokens:** chip, search, list and floating panel tokens; label-large for the count and option counts, title-small for
+facet titles; `--s4-space-*`.
+
+---
+
 <a id="chart"></a>
 
 ## Charts
@@ -1902,6 +2086,81 @@ they arrive while the person reads. Sender names are text, not only avatars.
 
 **Tokens:** `--md-sys-color-primary`, `--md-sys-color-surface-container-high`, `--md-sys-shape-corner-large`,
 `--md-sys-shape-corner-small`, `--md-sys-shape-corner-extra-large`, `--s4-app-inset-bottom`, `--s4-z-sticky`.
+
+---
+
+<a id="code"></a>
+
+## Code
+
+A block of code people read or copy: a snippet in docs, a config file, a command, a change. It carries its file name
+and language, line numbers, marked lines, a **Wrap** toggle and **Copy**. A diff shows added and removed lines with
+their sign. Inline code and keys sit in running text. Code is solid content, never glass.
+
+```html
+<figure class="s4-code" data-lang="js" data-lines data-mark="6-8">
+  <figcaption class="s4-code-head"><span class="s4-code-file">specimens/table.js</span></figcaption>
+  <pre><code>const table = S4.table(el);
+table.setRows(rows);</code></pre>
+</figure>
+
+<figure class="s4-code" data-variant="diff" data-lines>…<pre><code>- old line
++ new line</code></pre></figure>
+
+<p>Fill it with <code class="s4-code-inline">setRows(rows)</code>; search with <span class="s4-keys"><kbd class="s4-kbd">Ctrl</kbd><kbd class="s4-kbd">K</kbd></span>.</p>
+```
+
+| Attribute / part | What | Default |
+|---|---|---|
+| `.s4-code` on a `<figure>` | the block: `surface-container` (one step up inside a card, pane or panel), large corners | — |
+| `.s4-code-head` (`<figcaption>`) + `.s4-code-file` | the head: file name in the mono face; the language label and the buttons are added | no head: the buttons sit in the top corner |
+| `data-lang` | `js`, `ts`, `json`, `css`, `html`, `xml`, `py`, `sh` (and long names) are colored by the built-in tokenizer; any other name only labels | no colors |
+| `data-lines` | line numbers in a gutter that stays while the code scrolls sideways; never copied | none |
+| `data-mark="3-4,9"` | marked lines: a step-up fill and an accent bar at the start | none |
+| `data-wrap` | long lines wrap; the Wrap button toggles it (`aria-pressed`) | scroll sideways |
+| `data-variant="diff"` | lines starting `+` are `<ins>` on the success container, `-` are `<del>` on the error container, `@@` and file lines are quiet; the sign keeps its own column | — |
+| `data-plain` | keep the code as written, no colors | — |
+| `data-no-actions` | no Wrap or Copy (a one-line example) | buttons |
+| `<span class="s4-syntax-…">` inside the code | pre-tokenised code is kept: `keyword`, `string`, `number`, `comment`, `function`, `type`, `property`, `punctuation` | — |
+| `.s4-code-inline` | inline code in running text | — |
+| `.s4-kbd`, `.s4-keys` | one key (from the desktop component), a combination of keys | — |
+
+Script: `S4.code.render(fig)` after you change the code; `S4.code.text(fig)` gives it as text; `S4.code.tokenize(text, lang)`
+gives `[[role, text], …]`. Events: `s4-copy { text, ok }`, `s4-change { wrap }`.
+
+**Colors** are tokens, `--s4-syntax-keyword | string | number | comment | function | type | property`: fixed hues, like the
+status colors, so code reads the same with any accent. Each is proven at 4.5:1 on every surface in light, dark and both
+high-contrast modes (6:1 there) by `npm run check:tokens`, and on the surfaces of every tinted scheme by
+`npm run check:accent`. Comments are italic as well as gray. Plain code and punctuation are `on-surface` and
+`on-surface-variant`.
+
+**The tokenizer** is about 3 KB and covers the languages people paste most. It is a set of patterns, not a parser: it
+is right for snippets and config, not for a code editor. For any other language, tokenise on the server (Shiki,
+Pygments, highlight.js) and map its classes to the `s4-syntax-*` names; the block keeps them.
+
+**When to use what**
+- A block for anything people copy or read as code (more than a few words, or several lines).
+- `.s4-code-inline` for a name, a value or a short command inside a sentence.
+- `.s4-kbd` for keys; never for code.
+- A diff for a change someone reviews; not for showing a whole new file.
+
+**Do**
+- Name the file in the head when there is one; it is what people search for.
+- Mark the two or three lines the text talks about, and say in the text why.
+- Keep examples short and real (names and values from the app).
+
+**Don't**
+- Don't use a code block for output people only glance at (a log line in a list is plain text).
+- Don't add line numbers to a two-line snippet.
+- Don't color code by hand outside the tokens; don't put a code block on glass.
+
+**Accessibility:** the `<pre>` is a focusable, named region (from the file name), so the keyboard can scroll long
+lines and a screen reader can find it; line numbers and the gutter are generated content and never read or copied;
+added and removed lines are `<ins>` and `<del>` with their sign, never color alone; Copy says "Copied" in a polite live
+region. Forced colors: the block, inline code and marked lines get a system border.
+**Motion:** none (Copy's check is an icon swap). **Tokens:** `--s4-syntax-*`, `surface-container`,
+`surface-container-high`, `surface-container-highest`, `primary` (the mark bar), `--s4-color-success-container`,
+`error-container`, `--md-ref-typeface-mono`, body-medium size, body-large line height, label-large.
 
 ---
 

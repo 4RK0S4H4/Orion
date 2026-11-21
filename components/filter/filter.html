@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Filters and Views · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Filters and Views</h1></header>
+<main class="ex-main">
+  <p>One pattern for narrowing a collection: a search that filters as you type, the filters in force as chips (each removable, and Clear All), Add Filter, a tool panel with every facet and what each choice would give, a sort control and named views you can save, rename and delete (with Undo). The panel is a tool panel (decision 0054): from 600 wide the page stays live beside it and every choice acts at once. The state is in the address, so a view can be linked.</p>
+
+  <section class="ex-sec">
+    <h2>Filter Bar, Views and a Table</h2>
+    <p>Try “owl”, add a Family, narrow the years in All Filters, then Save as New View. The count under the bar is announced when typing pauses.</p>
+    <div class="ex-board col">
+      <div class="s4-filter" id="fx" data-for="#fx-table" data-key="ref-filter" data-url aria-label="Filter specimens">
+        <div class="s4-filter-views" aria-label="Saved Views"></div>
+        <div class="s4-filter-bar">
+          <div class="s4-search" role="search">
+            <span class="s4-icon" data-icon="search"></span>
+            <input class="s4-search-input" type="search" placeholder="Search Specimens" aria-label="Search specimens">
+            <button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Search" hidden><span class="s4-icon" data-icon="close"></span></button>
+          </div>
+          <button class="s4-button" data-variant="tonal" type="button" data-filter-add data-menu="fx-add"><span class="s4-icon" data-icon="add"></span>Add Filter</button>
+          <div class="s4-menu" id="fx-add" aria-label="Add a filter"></div>
+          <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="fx-panel"><span class="s4-icon" data-icon="filter"></span>All Filters<span class="s4-badge" hidden></span></button>
+          <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="fx-sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+          <div class="s4-menu" id="fx-sort" aria-label="Sort"></div>
+          <button class="s4-icon-button" data-variant="tonal" type="button" data-filter-views data-menu="fx-views" aria-label="View Options"><span class="s4-icon" data-icon="bookmark"></span></button>
+          <div class="s4-menu" id="fx-views" data-align="end" aria-label="View options"></div>
+        </div>
+        <div class="s4-filter-active" aria-label="Active Filters" hidden></div>
+        <p class="s4-filter-count"></p>
+      </div>
+      <div class="s4-states" id="fx-states" data-state="loading">
+        <div data-when="loading" data-table-skeleton="6"></div>
+        <div class="s4-table-wrap" data-when="ready" data-sticky style="--s4-table-max-height: 26rem">
+          <table class="s4-table" id="fx-table">
+            <caption class="s4-visually-hidden">Specimens</caption>
+            <thead><tr>
+              <th scope="col" data-field="catalogue" aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="taxon" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Taxon<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="family" aria-sort="none"><button type="button" class="s4-table-sort">Family<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="collector">Collector</th>
+              <th scope="col" data-field="year" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Collected<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+              <th scope="col" data-field="status">Status</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div data-when="no-results" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="search"></span></span><h3 class="s4-empty-title">No Specimens Match</h3><p class="s4-empty-text">Nothing fits these filters. Take one away, or clear them all.</p><button class="s4-button" data-variant="tonal" type="button" id="fx-clear">Clear Filters</button></div>
+        <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="folder"></span></span><h3 class="s4-empty-title">No Specimens Yet</h3><p class="s4-empty-text">Accessioned specimens appear here.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <dialog class="s4-side-sheet" id="fx-panel" data-modeless aria-labelledby="fx-panel-h">
+    <div class="s4-sheet-header"><h2 class="s4-sheet-title" id="fx-panel-h">Filters</h2><button class="s4-icon-button" type="button" data-close aria-label="Close Filters"><span class="s4-icon" data-icon="close"></span></button></div>
+    <div class="s4-sheet-content"><div class="s4-filter-facets"></div></div>
+    <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" type="button" data-filter-clear-panel>Clear All</button><button class="s4-button" type="button" data-filter-done>Show Records</button></div>
+  </dialog>
+
+  <section class="ex-sec">
+    <h2>Where It Goes</h2>
+    <p>The views sit on top (they change everything below), the bar under them, the filters in force under the bar, then the count and the collection. On a phone the views and the chips are one row each that scrolls sideways, the search takes the full width and the panel covers the screen with a Show button that closes it. A saved view is a named set of filters, a search and a sort; the first view is the whole collection and cannot be deleted.</p>
+  </section>
+  <p class="ex-foot">Source: <code>components/filter/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  (function () {
+    var seed = 7, rnd = function () { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }, pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
+    var FAM = [['Strigidae', ['Strix aluco (tawny owl)', 'Asio otus (long-eared owl)', 'Athene noctua (little owl)']], ['Corvidae', ['Corvus corax (raven)', 'Pica pica (magpie)', 'Garrulus glandarius (jay)']], ['Carabidae', ['Carabus violaceus', 'Nebria brevicollis']], ['Nymphalidae', ['Vanessa atalanta (red admiral)', 'Aglais io (peacock)']], ['Mustelidae', ['Meles meles (badger)', 'Lutra lutra (otter)']], ['Fringillidae', ['Fringilla coelebs (chaffinch)', 'Pyrrhula pyrrhula (bullfinch)']]];
+    var WHO = ['A. Ribeiro', 'T. Okafor', 'P. Nair', 'M. Lindqvist', 'E. Hartley', 'J. Mbeki', 'R. Sato', 'C. Duarte'];
+    var STATUS = ['In Store', 'In Store', 'On Display', 'On Loan', 'Conservation'];
+    var rows = [];
+    for (var i = 1; i <= 600; i++) { var f = pick(FAM); rows.push({ id: i, catalogue: 'NH-' + String(i).padStart(5, '0'), taxon: pick(f[1]), family: f[0], collector: pick(WHO), year: 1850 + Math.floor(rnd() * 176), status: pick(STATUS) }); }
+    var TONE = { 'On Loan': 'tertiary', Conservation: 'error' };
+    var table = S4.table(document.getElementById('fx-table'), { cell: { status: function (v) { return '<span class="s4-status"' + (TONE[v] ? ' data-tone="' + TONE[v] + '"' : '') + '>' + v + '</span>'; } } });
+    setTimeout(function () {
+      table.setRows(rows);
+      var filter = S4.filter(document.getElementById('fx'), {
+        noun: 'specimen', nouns: 'specimens',
+        facets: [
+          { field: 'family', label: 'Family', type: 'choice', icon: 'tag' },
+          { field: 'status', label: 'Status', type: 'choice', icon: 'info' },
+          { field: 'collector', label: 'Collector', type: 'tags', icon: 'person', noun: 'collectors' },
+          { field: 'year', label: 'Collected', type: 'range', icon: 'calendar', min: 1800, max: 2026, grouping: false }
+        ],
+        views: [
+          { id: 'all', name: 'All Specimens' },
+          { id: 'on-loan', name: 'On Loan', state: { f: { status: ['On Loan'] }, sort: { field: 'year', dir: 'ascending' } } },
+          { id: 'owls', name: 'Owls Before 1900', state: { f: { family: ['Strigidae'], year: { min: null, max: 1899 } } } }
+        ]
+      });
+      document.getElementById('fx-clear').addEventListener('click', function () { filter.clear(); });
+      document.querySelector('[data-filter-clear-panel]').addEventListener('click', function () { filter.clear(); });
+    }, 500);
+  })();
+</script>
+</body>
+</html>

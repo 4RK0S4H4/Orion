@@ -38,5 +38,15 @@ for (const dark of [false, true]) for (const [seed, variants] of seeds) for (con
   for (const [name, fg, bg] of text) { const r = ratio(fg, bg); worst.text = Math.min(worst.text, r); if (r < 4.5) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v}: ${name} is ${r.toFixed(2)}:1, needs 4.5:1`); } }
   for (const surf of SURFACES) { const r = ratio(s.primary, neutral(surf, dark)); worst.shape = Math.min(worst.shape, r); if (r < 3) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v}: primary on ${surf} is ${r.toFixed(2)}:1, needs 3:1`); } }
 }
+/* syntax colors (code blocks) keep 4.5:1 on the tinted surfaces of every accent (S4.theme({ surfaces: 'tinted' }) uses
+   M3's tonal scheme unless a variant is named), so a code block reads the same in both color modes */
+const SYNTAX = ['keyword', 'string', 'number', 'comment', 'function', 'type', 'property'];
+const syntax = (r, dark) => { const t = T['--s4-syntax-' + r]; return dark ? t.modes.dark : t.value; };
+let tinted = 0; worst.syntax = Infinity;
+for (const dark of [false, true]) for (const [seed, variants] of seeds) for (const v of ['tonal', ...variants]) {
+  tinted++;
+  const s = M3.scheme(seed, v, dark, 0);
+  for (const surf of SURFACES) for (const r of SYNTAX) { const x = ratio(syntax(r, dark), s[surf]); worst.syntax = Math.min(worst.syntax, x); if (x < 4.5) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v} tinted: syntax ${r} on ${surf} is ${x.toFixed(2)}:1, needs 4.5:1`); } }
+}
 if (failures) { console.error(`${failures} accent pair(s) below the bar.`); process.exit(1); }
-console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + the named accents in vibrant and their default variant, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed).`);
+console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + the named accents in vibrant and their default variant, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed); syntax colors on ${tinted} tinted schemes worst ${worst.syntax.toFixed(2)}:1 (4.5 needed).`);

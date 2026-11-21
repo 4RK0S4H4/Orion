@@ -52,6 +52,37 @@
   .s4-chart-legend > li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
   .s4-chart-key { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); flex: none; }
 
+  /* a legend that switches series (data-legend="toggle"): each name is a button; a switched-off key is a faded key and a struck-through name */
+  .s4-chart-legend[data-toggle] { gap: var(--s4-space-1) var(--s4-space-1); margin-inline-start: calc(var(--s4-space-2) * -1); }
+  .s4-chart-series {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-space-8);
+    margin: 0;
+    padding: 0 var(--s4-space-3) 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--s4-shape-control);
+    background: transparent;
+    color: var(--md-sys-color-on-surface);
+    font: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-chart-series::after { content: ""; position: absolute; inset: 50% auto auto 50%; inline-size: 100%; min-inline-size: var(--s4-size-touch-target); block-size: var(--s4-size-touch-target); translate: -50% -50%; }
+  .s4-chart-series { position: relative; }
+  @media (hover: hover) { .s4-chart-series:hover { background: var(--md-sys-color-surface-container-high); } }
+  .s4-chart-series:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  .s4-chart-series[aria-pressed="false"] { color: var(--md-sys-color-on-surface-variant); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .s4-chart-series[aria-pressed="false"] .s4-chart-key { opacity: var(--md-sys-state-disabled-content-opacity); }
+
+  /* the time range control above a chart: ranges as a button group, Custom opens a date range in place */
+  .s4-chart-range { display: flex; flex-wrap: wrap; align-items: end; gap: var(--s4-space-2) var(--s4-space-3); min-inline-size: 0; }
+  .s4-chart-range-custom { display: flex; align-items: end; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-chart-range-custom[hidden] { display: none; }
+  .s4-chart-range-custom > .s4-text-field { min-inline-size: calc(var(--s4-space-16) * 4); }
+
   .s4-chart-toggle { position: absolute; inset-block-start: calc(var(--s4-space-1) * -1); inset-inline-end: 0; }
   .s4-chart-table { overflow-x: auto; }
   .s4-chart-table[hidden] { display: none; }
@@ -81,5 +112,5 @@
   /* spark: a small line beside a number; no axes, no table */
   .s4-chart[data-type="spark"] { display: inline-flex; inline-size: var(--s4-chart-spark-width, 6rem); }
   .s4-chart[data-type="spark"] > .s4-chart-plot { block-size: var(--s4-space-8); }
-  @media (forced-colors: active) { .s4-chart-mark, .s4-chart-arc, .s4-chart-line { forced-color-adjust: none; } }
+  @media (forced-colors: active) { .s4-chart-mark, .s4-chart-arc, .s4-chart-line { forced-color-adjust: none; } .s4-chart-series { border: 1px solid ButtonText; } }
 }
