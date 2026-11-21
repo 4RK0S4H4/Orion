@@ -12,6 +12,7 @@ the few things an app still has to do.
 | Contrast levels | Standard, medium, high; device "more contrast" picks high unless the app chose a level | tokens, `S4.theme({ contrast })` |
 | Focus | 3dp `secondary` ring, 2dp outside, on every interactive element (`:focus-visible`) | `base.css` |
 | Touch targets | ≥ 48dp on every control, even when the visual is 32 or 40dp | components (`::after` hit areas) |
+| Dense maps of real things | `data-dense` on a seat plan, a keyboard, a calendar's cells (never on ordinary controls): each target drawn ≥ 18px and ≥ 24px from the centre of its nearest neighbour (WCAG 2.5.8's spacing rule), arrow keys between them (decision 0063) | the suite's phone pass |
 | Reduced motion | Spatial springs become instant; fades remain; JS animations read the same tokens; the reach suite checks nothing keeps looping | tokens, `S4.motion` |
 | Reduced transparency | Glass becomes solid (`prefers-reduced-transparency`, `data-glass="off"`, no `backdrop-filter` support) | tokens |
 | Forced colors | Decorative layers drop out; buttons, icon buttons, fields, checkboxes and radios keep a real 1px or 2px system-color edge; sliders and switches paint in Highlight. The reach suite checks every control has a boundary | `base.css`, each component |

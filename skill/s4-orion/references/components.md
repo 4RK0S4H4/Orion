@@ -1648,6 +1648,11 @@ read on its own. Keep tables to the columns that matter; put the rest on the det
 - Don't rely on sideways scrolling on phones; the stacked layout is there so you don't need it.
 - Don't sort columns where order means nothing (descriptions).
 
+**Selecting rows (decision 0063, amends 0044 inside tables):** an empty box in a resting row is a quiet dot, half the
+size, in the same 3:1 control color; it grows into the full box when its row is hovered or holds the focus, and every
+box shows in full while anything is selected. The Select All box in the head always shows in full. Cells keep wrapping
+(0058); they never truncate.
+
 **Accessibility:** a real `<table>` with `<caption>`, `scope`d headers and `aria-sort`, so screen readers announce the
 column and sort order. Sorting is a native button in the header. Clickable rows are focusable with an inner focus ring and
 open on Enter; the link inside stays the accessible way in. Forced-colors mode draws the wrap's border and outlines

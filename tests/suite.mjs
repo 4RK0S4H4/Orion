@@ -104,7 +104,24 @@ function audit(opts) {
   });
   /* touch targets on a phone: the tappable box, counting an enlarged ::after hit area */
   if (opts.phone) {
+    /* decision 0063: a dense map of real things (seats, keys, calendar cells) marked data-dense is held to WCAG 2.5.8's
+       spacing rule instead: each target drawn at least 18px, and 24px or more from the centre of its nearest neighbour */
+    const dense = new Map();
+    document.querySelectorAll('[data-dense]').forEach((map) => {
+      const ts = [...map.querySelectorAll('button, a[href], input, [role="button"], [role="gridcell"][tabindex], [role="option"]')].filter((el) => vis(el) && !el.disabled && el.getAttribute('aria-disabled') !== 'true');
+      ts.forEach((el) => dense.set(el, map));
+      const c = ts.map((el) => { const r = el.getBoundingClientRect(); return { el, x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; });
+      let small = 0, close = 0, worst = Infinity, tiny = Infinity;
+      c.forEach((a) => {
+        if (a.w < 18 || a.h < 18) { small++; tiny = Math.min(tiny, a.w, a.h); }
+        const d = Math.min(...c.filter((b) => b !== a).map((b) => Math.hypot(a.x - b.x, a.y - b.y)));
+        if (d < 24) { close++; worst = Math.min(worst, d); }
+      });
+      if (small) out.push(`dense map ${tag(map)}: ${small} target(s) drawn under 18px (${Math.round(tiny)}px)`);
+      if (close) out.push(`dense map ${tag(map)}: ${close} target(s) closer than 24px to the next (${Math.round(worst)}px between centres)`);
+    });
     document.querySelectorAll('button, a[href], input, select, summary, [role="button"], [role="tab"]').forEach((el) => {
+      if (dense.has(el)) return;
       if (!vis(el) || el.disabled || el.getAttribute('aria-disabled') === 'true' || el.tabIndex < 0 && el.tagName !== 'INPUT') return;
       if (el.closest('.ex-foot, .s4-prose, p, footer, li > a:only-child') && el.tagName === 'A') return;                    /* links inside text follow the text */
       let r = el.getBoundingClientRect(), w = r.width, h = r.height;
