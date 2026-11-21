@@ -1,7 +1,8 @@
 /* Prose: long-form text (articles, help pages, release notes, legal, AI answers). S4 addition.
    <article class="s4-prose">…plain h1-h4, p, ul/ol, blockquote, code, pre, a, hr, figure, table…</article>
    The one place bare elements get styled, and only inside .s4-prose. Body-large text, about 70 characters a line,
-   headings on the M3 type scale (emphasized), links underlined in primary. Put it in a data-width="reading" page. */
+   headings on the M3 type scale (emphasized), links underlined in primary. Put it in a data-width="reading" page.
+   Also here, usable anywhere (decision 0063): .s4-kicker (an editorial label in small capitals) and figure.s4-figure. */
 @layer s4.components {
   .s4-prose {
     max-inline-size: 70ch;
@@ -79,7 +80,7 @@
   .s4-prose hr { border: 0; border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); margin-block: var(--s4-space-8); }
   .s4-prose :where(img, video) { border-radius: var(--md-sys-shape-corner-large); }
   .s4-prose figure { margin-inline: 0; }
-  .s4-prose figcaption {
+  .s4-prose figcaption, .s4-figure > figcaption {
     margin-block-start: var(--s4-space-2);
     color: var(--md-sys-color-on-surface-variant);
     font-size: var(--md-sys-typescale-body-small-size);
@@ -91,5 +92,41 @@
     font-size: var(--md-sys-typescale-title-large-size);
     line-height: var(--md-sys-typescale-title-large-line-height);
   }
+
+  /* ---------- kicker (decision 0063): the short label above an editorial title, or a post's section ----------
+     Real small capitals where the face has them (font-synthesis off, so a face without them never fakes them); in
+     Inter, which has none, it is the emphasized label in the accent, in Title Case. Inside or outside prose. */
+  .s4-kicker {
+    display: block;
+    margin: 0;
+    color: var(--md-sys-color-primary);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
+    font-variant-caps: all-small-caps;
+    font-synthesis-small-caps: none;
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
+  .s4-prose > .s4-kicker + * { margin-block-start: var(--s4-space-2); }
+  /* a text face other than Inter (a serif, a humanist face): small capitals read best a size up, a little apart, at the
+     face's own text weight */
+  :where([data-type-text]:not([data-type-text="inter"])) .s4-kicker {
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    letter-spacing: var(--s4-type-caps-tracking);
+    font-weight: var(--md-sys-typescale-title-medium-weight);
+  }
+
+  /* ---------- figure (decision 0063): a picture with its caption, outside prose too ----------
+     <figure class="s4-figure"><img …> or a drawing <figcaption>What it shows, and who made it.</figcaption></figure>
+     The picture takes large corners and the full width; the caption sits under it in body-small. */
+  .s4-figure { display: grid; gap: var(--s4-space-2); margin: 0; min-inline-size: 0; }
+  .s4-figure > :not(figcaption) { min-inline-size: 0; max-inline-size: 100%; border-radius: var(--md-sys-shape-corner-large); overflow: clip; }
+  .s4-figure > :where(img, video, svg, canvas, picture) { display: block; inline-size: 100%; block-size: auto; }
+  .s4-figure > figcaption { margin-block-start: 0; text-wrap: pretty; }
+
   @media (forced-colors: active) { .s4-prose :where(blockquote, pre) { border: 1px solid CanvasText; } }
 }

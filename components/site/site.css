@@ -961,6 +961,17 @@
     line-height: var(--md-sys-typescale-body-medium-line-height);
     font-variant-numeric: tabular-nums;
   }
+  /* decision 0063: a post's section is a kicker (.s4-kicker, components/prose) above its title; the byline is one quiet
+     line, the names in it in on-surface (small capitals where the face has them) */
+  .s4-post-byline {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+  }
+  .s4-post-byline :where(b, strong) { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-small-weight); font-variant-caps: all-small-caps; font-synthesis-small-caps: none; }
+  :where([data-type-text]:not([data-type-text="inter"])) .s4-post-byline :where(b, strong) { font-weight: inherit; letter-spacing: var(--s4-type-caps-tracking); }
   @container s4-site-section (width >= 840px) {
     .s4-post { grid-template-columns: calc(var(--s4-space-16) * 3) minmax(0, 1fr); column-gap: var(--s4-space-8); }
     .s4-post > .s4-post-meta:first-child { grid-row: span 3; align-self: start; flex-direction: column; align-items: flex-start; padding-block-start: var(--s4-space-1); }

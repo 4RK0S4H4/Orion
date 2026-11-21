@@ -22,6 +22,7 @@
     --s4-category-4: var(--s4-chart-4);
     --s4-category-5: var(--s4-chart-5);
     --s4-category-6: var(--s4-chart-6);
+    --s4-type-caps-tracking: 0.06em;
     --s4-glass-tint-opacity-fab-secondary-container: 0.9;
     --s4-glass-tint-opacity-fab-tertiary-container: 0.99;
     --s4-glass-tint-opacity-fab-primary: 0.9;

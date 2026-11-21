@@ -1,0 +1,12 @@
+{
+  "$description": "Editorial type (decision 0063): the spacing small capitals take in a kicker or a byline when the page's face has real small capitals.",
+  "s4": {
+    "type": {
+      "$type": "dimension",
+      "caps-tracking": {
+        "$value": { "value": 0.06, "unit": "em" },
+        "$description": "Letter spacing for real small capitals (.s4-kicker, .s4-post-byline names) in a face other than Inter. Inter has no small capitals, so there the kicker stays a Title Case label with the label's own tracking."
+      }
+    }
+  }
+}

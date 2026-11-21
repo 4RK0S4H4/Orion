@@ -23,7 +23,6 @@
   .pn-main { display: grid; gap: var(--s4-space-6); min-inline-size: 0; }
 
   /* ---------- the sky: a scoped dark block; the drawing is decoration, the caption says what it shows ---------- */
-  .pn-sky { margin: 0; display: grid; gap: var(--s4-space-2); }
   .pn-sky-art { position: relative; aspect-ratio: 16 / 10; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); overflow: hidden; }
   .pn-sky-art svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
   .pn-sky-art .star { fill: var(--md-sys-color-on-surface); }
@@ -33,11 +32,9 @@
   .pn-sky-art .land { fill: var(--md-sys-color-surface-container-low); }
   .pn-sky-art .temple { fill: var(--md-sys-color-surface-container-lowest); }
   .pn-sky-art .river { fill: var(--md-sys-color-surface-container-highest); }
-  .pn-sky figcaption, .pn-caption { margin: 0; padding-inline: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
 
   /* ---------- title, lead and byline: a magazine head above the prose ---------- */
   .pn-head { display: grid; gap: var(--s4-space-4); max-inline-size: 70ch; }
-  .pn-kicker { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
   .pn-title { margin: 0; font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: 500; text-wrap: balance; }
   @container s4-app (width >= 600px) { .pn-title { font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); } }
   .pn-lead { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-title-large-size); line-height: calc(var(--md-sys-typescale-title-large-line-height) + var(--s4-space-1)); }
@@ -111,13 +108,13 @@
 
           <!-- The title first, the picture after: a reader knows what this is before the art -->
           <header class="pn-head">
-            <p class="pn-kicker">Total Solar Eclipse · 2 August 2027</p>
+            <p class="s4-kicker">Total Solar Eclipse · 2 August 2027</p>
             <h2 class="pn-title" id="top">Six Minutes in Luxor</h2>
             <p class="pn-lead">The longest totality on land this century crosses the Nile at lunchtime. Here is where to stand, what the sky will do, and how to keep the day from going wrong.</p>
             <div class="pn-by"><span class="s4-avatar" aria-hidden="true">AN</span><span><strong>Amara Nwosu</strong><small>Eleven totalities, two of them clouded out · 9 min read · Updated 12 Nov 2026</small></span></div>
           </header>
 
-          <figure class="pn-sky">
+          <figure class="s4-figure">
             <div class="pn-sky-art" data-theme="dark">
               <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" id="sky"></svg>
             </div>

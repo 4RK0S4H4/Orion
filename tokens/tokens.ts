@@ -85,6 +85,11 @@ export const tokens = {
     "value": "var(--s4-chart-6)",
     "description": "Category 6 (deep green), decision 0060: the same color as chart series 6, named for what is not a chart: tags, desks, revision colors, a calendar's kinds of booking, drawn artwork. Always named in words beside it; never text color."
   },
+  "--s4-type-caps-tracking": {
+    "type": "dimension",
+    "value": "0.06em",
+    "description": "Letter spacing for real small capitals (.s4-kicker, .s4-post-byline names) in a face other than Inter. Inter has no small capitals, so there the kicker stays a Title Case label with the label's own tracking."
+  },
   "--s4-glass-tint-opacity-fab-secondary-container": {
     "type": "number",
     "value": "0.9",

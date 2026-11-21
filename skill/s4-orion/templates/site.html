@@ -54,9 +54,8 @@
   .hv-hero-text > div > * { margin: 0; }
   .hv-hero-text > div > .s4-site-actions-row { justify-self: stretch; }
   .hv-hero .s4-hero-title { margin: 0; max-inline-size: 13ch; font-size: calc(var(--s4-site-hero-size) * 1.3); line-height: calc(var(--s4-site-hero-line-height) * 1.18); }
-  .hv-hero .s4-eyebrow { margin: 0; }
   @container s4-site-section (width >= 840px) { .hv-hero-text { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: var(--s4-site-section-gap); } }
-  .hv-sheet { margin: 0; display: grid; gap: var(--s4-space-3); }
+  .hv-sheet { gap: var(--s4-space-3); }
   .hv-sheet-art { position: relative; padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
   @container s4-site-section (width >= 840px) { .hv-sheet-art { padding: var(--s4-space-10) var(--s4-space-12); } }
   .hv-sheet figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-6); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
@@ -154,7 +153,7 @@
     <div class="hv-hero">
       <div class="hv-hero-text">
         <div>
-          <p class="s4-eyebrow">Architects · Glasgow · Since 2009</p>
+          <p class="s4-kicker">Architects · Glasgow · Since 2009</p>
           <h1 class="s4-hero-title" id="hero-h">Buildings for the Ordinary Parts of a Day</h1>
         </div>
         <div>
@@ -165,7 +164,7 @@
           </div>
         </div>
       </div>
-      <figure class="hv-sheet">
+      <figure class="s4-figure hv-sheet">
         <div class="hv-sheet-art" role="img" aria-label="Ground floor plan of Govanhill Library and Baths: an entrance hall and café on the left, the reading room in the middle, the pool hall on the right, with a children's library, study rooms, changing rooms and plant along Calder Street.">
           <svg class="hv-plan" data-wide viewBox="0 0 1200 470" aria-hidden="true">
             <circle class="tree" cx="120" cy="26" r="20"/><circle class="tree" cx="190" cy="22" r="16"/><circle class="tree" cx="430" cy="24" r="22"/><circle class="tree" cx="510" cy="20" r="15"/><circle class="tree" cx="900" cy="24" r="20"/><circle class="tree" cx="1080" cy="22" r="18"/>
