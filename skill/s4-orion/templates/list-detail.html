@@ -48,6 +48,8 @@
   .rl-facts dd { margin: 0; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
   /* below 1600 the card opens in place from the ticket; from 1600 it is its own pane, so the button goes */
   @container s4-app (width >= 1600px) { .rl-ctx-toggle { display: none; } }
+  /* on a wide window the queue gets the room a ticket's title needs (one or two lines, not four); dragging the seam still wins */
+  @container s4-app (width >= 1400px) { #queue { --s4-split-list: 28rem; } }
   .s4-subpage > article { max-inline-size: var(--s4-layout-content-reading); margin-inline: auto; }
 </style>
 </head>
