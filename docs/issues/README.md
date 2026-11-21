@@ -35,7 +35,7 @@ Sent with screenshots after the round 0056 publish; "more minor critiques and id
   Image: `img/2026-11-17-composer-double-ring.png`.
 - **65.** Onboarding step dots: "also bug here" (the active dot is a squashed ellipse, not a clean pill, and sits off
   the row). Image: `img/2026-11-17-onboarding-dots.png`.
-- **66.** Direction for templates: monochrome stays for Orion's own pages (the design language site, showcase,
+- **66.** Done 2026-11-21 (all 19 templates plus the new Data Table are their own products, each with its own brand through the dials; the lessons became decision 0060, proposals in `docs/history/round-0056/lessons.md`). Direction for templates: monochrome stays for Orion's own pages (the design language site, showcase,
   reference pages). **Every template should be its own thing**: "super unique", a high quality standalone page with
   Orion as the base, showing "how far this framework can be customized in all aspects ... focus on making the page
   fulfill that purpose and see in what ways S4 Orion holds you back or what you would want different. Similar to how
@@ -69,9 +69,9 @@ questions; the small ones can be fixed without asking.
 - **58.** Small things: the Elevated button looks like the Text button on a card (no shadow to elevate with); avatar
   stacks cover each other's initials; breadcrumb chevrons sit unevenly between pills and the current page. Done
   2026-11-16 (decision 0058; look on an iPhone at Elevated vs Tonal on a dark card and the stack at xs).
-- **59.** Rich inputs and data at scale (combobox, tag input, upload, time, number, one-time code, tree, table resize /
+- **59.** Done 2026-11-21 (rich inputs merged earlier in round 0056; data at scale in decision 0061: data tables with virtual rows, pinned and resizable columns, filters and saved views, code blocks; the tree came with 0062; needs the owner's iPhone and desktop look at `templates/data-table.html`). Rich inputs and data at scale (combobox, tag input, upload, time, number, one-time code, tree, table resize /
   pinning / virtual rows): already Horizon 2; the review argues for pulling rich inputs forward.
-- **60.** Desktop anatomy beyond the title bar: menu bar, status bar, document tabs, sidebar tree, settings window, a
+- **60.** Partly done 2026-11-21 (decision 0062: commands, menu bar, status bar, document tabs, tree, inspector, settings as a view, Parley; the Electron and installed-app examples in `examples/` could not be run here, Tauri is notes only; needs a look on a real desktop). Desktop anatomy beyond the title bar: menu bar, status bar, document tabs, sidebar tree, settings window, a
   real shell example.
 - **Reach** (Horizon 1 item 4): right-to-left, print, 200% text, long text, forced colors, keyboard. Done 2026-11-16
   (decision 0058, `tests/reach.mjs`). Left: WebKit and Firefox runs, print pagination, the exemptions listed in 0058

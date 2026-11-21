@@ -36,15 +36,15 @@ When two good ideas conflict, the earlier line wins.
 6. **Any accent, any app.** Nothing may depend on black and white, on one kind of content, or on one screen size.
 7. **The app is the app** (0053). Orion is a language, not a kit of parts: an app keeps its own screens and elements, and Orion grows the component the app needs. The app is never bent to fit what is on the shelf.
 
-## Where it stands (2026-11-16)
+## Where it stands (2026-11-21)
 
 | Layer | State |
 |---|---|
 | Tokens, color, type, shape, glass | Settled (0003 to 0045). Open only: the owner's iPhone looks for 0037, 0040. |
 | Motion | Settled: ten patterns, enforced (0046). |
-| Places | Settled in principle: views, pages (0050), the placement ladder (0047). Tool panels (0054) settle modal versus live. |
-| Components | 62. The website kit (0057); themes on any container (0056). The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
-| Templates | 19: 14 app archetypes and five site templates (landing, pricing, blog, docs, site). |
+| Places | Settled in principle: views, pages (0050), the placement ladder (0047). Tool panels (0054) settle modal versus live. A desktop window's parts (menu bar, document tabs, tree, inspector, status bar, settings as a view) are settled by 0062. |
+| Components | 79. The website kit (0057); themes on any container (0056); rich inputs; data at scale (data tables, filters and saved views, code; 0061); desktop anatomy (commands, menu bar, status bar, document tabs, tree; 0062). The app-level set is there (palette, states, forms, direct manipulation, charts); the first four made for a real app (ring, milestones, month, timeline; 0053). |
+| Templates | 20: 15 app archetypes (Data Table added) and five site templates (landing, pricing, blog, docs, site), each its own product with its own brand (issue 66); their lessons became 0060. |
 | Proof | `npm run check` (tokens, glass, accents, scopes, motion, stale output) and `npm test` (every page used like a person, every dial preset, and reach: rtl, print, 200% text, long text, forced colors, keyboard; Chromium and WebKit in CI). |
 | Skill | Packaged; needs its evals re-run against the new components. |
 
@@ -62,10 +62,10 @@ The goal is that the owner can ask for any app and get something they would ship
 
 ### Horizon 2: 1.3, "a desktop and data citizen"
 1. **Non-modal floating panels** (write a message while reading another), if the owner wants them.
-2. **A menu bar pattern** and a real Electron or Tauri shell example wired to `data-window`.
+2. **A menu bar pattern** and a real Electron or Tauri shell example wired to `data-window`. Built in round 0056 (0062); the shells need a run on a real desktop.
 3. **Data at scale:** a table with column resize, pinned columns and row virtualisation; filters and saved views;
-   charts with a time range control.
-4. **Rich inputs:** combobox with search, tag input, file drop, time and date-time, a color field.
+   charts with a time range control. Built in round 0056 (0061).
+4. **Rich inputs:** combobox with search, tag input, file drop, time and date-time, a color field. Built in round 0056.
 5. **Minified bundles** and per-set icon files, so an app ships only what it uses.
 
 ### Horizon 3: 2.0, "a language others could use"

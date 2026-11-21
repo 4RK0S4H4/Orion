@@ -8,8 +8,25 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
-Round 0056: themes on any container, the website kit, reach (decisions 0056 to 0058):
+Round 0056: themes on any container, the website kit, reach, lessons from the templates, data at scale, desktop anatomy (decisions 0056 to 0062):
 
+- Added: tables at scale (decision 0061): `data-resizable` column grips, `th[data-pin]` pinned columns, `data-column-menu`, a Columns menu (`.s4-menu[data-table-columns]`), saved layout (`data-key`), `S4.tableColumns`.
+- Added: data tables, `S4.table(el, options)`: virtual rows, one Tab stop with arrow keys, groups and subtotals, a sticky totals footer, details in place, editing in place with Undo, a row menu (`s4-row-action`), the selection bar, states with skeleton rows, `data-layout="scroll"` for a real table on a phone.
+- Added: filters and saved views (`.s4-filter`, `S4.filter`), state in the address query.
+- Added: code blocks (`.s4-code`, `S4.code`), inline code (`.s4-code-inline`), key combinations (`.s4-keys`), diffs; syntax color tokens `--s4-syntax-*`, proven in four modes and on every tinted scheme.
+- Added: chart time range control (`.s4-chart-range`, `s4-range`) and a legend that switches series (`data-legend="toggle"`).
+- Added: icons `columns` and `pin`.
+- Added: template Data Table (Linnea, a museum's collections register, 5,000 rows).
+- Changed: table header sort buttons draw their focus ring inside (a scrolling wrap no longer cuts it); `components/table/table.html` loads the bundle.
+- Added: `S4.commands` (decision 0062), one list of an app's actions feeding the menu bar, menus, right-click menus, shortcuts, buttons (`data-cmd`), the palette and a shell's native menu (`S4.commands.native`).
+- Added: menu bar (`.s4-menubar`), status bar (`.s4-statusbar`), document tabs (`.s4-doc-tabs`), tree view (`.s4-tree`); submenus in menus (`data-submenu`); keyboard context menus (Shift+F10, the menu key). 79 components.
+- Added: the rail as a source list: folding groups, a tree inside, `data-resizable`.
+- Added: title bar variants `tabs` and `unified`; `<html data-shell>`, `data-native-menu`, `data-window-blurred`, `data-window-state`; the inspector pane (`.s4-inspector`).
+- Added: tokens `--s4-size-statusbar`, `-menubar-item`, `-doc-tab`, `-tree-row`, `-tree-indent`, `-inspector`.
+- Added: `examples/` with an Electron shell, an installed web app with window controls overlay, and a shell bridge.
+- Changed: the desktop app template is Parley, a translation workbench with the whole desktop anatomy and its own brand. 20 templates (15 app, five site), every one its own product (issue 66).
+- Changed: `S4.palette.register` adds to `S4.commands`; registered shortcuts now run from anywhere.
+- Fixed: the rail's sliding highlight stayed on the list when the current destination was in the footer; a collapsed rail's main action grew tall when its hidden label wrapped; a keyboard hint inside a filled button had low contrast.
 - Changed: a seed with no variant picks one by itself (`auto`, decision 0060): `fidelity` for a muted or deep brand color (chroma under 60 or tone under 35), `vibrant` for a vivid one; `S4.theme.variantFor(seed)`. Muted brand colors no longer turn neon. Swatches keep the page's own variant. `S4.theme()` reports `variant: 'auto'` when none was named.
 - Fixed: glass FAB labels reach 4.5:1 with any seed: the default FAB's icon and label (`--s4-color-on-fab`) and every FAB's tint are chosen per scheme, the owner's tint kept wherever the label allows (decision 0060); `check-glass` proves FAB labels for 192 seeded schemes; the suite no longer exempts seeded FABs.
 - Fixed: a restored tinted app no longer switches from tonal to vibrant (the saved theme held `variant: 'vibrant'`).

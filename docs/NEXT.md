@@ -3,7 +3,78 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-16, round 0056): wave 1 built, needs the owner's look
+## Now (2026-11-21, round 0056 finished): everything built, needs the owner's look
+
+The owner asked for every area of the design review taken to a 10 and left the order and the calls to us ("I trust
+your judgement", 2026-11-16). Round 0056 built all of it in workstreams and merged them (notes in
+[`history/round-0056/`](history/round-0056/)); `npm run check` and `npm test` are green:
+- **Wave 1:** themes on any container, motion energy, app defaults, roomy density (0056); the website kit (0057); reach
+  and every dial preset proven (0058).
+- **Wave 2:** hierarchy and wide windows (issues 54, 56); the owner's critiques 61 to 65; button groups are the Ink Track
+  and tabs join the navigation family (0059, the owner's pick).
+- **Templates as products** (issue 66, done): all 19 templates and the new Data Table are their own products with their
+  own brands through the dials (Tally, Relay, Pressroom, Moorings, Slugline, Crate, Proof, The Velvet, Fetch, Puck, Sprig,
+  Hollis & Vane, Tidewater, Mallet, Spool, Larkline, Overhang, Penumbra, Linnea, Parley).
+- **Lessons from the templates** (0060): a seed keeps its own color (variant `auto`), glass FAB labels proven for every
+  seed, `S4.theme.restore(…, { only: ['mode'] })`, category colors, `geometric` and `humanist` faces, the display weight
+  dial, `S4.buttonGroup.set`, the hairline token, message notes, small swatches. All 52 lessons:
+  [`history/round-0056/lessons.md`](history/round-0056/lessons.md).
+- **Rich inputs** (issue 59): combobox, tag input, number, one-time code, upload, time, rating, color, password helpers.
+- **Data at scale** (0061, issue 59): data tables with virtual rows, pinned and resizable columns, column menus, groups,
+  editing in place; filters and saved views in the address; code blocks and syntax tokens; chart ranges; Linnea.
+- **Desktop anatomy** (0062, issue 60): `S4.commands`, menu bar, status bar, document tabs, tree, the rail as a source
+  list, inspector, settings as a view, window states, `examples/` shells; Parley.
+79 components, 20 templates (15 app, five site).
+
+**Needs the owner's look on an iPhone:**
+1. `templates/data-table.html` (Linnea): stacked rows, scrolling the 5,000, details, tapping a Drawer cell to edit, the
+   filters panel, Loans scrolling sideways with the borrower pinned.
+2. `templates/desktop-app.html` (Parley) at phone width: the nav bar, a line opening with Back, settings list then category.
+3. The templates' brands (each should feel like a different product): Tally's serif, Relay's tinted page and dark rail,
+   Pressroom's mono headings; Crate's Futura, Proof's Optima, Moorings' rounded face (real faces only on the iPhone);
+   Slugline's script page (the line-type group following the caret).
+4. The rich inputs: the combobox list above the keyboard, the one-time code's autofill from Messages, the number field's
+   keyboard and hold-to-repeat, the upload zone opening the photo picker.
+5. From wave 1 and 2: the site templates' glass header and phone panel; the themes page and Dark Navigation (`@scope`
+   needs Safari 17.5+); Lively energy with `demo/index.html?scrub`; Larger Text, `dir=rtl`, print preview from Safari;
+   the field focus hairline on tap vs the ring from a keyboard; the Ink Track's lead and trail at speed.
+
+**Needs a look on a desktop (Windows or a Mac):**
+1. Parley at full size: the menu bar with F10 and Alt; right-click a line, a file and a tab; drag a tab and a file onto a
+   folder; collapse and resize the sidebar; Settings (mod+comma).
+2. Linnea at 1280 and 1600: column grips, column menus, pinned columns while scrolling sideways, the filters panel beside
+   the register, the keyboard through the table; `components/code/code.html`.
+3. Centred or start-aligned capped content on wide windows (showcase home and Settings at 1600 and 1920); pane titles at 600.
+
+**Not verified here:** WebKit and Firefox (not installable; CI runs WebKit); data table performance on real devices
+(60 fps median measured only in this sandbox); the Electron and installed-app examples (cannot run here; Tauri is notes
+only); the rail's resize and the inspector grip (by hand only, not in the suite); print pagination; real system faces.
+
+**Decisions waiting for the owner** (each with our recommendation; details in the notes):
+1. The brand color arrives late (a branded page paints monochrome first). **Recommend** a brand CSS file written at build
+   time for fixed brands, a runtime cache later for apps where the visitor picks a color.
+2. Editorial type. **Recommend** a `.s4-kicker` role with real small capitals; no old-style figures dial until a second
+   editorial template asks.
+3. A meter (the labelled track five templates drew). **Recommend** building `.s4-meter`.
+4. A board with lanes (counts, limits, add in place). **Recommend** building `.s4-board` after the meter.
+5. Dense map-like pickers (seats). **Recommend** an opt-in `data-dense` checked against the 24px spacing rule, only for
+   maps of real things.
+6. One bundled brand face. **Recommend** no: Inter stays the only bundled face; document how an app ships its own.
+7. Monochrome colored FAB labels (3.85:1 for `tertiary-container` over white). **Recommend** the per-scheme FAB rule of
+   0060 computed at build time for the monochrome FABs too.
+8. The vibrant toolbar on glass with a seed. **Recommend** the same rule (tint rises only as far as the text needs).
+9. Desktop (0062): rename taking the cursor (F2 is the person asking), the sixth truncation place (document tab labels),
+   a selection-strength dial for vivid accents. **Recommend** keeping rename and the tab ellipsis as built; the dial
+   only if the owner finds vivid selected rows too loud.
+10. Data (0061): a quieter resting checkbox in dense tables, and whether table cells may truncate. **Recommend** a
+    quieter checkbox inside tables; cells keep wrapping (0058) unless the owner prefers truncation with the full value
+    on hover.
+11. Wide windows: centred (built) or start-aligned capped content. **Recommend** centred.
+
+**Order from here (left to us):** the owner's looks first (device-only bugs before anything new), then the meter and the
+board if the owner agrees, then Horizon 1's real apps built end to end with the skill, skill evals, and release 1.2.
+
+## Earlier (2026-11-16, round 0056 wave 1): built, needs the owner's look
 
 The owner asked for every area of the design review taken to a 10 and left the order and the calls to us ("I trust
 your judgement"). Wave 1 was built by four workstreams and merged (notes in [`history/round-0056/`](history/round-0056/)):
@@ -30,7 +101,7 @@ your judgement"). Wave 1 was built by four workstreams and merged (notes in [`hi
 **Not verified here:** WebKit and Firefox (not installable; CI runs WebKit); print pagination (screenshots only); accent
 text on glass for all 210 schemes (one seed tested); the reach suite's exemptions listed in 0058.
 
-**Order from here (left to us):**
+**Order from here (left to us; all three done by 2026-11-21, see Now):**
 1. Wave 2: hierarchy and wide-window layout across the showcase and app templates (issues 54, 56).
 2. Rich inputs (combobox, tag input, upload, time, number, one-time code, rating) and data at scale (table at scale,
    filters and saved views, code block) (issue 59).
@@ -112,7 +183,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
    (Rail auto-expand and the rail FAB are settled by 0043.)
 4. Release: CHANGELOG date, tag, re-package the skill, tell the owner to re-download it.
 5. Desktop next steps (resizable panes and the command palette are in the idea quiz): a menu bar pattern, a real
-   Electron or Tauri shell example wired to `s4-window`.
+   Electron or Tauri shell example wired to `s4-window`. Done in round 0056 (0062); the shells need a real desktop run.
 6. Showcase: add the date picker, a floating side panel, status tones and a compact-density toggle.
 
 ## Backlog
@@ -126,6 +197,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-21 (round 0056, last merge): lessons (0060), data at scale (0061), desktop anatomy (0062) merged and fixed together; all templates are products (issue 66); decisions, docs, skill and hub updated; check and test green. Next: the owner's looks and the eleven decisions under Now.
 - 2026-11-16 (round 0056, wave 1): themes on any container, energy, app defaults, roomy (0056); website kit (0057); reach and proven dial presets (0058); four workstreams merged, check and test green. Next: the owner's looks, then wave 2 (issues 54, 56), 59, 60.
 - 2026-11-16 (brand dials): the owner's answers recorded as 0055; type retuned, first dials built, drift fixed. Next: the order above.
 - 2026-11-16 (design review): end-to-end review, comparison and brand dials proposal published as a quiz; issues 51 to 60 logged. Next: the owner's eight answers, then a numbered decision.
