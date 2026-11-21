@@ -34,7 +34,9 @@ let failures = 0, n = 0; const worst = { text: Infinity, shape: Infinity };
 for (const dark of [false, true]) for (const [seed, variants] of seeds) for (const v of variants) {
   n++;
   const s = M3.scheme(seed, v, dark, 0), pal = M3.palettes(seed, v), tone = (t) => pal.rows.Primary[pal.tones.indexOf(t)];
-  const text = [['on-primary', s['on-primary'], s.primary], ['on-primary-container', s['on-primary-container'], s['primary-container']], ['selection text', tone(dark ? 90 : 10), tone(dark ? 20 : 90)]];
+  /* the selection, as core.js writes it (decision 0063): never more colorful than the tonal palette's primary at that tone */
+  const calm = M3.palettes(seed, 'tonal'), sel = (t, row) => { const a = tone(t), b = calm.rows[row || 'Primary'][calm.tones.indexOf(t)]; return M3.hct(b).chroma < M3.hct(a).chroma ? b : a; };
+  const text = [['on-primary', s['on-primary'], s.primary], ['on-primary-container', s['on-primary-container'], s['primary-container']], ['selection text', sel(dark ? 90 : 10), dark ? sel(25, 'Secondary') : sel(90)]];
   for (const [name, fg, bg] of text) { const r = ratio(fg, bg); worst.text = Math.min(worst.text, r); if (r < 4.5) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v}: ${name} is ${r.toFixed(2)}:1, needs 4.5:1`); } }
   for (const surf of SURFACES) { const r = ratio(s.primary, neutral(surf, dark)); worst.shape = Math.min(worst.shape, r); if (r < 3) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v}: primary on ${surf} is ${r.toFixed(2)}:1, needs 3:1`); } }
 }

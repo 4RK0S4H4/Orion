@@ -84,7 +84,8 @@ for (const mode of ['light', 'dark']) {
   const accentRoles = (seed, v, dark) => {   /* neutral mode, as core.js writes it: the accent roles from the seed, the selection from the primary palette */
     const s = M3.scheme(seed, v, dark, 0), tone = toneOf(seed, v);
     const o = { 'primary-container': s['primary-container'], 'on-primary-container': s['on-primary-container'], primary: s.primary, 'on-primary': s['on-primary'] };
-    o['secondary-container'] = tone(dark ? 20 : 90); o['on-secondary-container'] = tone(dark ? 90 : 10);
+    const calm = M3.palettes(seed, 'tonal'), sel = (t, row) => { const a = tone(t), b = calm.rows[row || 'Primary'][calm.tones.indexOf(t)]; return M3.hct(b).chroma < M3.hct(a).chroma ? b : a; };   /* decision 0063 */
+    o['secondary-container'] = dark ? sel(25, 'Secondary') : sel(90); o['on-secondary-container'] = sel(dark ? 90 : 10);
     return o;
   };
   let fabSeeded = { t: 0 }, fabSeededColor = { t: 0 }, toolbarWorst = { t: 0 }, seededSchemes = 0; const fabTints = {};
