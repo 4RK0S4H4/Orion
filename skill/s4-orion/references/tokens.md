@@ -197,7 +197,8 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-shape-menu` | var(--md-sys-shape-corner-extra-large) |  |  |
 | `--s4-shape-menu-item` | var(--s4-shape-control) |  |  |
 | `--s4-shape-dialog` | var(--md-sys-shape-corner-extra-large) |  |  |
-| `--s4-shape-sheet` | var(--md-sys-shape-corner-extra-large) |  | Top corners of a bottom sheet; the edge that meets the screen stays square. |
+| `--s4-shape-sheet` | var(--md-sys-shape-corner-extra-large) |  | Corners of a floating panel (decision 0043: all four, it floats inside the window). |
+| `--s4-shape-screen` | 48px |  | Decision 0064: about how round a phone's own screen corners are. On a phone a dialog or floating panel sits in the bottom of the screen, and its bottom corners are this minus the inset, so they run parallel to the screen's corners. Not a brand dial: the device is as round as it is, whatever corners the app picks. |
 | `--s4-shape-snackbar` | var(--md-sys-shape-corner-full) |  |  |
 | `--s4-shape-tooltip` | var(--s4-shape-control) |  |  |
 | `--s4-shape-nav-indicator` | var(--s4-shape-control) |  |  |
@@ -364,7 +365,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-focus-ring-width` | 3px |  |  |
 | `--s4-focus-ring-offset` | 2px |  |  |
 | `--s4-focus-ring-color` | var(--md-sys-color-secondary) |  | M3 focus indicator: 3dp secondary, 2dp outside the component. |
-| `--s4-scrim-opacity` | 0.32 |  | Scrim behind modal surfaces: md.sys.color.scrim at this opacity. |
+| `--s4-scrim-opacity` | 0.16 | 0.32 | Scrim behind modal surfaces: md.sys.color.scrim at this opacity. Decision 0064: half of M3's 32% in light mode, where a gray page was the loudest thing about a dialog; dark mode keeps 32% (a dark page barely dims) and high contrast keeps the firm scrim. |
 
 ## Motion: springs
 
@@ -437,6 +438,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-glass-tint-opacity-fill` | 0.56 | 0.64 |  |
 | `--s4-glass-tint-opacity-medium-contrast` | 0.86 |  | Float tint when the app runs at medium contrast (contrast level 0.5). |
 | `--s4-glass-tint-opacity-fab-color` | 0.9 |  | Decision 0032: floating buttons in a color other than the default (secondary, tertiary, primary, or a container of those) are tinted 90%. Their own color pair is lower contrast than the default's, and at 75% the page checker found labels at 2.9:1 and 3.6:1 over a pure black or white backdrop. The default FAB keeps the owner's 75%. |
+| `--s4-glass-tint-opacity-modal` | 0.9 |  | Decision 0064: a modal dialog or panel is tinted 90%. It already sits over a scrim that sets it apart, so the page showing through it only added noise behind its question or its form. Still glass (it blurs and lets the color through), firmer than the 75% float, so the contrast guarantee holds with room to spare. |
 | `--s4-glass-blur-float` | 8px |  | Backdrop blur radius. Decision 0021: 8px (owner's playground pick; was 16px). |
 | `--s4-glass-saturation-float` | 1.5 |  | saturate() on the backdrop. Decision 0021: 150% (owner's playground pick; was 120% in 0014). |
 | `--s4-glass-backdrop-contrast-float` | 1 | 1 | contrast() on the backdrop. 1 (off) since decision 0021: the 75% tint alone keeps on-surface text at 4.5:1 or better over pure black or white (check-glass). Lower it below 1 only if the tint is lowered. |
@@ -445,7 +447,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-glass-item-fill` | 1 |  | How much of its own color an item (button, chip, text field) keeps on glass, 1 = fully (decision 0015: owner picked full fill; lower it to let the blurred backdrop tint items). |
 | `--s4-glass-item-outline` | rgb(255 255 255 / 0.28) | rgb(255 255 255 / 0.28) | The outline of an outline-only item on glass (outlined button, unselected chip): the glass's milky frost line, a little stronger than the edge (decision 0015). Zero in high contrast, where glass is solid and the item keeps its own outline. |
 | `--s4-glass-edge-width` | 1px |  |  |
-| `--s4-glass-edge-line` | rgb(23 23 26 / 0.08) | rgb(255 255 255 / 0.08) | The single line full-width bars draw on their content-facing edge. |
+| `--s4-glass-edge-line` | rgb(23 23 26 / 0.2) | rgb(255 255 255 / 0.16) | Decision 0064: the one hairline a docked glass bar (top app bar once content scrolls under it, site header, nav bar, docked toolbar) draws on the edge that faces the content, one device pixel wide, instead of a lit rim and glow. Zero where glass is solid (the bar keeps its own solid look). |
 | `--s4-glass-edge-scale-standard` | 1.5 |  | Decision 0029: on a standard-density screen (under 1.5 device pixels per CSS pixel, e.g. a 1080p or 1440p monitor) the edge width is multiplied by this, so it stays visible. Retina and phone screens keep the width as it is. |
 | `--s4-glass-edge-scale-large` | 2 |  | Edge width multiplier on a large standard-density screen (a 2200px or wider display at under 1.5 device pixels per CSS pixel, e.g. 1440p and up). |
 | `--s4-glass-edge-top-alpha` | 0.46 | 0.12 | How strong the light line along the top edge is (0 to 1). Its color comes from the surface (see `lift`), never pure white. |

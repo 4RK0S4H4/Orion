@@ -135,11 +135,19 @@
     --md-sys-color-secondary-container: color-mix(in srgb, var(--md-sys-color-primary) calc(var(--s4-glass-fill-selected-opacity) * 100%), transparent);
     --md-sys-color-on-secondary-container: var(--md-sys-color-on-surface);
   }
-  /* DOCKED GLASS (decision 0040): a surface that touches the screen edge lights, glows and shades only the edge that faces the content
-     (the top bar its bottom edge, the bottom nav its top edge, the rail its inner side). Floating panels (the former sheets, decision 0043) float clear of every edge and get the full edge. */
-  :where(.s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled]) { --_kt: 0; --_kl: 0; --_kr: 0; }
-  :where(.s4-nav-bar, .s4-toolbar[data-type="docked"]) { --_kb: 0; --_kl: 0; --_kr: 0; }
-  :where(.s4-nav-rail:is([data-modal], [data-overlay])) { --_kt: 0; --_kb: 0; --_kl: 0; --_lit: 1; }
+  /* DOCKED GLASS (decision 0064, replaces the lit edge of 0039 and 0040): a bar that sits against the screen edge (the top bar once
+     content scrolls under it, the site header, the nav bar, a docked toolbar) keeps the tint and the blur but has no rim, no glow
+     and no shade. A glowing rim reads as the edge of a raised slab, and a bar that runs off the screen on three sides is not an
+     object you could hold; on the iPhone the tab bar and the toolbar end in one hairline. So a docked bar draws a single device-
+     pixel hairline (--s4-glass-edge-line) on the edge that faces the content, and nothing else. Floating glass (menus, FABs,
+     panels, dialogs, the floating toolbar, tooltips) keeps the full edge: it floats clear of every edge, so it is an object. */
+  :root { --_hair: 1px; }
+  @media (resolution >= 2dppx) { :root { --_hair: .5px; } }
+  @media (resolution >= 3dppx) { :root { --_hair: calc(1px / 3); } }
+  :where(.s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled]) { --_kt: 0; --_kl: 0; --_kr: 0; box-shadow: inset 0 calc(-1 * var(--_hair)) 0 0 var(--s4-glass-edge-line); }
+  :where(.s4-nav-bar, .s4-toolbar[data-type="docked"]) { --_kb: 0; --_kl: 0; --_kr: 0; box-shadow: inset 0 var(--_hair) 0 0 var(--s4-glass-edge-line); }
+  :where(.s4-nav-rail:is([data-modal], [data-overlay])) { --_kt: 0; --_kb: 0; --_kl: 0; --_lit: 1; box-shadow: inset calc(-1 * var(--_hair)) 0 0 0 var(--s4-glass-edge-line); }
+  :where(.s4-nav-rail:is([data-modal], [data-overlay])):dir(rtl) { box-shadow: inset var(--_hair) 0 0 0 var(--s4-glass-edge-line); }
   /* FLOATING ACTION BUTTONS (decision 0025): glass too, tinted with the FAB's own color (--_bg) instead of the surface color, so
      it keeps its identity (primary-container by default, or the data-color it sets). Its icon and label keep the FAB's own
      on-color; scripts/check-glass.mjs proves that pair too. */
@@ -203,6 +211,10 @@
   :where(:root[data-contrast="medium"]) :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled], .s4-site-panel[data-open], .s4-nav-bar, .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-tooltip, .s4-snackbar) {
     --_glass-tint: var(--s4-glass-tint-opacity-medium-contrast);
   }
+
+  /* modal surfaces (decision 0064): over a scrim, the page showing through a dialog or a modal panel is only noise, so they
+     are firmer glass (90%); tool panels that leave the page live (0054) keep the float tint */
+  :where(.s4-dialog:modal, .s4-bottom-sheet:modal, .s4-side-sheet:modal) { --_glass-tint: var(--s4-glass-tint-opacity-modal); }
 
   /* at most two glass layers: a third glass surface nested inside two others is solid */
   :where(.s4-glass, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-toolbar)

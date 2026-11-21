@@ -126,7 +126,14 @@
       },
       "sheet": {
         "$value": "{md.sys.shape.corner.extra-large}",
-        "$description": "Top corners of a bottom sheet; the edge that meets the screen stays square."
+        "$description": "Corners of a floating panel (decision 0043: all four, it floats inside the window)."
+      },
+      "screen": {
+        "$value": {
+          "value": 48,
+          "unit": "px"
+        },
+        "$description": "Decision 0064: about how round a phone's own screen corners are. On a phone a dialog or floating panel sits in the bottom of the screen, and its bottom corners are this minus the inset, so they run parallel to the screen's corners. Not a brand dial: the device is as round as it is, whatever corners the app picks."
       },
       "snackbar": {
         "$value": "{md.sys.shape.corner.full}"

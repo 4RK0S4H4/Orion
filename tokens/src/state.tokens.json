@@ -62,8 +62,15 @@
     "scrim": {
       "opacity": {
         "$type": "number",
-        "$value": 0.32,
-        "$description": "Scrim behind modal surfaces: md.sys.color.scrim at this opacity."
+        "$value": 0.16,
+        "$description": "Scrim behind modal surfaces: md.sys.color.scrim at this opacity. Decision 0064: half of M3's 32% in light mode, where a gray page was the loudest thing about a dialog; dark mode keeps 32% (a dark page barely dims) and high contrast keeps the firm scrim.",
+        "$extensions": {
+          "com.s4.modes": {
+            "dark": 0.32,
+            "high-contrast": 0.32,
+            "dark-high-contrast": 0.32
+          }
+        }
       }
     }
   }

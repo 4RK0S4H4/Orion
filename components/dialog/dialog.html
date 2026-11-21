@@ -16,36 +16,37 @@
 <body>
 <header class="ex-bar"><h1><a href="../">Components</a> / Dialog</h1></header>
 <main class="ex-main">
-  <p>Dialogs ask for a decision. It <b>pops</b> in: rises a little and fades in, and drops away when it closes. Focus starts on the first non-destructive action, so Enter never confirms a delete by accident.</p>
-  <section class="ex-sec"><h2>Basic and Destructive</h2><p>Escape, Cancel, or a click on the scrim closes the dialog.</p>
+  <p>A dialog asks a question the app cannot go on without: something serious that cannot be undone, leaving with unsaved work, or a permission. Everything else goes somewhere calmer first (decision 0047): a reply or a rename in place, choices in a menu, a short task in a floating panel, reading on a page. On a wide window it is a modest card in the middle; on a phone it sits in the bottom of the screen within reach of your thumb, its answers side by side, and a tap outside, a swipe down, Escape or Back puts it away (decision 0064).</p>
+  <section class="ex-sec"><h2>The Three Questions</h2><p>Destructive and final, unsaved work, and a permission. The dialog itself takes focus, never a field and never the destructive answer.</p>
     <div class="ex-board">
-      <button class="s4-button" data-variant="tonal" data-dialog="d-rename" type="button"><span class="s4-icon" data-icon="edit"></span>Rename Bill</button>
       <button class="s4-button" data-color="error" data-dialog="d-delete" type="button">Delete Bill</button>
-      <button class="s4-button" data-variant="outlined" data-dialog="d-full" type="button">Edit Details</button>
+      <button class="s4-button" data-variant="tonal" data-dialog="d-leave" type="button"><span class="s4-icon" data-icon="close"></span>Close Draft</button>
+      <button class="s4-button" data-variant="tonal" data-dialog="d-allow" type="button"><span class="s4-icon" data-icon="notifications"></span>Due Date Reminders</button>
       <span class="s4-on-surface-variant" id="d-result" aria-live="polite"></span>
     </div>
     <div class="ex-backdrop" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   </section>
+  <section class="ex-sec"><h2>Not a Dialog</h2><p>Rename edits the name where it is; archive just happens and offers Undo; a bill's details open as a page. None of them stop the app to ask.</p>
+    <div class="ex-board">
+      <button class="s4-button" data-variant="tonal" type="button" id="d-archive"><span class="s4-icon" data-icon="archive"></span>Archive Bill</button>
+    </div>
+  </section>
   <dialog class="s4-dialog" id="d-delete" aria-labelledby="d-delete-h">
     <span class="s4-icon s4-dialog-icon" data-icon="delete"></span>
     <h2 class="s4-dialog-headline" id="d-delete-h">Delete this bill?</h2>
-    <div class="s4-dialog-content">Staples, $72.40, due Nov 2. This can’t be undone.</div>
-    <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="text" data-color="error" data-close="delete" type="button">Delete</button></div>
+    <div class="s4-dialog-content">Staples, $72.40, due Nov 2. It goes from every device and can’t be undone.</div>
+    <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="tonal" data-color="error" data-close="delete" type="button">Delete</button></div>
   </dialog>
-  <dialog class="s4-dialog" id="d-rename" aria-labelledby="d-rename-h">
-    <h2 class="s4-dialog-headline" id="d-rename-h">Rename Bill</h2>
-    <div class="s4-dialog-content"><p style="margin:0">Choose the name shown in your bill list.</p>
-      <div class="s4-text-field"><input id="d-name" value="Comcast Business"><label for="d-name">Name</label></div></div>
-    <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="text" data-close="save" type="button">Save</button></div>
+  <dialog class="s4-dialog" id="d-leave" aria-labelledby="d-leave-h">
+    <h2 class="s4-dialog-headline" id="d-leave-h">Close without saving?</h2>
+    <div class="s4-dialog-content">Your note to Comcast Business hasn’t been saved.</div>
+    <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Keep Editing</button><button class="s4-button" data-variant="tonal" data-color="error" data-close="discard" type="button">Discard</button><button class="s4-button" data-close="save" type="button">Save</button></div>
   </dialog>
-  <dialog class="s4-dialog" id="d-full" data-fullscreen="compact" aria-labelledby="d-full-h">
-    <div class="s4-dialog-bar"><button class="s4-icon-button" data-close="cancel" aria-label="Close" type="button"><span class="s4-icon" data-icon="close"></span></button><h2 class="s4-dialog-headline">Edit Details</h2><button class="s4-button" data-variant="text" data-close="save" type="button">Save</button></div>
-    <h2 class="s4-dialog-headline" id="d-full-h">Edit Details</h2>
-    <div class="s4-dialog-content">
-      <div class="s4-text-field"><input id="d-v" value="Iron Mountain"><label for="d-v">Vendor</label></div>
-      <div class="s4-text-field"><span class="s4-text-field-affix" data-prefix>$</span><input id="d-a" value="1,240.00" inputmode="decimal"><label for="d-a">Amount</label></div>
-      <p style="margin:0">On phones this dialog fills the screen.</p></div>
-    <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="text" data-close="save" type="button">Save</button></div>
+  <dialog class="s4-dialog" id="d-allow" aria-labelledby="d-allow-h">
+    <span class="s4-icon s4-dialog-icon" data-icon="notifications"></span>
+    <h2 class="s4-dialog-headline" id="d-allow-h">Remind you before bills are due?</h2>
+    <div class="s4-dialog-content">A notification two days before each due date. You can change this in Settings.</div>
+    <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="no" type="button">Not Now</button><button class="s4-button" data-close="allow" type="button">Allow</button></div>
   </dialog>
   <p class="ex-foot">Source: <code>components/dialog/</code> · Solar icons by 480 Design (CC BY 4.0)</p>
 </main>
@@ -55,9 +56,11 @@
 <script src="../button/button.js"></script>
 <script src="../button-group/button-group.js"></script>
 <script src="dialog.js"></script>
+<script src="../snackbar/snackbar.js"></script>
 <script src="../text-field/text-field.js"></script>
 <script src="../icon-button/icon-button.js"></script>
 <script src="../_example/example.js"></script>
-<script>document.addEventListener("s4-close",e=>{document.getElementById("d-result").textContent=e.detail.value?"Closed with: "+e.detail.value:"Dismissed"});</script>
+<script>document.addEventListener("s4-close",e=>{document.getElementById("d-result").textContent=e.detail.value?"Closed with: "+e.detail.value:"Dismissed"});
+document.getElementById("d-archive").addEventListener("click",()=>S4.snackbar({text:"Bill archived",action:"Undo"}));</script>
 </body>
 </html>

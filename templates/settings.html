@@ -15,7 +15,7 @@
      its song as a sonogram), the notebook header and the storage bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('larkline-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=d4701ca">
+<link rel="stylesheet" href="../components/orion.css?v=1add20d">
 <style>
   /* Larkline's own layout and elements: tokens only; nothing here restyles an Orion component */
   .lk-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
@@ -295,10 +295,10 @@
   <span class="s4-icon s4-dialog-icon" data-icon="delete"></span>
   <h2 class="s4-dialog-headline" id="cd-h">Delete your notebook?</h2>
   <div class="s4-dialog-content">All 412 recordings and 138 species go for good, on every device.</div>
-  <div class="s4-dialog-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Keep It</button><button class="s4-button" data-variant="text" data-color="error" data-close="delete" type="button">Delete</button></div>
+  <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Keep It</button><button class="s4-button" data-variant="tonal" data-color="error" data-close="delete" type="button">Delete</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=ea7ed9f"></script>
+<script src="../components/orion.js?v=e5b00bd"></script>
 <script>
 /* Larkline's look, saved under its own key: the visitor's choices from the Appearance section win over the defaults. */
 var LOOK = { seed: '#7c4f24', variant: 'fidelity', surfaces: 'tinted', display: 'inter', contrast: 0, corners: 'soft', energy: 'calm' };
