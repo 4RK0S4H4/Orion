@@ -27,16 +27,8 @@
   .rl-ticket-head h2 { margin: 0; overflow-wrap: anywhere; }
   .rl-id { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
 
-  /* the response clock: time used against the promise, in words first */
-  .rl-clock { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-high); }
-  .rl-clock-left { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-large-weight); font-variant-numeric: tabular-nums; }
-  .rl-clock-what { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); text-align: end; }
-  .rl-clock-track { grid-column: 1 / -1; block-size: var(--s4-space-2); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); overflow: hidden; }
-  .rl-clock-track > i { display: block; block-size: 100%; inline-size: var(--used); border-radius: inherit; background: var(--md-sys-color-primary); }
-  .rl-clock[data-tone="warning"] .rl-clock-track > i { background: var(--s4-color-warning); }
-  .rl-clock[data-tone="error"] .rl-clock-track > i { background: var(--md-sys-color-error); }
-  .rl-clock[data-tone="error"] .rl-clock-left { color: var(--md-sys-color-error); }
-  .rl-clock[data-tone="none"] .rl-clock-track { display: none; }
+  /* the response clock: an Orion meter (decision 0063), time used against the promise, in words first; Relay sets it on its own card */
+  .rl-clock { padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-high); }
 
   /* an internal note sits in the thread but never reads as a message to the customer */
   .rl-note { display: flex; flex-direction: column; gap: var(--s4-space-1); margin-block: var(--s4-space-2); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--s4-color-warning-container); color: var(--s4-color-on-warning-container); list-style: none; }
@@ -129,9 +121,9 @@
                 <button class="s4-icon-button" type="button" aria-label="Open Full Page" data-tooltip="Open Full Page" id="d-open"><span class="s4-icon" data-icon="book"></span></button>
                 <button class="s4-icon-button" type="button" aria-label="Ticket Actions" data-menu="rl-more"><span class="s4-icon" data-icon="more-vert"></span></button>
               </div>
-              <div class="rl-clock" id="d-clock" data-tone="error" style="--used: 100%">
-                <span class="rl-clock-left" id="d-left">20 min late</span><span class="rl-clock-what" id="d-what">First reply promised in 1 hour (Business)</span>
-                <span class="rl-clock-track" aria-hidden="true"><i></i></span>
+              <div class="s4-meter rl-clock" id="d-clock" data-state="over" data-value="100">
+                <div class="s4-meter-head"><span class="s4-meter-label" id="d-what">First reply promised in 1 hour (Business)</span><span class="s4-meter-value"><strong id="d-left">20 min late</strong></span></div>
+                <div class="s4-meter-track"><i class="s4-meter-fill"></i></div>
               </div>
               <ol class="s4-thread" id="d-thread" aria-label="Conversation"></ol>
               <div class="rl-suggest">
@@ -264,7 +256,8 @@ function show(key) {
   var t = T[key]; if (!t) return; current = key;
   document.getElementById('d-id').textContent = t.id + ' · ' + t.topic;
   document.getElementById('d-subject').textContent = t.subject;
-  var clock = document.getElementById('d-clock'); clock.dataset.tone = t.tone; clock.style.setProperty('--used', t.used);
+  var clock = document.getElementById('d-clock'), state = { warning: 'near', error: 'over' }[t.tone];
+  clock.dataset.value = parseFloat(t.used); if (state) clock.dataset.state = state; else clock.removeAttribute('data-state');
   document.getElementById('d-left').textContent = t.left; document.getElementById('d-what').textContent = t.what;
   document.getElementById('d-thread').innerHTML = thread(t);
   var chips = document.getElementById('d-suggest');

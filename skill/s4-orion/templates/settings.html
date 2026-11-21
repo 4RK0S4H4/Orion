@@ -93,18 +93,10 @@
   .lk-store { display: grid; gap: var(--s4-space-3); }
   .lk-store-total { display: flex; align-items: baseline; gap: var(--s4-space-2); flex-wrap: wrap; }
   .lk-store-total strong { font-family: var(--md-sys-typescale-headline-medium-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight, 600); font-variant-numeric: tabular-nums; }
-  .lk-bar { display: flex; gap: 2px; block-size: var(--s4-space-4); }
-  .lk-bar > i { flex: var(--w) 1 0; min-inline-size: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--_k); }
-  .lk-bar > i:first-child { border-start-start-radius: var(--md-sys-shape-corner-full); border-end-start-radius: var(--md-sys-shape-corner-full); }
-  .lk-bar > i:last-child { border-start-end-radius: var(--md-sys-shape-corner-full); border-end-end-radius: var(--md-sys-shape-corner-full); }
-  .lk-key { display: flex; flex-wrap: wrap; gap: var(--s4-space-1) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); font-variant-numeric: tabular-nums; }
-  .lk-key li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
-  .lk-key i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--_k); }
-  [data-k="rec"] { --_k: var(--md-sys-color-primary); }
-  [data-k="gb"] { --_k: var(--md-sys-color-tertiary); }
-  [data-k="ib"] { --_k: var(--md-sys-color-secondary); }
-  [data-k="sc"] { --_k: var(--md-sys-color-on-primary-container); }
-  [data-k="free"] { --_k: var(--md-sys-color-surface-container-highest); }
+  /* the storage bar is an Orion meter (decision 0063): each kind a category color, named in its legend; the pack dots match */
+  [data-k="gb"] { --_k: var(--s4-category-2); }
+  [data-k="ib"] { --_k: var(--s4-category-3); }
+  [data-k="sc"] { --_k: var(--s4-category-4); }
   .lk-packs { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
   .lk-pack { display: grid; grid-template-columns: var(--s4-space-3) minmax(0, 1fr) auto; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-3) var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); }
   .lk-pack > i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--_k); }
@@ -112,7 +104,7 @@
   .lk-pack-text { display: grid; gap: 2px; min-inline-size: 0; }
   .lk-pack-text strong { font-weight: var(--md-sys-typescale-emphasized-body-large-weight, 600); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
   .lk-pack .s4-progress { grid-column: 2 / -1; }
-  @media (forced-colors: active) { .lk-bar > i, .lk-key i, .lk-pack > i, .lk-gram i { background: CanvasText; } .lk-card, .lk-pack, .lk-tally > div { border: 1px solid CanvasText; } }
+  @media (forced-colors: active) { .lk-pack > i, .lk-gram i { background: CanvasText; } .lk-card, .lk-pack, .lk-tally > div { border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
@@ -262,8 +254,10 @@
               <h2 class="s4-pane-title" id="store-h">Song Packs on This Phone</h2>
               <div class="lk-store">
                 <p class="lk-store-total"><strong id="store-used" data-hero>3.4 GB</strong><span class="lk-sub">of 8 GB set aside for Larkline</span></p>
-                <div class="lk-bar" id="store-bar" role="img" aria-label="Storage"></div>
-                <ul class="lk-key" id="store-key"></ul>
+                <div class="s4-meter" id="store-bar" data-segmented data-size="l" data-max="8" aria-label="Storage">
+                  <div class="s4-meter-track"></div>
+                  <ul class="s4-meter-legend" id="store-key"></ul>
+                </div>
               </div>
               <ul class="lk-packs" id="packs" aria-label="Song Packs">
                 <li class="lk-pack" data-on data-k="gb" data-id="gb"><i aria-hidden="true"></i><span class="lk-pack-text"><strong>Britain and Ireland</strong><span class="lk-sub lk-small">263 birds · 0.9 GB</span></span><button class="s4-button" data-variant="text" data-size="s" type="button">Remove</button></li>
@@ -352,9 +346,10 @@ function gb(n) { return (Math.round(n * 10) / 10).toFixed(1) + ' GB'; }
 function drawStore() {
   var ks = on(), used = ks.reduce(function (a, k) { return a + SIZES[k]; }, 0), free = CAP - used;
   $('store-used').textContent = gb(used);
-  $('store-bar').innerHTML = ks.map(function (k) { return '<i data-k="' + k + '" style="--w:' + SIZES[k] + '"></i>'; }).join('') + '<i data-k="free" style="--w:' + free + '"></i>';
-  $('store-bar').setAttribute('aria-label', 'Storage: ' + ks.map(function (k) { return NAMES[k] + ' ' + gb(SIZES[k]); }).join(', ') + ', ' + gb(free) + ' free');
-  $('store-key').innerHTML = ks.map(function (k) { return '<li data-k="' + k + '"><i aria-hidden="true"></i>' + NAMES[k] + ' ' + gb(SIZES[k]) + '</li>'; }).join('') + '<li data-k="free"><i aria-hidden="true"></i>Free ' + gb(free) + '</li>';
+  var CAT = { rec: 1, gb: 2, ib: 3, sc: 4 }, bar = $('store-bar');
+  bar.querySelector('.s4-meter-track').innerHTML = ks.map(function (k) { return '<i class="s4-meter-fill" data-value="' + SIZES[k] + '" data-category="' + CAT[k] + '"></i>'; }).join('');
+  bar.setAttribute('aria-valuetext', ks.map(function (k) { return NAMES[k] + ' ' + gb(SIZES[k]); }).join(', ') + ', ' + gb(free) + ' free of ' + CAP + ' GB');
+  $('store-key').innerHTML = ks.map(function (k) { return '<li data-category="' + CAT[k] + '">' + NAMES[k] + ' <b>' + gb(SIZES[k]) + '</b></li>'; }).join('') + '<li data-track>Free <b>' + gb(free) + '</b></li>';
 }
 function setPack(li, isOn) {
   var btn = li.querySelector('button');

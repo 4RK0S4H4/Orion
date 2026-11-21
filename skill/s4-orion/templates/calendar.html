@@ -96,10 +96,7 @@
   .mr-boat-name { min-inline-size: 0; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
   .mr-boat-name small { display: block; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-weight: var(--md-sys-typescale-label-small-weight); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mr-track { position: relative; block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-highest); }
-  .mr-block { position: absolute; inset-block: var(--s4-space-1); inset-inline-start: calc(var(--s) * 1%); inline-size: calc(var(--w) * 1%); min-inline-size: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
-  .mr-block[data-mine] { background: var(--md-sys-color-primary); }
   .mr-track[data-repair] { display: flex; align-items: center; padding-inline: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .mr-now { position: absolute; inset-block: calc(var(--s4-space-1) * -1); inset-inline-start: calc(var(--s) * 1%); inline-size: 2px; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-on-surface); }
   .mr-hours { display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
   .mr-hours > span:last-child { display: flex; justify-content: space-between; }
   .mr-free { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
@@ -136,7 +133,7 @@
 
   .s4-subpage > article { max-inline-size: 44rem; margin-inline: auto; }
   .mr-check { display: grid; gap: var(--s4-space-3); }
-  @media (forced-colors: active) { .mr-day, .mr-track, .mr-block, .mr-sea { border: 1px solid CanvasText; } .mr-block[data-mine] { background: Highlight; } }
+  @media (forced-colors: active) { .mr-day, .mr-track, .mr-sea { border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
@@ -424,10 +421,13 @@ function board(date) {
   $('mr-board').innerHTML = BOATS.map(function (b) {
     var mineB = list.filter(function (x) { return x.boat === b.id; }), rep = inRepair(b, date), freeAt = Math.max.apply(null, [SPAN[0]].concat(mineB.map(function (x) { return x.start + x.hours; })));
     var words = rep ? b.repair : mineB.length ? mineB.map(function (x) { return hm(x.start) + '–' + hm(x.start + x.hours) + ' ' + x.who; }).join('; ') : 'Free all day';
-    var track = rep ? '<span class="mr-track" data-repair>In the shed until Nov 21</span>' :
-      '<span class="mr-track" aria-hidden="true">' + mineB.map(function (x) { return '<i class="mr-block"' + (mine(x) ? ' data-mine' : '') + ' style="--s:' + pct(x.start).toFixed(2) + ';--w:' + (pct(x.start + x.hours) - pct(x.start)).toFixed(2) + '"></i>'; }).join('') +
-      (date === TODAY ? '<i class="mr-now" style="--s:' + pct(NOW).toFixed(2) + '"></i>' : '') + '</span>';
-    return '<li class="mr-boat"><span class="mr-boat-name">' + esc(b.name) + '<small>' + (rep ? 'In repair' : mineB.length ? (freeAt >= SPAN[1] - 1 ? 'Out all day' : 'Free after ' + hm(freeAt)) : 'Free all day') + '</small></span>' + track + '<span class="s4-visually-hidden">' + esc(b.name) + ': ' + esc(words) + '</span></li>';
+    /* a boat's day is an Orion meter (decision 0063): the sailing day is the track, each booking a range on it (yours
+       in the accent, other people's quiet), a line for now */
+    var track = rep ? '<span class="mr-track" data-repair>In the shed until Nov 21</span><span class="s4-visually-hidden">' + esc(b.name) + ': ' + esc(words) + '</span>' :
+      '<div class="s4-meter" data-size="xl" data-min="' + SPAN[0] + '" data-max="' + SPAN[1] + '" aria-label="' + esc(b.name) + '" aria-valuetext="' + esc(words) + '"><div class="s4-meter-track">' +
+      mineB.map(function (x) { return '<i class="s4-meter-fill" data-from="' + x.start + '" data-value="' + x.hours + '"' + (mine(x) ? '' : ' data-tone="quiet"') + '></i>'; }).join('') +
+      (date === TODAY ? '<i class="s4-meter-mark" data-at="' + NOW + '" aria-hidden="true"></i>' : '') + '</div></div>';
+    return '<li class="mr-boat"><span class="mr-boat-name">' + esc(b.name) + '<small>' + (rep ? 'In repair' : mineB.length ? (freeAt >= SPAN[1] - 1 ? 'Out all day' : 'Free after ' + hm(freeAt)) : 'Free all day') + '</small></span>' + track + '</li>';
   }).join('');
 }
 function row(b, withDate) {

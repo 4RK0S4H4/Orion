@@ -958,6 +958,17 @@ async function apiAudit(page, add) {
         }
       }
     }
+    /* the meter (decision 0063): a reading set from script redraws its fill and its reading for screen readers */
+    const mt = [...document.querySelectorAll('.s4-meter[data-value]:not([data-segmented])')].find((x) => x.offsetWidth && x.querySelectorAll('.s4-meter-fill').length === 1);
+    if (mt) {
+      const was = mt.dataset.value, max = +(mt.dataset.max || 100), min = +(mt.dataset.min || 0), f = mt.querySelector('.s4-meter-fill');
+      if (mt.getAttribute('role') !== 'meter' || !mt.hasAttribute('aria-valuenow') || !(mt.getAttribute('aria-label') || mt.getAttribute('aria-labelledby'))) o.push('a meter has no role="meter", reading or name');
+      const half = min + (max - min) / 2; mt.dataset.value = half; await frame(); await wait(20);
+      if (+mt.getAttribute('aria-valuenow') !== half) o.push('a meter set from script did not update aria-valuenow');
+      const tr = mt.querySelector('.s4-meter-track').getBoundingClientRect(), fr = f.getBoundingClientRect();
+      if (Math.abs(fr.width - tr.width / 2) > Math.max(4, tr.width * 0.03) + parseFloat(getComputedStyle(mt).getPropertyValue('--_inset') || 0) * 2) o.push(`a meter at half its range drew ${Math.round(fr.width)} of ${Math.round(tr.width)}px`);
+      mt.dataset.value = was; await frame();
+    }
     const sel = [...document.querySelectorAll('.s4-text-field > select[data-s4-native]')].find((x) => !x.disabled && x.options.length > 1 && x.closest('.s4-text-field').offsetWidth);
     if (sel) {
       const btn = sel.parentElement.querySelector(':scope > .s4-text-field-select'), was = sel.value;
@@ -1043,7 +1054,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker menubar doc-tabs statusbar tree desktop combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker menubar doc-tabs statusbar tree desktop combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart meter'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */

@@ -6953,6 +6953,213 @@
   }
 }
 
+/* ---- meter/meter.css ---- */
+/* Meter: how much of something there is, against a whole, a limit or a target. S4 addition (decision 0063).
+   <div class="s4-meter" data-value="7.2" data-max="12" aria-labelledby="runway-l">
+     <div class="s4-meter-head"><span class="s4-meter-label" id="runway-l">Runway</span><span class="s4-meter-value"><strong>7.2</strong> of 12 months</span></div>
+     <div class="s4-meter-track"><i class="s4-meter-fill"></i><i class="s4-meter-mark" data-at="6" aria-hidden="true"></i></div>
+     <div class="s4-meter-scale" aria-hidden="true"><span>Dec</span><span>Nov ’27</span></div>
+   </div>
+   A label, the value in words, a filled track. Options on .s4-meter:
+     data-value, data-min (0), data-max (100)   the reading; meter.js turns it into the fill and role="meter"
+     data-state="on-track | near | over"        tone by state (success, warning, error status colors); the words say it too
+     data-segmented                             a share of a whole: several fills, each data-value and data-category="1…6",
+                                                one after another with a hairline seam, and a .s4-meter-legend
+     data-steps="12"                            counted units (months, seats): the track is cut into that many steps
+     data-size="s | l | xl"                     4, 8 (default), 16, 32; at xl the fills sit inset (bookings on a day)
+     data-ink="current"                         on a colored surface: the fill takes the text color, the track a quarter of it
+   A fill may also take data-from (a range on the track: a booking from 09:00 to 12:00), and a .s4-meter-mark data-at
+   draws a target or a "now" line. Not interactive and never animated (a reading, not a progress bar). */
+@layer s4.components {
+  .s4-meter {
+    --_h: var(--s4-space-2);
+    --_inset: 0px;
+    --_r: min(calc(var(--_h) / 2), var(--s4-shape-chip));
+    --_fill: var(--md-sys-color-primary);
+    --_track: var(--md-sys-color-surface-container-highest);
+    --_seam: var(--s4-space-hairline);
+    --_steps: 1;
+
+    display: grid;
+    gap: var(--s4-space-2);
+    min-inline-size: 0;
+    color: var(--md-sys-color-on-surface);
+  }
+  .s4-meter[data-size="s"] { --_h: var(--s4-space-1); }
+  .s4-meter[data-size="l"] { --_h: var(--s4-space-4); }
+  .s4-meter[data-size="xl"] { --_h: var(--s4-space-8); --_inset: var(--s4-space-1); }
+  .s4-meter[data-ink="current"] { --_fill: currentColor; --_track: color-mix(in srgb, currentColor 24%, transparent); color: inherit; }
+
+  /* tone by state: the status colors (decision 0043) never change with the accent; the words carry the meaning too */
+  .s4-meter[data-state="on-track"] { --_fill: var(--s4-color-success); }
+  .s4-meter[data-state="near"] { --_fill: var(--s4-color-warning); }
+  .s4-meter[data-state="over"] { --_fill: var(--md-sys-color-error); }
+  .s4-meter[data-state="over"] .s4-meter-value { color: var(--md-sys-color-error); }
+  .s4-meter[data-state="over"] .s4-meter-value strong { color: inherit; }
+
+  /* ---------- head: the label, the value in words ---------- */
+  .s4-meter-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4-space-1) var(--s4-space-3);
+    min-inline-size: 0;
+  }
+  .s4-meter-head > * { min-inline-size: 0; margin: 0; }
+  .s4-meter-label {
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
+  .s4-meter-value {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-medium-font);
+    font-size: var(--md-sys-typescale-body-medium-size);
+    line-height: var(--md-sys-typescale-body-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-body-medium-tracking);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .s4-meter-value strong {
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-medium-font);
+    font-size: var(--md-sys-typescale-title-medium-size);
+    line-height: var(--md-sys-typescale-title-medium-line-height);
+    font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
+  }
+  .s4-meter[data-ink="current"] :is(.s4-meter-value, .s4-meter-value strong, .s4-meter-scale, .s4-meter-legend) { color: inherit; }
+
+  /* ---------- the track and what fills it ---------- */
+  .s4-meter-track {
+    position: relative;
+    container-type: inline-size;   /* fills measure their steps against the track (cqi) */
+    box-sizing: border-box;
+    block-size: var(--_h);
+    border-radius: var(--_r);
+  }
+  .s4-meter-track::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--_track);
+  }
+  .s4-meter-fill {
+    --value: 0;   /* 0 to 100, from meter.js (or written by hand) */
+    --from: 0;
+    position: absolute;
+    inset-block: var(--_inset);
+    inset-inline-start: calc(var(--_inset) + (100% - 2 * var(--_inset)) * var(--from) / 100);
+    inline-size: calc((100% - 2 * var(--_inset)) * var(--value) / 100);
+    min-inline-size: calc(var(--_h) - 2 * var(--_inset));   /* a little is still a dot, never nothing */
+    max-inline-size: calc(100% - 2 * var(--_inset));
+    box-sizing: border-box;
+    border-radius: max(0px, calc(var(--_r) - var(--_inset)));   /* concentric with the track (decision 0052) */
+    background: var(--_fill);
+  }
+  .s4-meter-fill[data-zero] { display: none; }
+  .s4-meter-fill[data-category="1"] { --_fill: var(--s4-category-1); }
+  .s4-meter-fill[data-category="2"] { --_fill: var(--s4-category-2); }
+  .s4-meter-fill[data-category="3"] { --_fill: var(--s4-category-3); }
+  .s4-meter-fill[data-category="4"] { --_fill: var(--s4-category-4); }
+  .s4-meter-fill[data-category="5"] { --_fill: var(--s4-category-5); }
+  .s4-meter-fill[data-category="6"] { --_fill: var(--s4-category-6); }
+  /* a second series of the same kind (other people's bookings): a quiet fill, not a louder color */
+  .s4-meter-fill[data-tone="quiet"] { --_fill: var(--md-sys-color-outline); }
+
+  /* share of a whole: segments one after another, a hairline seam between them, small inner corners */
+  .s4-meter[data-segmented] .s4-meter-fill {
+    inset-inline-start: calc(var(--_inset) + (100% - 2 * var(--_inset)) * var(--from) / 100 + var(--_seam) * min(1, var(--from)));
+    inline-size: calc((100% - 2 * var(--_inset)) * var(--value) / 100 - var(--_seam) * min(1, var(--from)));
+    min-inline-size: var(--s4-space-1);
+    border-radius: min(max(0px, calc(var(--_r) - var(--_inset))), var(--md-sys-shape-corner-extra-small));
+  }
+  .s4-meter[data-segmented] .s4-meter-fill[data-first] {
+    border-start-start-radius: max(0px, calc(var(--_r) - var(--_inset)));
+    border-end-start-radius: max(0px, calc(var(--_r) - var(--_inset)));
+  }
+  .s4-meter[data-segmented] .s4-meter-fill[data-last] {
+    border-start-end-radius: max(0px, calc(var(--_r) - var(--_inset)));
+    border-end-end-radius: max(0px, calc(var(--_r) - var(--_inset)));
+  }
+
+  /* counted units: the track and its fills are cut into --_steps steps by a hairline seam (a mask, so the cut shows
+     the surface behind it whatever it is); each fill places the pattern by its own offset on the track (cqi) */
+  .s4-meter[data-steps] .s4-meter-track::before,
+  .s4-meter[data-steps] .s4-meter-fill {
+    --_period: calc((100cqi + var(--_seam)) / var(--_steps));
+    -webkit-mask-image: repeating-linear-gradient(90deg, var(--md-sys-color-on-surface) 0 calc(var(--_period) - var(--_seam)), transparent 0 var(--_period));
+    mask-image: repeating-linear-gradient(90deg, var(--md-sys-color-on-surface) 0 calc(var(--_period) - var(--_seam)), transparent 0 var(--_period));
+    -webkit-mask-size: calc(100cqi + var(--_seam)) 100%;
+    mask-size: calc(100cqi + var(--_seam)) 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+  .s4-meter[data-steps] .s4-meter-fill { -webkit-mask-position: calc(var(--from) * -1cqi) 0; mask-position: calc(var(--from) * -1cqi) 0; }
+  .s4-meter[data-steps] .s4-meter-fill:dir(rtl) { -webkit-mask-position: calc((100 - var(--from) - var(--value)) * -1cqi) 0; mask-position: calc((100 - var(--from) - var(--value)) * -1cqi) 0; }
+
+  /* a target, a limit or "now": a short line across the track */
+  .s4-meter-mark {
+    --at: 0;
+    position: absolute;
+    inset-block: calc(var(--s4-space-1) * -1);
+    inset-inline-start: calc(var(--at) * 1%);
+    inline-size: var(--s4-space-hairline);
+    translate: -50% 0;
+    border-radius: var(--s4-space-hairline);
+    background: var(--md-sys-color-on-surface);
+  }
+  .s4-meter-mark:dir(rtl) { translate: 50% 0; }
+  .s4-meter[data-ink="current"] .s4-meter-mark { background: currentColor; }
+
+  /* ---------- under the track: a scale and a legend ---------- */
+  .s4-meter-scale {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4-space-2);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-small-font);
+    font-size: var(--md-sys-typescale-label-small-size);
+    line-height: var(--md-sys-typescale-label-small-line-height);
+    letter-spacing: var(--md-sys-typescale-label-small-tracking);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-meter-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4-space-1) var(--s4-space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-body-small-font);
+    font-size: var(--md-sys-typescale-body-small-size);
+    line-height: var(--md-sys-typescale-body-small-line-height);
+    letter-spacing: var(--md-sys-typescale-body-small-tracking);
+    font-variant-numeric: tabular-nums;
+  }
+  .s4-meter-legend > li { --_key: var(--md-sys-color-primary); display: inline-flex; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-meter-legend > li::before { content: ""; flex: none; inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--s4-space-3); background: var(--_key); }
+  .s4-meter-legend > li[data-category="1"] { --_key: var(--s4-category-1); }
+  .s4-meter-legend > li[data-category="2"] { --_key: var(--s4-category-2); }
+  .s4-meter-legend > li[data-category="3"] { --_key: var(--s4-category-3); }
+  .s4-meter-legend > li[data-category="4"] { --_key: var(--s4-category-4); }
+  .s4-meter-legend > li[data-category="5"] { --_key: var(--s4-category-5); }
+  .s4-meter-legend > li[data-category="6"] { --_key: var(--s4-category-6); }
+  .s4-meter-legend > li[data-tone="quiet"] { --_key: var(--md-sys-color-outline); }
+  .s4-meter-legend > li[data-track] { --_key: var(--_track); }
+  .s4-meter-legend b { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-small-weight); }
+
+  @media (forced-colors: active) {
+    .s4-meter-track::before { border: 1px solid CanvasText; }
+    .s4-meter-fill, .s4-meter-mark, .s4-meter-legend > li::before { forced-color-adjust: none; background: CanvasText; }
+    .s4-meter-legend > li[data-track]::before { background: Canvas; border: 1px solid CanvasText; }
+  }
+}
+
 /* ---- milestones/milestones.css ---- */
 /* Milestones: a road made of steps, with a marker where you are. S4 addition (decision 0053).
    <ol class="s4-milestones" aria-label="11 courses, 3 done">

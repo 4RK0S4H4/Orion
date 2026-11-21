@@ -8,10 +8,10 @@
      on Monday morning to answer three questions in order: how much cash is there and how long does it last, is money
      coming in faster than it goes out, and who owes us. Brand through the dials only: a deep green accent, warm grays,
      the soft page tone, firm corners, a serif display face (a ledger, not a cockpit), calm motion, filled cards.
-     Its own elements, drawn from Orion's rules: the runway meter, paired in/out bars and the aging bar. -->
+     Its own elements, drawn from Orion's rules: the runway (an Orion meter since 0063), paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=f8c34ee">
+<link rel="stylesheet" href="../components/orion.css?v=edddff9">
 <link rel="stylesheet" href="brand/dashboard.css?v=bb10572">
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -38,12 +38,7 @@
   .tl-cash-meta { margin: 0; color: var(--md-sys-color-on-surface-variant); }
   .tl-cash-meta strong { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-medium-weight); }
   /* runway meter: one pill a month, the months the cash covers are filled, the part month is filled in part */
-  .tl-runway { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s4-space-1); margin-block-start: var(--s4-space-4); }
-  .tl-runway > i { position: relative; overflow: hidden; block-size: var(--s4-space-3); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); }
-  .tl-runway > i[data-full] { background: var(--md-sys-color-primary); }
-  .tl-runway > i[data-part]::before { content: ""; position: absolute; inset-block: 0; inset-inline-start: 0; inline-size: var(--p); background: var(--md-sys-color-primary); }
-  .tl-runway > i[data-line]::after { content: ""; position: absolute; inset-block: 0; inset-inline-end: 0; inline-size: calc(var(--s4-space-1) / 2); background: var(--md-sys-color-on-surface); }
-  .tl-runway-scale { display: flex; justify-content: space-between; margin-block-start: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); font-variant-numeric: tabular-nums; }
+  .tl-runway { margin-block-start: var(--s4-space-4); }   /* the runway is an Orion meter (decision 0063): one step a month, the safe line a mark */
 
   /* money in and out: paired bars, a month a pair; the open month is named, not colored differently */
   .tl-legend { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-4); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
@@ -86,7 +81,7 @@
   .tl-table-wrap { overflow-x: auto; }
   .tl-accounts { display: grid; gap: var(--s4-layout-gap); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
   .tl-balance { margin: 0; font-variant-numeric: tabular-nums; }
-  @media (forced-colors: active) { .tl-runway > i, .tl-pair > i, .tl-agebar > i, .tl-key { border: 1px solid CanvasText; } }
+  @media (forced-colors: active) { .tl-pair > i, .tl-agebar > i, .tl-key { border: 1px solid CanvasText; } }
 </style>
 </head>
 <body>
@@ -129,10 +124,10 @@
               <p class="tl-cash-meta s4-body-medium">Lasts <strong>7.2 months</strong> at October’s spend of $11,700. Your safe line is 6.</p>
             </div>
             <div>
-              <div class="tl-runway" role="img" aria-label="Runway: 7.2 of 12 months covered; the safe line is 6 months">
-                <i data-full></i><i data-full></i><i data-full></i><i data-full></i><i data-full></i><i data-full data-line></i><i data-full></i><i data-part style="--p: 20%"></i><i></i><i></i><i></i><i></i>
+              <div class="s4-meter tl-runway" data-value="7.2" data-max="12" data-steps="12" data-size="l" aria-label="Runway" aria-valuetext="7.2 of 12 months covered; the safe line is 6 months">
+                <div class="s4-meter-track"><i class="s4-meter-fill"></i><i class="s4-meter-mark" data-at="6" aria-hidden="true"></i></div>
+                <div class="s4-meter-scale" aria-hidden="true"><span>Dec</span><span>Safe Line · May</span><span>Nov ’27</span></div>
               </div>
-              <div class="tl-runway-scale" aria-hidden="true"><span>Dec</span><span>Safe Line · May</span><span>Nov ’27</span></div>
             </div>
           </section>
 
@@ -264,7 +259,7 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Save Draft</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=47c8c10"></script>
+<script src="../components/orion.js?v=39a8a64"></script>
 <script>
 /* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#1d6b52', variant: 'tonal' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

@@ -13,7 +13,7 @@
      a finger (hold, then drag) or the keyboard; a story opens as a page; a new pitch is typed in place. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=f8c34ee">
+<link rel="stylesheet" href="../components/orion.css?v=edddff9">
 <link rel="stylesheet" href="brand/kanban.css?v=c205cf7">
 <style>
   /* the app's own layout: tokens only */
@@ -44,8 +44,6 @@
   .pr-desk { display: inline-flex; align-items: center; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
   .pr-desk::before { content: ""; inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--s4-shape-chip); background: var(--desk); }
   .pr-front { --s4-icon-size: var(--s4-space-4); color: var(--md-sys-color-primary); }
-  .pr-words { block-size: var(--s4-space-1); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); overflow: hidden; }
-  .pr-words > i { display: block; block-size: 100%; inline-size: var(--p); border-radius: inherit; background: var(--md-sys-color-on-surface-variant); }
   .pr-late { color: var(--md-sys-color-error); font-weight: var(--md-sys-typescale-label-large-weight); }
   .kb-lane[data-over] .kb-count { color: var(--md-sys-color-error); }
   .pr-limit { display: none; }
@@ -128,7 +126,7 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=bfe722b"></script>
-<script src="../components/orion.js?v=47c8c10"></script>
+<script src="../components/orion.js?v=39a8a64"></script>
 <script>
 /* the hub's light or dark choice carries over; Pressroom's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#d9480f' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -154,11 +152,10 @@ var app = document.querySelector('.s4-app'), lanes = Array.prototype.slice.call(
 function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function cardEl(c) {
   var li = document.createElement('li'); li.className = 'kb-card'; li.dataset.id = c.id; li.setAttribute('data-reorder-surface', '');
-  var pct = c.target ? Math.min(100, Math.round(c.words / c.target * 100)) : 0;
   var desk = DESKS[c.desk] || 1;
   li.innerHTML = '<div class="pr-card-top"><span class="pr-desk" style="--desk: var(--s4-chart-' + desk + ')">' + esc(c.desk || 'Desk') + '</span>' + (c.front ? '<span class="s4-icon pr-front" data-icon="star" role="img" aria-label="Front page"></span>' : '') + '</div>' +
     '<button class="kb-card-title" type="button" data-page-open="card" data-page-id="' + c.id + '" data-reorder-label>' + esc(c.title) + '</button>' +
-    (c.target && c.lane !== 'Published' ? '<div class="pr-words" role="img" aria-label="' + c.words + ' of ' + c.target + ' words"><i style="--p:' + pct + '%"></i></div>' : '') +
+    (c.target && c.lane !== 'Published' ? '<div class="s4-meter" data-size="s" data-value="' + c.words + '" data-max="' + c.target + '"' + (c.words > c.target ? ' data-state="over"' : '') + ' aria-label="Words" aria-valuetext="' + c.words + ' of ' + c.target + ' words"><div class="s4-meter-track"><i class="s4-meter-fill"' + (c.words > c.target ? '' : ' data-tone="quiet"') + '></i></div></div>' : '') +   /* the word count: a quiet Orion meter (decision 0063) */
     '<div class="kb-card-meta"><span>' + (c.late ? '<span class="pr-late">Late · was due ' + esc(c.due) + '</span>' : (c.lane === 'Published' ? 'Published ' + esc(c.due) : c.lane === 'Ready' ? 'Ready' : (c.lane === 'Pitched' ? 'For ' : 'Due ') + esc(c.due)) + (c.target && c.lane !== 'Published' ? ' · <span class="s4-num">' + c.words + '/' + c.target + '</span>' : '')) + '</span><span class="s4-avatar" data-size="s">' + esc(c.who) + '</span></div>';
   return li;
 }
