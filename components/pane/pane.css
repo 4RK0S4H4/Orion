@@ -53,7 +53,8 @@
   /* ---------- colors ---------- */
   .s4-pane[data-color="lowest"] { --_bg: var(--md-sys-color-surface-container-lowest); }
   .s4-pane[data-color="high"] { --_bg: var(--md-sys-color-surface-container-high); }
-  /* danger zone: destructive settings (delete account, erase data) */
+  /* old: a red danger zone. Danger zones are neutral panes with a tonal error button now (decision 0066); kept so
+     existing markup still reads */
   .s4-pane[data-color="error"] {
     --_bg: var(--md-sys-color-error-container);
     --_fg: var(--md-sys-color-on-error-container);

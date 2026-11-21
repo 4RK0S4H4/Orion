@@ -11,6 +11,7 @@
      .s4-bottom-sheet  floats at the bottom center (phones: the full width minus the inset, above the home indicator)
      .s4-side-sheet    floats at the end side, as tall as the window minus the inset (phones: same as the bottom panel)
    data-placement="center" on either centers it like a dialog from 600 wide (phones: bottom, decision 0064). A .s4-sheet-handle in older markup draws nothing.
+   Phones (decision 0066): a modal panel draws a grabber at its top, and while a finger drags it down the scrim follows.
    data-modeless (decision 0054) makes it a tool panel from 600 wide: no scrim, the page behind stays live.
    Solid here; glass.css makes both glass. */
 @layer s4.components {
@@ -32,7 +33,15 @@
     outline: none;
   }
   .s4-bottom-sheet[open], .s4-side-sheet[open] { display: flex; }
-  .s4-bottom-sheet::backdrop, .s4-side-sheet::backdrop { background: color-mix(in srgb, var(--md-sys-color-scrim) calc(var(--s4-scrim-opacity) * 100%), transparent); }
+  .s4-bottom-sheet::backdrop, .s4-side-sheet::backdrop {
+    background: color-mix(in srgb, var(--md-sys-color-scrim) calc(var(--s4-scrim-opacity) * 100%), transparent);
+    /* decision 0066: while a finger drags a modal panel down on a phone, the scrim follows it (dialog.js writes
+       --s4-sheet-drag, 0 at rest to 1 at the panel's full height); letting go settles it back with State */
+    opacity: calc(1 - var(--s4-sheet-drag, 0));
+    transition: opacity var(--s4-motion-state);
+  }
+  :is(.s4-bottom-sheet, .s4-side-sheet)[data-s4-dragging]::backdrop { transition: none; }
+  /* the grabber is drawn by the panel itself on a phone (below); a .s4-sheet-handle in older markup draws nothing */
   .s4-sheet-handle { display: none; }
   /* a tool panel is not in the top layer, so it needs its place in the stack */
   :is(.s4-bottom-sheet, .s4-side-sheet)[data-modeless]:not(:modal) { z-index: var(--s4-z-sheet); }
@@ -79,6 +88,21 @@
     .s4-sheet-actions > .s4-button { flex: 1 1 0; min-inline-size: 0; --_h: var(--s4-size-touch-target); }
     .s4-sheet-actions:has(> :nth-child(3)) { flex-direction: column-reverse; }
     .s4-sheet-actions > .s4-button[data-variant="text"] { --_bg: var(--md-sys-color-surface-container-highest); }
+    /* the grabber (decision 0066): modal panels only (never a dialog, which is a question, not a surface you move),
+       and not a persistent one, which only settles back. Decorative: the swipe is never the only way out. */
+    :is(.s4-bottom-sheet, .s4-side-sheet):modal:not([data-persistent])::before {
+      content: "";
+      position: absolute;
+      inset-block-start: var(--s4-space-2);
+      inset-inline: 0;
+      margin-inline: auto;
+      inline-size: var(--s4-size-grabber-width);
+      block-size: var(--s4-size-grabber-height);
+      border-radius: var(--md-sys-shape-corner-full);
+      background: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 40%, transparent);
+      pointer-events: none;
+    }
+    :is(.s4-bottom-sheet, .s4-side-sheet):modal:not([data-persistent]) { padding-block-start: calc(var(--s4-space-6) + var(--s4-space-2)); }
   }
 
   .s4-sheet-title {
@@ -94,5 +118,8 @@
   .s4-sheet-content { display: flex; flex-direction: column; gap: var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); }
   .s4-sheet-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s4-space-2); margin-top: auto; padding-top: var(--s4-space-2); }
 
-  @media (forced-colors: active) { .s4-bottom-sheet, .s4-side-sheet { border: 1px solid CanvasText; } }
+  @media (forced-colors: active) {
+    .s4-bottom-sheet, .s4-side-sheet { border: 1px solid CanvasText; }
+    :is(.s4-bottom-sheet, .s4-side-sheet)::before { forced-color-adjust: none; background: CanvasText; }
+  }
 }

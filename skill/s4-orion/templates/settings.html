@@ -275,11 +275,12 @@
               <li><button class="s4-list-item" type="button" id="signout"><span class="s4-list-leading"><span class="s4-icon" data-icon="logout"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sign Out</span></span></button></li>
             </ul>
 
-            <!-- Danger zone, last: the one thing that cannot be undone gets a dialog (decision 0047) -->
-            <section class="s4-pane" data-color="error" aria-labelledby="danger-h">
+            <!-- Danger zone, last: a neutral pane with a tonal error trigger; the one thing that cannot be undone gets a dialog,
+                 and the dialog carries the weight (decisions 0047, 0066) -->
+            <section class="s4-pane" aria-labelledby="danger-h">
               <h2 class="s4-pane-title" id="danger-h">Delete Account</h2>
               <p class="s4-pane-supporting">This deletes your notebook and all 412 recordings. Export them first if you want to keep them. You can’t undo this.</p>
-              <div class="s4-row"><button class="s4-button" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
+              <div class="s4-row"><button class="s4-button" data-variant="tonal" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
             </section>
           </div>
         </div>

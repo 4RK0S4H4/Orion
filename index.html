@@ -6,7 +6,7 @@
 <title>S4 Orion</title>
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="components/orion.css?v=fc08dba">
+<link rel="stylesheet" href="components/orion.css?v=6a9b5e6">
 <style>
   .hub { display: grid; gap: var(--s4-space-12); padding-block: var(--s4-space-6) var(--s4-space-16); }
   .hub-hero { display: grid; gap: var(--s4-space-3); justify-items: start; }
@@ -41,7 +41,7 @@
           <a class="s4-card" href="templates/index.html?v=80bde64"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="dashboard"></span><h3 class="s4-card-title">Templates</h3><p class="s4-card-supporting">Twenty starters, each its own product: fifteen apps (dashboard, data table, desktop app, board, calendar, editor…) and five websites.</p></div></a>
           <a class="s4-card" href="components/index.html"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="list"></span><h3 class="s4-card-title">Components</h3><p class="s4-card-supporting">Every component with its reference page: markup, variants, states.</p></div></a>
           <a class="s4-card" href="tokens/index.html?v=64b7cff"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="tune"></span><h3 class="s4-card-title">Tokens</h3><p class="s4-card-supporting">Color roles, type, shape, spacing, layout, motion springs and glass, in every mode.</p></div></a>
-          <a class="s4-card" href="demo/index.html?v=fec6c3c"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="sparkle"></span><h3 class="s4-card-title">Showcase</h3><p class="s4-card-supporting">One app with every element, to try on a phone.</p></div></a>
+          <a class="s4-card" href="demo/index.html?v=ba40151"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="sparkle"></span><h3 class="s4-card-title">Showcase</h3><p class="s4-card-supporting">One app with every element, to try on a phone.</p></div></a>
         </div>
       </section>
 
@@ -166,7 +166,7 @@
   <button class="s4-menu-item" type="button" role="menuitemradio" data-mode="dark"><span class="s4-icon" data-icon="dark-mode"></span>Dark</button>
 </div>
 <script src="components/assets/icons.js?v=9b1efac"></script>
-<script src="components/orion.js?v=d4755e7"></script>
+<script src="components/orion.js?v=2c32783"></script>
 <script>
 S4.theme.restore('orion-template-theme', { mode: 'system' });
 function markMode() { var m = S4.theme().mode || 'system'; document.querySelectorAll('[data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === m)); }); }

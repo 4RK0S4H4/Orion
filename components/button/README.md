@@ -25,7 +25,8 @@ pane, a menu), a tenth of the text color mixed into that surface, so it works in
 **Do**
 - Use Title Case labels that say what happens: "Save Changes", "Export to Excel".
 - Put the icon before the label.
-- Use `data-color="error"` only for the confirm button of a destructive dialog or a danger zone.
+- Use `data-color="error"` only for a destructive answer: in a dialog and in a danger zone it is `data-variant="tonal"
+  data-color="error"` (decisions 0064, 0066). A filled red button is louder than the question it leads to.
 
 **Don't**
 - Don't put two filled buttons side by side; make one tonal.

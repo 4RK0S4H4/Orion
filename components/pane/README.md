@@ -10,16 +10,17 @@ supporting text, then content.
   …
 </section>
 
-<section class="s4-pane" data-color="error" aria-labelledby="danger">
+<!-- danger zone: a neutral pane, last, with a tonal error button that opens the confirm dialog -->
+<section class="s4-pane" aria-labelledby="danger">
   <h2 class="s4-pane-title" id="danger">Delete Workspace</h2>
   <p class="s4-pane-supporting">This deletes every bill, receipt and vendor. You can't undo this.</p>
-  <div class="s4-row"><button class="s4-button" data-color="error" type="button">Delete Workspace</button></div>
+  <div class="s4-row"><button class="s4-button" data-variant="tonal" data-color="error" type="button">Delete Workspace</button></div>
 </section>
 ```
 
 | Attribute / part | Values | Default |
 |---|---|---|
-| `data-color` | `lowest` (surface-container-lowest), `high` (surface-container-high), `error` (danger zone: error-container, on-error-container) | surface-container-low |
+| `data-color` | `lowest` (surface-container-lowest), `high` (surface-container-high), `error` (old: a red pane; danger zones are neutral now, decision 0066) | surface-container-low |
 | `.s4-pane-title` | title-medium | — |
 | `.s4-pane-supporting` | body-medium, on-surface-variant, 4 below the title | — |
 | `--s4-pane-padding` | override the padding | 24, or 16 under 600 |
@@ -30,8 +31,10 @@ viewport when there is none), so a pane works with or without a container ancest
 container, so lists, tables and grids inside it can adapt to it.
 
 **When to use what:** a **pane** groups related settings or fields under a heading; a [card](../card/) is one item among
-many. Use `lowest` or `high` only to separate a pane from a neighbour or a parent of the same color. Use `error` once per
-page, last, for destructive settings.
+many. Use `lowest` or `high` only to separate a pane from a neighbour or a parent of the same color. A **danger zone**
+(delete the account, erase data) is a neutral pane, last on the page, whose button is `data-variant="tonal"
+data-color="error"`: the confirm dialog it opens carries the weight, so the pane never shouts louder than the question
+(decision 0066). `data-color="error"` on a pane is old markup; don't write it.
 
 **Do**
 - Give every pane a title in Title Case, and use supporting text in sentence case to say what the section is for.
@@ -40,9 +43,9 @@ page, last, for destructive settings.
 **Don't**
 - Don't nest panes of the same color.
 - Don't make panes glass; they are content surfaces.
-- Don't fill a whole page with `data-color="error"` panes.
+- Don't paint a danger zone red or give it a filled red button: it is louder than the dialog it opens.
 
-**Accessibility:** use `<section aria-labelledby>` so each pane is a named region. The error pane's text uses
+**Accessibility:** use `<section aria-labelledby>` so each pane is a named region. The old error pane's text uses
 on-error-container, which the token build checks at AA. Forced-colors mode draws a real border.
 
 **Tokens:** `--s4-shape-pane`, `--s4-space-4`, `--s4-space-6`, `--s4-breakpoint-medium`,

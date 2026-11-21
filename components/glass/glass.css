@@ -215,6 +215,11 @@
   /* modal surfaces (decision 0064): over a scrim, the page showing through a dialog or a modal panel is only noise, so they
      are firmer glass (90%); tool panels that leave the page live (0054) keep the float tint */
   :where(.s4-dialog:modal, .s4-bottom-sheet:modal, .s4-side-sheet:modal) { --_glass-tint: var(--s4-glass-tint-opacity-modal); }
+  /* on a phone the modal card sits over the button that opened it: firmer still, so a saturated button never shows
+     through as a smudge (decision 0066) */
+  @media (max-width: 599.98px) {
+    :where(.s4-dialog:modal, .s4-bottom-sheet:modal, .s4-side-sheet:modal) { --_glass-tint: var(--s4-glass-tint-opacity-modal-phone); }
+  }
 
   /* at most two glass layers: a third glass surface nested inside two others is solid */
   :where(.s4-glass, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-toolbar)

@@ -15,7 +15,7 @@
      its song as a sonogram), the notebook header and the storage bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('larkline-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=fc08dba">
+<link rel="stylesheet" href="../components/orion.css?v=6a9b5e6">
 <link rel="stylesheet" href="brand/settings.css?v=b9ba1a6">
 <script>(function (k) { try { var c = localStorage.getItem(k + ':color'); if (c) { var s = document.createElement('style'); s.id = 's4-dynamic-color'; s.textContent = c; document.head.appendChild(s); } } catch (e) {} })('larkline-theme');</script>   <!-- the visitor's own color, before the first paint (decision 0063) -->
 <style>
@@ -275,11 +275,12 @@
               <li><button class="s4-list-item" type="button" id="signout"><span class="s4-list-leading"><span class="s4-icon" data-icon="logout"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sign Out</span></span></button></li>
             </ul>
 
-            <!-- Danger zone, last: the one thing that cannot be undone gets a dialog (decision 0047) -->
-            <section class="s4-pane" data-color="error" aria-labelledby="danger-h">
+            <!-- Danger zone, last: a neutral pane with a tonal error trigger; the one thing that cannot be undone gets a dialog,
+                 and the dialog carries the weight (decisions 0047, 0066) -->
+            <section class="s4-pane" aria-labelledby="danger-h">
               <h2 class="s4-pane-title" id="danger-h">Delete Account</h2>
               <p class="s4-pane-supporting">This deletes your notebook and all 412 recordings. Export them first if you want to keep them. You can’t undo this.</p>
-              <div class="s4-row"><button class="s4-button" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
+              <div class="s4-row"><button class="s4-button" data-variant="tonal" data-color="error" type="button" data-dialog="confirm-delete">Delete Account</button></div>
             </section>
           </div>
         </div>
@@ -294,7 +295,7 @@
   <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Keep It</button><button class="s4-button" data-variant="tonal" data-color="error" data-close="delete" type="button">Delete</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=d4755e7"></script>
+<script src="../components/orion.js?v=2c32783"></script>
 <script>
 /* Larkline's look, saved under its own key: the visitor's choices from the Appearance section win over the defaults. */
 var LOOK = { seed: '#7c4f24', variant: 'fidelity', surfaces: 'tinted', display: 'inter', contrast: 0, corners: 'soft', energy: 'calm' };

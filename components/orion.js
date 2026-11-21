@@ -443,7 +443,7 @@
      Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
      Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow
      Pop      S4.transition.pop(surface, { open, from })       floating glass (dialogs, panels): rises 16px and fades in; from: px a finger pulled it down
-              S4.transition.scrim(dialog, open)                the dimmed page behind a modal fades with it
+              S4.transition.scrim(dialog, open, { from })      the dimmed page behind a modal fades with it (from: its opacity now)
      Rise     S4.transition.rise(el, { open })                 notices (snackbars, a new message): rise 14px and fade in
               S4.transition.tip(el, { open })                  the small rise (tooltips): 4px
      Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
@@ -593,10 +593,11 @@
   }
 
   /* ---------- scrim: the page behind a modal dims with it ---------- */
-  function scrim(dialog, open) {
+  function scrim(dialog, open, opts) {
     open = open !== false;
     var s = M.spring(open ? 'effects' : 'fast-effects');
-    return dialog.animate([{ opacity: open ? 0 : 1 }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
+    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* a dragged panel's scrim leaves from where the finger left it */
+    return dialog.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
   }
 
   /* ---------- enter: one view arriving on its own (the second half of a switch) ---------- */
@@ -8593,6 +8594,9 @@ S4.register('skeleton', function (scope) {
       e.preventDefault();
       dy = Math.max(0, y);
       d.style.transform = 'translateY(' + dy + 'px)';
+      /* a modal panel's scrim follows the finger (decision 0066; opacity under direct manipulation, not a transition);
+         a dialog's stays: it is a question, not a surface you move */
+      if (!d.classList.contains('s4-dialog')) { d.setAttribute('data-s4-dragging', ''); d.style.setProperty('--s4-sheet-drag', String(Math.min(1, dy / Math.max(1, d.offsetHeight)))); }
     }, { passive: false });
     function end(e) {
       if (y0 === null) return;
@@ -8600,7 +8604,9 @@ S4.register('skeleton', function (scope) {
       if (!dragging) return;
       dragging = false;
       var flick = dy > 24 && dy / Math.max(1, e.timeStamp - t0) > 0.5;
+      d.removeAttribute('data-s4-dragging');
       if (!d.hasAttribute('data-persistent') && (dy > d.offsetHeight / 4 || flick)) { close(d, '', { pulled: dy }); return; }
+      d.style.removeProperty('--s4-sheet-drag');   /* the scrim settles back with State (sheet.css) */
       d.style.transform = '';
       S4.transition.shift(d, 'translateY(' + dy + 'px)', 'none');   /* settles back */
     }
@@ -8611,13 +8617,15 @@ S4.register('skeleton', function (scope) {
     var d = el(id); if (!d || !d.open || d._s4closing) return Promise.resolve();
     d._s4closing = true;
     var from = d._s4from;
-    if (!d._s4modeless) S4.transition.scrim(d, false);
+    var drag = parseFloat(d.style.getPropertyValue('--s4-sheet-drag')) || 0;
+    if (!d._s4modeless) S4.transition.scrim(d, false, drag ? { from: 1 - drag } : undefined);   /* from where the finger left it */
     var p = motion(d, false, opts && opts.pulled);
     return p.then(function () {
       d.close(value || '');
       S4.transition.restore(d);
       d.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
       d.style.transform = '';
+      d.style.removeProperty('--s4-sheet-drag');
       d._s4closing = false;
       if (from && from.isConnected) from.focus({ preventScroll: true });
       S4.util.emit(d, 's4-close', { value: value || '' });

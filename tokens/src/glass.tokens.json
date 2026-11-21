@@ -75,6 +75,17 @@
             }
           },
           "$description": "Decision 0064: a modal dialog or panel is tinted 90%. It already sits over a scrim that sets it apart, so the page showing through it only added noise behind its question or its form. Still glass (it blurs and lets the color through), firmer than the 75% float, so the contrast guarantee holds with room to spare."
+        },
+        "modal-phone": {
+          "$value": 0.96,
+          "$extensions": {
+            "com.s4.modes": {
+              "high-contrast": 1,
+              "dark-high-contrast": 1,
+              "reduced-transparency": 1
+            }
+          },
+          "$description": "Decision 0066: on a phone a modal dialog or panel is a card in the bottom of the screen, often over the very button that opened it; at 90% a saturated button (a red Delete) showed through as a smudge. 96% keeps it glass (blur, a hint of the page) without show-through."
         }
       },
       "blur": {

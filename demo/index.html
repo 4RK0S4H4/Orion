@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=bfd06e2">
+<link rel="stylesheet" href="orion.css?v=05c8407">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -463,10 +463,10 @@
             </ul>
           </section>
 
-          <section class="s4-pane" data-color="error" aria-labelledby="danger-h">
+          <section class="s4-pane" aria-labelledby="danger-h">
             <h2 class="s4-pane-title" id="danger-h">Delete All Notes</h2>
             <p class="s4-pane-supporting">This deletes every note in this browser. You can't undo this.</p>
-            <div class="s4-row"><button class="s4-button" data-color="error" type="button" data-dialog="confirm-delete">Delete All Notes</button></div>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" data-color="error" type="button" data-dialog="confirm-delete">Delete All Notes</button></div>
           </section>
 
           <p class="s4-body-small s4-on-surface-variant demo-footer" id="icon-credit">Solar icons by 480 Design (CC BY 4.0)</p>
@@ -546,7 +546,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=d4755e7"></script>
+<script src="orion.js?v=2c32783"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>
