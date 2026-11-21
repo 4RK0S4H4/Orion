@@ -893,7 +893,9 @@ S4.register('fab', function (scope) {
      view replaces the current one with the shared axis pattern (old slides 30px out and fades, new slides in from the
      side you're heading; movement on the spatial spring, fades on effects), the page scrolls to the top, and the top app
      bar title takes the view's data-title. Fires s4-change { view, previous } on the .s4-app after the switch starts.
-   - S4.app.go(app, name) switches views from code (e.g. a "See All" link).
+   - S4.app.go(app, name) switches views from code (e.g. a "See All" link, a shortcut like mod+comma): focus moves to the
+     new view (a region named by its data-title), so the next Tab starts there. A switch from the navigation keeps focus
+     on the navigation item; focus left inside the view that went away also moves to the new view, never to <body>.
    - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view. */
 (function () {
   /* shared axis lives in motion/motion.js (S4.transition.sharedAxis) */
@@ -901,6 +903,12 @@ S4.register('fab', function (scope) {
 
   function views(app) { return Array.prototype.slice.call(app.querySelectorAll('.s4-view[data-view]')); }
 
+  /* the view itself takes the focus (never a field in it, decision 0049): a region named by its title */
+  function focusView(view) {
+    if (!view.hasAttribute('tabindex')) view.setAttribute('tabindex', '-1');
+    if (!view.hasAttribute('aria-label') && !view.hasAttribute('aria-labelledby') && view.dataset.title) view.setAttribute('aria-label', view.dataset.title);
+    view.focus({ preventScroll: true });
+  }
   function show(app, name, dir) {
     var list = views(app), to = null, from = null;
     list.forEach(function (v) { if (v.dataset.view === name) to = v; else if (!v.hidden) from = v; });
@@ -910,7 +918,10 @@ S4.register('fab', function (scope) {
     list.forEach(function (v) { if (v !== to && v !== from) v.hidden = true; });
     if (to === from || (!from && !to.hidden)) return true;
     /* the title and the scroll reset wait for the moment of the swap, so the old view doesn't jump while it fades out */
+    var a = document.activeElement, move = app._s4goFocus || !a || a === document.body || (from && from.contains(a));
+    app._s4goFocus = false;
     sharedAxis(from, to, dir || 1, state, function () {
+      if (move) { to.hidden = false; focusView(to); }   /* the swap runs just before the view unhides */
       var title = to.dataset.title, bar = app.querySelector('.s4-top-app-bar .s4-app-bar-title');
       if (title && bar) bar.textContent = title;
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -933,8 +944,11 @@ S4.register('fab', function (scope) {
       var nav = app.querySelector('.s4-nav-bar, .s4-nav-rail');
       var items = nav ? Array.prototype.slice.call(nav.querySelectorAll('.s4-nav-item')) : [];
       var target = items.filter(function (x) { return x.dataset.view === name; })[0];
-      if (target) { target.click(); return; }
-      show(app, name, 1);
+      app._s4goFocus = true;
+      if (target) target.click(); else show(app, name, 1);
+      /* already there (no switch happened): the view still takes the focus */
+      if (app._s4goFocus) { var v = views(app).filter(function (x) { return x.dataset.view === name && !x.hidden; })[0]; if (v && !v.contains(document.activeElement)) focusView(v); }
+      app._s4goFocus = false;
     }
   };
 
@@ -1113,7 +1127,9 @@ S4.register('fab', function (scope) {
    - The URL becomes #view/page/id; opening that link (or reloading) lands on the page, and Back returns to its view.
    - While a page is open the app has data-sub: the top app bar shows Back and the page's title, and on a phone the
      bottom navigation bar steps aside (a pushed page is not a destination). The rail stays on wide screens.
-   - Scroll position of the view you left is restored when you come back.
+   - Coming back keeps your place: the scroll position of the view you left is restored once it shows again, and focus
+     returns to the thing that opened the page (the trigger passed as opts.from, else the focused or last tapped
+     control in the view), or to the view itself when that is gone. Focus never drops to <body>.
    - S4.pages.sub(app, { title, close }) gives the same chrome, URL-less, to something that swaps content itself
      (the list-detail split under 840 uses it), so every "one level in" behaves the same.
    Motion: Switch (forward going in, back coming out). Opening a page never focuses a field (decision 0049). */
@@ -1153,6 +1169,27 @@ S4.register('fab', function (scope) {
     return app.querySelector('.s4-view:not([hidden])');
   }
   function viewName(app) { var v = app.querySelector('.s4-view:not([hidden])') || (st(app).stack[0] && st(app).stack[0].from); return v && v.dataset ? v.dataset.view || '' : ''; }
+  var FOCUSABLE = 'a[href],button,input,select,textarea,summary,[tabindex]';
+  /* the control that opened a page: passed in, focused, or last tapped inside the view being left */
+  function opener(app, from, given) {
+    var c = [given, document.activeElement, app._s4tapped];
+    for (var i = 0; i < c.length; i++) {
+      var el = c[i]; if (!el || el === document.body || !el.closest) continue;
+      el = el.closest(FOCUSABLE) || el;
+      if (!from || from.contains(el)) return el;
+    }
+    return null;
+  }
+  /* back where you were: focus the opener if it is still there and visible, else the view, never <body> */
+  function refocus(app, entry, to) {
+    var el = entry.opener;
+    if (el && el.isConnected && !el.closest('[hidden]') && el.getClientRects().length) {
+      if (!el.matches(FOCUSABLE)) el = el.querySelector(FOCUSABLE) || null;
+    } else el = null;
+    if (!el && entry.openerId && to) el = to.querySelector('[data-page-id="' + entry.openerId.replace(/"/g, '') + '"]');
+    if (!el) { el = to || shown(app); if (el && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1'); }
+    if (el) el.focus({ preventScroll: true });
+  }
   function find(app, name) { return typeof name === 'string' ? app.querySelector('.s4-subpage[data-page="' + name + '"]') : name; }
 
   function open(app, name, opts) {
@@ -1160,7 +1197,9 @@ S4.register('fab', function (scope) {
     var page = find(app, name); if (!page) return false;
     var s = st(app), from = shown(app), id = opts.id == null ? '' : String(opts.id);
     if (from === page && page.dataset.pageId === id) return true;
-    var entry = { el: page, from: from === page ? s.stack[s.stack.length - 1].from : from, title: opts.title || page.dataset.title || '', id: id, scroll: getScroll(app), name: page.dataset.page };
+    var prev = from === page ? s.stack[s.stack.length - 1] : null;
+    var entry = { el: page, from: prev ? prev.from : from, title: opts.title || page.dataset.title || '', id: id, scroll: prev ? prev.scroll : getScroll(app), name: page.dataset.page,
+      opener: prev ? prev.opener : opener(app, from, opts.from), openerId: prev ? prev.openerId : id };
     if (from === page) s.stack.pop();
     s.stack.push(entry);
     page.dataset.pageId = id;
@@ -1178,15 +1217,16 @@ S4.register('fab', function (scope) {
   /* something that swaps its own content (the split on a phone) borrows the chrome and the Back gesture */
   function sub(app, opts) {
     var s = st(app); opts = opts || {};
-    s.stack.push({ el: null, title: opts.title || '', close: opts.close, scroll: getScroll(app) });
+    s.stack.push({ el: null, title: opts.title || '', close: opts.close, scroll: getScroll(app), opener: opener(app, null, opts.from) });
     history.pushState({ s4page: s.stack.length }, '');
     chrome(app);
   }
   function leave(app, entry, animate) {
     var s = st(app);
-    if (!entry.el) { if (entry.close) entry.close(); chrome(app); return; }
+    if (!entry.el) { if (entry.close) entry.close(); chrome(app); setScroll(app, entry.scroll || 0); refocus(app, entry, null); return; }
     S4.util.emit(entry.el, 's4-close', { id: entry.id });
-    var to = entry.from, swap = function () { chrome(app); setScroll(app, entry.scroll || 0); };
+    /* the view must be showing (and tall again) before its scroll can come back: the swap runs before it unhides */
+    var to = entry.from, swap = function () { if (to) to.hidden = false; chrome(app); setScroll(app, entry.scroll || 0); refocus(app, entry, to); };
     if (!animate || !to) { entry.el.hidden = true; if (to) to.hidden = false; swap(); }
     else S4.transition.sharedAxis(entry.el, to, -1, s.axis, swap);
   }
@@ -1219,6 +1259,8 @@ S4.register('fab', function (scope) {
     S4.util.all(scope, '.s4-app').forEach(function (app) {
       if (!S4.util.once(app, 'pages')) return;
       app.querySelectorAll('.s4-subpage').forEach(function (p) { p.hidden = true; });
+      /* remember the last control tapped, for openers that call S4.pages.open from code */
+      app.addEventListener('pointerdown', function (e) { var t = e.target.closest && e.target.closest(FOCUSABLE); app._s4tapped = t || e.target; }, true);
       app.addEventListener('click', function (e) {
         var t = e.target.closest ? e.target : e.target.parentElement; if (!t) return;
         var b = t.closest('[data-page-back]');
@@ -2126,7 +2168,17 @@ S4.register('search', function (scope) {
     if (item) item.focus();
     return true;
   }
-  function leave(bar) { var b = before; before = null; if (b && b.isConnected && b !== document.body && b.focus) b.focus({ preventScroll: true }); else if (document.activeElement) document.activeElement.blur(); }
+  /* Escape on the bar: back to where focus was before F10, Alt or the click that opened a menu; with nowhere to go back
+     to, the window's current view or content takes it (a region), never <body> */
+  function leave(bar) {
+    var b = before; before = null;
+    if (b && b.isConnected && b !== document.body && b.focus && !b.closest('[hidden], [inert]') && b.getClientRects().length) { b.focus({ preventScroll: true }); return; }
+    var app = bar.closest('.s4-app') || document;
+    var to = app.querySelector('.s4-view:not([hidden])') || app.querySelector('main, .s4-app-body, .s4-content');
+    if (!to) { if (document.activeElement) document.activeElement.blur(); return; }
+    if (!to.hasAttribute('tabindex')) to.setAttribute('tabindex', '-1');
+    to.focus({ preventScroll: true });
+  }
   function activeBar() { return Array.prototype.filter.call(document.querySelectorAll('.s4-menubar'), shown)[0] || null; }
   /* which bar a menu (or a submenu of one) belongs to, and its item there */
   function rootItem(menu) {
@@ -2171,6 +2223,8 @@ S4.register('search', function (scope) {
         var cur = openOf(bar); if (!cur || cur === item) return;
         rove(bar, item); S4.menu.open(menuOf(item), item);
       });
+      /* a click on the bar: remember where focus was, so Escape can give it back */
+      bar.addEventListener('pointerdown', function () { if (!bar.contains(document.activeElement) && document.activeElement !== document.body) before = document.activeElement; }, true);
       bar.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-menubar-item'); if (item) rove(bar, item); });
     });
   });
@@ -5121,7 +5175,9 @@ S4.register('meter', function (scope) {
      the lane gets data-over past its limit, and the count's name is said in words. It follows every change.
    - add in place: a [data-lane-add] button at a lane's foot opens a draft (a field, Add and Cancel) in its place; Add
      fires s4-lane-add { value, lane, list } on the lane and the app makes the card. The field is not focused (0049):
-     the person taps it. Escape or Cancel closes the draft and gives the button back.
+     the draft itself takes the focus (a named group, so the next Tab reaches the field and nothing drops to <body>),
+     and the person taps or tabs into the field. Escape or Cancel closes the draft and gives the button back; after Add
+     the button has the focus again for the next card.
    - keyboard: with focus on anything in a card, Alt+Up and Alt+Down move the card in its lane, Alt+Left and Alt+Right
      to the lane before or after (S4.reorder.move, so the app hears s4-reorder as for a drag). Dragging is
      components/direct (data-reorder, data-reorder-group). Each move is announced. */
@@ -5158,19 +5214,23 @@ S4.register('board', function (scope) {
       var title = lane.querySelector('.s4-lane-title'), what = (add.textContent || '').trim() || 'Add';
       var li = document.createElement('li'); li.setAttribute('data-lane-draft', ''); li.setAttribute('data-reorder-fixed', '');
       var id = 's4-lane-draft-' + Math.random().toString(36).slice(2, 8);
-      li.innerHTML = '<form class="s4-lane-draft"><div class="s4-text-field"><input id="' + id + '" name="title" autocomplete="off" required></div>' +
+      li.innerHTML = '<form class="s4-lane-draft" tabindex="-1" role="group"><div class="s4-text-field"><input id="' + id + '" name="title" autocomplete="off" required></div>' +
         '<div class="s4-row"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-cancel>Cancel</button><button class="s4-button" data-variant="filled" data-size="s" type="submit">Add</button></div></form>';
       var input = li.querySelector('input');
       input.setAttribute('aria-label', what + (title ? ' to ' + title.textContent.trim() : ''));
       input.placeholder = add.getAttribute('data-lane-add') || 'Title';
+      var form = li.querySelector('form');
+      form.setAttribute('aria-label', input.getAttribute('aria-label'));
       list.appendChild(li); add.hidden = true;
+      /* the button just went away: hold the focus on the draft (never on the field, decision 0049) */
+      form.focus({ preventScroll: true }); li.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       var close = function () { li.remove(); add.hidden = false; add.focus(); };
       li.querySelector('[data-lane-cancel]').addEventListener('click', close);
       li.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); close(); } });
       li.querySelector('form').addEventListener('submit', function (ev) {
         ev.preventDefault();
         var v = input.value.trim(); if (!v) return;
-        li.remove(); add.hidden = false;
+        li.remove(); add.hidden = false; add.focus({ preventScroll: true });
         S4.util.emit(lane, 's4-lane-add', { value: v, lane: lane, list: list });
         say((title ? title.textContent.trim() + ': ' : '') + 'added ' + v);
       });
@@ -8651,6 +8711,7 @@ S4.register('skeleton', function (scope) {
        feeds the menu bar, menus and shortcuts. S4.palette.register([...]) adds to it (the older name).
        [data-command="Label"] on any button or link                                        runs by clicking it (its data-shortcut is shown)
        the app's navigation                                                                 "Go To Inbox", one per destination
+                                                                                            (left out when a command of that name opens it)
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
    - Type to filter (every word must match), Arrow keys move, Enter runs, Escape closes.
    - S4.palette.open() / close(). Fires s4-open and s4-close on the dialog and s4-command { command } on document.
@@ -8693,9 +8754,12 @@ S4.register('skeleton', function (scope) {
       out.push({ label: el.dataset.command || text(el), group: el.dataset.commandGroup || 'Actions', icon: icon ? icon.dataset.icon : '', shortcut: el.dataset.shortcut || '', keywords: el.dataset.commandKeywords || '', el: el });
     });
     var nav = document.querySelector('.s4-app .s4-nav-rail, .s4-app .s4-nav-bar');
+    /* one row per thing: a destination that a command already opens ("Settings", mod+comma) is not listed twice */
+    var have = {}; out.forEach(function (c) { have[c.label.toLowerCase()] = true; });
     if (nav) nav.querySelectorAll('.s4-nav-item').forEach(function (a) {
-      var icon = a.querySelector('.s4-icon[data-icon]'), label = a.querySelector('.s4-nav-label');
-      out.push({ label: 'Go To ' + (label ? label.textContent.trim() : text(a)), group: 'Go To', icon: icon ? icon.dataset.icon : '', el: a });
+      var icon = a.querySelector('.s4-icon[data-icon]'), label = a.querySelector('.s4-nav-label'), name = label ? label.textContent.trim() : text(a);
+      if (have[name.toLowerCase()] || have[('go to ' + name).toLowerCase()]) return;
+      out.push({ label: 'Go To ' + name, group: 'Go To', icon: icon ? icon.dataset.icon : '', el: a });
     });
     if (S4.palette.theme !== false && S4.theme) {
       var dark = (S4.theme() || {}).mode === 'dark' || ((S4.theme() || {}).mode !== 'light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);

@@ -3,7 +3,9 @@
      the lane gets data-over past its limit, and the count's name is said in words. It follows every change.
    - add in place: a [data-lane-add] button at a lane's foot opens a draft (a field, Add and Cancel) in its place; Add
      fires s4-lane-add { value, lane, list } on the lane and the app makes the card. The field is not focused (0049):
-     the person taps it. Escape or Cancel closes the draft and gives the button back.
+     the draft itself takes the focus (a named group, so the next Tab reaches the field and nothing drops to <body>),
+     and the person taps or tabs into the field. Escape or Cancel closes the draft and gives the button back; after Add
+     the button has the focus again for the next card.
    - keyboard: with focus on anything in a card, Alt+Up and Alt+Down move the card in its lane, Alt+Left and Alt+Right
      to the lane before or after (S4.reorder.move, so the app hears s4-reorder as for a drag). Dragging is
      components/direct (data-reorder, data-reorder-group). Each move is announced. */
@@ -40,19 +42,23 @@ S4.register('board', function (scope) {
       var title = lane.querySelector('.s4-lane-title'), what = (add.textContent || '').trim() || 'Add';
       var li = document.createElement('li'); li.setAttribute('data-lane-draft', ''); li.setAttribute('data-reorder-fixed', '');
       var id = 's4-lane-draft-' + Math.random().toString(36).slice(2, 8);
-      li.innerHTML = '<form class="s4-lane-draft"><div class="s4-text-field"><input id="' + id + '" name="title" autocomplete="off" required></div>' +
+      li.innerHTML = '<form class="s4-lane-draft" tabindex="-1" role="group"><div class="s4-text-field"><input id="' + id + '" name="title" autocomplete="off" required></div>' +
         '<div class="s4-row"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-cancel>Cancel</button><button class="s4-button" data-variant="filled" data-size="s" type="submit">Add</button></div></form>';
       var input = li.querySelector('input');
       input.setAttribute('aria-label', what + (title ? ' to ' + title.textContent.trim() : ''));
       input.placeholder = add.getAttribute('data-lane-add') || 'Title';
+      var form = li.querySelector('form');
+      form.setAttribute('aria-label', input.getAttribute('aria-label'));
       list.appendChild(li); add.hidden = true;
+      /* the button just went away: hold the focus on the draft (never on the field, decision 0049) */
+      form.focus({ preventScroll: true }); li.scrollIntoView({ block: 'nearest', inline: 'nearest' });
       var close = function () { li.remove(); add.hidden = false; add.focus(); };
       li.querySelector('[data-lane-cancel]').addEventListener('click', close);
       li.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); close(); } });
       li.querySelector('form').addEventListener('submit', function (ev) {
         ev.preventDefault();
         var v = input.value.trim(); if (!v) return;
-        li.remove(); add.hidden = false;
+        li.remove(); add.hidden = false; add.focus({ preventScroll: true });
         S4.util.emit(lane, 's4-lane-add', { value: v, lane: lane, list: list });
         say((title ? title.textContent.trim() + ': ' : '') + 'added ' + v);
       });

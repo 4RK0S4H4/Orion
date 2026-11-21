@@ -6,6 +6,7 @@
        feeds the menu bar, menus and shortcuts. S4.palette.register([...]) adds to it (the older name).
        [data-command="Label"] on any button or link                                        runs by clicking it (its data-shortcut is shown)
        the app's navigation                                                                 "Go To Inbox", one per destination
+                                                                                            (left out when a command of that name opens it)
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
    - Type to filter (every word must match), Arrow keys move, Enter runs, Escape closes.
    - S4.palette.open() / close(). Fires s4-open and s4-close on the dialog and s4-command { command } on document.
@@ -48,9 +49,12 @@
       out.push({ label: el.dataset.command || text(el), group: el.dataset.commandGroup || 'Actions', icon: icon ? icon.dataset.icon : '', shortcut: el.dataset.shortcut || '', keywords: el.dataset.commandKeywords || '', el: el });
     });
     var nav = document.querySelector('.s4-app .s4-nav-rail, .s4-app .s4-nav-bar');
+    /* one row per thing: a destination that a command already opens ("Settings", mod+comma) is not listed twice */
+    var have = {}; out.forEach(function (c) { have[c.label.toLowerCase()] = true; });
     if (nav) nav.querySelectorAll('.s4-nav-item').forEach(function (a) {
-      var icon = a.querySelector('.s4-icon[data-icon]'), label = a.querySelector('.s4-nav-label');
-      out.push({ label: 'Go To ' + (label ? label.textContent.trim() : text(a)), group: 'Go To', icon: icon ? icon.dataset.icon : '', el: a });
+      var icon = a.querySelector('.s4-icon[data-icon]'), label = a.querySelector('.s4-nav-label'), name = label ? label.textContent.trim() : text(a);
+      if (have[name.toLowerCase()] || have[('go to ' + name).toLowerCase()]) return;
+      out.push({ label: 'Go To ' + name, group: 'Go To', icon: icon ? icon.dataset.icon : '', el: a });
     });
     if (S4.palette.theme !== false && S4.theme) {
       var dark = (S4.theme() || {}).mode === 'dark' || ((S4.theme() || {}).mode !== 'light' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);

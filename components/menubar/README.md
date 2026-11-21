@@ -42,8 +42,9 @@ menu bar on a phone or a Mac shell.
 **Accessibility:** WAI-ARIA menubar. Left and Right move along the bar (and switch the open menu), Down, Enter or Space
 open a menu at its first item, Up at its last, Home and End, a letter jumps to a menu; inside a menu the arrow away from
 it moves to the next menu, the arrow back closes a submenu. F10 or a lone Alt moves focus to the bar and back; Alt with
-a letter opens that menu (not while typing on a Mac, where ⌥ types characters); Escape closes and returns focus. One tab
-stop for the bar.
+a letter opens that menu (not while typing on a Mac, where ⌥ types characters); Escape closes the menu, and a second
+Escape gives focus back to where it was before F10, Alt or the click (with nowhere to go back to, the current view takes
+it; never `<body>`, decision 0065). One tab stop for the bar.
 
 **Tokens:** `--s4-size-menubar-item`, `--s4-shape-control`, `--md-sys-color-secondary-container` (the open menu's item),
 label-large type.

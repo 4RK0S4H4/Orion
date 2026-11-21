@@ -10,7 +10,9 @@
    - The URL becomes #view/page/id; opening that link (or reloading) lands on the page, and Back returns to its view.
    - While a page is open the app has data-sub: the top app bar shows Back and the page's title, and on a phone the
      bottom navigation bar steps aside (a pushed page is not a destination). The rail stays on wide screens.
-   - Scroll position of the view you left is restored when you come back.
+   - Coming back keeps your place: the scroll position of the view you left is restored once it shows again, and focus
+     returns to the thing that opened the page (the trigger passed as opts.from, else the focused or last tapped
+     control in the view), or to the view itself when that is gone. Focus never drops to <body>.
    - S4.pages.sub(app, { title, close }) gives the same chrome, URL-less, to something that swaps content itself
      (the list-detail split under 840 uses it), so every "one level in" behaves the same.
    Motion: Switch (forward going in, back coming out). Opening a page never focuses a field (decision 0049). */
@@ -50,6 +52,27 @@
     return app.querySelector('.s4-view:not([hidden])');
   }
   function viewName(app) { var v = app.querySelector('.s4-view:not([hidden])') || (st(app).stack[0] && st(app).stack[0].from); return v && v.dataset ? v.dataset.view || '' : ''; }
+  var FOCUSABLE = 'a[href],button,input,select,textarea,summary,[tabindex]';
+  /* the control that opened a page: passed in, focused, or last tapped inside the view being left */
+  function opener(app, from, given) {
+    var c = [given, document.activeElement, app._s4tapped];
+    for (var i = 0; i < c.length; i++) {
+      var el = c[i]; if (!el || el === document.body || !el.closest) continue;
+      el = el.closest(FOCUSABLE) || el;
+      if (!from || from.contains(el)) return el;
+    }
+    return null;
+  }
+  /* back where you were: focus the opener if it is still there and visible, else the view, never <body> */
+  function refocus(app, entry, to) {
+    var el = entry.opener;
+    if (el && el.isConnected && !el.closest('[hidden]') && el.getClientRects().length) {
+      if (!el.matches(FOCUSABLE)) el = el.querySelector(FOCUSABLE) || null;
+    } else el = null;
+    if (!el && entry.openerId && to) el = to.querySelector('[data-page-id="' + entry.openerId.replace(/"/g, '') + '"]');
+    if (!el) { el = to || shown(app); if (el && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1'); }
+    if (el) el.focus({ preventScroll: true });
+  }
   function find(app, name) { return typeof name === 'string' ? app.querySelector('.s4-subpage[data-page="' + name + '"]') : name; }
 
   function open(app, name, opts) {
@@ -57,7 +80,9 @@
     var page = find(app, name); if (!page) return false;
     var s = st(app), from = shown(app), id = opts.id == null ? '' : String(opts.id);
     if (from === page && page.dataset.pageId === id) return true;
-    var entry = { el: page, from: from === page ? s.stack[s.stack.length - 1].from : from, title: opts.title || page.dataset.title || '', id: id, scroll: getScroll(app), name: page.dataset.page };
+    var prev = from === page ? s.stack[s.stack.length - 1] : null;
+    var entry = { el: page, from: prev ? prev.from : from, title: opts.title || page.dataset.title || '', id: id, scroll: prev ? prev.scroll : getScroll(app), name: page.dataset.page,
+      opener: prev ? prev.opener : opener(app, from, opts.from), openerId: prev ? prev.openerId : id };
     if (from === page) s.stack.pop();
     s.stack.push(entry);
     page.dataset.pageId = id;
@@ -75,15 +100,16 @@
   /* something that swaps its own content (the split on a phone) borrows the chrome and the Back gesture */
   function sub(app, opts) {
     var s = st(app); opts = opts || {};
-    s.stack.push({ el: null, title: opts.title || '', close: opts.close, scroll: getScroll(app) });
+    s.stack.push({ el: null, title: opts.title || '', close: opts.close, scroll: getScroll(app), opener: opener(app, null, opts.from) });
     history.pushState({ s4page: s.stack.length }, '');
     chrome(app);
   }
   function leave(app, entry, animate) {
     var s = st(app);
-    if (!entry.el) { if (entry.close) entry.close(); chrome(app); return; }
+    if (!entry.el) { if (entry.close) entry.close(); chrome(app); setScroll(app, entry.scroll || 0); refocus(app, entry, null); return; }
     S4.util.emit(entry.el, 's4-close', { id: entry.id });
-    var to = entry.from, swap = function () { chrome(app); setScroll(app, entry.scroll || 0); };
+    /* the view must be showing (and tall again) before its scroll can come back: the swap runs before it unhides */
+    var to = entry.from, swap = function () { if (to) to.hidden = false; chrome(app); setScroll(app, entry.scroll || 0); refocus(app, entry, to); };
     if (!animate || !to) { entry.el.hidden = true; if (to) to.hidden = false; swap(); }
     else S4.transition.sharedAxis(entry.el, to, -1, s.axis, swap);
   }
@@ -116,6 +142,8 @@
     S4.util.all(scope, '.s4-app').forEach(function (app) {
       if (!S4.util.once(app, 'pages')) return;
       app.querySelectorAll('.s4-subpage').forEach(function (p) { p.hidden = true; });
+      /* remember the last control tapped, for openers that call S4.pages.open from code */
+      app.addEventListener('pointerdown', function (e) { var t = e.target.closest && e.target.closest(FOCUSABLE); app._s4tapped = t || e.target; }, true);
       app.addEventListener('click', function (e) {
         var t = e.target.closest ? e.target : e.target.parentElement; if (!t) return;
         var b = t.closest('[data-page-back]');

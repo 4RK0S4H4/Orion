@@ -38,7 +38,8 @@ fill it from your data there. It fires `s4-close` when left.
 - **The bar follows:** Back appears, the title becomes the page's, and both return when you leave.
 - **On a phone the bottom navigation steps aside** while a page is open (a pushed page is not a destination). The
   side navigation stays on wide screens. Tapping the destination you are in takes you back to its start.
-- **Your place is kept:** the view you left is scrolled back to where you were.
+- **Your place is kept:** the view you left is scrolled back to where you were (once it shows again), and focus returns
+  to the item that opened the page, or to the view itself if that item is gone. Focus never drops to `<body>` (decision 0065).
 - **Pages can stack:** a page can open another page.
 
 **When to use what (where things open)**

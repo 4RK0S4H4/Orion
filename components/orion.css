@@ -3116,6 +3116,7 @@
 
   /* ---------- views: sibling destinations switched by app.js with the shared axis pattern ---------- */
   .s4-view { display: block; }
+  .s4-view:focus { outline: none; }   /* a view takes the focus as a region when code switches to it; no ring on a whole screen */
   /* a view sliding in (Switch) must never make the page wider than the screen, even for a moment */
   .s4-content:has(> .s4-view) { overflow-x: clip; }
 

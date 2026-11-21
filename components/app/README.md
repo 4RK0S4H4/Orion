@@ -42,7 +42,7 @@ needs bottom padding. Size classes are container queries on `.s4-app`, so the sh
 **Behaviour (`app.js`):** the nav bar and rail of one app stay in sync (same index). With views, a destination change
 runs the shared axis transition (old view slides 30px toward where you came from and fades; new one slides in from the
 side you're heading, spatial spring for movement, effects for fades), scrolls to the top and fires
-`s4-change { view, previous }` on `.s4-app`. `S4.app.go(app, 'bills')` switches from code.
+`s4-change { view, previous }` on `.s4-app`. `S4.app.go(app, 'bills')` switches from code and moves focus to the new view (a region named by its `data-title`, never a field), so a shortcut such as mod+comma lands you there; a switch from the navigation keeps focus on the navigation item (decision 0065).
 
 **Do**
 - Use the same destinations, in the same order, in the nav bar and the rail.

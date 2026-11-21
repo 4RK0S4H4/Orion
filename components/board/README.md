@@ -27,6 +27,10 @@ work. Pressroom and Moorings both rebuilt lane counts, limits and the add-in-pla
 | `.s4-lane-items` | the cards; add `data-reorder` and a shared `data-reorder-group` ([direct](../direct/)) so they drag between lanes | — |
 | `.s4-lane-foot` with `[data-lane-add="placeholder"]` | the add-in-place footer: a draft (field, Cancel, Add) opens where the button was; Add fires `s4-lane-add { value, lane, list }` | — |
 
+**Focus (decisions 0049, 0065):** Add opens the draft and holds the focus on the draft itself (a named group), never in
+the field: the next Tab, or a tap, reaches the field. Add gives the focus back to the lane's add button for the next card;
+Escape or Cancel does the same. Focus never drops to `<body>`.
+
 **Keyboard:** with focus on anything in a card, Alt+Up and Alt+Down move it in its lane, Alt+Left and Alt+Right to the
 lane before or after (mirrored right to left). The app hears `s4-reorder`, as for a drag, so Undo works the same way.
 Each move is announced ("Rents rise fastest, Ready, position 1 of 3"). Dragging is [direct](../direct/): a mouse drags,

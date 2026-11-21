@@ -392,6 +392,7 @@ async function use(page, add, phone) {
       await page.keyboard.press('Escape'); await settle(380);
       const gone = await until((id) => { const m = document.getElementById(id); if (!m) return true; const r = m.getBoundingClientRect(); return !(r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'); }, id);
       if (!gone) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
+      else if (await page.evaluate(() => !document.activeElement || document.activeElement === document.body)) add(`menu "${id}": Escape left focus on <body> (it goes back to the menu's button)`);
     }
     /* website kit: the phone menu and other site panels open as floating glass, close with Escape and give focus back */
     const sitePanels = await visible('.s4-site-menu-button, [data-site-panel]');
@@ -450,6 +451,7 @@ async function use(page, add, phone) {
       await page.keyboard.press('Escape'); await settle(650);
       const closed = await until((id) => document.getElementById(id).hidden, id);
       if (!closed) add(`expand "${id}" did not close with Escape`);
+      else if (await page.evaluate(() => !document.activeElement || document.activeElement === document.body)) add(`expand "${id}": Escape left focus on <body>`);
       const after = await page.evaluate(() => document.documentElement.scrollHeight);
       if (closed && (await shownView()) === viewBefore && Math.abs(after - before) > 2) add(`expand "${id}" left the page ${after - before}px taller after closing`);
     }
@@ -458,7 +460,11 @@ async function use(page, add, phone) {
     for (const name of pageOpeners) {
       const b = (await visible(`[data-page-open="${name}"]`))[0]; if (!b) continue;
       const depth0 = await page.evaluate(() => +(document.querySelector('.s4-app').dataset.sub || 0));
+      /* put the opener low on the screen, so the view has a scroll position worth keeping (Back must restore it) */
+      await b.evaluate((x) => x.scrollIntoView({ block: 'end', behavior: 'instant' })); await settle(200);
+      await b.evaluate((x) => { const app = x.closest('.s4-app'), body = app && app.hasAttribute('data-window') ? app.querySelector(':scope > .s4-app-body') : null; window.__s4opener = x; const y = () => (body ? body.scrollTop : window.scrollY); window.__s4where = y(); addEventListener('pointerdown', () => { window.__s4where = y(); }, { capture: true, once: true }); return y(); });
       if (!(await click(b, `opener of page "${name}"`))) continue;
+      const whereAt = await page.evaluate(() => window.__s4where);   /* where the view was when it was tapped (a click may scroll first) */
       await until((n) => { const p = document.querySelector(`.s4-subpage[data-page="${n}"]`); return !!p && !p.hidden; }, name);
       await settle(600);
       const st = await page.evaluate((n) => { const p = document.querySelector(`.s4-subpage[data-page="${n}"]`), k = document.querySelector('.s4-app-bar-back'), a = document.activeElement; return { shown: !!p && !p.hidden, back: !!k && !k.hidden, field: !!a && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select'), wide: document.documentElement.scrollWidth - innerWidth, hash: location.hash }; }, name);
@@ -470,6 +476,13 @@ async function use(page, add, phone) {
       await page.goBack(); await settle(600);
       const out = await until((a) => +(document.querySelector('.s4-app').dataset.sub || 0) === a[0] && document.querySelector(`.s4-subpage[data-page="${a[1]}"]`).hidden, [depth0, name]);
       if (!out) { add(`page "${name}" did not close with the browser's Back`); await page.evaluate(() => S4.pages.reset(document.querySelector('.s4-app'))); }
+      else {
+        /* Back keeps your place: the view's scroll comes back and focus returns to what opened the page, never <body> */
+        const kept = await page.evaluate(() => { const o = window.__s4opener, a = document.activeElement, app = document.querySelector('.s4-app'), body = app && app.hasAttribute('data-window') ? app.querySelector(':scope > .s4-app-body') : null; const y = body ? body.scrollTop : window.scrollY; const same = !!a && !!o && (a === o || a.contains(o) || o.contains(a) || (o.dataset.pageId != null && a.dataset && a.dataset.pageId === o.dataset.pageId)); window.__s4opener = null; return { y, body: !a || a === document.body, same, at: a ? a.tagName.toLowerCase() + (a.className && typeof a.className === 'string' ? '.' + a.className.trim().split(/\s+/)[0] : '') : '' }; });
+        if (Math.abs(kept.y - whereAt) > 4) add(`page "${name}": Back did not restore the view's scroll (${Math.round(whereAt)}px before, ${Math.round(kept.y)}px after)`);
+        if (kept.body) add(`page "${name}": Back left focus on <body> (focus returns to the item that opened the page)`);
+        else if (!kept.same) add(`page "${name}": Back put focus on ${kept.at}, not on the item that opened the page`);
+      }
     }
     /* the command palette: opens from its button without focusing its box, corners nest, Escape closes */
     const pal = (await visible('[data-palette]'))[0];
@@ -872,7 +885,8 @@ async function desktopKeys(page, add) {
   const mod = await ev(() => (window.S4 && S4.desktop && /mac|ios/.test(S4.desktop.platform)) ? 'Meta' : 'Control');
   /* menu bar */
   if (await ev(() => [...document.querySelectorAll('.s4-menubar')].some((b) => b.getClientRects().length && b.querySelector('.s4-menubar-item')))) {
-    await ev(() => { if (document.activeElement) document.activeElement.blur(); });
+    /* start from a control in the window, so the second Escape has somewhere to give focus back to */
+    await ev(() => { const bar = [...document.querySelectorAll('.s4-menubar')].find((b) => b.getClientRects().length), host = (bar && bar.closest('.s4-app, .s4-example, section')) || document; const c = [...host.querySelectorAll('button:not([disabled]), a[href]')].find((x) => x.getClientRects().length && !x.closest('.s4-menubar, .s4-menu, [hidden], [inert], dialog')); if (c) { c.setAttribute('data-kt-start', ''); c.focus(); } else if (document.activeElement) document.activeElement.blur(); });
     await page.keyboard.press('F10'); await settle();
     let a = await active();
     if (!a.menubar) add('menu bar: F10 did not move focus to the bar');
@@ -888,7 +902,19 @@ async function desktopKeys(page, add) {
       if ((await openMenus()).length || !a.menubar) add('menu bar: Escape did not close the menu and return to the bar');
       await page.keyboard.press('Escape'); await settle(); a = await active();
       if (a.menubar) add('menu bar: Escape on the bar did not give focus back');
+      else if (await ev(() => !!document.querySelector('[data-kt-start]') && !(document.activeElement && document.activeElement.hasAttribute('data-kt-start')))) add('menu bar: the second Escape did not give focus back to where it was before F10');
     }
+    /* opened with a click: Escape twice returns to where focus was, never <body> */
+    if (await ev(() => !!document.querySelector('[data-kt-start]'))) {
+      await ev(() => document.querySelector('[data-kt-start]').focus());
+      const item = page.locator('.s4-menubar-item').filter({ visible: true }).first();
+      await item.click(); await settle();
+      await page.keyboard.press('Escape'); await settle(); await page.keyboard.press('Escape'); await settle();
+      const at = await ev(() => { const a = document.activeElement; return !a || a === document.body ? 'body' : a.hasAttribute('data-kt-start') ? 'start' : (a.className || a.tagName); });
+      if (at === 'body') add('menu bar: after a click and two Escapes, focus dropped to <body>');
+      else if (at !== 'start') add(`menu bar: after a click and two Escapes, focus went to ${at}, not back to where it was`);
+    }
+    await ev(() => document.querySelectorAll('[data-kt-start]').forEach((x) => x.removeAttribute('data-kt-start')));
     /* a submenu: Right opens it, Left closes it */
     const sub = await ev(() => { for (const b of document.querySelectorAll('.s4-menubar-item')) { const m = document.getElementById(b.dataset.menu); if (m && m.querySelector('[data-submenu]') && b.getClientRects().length) { b.setAttribute('data-kt-sub', ''); return m.querySelector('[data-submenu]').textContent.trim(); } } return ''; });
     if (sub) {
@@ -941,6 +967,17 @@ async function desktopKeys(page, add) {
     }
     await ev(() => document.querySelectorAll('[data-kt-tabs]').forEach((x) => x.removeAttribute('data-kt-tabs')));
     await page.keyboard.press('Escape');
+  }
+  /* mod+comma (Settings, decision 0062): focus lands in the settings view, never on <body> */
+  const hasSettings = await ev(() => !!(window.S4 && S4.commands && S4.commands.list().some((c) => c.shortcut === 'mod+comma')));
+  if (hasSettings) {
+    const startView = await ev(() => { const v = document.querySelector('.s4-view:not([hidden])'); return v ? v.dataset.view : ''; });
+    await page.keyboard.press(`${mod}+Comma`); await page.waitForTimeout(700);
+    const st = await ev(() => { const a = document.activeElement, v = document.querySelector('.s4-view:not([hidden])'); return { body: !a || a === document.body, inView: !!(v && a && v.contains(a)), view: v ? v.dataset.view : '' }; });
+    if (st.body) add('mod+comma: focus dropped to <body> (it lands in the settings view)');
+    else if (!st.inView) add(`mod+comma: focus did not move into the "${st.view}" view`);
+    if (startView && startView !== st.view) await ev((v) => { const app = document.querySelector('.s4-app'); if (app && S4.app) S4.app.go(app, v); }, startView);
+    await page.waitForTimeout(600);
   }
   /* a right-click menu from the keyboard */
   const host = await ev(() => { const h = [...document.querySelectorAll('[data-context-menu]')].find((x) => x.getClientRects().length && (x.tabIndex >= 0 || x.matches('[role="treeitem"], [role="option"]')) && !x.closest('[hidden]')); if (!h) return false; h.focus(); return document.activeElement === h; });
@@ -1043,11 +1080,14 @@ async function apiAudit(page, add) {
         if (!input) o.push('[data-lane-add] did not open a draft with a field');
         else {
           if (document.activeElement === input) o.push('the add-in-place draft put the cursor in its field (decision 0049)');
+          else if (!draft.contains(document.activeElement)) o.push(`the add-in-place draft left focus on ${document.activeElement === document.body ? '<body>' : document.activeElement.tagName.toLowerCase()} (it holds the focus on the draft, so the next Tab reaches the field)`);
+          else { const f = [...draft.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"])')].filter((x) => !x.disabled && x.getClientRects().length && (document.activeElement.compareDocumentPosition(x) & Node.DOCUMENT_POSITION_FOLLOWING || document.activeElement.contains(x)) && x !== document.activeElement); if (f[0] !== input) o.push('the next Tab from the add-in-place draft does not reach its field'); }
           let got = null; const h = (e) => { got = e.detail; e.stopImmediatePropagation(); }; add.closest('.s4-lane').addEventListener('s4-lane-add', h, true);
           input.value = 'Suite Probe'; draft.querySelector('form').requestSubmit(); await frame();
           add.closest('.s4-lane').removeEventListener('s4-lane-add', h, true);
           if (!got || got.value !== 'Suite Probe') o.push('the draft did not fire s4-lane-add with its value');
           if (add.hidden || add.closest('.s4-lane').querySelector('[data-lane-draft]')) o.push('the draft did not give the add button back');
+          else if (document.activeElement !== add) o.push('after Add, focus did not return to the lane\'s add button');
         }
       }
     }

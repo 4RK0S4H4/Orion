@@ -290,7 +290,7 @@ needs bottom padding. Size classes are container queries on `.s4-app`, so the sh
 **Behaviour (`app.js`):** the nav bar and rail of one app stay in sync (same index). With views, a destination change
 runs the shared axis transition (old view slides 30px toward where you came from and fades; new one slides in from the
 side you're heading, spatial spring for movement, effects for fades), scrolls to the top and fires
-`s4-change { view, previous }` on `.s4-app`. `S4.app.go(app, 'bills')` switches from code.
+`s4-change { view, previous }` on `.s4-app`. `S4.app.go(app, 'bills')` switches from code and moves focus to the new view (a region named by its `data-title`, never a field), so a shortcut such as mod+comma lands you there; a switch from the navigation keeps focus on the navigation item (decision 0065).
 
 **Do**
 - Use the same destinations, in the same order, in the nav bar and the rail.
@@ -433,7 +433,8 @@ fill it from your data there. It fires `s4-close` when left.
 - **The bar follows:** Back appears, the title becomes the page's, and both return when you leave.
 - **On a phone the bottom navigation steps aside** while a page is open (a pushed page is not a destination). The
   side navigation stays on wide screens. Tapping the destination you are in takes you back to its start.
-- **Your place is kept:** the view you left is scrolled back to where you were.
+- **Your place is kept:** the view you left is scrolled back to where you were (once it shows again), and focus returns
+  to the item that opened the page, or to the view itself if that item is gone. Focus never drops to `<body>` (decision 0065).
 - **Pages can stack:** a page can open another page.
 
 **When to use what (where things open)**
@@ -1015,8 +1016,9 @@ menu bar on a phone or a Mac shell.
 **Accessibility:** WAI-ARIA menubar. Left and Right move along the bar (and switch the open menu), Down, Enter or Space
 open a menu at its first item, Up at its last, Home and End, a letter jumps to a menu; inside a menu the arrow away from
 it moves to the next menu, the arrow back closes a submenu. F10 or a lone Alt moves focus to the bar and back; Alt with
-a letter opens that menu (not while typing on a Mac, where ⌥ types characters); Escape closes and returns focus. One tab
-stop for the bar.
+a letter opens that menu (not while typing on a Mac, where ⌥ types characters); Escape closes the menu, and a second
+Escape gives focus back to where it was before F10, Alt or the click (with nowhere to go back to, the current view takes
+it; never `<body>`, decision 0065). One tab stop for the bar.
 
 **Tokens:** `--s4-size-menubar-item`, `--s4-shape-control`, `--md-sys-color-secondary-container` (the open menu's item),
 label-large type.
@@ -1818,6 +1820,10 @@ work. Pressroom and Moorings both rebuilt lane counts, limits and the add-in-pla
 | `.s4-lane-head` | `.s4-lane-title` (a heading, title-small) and `.s4-lane-count` (filled in by board.js: "4", or "4 / 3" with a limit) | — |
 | `.s4-lane-items` | the cards; add `data-reorder` and a shared `data-reorder-group` ([direct](#direct)) so they drag between lanes | — |
 | `.s4-lane-foot` with `[data-lane-add="placeholder"]` | the add-in-place footer: a draft (field, Cancel, Add) opens where the button was; Add fires `s4-lane-add { value, lane, list }` | — |
+
+**Focus (decisions 0049, 0065):** Add opens the draft and holds the focus on the draft itself (a named group), never in
+the field: the next Tab, or a tap, reaches the field. Add gives the focus back to the lane's add button for the next card;
+Escape or Cancel does the same. Focus never drops to `<body>`.
 
 **Keyboard:** with focus on anything in a card, Alt+Up and Alt+Down move it in its lane, Alt+Left and Alt+Right to the
 lane before or after (mirrored right to left). The app hears `s4-reorder`, as for a drag, so Undo works the same way.

@@ -54,7 +54,17 @@
     if (item) item.focus();
     return true;
   }
-  function leave(bar) { var b = before; before = null; if (b && b.isConnected && b !== document.body && b.focus) b.focus({ preventScroll: true }); else if (document.activeElement) document.activeElement.blur(); }
+  /* Escape on the bar: back to where focus was before F10, Alt or the click that opened a menu; with nowhere to go back
+     to, the window's current view or content takes it (a region), never <body> */
+  function leave(bar) {
+    var b = before; before = null;
+    if (b && b.isConnected && b !== document.body && b.focus && !b.closest('[hidden], [inert]') && b.getClientRects().length) { b.focus({ preventScroll: true }); return; }
+    var app = bar.closest('.s4-app') || document;
+    var to = app.querySelector('.s4-view:not([hidden])') || app.querySelector('main, .s4-app-body, .s4-content');
+    if (!to) { if (document.activeElement) document.activeElement.blur(); return; }
+    if (!to.hasAttribute('tabindex')) to.setAttribute('tabindex', '-1');
+    to.focus({ preventScroll: true });
+  }
   function activeBar() { return Array.prototype.filter.call(document.querySelectorAll('.s4-menubar'), shown)[0] || null; }
   /* which bar a menu (or a submenu of one) belongs to, and its item there */
   function rootItem(menu) {
@@ -99,6 +109,8 @@
         var cur = openOf(bar); if (!cur || cur === item) return;
         rove(bar, item); S4.menu.open(menuOf(item), item);
       });
+      /* a click on the bar: remember where focus was, so Escape can give it back */
+      bar.addEventListener('pointerdown', function () { if (!bar.contains(document.activeElement) && document.activeElement !== document.body) before = document.activeElement; }, true);
       bar.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-menubar-item'); if (item) rove(bar, item); });
     });
   });
