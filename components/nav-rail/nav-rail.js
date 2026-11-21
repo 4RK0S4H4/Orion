@@ -43,6 +43,9 @@ S4.register('nav-rail', function (scope) {
        .s4-app or a container. A rail's own data-expand or data-expanded still wins. */
     var host = rail.dataset.expand || rail.hasAttribute('data-expanded') ? null : rail.closest('[data-rail]');
     var appRail = host ? host.getAttribute('data-rail') : null;
+    /* decision 0063: a page whose app holds a board (.s4-board) starts with the rail collapsed, so the lanes get the width */
+    var boardApp = rail.closest('.s4-app');
+    if (!appRail && !rail.dataset.expand && !rail.hasAttribute('data-expanded') && boardApp && boardApp.querySelector('.s4-board')) appRail = 'collapsed';
     if (appRail === 'expanded') { rail.setAttribute('data-expanded', ''); sync(); }
     var auto = rail.dataset.expand === 'auto' || (!rail.dataset.expand && !rail.hasAttribute('data-expanded') && appRail !== 'collapsed');
     if (auto && window.ResizeObserver) {

@@ -7160,6 +7160,119 @@
   }
 }
 
+/* ---- board/board.css ---- */
+/* Board: lanes of cards that move from stage to stage (stories, tickets, a pipeline, a week). S4 addition (decision 0063).
+   <div class="s4-board" aria-label="Tonight’s Stories">
+     <section class="s4-lane" data-limit="3" aria-labelledby="l-editing">
+       <header class="s4-lane-head"><h2 class="s4-lane-title" id="l-editing">Editing</h2><span class="s4-lane-count"></span></header>
+       <ul class="s4-lane-items" data-reorder data-reorder-group="tonight" aria-label="Editing">…cards…</ul>
+       <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer>
+     </section>
+     …
+   </div>
+   Lanes sit side by side, each at least --s4-lane-min (13rem) wide; on a narrow board each lane is most of the width
+   and the board snaps lane to lane. board.js counts the cards (the count turns the error tone past data-limit), opens
+   the add-in-place draft at a lane's foot and moves a card with Alt and the arrow keys; dragging comes from
+   components/direct (data-reorder). A page with a board starts with its rail collapsed. */
+@layer s4.components {
+  .s4-board {
+    --s4-lane-min: 13rem;
+    /* a lane is most of a narrow board (85%, so the next one peeks out) and at least --s4-lane-min on a wide one:
+       (medium breakpoint - board width) is positive only while the board is narrower than it */
+    --_lane: max(var(--s4-lane-min), min(85%, (var(--s4-breakpoint-medium) - 100%) * 1000));
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(var(--_lane), 1fr);
+    gap: var(--s4-space-3);
+    align-items: start;
+    min-inline-size: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+  .s4-lane {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-2);
+    min-inline-size: 0;
+    padding: var(--s4-space-3);
+    border-radius: var(--md-sys-shape-corner-large);
+    background: var(--md-sys-color-surface-container-low);
+    scroll-snap-align: start;
+  }
+  .s4-lane-head {
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-space-8);
+    padding-inline: var(--s4-space-1);
+  }
+  .s4-lane-title {
+    flex: 1;
+    min-inline-size: 0;
+    margin: 0;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-title-small-font);
+    font-size: var(--md-sys-typescale-title-small-size);
+    line-height: var(--md-sys-typescale-title-small-line-height);
+    letter-spacing: var(--md-sys-typescale-title-small-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-title-small-weight);
+    overflow-wrap: anywhere;
+  }
+  /* the count: a small pill; with a limit it reads "4 / 3" and turns the error tone past it (the numbers say it too) */
+  .s4-lane-count {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-inline-size: var(--s4-space-6);
+    min-block-size: var(--s4-space-6);
+    padding: 0 var(--s4-space-2);
+    border-radius: var(--s4-shape-chip);
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .s4-lane[data-over] .s4-lane-count { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
+  .s4-lane-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-2);
+    min-block-size: var(--s4-space-12);   /* room to drop a card into an empty lane */
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s4-lane-items > li { min-inline-size: 0; }
+  .s4-lane-foot { display: flex; flex-direction: column; align-items: stretch; }
+  .s4-lane-foot > .s4-button { justify-content: flex-start; }
+  .s4-lane-foot > [hidden] { display: none; }
+
+  /* the add-in-place draft (decision 0047): a field and two buttons at the foot of the lane, never a dialog */
+  .s4-lane-draft {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s4-space-2);
+    padding: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-medium);
+    background: var(--md-sys-color-surface);
+  }
+  .s4-lane-draft > .s4-row { justify-content: flex-end; }
+
+  @media (forced-colors: active) {
+    .s4-lane { border: 1px solid CanvasText; }
+    .s4-lane-count { border: 1px solid CanvasText; }
+  }
+}
+
 /* ---- milestones/milestones.css ---- */
 /* Milestones: a road made of steps, with a marker where you are. S4 addition (decision 0053).
    <ol class="s4-milestones" aria-label="11 courses, 3 done">

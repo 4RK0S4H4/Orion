@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Board · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .bd-card { display: grid; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface); cursor: grab; touch-action: pan-y; }
+  .bd-card > button { border: 0; padding: 0; background: none; color: inherit; font: inherit; font-weight: var(--md-sys-typescale-title-small-weight); text-align: start; cursor: pointer; border-radius: var(--s4-shape-chip); }
+  .bd-meta { display: flex; justify-content: space-between; align-items: center; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Board</h1></header>
+<main class="ex-main">
+  <p>Lanes of cards that move from stage to stage: stories, tickets, a sales pipeline, a week. Each lane counts its cards (with an optional limit), takes a new card in place at its foot, and a card moves by dragging, with a finger (hold, then drag) or with the keyboard: <kbd>Alt</kbd> and the arrow keys. On a phone the lanes snap one by one. Full screen: <a href="../../templates/kanban.html">Pressroom</a>.</p>
+  <section class="ex-sec">
+    <h2>A Board With A Limit</h2>
+    <p>Editing has a limit of two: past it the count turns the error tone, and reads "3 / 2". Add a card at a lane's foot; the app makes it from the <code>s4-lane-add</code> event.</p>
+    <div>
+      <div class="s4-board" id="bd-demo" aria-label="Release 4.2">
+        <section class="s4-lane" aria-labelledby="bd-todo">
+          <header class="s4-lane-head"><h3 class="s4-lane-title" id="bd-todo">To Do</h3><span class="s4-lane-count"></span></header>
+          <ul class="s4-lane-items" data-reorder data-reorder-group="bd" aria-label="To Do">
+            <li class="bd-card"><button type="button" data-reorder-label>Export invoices as PDF</button><div class="bd-meta"><span class="s4-status">Billing</span><span class="s4-avatar" data-size="s">AK</span></div></li>
+            <li class="bd-card"><button type="button" data-reorder-label>Dark mode for receipts</button><div class="bd-meta"><span class="s4-status">Design</span><span class="s4-avatar" data-size="s">LF</span></div></li>
+          </ul>
+          <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="What needs doing"><span class="s4-icon" data-icon="add"></span>Add Card</button></footer>
+        </section>
+        <section class="s4-lane" aria-labelledby="bd-doing" data-limit="2">
+          <header class="s4-lane-head"><h3 class="s4-lane-title" id="bd-doing">Editing</h3><span class="s4-lane-count"></span></header>
+          <ul class="s4-lane-items" data-reorder data-reorder-group="bd" aria-label="Editing">
+            <li class="bd-card"><button type="button" data-reorder-label>Retry failed card payments</button><div class="bd-meta"><span class="s4-status" data-tone="warning">Due Today</span><span class="s4-avatar" data-size="s">JW</span></div></li>
+            <li class="bd-card"><button type="button" data-reorder-label>Faster search in the ledger</button><div class="bd-meta"><span class="s4-status">Core</span><span class="s4-avatar" data-size="s">MC</span></div></li>
+            <li class="bd-card"><button type="button" data-reorder-label>Reminder wording, take three</button><div class="bd-meta"><span class="s4-status">Copy</span><span class="s4-avatar" data-size="s">SO</span></div></li>
+          </ul>
+          <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="What needs doing"><span class="s4-icon" data-icon="add"></span>Add Card</button></footer>
+        </section>
+        <section class="s4-lane" aria-labelledby="bd-done">
+          <header class="s4-lane-head"><h3 class="s4-lane-title" id="bd-done">Done</h3><span class="s4-lane-count"></span></header>
+          <ul class="s4-lane-items" data-reorder data-reorder-group="bd" aria-label="Done">
+            <li class="bd-card"><button type="button" data-reorder-label>Sign in with a passkey</button><div class="bd-meta"><span class="s4-status" data-tone="success">Shipped</span><span class="s4-avatar" data-size="s">PN</span></div></li>
+          </ul>
+          <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="What needs doing"><span class="s4-icon" data-icon="add"></span>Add Card</button></footer>
+        </section>
+        <section class="s4-lane" aria-labelledby="bd-later">
+          <header class="s4-lane-head"><h3 class="s4-lane-title" id="bd-later">Later</h3><span class="s4-lane-count"></span></header>
+          <ul class="s4-lane-items" data-reorder data-reorder-group="bd" aria-label="Later"></ul>
+          <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="What needs doing"><span class="s4-icon" data-icon="add"></span>Add Card</button></footer>
+        </section>
+      </div>
+    </div>
+  </section>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../core/core.js"></script>
+<script src="../motion/motion.js"></script>
+<script src="../direct/direct.js"></script>
+<script src="../snackbar/snackbar.js"></script>
+<script src="board.js"></script>
+<script src="../button-group/button-group.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+document.getElementById('bd-demo').addEventListener('s4-lane-add', function (e) {
+  var li = document.createElement('li'); li.className = 'bd-card';
+  li.innerHTML = '<button type="button" data-reorder-label></button><div class="bd-meta"><span class="s4-status">New</span><span class="s4-avatar" data-size="s">ME</span></div>';
+  li.querySelector('button').textContent = e.detail.value;
+  e.detail.list.appendChild(li);
+  S4.snackbar && S4.snackbar({ text: 'Added to ' + e.detail.lane.querySelector('.s4-lane-title').textContent, action: 'Undo', onAction: function () { li.remove(); } });
+});
+</script>
+</body>
+</html>

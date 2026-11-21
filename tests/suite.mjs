@@ -969,6 +969,40 @@ async function apiAudit(page, add) {
       if (Math.abs(fr.width - tr.width / 2) > Math.max(4, tr.width * 0.03) + parseFloat(getComputedStyle(mt).getPropertyValue('--_inset') || 0) * 2) o.push(`a meter at half its range drew ${Math.round(fr.width)} of ${Math.round(tr.width)}px`);
       mt.dataset.value = was; await frame();
     }
+    /* the board (decision 0063): counts follow the cards, Alt and the arrow keys move a card between lanes (never
+       drag-only), and the add-in-place draft opens without putting the cursor in its field (0049) */
+    const bd = [...document.querySelectorAll('.s4-board')].find((x) => x.offsetWidth);
+    if (bd) {
+      const lists = [...bd.querySelectorAll('.s4-lane-items')], from = lists.find((l, i) => i < lists.length - 1 && l.querySelector(':scope > :not([data-reorder-fixed]) :is(button, a[href], [tabindex])'));
+      const cnt = (l) => (l.closest('.s4-lane').querySelector('.s4-lane-count') || {}).textContent || '';
+      const n = (l) => [...l.children].filter((c) => !c.matches('[data-reorder-fixed], [data-lane-draft]')).length;
+      if (lists.some((l) => l.closest('.s4-lane').querySelector('.s4-lane-count') && !cnt(l).startsWith(String(n(l))))) o.push('a lane count does not match its cards');
+      if (from) {
+        const to = lists[lists.indexOf(from) + 1], card = [...from.children].find((c) => !c.matches('[data-reorder-fixed]')), target = card.querySelector('button, a[href], [tabindex]');
+        const key = (k) => target.dispatchEvent(new KeyboardEvent('keydown', { key: k, altKey: true, bubbles: true, cancelable: true }));
+        target.focus(); const before = n(to); let heard = 0; const h = () => heard++; bd.addEventListener('s4-reorder', h);
+        key(document.dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight'); await wait(60);
+        if (card.parentElement !== to) o.push('Alt+Arrow did not move a card to the next lane');
+        else { if (!cnt(to).startsWith(String(before + 1))) o.push('a lane count did not follow a card moved with the keyboard'); if (!heard) o.push('a card moved with the keyboard did not fire s4-reorder'); if (document.activeElement !== target) o.push('the moved card lost the focus'); }
+        key(document.dir === 'rtl' ? 'ArrowRight' : 'ArrowLeft'); await wait(450);
+        bd.removeEventListener('s4-reorder', h);
+        if (card.parentElement !== from) o.push('Alt+Arrow did not move the card back');
+      }
+      const add = [...bd.querySelectorAll('[data-lane-add]')].find((x) => x.offsetWidth);
+      if (add) {
+        add.click(); await frame();
+        const draft = add.closest('.s4-lane').querySelector('[data-lane-draft]'), input = draft && draft.querySelector('input');
+        if (!input) o.push('[data-lane-add] did not open a draft with a field');
+        else {
+          if (document.activeElement === input) o.push('the add-in-place draft put the cursor in its field (decision 0049)');
+          let got = null; const h = (e) => { got = e.detail; e.stopImmediatePropagation(); }; add.closest('.s4-lane').addEventListener('s4-lane-add', h, true);
+          input.value = 'Suite Probe'; draft.querySelector('form').requestSubmit(); await frame();
+          add.closest('.s4-lane').removeEventListener('s4-lane-add', h, true);
+          if (!got || got.value !== 'Suite Probe') o.push('the draft did not fire s4-lane-add with its value');
+          if (add.hidden || add.closest('.s4-lane').querySelector('[data-lane-draft]')) o.push('the draft did not give the add button back');
+        }
+      }
+    }
     const sel = [...document.querySelectorAll('.s4-text-field > select[data-s4-native]')].find((x) => !x.disabled && x.options.length > 1 && x.closest('.s4-text-field').offsetWidth);
     if (sel) {
       const btn = sel.parentElement.querySelector(':scope > .s4-text-field-select'), was = sel.value;
