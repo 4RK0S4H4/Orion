@@ -87,7 +87,7 @@ outputs['skill/s4-orion/assets/orion.min.js'] = outputs['components/orion.min.js
    table, form basics, the quiet data pictures sites show in frames (ring, meter, milestones, stat), status and feedback.
    Left out: the app shell, navigation chrome, desktop anatomy, dialogs, sheets, the palette, tables at scale, filters,
    charts, boards, direct manipulation, the rich inputs. A site that needs one of those loads the full bundle instead. */
-const SITE_CSS = ['../tokens/tokens.css', 'base/base.css', 'base/density.css', 'base/gray.css', 'base/brand.css', 'base/defaults.css', 'base/print.css',
+const SITE_CSS = ['../tokens/tokens.css', 'base/base.css', 'base/scale.css', 'base/density.css', 'base/gray.css', 'base/brand.css', 'base/defaults.css', 'base/print.css',
   'button/button.css', 'icon-button/icon-button.css', 'button-group/button-group.css', 'tabs/tabs.css',
   'card/card.css', 'list/list.css', 'divider/divider.css', 'avatar/avatar.css', 'accordion/accordion.css', 'breadcrumbs/breadcrumbs.css', 'pagination/pagination.css',
   'table/table.css', 'stat/stat.css', 'ring/ring.css', 'meter/meter.css', 'milestones/milestones.css', 'description-list/description-list.css', 'prose/prose.css', 'code/code.css',

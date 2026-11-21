@@ -1132,6 +1132,8 @@ const PRESETS = [
   { key: 'type-mono', theme: { display: 'mono', text: 'mono' }, modes: ['phone-dark'] },
   { key: 'type-geometric-humanist', theme: { display: 'geometric', text: 'humanist', displayWeight: 'regular' }, modes: ['phone-dark'] },   /* decision 0060 */
   { key: 'seed-muted', theme: { seed: '#6e2a5e' } },   /* a muted brand seed: 'auto' picks fidelity; every FAB label still reads (decision 0060) */
+  { key: 'scale-compact-headings-tight', theme: { scale: 'compact', headings: 'tight' }, modes: ['phone-dark'] },   /* decision 0066: smaller type and spacing on the tight case */
+  { key: 'scale-large-headings-editorial', theme: { scale: 'large', headings: 'editorial', display: 'serif' } },   /* decision 0066: larger type must not overflow */
   { key: 'combo-firm-cool-soft-mono', theme: { corners: 'firm', gray: 'cool', page: 'soft', display: 'mono' }, dial: true },
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];

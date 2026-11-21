@@ -160,5 +160,19 @@ for (const t of ['warm', 'cool', 'pure']) {
   }
 }
 
+/* ---------- the scale and headings dials (decision 0066) touch no color ----------
+   They can sit on any element; if either declared a color, a mode-dependent value or a glass value, a scope with it
+   could break a proven pair. Only type, spacing and the tokens that alias them may appear. */
+const modeNames = new Set(rules.filter((r) => /data-theme|data-contrast|data-surfaces/.test(r.sel) || r.media.some((m) => /prefers-|forced-colors|print/.test(m))).flatMap((r) => r.decls.map(([n]) => n)));
+const scaleCss = readFileSync(join(root, 'components/base/scale.css'), 'utf8');
+const brandCss = readFileSync(join(root, 'components/base/brand.css'), 'utf8');
+const headingDecls = [...brandCss.matchAll(/:where\(\[data-headings="[a-z]+"\]\) \{([^}]*)\}/g)].flatMap((m) => [...m[1].matchAll(/(--[-\w]+):/g)].map((x) => x[1]));
+let dialDecls = 0;
+for (const n of [...scaleCss.matchAll(/^\s*(--[-\w]+):/gm)].map((m) => m[1]).concat(headingDecls)) {
+  dialDecls++;
+  if (modeNames.has(n) || /color|glass|scrim|elevation|state/.test(n)) { failures++; console.error(`  x the scale or headings dial declares ${n}, which a mode or contrast setting owns`); }
+}
+if (headingDecls.some((n) => !/^--md-sys-typescale-(emphasized-)?(display|headline|title-large)|^--s4-site-(hero|title)-/.test(n))) { failures++; console.error('  x the headings dial reaches past the heading roles'); }
+
 if (failures) { console.error(`${failures} scoped value(s) differ from the page-wide mode.`); process.exit(1); }
-console.log(`Scopes: ${scenarios} scoped scenarios (dark in light, light in dark, three deep; with high contrast, reduced transparency and reduced motion) match the page-wide modes token for token (${compared} values), dark scopes print light, so the 83 proven pairs hold in every scope; scoped gray: ${grayPairs} light-dark() values match the page-wide warm, cool and pure grays.`);
+console.log(`Scopes: ${scenarios} scoped scenarios (dark in light, light in dark, three deep; with high contrast, reduced transparency and reduced motion) match the page-wide modes token for token (${compared} values), dark scopes print light, so the 83 proven pairs hold in every scope; scoped gray: ${grayPairs} light-dark() values match the page-wide warm, cool and pure grays; scale and headings: ${dialDecls} declarations, none a color or mode value.`);

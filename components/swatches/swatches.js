@@ -71,11 +71,11 @@ S4.register('swatches', function (scope) {
 });
 
 /* Theme controls without app code: a connected button group with data-theme-mode (values system|light|dark),
-   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight" (values as
+   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight|scale|headings" (values as
    S4.theme takes them, e.g. tinted|neutral, serif|inter) calls S4.theme when picked and follows S4.theme() (restored
    or changed elsewhere). So an app's own Appearance section needs no script. */
 S4.register('theme-controls', function (scope) {
-  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight'];
+  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight', 'scale', 'headings'];
   S4.util.all(scope, '[data-theme-mode], [data-theme-contrast], [data-brand-dial]').forEach(function (g) {
     if (!S4.util.once(g, 'themectl')) return;
     var key = g.hasAttribute('data-theme-mode') ? 'mode' : g.hasAttribute('data-theme-contrast') ? 'contrast' : g.getAttribute('data-brand-dial');

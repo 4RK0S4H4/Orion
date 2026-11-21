@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-gray="warm" data-corners="soft" data-energy="calm" data-density="roomy" data-type-display="custom" data-type-text="custom" style="--md-ref-typeface-brand: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; --md-ref-typeface-plain: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif">
+<html lang="en" data-gray="warm" data-corners="soft" data-energy="calm" data-density="roomy" data-headings="editorial" data-type-display="custom" data-type-text="custom" style="--md-ref-typeface-brand: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif; --md-ref-typeface-plain: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -33,7 +33,7 @@
   .tw-mast { display: grid; justify-items: center; gap: var(--s4-space-4); padding-block: var(--s4-space-4) var(--s4-space-8); text-align: center; border-block-end: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
   .tw-mast > * { margin: 0; }
   .tw-issue-line { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s4-space-1) var(--s4-space-6); inline-size: 100%; padding-block: var(--s4-space-3); border-block: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-variant: small-caps; letter-spacing: 0.06em; font-variant-numeric: oldstyle-nums; }
-  .tw-mast .s4-hero-title { max-inline-size: none; font-size: calc(var(--s4-site-hero-size) * 2.1); line-height: 1.05; font-weight: 400; letter-spacing: -0.01em; }
+  .tw-mast .s4-hero-title { max-inline-size: none; font-size: calc(var(--s4-site-hero-size) * 2.1); line-height: 1.05; }   /* weight and tracking: data-headings="editorial" (0066) */
   .tw-mast .s4-site-lead { font-style: italic; }
 
   /* the current issue: a cover beside its contents page */
@@ -44,7 +44,7 @@
   .tw-cover .band { fill: var(--md-sys-color-on-primary-container); }
   .tw-cover .sun { fill: var(--md-sys-color-on-primary-container); opacity: 0.18; }
   .tw-cover-type { position: absolute; inset: 0; display: grid; align-content: start; gap: var(--s4-space-1); padding: var(--s4-space-6) var(--s4-space-6); }
-  .tw-cover-name { font-family: var(--s4-site-hero-font); font-size: calc(var(--s4-site-title-size) * 1.1); line-height: 1.05; font-weight: 400; }
+  .tw-cover-name { font-family: var(--s4-site-hero-font); font-size: calc(var(--s4-site-title-size) * 1.1); line-height: 1.05; font-weight: var(--s4-site-hero-weight); letter-spacing: var(--s4-site-hero-tracking); }
   .tw-cover-line { display: flex; justify-content: space-between; gap: var(--s4-space-3); padding-block: var(--s4-space-2); border-block: var(--s4-size-divider) solid currentColor; font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-variant: small-caps; letter-spacing: 0.06em; font-variant-numeric: oldstyle-nums; }
   .tw-cover-theme { margin-block-start: var(--s4-space-4); font-family: var(--s4-site-hero-font); font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-style: italic; }
   .tw-issue-body { display: grid; gap: var(--s4-space-6); }
@@ -292,7 +292,7 @@
 addEventListener('DOMContentLoaded', function () {
   /* the journal's brand: sea blue on warm grays, one book serif, soft corners, roomy, calm (0055, 0056) */
   var SERIF = "'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif";
-  S4.theme.restore('tidewater-theme', { mode: 'system', seed: '#1f4e66', variant: 'fidelity', gray: 'warm', corners: 'soft', energy: 'calm', display: SERIF, text: SERIF });
+  S4.theme.restore('tidewater-theme', { mode: 'system', seed: '#1f4e66', variant: 'fidelity', gray: 'warm', corners: 'soft', energy: 'calm', display: SERIF, text: SERIF, headings: 'editorial' });
 
   /* filter the latest writing by section, in place; an empty section says so and offers the next step */
   var pick = document.getElementById('section-pick'), list = document.getElementById('posts'), empty = document.getElementById('posts-empty');

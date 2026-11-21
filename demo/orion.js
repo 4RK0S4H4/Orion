@@ -325,7 +325,9 @@
     { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
     { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' },
     { key: 'displayWeight', attr: 'data-type-display-weight', base: 'semibold' },   /* regular, medium: for a display face lighter than Inter (decision 0060) */
-    { key: 'energy', attr: 'data-energy', base: 'standard' }   /* motion energy: calm, standard, lively (motion.css, motion.js) */
+    { key: 'energy', attr: 'data-energy', base: 'standard' },   /* motion energy: calm, standard, lively (motion.css, motion.js) */
+    { key: 'scale', attr: 'data-scale', base: 'default' },   /* type and spacing together: compact, default, large (scale.css, decision 0066) */
+    { key: 'headings', attr: 'data-headings', base: 'default' }   /* heading style: default, tight, editorial (brand.css, decision 0066) */
   ];
   /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
      A key set to null or '' removes the attribute (the container follows the page again); a default value ('round',
@@ -355,7 +357,8 @@
   S4.theme = function (opts, el) {
     if (el && el !== root) return themeElement(el, opts);
     if (!opts) return { seed: state.seed, variant: state.variantSet ? state.variant : 'auto', mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
-      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold' };
+      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold',
+      scale: state.scale || 'default', headings: state.headings || 'default' };
     var colorChanged = false;
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
@@ -7906,11 +7909,11 @@ S4.register('swatches', function (scope) {
 });
 
 /* Theme controls without app code: a connected button group with data-theme-mode (values system|light|dark),
-   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight" (values as
+   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight|scale|headings" (values as
    S4.theme takes them, e.g. tinted|neutral, serif|inter) calls S4.theme when picked and follows S4.theme() (restored
    or changed elsewhere). So an app's own Appearance section needs no script. */
 S4.register('theme-controls', function (scope) {
-  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight'];
+  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight', 'scale', 'headings'];
   S4.util.all(scope, '[data-theme-mode], [data-theme-contrast], [data-brand-dial]').forEach(function (g) {
     if (!S4.util.once(g, 'themectl')) return;
     var key = g.hasAttribute('data-theme-mode') ? 'mode' : g.hasAttribute('data-theme-contrast') ? 'contrast' : g.getAttribute('data-brand-dial');

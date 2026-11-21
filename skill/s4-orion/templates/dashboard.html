@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-gray="warm" data-page="soft" data-corners="firm" data-type-display="serif" data-energy="calm" data-cards="filled">
+<html lang="en" data-gray="warm" data-page="soft" data-corners="firm" data-type-display="serif" data-headings="tight" data-scale="compact" data-energy="calm" data-cards="filled">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -16,7 +16,7 @@
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
   .tl-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-3) var(--s4-space-4); padding-block: var(--s4-space-2) var(--s4-space-6); }
-  .tl-head > div { margin-inline-end: auto; }
+  .tl-head > div:first-child { margin-inline-end: auto; }   /* the title takes the room; the period switch sits with the main action */
   .tl-kicker { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
   .tl-title { margin: 0; }
   .tl-period { flex: none; }   /* the period switch keeps its own width; the header wraps instead */
@@ -25,11 +25,13 @@
   .tl-grid { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "numbers" "flow" "owed" "aging" "soon"; }
   .tl-grid > * { min-inline-size: 0; }
   .tl-hero { grid-area: hero; } .tl-numbers { grid-area: numbers; } .tl-flow { grid-area: flow; } .tl-owed { grid-area: owed; } .tl-aging { grid-area: aging; } .tl-soon { grid-area: soon; }
+  /* the chart runs the width of the hero and the numbers, at a reading height (it never stretches to a taller
+     neighbour); who owes us and the aging bar sit side by side under it */
   @container s4-app (width >= 840px) {
-    .tl-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "hero numbers" "flow owed" "flow aging" "soon soon"; }
+    .tl-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "hero numbers" "flow flow" "owed aging" "owed soon"; }
   }
-  @container s4-app (width >= 1600px) {
-    .tl-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-areas: "hero numbers soon" "flow owed soon" "flow aging soon"; }
+  @container s4-app (width >= 1400px) {
+    .tl-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-areas: "hero numbers soon" "flow flow soon" "owed aging soon"; }
   }
 
   /* hero: the one number, then how long it lasts */
@@ -45,8 +47,8 @@
   .tl-legend li { display: inline-flex; align-items: center; gap: var(--s4-space-2); }
   .tl-key { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
   .tl-key[data-out] { background: var(--md-sys-color-on-surface-variant); }
-  /* the chart takes whatever height its row gives it, so it never leaves a hole beside a taller neighbour */
-  .tl-bars { flex: 1 1 auto; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s4-space-1); min-block-size: calc(var(--s4-size-button-large) * 2); }
+  /* the chart has a reading height of its own: wide and low, as a year of months reads best */
+  .tl-bars { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--s4-space-1); block-size: calc(var(--s4-size-button-large) * 2.5); }
   .tl-month { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: var(--s4-space-1); block-size: 100%; }
   .tl-pair { display: flex; align-items: flex-end; justify-content: center; gap: calc(var(--s4-space-1) / 2); min-block-size: 0; }
   .tl-pair > i { inline-size: min(40%, var(--s4-space-3)); block-size: var(--h); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
