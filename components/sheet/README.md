@@ -2,7 +2,11 @@
 
 A short task without leaving the screen (decision 0043; these replace bottom and side sheets and keep their class
 names). A panel is a glass surface that floats inside the window: inset from every edge, all four corners round, and it
-pops in like a dialog. Nothing slides up the screen and nothing docks to an edge.
+pops in like a dialog. Nothing slides up the screen and nothing docks to an edge. **On a phone (under 600) every panel
+sits in the bottom of the screen** within reach of the thumb (decision 0064): its bottom corners run parallel to the
+screen's own corners, its actions fill the width (two side by side, three or more stacked with the first at the
+bottom), and a tap outside, a **swipe down**, Escape or Back puts it away. A modal panel is firmer glass (90%) over a
+light scrim; a tool panel keeps the float tint.
 
 ```html
 <button class="s4-button" data-sheet="add-expense">Add Expense</button>
@@ -21,22 +25,26 @@ pops in like a dialog. Nothing slides up the screen and nothing docks to an edge
 |---|---|
 | `.s4-bottom-sheet` | Floats at the bottom center (on a phone: the full width minus the inset, above the home indicator). |
 | `.s4-side-sheet` | From 600 wide: floats at the end side, as tall as the window minus the inset. On a phone: same as the bottom panel. |
-| `data-placement="center"` | Centers the panel like a dialog. |
-| `data-persistent` | A click outside doesn't close it. |
+| `data-placement="center"` | Centers the panel like a dialog from 600 wide (on a phone it stays in the bottom). |
+| `data-persistent` | A click outside or a swipe down doesn't close it. |
 | `data-modeless` | A **tool panel** (decision 0054): from 600 wide it opens with no scrim and the page behind stays live. Closes with Close, Escape (focus inside), or a second tap on its opener. On a phone it is modal as usual. |
 
 Opening, closing, `[data-close]`, focus and events work exactly like the [dialog](../dialog/) (`S4.sheet.open/close`
 are the same functions). Opening never focuses a text field (decision 0049); `data-autofocus` on a button picks that button.
-`.s4-sheet-handle` in older markup draws nothing, and panels are not dragged.
+`.s4-sheet-handle` in older markup draws nothing. On a phone a swipe down puts a panel away (it follows the finger, and
+leaves past a quarter of its height or after a flick); it never starts on a field, a slider or scrolled content, and it is
+never the only way out.
 
 **Modal or tool panel?** A panel that is a short task you finish or cancel (Add Expense) is modal: the default. A
 panel that is a tool for the page behind it (filters, an inspector, formatting) is `data-modeless`: its controls act at
 once, there is no Apply button, and you keep working in the page while it is open. Dialogs are always modal.
 
-**Do:** use a bottom panel for a quick add or a set of choices; a side panel for filters or details beside content on
-wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dialog, or a second panel on a panel.
+**Do:** use a bottom panel for a quick add or a short task with no place in the page; a side panel for a tool beside the
+content on wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dialog, or a second panel on a
+panel; open a panel for something that fits in place (`.s4-expand`) or for a long task (a page).
 
 **Accessibility:** a native modal `<dialog>`: focus is trapped, Escape closes, focus returns to the opener. Give it
 `aria-labelledby`.
 
-**Tokens:** `--s4-shape-sheet`, `--s4-space-4` (inset), `--s4-scrim-opacity`, glass tokens.
+**Tokens:** `--s4-shape-sheet`, `--s4-shape-screen` (phone bottom corners), `--s4-space-4` (inset), `--s4-scrim-opacity`,
+`--s4-glass-tint-opacity-modal`, glass tokens.

@@ -20,7 +20,7 @@ Actions for the current page or selection. M3 Expressive floating and docked too
 |---|---|---|
 | `data-color` | `vibrant` (primary-container) | standard (surface-container) |
 | `data-orientation` | `vertical` | horizontal |
-| `data-type` | `docked`: full width, 64dp, square corners, no shadow, home-indicator padding | floating: 64dp pill, elevation 3 |
+| `data-type` | `docked`: full width, 64dp, square corners, no shadow, home-indicator padding; docked glass (one hairline on its top edge, no rim or glow, decision 0064) | floating: 64dp pill, glass with the full edge |
 | `.s4-toolbar-divider` | a separator between groups | — |
 | `.s4-toolbar-dock` | toolbar + FAB in a row; `data-position="bottom"` floats the pair centered above the bottom (and above the nav bar in an app shell) | — |
 

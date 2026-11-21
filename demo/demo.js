@@ -23,7 +23,6 @@
   $('#demo-comment').addEventListener('s4-close', function (e) { if (e.detail.value === 'post') S4.snackbar('Comment posted'); });
   $('#demo-confirm').addEventListener('s4-close', function (e) { if (e.detail.value === 'remove') S4.snackbar({ text: 'Tag removed', action: 'Undo' }); });
   $('#confirm-delete').addEventListener('s4-close', function (e) { if (e.detail.value === 'delete') S4.snackbar('All notes deleted'); });
-  $('#filters').addEventListener('s4-close', function (e) { if (e.detail.value === 'apply') S4.snackbar('Filters applied'); });
 
   /* Settings: icon set (S4.icon.use switches every icon; the choice is remembered) */
   var CREDITS = { solar: 'Solar icons by 480 Design (CC BY 4.0)', 'phosphor-duotone': 'Phosphor Icons (MIT)', 'phosphor-bold-duotone': 'Phosphor Icons (MIT)' };

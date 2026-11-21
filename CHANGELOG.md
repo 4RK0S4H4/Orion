@@ -24,6 +24,19 @@ Round 0057: the eleven calls (decision 0063, the owner handed us the lead):
 - Fixed: Parley's phone title bar showed a search button right above its filter field.
 - Docs: how an app ships its own face (one `@font-face`, `font-display: swap`, first in `custom`); two trailing statuses in a list row.
 
+Round 0057: calm dialogs and docked glass (decision 0064, the owner's notes, issues 67 and 68):
+
+- Added: on a phone a swipe down puts a dialog or floating panel away (it follows the finger; past a quarter of its height or a flick it leaves, otherwise it settles back; `data-persistent` only settles back). `S4.transition.pop(el, { open: false, from })` leaves from where a finger let go.
+- Added: tokens `--s4-shape-screen` (48, a phone's own screen corner) and `--s4-glass-tint-opacity-modal` (0.9).
+- Added: the page checker and the suite fail a dialog with fewer than two answers or holding a form (unless its answer is destructive); the suite's phone pass checks every dialog and panel sits at the bottom and closes with a swipe down.
+- Added: `explore/calm-dialogs.html`, before and after on the live Showcase in phone frames; a Dialogs and Panels section in `references/patterns.md`.
+- Changed: on a phone, dialogs and modal panels are a card in the bottom of the screen: inset 16, bottom corners concentric with the screen, answers 48 high filling the width (two side by side, three or more stacked with Cancel at the bottom). `data-placement="center"` panels center only from 600.
+- Changed: dialogs everywhere: a title-large start-aligned headline, the icon at the start, as wide as the question needs (20 to 28rem), Cancel tonal and a destructive answer tonal error.
+- Changed: scrim 16% in light mode (was 32%); dark and high contrast keep 32%. Dialogs and modal panels are 90% glass (was 75%); tool panels keep 75%.
+- Changed: docked glass (top bar scrolled, site header, nav bar, docked toolbar) has no rim, glow or shade: one device-pixel hairline (`--s4-glass-edge-line`) on the edge facing the content. Replaces 0039/0040.
+- Changed: the Showcase's Filters is a tool panel (no Apply); Combobox Move to Folder is a floating panel; the dialog page shows the three true questions and a "Not a Dialog" example.
+- Fixed: issues 67 and 68.
+
 
 Round 0056: themes on any container, the website kit, reach, lessons from the templates, data at scale, desktop anatomy (decisions 0056 to 0062):
 

@@ -292,5 +292,13 @@ window.S4_REVIEW_DEMOS = [
       { id: 'next', label: 'What comes first', options: [{ v: 'A', label: 'Tidy, Then Brand Dials' }, { v: 'B', label: 'Website Kit' }, { v: 'C', label: 'Rich Inputs And Data' }, { v: 'D', label: 'Desktop Anatomy' }, { v: 'E', label: 'Real Apps First', desc: 'Keep the roadmap as it is.' }] },
       { id: 'dist', label: 'Who Orion is for', options: [{ v: 'A', label: 'Only Me, Through The Skill', desc: 'No package, no typed API. Smaller bundles only where a page needs them.' }, { v: 'B', label: 'Others Too, Later', desc: 'Plan for a package, minified builds and typed API in 2.0.' }] }
     ]
+  },
+  {
+    id: 'calm-dialogs', title: 'Calm Dialogs and Docked Glass', href: 'explore/calm-dialogs.html',
+    questions: [
+      { id: 'dialogs', label: 'A dialog on a phone', options: [{ v: 'A', label: 'Before' }, { v: 'B', label: 'After (in reach, calmer)' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'panels', label: 'A floating panel on a phone', options: [{ v: 'A', label: 'Before' }, { v: 'B', label: 'After (actions in reach)' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'docked', label: 'Docked glass bars', options: [{ v: 'A', label: 'Before (rim and glow)' }, { v: 'B', label: 'After (one hairline)' }, { v: 'Other', label: 'Describe in notes' }] }
+    ]
   }
 ];

@@ -4,7 +4,8 @@
    Loads each page as a 390px dark phone and a 1280px light desktop (Playwright + Chromium) and reports:
      errors   – console errors, failed requests, unknown icons, sideways scroll, text below WCAG AA as rendered
                 (on glass: against the worst backdrop after the glass's own filter and tint), icon-only controls with
-                no name, a button group that swaps panels or tabs without panels (decision 0059), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
+                no name, a button group that swaps panels or tabs without panels (decision 0059), a dialog that does not ask (one
+                answer, or a form: decision 0064), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
                 easings, glass on content, bare element selectors)
      warnings – more than one filled button in one area, labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -172,6 +173,16 @@ function audit() {
     const tabs = [...l.querySelectorAll('.s4-tab')];
     const bare = tabs.filter((t) => { const id = t.getAttribute('aria-controls'); return !id || !document.getElementById(id); });
     if (tabs.length && bare.length) issues.roles.push(`tabs "${nameOf(l)}" without panels (${bare.length} of ${tabs.length} tabs control no tab panel): tabs swap panels; if it changes a value or how the same thing is shown, it is a button group`);
+  }
+  /* decision 0064: a dialog asks a question the app cannot go on without. One with a single answer is something to read
+     (a page) or a notice (a snackbar); one that holds a form is a task (in place, a floating panel or a page), unless its
+     answer is destructive (typing a name to confirm a delete) */
+  for (const d of document.querySelectorAll('dialog.s4-dialog:not(.s4-palette)')) {
+    const answers = new Set([...d.querySelectorAll('[data-close]')].map((b) => b.getAttribute('data-close')));
+    const label = d.id || (d.querySelector('.s4-dialog-headline') || d).textContent.trim().slice(0, 40);
+    if (answers.size < 2) issues.roles.push(`dialog "${label}" has ${answers.size ? 'one answer' : 'no answer'}: a dialog asks a question the app cannot go on without; something to read is a page (.s4-subpage), a notice is a snackbar`);
+    const field = d.querySelector('input:not([type="checkbox"], [type="radio"], [type="hidden"]), textarea, select, [contenteditable="true"]');
+    if (field && !d.querySelector('[data-close][data-color="error"]')) issues.roles.push(`dialog "${label}" holds a form: a task goes in place (.s4-expand), in a floating panel (.s4-bottom-sheet) or on a page; a dialog only asks`);
   }
   /* glass on content */
   for (const g of document.querySelectorAll('.s4-glass')) if (g.matches('.s4-card, .s4-pane, .s4-list, .s4-table, .s4-text-field, main, article, p, li, td') || (g.closest('.s4-content') && /^(static|relative)$/.test(getComputedStyle(g).position)))

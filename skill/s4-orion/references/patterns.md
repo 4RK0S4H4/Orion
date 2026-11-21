@@ -9,6 +9,7 @@ component are in `components.md`. Live demo app: https://4rk0s4h4.github.io/s4-o
 - Dashboard
 - List and detail
 - Settings
+- Dialogs and panels
 - Forms
 - Empty, loading and error states
 - Theme controls
@@ -78,12 +79,29 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 
 - Group settings into `.s4-pane`s, one per topic, each with a `.s4-pane-title` and an optional `.s4-pane-supporting`.
 - Inside a pane, a `.s4-list` of rows: a switch as the trailing element for on/off, a trailing value + chevron for a
-  choice that opens a dialog or menu.
+  choice that opens a menu (a few options) or a page (many). Never a dialog for a choice.
 - Switches apply immediately (no Save button). Confirm with nothing, or a snackbar only when the effect is invisible.
 - A destructive setting goes last, in a pane with `data-color="error"`, with a tonal error button that opens a
   confirm dialog (serious and cannot be undone: the one place a dialog is right; smaller removals use the inline
-  confirm or act at once with Undo).
+  confirm or act at once with Undo). Its answers: Cancel `data-variant="tonal"`, then the destructive one
+  `data-variant="tonal" data-color="error"` named by what it does ("Delete Account").
 - Appearance settings: see **Theme controls**.
+
+## Dialogs and panels (decision 0064)
+
+- Walk the placement ladder first (decision 0047): in place, an expand, a menu, a pane, a page, a floating panel. A
+  dialog only for a question the app cannot go on without: deleting something for good, leaving with unsaved work, a
+  permission. A reversible action just happens and offers Undo in a snackbar. Expect one or two dialogs in a whole app.
+- A dialog asks: a headline that is the question in sentence case ("Delete this bill?"), one or two lines of what
+  happens, and two answers that say what they do. Cancel first and `data-variant="tonal"`; the answer last
+  (`data-variant="tonal" data-color="error"` when it destroys, filled otherwise). Never a single OK (something to read is
+  a page, a notice is a snackbar) and never a form (the page checker fails both).
+- On a phone, dialogs and floating panels sit in the bottom of the screen within reach of the thumb, the answers fill
+  its width (two side by side, three or more stacked with Cancel at the bottom), and a tap outside, a swipe down,
+  Escape or Back puts it away. This is automatic; do not position them yourself. `data-persistent` keeps a tap outside
+  or a swipe from dismissing one (Escape and Cancel still do).
+- A tool for the page behind it (filters, an inspector) is a `data-modeless` floating panel whose controls act at once:
+  no Apply button (decision 0054).
 
 ## Forms
 
@@ -92,8 +110,9 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 - Labels in Title Case, helper text and errors as sentences. Validate on blur and on submit, not on every keystroke;
   set `data-error="Enter an amount above $0.00."` and move focus to the first invalid field on submit.
 - Actions at the end, end-aligned: Cancel (text) then the main action (filled), named by what it does ("Save Bill").
-- In a dialog or sheet the same rules apply; the actions go in `.s4-dialog-actions` / `.s4-sheet-actions` with
-  `data-close` values, and the code handles `s4-close`.
+- In a floating panel the same rules apply; the actions go in `.s4-sheet-actions` with `data-close` values, and the
+  code handles `s4-close`. A form never goes in a dialog (decision 0064; the page checker fails it): a short one opens
+  in place (`.s4-expand`), a task with no place in the page is a floating panel, a long one is a page.
 - Required fields: mark the optional ones "(Optional)" instead when most fields are required.
 
 ## Empty, loading and error states
@@ -229,7 +248,7 @@ Lessons from building the templates as real products (decision 0060).
   rail's FAB slot instead of a second FAB (the rail's slot is the only second place it may appear). From 840 the app
   shell hides the views' `data-fixed` FABs when the rail has one, so the pinned FAB never floats over content.
 - **List and detail on wide screens:** a list with a detail pane splits side by side from 840; below that the detail is a
-  container-transform dialog opened with `S4.dialog.open(id, { from: row })`.
+  page (`.s4-subpage`, decision 0050), never a dialog.
 - **Validating before a sheet closes:** `data-close="save"` closes at once. To validate first, give Save no `data-close`,
   check the fields, then call `S4.sheet.close(id, 'save')`.
 - **Search plus your own filters:** `data-filter-empty` needs an element of its own ("No bills match “zzz”"); keep the

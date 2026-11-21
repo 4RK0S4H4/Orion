@@ -17,6 +17,15 @@ enough to never be in the way, but never looking instant. This amends 0022 (simp
 (transform and opacity, one transition per element, nothing cloned) unless the owner agrees otherwise; record as a new
 decision and show options in a motion lab with the scrubber before building.
 
+## Owner notes (2026-11-21)
+
+- **67.** Done 2026-11-21 (decision 0064). Docked glass bars "look a bit weird with the edge glow": docked bars keep tint
+  and blur, drop rim, glow and shade, and draw one device-pixel hairline on the content-facing edge. No reference image.
+- **68.** Done 2026-11-21 (decision 0064). Dialogs "overused, way too in your face, and just feels weird on mobile": the
+  audit moved forms out of dialogs; on a phone dialogs and panels are a card in the bottom in reach with answers filling
+  the width, swipe down to dismiss, a lighter scrim in light mode, firmer modal glass, a calmer headline and answers.
+  No reference image.
+
 ## Owner critiques (2026-11-17)
 
 Sent with screenshots after the round 0056 publish; "more minor critiques and ideas for you to carry forward".

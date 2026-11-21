@@ -28,7 +28,9 @@ Expressive horizontal items from 600 wide.
 
 **Layout:** 80dp on surface-container. Under 600 the icon sits over the label; from 600 (the bar is its own container)
 the icon and label sit side by side inside a 40dp pill. Inside `.s4-app` the bar is sticky at the bottom, pads for the
-home indicator and hides from 840, where the [nav rail](../nav-rail/) takes over.
+home indicator and hides from 840, where the [nav rail](../nav-rail/) takes over. glass.css makes it docked glass
+(decision 0064): the tint and the blur with one device-pixel hairline along its top edge, and no rim or glow, like the
+iPhone tab bar.
 
 **Behaviour (`nav-bar.js`):** clicking an item moves `aria-current` to it and fires `s4-change { item, index, value }`
 on the bar (`value` = `data-view`, else `href`). `preventDefault()` in a click handler vetoes it. The new pill expands

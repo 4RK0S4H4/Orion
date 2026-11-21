@@ -8,7 +8,11 @@
      Focus returns to the opener. Bottom and side sheets are floating panels and open the same way.
    - Tool panels (decision 0054): data-modeless on a floating panel opens it without a scrim and leaves the page behind
      it live (scroll it, tap it), from 600 wide. It closes with its Close button, Escape while focus is inside it, or
-     its opener (a second tap). On a phone it is modal like any other panel. Dialogs are always modal. */
+     its opener (a second tap). On a phone it is modal like any other panel. Dialogs are always modal.
+   - Phones (decision 0064): dialogs and panels sit in the bottom of the screen (dialog.css, sheet.css), and a swipe down
+     puts one away: it follows the finger, and past a quarter of its height (or after a flick) it leaves from where the
+     finger let go; otherwise it settles back. data-persistent only settles back. Never the only way out: Cancel,
+     Escape, Back (Android's Back closes a modal dialog natively, through the cancel event) and a tap outside work too. */
 (function () {
   var S4 = window.S4;
   var FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -41,16 +45,58 @@
     return p;
   }
   /* decision 0043: sheets are floating panels; like dialogs they pop in (rise or step in from their side, and fade) */
-  function motion(d, open) {
+  function motion(d, open, pulled) {
     if (d.classList.contains('s4-side-sheet') && !narrow()) return S4.transition.pop(d, { open: open, axis: 'x' });
-    return S4.transition.pop(d, { open: open });
+    return S4.transition.pop(d, { open: open, from: pulled });   /* pulled: how far a finger dragged it down (swipe) */
   }
-  function close(id, value) {
+
+  /* swipe down to put it away (phones, decision 0064). Starts only where nothing else wants the finger: not on a field,
+     a slider or a scrolling area that is not at its top, and not a sideways or upward drag. The surface follows the
+     finger (it is not animated under it, decision 0052); the way back or away is a transition from where it was let go. */
+  function scrolled(t, d) {
+    for (var n = t; n && n !== d.parentNode; n = n.parentNode) if (n.nodeType === 1 && n.scrollTop > 0) return true;
+    return false;
+  }
+  function swipe(d) {
+    var y0 = null, x0 = 0, t0 = 0, dy = 0, dragging = false;
+    d.addEventListener('touchstart', function (e) {
+      y0 = null;
+      if (!narrow() || !d.open || d._s4closing || d._s4modeless || e.touches.length !== 1) return;
+      if (e.target.closest && e.target.closest('input, textarea, select, [contenteditable], .s4-slider, [data-s4-noswipe]')) return;
+      if (scrolled(e.target, d)) return;
+      y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; t0 = e.timeStamp; dy = 0; dragging = false;
+    }, { passive: true });
+    d.addEventListener('touchmove', function (e) {
+      if (y0 === null) return;
+      var y = e.touches[0].clientY - y0, x = e.touches[0].clientX - x0;
+      if (!dragging) {
+        if (Math.abs(y) < 8 && Math.abs(x) < 8) return;
+        if (y <= 0 || Math.abs(x) > Math.abs(y)) { y0 = null; return; }   /* up or sideways: not ours */
+        dragging = true;
+      }
+      e.preventDefault();
+      dy = Math.max(0, y);
+      d.style.transform = 'translateY(' + dy + 'px)';
+    }, { passive: false });
+    function end(e) {
+      if (y0 === null) return;
+      y0 = null;
+      if (!dragging) return;
+      dragging = false;
+      var flick = dy > 24 && dy / Math.max(1, e.timeStamp - t0) > 0.5;
+      if (!d.hasAttribute('data-persistent') && (dy > d.offsetHeight / 4 || flick)) { close(d, '', { pulled: dy }); return; }
+      d.style.transform = '';
+      S4.transition.shift(d, 'translateY(' + dy + 'px)', 'none');   /* settles back */
+    }
+    d.addEventListener('touchend', end);
+    d.addEventListener('touchcancel', end);
+  }
+  function close(id, value, opts) {
     var d = el(id); if (!d || !d.open || d._s4closing) return Promise.resolve();
     d._s4closing = true;
     var from = d._s4from;
     if (!d._s4modeless) S4.transition.scrim(d, false);
-    var p = motion(d, false);
+    var p = motion(d, false, opts && opts.pulled);
     return p.then(function () {
       d.close(value || '');
       S4.transition.restore(d);
@@ -76,6 +122,7 @@
     });
     S4.util.all(scope, 'dialog.s4-dialog, dialog.s4-bottom-sheet, dialog.s4-side-sheet').forEach(function (d) {
       if (!S4.util.once(d, 'dialog')) return;
+      if (!d.classList.contains('s4-palette')) swipe(d);
       d.addEventListener('cancel', function (e) { e.preventDefault(); close(d, ''); });   /* Escape: animate out */
       d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && d._s4modeless && d.open && !e.defaultPrevented) { e.preventDefault(); close(d, ''); } });
       d.addEventListener('click', function (e) {

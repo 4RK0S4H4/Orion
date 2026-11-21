@@ -262,6 +262,14 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 3. **Menu:** a short list of choices from a button. 4. **Pane:** detail beside the content (`.s4-split`).
 5. **Floating panel:** a longer task with no place in the page (`.s4-bottom-sheet` quick add, `.s4-side-sheet` filters, a new message). Panels are glass, inset from every edge, and never slide or dock.
 6. **Dialog:** only when the app cannot go on without an answer (serious and cannot be undone). Never open a dialog for a reply, a rename, an add form or a filter.
+- **A dialog** (decision 0064) only asks a question the app cannot go on without: delete for good, leave unsaved work,
+  a permission. Expect one or two per app. The headline is the question in sentence case, one or two lines of content,
+  then `.s4-dialog-actions` with Cancel (`data-variant="tonal"`, `data-close="cancel"`) and the answer
+  (`data-variant="tonal" data-color="error"` when it destroys, filled otherwise). Never one answer, never "OK", never a
+  form (the page checker fails all three); a form goes in place, in a floating panel or on a page.
+- On a phone, dialogs and panels sit in the bottom of the screen with full-width answers and swipe-down dismissal by
+  themselves; never position or size them. `data-persistent` blocks tap-outside and swipe. A filter or inspector panel
+  is `data-modeless` with no Apply button.
 - Confirmation after an action: **snackbar** with Undo. Naming an icon: **tooltip**.
 - Confirm only what can't be undone. Prefer Undo in a snackbar.
 
@@ -274,6 +282,8 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 **Glass** (read `references/glass.md` before adding any)
 - Only floating chrome and overlays get glass, and the components already have it. Content is never glass.
 - Text on glass is `on-surface`; at most two glass layers overlap; `data-glass="off"` keeps one element solid.
+- Docked bars (nav bar, scrolled top bar, site header, docked toolbar) are glass with one hairline and no edge glow
+  (0064); never add a rim, glow, border or shadow to them. Floating glass keeps the full edge.
 - A custom floating panel can opt in with `class="s4-glass"`; a card can't.
 
 **Type and writing**

@@ -196,6 +196,16 @@ export const tokens = {
       "reduced-transparency": "1"
     }
   },
+  "--s4-glass-tint-opacity-modal": {
+    "type": "number",
+    "value": "0.9",
+    "description": "Decision 0064: a modal dialog or panel is tinted 90%. It already sits over a scrim that sets it apart, so the page showing through it only added noise behind its question or its form. Still glass (it blurs and lets the color through), firmer than the 75% float, so the contrast guarantee holds with room to spare.",
+    "modes": {
+      "high-contrast": "1",
+      "dark-high-contrast": "1",
+      "reduced-transparency": "1"
+    }
+  },
   "--s4-glass-tint-float": {
     "type": "color",
     "value": "var(--md-sys-color-surface-container)",
@@ -266,10 +276,10 @@ export const tokens = {
   },
   "--s4-glass-edge-line": {
     "type": "color",
-    "value": "rgb(23 23 26 / 0.08)",
-    "description": "The single line full-width bars draw on their content-facing edge.",
+    "value": "rgb(23 23 26 / 0.2)",
+    "description": "Decision 0064: the one hairline a docked glass bar (top app bar once content scrolls under it, site header, nav bar, docked toolbar) draws on the edge that faces the content, one device pixel wide, instead of a lit rim and glow. Zero where glass is solid (the bar keeps its own solid look).",
     "modes": {
-      "dark": "rgb(255 255 255 / 0.08)",
+      "dark": "rgb(255 255 255 / 0.16)",
       "high-contrast": "rgb(255 255 255 / 0)",
       "dark-high-contrast": "rgb(255 255 255 / 0)",
       "reduced-transparency": "rgb(255 255 255 / 0)"
@@ -714,7 +724,12 @@ export const tokens = {
   "--s4-shape-sheet": {
     "type": "dimension",
     "value": "var(--md-sys-shape-corner-extra-large)",
-    "description": "Top corners of a bottom sheet; the edge that meets the screen stays square."
+    "description": "Corners of a floating panel (decision 0043: all four, it floats inside the window)."
+  },
+  "--s4-shape-screen": {
+    "type": "dimension",
+    "value": "48px",
+    "description": "Decision 0064: about how round a phone's own screen corners are. On a phone a dialog or floating panel sits in the bottom of the screen, and its bottom corners are this minus the inset, so they run parallel to the screen's corners. Not a brand dial: the device is as round as it is, whatever corners the app picks."
   },
   "--s4-shape-snackbar": {
     "type": "dimension",
@@ -1309,8 +1324,13 @@ export const tokens = {
   },
   "--s4-scrim-opacity": {
     "type": "number",
-    "value": "0.32",
-    "description": "Scrim behind modal surfaces: md.sys.color.scrim at this opacity."
+    "value": "0.16",
+    "description": "Scrim behind modal surfaces: md.sys.color.scrim at this opacity. Decision 0064: half of M3's 32% in light mode, where a gray page was the loudest thing about a dialog; dark mode keeps 32% (a dark page barely dims) and high contrast keeps the firm scrim.",
+    "modes": {
+      "dark": "0.32",
+      "high-contrast": "0.32",
+      "dark-high-contrast": "0.32"
+    }
   },
   "--s4-color-success": {
     "type": "color",

@@ -90,6 +90,15 @@ function audit(opts) {
     const tabs = [...l.querySelectorAll('.s4-tab')], bare = tabs.filter((t) => { const id = t.getAttribute('aria-controls'); return !id || !document.getElementById(id); });
     if (tabs.length && bare.length) out.push(`tabs "${gname(l)}" without panels (${bare.length} of ${tabs.length}): if it changes a value or how the same thing is shown, it is a button group`);
   });
+  /* decision 0064: a dialog asks a question the app cannot go on without. One with a single answer is something to read
+     (a page, 0050) or a notice (a snackbar); one that holds a form is a task (in place, a floating panel or a page),
+     unless its answer is destructive (typing a name to confirm a delete) */
+  document.querySelectorAll('dialog.s4-dialog:not(.s4-palette)').forEach((d) => {
+    const answers = new Set([...d.querySelectorAll('[data-close]')].map((b) => b.getAttribute('data-close')));
+    if (answers.size < 2) out.push(`dialog "${d.id}" has ${answers.size ? 'one answer' : 'no answer'}: a dialog asks a question; something to read is a page, a notice is a snackbar (decisions 0050, 0064)`);
+    const field = d.querySelector('input:not([type="checkbox"], [type="radio"], [type="hidden"]), textarea, select, [contenteditable="true"]');
+    if (field && !d.querySelector('[data-close][data-color="error"]')) out.push(`dialog "${d.id}" holds a form: a task goes in place (.s4-expand), in a floating panel or on a page; a dialog only asks (decisions 0047, 0064)`);
+  });
   /* duplicate ids */
   const seen = new Map();
   document.querySelectorAll('[id]').forEach((e) => { if (e.id && !e.closest('svg')) seen.set(e.id, (seen.get(e.id) || 0) + 1); });
@@ -344,9 +353,31 @@ async function use(page, add, phone) {
       (await page.evaluate(nestAudit)).forEach(add);
       const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); }, id);
       if (fieldFocused) add(`dialog "${id}" put the cursor in a text field when it opened (decision 0049)`);
-      await page.keyboard.press('Escape'); await settle(520);
+      /* decision 0064: on a phone a dialog or panel sits in the bottom of the screen, in reach of the thumb, and a swipe
+         down puts it away (a persistent one settles back) */
+      let how = 'Escape', swiped = null;
+      if (phone) {
+        const low = await page.evaluate((id) => { const d = document.getElementById(id); if (d.matches('.s4-palette, [data-fullscreen]')) return ''; const r = d.getBoundingClientRect(); return r.bottom < innerHeight - 64 ? `sits ${Math.round(innerHeight - r.bottom)}px above the bottom of a phone screen (decision 0064: a dialog or panel sits in reach of the thumb)` : ''; }, id);
+        if (low) add(`dialog "${id}" ${low}`);
+        swiped = await page.evaluate(async (id) => {
+          const d = document.getElementById(id);
+          if (typeof Touch === 'undefined' || typeof TouchEvent === 'undefined' || d.matches('.s4-palette, [data-fullscreen]')) return null;
+          const t = d.querySelector('.s4-dialog-headline, .s4-sheet-title') || d, r = t.getBoundingClientRect(), x = r.left + 4, y0 = r.top + r.height / 2;
+          const fire = (type, y) => { const touch = new Touch({ identifier: 1, target: t, clientX: x, clientY: y }); const now = type === 'touchend' ? [] : [touch]; t.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, touches: now, targetTouches: now, changedTouches: [touch] })); };
+          fire('touchstart', y0);
+          for (let i = 1; i <= 8; i++) { fire('touchmove', y0 + i * 40); await new Promise((f) => requestAnimationFrame(f)); }
+          fire('touchend', y0 + 320);
+          return d.hasAttribute('data-persistent') ? 'stays' : 'closes';
+        }, id);
+        await settle(520);
+        if (swiped === 'stays') {
+          const ok = await page.evaluate((id) => { const d = document.getElementById(id); return d.open && !d.style.transform; }, id);
+          if (!ok) add(`persistent dialog "${id}" did not settle back after a swipe down`);
+        } else if (swiped === 'closes') how = 'a swipe down';
+      }
+      if (how === 'Escape') { await page.keyboard.press('Escape'); await settle(520); }
       const still = !(await until((id) => !document.getElementById(id).open, id));
-      if (still) { add(`dialog "${id}" did not close with Escape`); await closeAll(); continue; }
+      if (still) { add(`dialog "${id}" did not close with ${how}`); await closeAll(); continue; }
       const back = await page.evaluate((id) => { const a = document.activeElement; return !!a && (a.dataset.dialog === id || a.dataset.sheet === id); }, id);
       if (!back) add(`dialog "${id}" did not give focus back to its opener`);
     }

@@ -10,7 +10,7 @@
    from every edge, with all four corners round and the full glass edge, and it pops in like a dialog:
      .s4-bottom-sheet  floats at the bottom center (phones: the full width minus the inset, above the home indicator)
      .s4-side-sheet    floats at the end side, as tall as the window minus the inset (phones: same as the bottom panel)
-   data-placement="center" on either centers it like a dialog. A .s4-sheet-handle in older markup draws nothing.
+   data-placement="center" on either centers it like a dialog from 600 wide (phones: bottom, decision 0064). A .s4-sheet-handle in older markup draws nothing.
    data-modeless (decision 0054) makes it a tool panel from 600 wide: no scrim, the page behind stays live.
    Solid here; glass.css makes both glass. */
 @layer s4.components {
@@ -57,11 +57,28 @@
     }
     .s4-side-sheet:dir(rtl) { inset: var(--_inset) auto var(--_inset) var(--_inset); }
   }
-  :is(.s4-bottom-sheet, .s4-side-sheet)[data-placement="center"] {
-    inset: 0;
-    height: fit-content;
-    max-height: calc(100dvh - 2 * var(--_inset));
-    margin: auto;
+  /* centered from 600 wide; on a phone every panel sits in the bottom, in reach of the thumb (decision 0064) */
+  @media (min-width: 600px) {
+    :is(.s4-bottom-sheet, .s4-side-sheet)[data-placement="center"] {
+      inset: 0;
+      height: fit-content;
+      max-height: calc(100dvh - 2 * var(--_inset));
+      margin: auto;
+    }
+  }
+  /* Phones (decision 0064): the bottom corners run parallel to the screen's own corners, the answers fill the bottom of
+     the panel (two side by side, three or more stacked with the first one at the bottom), and a swipe down puts a
+     panel away (dialog.js), so the page under it does not scroll instead. */
+  @media (max-width: 599.98px) {
+    .s4-bottom-sheet, .s4-side-sheet {
+      border-end-start-radius: max(var(--s4-shape-sheet), calc(var(--s4-shape-screen) - var(--_inset)));
+      border-end-end-radius: max(var(--s4-shape-sheet), calc(var(--s4-shape-screen) - var(--_inset)));
+      touch-action: pan-y;
+    }
+    .s4-sheet-actions { flex-wrap: nowrap; }
+    .s4-sheet-actions > .s4-button { flex: 1 1 0; min-inline-size: 0; --_h: var(--s4-size-touch-target); }
+    .s4-sheet-actions:has(> :nth-child(3)) { flex-direction: column-reverse; }
+    .s4-sheet-actions > .s4-button[data-variant="text"] { --_bg: var(--md-sys-color-surface-container-highest); }
   }
 
   .s4-sheet-title {

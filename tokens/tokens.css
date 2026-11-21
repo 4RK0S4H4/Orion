@@ -34,6 +34,7 @@
     --s4-glass-tint-opacity-fill: 0.56;
     --s4-glass-tint-opacity-medium-contrast: 0.86;
     --s4-glass-tint-opacity-fab-color: 0.9;
+    --s4-glass-tint-opacity-modal: 0.9;
     --s4-glass-tint-float: var(--md-sys-color-surface-container);
     --s4-glass-tint-fill: var(--md-sys-color-surface-container-highest);
     --s4-glass-blur-float: 8px;
@@ -44,7 +45,7 @@
     --s4-glass-item-fill: 1;
     --s4-glass-item-outline: rgb(255 255 255 / 0.28);
     --s4-glass-edge-width: 1px;
-    --s4-glass-edge-line: rgb(23 23 26 / 0.08);
+    --s4-glass-edge-line: rgb(23 23 26 / 0.2);
     --s4-glass-edge-scale-standard: 1.5;
     --s4-glass-edge-scale-large: 2;
     --s4-glass-edge-top-alpha: 0.46;
@@ -129,6 +130,7 @@
     --s4-shape-menu-item: var(--s4-shape-control);
     --s4-shape-dialog: var(--md-sys-shape-corner-extra-large);
     --s4-shape-sheet: var(--md-sys-shape-corner-extra-large);
+    --s4-shape-screen: 48px;
     --s4-shape-snackbar: var(--md-sys-shape-corner-full);
     --s4-shape-tooltip: var(--s4-shape-control);
     --s4-shape-nav-indicator: var(--s4-shape-control);
@@ -267,7 +269,7 @@
     --s4-focus-ring-width: 3px;
     --s4-focus-ring-offset: 2px;
     --s4-focus-ring-color: var(--md-sys-color-secondary);
-    --s4-scrim-opacity: 0.32;
+    --s4-scrim-opacity: 0.16;
     --s4-color-success: #146c40;
     --s4-color-success-container: #d7f2e1;
     --s4-color-on-success-container: #0b4429;
@@ -510,13 +512,14 @@
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
       --s4-glass-item-outline: rgb(255 255 255 / 0.28);
-      --s4-glass-edge-line: rgb(255 255 255 / 0.08);
+      --s4-glass-edge-line: rgb(255 255 255 / 0.16);
       --s4-glass-edge-top-alpha: 0.12;
       --s4-glass-edge-side-alpha: 0;
       --s4-glass-edge-bottom-alpha: 0.12;
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #62d39b;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -601,13 +604,14 @@
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
       --s4-glass-item-outline: rgb(255 255 255 / 0.28);
-      --s4-glass-edge-line: rgb(255 255 255 / 0.08);
+      --s4-glass-edge-line: rgb(255 255 255 / 0.16);
       --s4-glass-edge-top-alpha: 0.12;
       --s4-glass-edge-side-alpha: 0;
       --s4-glass-edge-bottom-alpha: 0.12;
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #62d39b;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -691,13 +695,14 @@
     --s4-glass-backdrop-contrast-float: 1;
     --s4-glass-backdrop-brightness-float: 1;
     --s4-glass-item-outline: rgb(255 255 255 / 0.28);
-    --s4-glass-edge-line: rgb(23 23 26 / 0.08);
+    --s4-glass-edge-line: rgb(23 23 26 / 0.2);
     --s4-glass-edge-top-alpha: 0.46;
     --s4-glass-edge-side-alpha: 0;
     --s4-glass-edge-bottom-alpha: 0.46;
     --s4-glass-fill-opacity: 0.07;
     --s4-glass-fill-selected-opacity: 0.14;
     --s4-icon-duo-opacity: 0.42;
+    --s4-scrim-opacity: 0.16;
     --s4-color-success: #146c40;
     --s4-color-success-container: #d7f2e1;
     --s4-color-on-success-container: #0b4429;
@@ -814,6 +819,7 @@
     --s4-shape-search: var(--md-sys-shape-corner-large);
   }
   :where([data-corners="round"]:not(:root)) {
+    --s4-shape-screen: 48px;
     --md-sys-shape-corner-none: 0px;
     --md-sys-shape-corner-extra-small: 4px;
     --md-sys-shape-corner-small: 8px;
@@ -878,12 +884,14 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-item-outline: rgb(255 255 255 / 0);
       --s4-glass-edge-line: rgb(255 255 255 / 0);
       --s4-glass-edge-top-alpha: 0;
       --s4-glass-edge-side-alpha: 0;
       --s4-glass-edge-bottom-alpha: 0;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #0b4429;
       --s4-color-warning: #4d3200;
       --s4-color-info: #0a376f;
@@ -957,12 +965,14 @@
     --s4-glass-tint-opacity-fab: 1;
     --s4-glass-tint-opacity-fill: 1;
     --s4-glass-tint-opacity-fab-color: 1;
+    --s4-glass-tint-opacity-modal: 1;
     --s4-glass-blur-float: 0px;
     --s4-glass-item-outline: rgb(255 255 255 / 0);
     --s4-glass-edge-line: rgb(255 255 255 / 0);
     --s4-glass-edge-top-alpha: 0;
     --s4-glass-edge-side-alpha: 0;
     --s4-glass-edge-bottom-alpha: 0;
+    --s4-scrim-opacity: 0.32;
     --s4-color-success: #0b4429;
     --s4-color-warning: #4d3200;
     --s4-color-info: #0a376f;
@@ -1052,6 +1062,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -1063,6 +1074,7 @@
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #b9f0d2;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -1151,6 +1163,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -1162,6 +1175,7 @@
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #b9f0d2;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -1250,6 +1264,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -1261,6 +1276,7 @@
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #b9f0d2;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -1349,6 +1365,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-backdrop-contrast-float: 1;
       --s4-glass-backdrop-brightness-float: 1;
@@ -1360,6 +1377,7 @@
       --s4-glass-fill-opacity: 0.06;
       --s4-glass-fill-selected-opacity: 0.07;
       --s4-icon-duo-opacity: 0.38;
+      --s4-scrim-opacity: 0.32;
       --s4-color-success: #b9f0d2;
       --s4-color-success-container: #173a2a;
       --s4-color-on-success-container: #b9f0d2;
@@ -1500,6 +1518,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-item-outline: rgb(255 255 255 / 0);
       --s4-glass-edge-line: rgb(255 255 255 / 0);
@@ -1519,6 +1538,7 @@
     --s4-glass-tint-opacity-fab: 1;
     --s4-glass-tint-opacity-fill: 1;
     --s4-glass-tint-opacity-fab-color: 1;
+    --s4-glass-tint-opacity-modal: 1;
     --s4-glass-blur-float: 0px;
     --s4-glass-item-outline: rgb(255 255 255 / 0);
     --s4-glass-edge-line: rgb(255 255 255 / 0);
@@ -1538,6 +1558,7 @@
       --s4-glass-tint-opacity-fab: 1;
       --s4-glass-tint-opacity-fill: 1;
       --s4-glass-tint-opacity-fab-color: 1;
+      --s4-glass-tint-opacity-modal: 1;
       --s4-glass-blur-float: 0px;
       --s4-glass-item-outline: rgb(255 255 255 / 0);
       --s4-glass-edge-line: rgb(255 255 255 / 0);

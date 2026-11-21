@@ -2,7 +2,7 @@
    Components never call element.animate or pick a spring themselves: they name a pattern here (npm run check:motion).
      Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
      Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow
-     Pop      S4.transition.pop(surface, { open })             floating glass (dialogs, panels): rises 16px and fades in
+     Pop      S4.transition.pop(surface, { open, from })       floating glass (dialogs, panels): rises 16px and fades in; from: px a finger pulled it down
               S4.transition.scrim(dialog, open)                the dimmed page behind a modal fades with it
      Rise     S4.transition.rise(el, { open })                 notices (snackbars, a new message): rise 14px and fade in
               S4.transition.tip(el, { open })                  the small rise (tooltips): 4px
@@ -64,10 +64,10 @@
     }, function () { return false; });
   }
   /* move + fade on two springs: movement on a spatial spring, opacity on an effects spring (never overshoots) */
-  function moveFade(el, open, offTransform, springs) {
+  function moveFade(el, open, offTransform, springs, from) {
     var now = begin(el);
     var shown = { opacity: '1', transform: 'none' }, hidden = { opacity: '0', transform: offTransform };
-    var start = now || (open ? hidden : shown), end = open ? shown : hidden;
+    var start = from || now || (open ? hidden : shown), end = open ? shown : hidden;
     var t = track(el, M.animate(el, [{ transform: start.transform }, { transform: end.transform }], springs[0]));
     var o = track(el, M.animate(el, [{ opacity: start.opacity }, { opacity: end.opacity }], springs[1]));
     return settle(el, [t, o], !open);
@@ -78,7 +78,10 @@
     var open = !opts || opts.open !== false, d = travel(el, 16, 'pop');
     /* axis 'x': a floating panel at the side arrives from its side (decision 0043); sign follows the writing direction */
     var x = opts && opts.axis === 'x', sign = x && getComputedStyle(el).direction === 'rtl' ? -1 : 1;
-    return moveFade(el, open, (x ? 'translateX(' : 'translateY(') + (sign * (open ? d : d / 2)) + 'px)', open ? [spring(el, 'spatial', 'pop'), 'effects'] : ['fast-effects', 'fast-effects']);
+    /* from (closing only): a finger dragged the surface this far down and let go (decision 0064); it leaves from there */
+    var pulled = !open && opts && typeof opts.from === 'number' && !x ? opts.from : 0;
+    return moveFade(el, open, (x ? 'translateX(' : 'translateY(') + (pulled + sign * (open ? d : d / 2)) + 'px)', open ? [spring(el, 'spatial', 'pop'), 'effects'] : ['fast-effects', 'fast-effects'],
+      pulled ? { opacity: '1', transform: 'translateY(' + pulled + 'px)' } : null);
   }
 
   /* ---------- drop: menus (0042: not out of the button; the glass fades in place, the items follow) ---------- */

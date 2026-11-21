@@ -60,6 +60,16 @@ wide content as built. 81 components. **Needs the owner's look on an iPhone:** t
 Moorings and Larkline; Pressroom's board (lanes snapping, hold-to-drag, add in place); The Velvet's seat plan; Linnea's
 quiet checkboxes; Parley's selected row in dark mode; Tidewater's kicker and byline in Safari's serif (real small caps).
 
+**Built alongside, decision 0064 (the owner's notes, issues 67 and 68):** dialogs are calmer and rarer (a dialog only asks
+a question the app cannot go on without, with two or three named answers; the checker fails one answer or a form), on a
+phone dialogs and modal panels are a card in the bottom of the screen with swipe-down dismissal, the light scrim is 16%,
+modal glass 90%, and docked glass bars drop the rim and glow for one hairline. **Needs the owner's look on an iPhone:**
+[`explore/calm-dialogs.html`](../explore/calm-dialogs.html) (swipe the cards down; is Delete clear as a quiet red; is
+the light scrim enough), the Showcase's Overlays and Settings > Delete All Notes, the bottom corners against the real
+screen corners, and one hairline (no glow) under the bars while scrolling, light and dark. Not verified: real iOS touch
+handling of the swipe (synthetic touch in Chromium only).
+
+
 **Order from here (left to us):** the owner's looks first (device-only bugs before anything new), then the meter and the
 board if the owner agrees, then Horizon 1's real apps built end to end with the skill, skill evals, and release 1.2.
 
@@ -186,6 +196,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-21 (round 0057, calm): calm dialogs, phone cards with swipe-down, lighter scrim, firmer modal glass, docked bars with one hairline (0064, issues 67 and 68); merged with the decisions branch and published.
 - 2026-11-21 (round 0057, decisions): the eleven calls taken as recommended and built (0063): brand files, kicker and figure, meter, board, quiet table checkboxes, one label rule, dense maps, calmer selection, small lessons 38, 39, 42, 43, Parley's phone bar. Next: merge with round57/calm, then the owner's looks.
 - 2026-11-21 (round 0056, last merge): lessons (0060), data at scale (0061), desktop anatomy (0062) merged and fixed together; all templates are products (issue 66); decisions, docs, skill and hub updated; check and test green. Next: the owner's looks and the eleven decisions under Now.
 - 2026-11-16 (round 0056, wave 1): themes on any container, energy, app defaults, roomy (0056); website kit (0057); reach and proven dial presets (0058); four workstreams merged, check and test green. Next: the owner's looks, then wave 2 (issues 54, 56), 59, 60.

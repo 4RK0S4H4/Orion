@@ -30,7 +30,7 @@ screen where the title deserves weight (Budget, Reports). They collapse into the
 
 **Behaviour:** sticky at the top of its scroll container (the window, or the nearest scrolling ancestor). At rest the
 bar is `surface`; once content scrolls under it, `data-scrolled` switches it to `surface-container` (and glass.css turns
-that into glass). Medium and large stick with a negative `top`, so only the 64dp row stays; the JS slides that row down
+that into glass: docked glass, tint and blur with one hairline along its bottom edge and no rim or glow, decision 0064). Medium and large stick with a negative `top`, so only the 64dp row stays; the JS slides that row down
 as the headline scrolls away, clips and fades the headline, and fades a small copy of the title (`aria-hidden`) into the
 row. Changing `.s4-app-bar-title` text updates the copy.
 
