@@ -3881,13 +3881,26 @@ S4.register('accordion', function (scope) {
         g.setAttribute('aria-valuemax', '960');
         c.th.appendChild(g); c.grip = g;
         g.addEventListener('keydown', function (e) {
-          var step = e.shiftKey ? 64 : 16, dir = rtl(g) ? -1 : 1, d = 0;
+          var dir = rtl(g) ? -1 : 1, d = 0, roving = !!self.table._s4data, resizing = g.hasAttribute('data-resizing');
+          /* in a data table the header is one Tab stop whose arrows move along it (the grid pattern): a grip resizes with
+             Shift and the arrows, or after Enter (or F2) until Enter, Escape (puts the width back) or Tab */
+          if (roving && !resizing) {
+            if (e.key === 'Enter' || e.key === 'F2') { e.preventDefault(); e.stopPropagation(); g.setAttribute('data-resizing', ''); g._s4was = c.width; self.say('Resizing ' + c.label + '. Left and Right change the width, Enter to finish'); return; }
+            if (!e.shiftKey || (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft')) return;
+          }
+          if (roving && resizing && (e.key === 'Enter' || e.key === 'F2' || e.key === 'Escape' || e.key === 'Tab')) {
+            if (e.key !== 'Tab') { e.preventDefault(); e.stopPropagation(); }
+            if (e.key === 'Escape' && g._s4was) self.width(c.field, g._s4was);
+            g.removeAttribute('data-resizing'); self.say(c.label + ' is ' + Math.round(c.width) + ' pixels wide'); return;
+          }
+          var step = e.shiftKey && !roving ? 64 : 16;
           if (e.key === 'ArrowRight') d = step * dir; else if (e.key === 'ArrowLeft') d = -step * dir;
-          else if (e.key === 'Enter') { e.preventDefault(); self.fit(c.field); return; }
-          else if (e.key === 'Home') { e.preventDefault(); self.width(c.field, self.min(c)); return; }
+          else if (e.key === 'Enter' && !roving) { e.preventDefault(); self.fit(c.field); return; }
+          else if (e.key === 'Home' && !roving) { e.preventDefault(); self.width(c.field, self.min(c)); return; }
           else return;
-          e.preventDefault(); self.width(c.field, c.width + d);
+          e.preventDefault(); e.stopPropagation(); self.width(c.field, c.width + d);
         });
+        g.addEventListener('blur', function () { g.removeAttribute('data-resizing'); });
         g.addEventListener('dblclick', function (e) { e.preventDefault(); self.fit(c.field); });
         g.addEventListener('pointerdown', function (e) {
           if (e.button) return;
@@ -3903,6 +3916,7 @@ S4.register('accordion', function (scope) {
       });
       this.syncGrips();
     },
+    say: function (text) { if (this.table._s4data) this.table._s4data.say(text); },
     syncGrips: function () { this.cols.forEach(function (c) { if (c.grip) { c.grip.setAttribute('aria-valuenow', String(Math.round(c.width))); c.grip.setAttribute('aria-valuetext', Math.round(c.width) + ' pixels'); } }); },
     col: function (field) { return this.cols.filter(function (c) { return c.field === field; })[0]; },
     width: function (field, px, live) {
@@ -4001,7 +4015,7 @@ S4.register('accordion', function (scope) {
     if (this.wrap) {
       this.wrap.setAttribute('data-virtual', '');
       this.wrap.addEventListener('scroll', function () { self.schedule(); }, { passive: true });
-      if (window.ResizeObserver) new ResizeObserver(function () { self.viewport = 0; self.headH = null; self.measuredAt = {}; self.measuredRow = false; self.schedule(); }).observe(this.wrap);
+      if (window.ResizeObserver) new ResizeObserver(function () { self.viewport = 0; self.headH = null; self.measuredAt = {}; self.measuredRow = false; self.schedule(); if (self.headRoving) self.headRove(); }).observe(this.wrap);
     }
     var head = table.tHead && table.tHead.rows[table.tHead.rows.length - 1];
     if (head) head.setAttribute('aria-rowindex', '1');
@@ -4009,6 +4023,7 @@ S4.register('accordion', function (scope) {
     this.bar = table.getAttribute('data-selection-bar') && document.querySelector(table.getAttribute('data-selection-bar'));
     this.wire();
     this.columnMenus();
+    this.headKeys();
     this.skeletons();
   }
   Data.prototype = {
@@ -4434,13 +4449,21 @@ S4.register('accordion', function (scope) {
       this.selectionChanged();
     },
     keys: function (e) {
+      if (e.defaultPrevented) return;
       var self = this, a = document.activeElement, tr = a && a.closest && a.closest('tbody tr[data-n]');
       if (!tr || !this.body.contains(tr)) return;
       var n = +tr.dataset.n, it = this.items[n], onRow = a === tr, page = Math.max(1, Math.floor(this.wrap.clientHeight / this.est.r) - 2);
       var dir = rtl(this.table) ? -1 : 1, k = e.key;
+      if (k === 'ArrowUp' && !e.shiftKey && n === 0 && this.headTo()) { e.preventDefault(); return; }
       if (k === 'ArrowDown' || k === 'ArrowUp') { e.preventDefault(); if (e.shiftKey && it.t === 'r') { this.pick(this.id(this.rows[it.i], it.i), true); } this.go(n + (k === 'ArrowDown' ? 1 : -1)); if (e.shiftKey) { var it2 = this.items[this.current]; if (it2 && it2.t === 'r') this.pick(this.id(this.rows[it2.i], it2.i), true); this.selectionChanged(); } return; }
       if (k === 'PageDown' || k === 'PageUp') { e.preventDefault(); this.go(n + (k === 'PageDown' ? page : -page)); return; }
-      if ((k === 'Home' || k === 'End') && (onRow || e.ctrlKey)) { e.preventDefault(); this.go(k === 'Home' ? 0 : this.items.length - 1); return; }
+      /* Ctrl+Home and Ctrl+End: the first and last row; Home and End: the start and end of this row (the grid pattern) */
+      if ((k === 'Home' || k === 'End') && (e.ctrlKey || e.metaKey || it.t !== 'r')) { e.preventDefault(); this.go(k === 'Home' ? 0 : this.items.length - 1); return; }
+      if (k === 'Home' || k === 'End') {
+        e.preventDefault();
+        var row = this.targets(tr), to = k === 'End' && row.length ? row[row.length - 1] : tr;
+        to.focus({ preventScroll: true }); this.scrollCell(to === tr ? tr.cells[0] : to); return;
+      }
       if (it.t === 'g') {
         if (k === 'Enter' || k === ' ' || (k === 'ArrowRight') === (dir > 0) && (k === 'ArrowRight' || k === 'ArrowLeft')) {
           var key = it.key, open = !this.collapsed.has(key), want = k === 'Enter' || k === ' ' ? !open : (k === 'ArrowRight') === (dir > 0);
@@ -4474,6 +4497,43 @@ S4.register('accordion', function (scope) {
       if (el.closest('[data-pin]')) return;
       var ltr = !rtl(w), left = ltr ? wr.left + pinS : wr.left + pinE, right = ltr ? wr.right - pinE : wr.right - pinS;
       if (r.left < left) w.scrollLeft -= left - r.left; else if (r.right > right) w.scrollLeft += r.right - right;
+    },
+    /* ---------- the header: one Tab stop, arrows move along it (WAI-ARIA grid) ---------- */
+    headTargets: function () {
+      var row = this.table.tHead && this.table.tHead.rows[this.table.tHead.rows.length - 1]; if (!row) return [];
+      return slice(row.querySelectorAll('input, button, a[href], .s4-table-grip')).filter(function (x) { return !x.disabled && !x.closest('th[hidden]') && x.getClientRects().length; });
+    },
+    headRove: function (to) {
+      var ts = this.headTargets(); if (!ts.length) return;
+      if (to && ts.indexOf(to) >= 0) this.headCur = to;
+      if (!this.headCur || ts.indexOf(this.headCur) < 0) this.headCur = ts[0];
+      var cur = this.headCur, row = cur.closest('tr');
+      /* every header control leaves the Tab order, shown or not (a hidden one may show at another width), but one */
+      slice(row.querySelectorAll('input, button, a[href], .s4-table-grip')).forEach(function (x) { var want = x === cur ? 0 : -1; if (x.tabIndex !== want) x.tabIndex = want; });
+    },
+    /* to the header from the body (Up on the first row) */
+    headTo: function () { this.headRove(); if (!this.headCur) return false; this.headCur.focus({ preventScroll: true }); return true; },
+    headKeys: function () {
+      var self = this, t = this.table, head = t.tHead; if (!head) return;
+      this.headRoving = true;
+      this.headRove();
+      /* the header changes (columns moved, hidden, menus and grips added): keep exactly one Tab stop */
+      new MutationObserver(function () { if (self.headQueued) return; self.headQueued = true; requestAnimationFrame(function () { self.headQueued = false; self.headRove(); }); }).observe(head, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden'] });
+      head.addEventListener('focusin', function (e) { var ts = self.headTargets(); if (ts.indexOf(e.target) >= 0) self.headRove(e.target); });
+      head.addEventListener('keydown', function (e) {
+        if (e.defaultPrevented || e.altKey) return;
+        var ts = self.headTargets(), i = ts.indexOf(document.activeElement); if (i < 0) return;
+        var dir = rtl(t) ? -1 : 1, k = e.key, to = null;
+        if (k === 'ArrowRight') to = ts[Math.min(ts.length - 1, i + dir)] || ts[i];
+        else if (k === 'ArrowLeft') to = ts[Math.max(0, i - dir)] || ts[i];
+        else if (k === 'Home') to = ts[0];
+        else if (k === 'End') to = ts[ts.length - 1];
+        else if (k === 'ArrowDown' && !document.activeElement.matches('[aria-haspopup], [data-menu]')) { e.preventDefault(); if (self.items.length) self.go(self.current); return; }
+        else return;
+        e.preventDefault();
+        self.headRove(to); to.focus({ preventScroll: true });
+        var cell = to.closest('th'); if (cell && self.wrap) self.scrollCell(cell);
+      });
     },
     /* ---------- menus: a column's own menu, and the Columns menu (show, hide, order) ---------- */
     columnMenus: function () {
@@ -4511,7 +4571,7 @@ S4.register('accordion', function (scope) {
         if (c.th.querySelector('.s4-table-col-menu')) return;
         var b = document.createElement('button'); b.type = 'button'; b.className = 's4-icon-button s4-table-col-menu'; b.dataset.size = 'xs';
         b.setAttribute('data-menu', m.id); b.setAttribute('aria-label', c.label + ' Column Options'); b.innerHTML = icon('more-vert');
-        if (c.th.classList.contains('num')) c.th.insertBefore(b, c.th.firstChild); else c.th.insertBefore(b, c.grip || null);
+        c.th.insertBefore(b, c.grip || null);   /* the same order in every column: name, options, grip */
         b.addEventListener('click', function () { self.menuCol = c.field; self.fillColMenu(); }, true);
       });
       m.addEventListener('s4-select', function (e) {

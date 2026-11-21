@@ -805,14 +805,58 @@ async function use(page, add, phone) {
         if (!open) add('data table: the details button did not open the row details in place');
         await click(t.locator('tbody .s4-table-expand[aria-expanded="true"]').first(), 'row details (close)'); await settle(500);
       }
-      /* a column grip: arrows widen */
+      /* a column grip: in a data table's header the arrows move along it, so Shift with the arrows widens */
       const grip = t.locator('thead .s4-table-grip').first();
       if (await grip.isVisible().catch(() => false)) {
         await grip.focus(); const w0 = +(await grip.getAttribute('aria-valuenow'));
-        await page.keyboard.press('ArrowRight');
+        await page.keyboard.press('Shift+ArrowRight');
         const w1 = +(await grip.getAttribute('aria-valuenow'));
-        if (!(w1 !== w0)) add('data table: a column grip did not resize with the arrow keys');
-        await page.keyboard.press('ArrowLeft');
+        if (!(w1 !== w0)) add('data table: a column grip did not resize with Shift and the arrow keys');
+        await page.keyboard.press('Shift+ArrowLeft');
+      }
+      /* the grid pattern (decision 0065): one Tab stop for the header and one for the body, arrows move along the header,
+         Home and End within a row, Up from the first row to the header, Tab leaves the table, the same header order */
+      const grid = await t.evaluate((x) => {
+        const o = [], vis = (e) => e.getClientRects().length && !e.closest('[hidden]');
+        const stops = (root) => [...root.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')].filter((e) => vis(e) && !e.disabled && e.tabIndex >= 0);
+        if (x.tHead && stops(x.tHead).length !== 1) o.push(`data table: the header has ${stops(x.tHead).length} Tab stops (one, the arrows move along it)`);
+        if (stops(x.tBodies[0]).length !== 1) o.push(`data table: the body has ${stops(x.tBodies[0]).length} Tab stops (one, the current row)`);
+        x.querySelectorAll('thead th').forEach((th) => {
+          const s = th.querySelector('.s4-table-sort'), m = th.querySelector('.s4-table-col-menu'), g = th.querySelector('.s4-table-grip');
+          const before = (a, b) => !a || !b || !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+          if (!before(s, m) || !before(m, g) || !before(s, g)) o.push(`data table: the "${(th.textContent || '').trim()}" header puts its controls in another order (name, options, grip in every column)`);
+        });
+        return o;
+      });
+      grid.forEach(add);
+      const headStop = await t.evaluate((x) => { const e = x.tHead && [...x.tHead.querySelectorAll('[tabindex="0"], button, input')].find((b) => b.tabIndex === 0 && b.getClientRects().length); if (!e) return false; e.setAttribute('data-kt-head', ''); return true; });
+      if (headStop) {
+        await t.locator('[data-kt-head]').focus();
+        await page.keyboard.press('ArrowRight');
+        if (await page.evaluate(() => document.activeElement.hasAttribute('data-kt-head') || !document.activeElement.closest('thead'))) add('data table: Right did not move along the header');
+        if (await t.evaluate((x) => [...x.tHead.querySelectorAll('button, input, .s4-table-grip')].filter((b) => b.tabIndex === 0).length !== 1)) add('data table: moving along the header left more than one Tab stop');
+        await page.keyboard.press('ArrowDown');
+        if (await page.evaluate(() => !document.activeElement.matches('tbody tr[data-n]'))) add('data table: Down from the header did not go to the current row');
+        else {
+          await t.evaluate((x) => x._s4data.go(0));
+          await page.keyboard.press('End');
+          const end = await page.evaluate(() => { const a = document.activeElement; return { body: a === document.body, inRow: !!a.closest('tbody tr[data-n="0"]'), row: a.matches('tr') }; });
+          if (end.body || !end.inRow) add('data table: End in a row left the row' + (end.body ? ' (focus on <body>)' : ''));
+          else if (end.row && await t.evaluate((x) => x.querySelectorAll('tbody tr[data-n="0"] button, tbody tr[data-n="0"] input').length)) add('data table: End did not move to the end of the row');
+          await page.keyboard.press('Home');
+          if (await page.evaluate(() => !document.activeElement.matches('tbody tr[data-n="0"]'))) add('data table: Home did not return to the start of the row');
+          await page.keyboard.press('ArrowUp');
+          if (await page.evaluate(() => !document.activeElement.closest('thead'))) add('data table: Up from the first row did not go to the header');
+          /* Tab leaves the table for the next control, never <body>; Shift+Tab from the body reaches the header in one step */
+          await t.evaluate((x) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = 'After'; b.setAttribute('data-kt-after', ''); (x.closest('.s4-table-wrap') || x).after(b); x._s4data.go(0); });
+          await page.keyboard.press('Tab');
+          if (await page.evaluate(() => !document.activeElement.hasAttribute('data-kt-after'))) add(`data table: Tab from a row did not leave the table for the next control (focus on ${await page.evaluate(() => document.activeElement === document.body ? '<body>' : document.activeElement.tagName.toLowerCase())})`);
+          await t.evaluate((x) => x._s4data.go(0));
+          await page.keyboard.press('Shift+Tab');
+          if (await page.evaluate(() => !document.activeElement.closest('thead'))) add('data table: Shift+Tab from the body did not reach the header in one step');
+          await page.evaluate(() => document.querySelectorAll('[data-kt-after]').forEach((b) => b.remove()));
+        }
+        await page.evaluate(() => document.querySelectorAll('[data-kt-head]').forEach((b) => b.removeAttribute('data-kt-head')));
       }
     }
     for (const f of (await visible('.s4-filter')).slice(0, 1)) {

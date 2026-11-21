@@ -1550,7 +1550,7 @@ Everything below is opt-in; markup without these attributes behaves exactly as a
 
 | Attribute | What |
 |---|---|
-| `data-resizable` on the table | a grip at the end of each header: drag it (mouse or finger), or Tab to it and use Left / Right (Shift for bigger steps), Home for the narrowest; double-click or Enter fits the column to its content. The grip is a `role="separator"` with `aria-valuenow`. |
+| `data-resizable` on the table | a grip at the end of each header: drag it (mouse or finger), or Tab to it and use Left / Right (Shift for bigger steps), Home for the narrowest; double-click or Enter fits the column to its content. In a data table the header is one Tab stop: arrows move along it and a grip resizes with Shift+Left / Right, or Enter then the arrows (see Keyboard below); its column menu's Fit to Content fits. The grip is a `role="separator"` with `aria-valuenow`. |
 | `th[data-pin]`, `th[data-pin="end"]` | the column stays while the table scrolls sideways. Pinned cells are solid (the table's surface, the row's selection or state mixed in) with a tonal edge only while something is under them; never a shadow, never glass. The checkbox and details columns travel with the start pins. |
 | `data-key="name"` on the table | widths, order, hidden and pinned columns are kept in this browser under that name |
 | `th[data-fill]` | the column that takes the spare width when the columns are narrower than the table (default: the `data-primary` one) |
@@ -1618,9 +1618,13 @@ the page at any time (under 830 elements in the table while scrolling from top t
 second with the median frame at 16.7 ms. Every drawn row carries `aria-rowindex`; the table carries `aria-rowcount`, so a
 screen reader says "row 4,812 of 5,002".
 
-**Keyboard (data tables):** the table is one Tab stop (the current row). Up and Down move a row, Page Up and Page Down a
-screen, Home and End (or Ctrl with them) the first and last; Right and Left move through the row's controls and cells
-that edit; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
+**Keyboard (data tables, the WAI-ARIA grid pattern, decision 0065):** two Tab stops, the header and the body, and Tab
+leaves the table for the next control. **Header:** Left and Right move through every header control (Select All, each
+column's sort button, its options button and its grip, in that order in every column), Home and End to the first and
+last, Down to the body. On a grip, Shift with Left or Right resizes, or Enter (or F2) starts resizing with the plain
+arrows until Enter, Tab or Escape (which puts the width back). **Body** (the current row): Up and Down move a row (Up
+from the first row goes to the header), Page Up and Page Down a screen, Ctrl+Home and Ctrl+End the first and last row;
+Right and Left move through the row's controls and cells that edit, Home and End to the start and end of the row; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
 extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
 On a group row, Enter or Right and Left open and close the group.
 
@@ -1654,7 +1658,8 @@ read on its own. Keep tables to the columns that matter; put the rest on the det
 
 **Selecting rows (decision 0063, amends 0044 inside tables):** an empty box in a resting row is a quiet dot, half the
 size, in the same 3:1 control color; it grows into the full box when its row is hovered or holds the focus, and every
-box shows in full while anything is selected. The Select All box in the head always shows in full. Cells keep wrapping
+box shows in full while anything is selected. The Select All box rests as the same dot and grows when the head row
+is hovered or holds the focus, or while anything is selected (decision 0065). Cells keep wrapping
 (0058); they never truncate.
 
 **Accessibility:** a real `<table>` with `<caption>`, `scope`d headers and `aria-sort`, so screen readers announce the
