@@ -237,14 +237,17 @@ for (const page of pages) {
     const html = readFileSync(resolve(page), 'utf8');
     let n = 0;
     for (const m of html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)) {
-      n++; if (/^\s*\/\* S4 Orion [\d.]+ stylesheet/.test(m[1])) continue;     /* orion.css inlined by inline.mjs */
+      n++; if (/^\s*\/\* S4 Orion [\d.]+ stylesheet|^\s*\/\* S4 Orion brand: /.test(m[1])) continue;     /* orion.css or a brand file inlined by inline.mjs */
       lintCss(m[1], `<style> #${n}`).forEach((e) => errors.add(e));
     }
     for (const m of html.matchAll(/<link[^>]+rel=["']?stylesheet[^>]*>/gi)) {
       const href = (/href=["']?([^"'\s>]+)/.exec(m[0]) || [])[1];
       if (!href || /^(https?:)?\/\//.test(href) || SYSTEM_CSS.test(href.split('?')[0])) continue;
       const f = resolve(dirname(resolve(page)), href.split('?')[0]);
-      if (existsSync(f)) lintCss(readFileSync(f, 'utf8'), href).forEach((e) => errors.add(e));
+      if (!existsSync(f)) continue;
+      const text = readFileSync(f, 'utf8');
+      if (/^\s*\/\* S4 Orion brand: /.test(text)) continue;   /* a brand file from brand.mjs (decision 0063) is Orion's own generated scheme, not app CSS */
+      lintCss(text, href).forEach((e) => errors.add(e));
     }
     for (const m of html.matchAll(/\sstyle="([^"]*)"/gi)) lintCss(`.x{${m[1]}}`, `style=""`).forEach((e) => errors.add(e.replace(/: \.x → /, " → ")));
   }
