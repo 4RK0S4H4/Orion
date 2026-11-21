@@ -31,6 +31,31 @@ with an optional menu button and FAB. Uses the same `.s4-nav-item` as the [navig
 | `.s4-nav-rail-header` | Menu button and FAB slot. In the collapsed rail the FAB's label is hidden (icon FAB); expanded it shows (extended FAB). |
 | `.s4-nav-rail-items` | The destinations (`.s4-nav-item`, see nav bar). |
 
+**As a desktop source list (issue 60):** the expanded rail is the sidebar of a desktop app. It takes sections with
+titles (`.s4-nav-rail-title`), sections that fold away, a [tree](../tree/), a footer for the account and Settings, a grip
+to resize it, and it still collapses to icons. There is no second sidebar component.
+
+```html
+<nav class="s4-nav-rail" aria-label="Project" data-expanded data-resizable data-resize-key="app-sidebar">
+  <div class="s4-nav-rail-items">
+    <a class="s4-nav-item" href="#strings" aria-current="page">…</a>
+    <div class="s4-nav-rail-group">
+      <button class="s4-nav-rail-title" type="button" aria-expanded="true">Languages</button>
+      <div class="s4-nav-rail-group-items"><a class="s4-nav-item" href="#fr">…</a>…</div>
+    </div>
+    <div class="s4-nav-rail-title">Files</div>
+    <ul class="s4-tree" aria-label="Files" data-density="compact">…</ul>
+  </div>
+  <div class="s4-nav-rail-footer">…account, Settings…</div>
+</nav>
+```
+
+| Part / attribute | What |
+|---|---|
+| `.s4-nav-rail-group` + `button.s4-nav-rail-title` + `.s4-nav-rail-group-items` | A section whose title folds it (Reveal); `aria-expanded` follows; remembered with `data-resize-key`. Collapsed to icons, a folded group still shows its icons |
+| `.s4-tree` inside | A tree in a section; its icons line up with the items; hidden while the rail is collapsed |
+| `data-resizable` (+ `data-resize-key`) | A grip on the end edge (`role="separator"`): drag, or Left / Right on it, Home / End for 200 and 400, Enter collapses or expands; dragged narrower than 150 it collapses. Fires `s4-resize { size, collapsed }` |
+
 **Behaviour (`nav-rail.js`):** item clicks move `aria-current` and fire `s4-change { item, index, value }`; the toggle
 fires `s4-toggle { expanded }`. The width animates on the spatial spring, labels fade in on effects; icons stay in place
 because the expanded pill starts where the collapsed one did. In an [app shell](../app/) the rail is sticky at full

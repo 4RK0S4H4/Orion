@@ -211,7 +211,7 @@ function dialAudit(opts) {
   const shown = (el) => { const r = el.getBoundingClientRect(), cs = getComputedStyle(el); return r.width >= 8 && r.height >= 8 && cs.visibility !== 'hidden' && cs.display !== 'none' && +cs.opacity > 0 && !el.closest('[hidden], [inert], [data-s4-skip], svg'); };
   /* (a) corners: everything you click that is meant to follow the dial must not be a pill when the dial is not round */
   if (opts.dial) {
-    const FOLLOW = '.s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option, .s4-color-field-swatch, .s4-rating-star';
+    const FOLLOW = '.s4-menubar-item, .s4-doc-tab, .s4-statusbar-item, .s4-tree-row, .s4-button, .s4-icon-button, .s4-chip, .s4-tab, .s4-nav-item, .s4-nav-indicator, .s4-nav-pill, .s4-menu-item, .s4-pagination a, .s4-pagination button, .s4-pagination li, .s4-breadcrumbs a, .s4-breadcrumbs [aria-current], .s4-fab, .s4-segment, .s4-button-group > :not(.s4-button-group-ink), .s4-status, .s4-tooltip, .s4-list-item, .s4-tabs-indicator, .s4-select-option, .s4-color-field-swatch, .s4-rating-star';
     const EXEMPT = '.s4-badge, .s4-avatar, .s4-chip-avatar, .s4-switch *, .s4-radio *, .s4-checkbox *, .s4-slider *, .s4-progress *, .s4-date-picker-day, .s4-status-dot, .s4-chip-remove, [data-shape="circle"]';
     const seen = new Set();
     for (const el of document.querySelectorAll(FOLLOW)) {
@@ -815,6 +815,95 @@ async function use(page, add, phone) {
   left.forEach(add);
 }
 
+/* ---------- desktop anatomy by keyboard (issue 60): menu bar, submenus, tree, document tabs, context menus ---------- */
+async function desktopKeys(page, add) {
+  const ev = (fn, a) => page.evaluate(fn, a);
+  const openMenus = () => ev(() => [...document.querySelectorAll('.s4-menu')].filter((m) => m.matches(':popover-open') && !m._s4closing).map((m) => m.id));
+  const active = () => ev(() => { const a = document.activeElement; return { menubar: !!(a && a.closest && a.closest('.s4-menubar')), inMenu: !!(a && a.closest && a.closest('.s4-menu')), text: a ? (a.textContent || '').trim().slice(0, 30) : '', sub: !!(a && a.dataset && a.dataset.submenu) }; });
+  const settle = () => page.waitForTimeout(260);
+  const mod = await ev(() => (window.S4 && S4.desktop && /mac|ios/.test(S4.desktop.platform)) ? 'Meta' : 'Control');
+  /* menu bar */
+  if (await ev(() => [...document.querySelectorAll('.s4-menubar')].some((b) => b.getClientRects().length && b.querySelector('.s4-menubar-item')))) {
+    await ev(() => { if (document.activeElement) document.activeElement.blur(); });
+    await page.keyboard.press('F10'); await settle();
+    let a = await active();
+    if (!a.menubar) add('menu bar: F10 did not move focus to the bar');
+    else {
+      const first = a.text;
+      await page.keyboard.press('ArrowRight'); await settle(); a = await active();
+      if (!a.menubar || a.text === first) add('menu bar: Right did not move along the bar');
+      await page.keyboard.press('ArrowDown'); await settle();
+      const m1 = await openMenus(); a = await active();
+      if (!m1.length || !a.inMenu) add('menu bar: Down did not open a menu with focus in it');
+      if (!a.sub) { await page.keyboard.press('ArrowRight'); await settle(); const m2 = await openMenus(); if (!m2.length || m2.join() === m1.join()) add('menu bar: Right inside a menu did not move to the next menu'); }
+      await page.keyboard.press('Escape'); await settle(); a = await active();
+      if ((await openMenus()).length || !a.menubar) add('menu bar: Escape did not close the menu and return to the bar');
+      await page.keyboard.press('Escape'); await settle(); a = await active();
+      if (a.menubar) add('menu bar: Escape on the bar did not give focus back');
+    }
+    /* a submenu: Right opens it, Left closes it */
+    const sub = await ev(() => { for (const b of document.querySelectorAll('.s4-menubar-item')) { const m = document.getElementById(b.dataset.menu); if (m && m.querySelector('[data-submenu]') && b.getClientRects().length) { b.setAttribute('data-kt-sub', ''); return m.querySelector('[data-submenu]').textContent.trim(); } } return ''; });
+    if (sub) {
+      await page.click('[data-kt-sub]'); await settle();
+      const ok = await ev(() => { const it = [...document.querySelectorAll('.s4-menu:popover-open [data-submenu]')][0]; if (!it) return false; it.focus(); return true; });
+      if (ok) {
+        await page.keyboard.press('ArrowRight'); await settle();
+        const n = (await openMenus()).length; a = await active();
+        if (n < 2 || !a.inMenu || a.sub) add(`menu bar: Right on "${sub}" did not open its submenu`);
+        await page.keyboard.press('ArrowLeft'); await settle(); a = await active();
+        if ((await openMenus()).length !== 1 || !a.sub) add(`menu bar: Left did not close the submenu of "${sub}" and return to it`);
+      }
+      await page.keyboard.press('Escape'); await settle(); await page.keyboard.press('Escape'); await settle();
+      await ev(() => document.querySelectorAll('[data-kt-sub]').forEach((x) => x.removeAttribute('data-kt-sub')));
+    }
+  }
+  /* tree */
+  const hasTree = await ev(() => { const t = [...document.querySelectorAll('.s4-tree')].find((x) => x.getClientRects().length && x.querySelector('[role="treeitem"]')); if (!t) return false; t.setAttribute('data-kt-tree', ''); const it = t.querySelector('[role="treeitem"][tabindex="0"]'); if (!it) return 'none'; it.focus(); return true; });
+  if (hasTree === 'none') add('tree: no item is in the tab order');
+  else if (hasTree) {
+    const st = () => ev(() => { const a = document.activeElement; return { item: !!(a && a.matches('[role="treeitem"]')), label: a && a.querySelector ? (a.querySelector(':scope > .s4-tree-row .s4-tree-label') || {}).textContent : '', exp: a && a.getAttribute && a.getAttribute('aria-expanded') }; });
+    const s0 = await st();
+    await page.keyboard.press('ArrowDown'); await settle(); const s1 = await st();
+    if (!s1.item || s1.label === s0.label) add('tree: Down did not move to the next item');
+    await page.keyboard.press('Home'); await settle(); const s2 = await st();
+    if (!s2.item) add('tree: Home lost focus');
+    /* a closed folder opens with Right and closes with Left */
+    const folder = await ev(() => { const t = document.querySelector('[data-kt-tree]'); const f = [...t.querySelectorAll('[role="treeitem"][aria-expanded="false"]')].find((x) => x.getClientRects().length && !x.hasAttribute('data-lazy')); if (!f) return false; t.querySelectorAll('[role="treeitem"]').forEach((x) => { x.tabIndex = x === f ? 0 : -1; }); f.focus(); return true; });
+    if (folder) {
+      await page.keyboard.press('ArrowRight'); await page.waitForTimeout(450);
+      if ((await st()).exp !== 'true') add('tree: Right did not open a closed folder');
+      await page.keyboard.press('ArrowLeft'); await page.waitForTimeout(450);
+      if ((await st()).exp !== 'false') add('tree: Left did not close the open folder');
+    }
+    await ev(() => document.querySelectorAll('[data-kt-tree]').forEach((x) => x.removeAttribute('data-kt-tree')));
+  }
+  /* document tabs */
+  const dt = await ev(() => { const b = [...document.querySelectorAll('.s4-doc-tabs')].find((x) => x.getClientRects().length && x.querySelectorAll('.s4-doc-tab').length > 1); if (!b) return false; b.setAttribute('data-kt-tabs', ''); b.querySelector('.s4-doc-tab-label[aria-selected="true"]').focus(); return true; });
+  if (dt) {
+    const st = () => ev(() => { const b = document.querySelector('[data-kt-tabs]'); return { n: b.querySelectorAll('.s4-doc-tab').length, sel: (b.querySelector('.s4-doc-tab-label[aria-selected="true"]') || {}).textContent, focus: !!(document.activeElement && document.activeElement.matches('.s4-doc-tab-label')) }; });
+    const t0 = await st();
+    await page.keyboard.press('ArrowRight'); await settle(); const t1 = await st();
+    if (t1.sel === t0.sel || !t1.focus) add('document tabs: Right did not select the next tab');
+    await page.keyboard.press('Delete'); await settle(); const t2 = await st();
+    const kept = t2.n === t1.n;   /* an app may keep a tab open (its s4-close was cancelled) */
+    if (!kept) {
+      if (t2.n !== t1.n - 1 || !t2.focus) add('document tabs: Delete did not close the tab and keep focus in the row');
+      await page.keyboard.press(`${mod}+Shift+KeyT`); await settle(); const t3 = await st();
+      if (t3.n !== t1.n) add('document tabs: mod+Shift+T did not reopen the closed tab');
+    }
+    await ev(() => document.querySelectorAll('[data-kt-tabs]').forEach((x) => x.removeAttribute('data-kt-tabs')));
+    await page.keyboard.press('Escape');
+  }
+  /* a right-click menu from the keyboard */
+  const host = await ev(() => { const h = [...document.querySelectorAll('[data-context-menu]')].find((x) => x.getClientRects().length && (x.tabIndex >= 0 || x.matches('[role="treeitem"], [role="option"]')) && !x.closest('[hidden]')); if (!h) return false; h.focus(); return document.activeElement === h; });
+  if (host) {
+    await page.keyboard.press('Shift+F10'); await settle();
+    if (!(await openMenus()).length) add('context menu: Shift+F10 did not open the menu of the focused element');
+    await page.keyboard.press('Escape'); await settle();
+  }
+  await ev(() => { document.querySelectorAll('.s4-menu').forEach((m) => { if (m.matches(':popover-open') && window.S4 && S4.menu) S4.menu.close(m, false); }); if (document.activeElement) document.activeElement.blur(); });
+}
+
 /* ---------- run ---------- */
 /* ---------- script APIs that follow the page (decision 0060) ----------
    run once per page that has them: a seed's default variant, restore keeping a fixed brand, data-accent set by
@@ -913,6 +1002,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
     }
     await use(page, add, mode.phone);
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
+    if (!reduced && !mode.phone) await desktopKeys(page, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));
   } catch (e) { add('suite could not finish: ' + String(e.message).split('\n')[0].slice(0, 160)); }
   if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', label.replace(/[^\w.-]+/g, '_') + '.png') }).catch(() => {}); }
@@ -953,7 +1043,7 @@ const PRESETS = [
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];
 /* every template, the showcase in each of its views, and the component pages that hold controls and their containers */
-const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart'.split(' ');
+const DIAL_COMPONENTS = 'button button-group chip tabs menu dialog sheet snackbar toolbar nav-rail nav-bar text-field search list pagination breadcrumbs fab date-picker menubar doc-tabs statusbar tree desktop combobox tag-input number-field code-field upload time-field rating color-field password table filter code chart'.split(' ');
 const dialPages = ['demo/index.html', ...pages.filter((p) => p.startsWith('templates/') && p !== 'templates/index.html')   /* the templates hub sets its own theme */, ...DIAL_COMPONENTS.map((d) => `components/${d}/${d}.html`)].filter((p) => existsSync(join(root, p)) && (!ONLY || p.includes(ONLY)));
 
 /* the pressed shape must never be rounder than the resting one (decision 0055: the morph goes toward square) */

@@ -12,7 +12,7 @@ Everything flows one way. A change at one layer is picked up by every layer afte
 | 1. Tokens | `tokens/src/*.tokens.json` | Every value: color roles (from one seed), type, shape, spacing, sizes, layout widths, breakpoints, z-index, springs, glass. |
 | 2. Base | `components/base/` | Reset, focus ring, state layers, utilities (`.s4-stack`, `.s4-row`, `.s4-grid`, `.s4-num`, type classes), density. |
 | 3. Components | `components/<name>/` | 62 components, each with CSS, optional JS, a README and a reference page. |
-| 4. Layout | `components/app/`, `components/layout/`, `components/desktop/`, `components/site/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar, pane scrolling, shortcuts, context menus); for websites, the site shell and sections (a page that scrolls as a document, no app shell). |
+| 4. Layout | `components/app/`, `components/layout/`, `components/desktop/`, `components/site/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar and its variants, pane scrolling, shortcuts, context menus, the inspector, window states; with the menu bar, status bar, document tabs, tree and the command registry beside it, issue 60); for websites, the site shell and sections (a page that scrolls as a document, no app shell). |
 | 5. Glass and motion | `components/glass/`, `components/motion/` | The glass layer on chrome and overlays; the ten named motion patterns: pattern tokens in CSS and `S4.transition.*` in script (decision 0046; `npm run check:motion`). |
 | 6. Templates | `templates/` | Nineteen complete starters: one per kind of app, and four site pages (landing, pricing, blog, docs) plus a studio site. |
 | 7. Skill | `skill/s4-orion/` | Decision rules for Claude, generated references, the bundled assets and templates, the page checker. |
@@ -26,7 +26,15 @@ unlayered CSS always wins, so apps never need `!important` or edits to `orion.cs
 |---|---|---|
 | Phone and tablet | Nav bar at the bottom, one pane at a time, touch sizes, floating panels full width | Nothing: the default |
 | Desktop browser window | Side navigation (rows, expands from 1200), two panes, hover and focus states | Nothing; `data-density="auto"` for pointer sizes |
-| Desktop app (installed web app, Electron, Tauri) | The window never scrolls as a page, title bar, shortcuts, right-click menus, compact sizes | `data-window data-density="auto"` on `.s4-app`, `.s4-titlebar`; start from `desktop-app.html` |
+| Desktop app (installed web app, Electron, Tauri) | The window never scrolls as a page; title bar (with the menu bar or document tabs), the rail as a resizable source list, an inspector, a status bar; shortcuts, right-click menus and the palette from one list of commands; compact sizes; settings as a view, never a dialog | `data-window` on `.s4-app`, `data-density="auto"` on `<html>`, `.s4-titlebar`, `S4.commands`; start from `desktop-app.html`; a shell from `examples/` |
+
+**A desktop window's anatomy** (issue 60, `components/desktop/README.md`): title bar (`.s4-titlebar`, variants `tabs`
+and `unified`), menu bar (`.s4-menubar`, hidden on a Mac shell that draws the native menu), sidebar (the expanded
+`.s4-nav-rail` with folding sections, a `.s4-tree`, account and Settings, `data-resizable`), document tabs
+(`.s4-doc-tabs`), content (a resizable `.s4-split`), inspector (`.s4-inspector`), status bar (`.s4-statusbar`), palette.
+Every action is a command (`S4.commands.add`) and every menu is a named list of commands (`S4.commands.menu`), so the
+menu bar, right-click menus, shortcuts, buttons (`data-cmd`), the palette and a shell's native menu
+(`S4.commands.native`) never disagree. Each part steps out on a phone, where the same page is the touch app.
 
 Size follows the **pointer** (density), layout follows the **width** (window classes). They are separate on purpose: a
 touch laptop keeps touch sizes in a wide layout, a narrow desktop window keeps pointer sizes in a phone layout.
@@ -60,15 +68,20 @@ inside of `orion.js`) can change at any time.
   `data-layout`, `data-open`, `data-sticky`, `data-expand`, `data-menu`, `data-dialog`, `data-sheet`, `data-close`,
   `data-split-open`, `data-split-back`, `data-theme-mode`, `data-theme-contrast`, `data-theme-seed`, `data-glass`, `data-corners`, `data-gray`, `data-page`, `data-type-display`, `data-type-text`, `data-energy`, `data-accent`,
   `data-accent-variant`, `data-surfaces`, `data-buttons`, `data-cards`, `data-lists`, `data-rail`, `data-density="roomy"`,
-  `data-density`, `data-window`, `data-shortcut`, `data-context-menu`, `data-autofocus`, `data-placement`, `data-range-end`, …
+  `data-density`, `data-window`, `data-shortcut`, `data-context-menu`, `data-cmd`, `data-menus`, `data-item-menu`, `data-lazy`,
+  `data-modified`, `data-resizable` (splits and the rail), `data-resize-key`, `data-native-menu`, `data-shell`, `data-platform`,
+  `data-window-blurred`, `data-window-state`, `data-autofocus`, `data-placement`, `data-range-end`, …
 - **ARIA state** as the styling hook: `aria-pressed`, `aria-selected`, `aria-current`, `aria-expanded`, `aria-checked`.
 - **Tokens**: every `--md-sys-*` and `--s4-*` custom property in `tokens/tokens.css` (not `--_*`).
 - **Public knobs**: `--s4-content-max`, `--s4-gap`, `--s4-min`, `--s4-split-list`, `--s4-split-support`, `--s4-stat-min`,
-  `--s4-pane-padding`, `--s4-app-inset-bottom` (read only).
+  `--s4-pane-padding`, `--s4-app-inset-bottom` (read only), `--s4-nav-rail-expanded-width`, `--s4-inspector-width`, `--s4-tree-guides`.
 - **JavaScript**: `S4.theme(…)`, `S4.theme(options, element)` (a scoped theme), `S4.theme.restore(key, defaults)`, `S4.transition.energy(el)`, `S4.snackbar(…)`, `S4.app.go(app, view)`,
   `S4.split.open(split, on)`, `S4.transition.*`, `S4.motion.animate/spring/reduced`, `S4.icon.add/use/names`,
-  `S4.init(scope)`, `S4.register(name, fn)`, `S4.util.css/emit`, `S4.desktop.platform/format`.
-- **Events** (bubbling `CustomEvent`s): `s4-change`, `s4-select`, `s4-toggle`, `s4-open`, `s4-close`, `s4-theme`, `s4-context`, `s4-window`.
+  `S4.init(scope)`, `S4.register(name, fn)`, `S4.util.css/emit`, `S4.desktop.platform/format/matches/inspector`,
+  `S4.commands.add/remove/run/get/list/enabled/checked/menu/refresh/native/accelerator`, `S4.menubar.render/focus`,
+  `S4.docTabs.add/select/close/reopen/move/modified/tabs/current`, `S4.tree.render/load/select/open/rename/selected/cut/paste/reveal/focus`,
+  `S4.menu.open/close` (with submenus: `data-submenu`), `S4.palette.*`.
+- **Events** (bubbling `CustomEvent`s): `s4-change`, `s4-select`, `s4-toggle`, `s4-open`, `s4-close`, `s4-theme`, `s4-context`, `s4-window`, `s4-command`, `s4-commands`, `s4-reorder`, `s4-resize`, `s4-rename`, `s4-move`.
 - **Icon names** in `components/icons/names.json`.
 
 ## Versioning

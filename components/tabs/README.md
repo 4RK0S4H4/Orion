@@ -9,6 +9,11 @@ neutral indicator the nav bar and rail use, sliding from tab to tab; its label s
 thing is shown (Week / Month / Year on a chart, list or grid), it is a [button group](../button-group/). If it narrows a
 collection and there can be many, it is [chips](../chip/).
 
+**Tabs or document tabs?** These tabs are a fixed set of views of one thing, chosen by the app: they never close, never
+move and their set does not change. The open files or records of a desktop window, which the person opens, closes and
+reorders, are [document tabs](../doc-tabs/) (`.s4-doc-tabs`): each a filled pill with a close button and an
+unsaved-changes dot, no sliding indicator.
+
 ```html
 <div class="s4-tabs" role="tablist" aria-label="Bill">
   <button class="s4-tab" type="button" role="tab" id="tab-details" aria-controls="panel-details" aria-selected="true">Details</button>

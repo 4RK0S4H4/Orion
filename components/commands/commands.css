@@ -1,0 +1,18 @@
+/* Commands (issue 60): S4.commands has no look of its own; what it renders is the menu, the menu bar and the palette.
+   These are the few parts a command menu adds to the glass menu:
+     .s4-menu-item [data-slot]       an empty icon column, so labels line up when some items have icons
+     .s4-menu-item[data-check]       a check or radio item: its check mark shows only when aria-checked="true"
+     .s4-menu-item-sub               the chevron of an item that opens a submenu */
+@layer s4.components {
+  .s4-menu-item > .s4-icon[data-slot] { visibility: hidden; }
+  .s4-menu-item[data-check][aria-checked="true"] { background: transparent; }
+  .s4-menu-item[data-check][aria-checked="true"]:not([aria-disabled="true"]) { color: inherit; }
+  .s4-menu-item[data-check] > .s4-icon:first-child { opacity: 0; color: inherit; transition: opacity var(--s4-motion-state); }
+  .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { opacity: 1; }
+  .s4-menu-item[data-check][aria-checked="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  .s4-menu-item > .s4-menu-item-text { flex: 1 1 auto; min-inline-size: 0; }
+  .s4-menu-item > .s4-menu-item-sub { margin-inline-start: auto; --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-menu-item[aria-expanded="true"]::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  .s4-menu-item > .s4-kbd { background: transparent; padding-inline-end: 0; }
+  @media (forced-colors: active) { .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { forced-color-adjust: auto; } }
+}

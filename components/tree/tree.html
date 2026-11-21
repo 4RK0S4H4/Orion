@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tree View · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .tr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(var(--s4-space-16) * 4.5)), 1fr)); gap: var(--s4-space-6); }
+  .tr-side { padding: var(--s4-space-2); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .tr-narrow { max-inline-size: calc(var(--s4-space-16) * 4.5); }
+  .tr-out { margin: var(--s4-space-3) 0 0; color: var(--md-sys-color-on-surface-variant); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Tree View</h1></header>
+<main class="ex-main">
+  <p>Nested things you open and close: folders and files, chapters and scenes, regions and sites. Rows are small list rows: a filled selection, a hover that leans in from where the pointer came, corners from the dial. Use the arrow keys (Right opens, Left closes), Home and End, or type a name. F2 renames.</p>
+
+  <section class="ex-sec">
+    <h2>Files, Comfortable And Compact</h2>
+    <p>The same tree at touch size (48 rows, for a phone's file browser) and in compact density (28 rows, a desktop sidebar). Counts sit at the end; the guide lines show whose child a row is.</p>
+    <div class="tr-grid">
+      <div class="tr-side">
+        <ul class="s4-tree" aria-label="Project files" id="tr-a">
+          <li class="s4-tree-item" aria-expanded="true">
+            <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Quests</span><span class="s4-tree-trailing"><span class="s4-tree-count">412</span></span></div>
+            <ul role="group">
+              <li class="s4-tree-item" aria-expanded="true">
+                <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">The Lighthouse</span><span class="s4-tree-trailing"><span class="s4-tree-count">96</span></span></div>
+                <ul role="group">
+                  <li class="s4-tree-item" aria-selected="true"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">dialogue.json</span><span class="s4-tree-trailing"><span class="s4-badge">4</span></span></div></li>
+                  <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">journal.json</span></div></li>
+                </ul>
+              </li>
+              <li class="s4-tree-item" aria-expanded="false">
+                <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Salt Marsh</span><span class="s4-tree-trailing"><span class="s4-tree-count">71</span></span></div>
+                <ul role="group">
+                  <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">dialogue.json</span></div></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="s4-tree-item" aria-expanded="false">
+            <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Interface</span><span class="s4-tree-trailing"><span class="s4-tree-count">188</span></span></div>
+            <ul role="group">
+              <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">menus.json</span></div></li>
+              <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="document"></span><span class="s4-tree-label">tutorial.json</span></div></li>
+            </ul>
+          </li>
+          <li class="s4-tree-item"><div class="s4-tree-row"><span class="s4-icon" data-icon="book"></span><span class="s4-tree-label">glossary.csv</span></div></li>
+        </ul>
+      </div>
+      <div class="tr-side" data-density="compact">
+        <ul class="s4-tree" aria-label="Project files, compact" id="tr-b"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Several At Once, And Moving Them</h2>
+    <p>With <code>aria-multiselectable</code>: Shift-click or Shift with the arrows selects a range, Ctrl or ⌘-click adds one, Space adds the focused row. Drag rows onto a folder with a mouse, or press mod+X and then mod+V on the folder. Right-click for the same actions.</p>
+    <div class="tr-side tr-narrow" data-density="compact">
+      <ul class="s4-tree" aria-label="Photo library" aria-multiselectable="true" data-item-menu="tr-menu" id="tr-c"></ul>
+    </div>
+    <p class="tr-out" id="tr-c-out" aria-live="polite">Nothing moved yet.</p>
+    <div class="s4-menu" id="tr-menu" aria-label="Photo actions">
+      <button class="s4-menu-item" type="button" data-value="rename"><span class="s4-menu-item-text">Rename</span><kbd class="s4-kbd">F2</kbd></button>
+      <button class="s4-menu-item" type="button" data-value="cut"><span class="s4-menu-item-text">Cut</span><kbd class="s4-kbd" id="tr-k-cut"></kbd></button>
+      <button class="s4-menu-item" type="button" data-value="paste"><span class="s4-menu-item-text">Paste Into Folder</span><kbd class="s4-kbd" id="tr-k-paste"></kbd></button>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Children That Load, And Deep Paths</h2>
+    <p>A folder marked <code>data-lazy</code> asks the app for its children the first time it opens, with a quiet loading row meanwhile (this one takes a second; Archive fails once to show Retry). Past the fourth level each level steps in by half, so a deep path still fits a narrow sidebar.</p>
+    <div class="tr-side tr-narrow" data-density="compact">
+      <ul class="s4-tree" aria-label="Survey sites" id="tr-d"></ul>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/tree/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  var files = [
+    { label: 'Quests', icon: 'folder', count: 412, open: true, children: [
+      { label: 'The Lighthouse', icon: 'folder', count: 96, open: true, children: [{ label: 'dialogue.json', icon: 'document', badge: 4, selected: true }, { label: 'journal.json', icon: 'document' }] },
+      { label: 'Salt Marsh', icon: 'folder', count: 71, children: [{ label: 'dialogue.json', icon: 'document' }] }] },
+    { label: 'Interface', icon: 'folder', count: 188, children: [{ label: 'menus.json', icon: 'document' }, { label: 'tutorial.json', icon: 'document' }] },
+    { label: 'glossary.csv', icon: 'book' }];
+  S4.tree.render(document.getElementById('tr-b'), files);
+
+  var photos = document.getElementById('tr-c');
+  S4.tree.render(photos, [
+    { label: 'Hebrides, May', icon: 'folder', open: true, children: [{ label: 'puffins-cliff.jpg', icon: 'image' }, { label: 'machair-dawn.jpg', icon: 'image' }, { label: 'ferry-wake.jpg', icon: 'image' }, { label: 'gannet-dive.jpg', icon: 'image' }] },
+    { label: 'Best Of The Year', icon: 'folder', children: [] },
+    { label: 'To Sort', icon: 'folder', children: [{ label: 'IMG_2231.jpg', icon: 'image' }] }]);
+  var out = document.getElementById('tr-c-out');
+  photos.addEventListener('s4-move', function (e) { out.textContent = 'Moved ' + e.detail.items.length + ' into ' + e.detail.target.querySelector('.s4-tree-label').textContent + '.'; });
+  photos.addEventListener('s4-rename', function (e) { out.textContent = 'Renamed ' + e.detail.old + ' to ' + e.detail.value + '.'; });
+  document.getElementById('tr-k-cut').textContent = S4.desktop.format('mod+x');
+  document.getElementById('tr-k-paste').textContent = S4.desktop.format('mod+v');
+  document.getElementById('tr-menu').addEventListener('s4-select', function (e) {
+    var item = this.contextTarget, v = e.detail.item.dataset.value; if (!item) return;
+    if (v === 'rename') setTimeout(function () { S4.tree.rename(item); }, 50);
+    else if (v === 'cut') S4.tree.cut(S4.tree.selected(photos));
+    else if (v === 'paste') S4.tree.paste(item);
+  });
+
+  var sites = document.getElementById('tr-d'), failed = false;
+  S4.tree.render(sites, [
+    { label: 'Cairngorms', icon: 'location', open: true, children: [
+      { label: 'Glen Feshie', icon: 'location', open: true, children: [
+        { label: 'Upper Glen', icon: 'location', open: true, children: [
+          { label: 'Ruigh Aiteachain', icon: 'location', open: true, children: [
+            { label: 'Transect 4', icon: 'route', open: true, children: [{ label: 'Plot 4.2, juniper scrub regenerating', icon: 'document' }] }] }] }] },
+      { label: 'Abernethy', icon: 'location', lazy: true }] },
+    { label: 'Archive', icon: 'archive', lazy: true }]);
+  S4.tree.load(sites, function (item) {
+    var name = item.querySelector('.s4-tree-label').textContent;
+    return new Promise(function (ok, no) { setTimeout(function () {
+      if (name === 'Archive' && !failed) { failed = true; no(new Error('offline')); return; }
+      ok(name === 'Archive' ? [{ label: '2019 Survey', icon: 'folder', children: [] }, { label: '2020 Survey', icon: 'folder', children: [] }] : [{ label: 'Loch Garten', icon: 'location' }, { label: 'Forest Lodge', icon: 'location' }]);
+    }, 1000); });
+  });
+</script>
+</body>
+</html>

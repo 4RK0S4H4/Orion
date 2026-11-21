@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Commands · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .cm-out { margin: 0; padding: var(--s4-space-4); max-block-size: calc(var(--s4-space-16) * 4); overflow: auto; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .cm-list { display: flex; flex-direction: column; gap: var(--s4-space-1); margin: 0; padding: 0; list-style: none; inline-size: 100%; }
+  .cm-row { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Commands</h1></header>
+<main class="ex-main">
+  <p>One list of what an app can do, written once with <code>S4.commands.add</code>, and every way of doing it drawn from that list: the menu bar, menus, right-click menus, keyboard shortcuts, the command palette (<kbd class="s4-kbd" id="cm-k"></kbd>), buttons with <code>data-cmd</code>, and a desktop shell's native menu. A command knows its label, icon, shortcut, whether it can run now and whether it is on, so every place shows the same thing.</p>
+
+  <section class="ex-sec">
+    <h2>Four Places, One Command</h2>
+    <p>Pin is a check command, Archive is off until a row is picked. Try the buttons, a row's right-click menu, the palette or <kbd class="s4-kbd" id="cm-k2"></kbd>: they all run the same thing and stay in step.</p>
+    <div class="ex-board col">
+      <div class="s4-row">
+        <button class="s4-button" data-variant="tonal" type="button" data-cmd="cm.pin"><span class="s4-icon" data-icon="star"></span>Pin<kbd class="s4-kbd"></kbd></button>
+        <button class="s4-button" data-variant="tonal" type="button" data-cmd="cm.archive"><span class="s4-icon" data-icon="archive"></span>Archive<kbd class="s4-kbd"></kbd></button>
+      </div>
+      <ul class="cm-list" aria-label="Harbour notices">
+        <li class="cm-row" tabindex="0" data-context-menu="cm-row-menu" data-name="Pontoon B closed for repairs">Pontoon B closed for repairs <span class="s4-status" id="cm-s0">Open</span></li>
+        <li class="cm-row" tabindex="0" data-context-menu="cm-row-menu" data-name="Fuel berth hours change on Monday">Fuel berth hours change on Monday <span class="s4-status" id="cm-s1">Open</span></li>
+      </ul>
+      <p id="cm-out" class="s4-body-medium s4-on-surface-variant" aria-live="polite" style="margin:0">Pick a notice with a right-click, or press a button.</p>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>The Same Menu For A Shell</h2>
+    <p><code>S4.commands.native('row')</code> gives the menu as plain data with Electron-style accelerators, for a desktop shell to draw its own native menu from. It is rebuilt here whenever a command changes (<code>s4-commands</code>).</p>
+    <pre class="cm-out" id="cm-native"></pre>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/commands/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  document.getElementById('cm-k').textContent = S4.desktop.format('mod+k');
+  document.getElementById('cm-k2').textContent = S4.desktop.format('mod+shift+p');
+  var pinned = false, picked = null, out = document.getElementById('cm-out');
+  S4.commands.add([
+    { id: 'cm.pin', label: 'Pin To Top', group: 'Notices', icon: 'star', type: 'check', shortcut: 'mod+shift+p', checked: function () { return pinned; }, run: function () { pinned = !pinned; out.textContent = pinned ? 'Pinned to the top of the board.' : 'Unpinned.'; } },
+    { id: 'cm.archive', label: 'Archive Notice', group: 'Notices', icon: 'archive', shortcut: 'mod+e', enabled: function () { return !!picked; }, run: function (ctx) {
+      var row = (ctx && ctx.target) || picked; if (!row) return; var i = [].indexOf.call(row.parentElement.children, row);
+      document.getElementById('cm-s' + i).textContent = 'Archived'; out.textContent = 'Archived: ' + row.dataset.name + '.'; } },
+    { id: 'cm.copy', label: 'Copy Link', group: 'Notices', icon: 'link', run: function () { out.textContent = 'Link copied.'; } }
+  ]);
+  S4.commands.menu('cm-row-menu', ['cm.pin', '-', 'cm.copy', 'cm.archive']);
+  document.getElementById('cm-row-menu').addEventListener('s4-context', function (e) { picked = e.detail.target; S4.commands.refresh(); });
+  function show() { document.getElementById('cm-native').textContent = JSON.stringify(S4.commands.native('cm-row-menu'), null, 2); }
+  document.addEventListener('s4-commands', show); show();
+</script>
+</body>
+</html>

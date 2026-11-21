@@ -22,7 +22,7 @@ S4.palette.register([
 
 | Where commands come from | How |
 |---|---|
-| The app's own | `S4.palette.register([{ label, group, icon, shortcut, keywords, run }])` |
+| The app's own | its [commands](../commands/) (`S4.commands.add`), the same list that feeds the menu bar, menus and shortcuts; `palette: false` keeps one out, disabled ones are left out. `S4.palette.register([{ label, group, icon, shortcut, keywords, run }])` adds to the same list |
 | Buttons and links on the page | `data-command="Label"` (optional `data-command-group`, `data-command-keywords`); running it clicks the element; its `data-shortcut` is shown |
 | The navigation | every destination appears as "Go To …" |
 | Appearance | "Switch To Dark Mode" / "Light Mode" (turn off with `S4.palette.theme = false`) |

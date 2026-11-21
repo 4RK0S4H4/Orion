@@ -1,0 +1,170 @@
+/* Tree view (issue 60): nested things you open and close. A file tree in a sidebar, chapters in an editor, groups of
+   records. Rows are the list's rows made small: filled selection (secondary-container), the hover box that leans in
+   from where the pointer came (Edges Lean, decision 0044), corners from the dial (decision 0055), nothing outlined.
+   <ul class="s4-tree" role="tree" aria-label="Files">
+     <li class="s4-tree-item" aria-expanded="true">
+       <div class="s4-tree-row"><span class="s4-icon" data-icon="folder"></span><span class="s4-tree-label">Quests</span>
+         <span class="s4-tree-trailing"><span class="s4-tree-count">48</span></span></div>
+       <ul role="group">…</ul></li>
+   </ul>
+   Each level steps in by --s4-size-tree-indent (20, compact 14); past the fourth level only by half, so a deep path
+   still fits a narrow sidebar, and a faint guide line runs down each open folder so you can see whose child a row is.
+   Labels wrap instead of being cut. Rows are touch sized by default (48) and 28 in compact density. Opening a folder is
+   Reveal; the chevron turns (Bend). Public knob: --s4-tree-guides (set to transparent to drop the guide lines). */
+@layer s4.components {
+  .s4-tree {
+    --_row: var(--s4-size-tree-row);
+    --_step: var(--s4-size-tree-indent);
+    --_pad: var(--s4-space-2);
+    --_toggle: var(--s4-size-icon-small);
+    --s4-tree-cycle: 1200ms;
+    display: block;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    line-height: var(--md-sys-typescale-label-large-line-height);
+    letter-spacing: var(--md-sys-typescale-label-large-tracking);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .s4-tree [role="group"] { position: relative; margin: 0; padding: 0; list-style: none; }
+  .s4-tree-item { --_depth: 0; display: block; margin: 0; padding: 0; outline: none; }
+  .s4-tree-item + .s4-tree-item { margin-block-start: calc(var(--s4-space-1) / 4); }
+
+  /* depth: full steps for four levels, half steps after that */
+  .s4-tree-row {
+    --_indent: calc(min(var(--_depth), 4) * var(--_step) + max(var(--_depth) - 4, 0) * var(--_step) / 2);
+    --_h: var(--_row);
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: var(--s4-space-2);
+    min-block-size: var(--_row);
+    padding-block: calc(var(--s4-space-1) / 2);
+    padding-inline: calc(var(--_pad) + var(--_indent)) var(--s4-space-3);
+    border-radius: min(calc(var(--_h) / 2), var(--s4-shape-control));
+    color: var(--md-sys-color-on-surface);
+    cursor: default;
+    -webkit-tap-highlight-color: transparent;
+    --s4-icon-size: var(--s4-size-icon-small);
+    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  .s4-tree-row > .s4-icon { flex: none; color: var(--md-sys-color-on-surface-variant); }
+  .s4-tree-label { flex: 1 1 auto; min-inline-size: 0; overflow-wrap: anywhere; }
+  .s4-tree-trailing { display: inline-flex; flex: none; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  .s4-tree-count {
+    color: var(--md-sys-color-on-surface-variant);
+    font-family: var(--md-sys-typescale-label-medium-font);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the open / close chevron (leaves keep the same space, so labels line up) */
+  .s4-tree-toggle {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    inline-size: var(--_toggle);
+    block-size: var(--_toggle);
+    margin-inline-end: calc(var(--s4-space-1) * -1);
+    color: var(--md-sys-color-on-surface-variant);
+    --s4-icon-size: var(--s4-size-icon-small);
+    transition: transform var(--s4-motion-bend);
+  }
+  .s4-tree-item[aria-expanded="true"]:not([data-closing]) > .s4-tree-row > .s4-tree-toggle { transform: rotate(90deg); }
+  .s4-tree-item[aria-expanded="true"]:not([data-closing]) > .s4-tree-row > .s4-tree-toggle:dir(rtl) { transform: rotate(-90deg); }
+
+  /* hover: its own box, leaning in from where the pointer came (decision 0044); never a travelling highlight */
+  .s4-tree-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: currentColor;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.985, 0.84);
+    transform-origin: 50% var(--_lean, 50%);
+    transition: opacity var(--s4-motion-state), transform var(--s4-motion-ink);
+  }
+  @media (hover: hover) {
+    .s4-tree-row:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); transform: none; }
+  }
+  .s4-tree-row:active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); transform: none; }
+
+  /* selected: filled, like every selection; in a window that is not in front it turns neutral (desktop.css) */
+  .s4-tree-item[aria-selected="true"] > .s4-tree-row {
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+  }
+  .s4-tree-item[aria-selected="true"] > .s4-tree-row :is(.s4-icon, .s4-tree-toggle, .s4-tree-count) { color: inherit; }
+  .s4-tree-item:focus-visible > .s4-tree-row { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+
+  /* guide lines: a hairline down each open folder, under its chevron */
+  .s4-tree [role="group"]::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: calc(var(--_pad) + min(var(--_depth), 4) * var(--_step) + max(var(--_depth) - 4, 0) * var(--_step) / 2 + var(--_toggle) / 2);
+    inline-size: 1px;
+    background: var(--s4-tree-guides, var(--md-sys-color-outline-variant));
+    pointer-events: none;
+  }
+  .s4-tree:not(:hover, :focus-within) [role="group"]::before { opacity: 0.6; }
+
+  /* moving: what you carry dims; the folder under it fills */
+  .s4-tree-item[data-cut] > .s4-tree-row,
+  .s4-tree-item[data-dragging] > .s4-tree-row { opacity: 0.55; }
+  .s4-tree-row[data-drop] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .s4-tree-row[data-drop] :is(.s4-icon, .s4-tree-toggle) { color: inherit; }
+
+  /* loading children: a quiet row while they come */
+  .s4-tree-loading > .s4-tree-row { color: var(--md-sys-color-on-surface-variant); }
+  .s4-tree-loading > .s4-tree-row::before { content: none; }
+  .s4-tree-spinner {
+    flex: none;
+    inline-size: var(--s4-space-2);
+    block-size: var(--s4-space-2);
+    margin-inline: calc((var(--s4-size-icon-small) - var(--s4-space-2)) / 2);
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary);
+    animation: s4-tree-pulse var(--s4-tree-cycle) ease-in-out infinite;
+  }
+  @keyframes s4-tree-pulse { 50% { opacity: 0.25; } }
+  @media (prefers-reduced-motion: reduce) { .s4-tree-spinner { animation: none; } }
+  :root[data-motion="reduced"] .s4-tree-spinner { animation: none; }
+
+  /* rename: a small field in place of the label */
+  .s4-tree-rename {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    block-size: calc(var(--_row) - var(--s4-space-2));
+    min-block-size: var(--s4-space-6);
+    margin: 0;
+    padding: 0 var(--s4-space-2);
+    border: 0;
+    border-radius: var(--md-sys-shape-corner-small);
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+    font: inherit;
+    letter-spacing: inherit;
+    outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
+    outline-offset: 0;
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  @media (forced-colors: active) {
+    .s4-tree-item[aria-selected="true"] > .s4-tree-row { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+    .s4-tree-row[data-drop] { outline: 2px solid Highlight; }
+    .s4-tree [role="group"]::before { background: GrayText; }
+  }
+}

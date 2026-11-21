@@ -26,6 +26,9 @@
     --s4-size-toolbar: var(--s4-density-compact-toolbar);
     --s4-size-avatar: var(--s4-density-compact-avatar);
     --s4-size-icon: var(--s4-density-compact-icon);
+    --s4-size-doc-tab: var(--s4-density-compact-doc-tab);
+    --s4-size-tree-row: var(--s4-density-compact-tree-row);
+    --s4-size-tree-indent: var(--s4-density-compact-tree-indent);
     --s4-layout-margin: var(--s4-density-compact-layout-margin);
     --s4-layout-gap: var(--s4-density-compact-layout-gap);
     --md-sys-typescale-body-large-size: var(--md-sys-typescale-body-medium-size);
@@ -56,6 +59,9 @@
       --s4-size-toolbar: var(--s4-density-compact-toolbar);
       --s4-size-avatar: var(--s4-density-compact-avatar);
       --s4-size-icon: var(--s4-density-compact-icon);
+      --s4-size-doc-tab: var(--s4-density-compact-doc-tab);
+      --s4-size-tree-row: var(--s4-density-compact-tree-row);
+      --s4-size-tree-indent: var(--s4-density-compact-tree-indent);
       --s4-layout-margin: var(--s4-density-compact-layout-margin);
       --s4-layout-gap: var(--s4-density-compact-layout-gap);
       --md-sys-typescale-body-large-size: var(--md-sys-typescale-body-medium-size);

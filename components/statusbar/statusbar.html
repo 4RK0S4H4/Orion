@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Status Bar · S4 Orion</title>
+<link rel="stylesheet" href="../index.css">
+<link rel="stylesheet" href="../_example/example.css">
+<style>
+  .sb-window { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .sb-doc { padding: var(--s4-space-6); min-block-size: calc(var(--s4-space-16) * 1.5); color: var(--md-sys-color-on-surface-variant); }
+  .sb-doc p { margin: 0; max-inline-size: 60ch; }
+</style>
+</head>
+<body>
+<header class="ex-bar"><h1><a href="../">Components</a> / Status Bar</h1></header>
+<main class="ex-main">
+  <p>A slim solid bar along the bottom of a desktop window for the state of things: is it saved and synced, what is selected, where the cursor is, the zoom, the connection. Quiet chrome: small type, no fills at rest. A segment you can click is a button that opens a menu or a panel, and what it opens is always reachable another way too. In a window it shows from 840 wide.</p>
+
+  <section class="ex-sec">
+    <h2>An Editor's Status</h2>
+    <p>Sync and the cursor's line on the left; the language, the zoom and the connection on the right. The zoom opens a menu, the language runs a command. Select some text to see the count change (it is announced politely).</p>
+    <div class="sb-window" data-density="compact">
+      <div class="sb-doc" id="sb-doc"><p>Long before the lamp was lit, the keeper wrote down every ship that passed the point: their names, their flags, the hour the tide turned under them. Select a few words of this.</p></div>
+      <footer class="s4-statusbar" aria-label="Status">
+        <span class="s4-statusbar-item"><span class="s4-statusbar-dot" data-tone="success"></span>Saved</span>
+        <span class="s4-statusbar-item"><span class="s4-icon" data-icon="refresh"></span>Synced 2 min ago</span>
+        <span class="s4-statusbar-item s4-num">Ln 12, Col 48</span>
+        <span class="s4-statusbar-item" role="status" aria-live="polite" id="sb-sel">Nothing selected</span>
+        <span class="s4-statusbar-spacer"></span>
+        <button class="s4-statusbar-item" type="button" data-cmd="sb.lang"><span class="s4-icon" data-icon="globe"></span>English (UK)</button>
+        <button class="s4-statusbar-item" type="button" data-menu="sb-zoom" id="sb-zoom-b">100%</button>
+        <span class="s4-statusbar-item"><span class="s4-statusbar-dot" data-tone="info"></span>Online</span>
+      </footer>
+    </div>
+    <div class="s4-menu" id="sb-zoom" aria-label="Zoom" data-align="end">
+      <button class="s4-menu-item" type="button" role="menuitemradio" aria-checked="false" data-value="90%">90%</button>
+      <button class="s4-menu-item" type="button" role="menuitemradio" aria-checked="true" data-value="100%">100%</button>
+      <button class="s4-menu-item" type="button" role="menuitemradio" aria-checked="false" data-value="125%">125%</button>
+    </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Trouble</h2>
+    <p>A segment with <code>data-tone="error"</code> says what went wrong in words; its button opens what fixes it.</p>
+    <div class="sb-window" data-density="compact">
+      <footer class="s4-statusbar" aria-label="Status, offline">
+        <span class="s4-statusbar-item" data-tone="error"><span class="s4-statusbar-dot" data-tone="error"></span>Offline: 3 changes waiting</span>
+        <button class="s4-statusbar-item" type="button" id="sb-retry"><span class="s4-icon" data-icon="refresh"></span>Try Again</button>
+        <span class="s4-statusbar-spacer"></span>
+        <span class="s4-statusbar-item">4 of 96 lines need review</span>
+      </footer>
+    </div>
+  </section>
+
+  <p class="ex-foot">Source: <code>components/statusbar/</code></p>
+</main>
+<script src="../assets/icons.js"></script>
+<script src="../orion.js"></script>
+<script src="../_example/example.js"></script>
+<script>
+  S4.commands.add({ id: 'sb.lang', label: 'Change Spelling Language', group: 'Edit', icon: 'globe', run: function () { S4.snackbar({ text: 'Spelling language: English (UK)' }); } });
+  document.getElementById('sb-zoom').addEventListener('s4-select', function (e) { document.getElementById('sb-zoom-b').textContent = e.detail.value; });
+  document.getElementById('sb-retry').addEventListener('click', function () { S4.snackbar({ text: 'Still offline. Changes are kept on this computer.' }); });
+  document.addEventListener('selectionchange', function () {
+    var s = String(window.getSelection() || '').trim(), words = s ? s.split(/\s+/).length : 0;
+    document.getElementById('sb-sel').textContent = words ? words + (words === 1 ? ' word' : ' words') + ' selected' : 'Nothing selected';
+  });
+</script>
+</body>
+</html>
