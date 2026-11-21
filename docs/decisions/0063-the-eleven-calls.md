@@ -69,7 +69,9 @@ always shows in full. Amends 0044 inside tables only.
 0060 rule (raised only as far as the label needs, per mode); monochrome `tertiary-container` rises to 0.99 in light
 mode, everything else keeps 90%. `core.js` writes the same per color for every seed. `check-glass` proves every
 monochrome label at 4.5:1 at its own tint and the vibrant toolbar for 192 seeded schemes; the suite's vibrant-toolbar
-exemption is removed.
+exemption is removed. Removing it showed one pair no check covered: a tonal button on the vibrant toolbar kept the
+selection fill under the bar's text color (3.97:1 with a muted seed in dark mode); it is now the accent pair, the bar's
+strong action. The page checker skips brand files as it skips `orion.css` (they are generated scheme, not app CSS).
 
 **Dense maps (5).** `data-dense` on a map of real things (seats, keys, calendar cells): the suite's phone pass asks
 each target to be drawn at least 18px and 24px from its nearest neighbour's centre, instead of a 24px box. The Velvet's
@@ -102,5 +104,6 @@ in a `custom` stack.
 
 ## Not done here
 - Boat and mountain icons (Solar has none); a non-menu anchored popover; a compact row-height token for data tables.
-- `docs/foundations/` placement docs, dialogs, sheets, glass, the nav and top app bars belong to the parallel round
-  (round57/calm) and were not touched.
+- Dialogs, sheets, glass, the nav and top app bars were the parallel round's ([0064](0064-calm-dialogs-docked-glass.md),
+  merged with this one). The two agree: 0063 adds no dialog (the board adds cards in place), the calmer selection and
+  the per-color FAB tints sit beside 0064's modal glass tint and docked hairline without touching them.
