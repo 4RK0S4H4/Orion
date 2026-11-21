@@ -22,6 +22,7 @@ Round 0057: the eleven calls (decision 0063, the owner handed us the lead):
 - Changed: the selection a seed writes is never more colorful than the tonal palette for its hue (dark mode: secondary tone 25), so vivid accents select quietly.
 - Changed: `core.js`'s color engine is a pure block (`colorKit`) shared with `brand.mjs`.
 - Fixed: Parley's phone title bar showed a search button right above its filter field.
+- Fixed: a tonal button on the vibrant toolbar kept the selection fill with the toolbar's text color (3.97:1 with a muted seed in dark mode, hidden by the old exemption); it is now the accent pair, the bar's strong action.
 - Docs: how an app ships its own face (one `@font-face`, `font-display: swap`, first in `custom`); two trailing statuses in a list row.
 
 Round 0057: calm dialogs and docked glass (decision 0064, the owner's notes, issues 67 and 68):

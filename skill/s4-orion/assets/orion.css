@@ -4105,8 +4105,15 @@
     --s4-glass-tint-opacity-fab-color: var(--s4-glass-tint-opacity-toolbar-vibrant);   /* decision 0063: its glass tint rises only as far as its labels need */
   }
   /* standard icon buttons and text buttons take the toolbar's content color (on vibrant they'd otherwise vanish) */
-  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-icon-button[data-variant="tonal"], .s4-button[data-variant="text"], .s4-button[data-variant="tonal"]):not(:disabled, [aria-disabled="true"]) {
+  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button:not([data-variant]), .s4-button[data-variant="text"]):not(:disabled, [aria-disabled="true"]) {
     color: var(--md-sys-color-on-primary-container);
+  }
+  /* decision 0063: a tonal button on the vibrant toolbar is its strong action, drawn as the accent pair (on-primary on
+     primary, proven 4.5:1 for every seed). It used to keep the selection fill with the toolbar's text color, a pair no
+     check covered (3.97:1 with a muted seed in dark mode once the exemption was gone). */
+  .s4-toolbar[data-color="vibrant"] > :is(.s4-icon-button[data-variant="tonal"], .s4-button[data-variant="tonal"]):not(:disabled, [aria-disabled="true"]) {
+    --_bg: var(--md-sys-color-primary);
+    --_fg: var(--md-sys-color-on-primary);
   }
 
   .s4-toolbar[data-orientation="vertical"] {
