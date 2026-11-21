@@ -146,6 +146,18 @@
     padding-inline-end: 0;
   }
   .s4-table :is(th, td)[data-check] input { margin: 0; }
+  /* Decision 0063 (amends 0044 inside tables): a column of empty boxes was louder than the data. A resting row's empty
+     box is a quiet dot, half the size, in the same 3:1 control color (so it still reads as a control and keeps 1.4.11);
+     it grows into the full box when its row is hovered or holds the focus, and every box shows in full while anything
+     is selected (selection mode). The Select All box in the head always shows in full. Transform only (Ink). */
+  .s4-table tbody [data-check] .s4-checkbox:not(:has(> input:is(:checked, :indeterminate))) .s4-checkbox-box { transform: scale(0.5); }
+  .s4-table tbody tr:focus-within [data-check] .s4-checkbox .s4-checkbox-box,
+  .s4-table:has(tbody [data-check] input:checked) tbody [data-check] .s4-checkbox .s4-checkbox-box { transform: none; }
+  @media (hover: hover) {
+    .s4-table tbody tr:hover [data-check] .s4-checkbox .s4-checkbox-box { transform: none; }
+    .s4-table tbody [data-check] .s4-checkbox:hover:not(:has(> input:disabled)) .s4-checkbox-box { transform: scale(1.1); }
+  }
+  .s4-table tbody [data-check] .s4-checkbox:active:not(:has(> input:disabled)) .s4-checkbox-box { transform: scale(0.9); }
   .s4-table tbody tr:has(> [data-check] input:checked) {
     background: var(--md-sys-color-secondary-container);
     color: var(--md-sys-color-on-secondary-container);
