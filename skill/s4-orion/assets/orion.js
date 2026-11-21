@@ -5520,6 +5520,18 @@ S4.register('month', function (scope) {
 S4.register('site', function (scope) {
   var wide = window.matchMedia('(width >= 840px)');
 
+  /* ---------- tables on the site bundle (decision 0066) ----------
+     The site runtime leaves table.js out; a site table still needs its column names on each cell to stack on a
+     phone. Only when table.js is absent, and a cell's own data-label always wins. */
+  if (!S4.table) S4.util.all(scope, 'table.s4-table').forEach(function (t) {
+    var heads = S4.util.all(t, 'thead th').map(function (th) { return th.textContent.trim(); });
+    S4.util.all(t, 'tbody tr, tfoot tr').forEach(function (tr) {
+      Array.prototype.forEach.call(tr.cells, function (td, i) { if (heads[i] && !td.hasAttribute('data-label')) td.setAttribute('data-label', heads[i]); });
+    });
+    var p = t.querySelector('thead th[data-primary]');
+    if (p) S4.util.all(t, 'tbody tr').forEach(function (tr) { var c = tr.cells[p.cellIndex]; if (c) c.setAttribute('data-primary', ''); });
+  });
+
   /* ---------- a floating panel opened by a button ---------- */
   function panel(button, el) {
     if (!S4.util.once(button, 'sitepanel')) return;

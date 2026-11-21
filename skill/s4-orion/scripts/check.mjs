@@ -25,7 +25,7 @@ try { ({ chromium } = await import('playwright')); }
 catch { try { ({ chromium } = createRequire(resolve('x.js'))('playwright')); } catch { try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch {} } }
 if (!chromium) { console.error('Playwright is not installed: npm i -D playwright && npx playwright install chromium'); process.exit(2); }
 
-const SYSTEM_CSS = /(^|\/)orion(\.min)?\.css$/;
+const SYSTEM_CSS = /(^|\/)orion(\.site)?(\.min)?\.css$/;
 const SAFE_SELECTOR = /^(html|body|:root|\*|::?[a-z-]+|from|to|\d+(\.\d+)?%)$/;
 
 /* ---------------- static lint of the app's own CSS ---------------- */
