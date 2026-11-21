@@ -219,6 +219,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-space-10` | 40px |  |  |
 | `--s4-space-12` | 48px |  |  |
 | `--s4-space-16` | 64px |  |  |
+| `--s4-space-hairline` | 2px |  | Decision 0060: the 2dp gap, half a grid step: the seam between joined or paired shapes (paired bars, segmented bars, keys on a drawn keyboard), a hairline inset. Never a layout gap. |
 
 ## Sizes
 

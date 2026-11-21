@@ -19,6 +19,12 @@
     --s4-chart-4: #eda100;
     --s4-chart-5: #e87ba4;
     --s4-chart-6: #008300;
+    --s4-category-1: var(--s4-chart-1);
+    --s4-category-2: var(--s4-chart-2);
+    --s4-category-3: var(--s4-chart-3);
+    --s4-category-4: var(--s4-chart-4);
+    --s4-category-5: var(--s4-chart-5);
+    --s4-category-6: var(--s4-chart-6);
     --s4-glass-tint-float: var(--md-sys-color-surface-container);
     --s4-glass-tint-fill: var(--md-sys-color-surface-container-highest);
     --s4-glass-tint-opacity-float: 0.75;
@@ -161,6 +167,7 @@
     --s4-space-10: 40px;
     --s4-space-12: 48px;
     --s4-space-16: 64px;
+    --s4-space-hairline: 2px;
     --s4-size-touch-target: 48px;
     --s4-size-icon: 24px;
     --s4-size-icon-small: 20px;
@@ -727,6 +734,12 @@
     --s4-glass-tint-fill: #e2e2e2;
   }
   :where([data-theme]:not(:root), [data-gray]:not(:root), [data-accent]:not(:root)) {
+    --s4-category-1: var(--s4-chart-1);
+    --s4-category-2: var(--s4-chart-2);
+    --s4-category-3: var(--s4-chart-3);
+    --s4-category-4: var(--s4-chart-4);
+    --s4-category-5: var(--s4-chart-5);
+    --s4-category-6: var(--s4-chart-6);
     --s4-focus-ring-color: var(--md-sys-color-secondary);
   }
   :where([data-gray]:not(:root), [data-accent]:not(:root)) {
@@ -2046,11 +2059,15 @@
 
      data-corners="round | soft | firm"       what you click: pills (default), 14, 10. Never sharp (the soft range).
                                               A custom value: --s4-shape-control on :root, 10px or more.
-     data-type-display="serif | rounded | mono | system | custom"   the display face (display, headline, title-large)
-     data-type-text="serif | rounded | mono | system | custom"      the text face (title, body, label)
+     data-type-display="serif | rounded | mono | system | geometric | humanist | custom"   the display face (display, headline, title-large)
+     data-type-text="serif | rounded | mono | system | geometric | humanist | custom"      the text face (title, body, label)
                                               custom: also set --md-ref-typeface-brand / --md-ref-typeface-plain.
                                               Inter's letter spacing is dropped for any other face; set your own
                                               --md-sys-typescale-<role>-tracking if the face needs it.
+                                              Every preset is a system stack (nothing is downloaded), with fallbacks
+                                              on Windows, Android and Linux, so it degrades to a near face, not Inter.
+     data-type-display-weight="medium | regular"   the weight of the display face's roles (default semibold, 600): a
+                                              Didone, a book serif or a geometric face is drawn lighter than Inter.
      data-page="soft"                         page tone: white cards on a soft gray page (light mode; dark already
                                               has cards lighter than the page)
      data-gray="warm | cool"                  gray temperature: see gray.css (generated)
@@ -2076,16 +2093,54 @@
   }
 
   /* ---------- typefaces ---------- */
+  /* the stacks: Apple's own face first, then what Windows (and Office), Android and Linux ship that is closest to it.
+     rounded: SF Rounded; Hiragino Maru Gothic on a Mac outside Safari; Nunito, Quicksand or Comfortaa where installed;
+     Arial Rounded (display only: it has one weight, bold); Calibri, whose ends are rounded, on Windows.
+     geometric: Futura (Apple); Century Gothic (Windows with Office); URW Gothic (Linux); Avenir Next; Corbel.
+     humanist: Seravek and Gill Sans (Apple); Gill Sans MT, Calibri and Candara (Windows); Ubuntu; Noto Sans (Android). */
   :where([data-type-display="serif"]) { --md-ref-typeface-brand: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where([data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-display="rounded"]) { --md-ref-typeface-brand: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Nunito, Quicksand, Comfortaa, "Arial Rounded MT", "Arial Rounded MT Bold", Calibri, system-ui, sans-serif; }
   :where([data-type-display="mono"]) { --md-ref-typeface-brand: var(--md-ref-typeface-mono); }
   :where([data-type-display="system"]) { --md-ref-typeface-brand: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-display="geometric"]) { --md-ref-typeface-brand: Futura, "Futura PT", "Century Gothic", "URW Gothic", "URW Gothic L", "Avenir Next", Avenir, Corbel, system-ui, sans-serif; }
+  :where([data-type-display="humanist"]) { --md-ref-typeface-brand: Seravek, "Gill Sans Nova", "Gill Sans", "Gill Sans MT", Calibri, Candara, Ubuntu, "Noto Sans", system-ui, sans-serif; }
   :where([data-type-text="serif"]) { --md-ref-typeface-plain: ui-serif, "New York", "Iowan Old Style", Georgia, "Times New Roman", serif; }
-  :where([data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  :where([data-type-text="rounded"]) { --md-ref-typeface-plain: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Nunito, Quicksand, Comfortaa, Calibri, system-ui, sans-serif; }
   :where([data-type-text="mono"]) { --md-ref-typeface-plain: var(--md-ref-typeface-mono); }
   :where([data-type-text="system"]) { --md-ref-typeface-plain: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  :where([data-type-text="geometric"]) { --md-ref-typeface-plain: "Avenir Next", Avenir, "Century Gothic", "URW Gothic", "URW Gothic L", Futura, Corbel, system-ui, sans-serif; }
+  :where([data-type-text="humanist"]) { --md-ref-typeface-plain: Seravek, "Gill Sans Nova", "Gill Sans", "Gill Sans MT", Calibri, Candara, Ubuntu, "Noto Sans", system-ui, sans-serif; }
+  /* display weight: every role on the display face (display, headline, title-large) one or two steps lighter; its
+     emphasized roles stay a step above it */
+  :where([data-type-display-weight="medium"]) {
+    --md-sys-typescale-display-large-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-display-medium-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-display-small-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-large-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-medium-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-headline-small-weight: var(--md-ref-typeface-weight-medium);
+    --md-sys-typescale-title-large-weight: var(--md-ref-typeface-weight-medium);
+  }
+  :where([data-type-display-weight="regular"]) {
+    --md-sys-typescale-display-large-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-display-medium-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-display-small-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-large-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-medium-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-headline-small-weight: var(--md-ref-typeface-weight-regular);
+    --md-sys-typescale-title-large-weight: var(--md-ref-typeface-weight-regular);
+  }
+  :where(:is([data-type-display-weight="medium"], [data-type-display-weight="regular"])) {
+    --md-sys-typescale-emphasized-display-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-display-medium-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-display-small-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-medium-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-headline-small-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+    --md-sys-typescale-emphasized-title-large-weight: calc(var(--md-ref-typeface-weight-medium) + 100);
+  }
   /* the letter spacing in the tokens is tuned for Inter (and suits the system face); any other face starts from its own */
-  :where(:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="custom"])) {
+  :where(:is([data-type-display="serif"], [data-type-display="rounded"], [data-type-display="mono"], [data-type-display="geometric"], [data-type-display="humanist"], [data-type-display="custom"])) {
     --md-sys-typescale-display-large-tracking: 0px;
     --md-sys-typescale-display-medium-tracking: 0px;
     --md-sys-typescale-display-small-tracking: 0px;
@@ -2094,7 +2149,7 @@
     --md-sys-typescale-headline-small-tracking: 0px;
     --md-sys-typescale-title-large-tracking: 0px;
   }
-  :where(:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="custom"])) {
+  :where(:is([data-type-text="serif"], [data-type-text="rounded"], [data-type-text="mono"], [data-type-text="geometric"], [data-type-text="humanist"], [data-type-text="custom"])) {
     --md-sys-typescale-title-medium-tracking: 0px;
     --md-sys-typescale-title-small-tracking: 0px;
     --md-sys-typescale-body-large-tracking: 0px;
@@ -2684,7 +2739,7 @@
     --_track: var(--md-sys-typescale-title-medium-tracking);
     --_weight: var(--md-sys-typescale-title-medium-weight);
     --_bg: var(--md-sys-color-primary-container);
-    --_fg: var(--md-sys-color-on-primary-container);
+    --_fg: var(--s4-color-on-fab, var(--md-sys-color-on-primary-container));   /* with a seed, core.js may pick white or the accent's darkest tone so the glass stays (decision 0060) */
     --_elevation: var(--md-sys-elevation-level3);
 
     display: inline-flex;
@@ -2978,9 +3033,14 @@
       grid-template-columns: minmax(0, 1fr) minmax(0, var(--s4-split-support, var(--s4-layout-inspector-width)));
     }
     .s4-split > .s4-split-pane[data-sticky] {
+      /* it scrolls inside itself, so it keeps room for a focus ring at its edges and gives that room back with a
+         negative margin: nothing moves, and a button in its top corner shows its whole ring (decision 0060) */
+      --_ring: calc(var(--s4-focus-ring-width) + var(--s4-focus-ring-offset));
+      padding: var(--_ring);
+      margin: calc(-1 * var(--_ring));
       position: sticky;
-      inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2));
-      max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-6));
+      inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-2) - var(--_ring));
+      max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-6) + 2 * var(--_ring));
       overflow: auto;
       overscroll-behavior: contain;
     }
@@ -3412,7 +3472,7 @@
   /* badge slot: top-end of the icon */
   .s4-nav-indicator > .s4-badge {
     position: absolute;
-    inset-block-start: calc(var(--s4-space-1) / 2);
+    inset-block-start: var(--s4-space-hairline);
     inset-inline-start: calc(50% + var(--s4-space-1));
     z-index: 1;
   }
@@ -3515,7 +3575,7 @@
   .s4-nav-rail-footer {
     display: flex;
     flex-direction: column;
-    gap: calc(var(--s4-space-1) / 2);
+    gap: var(--s4-space-hairline);
     padding-inline: var(--_pad);
   }
   .s4-nav-rail-header { gap: var(--s4-space-3); }
@@ -5460,7 +5520,8 @@
      <span class="s4-stat-meta"><span class="s4-status" data-tone="error">+12%</span>vs. September</span>
    </div>
    The value is display-small on the M3 Expressive emphasized weight, tabular. data-size="small" drops it to
-   headline-small for dense dashboards. Put stats in a pane, a card or an .s4-stat-row (wraps, 2 per row on phones). */
+   headline-small for dense dashboards; data-size="hero" raises the one number a screen exists for to display-medium
+   (one a screen, decision 0060). Put stats in a pane, a card or an .s4-stat-row (wraps, 2 per row on phones). */
 @layer s4.components {
   .s4-stat { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
   .s4-stat :where(.s4-stat-label, .s4-stat-value, .s4-stat-meta) { overflow-wrap: anywhere; }
@@ -5488,6 +5549,13 @@
     line-height: var(--md-sys-typescale-headline-small-line-height);
     letter-spacing: var(--md-sys-typescale-headline-small-tracking);
     font-weight: var(--md-sys-typescale-emphasized-headline-small-weight);
+  }
+  .s4-stat[data-size="hero"] .s4-stat-value {
+    font-family: var(--md-sys-typescale-display-medium-font);
+    font-size: var(--md-sys-typescale-display-medium-size);
+    line-height: var(--md-sys-typescale-display-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-display-medium-tracking);
+    font-weight: var(--md-sys-typescale-emphasized-display-medium-weight);
   }
   .s4-stat-meta {
     display: flex;
@@ -6016,6 +6084,31 @@
   /* a new speaker gets a little more room */
   .s4-message:not([data-from="me"]) + .s4-message[data-from="me"],
   .s4-message[data-from="me"] + .s4-message:not([data-from="me"]) { margin-block-start: var(--s4-space-2); }
+  /* kinds (decision 0060).
+     note: an internal note in a thread people outside it also read (a support desk, a shared document): the warning
+       container across the thread, square to neither side, so it never reads as a message to the other person. Say
+       who can see it in the meta ("Only your team sees this").
+     card: rich content the thread carries (a live order, a walk report, a booking): no bubble of its own; put a card,
+       a pane or the app's own element inside, on the speaker's side. */
+  .s4-message[data-kind="note"] {
+    --_bg: var(--s4-color-warning-container);
+    --_fg: var(--s4-color-on-warning-container);
+    --_meta: var(--s4-color-on-warning-container);
+    align-self: stretch;
+    max-inline-size: none;
+    margin-block: var(--s4-space-2);
+    border-radius: var(--md-sys-shape-corner-medium);
+  }
+  .s4-message[data-kind="card"] {
+    --_bg: transparent;
+    --_fg: var(--md-sys-color-on-surface);
+    padding: 0;
+    border-radius: 0;
+    max-inline-size: min(100%, var(--s4-layout-content-reading));
+    inline-size: 100%;
+  }
+  .s4-message[data-kind="card"] > .s4-message-meta { padding-inline: var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); }
+  .s4-message[data-kind="card"][data-from="me"] > .s4-message-meta { align-self: flex-end; }
   .s4-message-meta {
     color: var(--_meta);
     font-family: var(--md-sys-typescale-label-small-font);
@@ -7214,6 +7307,9 @@
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr); }
     .s4-docs-bar { display: none; }
     .s4-docs-nav { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-12)); overflow: auto; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1) 0 0 calc((var(--s4-space-3) + var(--s4-space-2)) * -1); }
+    /* a themed sidebar (decision 0060): data-theme="dark" (or data-accent, data-gray) on the docs nav makes it a toned,
+       rounded block, so a scoped theme paints a shape, never a square patch; its links keep their edge inside it */
+    .s4-docs-nav:is([data-theme], [data-accent], [data-gray]) { padding: var(--s4-space-4) var(--s4-space-2); margin: 0; border-radius: var(--s4-shape-sheet); }
   }
   @media (width >= 1200px) {
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr) calc(var(--s4-space-16) * 3.5); }
@@ -7373,8 +7469,8 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .s4-text-field-affix[data-prefix] { grid-column: 3; padding-inline-end: calc(var(--s4-space-1) / 2); }
-  .s4-text-field-affix[data-suffix] { grid-column: 5; padding-inline-start: calc(var(--s4-space-1) / 2); }
+  .s4-text-field-affix[data-prefix] { grid-column: 3; padding-inline-end: var(--s4-space-hairline); }
+  .s4-text-field-affix[data-suffix] { grid-column: 5; padding-inline-start: var(--s4-space-hairline); }
 
   /* ---------- supporting text and counter ---------- */
   .s4-text-field-supporting,
@@ -8004,7 +8100,7 @@
     font-variant-numeric: tabular-nums;
   }
   .s4-rating[data-size="l"] { --_size: var(--s4-size-icon); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); }
-  .s4-rating-stars { display: inline-flex; align-items: center; gap: calc(var(--s4-space-1) / 2); }
+  .s4-rating-stars { display: inline-flex; align-items: center; gap: var(--s4-space-hairline); }
   .s4-rating-mark { position: relative; display: inline-grid; inline-size: var(--_size); block-size: var(--_size); flex: none; }
   .s4-rating-mark > span { grid-area: 1 / 1; display: block; }
   .s4-rating-mark svg { display: block; inline-size: 100%; block-size: 100%; overflow: visible; }
@@ -8970,7 +9066,7 @@
     --_handle-w: var(--s4-space-1);
     --_handle-h: calc(var(--s4-space-10) + var(--s4-space-1));
     --_gap: calc(var(--s4-space-1) * 1.5);
-    --_inset: calc(var(--s4-space-1) / 2);                    /* the handle travels the whole track: at 0% and 100% it sits on the very end, so no sliver of track is left beyond it (decision 0043) */
+    --_inset: var(--s4-space-hairline);                    /* the handle travels the whole track: at 0% and 100% it sits on the very end, so no sliver of track is left beyond it (decision 0043) */
     --_round: calc(var(--_track-h) / 2);
     --_inner: calc(var(--md-sys-shape-corner-extra-small) / 2);
     --_active: var(--md-sys-color-primary);
@@ -9107,7 +9203,7 @@
   .s4-slider > input[type="range"]::-moz-range-thumb { width: var(--s4-space-1); height: var(--_handle-h); border: 0; }
 
   /* pressed and focus */
-  .s4-slider:has(> input:active) { --_handle-w: calc(var(--s4-space-1) / 2); }
+  .s4-slider:has(> input:active) { --_handle-w: var(--s4-space-hairline); }
   .s4-slider:has(> input:focus-visible) .s4-slider-handle {
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
@@ -9142,7 +9238,8 @@
    Each 48dp swatch previews the palette its seed makes: a primary top half over secondary and tertiary quarters
    (computed with relative color syntax; browsers without it show the plain seed). The selected one (aria-pressed)
    shrinks inside a ring with a gap and shows a check. swatches.js manages aria-pressed, arrow keys and s4-change;
-   with data-theme-seed a click themes the page with S4.theme({ seed, variant: 'vibrant' }) and stays in sync with it.
+   with data-theme-seed a click themes the page with S4.theme({ seed, variant }) and stays in sync with it.
+   data-size="s": 40dp swatches for a picker inside a pane.
    --s4-swatch-color (set from data-seed by swatches.js) is the public knob. */
 @layer s4.components {
   .s4-swatches {
@@ -9182,6 +9279,13 @@
     --_ring: var(--md-sys-color-on-surface);
     --_gap: calc(var(--s4-space-1) * 1.5);
   }
+  /* small (decision 0060): 40dp swatches (an icon button's size) for a picker inside a pane or a card, so six fit a
+     phone's row; with the 8dp gap each still owns a 48dp stretch of the row */
+  .s4-swatches[data-size="s"] .s4-swatch {
+    width: calc(var(--s4-size-touch-target) - var(--s4-space-2));
+    height: calc(var(--s4-size-touch-target) - var(--s4-space-2));
+  }
+  .s4-swatches[data-size="s"] .s4-swatch[aria-pressed="true"] { --_gap: var(--s4-space-1); }
   /* the check badge (added by swatches.js) */
   .s4-swatch-check {
     position: absolute;

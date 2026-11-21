@@ -14,7 +14,7 @@
 
   <section class="ex-sec">
     <h2>Theme Color</h2>
-    <p><code>data-theme-seed</code> on the group: a click calls <code>S4.theme({ seed, variant: 'vibrant' })</code>. Tab in, then use the arrow keys.</p>
+    <p><code>data-theme-seed</code> on the group: a click calls <code>S4.theme({ seed })</code> (the group's <code>data-variant</code>, or the page's own; by default each seed picks its variant). Tab in, then use the arrow keys.</p>
     <div class="ex-board col">
       <div class="s4-swatches" data-theme-seed aria-label="Theme Color" id="theme-swatches">
         <button class="s4-swatch" type="button" data-seed="#000000" aria-label="Mono"></button>
@@ -46,6 +46,20 @@
         <button class="s4-swatch" type="button" data-seed="#6d6d6d" aria-label="Grey" disabled></button>
       </div>
       <p class="s4-body-medium s4-on-surface-variant" style="margin:0">Utilities color: <b id="cat-out">#0b57d0</b></p>
+    </div>
+  </section>
+  <section class="ex-sec">
+    <h2>Small</h2>
+    <p><code>data-size="s"</code>: 40dp swatches for a picker inside a pane or a card, so six fit a phone's row.</p>
+    <div class="ex-board col">
+      <div class="s4-swatches" data-size="s" aria-label="Plumage">
+          <button class="s4-swatch" type="button" data-seed="#7c4f24" aria-label="Wren" aria-pressed="true"></button>
+          <button class="s4-swatch" type="button" data-seed="#00708a" aria-label="Kingfisher"></button>
+          <button class="s4-swatch" type="button" data-seed="#c2410c" aria-label="Robin"></button>
+          <button class="s4-swatch" type="button" data-seed="#4c7a2a" aria-label="Greenfinch"></button>
+          <button class="s4-swatch" type="button" data-seed="#6e2a5e" aria-label="Plum"></button>
+          <button class="s4-swatch" type="button" data-seed="#000000" aria-label="Magpie"></button>
+      </div>
     </div>
   </section>
   <p class="ex-foot">Source: <code>components/swatches/</code> · Solar icons by 480 Design (CC BY 4.0)</p>

@@ -238,7 +238,7 @@ function dialAudit(opts) {
 /* (c) text contrast as rendered, AA: 4.5, or 3 for large text; text on glass is checked against the worst backdrop
    after the glass's own filter and tint (the same method as skill/s4-orion/scripts/check.mjs) */
 function contrastAudit(seeded) {
-  const out = [];      /* seeded: colored FABs and the vibrant toolbar are glass in the accent's own color: the recorded exception (decisions 0028 and 0032) */
+  const out = [];      /* seeded: the vibrant toolbar is glass in the accent's own color, the recorded exception (decision 0032); FABs are proven (decision 0060: core.js keeps their labels at 4.5:1) */
   const cv = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
   const parse = (c) => {
     let m = c.match(/^rgba?\(([^)]+)\)/);
@@ -258,7 +258,7 @@ function contrastAudit(seeded) {
   const seen = new Set();
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.nodeValue.trim() ? 1 : 2 });
   for (let t; (t = walker.nextNode());) {
-    const el = t.parentElement; if (!el || seen.has(el) || off(el) || (seeded && el.closest('.s4-fab, .s4-toolbar[data-color="vibrant"]')) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(el.tagName)) continue;
+    const el = t.parentElement; if (!el || seen.has(el) || off(el) || (seeded && el.closest('.s4-toolbar[data-color="vibrant"]')) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(el.tagName)) continue;
     seen.add(el);
     const cs = getComputedStyle(el), r = el.getBoundingClientRect();
     if (!r.width || !r.height || cs.visibility !== 'visible' || +cs.opacity === 0) continue;
@@ -645,15 +645,13 @@ async function use(page, add, phone) {
       await t.click();
       if ((await inp.getAttribute('type')) !== 'password' || (await t.getAttribute('aria-pressed')) !== 'false') add('password: a second press did not hide it again');
     }
-    for (const f of (await visible('.s4-password[data-strength]')).slice(0, 1)) {
-      /* empty, the meter may hide; once something is typed it must say the strength in words */
-      const inp = f.locator(':scope > input');
-      await inp.fill('correct horse battery');
-      await settle(120);
+    for (const f of (await visible('.s4-password[data-strength]:not(:has(input:disabled))')).slice(0, 1)) {
+      /* an empty field hides its meter: type a password the way a person would, read the words, then put it back */
+      const inp = f.locator(':scope > input'), was = await inp.inputValue();
+      if (!was) { try { await inp.fill('maple7'); } catch (e) { add('password: could not type into the strength field'); continue; } await settle(120); }
       const w = await f.evaluate((x) => { const m = x.querySelector('.s4-password-strength'); return m && !m.hidden ? m.textContent : 'none'; });
       if (!/Strength: /.test(w)) add('password: the strength meter has no words');
-      await inp.fill('');
-      await page.evaluate(() => document.activeElement && document.activeElement.blur());
+      if (!was) { await inp.fill(''); await page.evaluate(() => document.activeElement && document.activeElement.blur()); }
     }
     for (const el of (await visible('.s4-inline-edit:not(:has(input:disabled))')).slice(0, 1)) {
       const inp = el.locator(':scope > input');
@@ -697,6 +695,74 @@ async function use(page, add, phone) {
 }
 
 /* ---------- run ---------- */
+/* ---------- script APIs that follow the page (decision 0060) ----------
+   run once per page that has them: a seed's default variant, restore keeping a fixed brand, data-accent set by
+   setAttribute, S4.buttonGroup.set moving the ink, and a select changed from script redrawing its picker */
+async function apiAudit(page, add) {
+  const out = await page.evaluate(async () => {
+    const o = [], wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    if (document.querySelector('.th-brand, [data-api-probe="theme"]') || location.pathname.endsWith('/components/base/themes.html')) {
+      const keep = S4.theme(), key = S4.theme.key, only = S4.theme.only;
+      try {
+        S4.theme.key = null;
+        S4.theme({ seed: '#6e2a5e' }); await wait(500);
+        if (S4.theme().variant !== 'auto') o.push(`S4.theme({ seed }) reports variant ${S4.theme().variant}, not auto`);
+        if (S4.util.css('--md-sys-color-primary-container').toLowerCase() !== '#6e2a5e') o.push('a muted seed without a variant did not keep its own color (fidelity)');
+        if (S4.theme.variantFor('#0b57d0') !== 'vibrant' || S4.theme.variantFor('#1f4e66') !== 'fidelity') o.push('S4.theme.variantFor picks the wrong variant');
+        localStorage.setItem('s4-suite-api', JSON.stringify({ mode: 'dark', seed: '#ff0000', corners: 'firm' }));
+        S4.theme.restore('s4-suite-api', { mode: 'system', seed: '#1f4e66', corners: 'soft' }, { only: ['mode'] }); await wait(300);
+        const t = S4.theme();
+        if (t.mode !== 'dark' || t.seed !== '#1f4e66' || t.corners !== 'soft') o.push(`restore with only: got mode ${t.mode}, seed ${t.seed}, corners ${t.corners} (wanted the saved mode and the fixed brand)`);
+        S4.theme({ mode: 'light' });
+        const saved = JSON.parse(localStorage.getItem('s4-suite-api'));
+        if (saved.mode !== 'light' || saved.seed !== '#ff0000' || saved.corners !== 'firm') o.push('restore with only saved more than the visitor\'s keys');
+        const d = document.createElement('div'); document.body.appendChild(d); await frame();
+        d.setAttribute('data-accent', '#c62828'); await wait(300);
+        const a = getComputedStyle(d).getPropertyValue('--md-sys-color-primary');
+        d.setAttribute('data-accent', '#0b57d0'); await wait(300);
+        if (!a || a === getComputedStyle(d).getPropertyValue('--md-sys-color-primary')) o.push('data-accent changed with setAttribute did not recolor its element');
+        d.remove();
+      } finally {
+        localStorage.removeItem('s4-suite-api');
+        S4.theme.key = null; S4.theme.only = null;
+        S4.theme({ seed: keep.seed, variant: keep.variant, surfaces: keep.surfaces, mode: keep.mode || 'system', corners: keep.corners });
+        S4.theme.key = key; S4.theme.only = only;
+      }
+    }
+    const g = [...document.querySelectorAll('.s4-button-group[data-connected][data-select="single"]')].find((x) => x.offsetWidth && x.querySelectorAll('[aria-pressed="false"]').length);
+    if (g) {
+      if (!S4.buttonGroup || !S4.buttonGroup.set) o.push('S4.buttonGroup.set is missing');
+      else {
+        const b = g.querySelector('[aria-pressed="false"]'), v = b.value || b.getAttribute('value') || b.textContent.trim();
+        let fired = false; const h = () => { fired = true; }; g.addEventListener('s4-change', h);
+        S4.buttonGroup.set(g, v); await wait(700);
+        g.removeEventListener('s4-change', h);
+        if (b.getAttribute('aria-pressed') !== 'true' || g.querySelectorAll('[aria-pressed="true"]').length !== 1) o.push('S4.buttonGroup.set did not press exactly that option');
+        if (fired) o.push('S4.buttonGroup.set fired s4-change');
+        if (S4.buttonGroup.value(g) !== v) o.push('S4.buttonGroup.value did not read the set value');
+        const ink = g.querySelector(':scope > .s4-button-group-ink');
+        if (ink && !ink.hidden) {   /* the ink's pill is placed by --_ix / --_iw inside the track */
+          const gr = g.getBoundingClientRect(), r = b.getBoundingClientRect(), x = parseFloat(ink.style.getPropertyValue('--_ix')), w = parseFloat(ink.style.getPropertyValue('--_iw'));
+          if (!(Math.abs(gr.left + g.clientLeft + x - r.left) <= 2 && Math.abs(w - r.width) <= 2)) o.push('the ink did not follow S4.buttonGroup.set');
+        }
+      }
+    }
+    const sel = [...document.querySelectorAll('.s4-text-field > select[data-s4-native]')].find((x) => !x.disabled && x.options.length > 1 && x.closest('.s4-text-field').offsetWidth);
+    if (sel) {
+      const btn = sel.parentElement.querySelector(':scope > .s4-text-field-select'), was = sel.value;
+      const opt = document.createElement('option'); opt.value = 's4-suite-probe'; opt.textContent = 'Suite Probe'; sel.appendChild(opt); await frame();
+      sel.value = 's4-suite-probe'; await frame();
+      if (!btn || btn.textContent.trim() !== 'Suite Probe') o.push('a select set from script did not redraw its button');
+      const menu = document.getElementById(btn.getAttribute('aria-controls') || '') || [...document.querySelectorAll('.s4-menu[data-field-menu]')].find((m) => m.textContent.includes('Suite Probe'));
+      if (!menu) o.push('an option added from script is not in the select\'s picker');
+      opt.remove(); sel.value = was; await frame();
+    }
+    return o;
+  });
+  out.forEach(add);
+}
+
 const MODES = [
   { key: 'phone-dark', viewport: { width: 390, height: 844 }, colorScheme: 'dark', phone: true },
   { key: 'desktop-light', viewport: { width: 1280, height: 800 }, colorScheme: 'light', phone: false },
@@ -725,6 +791,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
     }
     await use(page, add, mode.phone);
+    if (!reduced && mode === MODES[0]) await apiAudit(page, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));
   } catch (e) { add('suite could not finish: ' + String(e.message).split('\n')[0].slice(0, 160)); }
   if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', label.replace(/[^\w.-]+/g, '_') + '.png') }).catch(() => {}); }
@@ -759,6 +826,8 @@ const PRESETS = [
   { key: 'page-soft', theme: { page: 'soft' }, modes: ['desktop-light'] },   /* the soft page is a light-mode tone */
   { key: 'type-serif-rounded', theme: { display: 'serif', text: 'rounded' }, modes: ['phone-dark'] },   /* faces change widths, not colors: the phone is the tight case */
   { key: 'type-mono', theme: { display: 'mono', text: 'mono' }, modes: ['phone-dark'] },
+  { key: 'type-geometric-humanist', theme: { display: 'geometric', text: 'humanist', displayWeight: 'regular' }, modes: ['phone-dark'] },   /* decision 0060 */
+  { key: 'seed-muted', theme: { seed: '#6e2a5e' } },   /* a muted brand seed: 'auto' picks fidelity; every FAB label still reads (decision 0060) */
   { key: 'combo-firm-cool-soft-mono', theme: { corners: 'firm', gray: 'cool', page: 'soft', display: 'mono' }, dial: true },
   { key: 'combo-tinted-blue', theme: { seed: '#0b57d0', surfaces: 'tinted', corners: 'soft', gray: 'warm', page: 'soft' }, dial: true },
 ];

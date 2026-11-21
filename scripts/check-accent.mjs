@@ -21,8 +21,12 @@ const ACCENTS = JSON.parse((core.match(/S4\.theme\.accents = (\{[^}]+\})/) || [,
 const lum = (h) => { const c = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
 const hue = (h) => { const s = 0.7, l = 0.45, k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [f(0), f(8), f(4)].map((v) => Math.round(v * 255).toString(16).padStart(2, '0')).join(''); };
+/* decision 0060: a seed with no variant gets 'fidelity' when muted or deep, else 'vibrant' (core.js AUTO_VARIANT); the named
+   accents are proven in vibrant and in the variant they get by default */
+const AUTO = JSON.parse((core.match(/AUTO_VARIANT = (\{[^}]+\})/) || [, '{"chroma":60,"tone":35}'])[1].replace(/(\w+):/g, '"$1":'));
+const auto = (seed) => { const h = M3.hct(seed); return h.chroma < AUTO.chroma || h.tone < AUTO.tone ? 'fidelity' : 'vibrant'; };
 const seeds = [...Array.from({ length: 24 }, (_, i) => [hue(i * 15), ['vibrant', 'tonal', 'fidelity', 'expressive']]),
-  ...Object.entries(ACCENTS).filter(([, v]) => v && v !== '#000000').map(([, v]) => [v, ['vibrant']])];
+  ...Object.entries(ACCENTS).filter(([, v]) => v && v !== '#000000').map(([, v]) => [v, [...new Set(['vibrant', auto(v)])]])];
 const SURFACES = ['surface', 'surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest', 'surface-dim', 'surface-bright'];
 const neutral = (role, dark) => { const t = T['--md-sys-color-' + role]; return dark ? (t.modes?.dark ?? t.value) : t.value; };
 
@@ -35,4 +39,4 @@ for (const dark of [false, true]) for (const [seed, variants] of seeds) for (con
   for (const surf of SURFACES) { const r = ratio(s.primary, neutral(surf, dark)); worst.shape = Math.min(worst.shape, r); if (r < 3) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v}: primary on ${surf} is ${r.toFixed(2)}:1, needs 3:1`); } }
 }
 if (failures) { console.error(`${failures} accent pair(s) below the bar.`); process.exit(1); }
-console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + ${Object.keys(ACCENTS).length} named accents, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed).`);
+console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + the named accents in vibrant and their default variant, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed).`);

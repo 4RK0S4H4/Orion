@@ -11,10 +11,22 @@
   sizes, tighter as size grows, slightly open at 11px.
 - **Hierarchy** (decision 0055): display, headline and title-large are weight 600; **emphasized** (700) is for the
   one moment that needs more: a hero number, a key title. Titles and labels are 500, body 400.
-- **An app's own faces** (decision 0055): `S4.theme({ display, text })` with `serif`, `rounded`, `mono`, `system` or a
-  font-family value. The display face covers display, headline and title-large; the text face everything else. Any
-  face but Inter drops Inter's letter spacing; set `--md-sys-typescale-<role>-tracking` if the face needs its own.
-  Load a custom font file in the app; keep Inter for text unless the brand truly has a text face.
+- **An app's own faces** (decisions 0055, 0060): `S4.theme({ display, text })` with `serif`, `rounded`, `mono`,
+  `system`, `geometric` (Futura, Century Gothic, URW Gothic, Avenir Next), `humanist` (Seravek, Gill Sans, Calibri,
+  Candara, Ubuntu) or a font-family value. Every preset is a system stack with fallbacks off Apple devices (rounded falls
+  back to Hiragino Maru Gothic, Nunito, Quicksand, Arial Rounded for display, then Calibri), so it degrades to a near
+  face, never to Inter. The display face covers display, headline and title-large; the text face everything else. Any
+  face but Inter and system drops Inter's letter spacing; set `--md-sys-typescale-<role>-tracking` if the face needs its
+  own. Load a custom font file in the app; keep Inter for text unless the brand truly has a text face. Stacks worth
+  knowing for `custom`: Didone `Didot, "Bodoni 72", "Bodoni MT", "Bodoni Moda", ui-serif, serif`; condensed
+  `"DIN Condensed", "Avenir Next Condensed", "Roboto Condensed", "Arial Narrow", sans-serif`; classical humanist
+  `Optima, Candara, "Noto Sans", sans-serif`.
+- **Display weight** (decision 0060): `S4.theme({ displayWeight: 'medium' | 'regular' })` (`data-type-display-weight`)
+  draws the display face's roles at 500 or 400 instead of 600, with emphasized at 600. A Didone, a book serif or a
+  geometric face is drawn lighter than Inter and loses its contrast at 600; Inter and system stay at the default.
+- **Own headings** (decision 0060): an element the app draws itself takes its face from the role it plays,
+  `font: … var(--md-sys-typescale-headline-small-font)` or a type class (`.s4-headline-small`); a bare `h2` styled by
+  hand is the text face, and the display dial misses it.
 - **Body text is 16px** (`body-large`) by default; `body-medium` (14px) for dense secondary content.
 - **Numbers:** tabular figures (`font-variant-numeric: tabular-nums`) on anything compared or scanned: amounts, counts,
   dates, IDs, table cells and inputs. Running text stays proportional.

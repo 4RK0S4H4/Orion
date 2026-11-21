@@ -143,8 +143,8 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .s4-text-field-affix[data-prefix] { grid-column: 3; padding-inline-end: calc(var(--s4-space-1) / 2); }
-  .s4-text-field-affix[data-suffix] { grid-column: 5; padding-inline-start: calc(var(--s4-space-1) / 2); }
+  .s4-text-field-affix[data-prefix] { grid-column: 3; padding-inline-end: var(--s4-space-hairline); }
+  .s4-text-field-affix[data-suffix] { grid-column: 5; padding-inline-start: var(--s4-space-hairline); }
 
   /* ---------- supporting text and counter ---------- */
   .s4-text-field-supporting,

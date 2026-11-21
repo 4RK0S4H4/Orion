@@ -1,8 +1,9 @@
 /* Swatches behaviour.
    Single choice: a click presses one swatch (aria-pressed) and fires s4-change { seed } on the group (seed null for
    the mono swatch, data-seed="#000000" or empty). One tab stop with arrow keys, Home and End (roving tabindex).
-   data-theme-seed: the click also calls S4.theme({ seed, variant: 'vibrant' }), and the group follows S4.theme() via the
-   s4-theme event, so it stays right when the theme changes elsewhere. */
+   data-theme-seed: the click also calls S4.theme({ seed, variant }), and the group follows S4.theme() via the
+   s4-theme event, so it stays right when the theme changes elsewhere. variant is the group's data-variant, or else the
+   page's own (an app that set 'fidelity' keeps it; with none, 'auto' picks per seed, decision 0060). */
 S4.register('swatches', function (scope) {
   var norm = function (s) { return !s || String(s).toLowerCase() === '#000000' ? null : String(s).toLowerCase(); };
   S4.util.all(scope, '.s4-swatches').forEach(function (g) {
@@ -41,7 +42,7 @@ S4.register('swatches', function (scope) {
       select(seed); stop(b);
       if (was) return;
       S4.util.emit(g, 's4-change', { seed: seed, swatch: b });
-      if (theme) S4.theme({ seed: seed, variant: g.dataset.variant || 'vibrant' });
+      if (theme) S4.theme({ seed: seed, variant: g.dataset.variant || S4.theme().variant || 'auto' });
     });
     g.addEventListener('focusin', function (e) { var b = e.target.closest('.s4-swatch'); if (b) stop(b); });
     g.addEventListener('keydown', function (e) {
@@ -57,11 +58,11 @@ S4.register('swatches', function (scope) {
 });
 
 /* Theme controls without app code: a connected button group with data-theme-mode (values system|light|dark),
-   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy" (values as
+   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight" (values as
    S4.theme takes them, e.g. tinted|neutral, serif|inter) calls S4.theme when picked and follows S4.theme() (restored
    or changed elsewhere). So an app's own Appearance section needs no script. */
 S4.register('theme-controls', function (scope) {
-  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy'];
+  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight'];
   S4.util.all(scope, '[data-theme-mode], [data-theme-contrast], [data-brand-dial]').forEach(function (g) {
     if (!S4.util.once(g, 'themectl')) return;
     var key = g.hasAttribute('data-theme-mode') ? 'mode' : g.hasAttribute('data-theme-contrast') ? 'contrast' : g.getAttribute('data-brand-dial');

@@ -48,6 +48,7 @@ S4.register('text-field', function (scope) {
       S4.init && S4.init(menu);
       trigger.addEventListener('click', function () {
         if (c.disabled) return;
+        build();   /* the picker always shows the select as it is now */
         menu.style.minWidth = f.querySelector(':scope > .s4-text-field-select').closest('.s4-text-field').getBoundingClientRect().width + 'px';
         menu.hasAttribute('data-open') || menu.matches(':popover-open') ? S4.menu.close(menu) : S4.menu.open(menu, trigger);
       });
@@ -58,6 +59,13 @@ S4.register('text-field', function (scope) {
       });
       menu.addEventListener('s4-close', function () { trigger.setAttribute('aria-expanded', 'false'); });
       c.addEventListener('change', build);
+      /* a select changed from script redraws its picker and its button (decision 0060): options added, removed or
+         disabled, and value or selectedIndex set as properties (which fire no event) */
+      new MutationObserver(build).observe(c, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['disabled', 'selected', 'label'] });
+      ['value', 'selectedIndex'].forEach(function (k) {
+        var d = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, k);
+        if (d && d.set) Object.defineProperty(c, k, { configurable: true, get: function () { return d.get.call(c); }, set: function (v) { d.set.call(c, v); build(); } });
+      });
     }
 
     /* the whole container is the hit area */

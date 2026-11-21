@@ -19,7 +19,7 @@
     --_track: var(--md-sys-typescale-title-medium-tracking);
     --_weight: var(--md-sys-typescale-title-medium-weight);
     --_bg: var(--md-sys-color-primary-container);
-    --_fg: var(--md-sys-color-on-primary-container);
+    --_fg: var(--s4-color-on-fab, var(--md-sys-color-on-primary-container));   /* with a seed, core.js may pick white or the accent's darkest tone so the glass stays (decision 0060) */
     --_elevation: var(--md-sys-elevation-level3);
 
     display: inline-flex;

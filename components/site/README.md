@@ -89,7 +89,7 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-site-signup` | An email field and a button on one line | — |
 | `.s4-site-index` > `li` > `.s4-site-index-row` | A numbered list of everything (all projects, past issues, an archive): `.s4-site-index-n`, `.s4-site-index-title`, `.s4-site-index-meta` (one or two spans), `.s4-site-index-year`. Meta under the title on a phone, its own columns from 840; rows hover with a rounded fill | — |
 | `.s4-post-featured`, `.s4-posts` > `.s4-post` | A featured post (cover + text) and a dated list (`.s4-post-meta`, `h3` link, sentence, tags) | — |
-| `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager` | — |
+| `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager`. `data-theme="dark"` (or `data-accent`) on `.s4-docs-nav` makes a toned, rounded sidebar from 840 (decision 0060) | — |
 | `.s4-callout` | A note in documentation or prose: `.s4-icon`, `.s4-callout-title`, one or two short paragraphs. Filled, never a stripe or an outline | `data-tone="warning|success|neutral"` (info by default) |
 | `[data-site-panel="id"]` | A button that opens that element as a floating glass panel on a phone (the docs sidebar) | — |
 | `.s4-site-footer` | `.s4-site-footer-top` (`.s4-site-footer-brand`, `.s4-site-footer-links`) and `.s4-site-footer-base` (small print, a theme switch) | `data-columns="2|3"` on the links (4 default) |

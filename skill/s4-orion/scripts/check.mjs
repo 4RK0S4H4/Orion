@@ -56,13 +56,29 @@ function lintCss(css, where) {
       }
     }
     if (sel.startsWith('@')) continue;
-    for (const s of sel.split(',').map((x) => x.trim())) {
+    for (const s of splitList(sel)) {
       if (!s || SAFE_SELECTOR.test(s)) continue;
       if (!/[.#[]/.test(s) && !/^(html|body|:root)\b/.test(s))
         out.push(`${where}: "${s}" styles bare elements (scope it under an app class so it can't leak into components)`);
     }
   }
   return out;
+}
+
+/* a selector list split at its own commas only: commas inside :is(), :where(), :not(), :has(), :nth-child(… of …) or an
+   attribute value belong to one selector (decision 0060) */
+function splitList(sel) {
+  const out = []; let depth = 0, quote = '', cur = '';
+  for (const ch of sel) {
+    if (quote) { if (ch === quote) quote = ''; cur += ch; continue; }
+    if (ch === '"' || ch === "'") quote = ch;
+    else if (ch === '(' || ch === '[') depth++;
+    else if (ch === ')' || ch === ']') depth = Math.max(0, depth - 1);
+    else if (ch === ',' && depth === 0) { out.push(cur.trim()); cur = ''; continue; }
+    cur += ch;
+  }
+  out.push(cur.trim());
+  return out.filter(Boolean);
 }
 
 /* ---------------- in-page audit (runs in the browser) ---------------- */

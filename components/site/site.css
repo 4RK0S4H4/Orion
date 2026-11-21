@@ -1043,6 +1043,9 @@
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr); }
     .s4-docs-bar { display: none; }
     .s4-docs-nav { position: sticky; inset-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-6)); max-block-size: calc(100dvh - var(--s4-size-top-app-bar) - var(--s4-space-12)); overflow: auto; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1) 0 0 calc((var(--s4-space-3) + var(--s4-space-2)) * -1); }
+    /* a themed sidebar (decision 0060): data-theme="dark" (or data-accent, data-gray) on the docs nav makes it a toned,
+       rounded block, so a scoped theme paints a shape, never a square patch; its links keep their edge inside it */
+    .s4-docs-nav:is([data-theme], [data-accent], [data-gray]) { padding: var(--s4-space-4) var(--s4-space-2); margin: 0; border-radius: var(--s4-shape-sheet); }
   }
   @media (width >= 1200px) {
     .s4-docs { grid-template-columns: calc(var(--s4-space-16) * 4) minmax(0, 1fr) calc(var(--s4-space-16) * 3.5); }

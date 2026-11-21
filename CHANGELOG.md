@@ -10,6 +10,18 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 Round 0056: themes on any container, the website kit, reach (decisions 0056 to 0058):
 
+- Changed: a seed with no variant picks one by itself (`auto`, decision 0060): `fidelity` for a muted or deep brand color (chroma under 60 or tone under 35), `vibrant` for a vivid one; `S4.theme.variantFor(seed)`. Muted brand colors no longer turn neon. Swatches keep the page's own variant. `S4.theme()` reports `variant: 'auto'` when none was named.
+- Fixed: glass FAB labels reach 4.5:1 with any seed: the default FAB's icon and label (`--s4-color-on-fab`) and every FAB's tint are chosen per scheme, the owner's tint kept wherever the label allows (decision 0060); `check-glass` proves FAB labels for 192 seeded schemes; the suite no longer exempts seeded FABs.
+- Fixed: a restored tinted app no longer switches from tonal to vibrant (the saved theme held `variant: 'vibrant'`).
+- Added: `S4.theme.restore(key, defaults, { only: ['mode'] })`: a fixed brand with only the visitor's choices saved; the seven templates that hand-wrote this use it.
+- Added: face presets `geometric` and `humanist`; `rounded` falls back to rounded faces off Apple devices; the display weight dial (`displayWeight: 'medium' | 'regular'`, `data-type-display-weight`).
+- Added: `--s4-category-1…6` (category colors, aliases of the chart palette); `--s4-space-hairline` (2px).
+- Added: `S4.buttonGroup.set(group, value)` and `.value(group)` (the Ink Track follows; no `s4-change`).
+- Added: `.s4-stat[data-size="hero"]`; `.s4-swatches[data-size="s"]`; `.s4-message[data-kind="note"]` and `[data-kind="card"]`; a scoped theme on `.s4-docs-nav` makes a toned, rounded sidebar.
+- Fixed: a select changed from script (options, `value`, `selectedIndex`) redraws its glass picker; `data-accent` set with `setAttribute` recolors its element; a sticky split pane no longer clips a focus ring at its edge.
+- Fixed: the page checker no longer reads the parts of `:is()` / `:where()` lists as bare selectors; the layout pass reads "3.4 GB" as a number and accepts a leading avatar in the top app bar.
+- Added: `docs/history/round-0056/lessons.md`: every lesson from the template round, what was built and eight proposals for the owner.
+
 - Added: themes on any container: `data-theme`, `data-gray`, `data-page`, `data-corners`, `data-type-*`, `data-accent` (+ `data-accent-variant`, `data-surfaces`) on any element, nesting; `S4.theme(options, element)`; reference page `components/base/themes.html`; `npm run check:scopes` (scopes match the page-wide modes token for token, and dark scopes print light).
 - Added: motion energy (`data-energy="calm|standard|lively"`, `S4.theme({ energy })`, `S4.transition.energy(el)`), eight spring tokens, checked by `check:motion`.
 - Added: app defaults `data-buttons="tonal"`, `data-cards="filled"`, `data-lists="segmented"`, `data-rail`; `data-variant="filled"` on buttons and `data-variant="elevated"` on cards as explicit names.

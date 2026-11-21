@@ -5,6 +5,8 @@
 [tokens page](https://4rk0s4h4.github.io/s4-orion/tokens/#spacing)
 
 - **4dp grid:** spacing steps 0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. Use the step names (`--s4-space-4` = 16px), not raw values.
+  One half step: `--s4-space-hairline` (2px), only for the seam between joined or paired shapes (paired bars, a
+  segmented bar, the keys of a drawn keyboard) and hairline insets; never a layout gap (decision 0060).
 - **Touch targets** are at least 48dp everywhere (decision 0001: M3 sizes everywhere). Visual size can be smaller (a 40px
   icon button) as long as the target is 48.
 - **Component sizes** are M3's: buttons 40 (small 32, medium 56, large 96), FAB 56, chips 32, text fields 56, list items

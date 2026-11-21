@@ -16,12 +16,14 @@ themes the app.
 | `data-seed` on `.s4-swatch` | the seed color; `#000000` (or empty) is Mono, S4's default monochrome theme (seed `null`) |
 | `aria-label` | the color name, Title Case |
 | `aria-pressed` | the current one (managed by swatches.js) |
-| `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant: 'vibrant' })` (`data-variant` overrides); the group follows `S4.theme()` through the `s4-theme` event |
+| `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant })`; the group follows `S4.theme()` through the `s4-theme` event |
+| `data-variant` on `.s4-swatches` | the scheme variant a picked seed gets (`vibrant`, `fidelity`, `tonal`, `auto`). Without it the page's own variant is kept: an app that set `fidelity` (a brown or caramel brand) keeps it for every swatch, and `auto` (the default) picks per seed (decision 0060) |
+| `data-size="s"` on `.s4-swatches` | 40dp swatches for a picker inside a pane or a card (six fit a phone's row in a pane) |
 | `--s4-swatch-color` | public knob; set from `data-seed` |
 
 **The other theme controls** live in the same script (`theme-controls`), on a connected single-select button group:
 `data-theme-mode` (values `system`, `light`, `dark`), `data-theme-contrast` (`0`, `0.5`, `1`) and
-`data-brand-dial="surfaces|gray|page|corners|display|text|energy"` (values as `S4.theme` takes them: `tinted` / `neutral`,
+`data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight"` (values as `S4.theme` takes them: `tinted` / `neutral`,
 `serif` / `inter`, `firm` / `soft` / `round`…). Each calls `S4.theme` when picked and follows `S4.theme()` when the theme
 changes elsewhere (restored, reset, Undo), so an app's own Appearance section needs no script (`templates/settings.html`).
 

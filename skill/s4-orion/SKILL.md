@@ -91,12 +91,13 @@ S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft
 
 | Dial | Values | Reach for it when |
 |---|---|---|
-| `seed` (+ `variant`) | any color, or a named accent | the app has a brand color |
+| `seed` (+ `variant`) | any color, or a named accent; variant `auto` (default) keeps a muted or deep seed's own color | the app has a brand color |
 | `surfaces` | `neutral` (default), `tinted` | the app should be colored all over, Material You style |
 | `gray` | `pure` (default), `warm`, `cool` | warm: editorial, food, craft, personal. cool: technical, data, developer tools |
 | `page` | `plain` (default), `soft` | dashboards and card-heavy screens: white cards on a soft gray page |
 | `corners` | `round` (default), `soft`, `firm` | soft: friendly but less playful. firm: dense professional tools. Never sharper |
-| `display` | `inter` (default), `serif`, `rounded`, `mono`, `system`, or a font-family | headings and big numbers carry the brand |
+| `display` | `inter` (default), `serif`, `rounded`, `mono`, `system`, `geometric`, `humanist`, or a font-family | headings and big numbers carry the brand |
+| `displayWeight` | `semibold` (default), `medium`, `regular` | a display face drawn lighter than Inter (Didone, book serif, geometric) |
 | `text` | the same | only when the brand truly has a text face; otherwise keep Inter |
 | `data-density` | comfortable, `compact`, `auto` | desktop tools |
 
@@ -112,7 +113,11 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - **Themes on any container:** every dial also works on any element and nests: `data-theme="dark"` on a sidebar of a
   light app, `data-accent="#0b6e4f"` (+ `data-surfaces="tinted"`) on a branded band, `data-corners`, `data-gray`,
   `data-type-display` on a region. At runtime `S4.theme(options, element)` (nothing saved; `null` follows the page).
-  For regions only, never to restyle one component. Contrast and reduced motion stay page-wide.
+  For regions only, never to restyle one component. Contrast and reduced motion stay page-wide. Put the scope on the
+  rounded block itself (it paints its own surface); `setAttribute('data-accent', …)` later recolors the region.
+- **Drawn things** (decision 0060): artwork of real objects on the fixed roles (`secondary-fixed`…, the same in both
+  modes); kinds of things in `--s4-category-1…6`, named in words; the app's own headings take a typescale font token
+  or a type class, or the display face misses them. More in `references/patterns.md`, "From the product templates".
 - **App defaults**, once on `<html>`, only when the app's character calls for it: `data-buttons="tonal"` (calm tools;
   still write `data-variant="filled"` on the one main action), `data-cards="filled"`, `data-lists="segmented"`
   (settings-like apps), `data-rail="expanded|collapsed|auto"` (a rail's own `data-expand` still wins).
@@ -180,8 +185,13 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 
 **Color**
 - **Choose the accent for the app.** A brand or named color wins: `S4.theme({ seed: '#2e7d32' })`, or a ready-made one: `S4.theme({ seed: 'blue' })` (`mono`, `blue`, `indigo`, `violet`, `pink`, `red`, `orange`, `amber`, `green`, `teal`). With nothing to go on, ask, or use `mono` (the owner's own favorite). Every accent is proven against the neutral base by `check-accent`, so none needs hand-tuning.
-- A named color ("make it green"): `S4.theme({ seed: '#2e7d32', variant: 'vibrant' })`. An exact brand hex that must show as
-  is: `variant: 'fidelity'`. Subtle or photo-derived: `'tonal'`.
+- **Pick the variant by the seed** (decision 0060): leave it out. `auto` gives a muted or deep brand color (plum,
+  terracotta, navy, espresso, forest green: HCT chroma under 60 or tone under 35) `fidelity`, which keeps it as is, and
+  a vivid one (the named accents, a magenta) `vibrant`. Name `vibrant` only when the user wants a brighter version of a
+  muted color (it turns terracotta coral and navy cyan); `tonal` for subtle or photo-derived colors (tinted mode's default).
+- A fixed brand that the visitor never changes: `S4.theme.restore(key, brand, { only: ['mode'] })`, so only light or dark
+  is saved. Never hand-write a mode-only restore. Glass FAB labels are proven for every seed: never switch a FAB to
+  `data-color` to get contrast.
 - Use roles, never hex: page `surface`; cards and panes `surface-container-low`; menus and nav `surface-container`;
   dialogs `surface-container-high`; fields `surface` (Quiet Box); text `on-surface`, secondary text
   `on-surface-variant`; selection `secondary-container`; the one main action `primary`; standout container (FAB)

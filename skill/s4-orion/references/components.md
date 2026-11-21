@@ -156,6 +156,11 @@ on the group (`value` is the pressed button's `value` attribute, or the array of
 selecting groups are one tab stop (roving tabindex): Arrow keys move focus (RTL aware), Home / End jump, Space / Enter
 press; disabled buttons are skipped. Groups get `role="group"`.
 
+**From script:** `S4.buttonGroup.set(group, 'month')` (an array for `data-select="multi"`) presses that option, moves the
+tab stop and slides the ink, and fires no `s4-change`, so a group can follow something the page knows (the line type
+under the caret, a value restored from storage) without a loop. `S4.buttonGroup.value(group)` reads it. Setting
+`aria-pressed` yourself also moves the ink, but `set` keeps exactly one option pressed in a single group.
+
 **The ink** (connected groups while at most one option is pressed): one pill behind the options, placed by script over
 the pressed option whoever changed `aria-pressed` (a click, the keyboard, a page script). It is drawn twice, the front
 copy on Ink (`--s4-motion-ink`) and the back copy on calm Ink (`--s4-motion-ink-calm`), so the edge in the direction of
@@ -1221,6 +1226,7 @@ optional change or note. The loudest thing on a dashboard should be the numbers,
 | `.s4-stat-value` | display-small, emphasized weight, tabular figures | — |
 | `.s4-stat-meta` | body-small, on-surface-variant; holds a `.s4-status` for the change | — |
 | `data-size="small"` | value on headline-small, for dense dashboards | — |
+| `data-size="hero"` | value on display-medium: the one number the screen exists for (cash on hand, a calculator's result). One a screen; the layout pass lets it outrank the page title | — |
 | `.s4-stat-row` | as many stats per row as fit, at least two on a phone; `--s4-stat-min` sets the column floor | 160 |
 
 **Do**
@@ -1877,6 +1883,8 @@ floats at the bottom over the thread, so it is glass.
 | `.s4-thread-day` | a day divider ("Today"), label-medium, centered | — |
 | `.s4-message` | a bubble: body-large, large corners, a small corner on the speaker's side | theirs: surface-container-high, start side |
 | `data-from="me"` | primary, on-primary, end side | — |
+| `data-kind="note"` | an internal note in a thread others also read: warning container across the whole thread, never a bubble; say who sees it in the meta | — |
+| `data-kind="card"` | rich content the thread carries (a live order, a report, a booking): no bubble, put a card or the app's own element inside, on the speaker's side | — |
 | `.s4-message-meta` | sender and time, label-small | — |
 | `.s4-composer` | sticks to the bottom above the nav bar; add `s4-glass` | surface-container |
 
@@ -1990,7 +1998,7 @@ not an app: no app shell, no nav bar. Big type is fluid and the space between se
 | `.s4-site-signup` | An email field and a button on one line | — |
 | `.s4-site-index` > `li` > `.s4-site-index-row` | A numbered list of everything (all projects, past issues, an archive): `.s4-site-index-n`, `.s4-site-index-title`, `.s4-site-index-meta` (one or two spans), `.s4-site-index-year`. Meta under the title on a phone, its own columns from 840; rows hover with a rounded fill | — |
 | `.s4-post-featured`, `.s4-posts` > `.s4-post` | A featured post (cover + text) and a dated list (`.s4-post-meta`, `h3` link, sentence, tags) | — |
-| `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager` | — |
+| `.s4-docs` | Docs page: `.s4-docs-bar` (phone), `.s4-docs-nav`, `.s4-docs-main`, `.s4-toc`, `.s4-docs-pager`. `data-theme="dark"` (or `data-accent`) on `.s4-docs-nav` makes a toned, rounded sidebar from 840 (decision 0060) | — |
 | `.s4-callout` | A note in documentation or prose: `.s4-icon`, `.s4-callout-title`, one or two short paragraphs. Filled, never a stripe or an outline | `data-tone="warning|success|neutral"` (info by default) |
 | `[data-site-panel="id"]` | A button that opens that element as a floating glass panel on a phone (the docs sidebar) | — |
 | `.s4-site-footer` | `.s4-site-footer-top` (`.s4-site-footer-brand`, `.s4-site-footer-links`) and `.s4-site-footer-base` (small print, a theme switch) | `data-columns="2|3"` on the links (4 default) |
@@ -2143,7 +2151,8 @@ textarea. 48dp tall, tabular figures. There is one look: `data-variant` is ignor
 
 **Behaviour** (`text-field.js`): adds `placeholder=" "` to text controls; adds a chevron to selects and opens the picker
 when the field is clicked; grows textareas; links supporting text with `aria-describedby`; keeps `aria-invalid` and the
-error message in sync with `data-error`.
+error message in sync with `data-error`. A select's glass picker follows the select: change its options (add, remove,
+disable) or set `select.value` / `selectedIndex` from script and the button and the list redraw; no `change` event needed.
 
 **Do**
 - Title Case labels ("Due Date"), sentence-case helper and error text that says how to fix it.
@@ -2808,12 +2817,14 @@ themes the app.
 | `data-seed` on `.s4-swatch` | the seed color; `#000000` (or empty) is Mono, S4's default monochrome theme (seed `null`) |
 | `aria-label` | the color name, Title Case |
 | `aria-pressed` | the current one (managed by swatches.js) |
-| `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant: 'vibrant' })` (`data-variant` overrides); the group follows `S4.theme()` through the `s4-theme` event |
+| `data-theme-seed` on `.s4-swatches` | a click calls `S4.theme({ seed, variant })`; the group follows `S4.theme()` through the `s4-theme` event |
+| `data-variant` on `.s4-swatches` | the scheme variant a picked seed gets (`vibrant`, `fidelity`, `tonal`, `auto`). Without it the page's own variant is kept: an app that set `fidelity` (a brown or caramel brand) keeps it for every swatch, and `auto` (the default) picks per seed (decision 0060) |
+| `data-size="s"` on `.s4-swatches` | 40dp swatches for a picker inside a pane or a card (six fit a phone's row in a pane) |
 | `--s4-swatch-color` | public knob; set from `data-seed` |
 
 **The other theme controls** live in the same script (`theme-controls`), on a connected single-select button group:
 `data-theme-mode` (values `system`, `light`, `dark`), `data-theme-contrast` (`0`, `0.5`, `1`) and
-`data-brand-dial="surfaces|gray|page|corners|display|text|energy"` (values as `S4.theme` takes them: `tinted` / `neutral`,
+`data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight"` (values as `S4.theme` takes them: `tinted` / `neutral`,
 `serif` / `inter`, `firm` / `soft` / `round`…). Each calls `S4.theme` when picked and follows `S4.theme()` when the theme
 changes elsewhere (restored, reset, Undo), so an app's own Appearance section needs no script (`templates/settings.html`).
 
