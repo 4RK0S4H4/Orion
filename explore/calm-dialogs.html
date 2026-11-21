@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>S4 Orion: Calm Dialogs and Docked Glass</title>
+<link rel="stylesheet" href="../components/orion.css?v=1add20d">
+<style>
+body{margin:0;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)}
+.page{max-inline-size:1500px;margin:0 auto;padding:var(--s4-space-6) var(--s4-space-4) var(--s4-space-16);display:flex;flex-direction:column;gap:var(--s4-space-8)}
+.intro{max-inline-size:72ch;display:flex;flex-direction:column;gap:var(--s4-space-3)}
+.intro ul{margin:0;padding-inline-start:var(--s4-space-5);display:flex;flex-direction:column;gap:var(--s4-space-2)}
+.sec{display:flex;flex-direction:column;gap:var(--s4-space-3)}
+.cards{--rv-min:820px}
+.ph-strip{display:flex;gap:var(--s4-space-5);overflow-x:auto;padding:var(--s4-space-3) var(--s4-space-3) var(--s4-space-4)}
+.ph-frame{flex:none;inline-size:min(390px,calc(100vw - 72px));block-size:720px;border:0;border-radius:var(--s4-shape-sheet);background:var(--md-sys-color-surface)}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="intro">
+    <h1 class="s4-headline-medium">Calm Dialogs and Docked Glass</h1>
+    <p class="s4-body-large">You said dialogs felt in your face and weird on a phone, and the docked bars looked odd with the edge glow. Each card below is the real Showcase in a phone frame: <b>A</b> is how it was, <b>B</b> is the new Orion. Swipe a row sideways on a phone.</p>
+    <ul class="s4-body-medium">
+      <li><b>Fewer dialogs.</b> Only questions the app cannot go on without stay dialogs (delete for good, leave unsaved work, a permission). Forms moved to panels or in place; filters became a tool panel with no Apply.</li>
+      <li><b>On a phone a dialog sits in the bottom of the screen</b>, in reach of your thumb, with its answers side by side and the destructive one quieter. The scrim is half as dark in light mode, and the card is firmer glass, so the page behind is not noise.</li>
+      <li><b>Swipe it down</b> to put it away, or tap outside. Try it in the B frames or on <a href="../demo/index.html#forms">the Showcase</a> and <a href="../components/dialog/dialog.html">the dialog page</a>.</li>
+      <li><b>Docked bars</b> (nav bar, top bar once you scroll, docked toolbar) keep the glass but lose the rim and glow: one hairline on the edge facing the content, like the iPhone tab bar. Menus, buttons, panels and dialogs that float keep their edge.</li>
+    </ul>
+  </div>
+  <div id="sections"></div>
+</main>
+<footer class="s4-body-small" style="padding:var(--s4-space-6);text-align:center;color:var(--md-sys-color-on-surface-variant)"><a href="../">S4 Orion</a> exploration</footer>
+
+<script src="../components/assets/icons.js?v=bfe722b"></script>
+<script src="../components/orion.js?v=e5b00bd"></script>
+<script src="lib/questions.js?v=9c78837"></script>
+<script src="lib/review.js?v=c12ab1a"></script>
+<script>
+/* Each frame is the live Showcase (decision 0048). "Before" puts back how Orion looked before decision 0064 with a little
+   CSS inside the frame; "After" is Orion as it is now. */
+const OLD_DIALOG = `
+.s4-dialog{inset:0!important;margin:auto!important;inline-size:calc(100vw - 48px)!important;max-inline-size:none!important;min-inline-size:0!important;border-radius:var(--s4-shape-dialog)!important;--_glass-tint:var(--s4-glass-tint-opacity-float)!important;gap:var(--s4-space-4)!important}
+.s4-dialog .s4-dialog-icon{align-self:center!important}
+.s4-dialog .s4-dialog-headline{font-size:var(--md-sys-typescale-headline-small-size)!important;line-height:var(--md-sys-typescale-headline-small-line-height)!important;text-align:center}
+.s4-dialog::backdrop,.s4-bottom-sheet::backdrop{background:color-mix(in srgb,var(--md-sys-color-scrim) 32%,transparent)!important}
+.s4-dialog-actions,.s4-sheet-actions{flex-wrap:wrap!important;flex-direction:row!important}
+.s4-dialog-actions>.s4-button,.s4-sheet-actions>.s4-button{flex:none!important;--_h:var(--s4-size-button)!important}
+.s4-dialog-actions>.s4-button{background:transparent!important;color:color-mix(in srgb,var(--md-sys-color-primary) 35%,var(--md-sys-color-on-surface))!important}
+.s4-dialog-actions>.s4-button[data-color=error]{color:color-mix(in srgb,var(--md-sys-color-error) 35%,var(--md-sys-color-on-surface))!important}
+.s4-sheet-actions>.s4-button[data-variant=text]{background:transparent!important}
+.s4-bottom-sheet{--_glass-tint:var(--s4-glass-tint-opacity-float)!important;border-radius:var(--s4-shape-sheet)!important}`;
+const OLD_DOCK = `
+:root:not([data-theme=dark]) .s4-nav-bar{box-shadow:inset 0 1px 1px color-mix(in srgb,white 46%,transparent),inset 0 12px 12px -12px color-mix(in srgb,black 28%,transparent)!important}
+:root:not([data-theme=dark]) .s4-top-app-bar[data-scrolled]{box-shadow:inset 0 -1px 1px color-mix(in srgb,white 46%,transparent),inset 0 -12px 12px -12px color-mix(in srgb,black 28%,transparent)!important}
+:root[data-theme=dark] .s4-nav-bar{box-shadow:inset 0 1px 1px color-mix(in srgb,white 12%,transparent),inset 0 12px 12px -12px color-mix(in srgb,white 24%,transparent)!important}
+:root[data-theme=dark] .s4-top-app-bar[data-scrolled]{box-shadow:inset 0 -1px 1px color-mix(in srgb,white 12%,transparent),inset 0 -12px 12px -12px color-mix(in srgb,white 24%,transparent)!important}`;
+
+function frame(view, theme, css, act) {
+  const el = document.createElement('iframe');
+  el.className = 'ph-frame'; el.title = view + ' (' + theme + ')'; el.src = '../demo/index.html'; el.loading = 'lazy';
+  el.addEventListener('load', () => {
+    const go = () => {
+      let w, d; try { w = el.contentWindow; d = w.document; } catch (e) { return; }
+      if (!w.S4 || !d.querySelector('.s4-nav-item')) return;
+      d.documentElement.dataset.theme = theme; d.dispatchEvent(new w.CustomEvent('s4-theme'));
+      if (css) { const s = d.createElement('style'); s.textContent = css; d.head.appendChild(s); }
+      const nav = d.querySelector('.s4-nav-item[data-view="' + view + '"]'); if (nav && nav.getAttribute('aria-current') !== 'page') nav.click();
+      setTimeout(() => { if (act) act(w, d); setTimeout(() => { if (el.parentElement) el.parentElement.scrollLeft = 0; }, 60); }, 700);   /* opening focuses inside the frame; keep the row where it was */
+    };
+    setTimeout(go, 400);
+  });
+  return el;
+}
+function strip(view, css, act) {
+  const wrap = document.createElement('div'); wrap.className = 'ph-strip';
+  wrap.append(frame(view, 'dark', css, act), frame(view, 'light', css, act));
+  return wrap;
+}
+const openDialog = (w, d) => { const b = d.querySelector('[data-dialog="confirm-delete"]'); if (b) b.scrollIntoView({ block: 'center' }); w.S4.dialog.open('confirm-delete'); };
+const openPanel = (w) => w.S4.sheet.open('share-note');
+const scrollDown = (w, d) => { w.scrollTo(0, 620); const body = d.querySelector('.s4-app-body'); if (body) body.scrollTop = 620; };
+
+const SECTIONS = [
+  { q: 'dialogs', h: 'A Dialog on a Phone', p: 'Delete All Notes in the Showcase: something that cannot be undone, so it stays a dialog.', view: 'forms', act: openDialog,
+    a: 'Centered, big headline, two words floating at the right, a gray page behind.', b: 'In the bottom, in reach; answers side by side; Delete quieter; half the scrim; firmer glass. Swipe it down.' },
+  { q: 'panels', h: 'A Floating Panel on a Phone', p: 'Share Note: a short task with no place in the page.', view: 'forms', act: openPanel,
+    a: 'Cancel as a bare word, Share small at the right.', b: 'Cancel and Share fill the bottom of the panel; its bottom corners follow the screen; swipe down to put it away.' },
+  { q: 'docked', h: 'Docked Glass Bars', p: 'The nav bar and the top bar with the Controls page scrolled under them.', view: 'controls', act: scrollDown, dock: true,
+    a: 'A bright rim with a glow (dark) or a gray shade band (light) along the edge.', b: 'The same glass, one hairline on the edge facing the content.' }
+];
+SECTIONS.forEach((x) => {
+  const sec = document.createElement('section'); sec.className = 'sec';
+  sec.innerHTML = '<h2 class="s4-title-large">' + x.h + '</h2><p class="s4-body-medium">' + x.p + '</p><div class="cards rv-group" role="radiogroup"></div>';
+  sec.querySelector('.rv-group').setAttribute('aria-label', x.h);
+  document.getElementById('sections').appendChild(sec);
+  const before = x.dock ? OLD_DOCK : OLD_DIALOG + OLD_DOCK;
+  sec.querySelector('.cards').append(
+    S4Review.card({ pick: x.q + ':A', letter: 'A', title: 'Before', desc: x.a, preview: strip(x.view, before, x.act) }),
+    S4Review.card({ pick: x.q + ':B', letter: 'B', title: 'After', tag: 'New', desc: x.b, preview: strip(x.view, '', x.act) })
+  );
+});
+S4Review.page('calm-dialogs');
+</script>
+</body>
+</html>

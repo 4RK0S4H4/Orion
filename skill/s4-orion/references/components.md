@@ -498,7 +498,7 @@ screen where the title deserves weight (Budget, Reports). They collapse into the
 
 **Behaviour:** sticky at the top of its scroll container (the window, or the nearest scrolling ancestor). At rest the
 bar is `surface`; once content scrolls under it, `data-scrolled` switches it to `surface-container` (and glass.css turns
-that into glass). Medium and large stick with a negative `top`, so only the 64dp row stays; the JS slides that row down
+that into glass: docked glass, tint and blur with one hairline along its bottom edge and no rim or glow, decision 0064). Medium and large stick with a negative `top`, so only the 64dp row stays; the JS slides that row down
 as the headline scrolls away, clips and fades the headline, and fades a small copy of the title (`aria-hidden`) into the
 row. Changing `.s4-app-bar-title` text updates the copy.
 
@@ -550,7 +550,9 @@ Expressive horizontal items from 600 wide.
 
 **Layout:** 80dp on surface-container. Under 600 the icon sits over the label; from 600 (the bar is its own container)
 the icon and label sit side by side inside a 40dp pill. Inside `.s4-app` the bar is sticky at the bottom, pads for the
-home indicator and hides from 840, where the [nav rail](#nav-rail) takes over.
+home indicator and hides from 840, where the [nav rail](#nav-rail) takes over. glass.css makes it docked glass
+(decision 0064): the tint and the blur with one device-pixel hairline along its top edge, and no rim or glow, like the
+iPhone tab bar.
 
 **Behaviour (`nav-bar.js`):** clicking an item moves `aria-current` to it and fires `s4-change { item, index, value }`
 on the bar (`value` = `data-view`, else `href`). `preventDefault()` in a click handler vetoes it. The new pill expands
@@ -751,7 +753,7 @@ Actions for the current page or selection. M3 Expressive floating and docked too
 |---|---|---|
 | `data-color` | `vibrant` (primary-container) | standard (surface-container) |
 | `data-orientation` | `vertical` | horizontal |
-| `data-type` | `docked`: full width, 64dp, square corners, no shadow, home-indicator padding | floating: 64dp pill, elevation 3 |
+| `data-type` | `docked`: full width, 64dp, square corners, no shadow, home-indicator padding; docked glass (one hairline on its top edge, no rim or glow, decision 0064) | floating: 64dp pill, glass with the full edge |
 | `.s4-toolbar-divider` | a separator between groups | — |
 | `.s4-toolbar-dock` | toolbar + FAB in a row; `data-position="bottom"` floats the pair centered above the bottom (and above the nav bar in an app shell) | — |
 
@@ -4026,20 +4028,23 @@ opener; Tab closes (a submenu and its parents together). Submenu items say `aria
 
 ## Dialog
 
-> **A dialog is the last rung of the placement ladder (decision 0047).** Use it only when the app cannot go on without an answer: something serious that cannot be undone, or leaving with unsaved work. A reply, a comment, an add form, a rename or a filter opens in place with [expand](#expand); a reversible action just happens and offers Undo in a snackbar.
+> **A dialog is the last rung of the placement ladder (decision 0047).** Use it only for a question the app cannot go on without: deleting something for good, leaving with unsaved work, a permission. A reply, a comment, an add form, a rename or a filter opens in place with [expand](#expand) or in a [floating panel](#sheet); a reversible action just happens and offers Undo in a snackbar; something to read is a [page](#page). Expect one or two dialogs in a whole app.
 
-Asks for a decision or a short input. It **pops** in: rises 16px and fades in on the spatial spring, and closes with a
-quick drop and fade (decision 0022). On glass, over a 32% scrim.
+Asks one question with two (rarely three) answers. On a wide window it is a modest card in the middle, no wider than its
+question needs. **On a phone (under 600) it sits in the bottom of the screen** (decision 0064): inset by the margin, within
+reach of the thumb, its bottom corners parallel to the screen's own corners, its answers filling the width. It **pops**
+in (rises 16px and fades in; Pop, decision 0046) over a light scrim, on firmer glass than menus (90%), and a tap
+outside, a **swipe down**, Escape or Back puts it away.
 
 ```html
 <button class="s4-button" data-color="error" data-dialog="confirm-delete">Delete Bill</button>
 <dialog class="s4-dialog" id="confirm-delete" aria-labelledby="cd-h">
   <span class="s4-icon s4-dialog-icon" data-icon="delete"></span>
   <h2 class="s4-dialog-headline" id="cd-h">Delete this bill?</h2>
-  <div class="s4-dialog-content">Staples, $72.40. This can’t be undone.</div>
+  <div class="s4-dialog-content">Staples, $72.40. It goes from every device and can’t be undone.</div>
   <div class="s4-dialog-actions">
-    <button class="s4-button" data-variant="text" data-close="cancel">Cancel</button>
-    <button class="s4-button" data-variant="text" data-color="error" data-close="delete">Delete</button>
+    <button class="s4-button" data-variant="tonal" data-close="cancel">Cancel</button>
+    <button class="s4-button" data-variant="tonal" data-color="error" data-close="delete">Delete</button>
   </div>
 </dialog>
 ```
@@ -4048,16 +4053,32 @@ quick drop and fade (decision 0022). On glass, over a 32% scrim.
 |---|---|
 | `[data-dialog="id"]` | Opens the dialog (focus returns to this element when it closes) |
 | `[data-close="value"]` | Closes it; the value comes back in `s4-close { value }` |
-| `data-fullscreen="compact"` | Full screen on phones. Needs **both** markups: the normal headline + actions (wide screens) and a `.s4-dialog-bar` (phones) holding a close icon button (`data-close="cancel"`), a `.s4-dialog-headline` and a confirm text button; the other set is hidden at each size |
-| `data-persistent` | A click on the scrim doesn't close it (Escape still does) |
-| `data-origin="none"` | Fade in place instead of growing from the opener |
+| `data-persistent` | A tap on the scrim or a swipe down doesn't close it (Escape and its answers still do) |
+| `data-fullscreen="compact"` | Old: full screen on phones. A task that needs the whole screen is a [page](#page) (decision 0050); kept so older markup works |
 | JS | `S4.dialog.open(id, { from })`, `S4.dialog.close(id, value)`; events `s4-open`, `s4-close` |
 
-**Focus:** the dialog itself takes focus when it opens, never a text field (decisions 0043 and 0049; there is no opt-in for fields). `data-autofocus` on a button picks that button. Tab then goes to the first control; focus returns to the opener on close.
-by accident. Focus returns to the opener.
+**The answers:** Cancel first, `data-variant="tonal"`; the answer last, named by what it does ("Delete", "Discard",
+"Allow", never "OK"). A destructive answer is `data-variant="tonal" data-color="error"` (clear, not shouting); any other
+is filled. On a phone two answers sit side by side; three or more stack with Cancel at the bottom, nearest the thumb.
+A text-variant answer gets a quiet fill on a phone so it never floats as a bare word.
 
-**Do:** questions as headlines in sentence case ("Delete this bill?"); actions say what they do ("Delete", not "OK"); confirm
-only what can't be undone (use Undo in a snackbar otherwise). **Don't:** stack dialogs; put a dialog on a sheet.
+**Swipe down (phones):** the card follows the finger; let go past a quarter of its height, or flick, and it leaves from
+where it was let go; otherwise it settles back. It does not start on a field or a slider, or while the content inside
+is scrolled. It is never the only way out.
+
+**Focus:** the dialog itself takes focus when it opens, never a text field (decisions 0043 and 0049; there is no opt-in for fields). `data-autofocus` on a button picks that button. Tab then goes to the first control; focus is trapped inside (native modal `<dialog>`, the page behind is inert) and returns to the opener on close.
+
+**Do:** questions as headlines in sentence case ("Delete this bill?"); one or two lines of what happens; answers that say
+what they do. **Don't:** a dialog with one answer (something to read is a page, a notice is a snackbar); a form in a
+dialog (it is a task: in place, a floating panel or a page); "Are you sure?" for something Undo can fix; stacked dialogs;
+a dialog on a panel. The page checker and the suite fail the first two.
+
+**Accessibility:** native `<dialog>` opened with `showModal()`: `aria-modal`, focus trap and inert page come from the
+browser; give it `aria-labelledby`. Android's Back closes it through the native `cancel` event. Reduced motion: it only
+fades. Reduced transparency and high contrast: solid, with the 32% scrim. Forced colors: a real border.
+
+**Tokens:** `--s4-shape-dialog`, `--s4-shape-screen` (phone bottom corners), `--s4-space-4` (inset), `--s4-scrim-opacity`,
+`--s4-glass-tint-opacity-modal`, `--s4-size-touch-target` (answers on a phone), title-large and body-medium type.
 
 ---
 
@@ -4067,7 +4088,11 @@ only what can't be undone (use Undo in a snackbar otherwise). **Don't:** stack d
 
 A short task without leaving the screen (decision 0043; these replace bottom and side sheets and keep their class
 names). A panel is a glass surface that floats inside the window: inset from every edge, all four corners round, and it
-pops in like a dialog. Nothing slides up the screen and nothing docks to an edge.
+pops in like a dialog. Nothing slides up the screen and nothing docks to an edge. **On a phone (under 600) every panel
+sits in the bottom of the screen** within reach of the thumb (decision 0064): its bottom corners run parallel to the
+screen's own corners, its actions fill the width (two side by side, three or more stacked with the first at the
+bottom), and a tap outside, a **swipe down**, Escape or Back puts it away. A modal panel is firmer glass (90%) over a
+light scrim; a tool panel keeps the float tint.
 
 ```html
 <button class="s4-button" data-sheet="add-expense">Add Expense</button>
@@ -4086,25 +4111,29 @@ pops in like a dialog. Nothing slides up the screen and nothing docks to an edge
 |---|---|
 | `.s4-bottom-sheet` | Floats at the bottom center (on a phone: the full width minus the inset, above the home indicator). |
 | `.s4-side-sheet` | From 600 wide: floats at the end side, as tall as the window minus the inset. On a phone: same as the bottom panel. |
-| `data-placement="center"` | Centers the panel like a dialog. |
-| `data-persistent` | A click outside doesn't close it. |
+| `data-placement="center"` | Centers the panel like a dialog from 600 wide (on a phone it stays in the bottom). |
+| `data-persistent` | A click outside or a swipe down doesn't close it. |
 | `data-modeless` | A **tool panel** (decision 0054): from 600 wide it opens with no scrim and the page behind stays live. Closes with Close, Escape (focus inside), or a second tap on its opener. On a phone it is modal as usual. |
 
 Opening, closing, `[data-close]`, focus and events work exactly like the [dialog](#dialog) (`S4.sheet.open/close`
 are the same functions). Opening never focuses a text field (decision 0049); `data-autofocus` on a button picks that button.
-`.s4-sheet-handle` in older markup draws nothing, and panels are not dragged.
+`.s4-sheet-handle` in older markup draws nothing. On a phone a swipe down puts a panel away (it follows the finger, and
+leaves past a quarter of its height or after a flick); it never starts on a field, a slider or scrolled content, and it is
+never the only way out.
 
 **Modal or tool panel?** A panel that is a short task you finish or cancel (Add Expense) is modal: the default. A
 panel that is a tool for the page behind it (filters, an inspector, formatting) is `data-modeless`: its controls act at
 once, there is no Apply button, and you keep working in the page while it is open. Dialogs are always modal.
 
-**Do:** use a bottom panel for a quick add or a set of choices; a side panel for filters or details beside content on
-wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dialog, or a second panel on a panel.
+**Do:** use a bottom panel for a quick add or a short task with no place in the page; a side panel for a tool beside the
+content on wide screens. Always give it a Cancel or Close. **Don't:** put a panel on a dialog, or a second panel on a
+panel; open a panel for something that fits in place (`.s4-expand`) or for a long task (a page).
 
 **Accessibility:** a native modal `<dialog>`: focus is trapped, Escape closes, focus returns to the opener. Give it
 `aria-labelledby`.
 
-**Tokens:** `--s4-shape-sheet`, `--s4-space-4` (inset), `--s4-scrim-opacity`, glass tokens.
+**Tokens:** `--s4-shape-sheet`, `--s4-shape-screen` (phone bottom corners), `--s4-space-4` (inset), `--s4-scrim-opacity`,
+`--s4-glass-tint-opacity-modal`, glass tokens.
 
 ---
 
