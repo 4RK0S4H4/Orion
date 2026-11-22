@@ -18,16 +18,16 @@ A 10 means: a top-tier professional team would ship it without reservations, che
 
 ## Status
 
-| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Review 3 (11-22, c089ade) | Target |
-|---|---|---|---|---|
-| Foundations | 9 | 8.5 | 9 | 10 |
-| Behaviour | 9 | 8 | 8.5 | 10 |
-| Accessibility | 8 | 7.5 | 8.5 | 10 |
-| App Components | 8 | 8.5 | 9 | 10 |
-| Visual Hierarchy | 6 | 7.5 | 8.5 | 10 |
-| Desktop Apps | 6 | 7.5 | 8.5 | 10 |
-| Websites | 4 | 7.5 | 8.5 | 10 |
-| Per-App Customization | 4 | 8 | 9 | 10 |
+| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Review 3 (11-22, c089ade) | Review 4 (11-22, 032c225) | Target |
+|---|---|---|---|---|---|
+| Foundations | 9 | 8.5 | 9 | 9 | 10 |
+| Behaviour | 9 | 8 | 8.5 | 9 | 10 |
+| Accessibility | 8 | 7.5 | 8.5 | 8.5 | 10 |
+| App Components | 8 | 8.5 | 9 | 9 | 10 |
+| Visual Hierarchy | 6 | 7.5 | 8.5 | 8.5 | 10 |
+| Desktop Apps | 6 | 7.5 | 8.5 | 8.5 | 10 |
+| Websites | 4 | 7.5 | 8.5 | 9 | 10 |
+| Per-App Customization | 4 | 8 | 9 | 9.5 | 10 |
 
 Review 1 is `explore/design-review.html` (issues 51-60). Review 2, with every blocker ranked and tagged, is
 [`history/round-0058/regrade-2.md`](history/round-0058/regrade-2.md). Review 3 is [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md); its Top 10 plans round 0059. Review 2 was stricter on behaviour and
@@ -77,7 +77,7 @@ accessibility, so some scores fell although nothing got worse.
    and Parley at phone width, the rich inputs, subset Inter in Safari), a desktop (Parley's menu bar and shortcuts, Linnea's grid,
    the Electron example), VoiceOver on a dialog and the table. Device-only bugs come before anything new.
 5. **Review 3** (done, c089ade, [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md)): 9 / 8.5 / 8.5 / 9 / 8.5 / 8.5 / 8.5 / 9; nothing a 10 yet.
-6. **Round 0059 — current stage**: review 3's Top 10, in two workstreams.
+6. **Round 0059** (done, 032c225): review 3's Top 10, in two workstreams.
    - **A** (built, decision 0067; branch `round59/a`, worktree `r59-a`, owns shared docs): dial values validated (dev warning
      and page checker); grid header keys surfaced (hint, aria-description, README); 0049 wording for shortcut-opened
      palettes; checker rules for mid-word breaks and one-glyph boxes proven on a known-bad page and added to evals; a
@@ -85,7 +85,17 @@ accessibility, so some scores fell although nothing got worse.
    - **B** (built and merged, decision 0068; branch `round59/b`, worktree `r59-b`, decision 0068, notes `history/round-0059/b.md`): Parley list column
      wider and resizable; one filled selection per region (Parley, Mallet docs); wide-window emptiness (Tally, Showcase
      at 1600); per-page icon subset for sites and a lower landing budget; app bundle split by component if it fits.
-   - Then A merges B, full tests, publish, review 4. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
+   - Published 032c225. Tag push was refused by GitHub (403); tags v1.0.0 (8f7d23f) and v1.1.0 (383dedb) exist only
+     if the owner creates them on GitHub.
+   - Review 4 ([`history/round-0059/regrade-4.md`](history/round-0059/regrade-4.md)): 9 / 9 / 8.5 / 9 / 8.5 / 8.5 / 9 / 9.5.
+6b. **Round 0060 — current stage**: review 4's blockers.
+   - **A** (branch `round60/a`, worktree `r60-a`, decision 0069, owns shared docs): app bundle split by component
+     (apps load only what they use; a budget in check); palette Escape with nothing focused lands on main, not body;
+     confirm Linnea's toolbar is outside the grid; grid-keys cue for a touch device with a keyboard.
+   - **B** (branch `round60/b`, worktree `r60-b`, decision 0070, notes `history/round-0060/b.md`): one accent job per
+     screen in Parley (four reds at once); Showcase 1600 weight in monochrome and the Folders/side column balance; a
+     third-party-brand trial: a new app built from the skill alone, checked for a bespoke look, its lessons fed back.
+   - Then A merges B, publish, review 5. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
      run for real, print pagination, skill evals proving bespoke results.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 with a git tag and a re-packaged skill (CHANGELOG 1.0.0 and 1.1.0 are still "Unreleased").
