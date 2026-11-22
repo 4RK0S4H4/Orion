@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Words</title>
+<!-- Known-bad fixture (round 0059, decision 0067). tests/checker.mjs expects the page checker to FAIL this page with the
+     message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<main class="s4-content" style="padding: 16px">
+  <h1>Collections</h1>
+  <!-- a bare table with no .s4-table-wrap and no orion.js (so nothing wraps it and nothing stacks its rows): at 390 its five columns are squeezed until words break -->
+  <table class="s4-table" style="width: 100%; table-layout: fixed">
+    <thead><tr><th scope="col">Specimen</th><th scope="col">Collector</th><th scope="col">Classification</th><th scope="col">Registration</th><th scope="col">Provenance</th></tr></thead>
+    <tbody>
+      <tr><td>Archaeopteryx</td><td>Fitzgerald-Montgomery</td><td>Paleontological</td><td>Accession-0042-A</td><td>Internationally</td></tr>
+      <tr><td>Trilobite</td><td>Wolverhampton</td><td>Invertebrate</td><td>Accession-0043-B</td><td>Unprovenanced</td></tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

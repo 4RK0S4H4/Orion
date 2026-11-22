@@ -7,7 +7,8 @@
                 no name, a button group that swaps panels or tabs without panels (decision 0059), a dialog that does not ask (one
                 answer, or a form: decision 0064), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
                 easings, glass on content, bare element selectors), and silent failures (decision 0065): an s4- class nothing
-                defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill
+                defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill,
+                a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067)
      warnings – more than one filled button in one area, labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -275,6 +276,7 @@ for (const page of pages) {
       r.names.forEach((x) => errors.add(`${at} control with no accessible name (add aria-label): ${x}`));
       r.glassContent.forEach((x) => errors.add(`${at} glass on content: ${x}`));
       r.roles.forEach((x) => errors.add(`${at} ${x}`));
+      (r.dials || []).forEach((x) => errors.add(`${at} ${x}`));   /* a dial attribute with a value Orion has no rule for (decision 0067) */
       (r.unknown || []).forEach((x) => errors.add(`${at} unknown class ${x}: nothing in Orion or the page defines it (check the name in the component's README)`));
       (r.broken || []).forEach((x) => errors.add(`${at} ${x}: the box is too narrow for its words (a fixed width, a column that cannot stack, or a part outside its component)`));
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
@@ -283,7 +285,7 @@ for (const page of pages) {
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };
     await p.evaluate(knownClasses);
-    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit));
+    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])) });
     report(await audited());
     const shot = join(OUT, `${label}-${v.name}.png`);
     await p.screenshot({ path: shot, fullPage: true });

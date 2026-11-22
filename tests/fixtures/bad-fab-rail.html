@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: FAB In Rail</title>
+<!-- Known-bad fixture (round 0059, decision 0067). tests/checker.mjs expects the page checker to FAIL this page with the
+     message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<!-- a FAB directly in the rail (not in .s4-nav-rail-header): it is squeezed to one glyph wide beside the items -->
+<nav class="s4-nav-rail" aria-label="Main" style="position: static; inline-size: 72px">
+  <button class="s4-fab" type="button" aria-label="Add Bill"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Add Bill Today</span></button>
+  <div class="s4-nav-rail-items">
+    <a class="s4-nav-item" href="#home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+  </div>
+</nav>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

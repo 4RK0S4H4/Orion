@@ -329,19 +329,73 @@
     { key: 'scale', attr: 'data-scale', base: 'default' },   /* type and spacing together: compact, default, large (scale.css, decision 0066) */
     { key: 'headings', attr: 'data-headings', base: 'default' }   /* heading style: default, tight, editorial (brand.css, decision 0066) */
   ];
+  /* Dial values (decision 0067): every dial takes a short list of values; anything else matches no rule and used to be
+     written to the page silently (S4.theme({ scale: 'roomy' }) wrote data-scale="roomy" and nothing changed). S4.theme
+     now warns, names the allowed values and does not write the attribute; the same list audits markup (S4.theme.audit)
+     and the page checker fails what it finds. A typeface may also be any font-family value (written as "custom"). */
+  var DIALS = {
+    'data-theme': ['light', 'dark', 'system'],
+    'data-contrast': ['standard', 'medium', 'high'],
+    'data-surfaces': ['neutral', 'tinted'],
+    'data-accent-variant': ['auto', 'tonal', 'vibrant', 'fidelity', 'expressive', 'content', 'neutral', 'monochrome', 'rainbow', 'fruit-salad'],
+    'data-corners': ['round', 'soft', 'firm'],
+    'data-gray': ['pure', 'warm', 'cool'],
+    'data-page': ['plain', 'soft'],
+    'data-type-display': ['inter'].concat(FACES, ['custom']),
+    'data-type-text': ['inter'].concat(FACES, ['custom']),
+    'data-type-display-weight': ['semibold', 'regular', 'medium'],
+    'data-energy': ['calm', 'standard', 'lively'],
+    'data-scale': ['default', 'compact', 'large'],
+    'data-headings': ['default', 'tight', 'editorial'],
+    'data-density': ['comfortable', 'compact', 'auto', 'roomy'],
+    'data-buttons': ['filled', 'tonal'],
+    'data-cards': ['filled', 'elevated'],
+    'data-lists': ['plain', 'segmented'],
+    'data-rail': ['auto', 'expanded', 'collapsed']
+  };
+  function sayList(a) { return a.length < 2 ? a.join('') : a.slice(0, -1).join(', ') + ' or ' + a[a.length - 1]; }
+  function dialMsg(attr, v) {
+    var ok = DIALS[attr];
+    if (!ok || v == null || v === '' || ok.indexOf(v) >= 0) return null;
+    return 'S4: ' + attr + '="' + v + '" is not a value of that dial; use ' + sayList(ok) + '.';
+  }
+  var warned = {};
+  function warnOnce(msg) { if (!warned[msg]) { warned[msg] = 1; console.warn(msg); } }
+  function ownPage(n) { return n.classList.contains('s4-subpage') || n.hasAttribute('data-title'); }   /* data-page on a page is its id, not the dial */
+  /* false, with a warning, for a value that is not on the dial's list: the caller leaves the attribute alone */
+  function dialOk(attr, key, v) {
+    if (v == null || v === '' || v === false) return true;
+    var ok = DIALS[attr]; if (!ok || ok.indexOf(String(v)) >= 0) return true;
+    warnOnce('S4: theme ' + key + ' "' + v + '" ignored (not written); use ' + sayList(ok) + '.');
+    return false;
+  }
+  /* a typeface dial also takes a font-family value, so it is never checked as a preset */
+  function brandOk(d, v) { return d.prop ? true : dialOk(d.attr, d.key, v); }
+  function auditDials(scope) {
+    var out = [], seen = {}, attrs = Object.keys(DIALS);
+    [].slice.call((scope || document).querySelectorAll(attrs.map(function (a) { return '[' + a + ']'; }).join(','))).forEach(function (n) {
+      attrs.forEach(function (a) {
+        if (!n.hasAttribute(a) || (a === 'data-page' && ownPage(n))) return;
+        var m = dialMsg(a, n.getAttribute(a));
+        if (m && !seen[m]) { seen[m] = 1; out.push(m); }
+      });
+    });
+    return out;
+  }
   /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
      A key set to null or '' removes the attribute (the container follows the page again); a default value ('round',
      'pure', 'inter', mode 'light') is written, so the container goes back to stock Orion inside a branded page. */
   function themeElement(el, opts) {
     var attr = function (name, v) { if (v == null || v === '' || v === 'system') el.removeAttribute(name); else el.setAttribute(name, v); };
     if (opts) {
-      if ('mode' in opts) attr('data-theme', opts.mode);
+      if ('mode' in opts && dialOk('data-theme', 'mode', opts.mode)) attr('data-theme', opts.mode);
       if ('seed' in opts) attr('data-accent', opts.seed);
-      if ('variant' in opts) attr('data-accent-variant', opts.variant);
+      if ('variant' in opts && dialOk('data-accent-variant', 'variant', opts.variant)) attr('data-accent-variant', opts.variant);
       if ('surfaces' in opts) attr('data-surfaces', opts.surfaces === 'tinted' ? 'tinted' : null);
       BRAND.forEach(function (d) {
         if (!(d.key in opts)) return;
         var v = opts[d.key];
+        if (!brandOk(d, v)) return;
         if (d.key === 'page' && v === 'plain') v = null;   /* page tone only adds: a plain region inside a soft page is not a dial */
         if (!d.prop || !v || v === d.base || FACES.indexOf(v) >= 0) { attr(d.attr, v); if (d.prop) el.style.removeProperty(d.prop); return; }
         attr(d.attr, 'custom'); el.style.setProperty(d.prop, v);
@@ -360,6 +414,11 @@
       corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold',
       scale: state.scale || 'default', headings: state.headings || 'default' };
     var colorChanged = false;
+    opts = Object.assign({}, opts);   /* a value off the dial's list is dropped, with a warning, never written (decision 0067) */
+    if ('mode' in opts && !dialOk('data-theme', 'mode', opts.mode)) delete opts.mode;
+    if ('variant' in opts && !dialOk('data-accent-variant', 'variant', opts.variant)) delete opts.variant;
+    if ('contrast' in opts && opts.contrast !== '' && opts.contrast != null && !(+opts.contrast >= 0 && +opts.contrast <= 1)) { warnOnce('S4: theme contrast "' + opts.contrast + '" ignored (not written); use 0, 0.5 or 1.'); delete opts.contrast; }
+    BRAND.forEach(function (d) { if (d.key in opts && !brandOk(d, opts[d.key])) delete opts[d.key]; });
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
       state.seed = seed && String(seed).toLowerCase() !== '#000000' ? seed : null; colorChanged = true;
@@ -396,6 +455,12 @@
     var v = root.getAttribute(d.attr); if (!v || v === d.base) return;
     state[d.key] = v === 'custom' && d.prop ? (root.style.getPropertyValue(d.prop).trim() || null) : v;
   });
+  S4.theme.dials = DIALS;
+  S4.theme.audit = auditDials;   /* the dial attributes in the page whose value is not on the list, as messages (the page checker fails them) */
+  S4.register('dial-values', function (scope) { auditDials(scope).forEach(warnOnce); });
+  new MutationObserver(function (list) {
+    list.forEach(function (m) { if (m.attributeName === 'data-page' && ownPage(m.target)) return; var msg = dialMsg(m.attributeName, m.target.getAttribute(m.attributeName)); if (msg) warnOnce(msg); });
+  }).observe(root, { attributes: true, subtree: true, attributeFilter: Object.keys(DIALS) });
   S4.theme.accents = { mono: '#000000', blue: '#0b57d0', indigo: '#4f46e5', violet: '#7c3aed', pink: '#c2185b', red: '#c62828', orange: '#d9480f', amber: '#b26a00', green: '#2e7d32', teal: '#00796b' };
   /* Apply a saved theme (or the defaults on a first visit) and keep saving changes under key. Returns true if one was saved. */
   /* opts.only (decision 0060): the keys the visitor owns, e.g. { only: ['mode'] }. Only those are read

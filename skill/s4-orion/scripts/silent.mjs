@@ -61,6 +61,24 @@ export function silentAudit() {
     }
   }
 
+  /* a box one glyph wide (or none): a block that holds real words but is narrower than 1.2 of its own letters, so its text
+     stacks one letter or word per line, or is gone (a FAB put straight in a rail instead of the rail's header, a column
+     too narrow for its label). A box that is hidden, faded out or clipped away on purpose is not counted. */
+  const ownWords = (e) => { for (const n of e.childNodes) if (n.nodeType === 3 && /[A-Za-z]{3}/.test(n.nodeValue)) return true; return false; };
+  let narrow = 0;
+  for (const el of document.body.querySelectorAll('*')) {
+    if (narrow >= 8 || !ownWords(el) || flagged.has(el) || skip(el) || /^(SCRIPT|STYLE|TEXTAREA|OPTION|TITLE)$/.test(el.tagName)) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.display === 'inline' || cs.display === 'contents') continue;
+    if (!(el.checkVisibility ? el.checkVisibility({ opacityProperty: true, visibilityProperty: true }) : cs.visibility !== 'hidden')) continue;
+    const r = el.getBoundingClientRect(), fs = parseFloat(cs.fontSize) || 16;
+    if (r.width >= fs * 1.2 || r.height === 0 && r.width === 0 && cs.overflow !== 'visible') continue;
+    if (cs.clipPath !== 'none' || (cs.position === 'absolute' && cs.clip !== 'auto') || (r.width <= 1.5 && r.height <= 1.5)) continue;   /* visually hidden on purpose: the name stays for screen readers */
+    if (el.closest('[aria-expanded="false"], [data-collapsed], [data-s4-collapsed]') && cs.overflow !== 'visible') continue;
+    narrow++; flagged.add(el);
+    out.broken.push(`"${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}" is squeezed into a box ${Math.round(r.width)}px wide, one glyph, in ${path(el)}`);
+  }
+
   /* parts outside the component they belong to */
   const NEED = [
     ['.s4-nav-item', '.s4-nav-bar, .s4-nav-rail', 'a navigation bar or rail'],
