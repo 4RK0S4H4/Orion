@@ -79,7 +79,7 @@ const DESCRIPTIONS = {
   'surface-container': 'Default container: nav bar, menus.',
   'surface-container-high': 'High-emphasis container: dialogs, search.',
   'surface-container-highest': 'Highest-emphasis container: filled text fields.',
-  outline: 'Important boundaries: outlined buttons, text field outlines.',
+  outline: 'Boundaries that must show at 3:1: the focus ring's fallback, forced-colors borders, chart axes (nothing in Orion is outlined).',
   'outline-variant': 'Decorative boundaries: dividers.',
   'inverse-surface': 'Snackbars and other inverted surfaces.',
   scrim: 'Behind modal surfaces (used at 32% opacity).',

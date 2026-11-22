@@ -220,7 +220,10 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - Rows people compare across columns: a **table** (it stacks into rows on phones by itself, in its `.s4-table-wrap`, which
   table.js adds when it is missing). Right-align numbers with `.s4-num` on their cells.
 - A few rich, independent things: **cards** in an `.s4-grid`. Sections of settings or a dashboard: **panes**.
-- State of a thing: a **status** pill with a tone and a word ("Overdue"), never color alone.
+- State of a thing: a **status** pill with a word ("Overdue"), never color alone. A status is a tint (decision 0065): no
+  tone for usual and finished states (Approved, Paid), `error` or `warning` only for the one state that needs action
+  now, `info`/`success` for plain facts; never paint a status as a filled pill (the checker fails it).
+- Toolbars: **one tonal tool** (the main one, e.g. Add Filter); the rest `text` or plain icon buttons.
 - Numbers people check over time (KPIs): **stats** (`.s4-stat`) in one pane's `.s4-stat-row`, not a pane per number.
 - An item's fields on a detail screen: a **description list** (`.s4-dl`).
 - A reading against a whole, a limit or a target (storage, time left, words, runway): a **meter** (`.s4-meter`,
@@ -237,6 +240,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   selected value `primary`, labels `on-surface-variant`, a text alternative (`role="img"` + `aria-label`).
 
 **Data at scale** (decision 0061; markup in `references/components.md`)
+- Keyboard: a data table is two Tab stops (header, body); never add `tabindex` to cells or header controls yourself.
 - More than about 50 rows, or rows from data: `S4.table(table, { cell, detail }).setRows(rows)` inside `.s4-states`, `data-sticky` on the wrap and a height (`--s4-table-max-height`). Pin the identifying column (`th[data-pin]`); `data-resizable` and `data-key` for tools used daily; `data-column-menu` past six columns; `data-edit` only for short values (Undo follows). A record opens as a page, never a dialog. Phones stack rows; `data-layout="scroll"` only for numbers compared across a row.
 - Narrowing a collection: `.s4-filter` (`S4.filter`), not a hand-made bar: saved views (two to five, named after the questions people ask), search, Add Filter, an All Filters tool panel (choice facets for a few values, tags for long lists, ranges for numbers and years), filters in force as chips, a count; always a `no-results` state with Clear Filters. Never an Apply button; never drag-only column order.
 - Code: `.s4-code` with a file name (`S4.code` colors it with the fixed `--s4-syntax-*` tokens; never by hand); `.s4-code-inline` in sentences, `.s4-keys` / `.s4-kbd` for keys. Charts over time: `.s4-chart-range` above the chart; `data-legend="toggle"` with three or more series.

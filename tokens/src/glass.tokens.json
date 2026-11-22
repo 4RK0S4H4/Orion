@@ -142,7 +142,7 @@
       },
       "item-outline": {
         "$type": "color",
-        "$description": "The outline of an outline-only item on glass (outlined button, unselected chip): the glass's milky frost line, a little stronger than the edge (decision 0015). Zero in high contrast, where glass is solid and the item keeps its own outline.",
+        "$description": "The line an item on glass would draw if it still had one (older markup: an unselected chip, the old outlined variant): the glass's milky frost line, a little stronger than the edge (decision 0015). Nothing in Orion is outlined (0023). Zero in high contrast, where glass is solid and the item keeps its own outline.",
         "$value": {
           "colorSpace": "srgb",
           "components": [

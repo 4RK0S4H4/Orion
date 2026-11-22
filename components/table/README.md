@@ -12,17 +12,17 @@ solid content surfaces, never glass.
       <th scope="col" data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Bills"><span class="s4-checkbox-box"></span></label></th>
       <th scope="col" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Vendor<span class="s4-icon" data-icon="chevron-down"></span></button></th>
       <th scope="col">Status</th>
-      <th scope="col" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Amount<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+      <th scope="col" class="s4-num" aria-sort="none"><button type="button" class="s4-table-sort">Amount<span class="s4-icon" data-icon="chevron-down"></span></button></th>
     </tr></thead>
     <tbody>
       <tr tabindex="0">
         <td data-check><label class="s4-checkbox"><input type="checkbox" aria-label="Select Iron Mountain INV-10482"><span class="s4-checkbox-box"></span></label></td>
         <td><a href="/bills/10482">Iron Mountain</a></td>
         <td><span class="s4-status" data-tone="tertiary">Due</span></td>
-        <td class="num" data-value="1240">$1,240.00</td>
+        <td class="s4-num" data-value="1240">$1,240.00</td>
       </tr>
     </tbody>
-    <tfoot><tr><th scope="row" colspan="3">Total</th><td class="num">$1,240.00</td></tr></tfoot>
+    <tfoot><tr><th scope="row" colspan="3">Total</th><td class="s4-num">$1,240.00</td></tr></tfoot>
   </table>
 </div>
 ```
@@ -32,7 +32,7 @@ solid content surfaces, never glass.
 | `.s4-table-wrap` | surface-container-low, large corners, scrolls sideways if it must; the container the compact layout measures | — |
 | `data-sticky` (wrap or table) | header stays at the top while rows scroll inside the wrap; height from `--s4-table-max-height` | header + 8 rows |
 | `th`, `td` | header 56 (title-small, on-surface-variant), rows 52 (body-medium), 16 side padding, tabular figures | — |
-| `.num` on `th` / `td` | right-aligned (table.js copies it from the header to the column's cells) | start |
+| `.s4-num` on `th` / `td` | figures: tabular and right-aligned (table.js copies it from the header to the column's cells, and a column whose every cell is `.s4-num` right-aligns its header). `.num` is the older name and still works | start |
 | `data-wrap` on `th` / `td` | let a long column wrap (min 192) | no wrap |
 | `th[aria-sort]` + `button.s4-table-sort` | click cycles `ascending` → `descending` → `none` (original order); sorts each tbody by `data-value` or text; `s4-change { type: 'sort', column, label, direction }` | — |
 | `data-value` on `td` | the sort key: a number for amounts, an ISO date for dates | the text |
@@ -75,7 +75,7 @@ Everything below is opt-in; markup without these attributes behaves exactly as a
         <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
         <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
         <th scope="col" data-field="taxon" data-primary data-edit>Taxon</th>
-        <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum">Specimens</th>
+        <th scope="col" data-field="count" class="s4-num" data-format="integer" data-edit="number" data-total="sum">Specimens</th>
         <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
       </tr></thead>
       <tbody></tbody>
@@ -133,6 +133,10 @@ Right and Left move through the row's controls and cells that edit, Home and End
 extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
 On a group row, Enter or Right and Left open and close the group.
 
+**The wrap:** a table always sits in `.s4-table-wrap` (the scroller, and the container that stacks rows under 600);
+table.js adds one around a bare `.s4-table`, unless its parent already scrolls sideways. Cells that do not stack keep
+words whole: a column is at least as wide as its longest word and the wrap scrolls (decision 0065).
+
 **Phones:** the stacked layout stays the default for data tables too (rows are measured as they are drawn): headline,
 then one line per value, details under the checkbox, the row menu in the top corner, the sort buttons in one row that
 scrolls sideways. Use `data-layout="scroll"` on the wrap instead when people compare numbers across a row (a price grid,
@@ -150,7 +154,7 @@ A data table prints the rows that are drawn: print from a report view of the row
 read on its own. Keep tables to the columns that matter; put the rest on the detail page.
 
 **Do**
-- Right-align amounts and counts (`.num`), and give them `data-value` so they sort as numbers.
+- Right-align amounts and counts (`.s4-num`), and give them `data-value` so they sort as numbers.
 - Make one column `data-primary` (usually the name) so stacked rows read well on phones.
 - Show status with a [status](../status/) pill (a label and a tone).
 - Label every row checkbox with what it selects ("Select Staples INV-10451").

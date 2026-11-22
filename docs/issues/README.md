@@ -30,19 +30,19 @@ decision and show options in a motion lab with the scrubber before building.
 
 Sent with screenshots after the round 0056 publish; "more minor critiques and ideas for you to carry forward".
 
-- **61.** Radio list in a pane (checkout, Delivery): "layout is a little bad here and looks glitched, with where the
+- **61.** Done 2026-11-17 (commit d0a6c3f: the legend is a label above, the options one filled box inset from every corner; marked in decision 0065). Radio list in a pane (checkout, Delivery): "layout is a little bad here and looks glitched, with where the
   text is and the radio button so close to the corner, conflicted with the corner radius."
   Image: `img/2026-11-17-radio-list-corner.png`.
-- **62.** Text field focus is "a bit too harsh and contrasty, especially in monochrome, either find a different way to
+- **62.** Done 2026-11-17 (commit 405528a: a quiet accent hairline after a tap or click, the focus ring from the keyboard; marked in decision 0065). Text field focus is "a bit too harsh and contrasty, especially in monochrome, either find a different way to
   indicate or use diff colors." Image: `img/2026-11-17-field-focus-harsh.png`.
 - **63.** Done 2026-11-17 (decision 0059: the owner picked A, Ink Track, in `explore/review-button-group-2.html`, pairs the same; tabs moved to the navigation family so the two never look alike; the page checker and suite guard which is which). Connected button group (the Joined Capsule, decision 0026): "I want a different take ... too similar to
   material 3 expressive, and I think it looks a bit odd. something with the same level of creativity, but not
   material. looks odd especially for 2 buttons." This reopens 0026 at the owner's request: show options in a quiz.
   Images: `img/2026-11-17-button-group-connected.png`, `img/2026-11-17-button-group-sizes.png`.
-- **64.** Chat composer: "on the text box select focus, this looks super bad, not sure why the whole message bar is
+- **64.** Done 2026-11-17 (commit 405528a: one ring, never the field and the bar at once; marked in decision 0065). Chat composer: "on the text box select focus, this looks super bad, not sure why the whole message bar is
   outlined in white as well, that's weird." Two rings at once (the field and the bar).
   Image: `img/2026-11-17-composer-double-ring.png`.
-- **65.** Onboarding step dots: "also bug here" (the active dot is a squashed ellipse, not a clean pill, and sits off
+- **65.** Done 2026-11-17 (commit a146b0f: the current step is a clean pill on the row's center line; marked in decision 0065). Onboarding step dots: "also bug here" (the active dot is a squashed ellipse, not a clean pill, and sits off
   the row). Image: `img/2026-11-17-onboarding-dots.png`.
 - **66.** Done 2026-11-21 (all 19 templates plus the new Data Table are their own products, each with its own brand through the dials; the lessons became decision 0060, proposals in `docs/history/round-0056/lessons.md`). Direction for templates: monochrome stays for Orion's own pages (the design language site, showcase,
   reference pages). **Every template should be its own thing**: "super unique", a high quality standalone page with

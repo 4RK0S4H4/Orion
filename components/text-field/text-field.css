@@ -8,7 +8,7 @@
      <button class="s4-icon-button" type="button" aria-label="Clear">…</button>  trailing icon or icon button (after the control)
      <div class="s4-text-field-supporting">Sentence case helper text.</div>
    </div>
-   One look: a quiet box (thin outline, medium corners, surface fill) with the label above it. No floating label, no filled
+   One look: a quiet box (filled, medium corners, never outlined: decision 0023) with the label above it. No floating label, no filled
    variant; data-variant is ignored, so older markup still works. Hover lifts the fill; focus is a quiet accent hairline
    for a tap or click and the focus ring for the keyboard (see states). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
    without a label is just the box. Parts are placed on a grid, so their source order only matters for leading vs trailing icons. */

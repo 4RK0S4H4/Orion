@@ -27,9 +27,10 @@ above content. Content itself is always solid.
 ```css
 background-color: color-mix(in srgb, var(--s4-glass-tint-float) 75%, transparent);   /* surface-container */
 backdrop-filter: blur(8px) saturate(1.5);                                            /* no backdrop dimming needed at 75% */
-box-shadow: inset 0 1px 0 var(--_edge-hi),                                   /* the edge light: bright along the top, */
-            inset 0 -1px 0 var(--_edge-hi),                                /* a faint return at the bottom, */
-            inset 0 0 0 1px var(--_edge-hi);                                  /* a faint line all round; no shadow */
+box-shadow: inset 0 var(--_hair) 0 var(--_edge-hi),                         /* floating glass: a thin rim along the top */
+            inset 0 calc(-1 * var(--_hair)) 0 var(--_edge-hi);              /* and the bottom, lit equally; none on the sides */
+            /* plus the soft glow (or the edge shade on a light surface) just inside it; no shadow.
+               Docked glass draws only one hairline, var(--s4-glass-edge-line), on the edge that faces the content */
 ```
 
 Components don't write this: `glass.css` applies it to the listed components in its own cascade layer. To make something
@@ -62,9 +63,9 @@ The glow flips on light surfaces (decisions 0036, 0037): a surface below OKLCH l
 
 Floating action buttons are glass too (decisions 0025, 0028): tinted with their own color at `--s4-glass-tint-opacity-fab` (75%); the default monochrome FAB keeps 3:1 or better over any backdrop (`scripts/check-glass.mjs` prints the seeded worst case). Optional brighter-near-the-edges surface (decision 0030): `--s4-glass-glow-alpha` (0 = off) and `--s4-glass-glow-size`; each side glows with its own edge light, so a stronger bottom edge gives a stronger bottom glow.
 
-Controls inside a glass surface (a dialog's fields, a menu's chips) stay your UI: they keep their own color at full fill (`--s4-glass-item-fill: 1`; lower it to let the blurred backdrop tint them) and drop their outlines, so the glass supplies the depth and the items stay clean (decision 0015).
-- No outline at rest on text fields and the switch. Focus, error and disabled keep theirs, because they carry meaning; hover draws none on glass.
-- An item that is only an outline with no fill (outlined button, unselected chip) keeps one, drawn as the frost line (`--s4-glass-item-outline`, white at 28%). Error-colored outlines stay.
+Controls inside a glass surface (a dialog's fields, a menu's chips) stay your UI: they keep their own color at full fill (`--s4-glass-item-fill: 1`; lower it to let the blurred backdrop tint them), so the glass supplies the depth and the items stay clean (decisions 0015, 0023, 0043).
+- Nothing on glass is outlined, as nowhere in Orion: fields, chips and buttons are filled; items on glass are tints, never solid patches (`check-glass` proves them). The focus ring is the only line.
+- Error keeps the field's normal fill and says so in words; disabled fades as everywhere else.
 - Solid wherever the glass is solid: all of this switches off with high contrast, reduced transparency, no `backdrop-filter` and `data-glass="off"`.
 
 ## Do / don't

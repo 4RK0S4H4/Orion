@@ -9204,7 +9204,7 @@
      <button class="s4-icon-button" type="button" aria-label="Clear">…</button>  trailing icon or icon button (after the control)
      <div class="s4-text-field-supporting">Sentence case helper text.</div>
    </div>
-   One look: a quiet box (thin outline, medium corners, surface fill) with the label above it. No floating label, no filled
+   One look: a quiet box (filled, medium corners, never outlined: decision 0023) with the label above it. No floating label, no filled
    variant; data-variant is ignored, so older markup still works. Hover lifts the fill; focus is a quiet accent hairline
    for a tap or click and the focus ring for the keyboard (see states). Error: aria-invalid="true" on the control and/or data-error="Message" on the field. A field
    without a label is just the box. Parts are placed on a grid, so their source order only matters for leading vs trailing icons. */
@@ -12569,7 +12569,8 @@
   /* ITEMS ON GLASS (decision 0015). The app's own UI stays the main thing on the depth the glass gives:
      - buttons, chips and text fields draw their own color at --s4-glass-item-fill (1 = fully; lower lets the blurred backdrop tint them);
      - no outlines at rest: text fields and the switch lose theirs (focus, error and disabled keep theirs, they carry meaning; hover adds none);
-     - only an item that is just an outline with no fill (outlined button, unselected chip) keeps one, drawn as the frost line.
+     - nothing is outlined (decision 0023); should an unselected chip or the old data-variant="outlined" still draw an --_outline
+       (older markup), it is the frost line, never a dark line on glass.
      Skipped wherever the glass is solid: high contrast and data-glass="off" are excluded in the selector, the two blocks after it
      hand everything back to the components for reduced transparency and for browsers without backdrop-filter. */
   :where(:root:not([data-contrast="high"])) :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled], .s4-site-panel[data-open], .s4-nav-bar, .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet, .s4-rich-tooltip, .s4-tooltip, .s4-snackbar):not([data-glass="off"]) :where(.s4-chip, .s4-button:not([data-variant="text"])) { background: color-mix(in srgb, var(--_bg) calc(var(--s4-glass-item-fill) * 100%), transparent); }

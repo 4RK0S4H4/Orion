@@ -3,7 +3,19 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-21, round 0056 finished): everything built, needs the owner's look
+## Now (2026-11-22, round 0058): the re-grade's blockers, in two workstreams
+
+An independent re-grade listed what blocks a 10 in each area. Round 0058 takes them in two workstreams (owner's lead,
+2026-11-21). **Workstream A** (decision 0065, built): Back keeps your place and focus; focus never drops to `<body>`
+(board drafts, mod+comma, the menu bar, the palette); data tables follow the grid pattern (one header and one body Tab
+stop, Home/End, Tab out); the page checker and suite fail silent failures (unknown classes, broken words, parts outside
+their component, loud statuses); bare tables and rail FABs render right; `.s4-num` right-aligns; statuses are tints;
+one tonal tool in the filter bar; Parley's inspector and list; a banned-phrase check; issues 61, 62, 64, 65 Done.
+**Workstream B** (decision 0066): light site bundle, Showcase and hub for wide windows, grabber and scrim, firm corners,
+`scale` and `headings` dials. Next: merge B, then the owner's device pass (Linnea's keyboard at 1280, Parley at 1280 and
+1600, a phone pass of the filter bar).
+
+## Earlier (2026-11-21, round 0056 finished): everything built, needs the owner's look
 
 The owner asked for every area of the design review taken to a 10 and left the order and the calls to us ("I trust
 your judgement", 2026-11-16). Round 0056 built all of it in workstreams and merged them (notes in
@@ -195,6 +207,8 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 - Off-switch ring on glass; tables lab (the owner wanted tables explored in context).
 
 ## Session log
+
+- 2026-11-22 (round 0058, workstream A): place, focus and silent failures (0065): Back restores scroll and focus, focus never on body, the grid keyboard for data tables, silent-failure checks in the checker and suite, bare tables and rail FABs, `.s4-num`, statuses are tints, one tonal tool per toolbar, Parley finish, drift and `check:words`. Next: merge workstream B (0066).
 
 - 2026-11-21 (round 0057, calm): calm dialogs, phone cards with swipe-down, lighter scrim, firmer modal glass, docked bars with one hairline (0064, issues 67 and 68); merged with the decisions branch and published.
 - 2026-11-21 (round 0057, decisions): the eleven calls taken as recommended and built (0063): brand files, kicker and figure, meter, board, quiet table checkboxes, one label rule, dense maps, calmer selection, small lessons 38, 39, 42, 43, Parley's phone bar. Next: merge with round57/calm, then the owner's looks.

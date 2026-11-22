@@ -262,7 +262,7 @@ export const tokens = {
   "--s4-glass-item-outline": {
     "type": "color",
     "value": "rgb(255 255 255 / 0.28)",
-    "description": "The outline of an outline-only item on glass (outlined button, unselected chip): the glass's milky frost line, a little stronger than the edge (decision 0015). Zero in high contrast, where glass is solid and the item keeps its own outline.",
+    "description": "The line an item on glass would draw if it still had one (older markup: an unselected chip, the old outlined variant): the glass's milky frost line, a little stronger than the edge (decision 0015). Nothing in Orion is outlined (0023). Zero in high contrast, where glass is solid and the item keeps its own outline.",
     "modes": {
       "dark": "rgb(255 255 255 / 0.28)",
       "high-contrast": "rgb(255 255 255 / 0)",
@@ -1807,7 +1807,7 @@ export const tokens = {
   "--md-sys-color-outline": {
     "type": "color",
     "value": "#757575",
-    "description": "Important boundaries: outlined buttons, text field outlines.",
+    "description": "Boundaries that must show at 3:1: the focus ring's fallback, forced-colors borders, chart axes (nothing in Orion is outlined).",
     "modes": {
       "dark": "#8f8f8f",
       "high-contrast": "#2c2c2c",

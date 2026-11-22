@@ -20,7 +20,7 @@ Browse every component on the [gallery](https://4rk0s4h4.github.io/s4-orion/comp
 components/
 ├── base/             cascade layers, Inter, element defaults, type utilities, focus ring, the shared state layer
 ├── core/core.js      S4 runtime: registry and auto-init, motion helpers, icons, theme
-├── motion/           transition patterns: container transform, unfold, shared axis, slide from edge
+├── motion/           the ten motion patterns (State, Ink, Morph, Bend, Reveal, Follow, Pop, Rise, Switch, Loop)
 ├── glass/glass.css   the glass layer (decision 0004)
 ├── <component>/      <component>.css, <component>.js (if it has behaviour), <component>.html (reference page), README.md
 ├── icons/            names.json (vocabulary) and the Solar source set

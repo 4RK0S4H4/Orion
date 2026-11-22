@@ -38,7 +38,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--md-sys-color-surface-container-high` | #e9e9e9 | #282828 | High-emphasis container: dialogs, search. |
 | `--md-sys-color-surface-container-highest` | #e2e2e2 | #333333 | Highest-emphasis container: filled text fields. |
 | `--md-sys-color-surface-tint` | #5e5e5e | #c6c6c6 |  |
-| `--md-sys-color-outline` | #757575 | #8f8f8f | Important boundaries: outlined buttons, text field outlines. |
+| `--md-sys-color-outline` | #757575 | #8f8f8f | Boundaries that must show at 3:1: the focus ring's fallback, forced-colors borders, chart axes (nothing in Orion is outlined). |
 | `--md-sys-color-outline-variant` | #c9c9c9 | #454545 | Decorative boundaries: dividers. |
 | `--md-sys-color-inverse-surface` | #2e2e2e | #ededed | Snackbars and other inverted surfaces. |
 | `--md-sys-color-inverse-on-surface` | #f2f2f2 | #2e2e2e |  |
@@ -451,7 +451,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-glass-backdrop-brightness-float` | 1 | 1 | brightness() on the backdrop. 1 (off) since decision 0021, see backdrop-contrast. |
 | `--s4-glass-max-stack` | 2 |  | At most two glass layers overlap at any point (e.g. a menu over an app bar). A third becomes solid. |
 | `--s4-glass-item-fill` | 1 |  | How much of its own color an item (button, chip, text field) keeps on glass, 1 = fully (decision 0015: owner picked full fill; lower it to let the blurred backdrop tint items). |
-| `--s4-glass-item-outline` | rgb(255 255 255 / 0.28) | rgb(255 255 255 / 0.28) | The outline of an outline-only item on glass (outlined button, unselected chip): the glass's milky frost line, a little stronger than the edge (decision 0015). Zero in high contrast, where glass is solid and the item keeps its own outline. |
+| `--s4-glass-item-outline` | rgb(255 255 255 / 0.28) | rgb(255 255 255 / 0.28) | The line an item on glass would draw if it still had one (older markup: an unselected chip, the old outlined variant): the glass's milky frost line, a little stronger than the edge (decision 0015). Nothing in Orion is outlined (0023). Zero in high contrast, where glass is solid and the item keeps its own outline. |
 | `--s4-glass-edge-width` | 1px |  |  |
 | `--s4-glass-edge-line` | rgb(23 23 26 / 0.2) | rgb(255 255 255 / 0.16) | Decision 0064: the one hairline a docked glass bar (top app bar once content scrolls under it, site header, nav bar, docked toolbar) draws on the edge that faces the content, one device pixel wide, instead of a lit rim and glow. Zero where glass is solid (the bar keeps its own solid look). |
 | `--s4-glass-edge-scale-standard` | 1.5 |  | Decision 0029: on a standard-density screen (under 1.5 device pixels per CSS pixel, e.g. a 1080p or 1440p monitor) the edge width is multiplied by this, so it stays visible. Retina and phone screens keep the width as it is. |

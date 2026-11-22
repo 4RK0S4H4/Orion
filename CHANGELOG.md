@@ -8,6 +8,22 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+Round 0058, workstream A: your place, your focus and silent failures (decision 0065):
+
+- Added: the page checker and the suite fail silent failures (`skill/s4-orion/scripts/silent.mjs`): an `s4-` class nothing defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill.
+- Added: `npm run check:words` (in `npm run check`): phrases that describe the old look fail in docs, the skill, component READMEs and reference pages (decisions, history and the issue log exempt).
+- Added: `data-cmd-plain` runs a check command without showing its pressed state (a panel's own Close button).
+- Changed: data tables have two Tab stops, the header and the body (WAI-ARIA grid): arrows move along the header, a grip resizes with Shift+arrows or Enter then arrows, Home/End within a row, Ctrl+Home/End for the first and last row, Up from the first row to the header; the same header order in every column; Select All rests as the quiet dot (amends 0063).
+- Changed: statuses are tints: the accent tones draw as a 16% wash with the surface's text, never the accent's container fill; only the state that needs action now is warm. Parley and Linnea retoned by meaning.
+- Changed: `.s4-num` is the documented class for figures and right-aligns in table cells and headers (a column of `.s4-num` cells right-aligns its header); `.num` still works.
+- Changed: the filter bar has one tonal tool (Add Filter); the rest are text buttons, icon-only on a phone (one row). Parley: inspector section renamed, a quiet close button, a wider resizable list, the inspector open from 1440.
+- Changed: `S4.app.go` moves focus into the new view; the menu bar's second Escape returns focus to where it was (also after a click); the palette lists a destination a command opens only once.
+- Fixed: Back from a page restored the scroll before the view showed (it landed at the top) and left focus on `<body>`; it now keeps the place and returns focus to the item that opened the page.
+- Fixed: the board's Add left focus on `<body>`; the draft holds the focus (never the field) and Add gives the button back.
+- Fixed: a bare `.s4-table` never stacked on a phone (table.js adds its wrap); a `.s4-fab` or items straight in `.s4-nav-rail` rendered as a column of letters (drawn as the rail's own now).
+- Fixed: table cells that do not stack broke words mid-word; they keep words whole and the wrap scrolls; status pills keep words whole; columns measured in a hidden view or rounded below their text.
+- Fixed: doc drift (foundations index, glass edge snippet and items on glass, text field comments, the outline token, SKILL.md dialog answers); issues 61, 62, 64, 65 marked Done.
+
 Round 0057: the eleven calls (decision 0063, the owner handed us the lead):
 
 - Added: brand files (`scripts/brand.mjs`, also in the skill): a fixed brand's scheme as CSS linked after `orion.css`, so it paints on the first frame; `core.js` recognises it (`--s4-brand`) and loads, generates and repaints nothing. Every branded template links `templates/brand/<name>.css`, written by `npm run build` and covered by the stale check. A visitor-picked color is cached under the save key and put back before the first paint by a head snippet (Larkline, Puck). `inline.mjs` leaves out `m3color.js` when a brand file holds the page's only color.

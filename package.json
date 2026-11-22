@@ -16,7 +16,7 @@
     "build": "npm run build:tokens && node scripts/build-gray.mjs && npm run build:icons && npm run build:bundle",
     "check:glass": "node scripts/check-glass.mjs",
     "check:gray": "node scripts/build-gray.mjs --check",
-    "check": "npm run check:tokens && npm run check:gray && npm run check:icons && npm run check:glass && npm run check:accent && npm run check:scopes && npm run check:motion && npm run check:bundle",
+    "check": "npm run check:tokens && npm run check:gray && npm run check:icons && npm run check:glass && npm run check:accent && npm run check:scopes && npm run check:motion && npm run check:words && npm run check:bundle",
     "build:bundle": "node scripts/build.mjs",
     "check:bundle": "node scripts/build.mjs --check",
     "check:accent": "node scripts/check-accent.mjs",
@@ -26,6 +26,7 @@
     "test:reach": "node tests/reach.mjs",
     "test:layout": "node tests/layout.mjs",
     "test:pages": "node skill/s4-orion/scripts/check.mjs templates/*.html demo/index.html --out tests/out/pages",
-    "check:scopes": "node scripts/check-scopes.mjs"
+    "check:scopes": "node scripts/check-scopes.mjs",
+    "check:words": "node scripts/check-words.mjs"
   }
 }
