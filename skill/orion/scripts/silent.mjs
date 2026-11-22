@@ -127,3 +127,43 @@ export function silentAudit() {
   }
   return out;
 }
+
+/* Window controls (decision 0072): a frameless window's Minimize, Maximize and Close are full cells, as Windows draws
+   them, so a pointer thrown into the window's top corner hits Close and one thrown at the top edge hits the control
+   below it (Fitts's law). For every shown .s4-window-controls in a .s4-titlebar:
+     - each control is at least 40 wide and the bar's whole height, starting at the bar's top edge;
+     - Close touches the bar's end edge (the right, or the left in right-to-left) with no gap;
+     - where the bar is on screen, the corner pixel and the top-edge pixel above each control hit that control (a
+       rounded frame around a demo window may clip its very corner: only a hit inside the bar counts against it).
+   Returns a list of problems. */
+export function windowAudit() {
+  const out = [];
+  const path = (e) => { const bits = []; for (let n = e; n && n !== document.body && bits.length < 3; n = n.parentElement) { let s = n.tagName.toLowerCase(); if (n.id) s += '#' + n.id; else if (n.classList.length) s += '.' + [...n.classList].slice(0, 2).join('.'); bits.unshift(s); } return bits.join(' > '); };
+  for (const set of document.querySelectorAll('.s4-titlebar .s4-window-controls')) {
+    const sr = set.getBoundingClientRect();
+    if (!sr.width || !sr.height || set.closest('[hidden], [inert]')) continue;
+    const bar = set.closest('.s4-titlebar'), b = bar.getBoundingClientRect();
+    const rtl = getComputedStyle(bar).direction === 'rtl', side = rtl ? 'left' : 'right';
+    const ctrls = [...set.querySelectorAll('.s4-window-control')].filter((c) => c.getClientRects().length);
+    const name = (c) => c.getAttribute('aria-label') || c.dataset.windowAction || 'control';
+    for (const c of ctrls) {
+      const r = c.getBoundingClientRect();
+      if (r.width < 39.5 || r.height < b.height - 1 || r.top > b.top + 0.5)
+        out.push(`window control "${name(c)}" is ${Math.round(r.width)}x${Math.round(r.height)}, ${Math.round(r.top - b.top)}px below the top of a ${Math.round(b.height)}px title bar (${path(bar)}): each is a full cell, at least 40 wide, the bar's whole height (decision 0072)`);
+    }
+    const close = ctrls.find((c) => c.dataset.windowAction === 'close');
+    if (!close) { out.push(`window controls without Close in ${path(bar)} (decision 0072)`); continue; }
+    const cr = close.getBoundingClientRect(), gap = rtl ? cr.left - b.left : b.right - cr.right;
+    if (gap > 0.5) out.push(`Close stops ${Math.round(gap)}px short of the title bar's ${side} edge (${path(bar)}): the window's top ${side} corner must hit Close (decision 0072)`);
+    if (b.top >= 0 && b.bottom <= innerHeight && b.left >= 0 && b.right <= innerWidth) {
+      const y = Math.ceil(b.top), x = rtl ? Math.ceil(b.left) : Math.floor(b.right) - 1;
+      const hit = document.elementFromPoint(x, y);
+      if (hit && bar.contains(hit) && !close.contains(hit)) out.push(`the title bar's top ${side} corner pixel hits ${path(hit)}, not Close (decision 0072)`);
+      for (const c of ctrls) {
+        const r = c.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, y);
+        if (h && bar.contains(h) && !c.contains(h)) out.push(`the top edge above "${name(c)}" hits ${path(h)}, not the control (decision 0072)`);
+      }
+    }
+  }
+  return out;
+}

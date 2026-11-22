@@ -2,8 +2,9 @@
    in this repository. To try it: cd examples/electron && npm install && npm start.
    What it shows:
    - a frameless window whose title bar is the page's .s4-titlebar (it drags because the CSS says app-region: drag):
-     on a Mac the traffic lights sit at the start (the page keeps room for them), on Windows and Linux the system's
-     buttons are drawn over the end of the title bar (titleBarOverlay; the page reads env(titlebar-area-*));
+     on a Mac the traffic lights sit at the start (the page keeps room for them); on Windows and Linux the page draws
+     its own window controls (decision 0072), or with ORION_CONTROLS=system the system's buttons are drawn over the end
+     of the title bar (titleBarOverlay; the page reads env(titlebar-area-*));
    - the native menu: on a Mac the page sends S4.commands.native('<menu bar name>') and this builds the menu bar from
      it, with the app menu holding Settings and Quit; clicks come back as commands. On Windows and Linux there is no
      native menu: the page's own menu bar (.s4-menubar) is the menu;
@@ -13,6 +14,10 @@ const path = require('node:path');
 const fs = require('node:fs');
 
 const isMac = process.platform === 'darwin';
+/* Windows and Linux: 'own' (the default) is a frameless window with Orion's window controls (decision 0072: full-height
+   cells to the window's top and end edges, so the corner hits Close); ORION_CONTROLS=system keeps the system's buttons
+   drawn over the bar (titleBarOverlay). */
+const CONTROLS = isMac ? 'system' : (process.env.ORION_CONTROLS === 'system' ? 'system' : 'own');
 const PAGE = path.join(__dirname, '..', '..', 'templates', 'desktop-app.html');
 const BRIDGE = fs.readFileSync(path.join(__dirname, '..', 'shell-bridge.js'), 'utf8');
 const SETTINGS = 'app.settings';   /* the command a Mac puts in the app menu, not in File */
@@ -24,10 +29,13 @@ function createWindow() {
     minWidth: 400,
     minHeight: 520,
     show: false,
-    titleBarStyle: 'hidden',
     ...(isMac
-      ? { trafficLightPosition: { x: 16, y: 13 } }
-      : { titleBarOverlay: { color: '#00000000', symbolColor: nativeTheme.shouldUseDarkColors ? '#e6e6e6' : '#1f1f1f', height: 40 } }),
+      ? { titleBarStyle: 'hidden', trafficLightPosition: { x: 16, y: 13 } }
+      : CONTROLS === 'own'
+        /* frameless: no system buttons. The window still resizes from its edges (the system's invisible borders, and a
+           thin band inside the top edge that the page keeps free of drag regions while the window is not maximized) */
+        ? { frame: false }
+        : { titleBarStyle: 'hidden', titleBarOverlay: { color: '#00000000', symbolColor: nativeTheme.shouldUseDarkColors ? '#e6e6e6' : '#1f1f1f', height: 40 } }),
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#141414' : '#ffffff',
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, sandbox: true },
   });
@@ -37,9 +45,9 @@ function createWindow() {
   win.once('ready-to-show', () => win.show());
 
   const send = () => win.webContents.send('window:state', {
-    focused: win.isFocused(), fullscreen: win.isFullScreen(), maximized: win.isMaximized(),
+    focused: win.isFocused(), fullscreen: win.isFullScreen(), maximized: win.isMaximized(), controls: CONTROLS,
   });
-  ['focus', 'blur', 'enter-full-screen', 'leave-full-screen', 'maximize', 'unmaximize'].forEach((e) => win.on(e, send));
+  ['focus', 'blur', 'enter-full-screen', 'leave-full-screen', 'maximize', 'unmaximize', 'restore'].forEach((e) => win.on(e, send));
   win.webContents.on('did-finish-load', send);
   return win;
 }
@@ -69,7 +77,8 @@ ipcMain.on('menu:set', (event, menus) => {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 });
 
-/* the window buttons of a frameless window that draws its own (.s4-window-control) */
+/* the window buttons of a frameless window that draws its own (.s4-window-control); s4-window says whether it was
+   maximized, but the window is asked, as the page may be out of date */
 ipcMain.on('window:action', (event, action) => {
   const win = BrowserWindow.fromWebContents(event.sender); if (!win) return;
   if (action === 'minimize') win.minimize();

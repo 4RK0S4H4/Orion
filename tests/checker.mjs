@@ -6,6 +6,7 @@
      bad-words.html     a table nothing wraps or stacks, squeezed at 390 until its words break across lines
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
      bad-dial.html      data-scale="roomy" and data-corners="square" on <html>
+     bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
    Usage: node tests/checker.mjs */
 import { spawnSync } from 'node:child_process';
@@ -26,6 +27,9 @@ const CASES = [
   ['bad-fab-rail.html', /"Add Bill" is squeezed into a box \d+px wide, one glyph/, 'a box one glyph wide'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
+  ['bad-window-controls.html', /window control "Close" is 32x28, \d+px below the top of a 40px title bar/, 'a window control smaller than a full cell'],
+  ['bad-window-controls.html', /Close stops 12px short of the title bar's right edge/, 'Close short of the window edge'],
+  ['bad-window-controls.html', /the title bar's top right corner pixel hits header\.s4-titlebar, not Close/, 'the corner pixel misses Close'],
 ];
 const ran = {};
 console.log('known-bad pages fail the page checker');

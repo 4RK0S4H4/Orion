@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Window Controls</title>
+<!-- Known-bad fixture (decision 0072, after decision 0067). tests/checker.mjs expects the page checker to FAIL this page
+     with the messages named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<!-- the window buttons as they were before decision 0072 (issue 69): small controls floating in the bar, with a gap to
+     the window's top and end edges, so the corner pixel misses Close and the top edge drags the window -->
+<header class="s4-titlebar"><span class="s4-titlebar-title">Ledger</span>
+  <div class="s4-window-controls" style="align-self: center; gap: 4px; margin-inline-end: 12px"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize" style="inline-size: 32px; block-size: 28px"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize" style="inline-size: 32px; block-size: 28px"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close" style="inline-size: 32px; block-size: 28px"></button></div>
+</header>
+<main style="padding: 16px"><p>Ledger</p></main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

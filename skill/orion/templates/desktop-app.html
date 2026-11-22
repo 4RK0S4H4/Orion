@@ -127,6 +127,8 @@
     <span class="s4-titlebar-title"><span id="tb-title">Saltreach</span> <span class="s4-on-surface-variant">· <span id="tb-lang">French (fr-FR)</span></span></span>
     <button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button>
     <button class="s4-icon-button" type="button" aria-label="Show Inspector" data-tooltip="Show Inspector" data-cmd="view.inspector"><span class="s4-icon" data-icon="sidebar" data-mirror></span></button>
+    <!-- window controls (decision 0072): shown only when a frameless Windows or Linux shell asks for them (shell-bridge.js) -->
+    <div class="s4-window-controls" hidden data-shell-controls><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button></div>
   </header>
 
   <!-- the sidebar: the rail, expanded, as a source list (sections, folding groups, trees, account and Settings) -->
