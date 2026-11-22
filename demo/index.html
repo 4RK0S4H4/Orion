@@ -124,6 +124,24 @@
             <h2 class="s4-empty-title">Nothing Found</h2>
             <p class="s4-empty-text">Try a different word, or clear the search.</p>
           </div>
+          <!-- a wide window gets more to read, not more air (decision 0068): notes other people shared, and the folders beside -->
+          <div class="demo-section-head">
+            <h2 class="s4-title-medium" id="shared-h">Shared With You</h2>
+          </div>
+          <div class="s4-grid demo-cards demo-shared" role="list" aria-labelledby="shared-h">
+            <article class="s4-card" data-variant="filled" role="listitem">
+              <div class="s4-card-body"><h3 class="s4-card-title">Community garden plan</h3><p class="s4-card-supporting">From Maya Chen · 2 days ago</p></div>
+              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs" data-page-open="note" data-page-id="garden" data-page-title="Community garden plan">Open</button></div>
+            </article>
+            <article class="s4-card" data-variant="filled" role="listitem">
+              <div class="s4-card-body"><h3 class="s4-card-title">Team offsite agenda</h3><p class="s4-card-supporting">From Jonas Weber · Yesterday</p></div>
+              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs" data-page-open="note" data-page-id="offsite" data-page-title="Team offsite agenda">Open</button></div>
+            </article>
+            <article class="s4-card" data-variant="filled" role="listitem">
+              <div class="s4-card-body"><h3 class="s4-card-title">Lunches for the week</h3><p class="s4-card-supporting">From Priya Nair · Monday</p></div>
+              <div class="s4-card-actions"><button class="s4-button" data-variant="tonal" type="button" data-size="xs" data-page-open="note" data-page-id="lunches" data-page-title="Lunches for the week">Open</button></div>
+            </article>
+          </div>
         </div>
 
         <!-- a glance at the week: one number per stat, a chart with its table, a meter for storage -->
@@ -149,6 +167,16 @@
               </div>
               <ul class="s4-meter-legend"><li data-category="1">Photos <b>1.2 GB</b></li><li data-category="2">Voice Notes <b>0.6 GB</b></li><li data-category="3">Text <b>0.3 GB</b></li><li data-track>Free <b>2.9 GB</b></li></ul>
             </div>
+          </section>
+          <section class="s4-pane" aria-labelledby="folders-h">
+            <h2 class="s4-pane-title" id="folders-h">Folders</h2>
+            <ul class="s4-list" aria-labelledby="folders-h" id="folder-list" data-density="compact">
+              <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Work"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Work</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
+              <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Personal"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Personal</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
+              <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Reading"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Reading</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
+              <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Travel"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Travel</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
+              <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Recipes"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Recipes</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
+            </ul>
           </section>
         </aside>
         </div>
