@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en" data-corners="soft" data-scale="large" data-type-display="humanist">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dosewise · Ruth’s Medicines</title>
+<meta name="description" content="Dosewise keeps track of a parent's medicines for the family who look after them: today's doses, what is running low, and the week so far.">
+<!-- Brand trial (round 0060, decision 0070): a product built from the S4 Orion skill alone (SKILL.md, references,
+     templates), by someone outside the project, with a brand handed to them: cobalt #2457c5, a humanist display face,
+     soft corners and the large scale (the people who use it are often older). It links the skill's own assets; a real
+     app copies them next to the page. What the skill lacked or misled is in docs/history/round-0060/b.md.
+     Dosewise is for the family who look after a parent's medicines: Ruth takes eight doses a day; her son and daughter
+     tick them off from their phones, see what runs out next and order it from the same pharmacy. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('dosewise-theme');</script>
+<link rel="preload" href="../../skill/s4-orion/assets/inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../skill/s4-orion/assets/orion.css">
+<link rel="stylesheet" href="brand.css">
+<style>
+  /* Dosewise's own layout and elements: tokens only, nothing restyles an Orion component */
+  .dw-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-3) var(--s4-space-4); padding-block: var(--s4-space-2) var(--s4-space-6); }
+  .dw-head > div { margin-inline-end: auto; min-inline-size: 0; }
+  .dw-kicker { margin: 0; color: var(--md-sys-color-on-surface-variant); font: var(--md-sys-typescale-label-large-weight) var(--md-sys-typescale-label-large-size) / var(--md-sys-typescale-label-large-line-height) var(--md-sys-typescale-label-large-font); }
+  .dw-title { margin: 0; }
+
+  /* Today: the doses, and beside them on a wide window how the day is going and what runs out next */
+  .dw-today { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .dw-today > * { min-inline-size: 0; }
+  @container s4-app (width >= 1000px) { .dw-today { grid-template-columns: minmax(0, 1fr) minmax(20rem, 24rem); } }
+
+  /* the next dose: the one thing the screen is for, its time as the hero number and the one filled action */
+  .dw-next { display: grid; gap: var(--s4-space-4); grid-template-columns: minmax(0, 1fr); align-items: end; }
+  @container s4-app (width >= 600px) { .dw-next { grid-template-columns: minmax(0, 1fr) auto; } }
+  .dw-next-actions { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .dw-day { display: flex; flex-direction: column; gap: var(--s4-space-2); margin-block-start: var(--s4-space-6); }
+  .dw-day-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); }
+
+  /* a dose row's pill: the medicine's own color, drawn from Orion's category roles and named in words beside it */
+  .dw-pill { display: inline-grid; place-items: center; inline-size: var(--s4-size-icon-button); block-size: var(--s4-size-icon-button); border-radius: var(--s4-shape-control); background: color-mix(in srgb, var(--_c) 18%, transparent); color: var(--_c); }
+  .dw-pill[data-category="1"] { --_c: var(--s4-category-1); }
+  .dw-pill[data-category="2"] { --_c: var(--s4-category-2); }
+  .dw-pill[data-category="3"] { --_c: var(--s4-category-3); }
+  .dw-pill[data-category="4"] { --_c: var(--s4-category-4); }
+  .dw-pill[data-category="5"] { --_c: var(--s4-category-5); }
+  .dw-pill[data-category="6"] { --_c: var(--s4-category-6); }
+
+  .dw-side { display: flex; flex-direction: column; gap: var(--s4-layout-gap); }
+  .dw-ring-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-4); }
+  .dw-ring-row > p { flex: 1 1 10rem; margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  .dw-ring-row strong { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-medium-weight); }
+
+  /* History: the week's numbers, the chart and what was missed */
+  .dw-week { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .dw-week > * { min-inline-size: 0; }
+  @container s4-app (width >= 1000px) { .dw-week { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
+
+  .dw-page-actions { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); margin-block-start: var(--s4-space-4); }
+  .dw-credit { margin: var(--s4-space-8) 0 var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  @media (forced-colors: active) { .dw-pill { border: 1px solid CanvasText; } }
+</style>
+</head>
+<body>
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-header">
+      <!-- while Today shows its own filled action (Mark Taken) the rail's action steps down by itself (decision 0070) -->
+      <button class="s4-fab" type="button" data-sheet="dw-add" aria-label="Add Medicine"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Add Medicine</span></button>
+    </div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#today" data-view="today" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="schedule"></span></span><span class="s4-nav-label">Today</span></a>
+      <a class="s4-nav-item" href="#medicines" data-view="medicines"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="pill"></span></span><span class="s4-nav-label">Medicines</span></a>
+      <a class="s4-nav-item" href="#week" data-view="week"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">This Week</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Dosewise</h1></div>
+      <div class="s4-app-bar-actions">
+        <button class="s4-icon-button" type="button" aria-label="Call Riverside Pharmacy" data-tooltip="Call Riverside Pharmacy" id="dw-call"><span class="s4-icon" data-icon="phone"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="More" data-menu="dw-more"><span class="s4-icon" data-icon="more-vert"></span></button>
+      </div>
+    </header>
+    <main class="s4-content" id="main">
+      <section class="s4-view" data-view="today" data-title="Dosewise">
+        <div class="dw-head">
+          <div><p class="dw-kicker">Wednesday, 18 November</p><h2 class="dw-title s4-headline-medium">Ruth’s Medicines</h2></div>
+        </div>
+        <div class="dw-today">
+          <div class="s4-stack">
+            <section class="s4-pane" aria-labelledby="dw-next-h">
+              <div class="dw-next">
+                <div class="s4-stat" data-size="hero">
+                  <span class="s4-stat-label" id="dw-next-h">Next Dose</span>
+                  <span class="s4-stat-value" id="dw-next-time">1:00 PM</span>
+                  <span class="s4-stat-meta" id="dw-next-what">Metformin 500 mg with lunch · in 40 minutes</span>
+                </div>
+                <div class="dw-next-actions">
+                  <button class="s4-button" data-variant="filled" type="button" id="dw-take"><span class="s4-icon" data-icon="check"></span>Mark Taken</button>
+                  <button class="s4-button" data-variant="text" type="button" id="dw-skip">Skip</button>
+                </div>
+              </div>
+              <!-- the day as a road (Orion's milestones): four dose times, the morning done, lunch next; the words say the times
+                   (the road is never labelled step by step, and the current step is drawn wider than the others) -->
+              <div class="dw-day">
+                <div class="dw-day-head"><span class="s4-label-large">Ruth’s Day</span><span class="s4-body-small s4-on-surface-variant" id="dw-day-words">Morning done · lunch next at 1 PM</span></div>
+                <ol class="s4-milestones" id="dw-road" aria-label="Four dose times today, the morning done">
+                  <li data-state="done" data-label="Morning, 8:00 AM"></li>
+                  <li data-state="current" data-value="0.6" data-label="Lunch, 1:00 PM"></li>
+                  <li data-label="Evening, 6:00 PM"></li>
+                  <li data-label="Bedtime, 10:00 PM"></li>
+                </ol>
+              </div>
+            </section>
+
+            <div class="s4-states" id="dw-states" data-state="loading" data-offline="auto">
+              <div data-when="loading" data-rows="6"></div>
+              <div data-when="offline" class="s4-banner" role="status"><span class="s4-icon" data-icon="cloud"></span><span class="s4-banner-text">You’re offline. Doses you tick are kept and shared with Tom when you’re back.</span></div>
+              <ul class="s4-list" data-style="segmented" id="dw-doses" data-when="ready offline" aria-label="Today’s doses"></ul>
+              <div data-when="error" class="s4-empty">
+                <span class="s4-empty-icon"><span class="s4-icon" data-icon="error"></span></span>
+                <h2 class="s4-empty-title">Couldn’t Load Today</h2>
+                <p class="s4-empty-text">The connection dropped. Nothing you ticked was lost.</p>
+                <button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button>
+              </div>
+            </div>
+          </div>
+
+          <aside class="dw-side" aria-label="The day so far">
+            <section class="s4-pane" aria-labelledby="dw-day-h">
+              <h3 class="s4-pane-title" id="dw-day-h">So Far Today</h3>
+              <div class="dw-ring-row">
+                <div class="s4-ring" id="dw-ring" data-value="0.5" aria-label="Doses Taken Today"><span class="s4-ring-value" id="dw-ring-value">4 of 8</span><span class="s4-ring-label">Taken</span></div>
+                <p id="dw-day-note"><strong>All on time.</strong> The rest are at lunch, six and bedtime.</p>
+              </div>
+            </section>
+            <section class="s4-pane" aria-labelledby="dw-low-h">
+              <h3 class="s4-pane-title" id="dw-low-h">Running Low</h3>
+              <div class="s4-stack">
+                <div class="s4-meter" data-value="5" data-max="28" data-state="near">
+                  <div class="s4-meter-head"><span class="s4-meter-label">Amlodipine</span><span class="s4-meter-value"><strong>5 days</strong> left of 28</span></div>
+                  <div class="s4-meter-track"><i class="s4-meter-fill"></i><i class="s4-meter-mark" data-at="7" aria-hidden="true"></i></div>
+                </div>
+                <div class="s4-meter" data-value="11" data-max="30">
+                  <div class="s4-meter-head"><span class="s4-meter-label">Metformin</span><span class="s4-meter-value"><strong>11 days</strong> left of 30</span></div>
+                  <div class="s4-meter-track"><i class="s4-meter-fill"></i><i class="s4-meter-mark" data-at="7" aria-hidden="true"></i></div>
+                </div>
+              </div>
+              <p class="s4-pane-supporting">Riverside Pharmacy needs two working days. Order Amlodipine by Friday.</p>
+              <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" data-page-open="medicine" data-page-id="amlodipine" data-page-title="Amlodipine">Order Amlodipine</button></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
+      <section class="s4-view" data-view="medicines" data-title="Medicines" data-width="reading" hidden>
+        <div class="dw-head">
+          <div><p class="dw-kicker">6 medicines · 8 doses a day</p><h2 class="dw-title s4-headline-medium">Medicines</h2></div>
+        </div>
+        <ul class="s4-list" data-style="segmented" id="dw-meds" aria-label="Medicines"></ul>
+        <button class="s4-fab" data-fixed data-sheet="dw-add" type="button"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Add Medicine</span></button>
+      </section>
+
+      <section class="s4-view" data-view="week" data-title="This Week" hidden>
+        <div class="dw-head">
+          <div><p class="dw-kicker">12 to 18 November</p><h2 class="dw-title s4-headline-medium">This Week</h2></div>
+        </div>
+        <div class="dw-week">
+          <section class="s4-pane" aria-labelledby="dw-week-h">
+            <h3 class="s4-pane-title" id="dw-week-h">Doses Taken</h3>
+            <div class="s4-stat-row">
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Taken</span><span class="s4-stat-value">51 of 56</span><span class="s4-stat-meta">Today still has five to go</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">On Time</span><span class="s4-stat-value">94%</span><span class="s4-stat-meta">Within 30 minutes</span></div>
+              <div class="s4-stat" data-size="small"><span class="s4-stat-label">Missed</span><span class="s4-stat-value">2</span><span class="s4-stat-meta">Both at bedtime</span></div>
+            </div>
+            <figure class="s4-chart" data-type="column" data-labels="Thu,Fri,Sat,Sun,Mon,Tue,Wed" data-values="8,8,7,8,8,7,3" data-name="Doses">
+              <figcaption class="s4-chart-title">Doses A Day <span class="s4-chart-subtitle">Eight are due each day; today is not over</span></figcaption>
+            </figure>
+          </section>
+          <section class="s4-pane" aria-labelledby="dw-missed-h">
+            <h3 class="s4-pane-title" id="dw-missed-h">Missed</h3>
+            <p class="s4-pane-supporting">Both were the bedtime Atorvastatin. A reminder at 9:30 PM might help.</p>
+            <ul class="s4-list">
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="dw-pill" data-category="3"><span class="s4-icon" data-icon="pill"></span></span></span><span class="s4-list-content"><span class="s4-list-headline">Atorvastatin 20 mg</span><span class="s4-list-supporting">Saturday, bedtime</span></span></div></li>
+              <li><div class="s4-list-item"><span class="s4-list-leading"><span class="dw-pill" data-category="3"><span class="s4-icon" data-icon="pill"></span></span></span><span class="s4-list-content"><span class="s4-list-headline">Atorvastatin 20 mg</span><span class="s4-list-supporting">Tuesday, bedtime</span></span></div></li>
+            </ul>
+            <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="dw-remind">Add A 9:30 PM Reminder</button></div>
+          </section>
+        </div>
+        <p class="dw-credit">Solar icons by 480 Design (CC BY 4.0).</p>
+      </section>
+
+      <!-- a medicine is something you go into: a page with Back and its own link (decision 0050) -->
+      <section class="s4-subpage" data-page="medicine" data-title="Medicine" hidden>
+        <header class="s4-subpage-header">
+          <h2 class="s4-subpage-title" id="dw-med-title">Amlodipine</h2>
+          <div class="s4-subpage-meta"><span id="dw-med-dose">5 mg tablet</span><span id="dw-med-for">For blood pressure</span></div>
+        </header>
+        <div class="s4-stack">
+          <section class="s4-pane" aria-labelledby="dw-supply-h">
+            <h3 class="s4-pane-title" id="dw-supply-h">Supply</h3>
+            <div class="s4-meter" id="dw-med-meter" data-value="5" data-max="28">
+              <div class="s4-meter-head"><span class="s4-meter-label">Left At Home</span><span class="s4-meter-value" id="dw-med-left"><strong>5 days</strong> of 28</span></div>
+              <div class="s4-meter-track"><i class="s4-meter-fill"></i><i class="s4-meter-mark" data-at="7" aria-hidden="true"></i></div>
+            </div>
+            <div class="dw-page-actions">
+              <button class="s4-button" data-variant="filled" type="button" id="dw-order"><span class="s4-icon" data-icon="cart"></span>Order Refill</button>
+              <button class="s4-button" data-variant="text" type="button" id="dw-edit">Edit Schedule</button>
+            </div>
+          </section>
+          <section class="s4-pane" aria-labelledby="dw-how-h">
+            <h3 class="s4-pane-title" id="dw-how-h">How She Takes It</h3>
+            <dl class="s4-dl" id="dw-med-dl"></dl>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#today" data-view="today" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="schedule"></span></span><span class="s4-nav-label">Today</span></a>
+    <a class="s4-nav-item" href="#medicines" data-view="medicines"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="pill"></span></span><span class="s4-nav-label">Medicines</span></a>
+    <a class="s4-nav-item" href="#week" data-view="week"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">This Week</span></a>
+  </nav>
+</div>
+
+<div class="s4-menu" id="dw-more" aria-label="More">
+  <button class="s4-menu-item" type="button" data-page-open="medicine" data-page-id="metformin" data-page-title="Metformin"><span class="s4-icon" data-icon="document"></span>Metformin</button>
+  <button class="s4-menu-item" type="button" id="dw-share"><span class="s4-icon" data-icon="share"></span>Share With Tom</button>
+</div>
+
+<!-- adding a medicine is a short task you save or cancel: a modal floating panel (decision 0054) -->
+<dialog class="s4-bottom-sheet" id="dw-add" aria-labelledby="dw-add-h">
+  <h2 class="s4-sheet-title" id="dw-add-h">Add Medicine</h2>
+  <form class="s4-sheet-content s4-form s4-stack" id="dw-add-form" novalidate>
+    <div class="s4-text-field"><label for="dw-name">Name</label><input id="dw-name" autocomplete="off"></div>
+    <div class="s4-text-field"><label for="dw-strength">Strength</label><input id="dw-strength" autocomplete="off" placeholder="5 mg"></div>
+    <div class="s4-chip-set" aria-label="When">
+      <button class="s4-chip" data-type="filter" type="button" aria-pressed="false">Morning</button>
+      <button class="s4-chip" data-type="filter" type="button" aria-pressed="false">Lunch</button>
+      <button class="s4-chip" data-type="filter" type="button" aria-pressed="false">Evening</button>
+      <button class="s4-chip" data-type="filter" type="button" aria-pressed="false">Bedtime</button>
+    </div>
+  </form>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" type="button" id="dw-add-save">Add Medicine</button></div>
+</dialog>
+
+<script src="../../skill/s4-orion/assets/icons.js"></script>
+<script src="../../skill/s4-orion/assets/orion.js"></script>
+<script>
+/* a pill: Orion has no medicine icon, so one is drawn in the Solar style (a duotone capsule) and added by name */
+S4.icon.add({ pill: '<g fill="currentColor" transform="rotate(-45 12 12)"><path d="M12 8.25H6.75a3.75 3.75 0 0 0 0 7.5H12Z" opacity=".5"/><path d="M12 8.25h5.25a3.75 3.75 0 0 1 0 7.5H12Z"/></g>' });
+/* the brand is fixed; only the visitor's light or dark choice is kept */
+S4.theme.restore('dosewise-theme', { mode: 'system', seed: '#2457c5', corners: 'soft', scale: 'large', display: 'humanist' }, { only: ['mode'] });
+
+var $ = function (id) { return document.getElementById(id); };
+/* the data (a real app loads this) */
+var MEDS = {
+  levothyroxine: { name: 'Levothyroxine', dose: '50 mcg tablet', for: 'For the thyroid', cat: 1, when: 'Morning, 30 minutes before breakfast', with: 'Water only', by: 'Dr Ahmed, Riverside Surgery', since: 'March 2019', left: 24, of: 28 },
+  amlodipine: { name: 'Amlodipine', dose: '5 mg tablet', for: 'For blood pressure', cat: 2, when: 'Morning', with: 'With or without food', by: 'Dr Ahmed, Riverside Surgery', since: 'June 2021', left: 5, of: 28 },
+  metformin: { name: 'Metformin', dose: '500 mg tablet', for: 'For blood sugar', cat: 4, when: 'Breakfast, lunch and evening meal', with: 'With food', by: 'Dr Ahmed, Riverside Surgery', since: 'January 2023', left: 11, of: 30 },
+  atorvastatin: { name: 'Atorvastatin', dose: '20 mg tablet', for: 'For cholesterol', cat: 3, when: 'Bedtime', with: 'With or without food', by: 'Dr Ahmed, Riverside Surgery', since: 'June 2021', left: 19, of: 28 },
+  vitd: { name: 'Vitamin D', dose: '1,000 unit capsule', for: 'For bones', cat: 5, when: 'Morning', with: 'With breakfast', by: 'Bought over the counter', since: 'October 2024', left: 52, of: 90 },
+  eyedrops: { name: 'Latanoprost Eye Drops', dose: 'One drop, each eye', for: 'For eye pressure', cat: 6, when: 'Evening', with: 'Wait five minutes before other drops', by: 'Eye clinic, St Anne’s', since: 'May 2022', left: 21, of: 28 }
+};
+var DOSES = [
+  { group: 'Morning, 8:00 AM', items: [['levothyroxine', 'Taken 7:32 AM'], ['amlodipine', 'Taken 8:05 AM'], ['vitd', 'Taken 8:05 AM'], ['metformin', 'Taken 8:20 AM, with breakfast']] },
+  { group: 'Lunch, 1:00 PM', items: [['metformin', 'With food']] },
+  { group: 'Evening, 6:00 PM', items: [['metformin', 'With the evening meal'], ['eyedrops', 'One drop, each eye']] },
+  { group: 'Bedtime, 10:00 PM', items: [['atorvastatin', 'With a glass of water']] }
+];
+/* the morning's four are ticked */
+var taken = { 'Morning, 8:00 AM:0': true, 'Morning, 8:00 AM:1': true, 'Morning, 8:00 AM:2': true, 'Morning, 8:00 AM:3': true };
+
+function pill(cat) { return '<span class="dw-pill" data-category="' + cat + '"><span class="s4-icon" data-icon="pill"></span></span>'; }
+function renderDoses() {
+  var html = '';
+  DOSES.forEach(function (g) {
+    html += '<li class="s4-list-subheader">' + g.group + '</li>';
+    g.items.forEach(function (it, i) {
+      var m = MEDS[it[0]], key = g.group + ':' + i, on = !!taken[key];
+      var note = on && !/^Taken/.test(it[1]) ? 'Taken · ' + it[1] : it[1];
+      html += '<li><label class="s4-list-item"><span class="s4-list-leading">' + pill(m.cat) + '</span>' +
+        '<span class="s4-list-content"><span class="s4-list-headline">' + m.name + ' ' + m.dose.replace(/ (tablet|capsule)$/, '') + '</span><span class="s4-list-supporting">' + note + '</span></span>' +
+        '<span class="s4-list-trailing"><span class="s4-checkbox"><input type="checkbox" data-key="' + key + '"' + (on ? ' checked' : '') + ' aria-label="' + m.name + ' taken"><span class="s4-checkbox-box"></span></span></span></label></li>';
+    });
+  });
+  $('dw-doses').innerHTML = html;
+  var n = Object.keys(taken).filter(function (k) { return taken[k]; }).length;
+  $('dw-ring').setAttribute('data-value', String(n / 8));
+  $('dw-ring-value').textContent = n + ' of 8';
+}
+$('dw-doses').addEventListener('change', function (e) {
+  var k = e.target.dataset.key; if (!k) return;
+  taken[k] = e.target.checked; renderDoses();
+  if (e.target.checked) S4.snackbar({ text: 'Marked taken at 12:20 PM', action: 'Undo', onAction: function () { taken[k] = false; renderDoses(); } });
+});
+/* the list has its states (decision 0051): loading, then the doses */
+setTimeout(function () { renderDoses(); S4.states.set($('dw-states'), 'ready'); }, 400);
+$('dw-states').addEventListener('s4-retry', function () { S4.states.set($('dw-states'), 'ready'); });
+
+$('dw-take').addEventListener('click', function () {
+  taken['Lunch, 1:00 PM:0'] = true; renderDoses();
+  $('dw-next-time').textContent = '6:00 PM'; $('dw-next-what').textContent = 'Metformin 500 mg and eye drops with the evening meal';
+  road(2);
+  S4.snackbar({ text: 'Lunchtime Metformin marked taken', action: 'Undo', onAction: function () { taken['Lunch, 1:00 PM:0'] = false; renderDoses(); $('dw-next-time').textContent = '1:00 PM'; $('dw-next-what').textContent = 'Metformin 500 mg with lunch · in 40 minutes'; road(1); } });
+});
+/* the road: steps before the next dose time are done, the next one is current */
+function road(next) {
+  [].forEach.call($('dw-road').children, function (li, i) { if (i < next) li.setAttribute('data-state', 'done'); else if (i === next) { li.setAttribute('data-state', 'current'); li.setAttribute('data-value', '0.1'); } else li.removeAttribute('data-state'); });
+  $('dw-day-words').textContent = next === 1 ? 'Morning done · lunch next at 1 PM' : 'Morning and lunch done · evening next at 6 PM';
+}
+$('dw-skip').addEventListener('click', function () { S4.snackbar({ text: 'Lunchtime Metformin skipped. Tom can see why.', action: 'Undo' }); });
+
+/* Medicines: one row each, opening its page */
+$('dw-meds').innerHTML = Object.keys(MEDS).map(function (id) {
+  var m = MEDS[id], days = m.left, low = days <= 7;
+  return '<li><button class="s4-list-item" type="button" data-page-open="medicine" data-page-id="' + id + '" data-page-title="' + m.name + '"><span class="s4-list-leading">' + pill(m.cat) + '</span>' +
+    '<span class="s4-list-content"><span class="s4-list-headline">' + m.name + '</span><span class="s4-list-supporting">' + m.dose + ' · ' + m.when + '</span></span>' +
+    '<span class="s4-list-trailing">' + (low ? '<span class="s4-status" data-tone="warning">' + days + ' Days Left</span>' : '<span class="s4-list-supporting">' + days + ' days left</span>') + '</span></button></li>';
+}).join('');
+
+/* a medicine's page: filled from its id, so its link reloads to the same medicine */
+document.querySelector('[data-page="medicine"]').addEventListener('s4-open', function (e) {
+  var m = MEDS[e.detail.id] || MEDS.amlodipine;
+  $('dw-med-title').textContent = m.name; $('dw-med-dose').textContent = m.dose; $('dw-med-for').textContent = m.for;
+  var meter = $('dw-med-meter'); meter.setAttribute('data-max', m.of); meter.setAttribute('data-value', m.left);
+  if (m.left <= 7) meter.setAttribute('data-state', 'near'); else meter.removeAttribute('data-state');
+  $('dw-med-left').innerHTML = '<strong>' + m.left + ' days</strong> of ' + m.of;
+  $('dw-med-dl').innerHTML = [['When', m.when], ['How', m.with], ['Prescribed By', m.by], ['Since', m.since]].map(function (r) { return '<div class="s4-dl-row"><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>'; }).join('');
+});
+$('dw-order').addEventListener('click', function () { S4.snackbar({ text: 'Refill ordered from Riverside Pharmacy, ready Friday', action: 'Undo' }); });
+$('dw-edit').addEventListener('click', function () { S4.snackbar('Schedule changes are made with her GP'); });
+$('dw-call').addEventListener('click', function () { S4.snackbar('Calling Riverside Pharmacy…'); });
+$('dw-remind').addEventListener('click', function () { S4.snackbar({ text: 'Reminder added for 9:30 PM', action: 'Undo' }); });
+$('dw-share').addEventListener('click', function () { S4.snackbar('Shared with Tom'); });
+$('dw-add-save').addEventListener('click', function () {
+  var name = $('dw-name');
+  if (!name.value.trim()) { name.closest('.s4-text-field').setAttribute('data-error', 'Enter the name on the box.'); return; }
+  name.closest('.s4-text-field').removeAttribute('data-error');
+  S4.sheet.close('dw-add', 'save'); S4.snackbar({ text: name.value.trim() + ' added', action: 'Undo' }); $('dw-add-form').reset();
+});
+</script>
+</body>
+</html>

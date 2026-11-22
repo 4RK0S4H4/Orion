@@ -3555,7 +3555,8 @@ S4.register('accordion', function (scope) {
       /* x labels: as many as fit */
       if (!spark) { var every = Math.max(1, Math.ceil(count / Math.max(1, Math.floor(pw / 56)))); d.labels.forEach(function (l, i) { if (i % every) return; var tx = svgEl('text', { x: X(i), y: H - 6, class: 's4-chart-axis', 'text-anchor': lineLike && i === 0 ? 'start' : lineLike && i === count - 1 ? 'end' : 'middle' }, svg); tx.textContent = l; }); }
       if (!lineLike) {
-        var gw = Math.min(24 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
+        /* columns are 16 wide at most: marks are thin (a wide window spaces them, it does not fatten them; decision 0070) */
+        var gw = Math.min(16 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
         d.series.forEach(function (s, si) { s.values.forEach(function (v, i) {
           var h = Math.max(1, (top ? v / top : 0) * ph), x = X(i) - gw / 2 + si * (bw + 2);
           svgEl('path', { d: column(x, padT + ph - h, bw, h, 4), class: 's4-chart-mark', style: 'fill:' + colorOf(si), 'data-i': i }, svg);
@@ -7997,6 +7998,9 @@ S4.register('checkbox', function (scope) {
 /* Chip behaviour.
    Filter chips (data-type="filter"): click toggles aria-pressed and fires s4-change { pressed } on the chip. In a
    .s4-chip-set[data-select="single"] exactly one can be pressed (radio-like). A .s4-chip-check is added for the check.
+   Add data-clearable to a single set that narrows a collection: at most one is pressed, pressing the pressed chip
+   clears it, and none pressed means everything, so the set needs no "All" chip and shows no accent fill at rest
+   (decision 0070).
    Input chips: .s4-chip-remove gets a close icon if empty; click (or Delete / Backspace on it) fires a cancelable
    s4-remove { chip } on the chip, then the chip collapses and is removed, and focus moves to a neighbour. */
 S4.register('chip', function (scope) {
@@ -8013,7 +8017,7 @@ S4.register('chip', function (scope) {
       var single = set && set.dataset.select === 'single';
       var on = c.getAttribute('aria-pressed') === 'true';
       if (single) {
-        if (on) return;
+        if (on && !set.hasAttribute('data-clearable')) return;
         S4.util.all(set, '.s4-chip[data-type="filter"][aria-pressed="true"]').forEach(function (o) {
           if (o.closest('.s4-chip-set') !== set) return;
           o.setAttribute('aria-pressed', 'false');

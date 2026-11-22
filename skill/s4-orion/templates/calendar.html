@@ -40,7 +40,7 @@
   @media (hover: hover) { .mr-day:hover { background: var(--md-sys-color-surface-container-high); } }
   .mr-day[data-outside] { background: none; color: var(--md-sys-color-on-surface-variant); }
   .mr-day[data-past]:not([aria-pressed="true"]) { color: var(--md-sys-color-on-surface-variant); }
-  .mr-day[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .mr-day[aria-pressed="true"] { background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); }   /* neutral: the day pane beside it names the day, the rail owns the accent selection (decision 0070) */
   .mr-date { display: flex; align-items: center; gap: var(--s4-space-1); }
   .mr-n { flex: none; white-space: nowrap; display: grid; place-items: center; min-inline-size: var(--s4-space-6); min-block-size: var(--s4-space-6); padding-inline: var(--s4-space-1); border-radius: var(--md-sys-shape-corner-full); font-size: var(--md-sys-typescale-label-large-size); line-height: 1; font-weight: var(--md-sys-typescale-label-large-weight); font-variant-numeric: tabular-nums; }
   .mr-day[data-today] .mr-n { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
@@ -171,7 +171,7 @@
           <aside class="s4-split-pane s4-stack" data-sticky aria-label="Day">
             <div class="mr-day-head">
               <div><p class="mr-kicker" id="mr-day-kicker">Today</p><h2 class="mr-h" id="mr-day-title">Saturday, 14 November</h2></div>
-              <button class="s4-button" data-variant="filled" data-size="s" type="button" data-expand="new-booking" id="mr-book"><span class="s4-icon" data-icon="add"></span>Book</button>
+              <button class="s4-button" data-variant="elevated" data-size="s" type="button" data-expand="new-booking" id="mr-book"><span class="s4-icon" data-icon="add"></span>Book</button>
             </div>
 
             <!-- a booking is made in place, under the day it belongs to (decision 0047) -->

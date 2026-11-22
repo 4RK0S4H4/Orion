@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Loud: Two Filled Actions</title>
+<!-- Known-loud fixture (round 0060, decision 0070). tests/checker.mjs expects the page checker to WARN on this page:
+     a filled main action, a second filled action elsewhere on the screen and an "All" chip pressed at rest. Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<main style="padding: 16px; display: grid; gap: 16px">
+  <h1>Strings</h1>
+  <div class="s4-chip-set" data-select="single" aria-label="Status">
+    <button class="s4-chip" data-type="filter" type="button" aria-pressed="true">All</button>
+    <button class="s4-chip" data-type="filter" type="button" aria-pressed="false">Untranslated</button>
+  </div>
+  <section aria-label="Next"><button class="s4-button" data-variant="filled" type="button">Next Untranslated</button></section>
+  <section aria-label="Line"><button class="s4-button" data-variant="filled" type="button">Approve</button></section>
+</main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

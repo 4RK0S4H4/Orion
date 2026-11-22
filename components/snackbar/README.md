@@ -1,6 +1,6 @@
 # Snackbar
 
-A short message after an action, often with Undo. **Slides up from the bottom edge**, above a nav bar, docked toolbar or FAB.
+A short message after an action, often with Undo. **Rises a few pixels into place near the bottom** (it never slides in from the screen's edge), above a nav bar, docked toolbar or FAB.
 Glass (decision 0042): a notification is a raised object. Text and the action are `on-surface` (the action in the
 emphasized weight), which the glass guarantee keeps at AA. Rises 14px into place on the `rise` spring.
 

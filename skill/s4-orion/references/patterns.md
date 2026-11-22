@@ -12,6 +12,8 @@ component are in `components.md`. Live demo app: https://4rk0s4h4.github.io/s4-o
 - Dialogs and panels
 - Forms
 - Empty, loading and error states
+- One accent job per screen
+- Making it the app's own (from the brand trial)
 - Theme controls
 - Saving data
 - Theming API
@@ -48,8 +50,10 @@ grid of panes: KPI panes (label, emphasized number, delta status) · a chart pan
   label, a display-small emphasized number, the change as a `.s4-status`. Template: `templates/dashboard.html`.
 - Period or scope switch: a **connected button group** with `data-select="single"` in the page header, not tabs.
   Tabs are for sibling content inside one screen.
-- Charts: draw with role colors read at run time (`S4.util.css('--md-sys-color-primary')`), redraw on the `s4-theme`
-  event. Series beyond two: `primary`, `tertiary`, `secondary`, `error` in that order. Gridlines `outline-variant`.
+- Charts: `<figure class="s4-chart" data-type="column|bar|line|area|donut|spark" data-labels data-values>` (decision
+  0051): one series wears the accent, several use `--s4-chart-1…6`, and every chart has its table view. Draw a chart by
+  hand only for a shape `.s4-chart` does not have (paired bars, an aging bar): role colors read at run time
+  (`S4.util.css('--md-sys-color-primary')`), redrawn on the `s4-theme` event, gridlines `outline-variant`.
 - A dashboard has no FAB unless one action clearly dominates the app.
 
 ## List and detail
@@ -68,8 +72,9 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 
 - **Phone and medium (< 840):** one pane at a time. A row with `data-split-open` shows the detail (shared axis), the
   phone's Back gesture or the `data-split-back` button returns to the list. Template: `templates/list-detail.html`.
-- **Expanded (≥ 840):** list (360) and detail side by side; the detail pane is sticky. Select the first item on load so
-  the detail is never empty. Changing the selection just re-renders the detail; nothing slides between panes.
+- **Expanded (≥ 840):** list and detail side by side; the detail pane is sticky. Select the first item on load so
+  the detail is never empty. Changing the selection just re-renders the detail; nothing slides between panes. The open
+  row is marked neutral by itself (decision 0070): the detail's heading names it, the navigation keeps the accent.
 - The list is a `role="listbox"` `.s4-list` when it drives a detail pane (arrow keys, `aria-selected`); fill the detail
   on its `s4-change`. Use plain links when each row navigates to its own page.
 - Detail header: title, a `.s4-status`, and the item's actions as one filled button + icon buttons with a `more-vert`
@@ -81,9 +86,9 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 - Inside a pane, a `.s4-list` of rows: a switch as the trailing element for on/off, a trailing value + chevron for a
   choice that opens a menu (a few options) or a page (many). Never a dialog for a choice.
 - Switches apply immediately (no Save button). Confirm with nothing, or a snackbar only when the effect is invisible.
-- A destructive setting goes last, in a pane with `data-color="error"`, with a tonal error button that opens a
-  confirm dialog (serious and cannot be undone: the one place a dialog is right; smaller removals use the inline
-  confirm or act at once with Undo). Its answers: Cancel `data-variant="tonal"`, then the destructive one
+- A destructive setting goes last, in a neutral pane (never `data-color="error"` on the pane, decision 0066), with a
+  `data-variant="tonal" data-color="error"` button that opens a confirm dialog (serious and cannot be undone: the one
+  place a dialog is right; smaller removals use the inline confirm or act at once with Undo). Its answers: Cancel `data-variant="tonal"`, then the destructive one
   `data-variant="tonal" data-color="error"` named by what it does ("Delete Account").
 - Appearance settings: see **Theme controls**.
 
@@ -106,10 +111,14 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 ## Forms
 
 - One column, fields at full width up to about 560px (`max-width: 35rem` on the form). Group long forms into sections.
-- Text fields are one look: a filled pill (label above, no outline; a textarea gets large corners). An error is a filled error-container field.
-- Labels in Title Case, helper text and errors as sentences. Validate on blur and on submit, not on every keystroke;
-  set `data-error="Enter an amount above $0.00."` and move focus to the first invalid field on submit.
-- Actions at the end, end-aligned: Cancel (text) then the main action (filled), named by what it does ("Save Bill").
+- Text fields are one look: filled, medium-rounded (12; never a pill, never squared, decision 0024), label above, no
+  outline. An error keeps the field's normal fill and adds the message (decision 0043).
+- Labels in Title Case, helper text and errors as sentences. `<form class="s4-form">` validates on leaving a field and on
+  submit, never while typing; set `data-error="Enter an amount above $0.00."`. Never move the cursor into a field, not
+  even the first invalid one after a submit (decision 0049): the error is shown on the field and named in the form's
+  status; the person taps the field.
+- Actions at the end, end-aligned: Cancel then the main action (filled), named by what it does ("Save Bill"). The
+  screen's one filled action rule applies (below): a form inside a page that already has a filled action uses tonal.
 - In a floating panel the same rules apply; the actions go in `.s4-sheet-actions` with `data-close` values, and the
   code handles `s4-close`. A form never goes in a dialog (decision 0064; the page checker fails it): a short one opens
   in place (`.s4-expand`), a task with no place in the page is a floating panel, a long one is a page.
@@ -117,26 +126,71 @@ Use the canonical layout (`references/components.md`, Layout), not a hand-made g
 
 ## Empty, loading and error states
 
-**Empty** (nothing yet, or no search results), centered in the space the content would fill:
+Every list, table and pane sits in `.s4-states` (decision 0051; `components.md`, States) with a part per state:
 
 ```html
-<div class="s4-stack" style="--s4-gap: var(--s4-space-3); align-items: center; text-align: center; padding-block: var(--s4-space-12);">
-  <span class="s4-icon" data-icon="bills" style="--s4-icon-size: var(--s4-size-icon-large)"></span>
-  <h2 class="s4-title-large">No Bills Yet</h2>
-  <p class="s4-body-medium s4-on-surface-variant">Bills you add or forward to your inbox show up here.</p>
-  <button class="s4-button" data-variant="tonal" type="button">Add Bill</button>
+<div class="s4-states" data-state="loading" data-offline="auto">
+  <div data-when="loading" data-rows="5"></div>
+  <ul class="s4-list" data-when="ready offline">…</ul>
+  <div data-when="empty" class="s4-empty">
+    <span class="s4-empty-icon"><span class="s4-icon" data-icon="bills"></span></span>
+    <h2 class="s4-empty-title">No Bills Yet</h2>
+    <p class="s4-empty-text">Bills you add or forward to your inbox show up here.</p>
+    <button class="s4-button" data-variant="tonal" type="button">Add Bill</button>
+  </div>
+  <div data-when="error" class="s4-empty">…<button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button></div>
 </div>
 ```
 
-(In app code, put those inline styles on an app class.) No search results: say what was searched and offer to clear
-filters; no illustration.
+**Empty:** what will appear here and the one action that fills it. No search results: say what was searched and offer
+to clear filters; no illustration.
 
-**Loading:** under a second, show nothing. Longer: a linear indeterminate `.s4-progress` at the top of the area being
-loaded (or under the top app bar for the whole screen); keep the old content visible when refreshing. A button that
-starts work can show a circular progress in place of its icon and `aria-disabled="true"`.
+**Loading:** skeleton rows shaped like the content (`data-rows`), never a lone spinner; under about 300ms show nothing.
+Refreshing something already shown keeps it and shows a linear `.s4-progress` at the top of the area.
 
-**Error:** inline where the content would be, as a sentence plus a Retry button ("Couldn't load bills. Check your
-connection and try again."). A failed background action: snackbar with Retry. Never a dialog for a recoverable error.
+**Error:** inline where the content would be, as a sentence plus Try Again ("Couldn't load bills. Nothing was lost.").
+A failed background action: snackbar with Retry. Never a dialog for a recoverable error.
+
+## One accent job per screen
+
+Decision 0070 (refines 0068). Look at the whole window, not one pane: at rest it shows **one filled action** and **one
+accent selection**.
+
+- **One filled action:** the action the person takes next on the work in front of them (Approve the open line, Reply
+  to the open ticket, Mark Taken for the next dose). Every other action on the screen is `elevated`, `tonal` or `text`.
+  The rail's main action steps down to elevated by itself while the open view shows a filled button, and is filled
+  again on a view with none. A second place for the same action (a Book button in a day pane when the rail says Book a
+  Boat) is `elevated`.
+- **One accent selection, and it belongs to the navigation** (the rail's or nav bar's current place). Everything else
+  that is selected is neutral (`surface-container-highest`, the heavier label): the open row of a list beside its detail
+  (automatic for `data-split-open` rows), the picked day beside its day pane, a tree's open file in the rail (0068).
+- **No pressed chip at rest:** a filter set that narrows a collection has no "All" chip. Use
+  `.s4-chip-set[data-select="single"][data-clearable]` (none pressed is everything; pressing the pressed chip clears it).
+- **Not counted:** the accent as text, icons, meters, chart marks and a sent message; values in a field (tag chips);
+  a site header's action, which is the hero's action kept in reach. Chart columns are 16 wide at most, so a wide pane
+  spaces them instead of fattening them.
+- The page checker warns when the first screen shows more than one filled accent action (`check.mjs`).
+
+## Making it the app's own (from the brand trial)
+
+Lessons from building an app from this skill alone with a brand handed over (round 0060: a medicines app, cobalt, a
+humanist display face, soft corners, the large scale). The dials gave it the brand's color, corners and size, and every
+page passed the checker, but the first pass looked like Orion in blue. What made it the product's own:
+
+- **Draw the one element the product is about**, from Orion's parts or rules (decision 0053): the day's doses as a
+  `.s4-milestones` road under the next dose, each medicine's own tile on `--s4-category-1…6` named in words. Look for it
+  before laying out panes: the thing people would sketch on a napkin.
+- **Lead with the hero:** the number or moment the screen exists for as `.s4-stat[data-size="hero"]` with the one filled
+  action beside it, then the lists. A screen that starts with a list reads as stock.
+- **The display face is a system stack.** `humanist`, `rounded` and `geometric` resolve to faces the device has
+  (Seravek, Calibri, Ubuntu…); where it has none they fall back to a near face, and on Android and Linux that is often
+  plain sans. A brand whose face matters ships it: one `@font-face` file named first in a `custom` stack.
+- **An icon the set lacks** (a pill, a leaf, a dumbbell) is drawn in the set's style (24 grid, a duotone half at
+  `opacity=".5"`, `fill="currentColor"`) and added once with `S4.icon.add({ name: '<svg body>' })`.
+- **Wide windows:** a long single list stretched to 1200 reads empty; give it a supporting column (what runs out next,
+  the day so far) or cap the view at `data-width="reading"`.
+
+## Theme controls
 
 ## Theme controls
 
@@ -256,4 +310,5 @@ Lessons from building the templates as real products (decision 0060).
 - **Charts in tabs or hidden views:** a canvas in a hidden panel has zero size; redraw on `s4-theme`, on tab change, or
   with a `ResizeObserver`. Take sizes and colors from tokens (`S4.util.css`); don't hard-code pixels in canvas code.
 - **Status pills in panes:** a pane stacks its children, so a pill stretches; wrap it in `.s4-row` to keep it inline.
-- The page checker only inspects the view that is visible on load. Check the other views by hand.
+- The page checker audits every app-shell view, not only the one visible on load; pages (`.s4-subpage`) and states
+  other than the first are still worth a look by hand (open them with their link, `#view/page/id`).

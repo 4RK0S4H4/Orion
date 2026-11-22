@@ -33,7 +33,7 @@ Script: `S4.chart(el, { labels, series })` draws or redraws. Charts redraw when 
 | Which way a stat is going | `spark` beside the number |
 | One number | not a chart: a [stat](../stat/) |
 
-**What every chart gets:** round axis ticks, hairline gridlines, thin marks with rounded data ends, a legend when
+**What every chart gets:** round axis ticks, hairline gridlines, thin marks with rounded data ends (columns 16 wide at most; a wide pane spaces them, decision 0070), a legend when
 there are two or more series (none for one: the title names it), one value label on what matters, a tooltip on hover,
 tap or arrow keys, and a **Table** button with the same numbers as rows.
 

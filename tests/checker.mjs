@@ -6,6 +6,7 @@
      bad-words.html     a table nothing wraps or stacks, squeezed at 390 until its words break across lines
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
      bad-dial.html      data-scale="roomy" and data-corners="square" on <html>
+     loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
    Usage: node tests/checker.mjs */
 import { spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -32,6 +33,15 @@ for (const [file, re, what] of CASES) {
   if (!ran[file]) ran[file] = spawnSync(process.execPath, [join(root, 'skill/s4-orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
   const r = ran[file];
   expect(r.status === 1 && re.test(r.stdout), `${file}: ${what} is an error (exit ${r.status})`);
+}
+
+/* 1b. known-loud pages pass but warn with the right message */
+const WARN_CASES = [
+  ['loud-screen.html', /more than one filled action on one screen at rest \(decision 0070[^\n]*3 accent fills: "All", "Next Untranslated", "Approve"/, 'two filled actions and a pressed All chip'],
+];
+for (const [file, re, what] of WARN_CASES) {
+  const r = spawnSync(process.execPath, [join(root, 'skill/s4-orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
+  expect(re.test(r.stdout), `${file}: ${what} is a warning (exit ${r.status})`);
 }
 
 /* 2. dial values at runtime */
