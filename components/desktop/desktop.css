@@ -100,6 +100,8 @@
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
     font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
   }
+  /* a labelled button keeps its whole label (words never break); the title and the spacer give way first */
+  .s4-titlebar > .s4-button { flex: none; white-space: nowrap; }
   /* what sits after the title fills the bar; a spacer pushes the rest to the end */
   .s4-titlebar-spacer { flex: 1 1 auto; align-self: stretch; min-inline-size: var(--s4-space-4); }
   .s4-titlebar > .s4-search { flex: 0 1 calc(var(--s4-space-16) * 5); min-inline-size: 0; }

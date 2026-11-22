@@ -1180,7 +1180,7 @@ S4.register('fab', function (scope) {
     for (var i = 0; i < c.length; i++) {
       var el = c[i]; if (!el || el === document.body || !el.closest) continue;
       el = el.closest(FOCUSABLE) || el;
-      if (!from || from.contains(el)) return el;
+      if (i === 0 || !from || from.contains(el) || (bar(app) && bar(app).contains(el))) return el;   /* the one passed in, or in the view or its top bar */
     }
     return null;
   }

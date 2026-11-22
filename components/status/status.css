@@ -2,7 +2,7 @@
    <span class="s4-status">Draft</span>
    <span class="s4-status" data-tone="primary|secondary|tertiary|error" data-dot>Overdue</span>
    Neutral by default (surface-container-high / on-surface-variant). A status is always a tint (decision 0065): the
-   status colors (success, warning, info, error) use their pale containers, the accent tones (primary, secondary,
+   status colors (success, warning, info) use their pale containers, error a 16% wash of the error color, the accent tones (primary, secondary,
    tertiary) a 16% wash of their color; only the one state that needs action now takes error (or warning for soon).
    The label always says the status: tone and dot only reinforce it, so it never relies on color alone.
    Not interactive: to filter by status use a filter chip. */
@@ -56,7 +56,8 @@
   .s4-status[data-tone="success"] { --_bg: var(--s4-color-success-container); --_fg: var(--s4-color-on-success-container); }
   .s4-status[data-tone="warning"] { --_bg: var(--s4-color-warning-container); --_fg: var(--s4-color-on-warning-container); }
   .s4-status[data-tone="info"] { --_bg: var(--s4-color-info-container); --_fg: var(--s4-color-on-info-container); }
-  .s4-status[data-tone="error"] { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
+  .s4-status[data-tone="error"] { --_bg: color-mix(in srgb, var(--md-sys-color-error) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="error"][data-dot]::before { background: var(--md-sys-color-error); }
 
   @media (forced-colors: active) {
     .s4-status { border: 1px solid CanvasText; }

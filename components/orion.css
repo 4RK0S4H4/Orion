@@ -4675,6 +4675,8 @@
     letter-spacing: var(--md-sys-typescale-title-medium-tracking);
     font-weight: var(--md-sys-typescale-emphasized-title-medium-weight);
   }
+  /* a labelled button keeps its whole label (words never break); the title and the spacer give way first */
+  .s4-titlebar > .s4-button { flex: none; white-space: nowrap; }
   /* what sits after the title fills the bar; a spacer pushes the rest to the end */
   .s4-titlebar-spacer { flex: 1 1 auto; align-self: stretch; min-inline-size: var(--s4-space-4); }
   .s4-titlebar > .s4-search { flex: 0 1 calc(var(--s4-space-16) * 5); min-inline-size: 0; }
@@ -9156,8 +9158,9 @@
   .s4-plan > .s4-checks { gap: var(--s4-space-3); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   .s4-plan > .s4-checks > li > .s4-icon { margin-block-start: calc((var(--md-sys-typescale-body-medium-line-height) - var(--s4-size-icon-small)) / 2); }
   .s4-plan-note { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
-  /* the featured plan is the accent fill (see the tone rule above): its status pill is the surface, so it reads as a label */
-  .s4-plan[data-featured] .s4-status { --_bg: var(--md-sys-color-primary); --_fg: var(--md-sys-color-on-primary); }
+  /* the featured plan is the accent fill (see the tone rule above): its status is plain text in the card's own color,
+     no pill (decision 0065: a status is never louder than what it describes; the label is as proven as the card's text) */
+  .s4-plan[data-featured] .s4-status { --_bg: transparent; --_fg: var(--md-sys-color-on-primary-container); padding-inline-end: 0; }
 
   /* comparison table: all plans side by side; under 600 one plan at a time, picked with a joined capsule group */
   .s4-compare { container-type: inline-size; display: grid; gap: var(--s4-space-4); }
@@ -11806,7 +11809,7 @@
    <span class="s4-status">Draft</span>
    <span class="s4-status" data-tone="primary|secondary|tertiary|error" data-dot>Overdue</span>
    Neutral by default (surface-container-high / on-surface-variant). A status is always a tint (decision 0065): the
-   status colors (success, warning, info, error) use their pale containers, the accent tones (primary, secondary,
+   status colors (success, warning, info) use their pale containers, error a 16% wash of the error color, the accent tones (primary, secondary,
    tertiary) a 16% wash of their color; only the one state that needs action now takes error (or warning for soon).
    The label always says the status: tone and dot only reinforce it, so it never relies on color alone.
    Not interactive: to filter by status use a filter chip. */
@@ -11860,7 +11863,8 @@
   .s4-status[data-tone="success"] { --_bg: var(--s4-color-success-container); --_fg: var(--s4-color-on-success-container); }
   .s4-status[data-tone="warning"] { --_bg: var(--s4-color-warning-container); --_fg: var(--s4-color-on-warning-container); }
   .s4-status[data-tone="info"] { --_bg: var(--s4-color-info-container); --_fg: var(--s4-color-on-info-container); }
-  .s4-status[data-tone="error"] { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
+  .s4-status[data-tone="error"] { --_bg: color-mix(in srgb, var(--md-sys-color-error) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="error"][data-dot]::before { background: var(--md-sys-color-error); }
 
   @media (forced-colors: active) {
     .s4-status { border: 1px solid CanvasText; }

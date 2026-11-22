@@ -16,7 +16,7 @@
      day) and the wind marks on the month. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=1c586ef">
+<link rel="stylesheet" href="../components/orion.css?v=17226a0">
 <link rel="stylesheet" href="brand/calendar.css?v=5e3b221">
 <style>
   /* Moorings' own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -140,7 +140,7 @@
 <div class="s4-app">
   <nav class="s4-nav-rail" aria-label="Main">
     <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
-      <button class="s4-fab" type="button" data-expand="new-booking" id="mr-book-rail"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Book a Boat</span></button></div>
+      <button class="s4-fab" type="button" aria-controls="new-booking" id="mr-book-rail"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Book a Boat</span></button></div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#calendar" data-view="calendar" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Calendar</span></a>
       <a class="s4-nav-item" href="#sails" data-view="sails"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">My Sails</span></a>
@@ -303,7 +303,7 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=4302b93"></script>
+<script src="../components/orion.js?v=57b01dc"></script>
 <script>
 /* Moorings' brand: tinted sea teal over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#006a6a', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -504,7 +504,11 @@ $('mr-prev').addEventListener('click', function () { shift(-1); });
 $('mr-next').addEventListener('click', function () { shift(1); });
 $('mr-today').addEventListener('click', function () { S4.app.go(app, 'calendar'); pick(TODAY); });
 /* the rail's Book a Boat opens the same form under the day */
-$('mr-book-rail').addEventListener('click', function () { S4.app.go(app, 'calendar'); });
+$('mr-book-rail').addEventListener('click', function () {
+  S4.app.go(app, 'calendar');
+  /* open it once the calendar is on screen, so the form takes focus and Escape closes it */
+  var tries = 0; (function open() { var x = $('new-booking'); if (x.getClientRects().length || tries++ > 20) { S4.expand.open('new-booking', { from: $('mr-book-rail') }); return; } requestAnimationFrame(open); })();
+});
 
 /* a boat cannot be out twice: the clash is the field's own error, written so it says what to do */
 function clash() {

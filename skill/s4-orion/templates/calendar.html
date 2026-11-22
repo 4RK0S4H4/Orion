@@ -140,7 +140,7 @@
 <div class="s4-app">
   <nav class="s4-nav-rail" aria-label="Main">
     <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button>
-      <button class="s4-fab" type="button" data-expand="new-booking" id="mr-book-rail"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Book a Boat</span></button></div>
+      <button class="s4-fab" type="button" aria-controls="new-booking" id="mr-book-rail"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">Book a Boat</span></button></div>
     <div class="s4-nav-rail-items">
       <a class="s4-nav-item" href="#calendar" data-view="calendar" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="calendar"></span></span><span class="s4-nav-label">Calendar</span></a>
       <a class="s4-nav-item" href="#sails" data-view="sails"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="history"></span></span><span class="s4-nav-label">My Sails</span></a>
@@ -504,7 +504,11 @@ $('mr-prev').addEventListener('click', function () { shift(-1); });
 $('mr-next').addEventListener('click', function () { shift(1); });
 $('mr-today').addEventListener('click', function () { S4.app.go(app, 'calendar'); pick(TODAY); });
 /* the rail's Book a Boat opens the same form under the day */
-$('mr-book-rail').addEventListener('click', function () { S4.app.go(app, 'calendar'); });
+$('mr-book-rail').addEventListener('click', function () {
+  S4.app.go(app, 'calendar');
+  /* open it once the calendar is on screen, so the form takes focus and Escape closes it */
+  var tries = 0; (function open() { var x = $('new-booking'); if (x.getClientRects().length || tries++ > 20) { S4.expand.open('new-booking', { from: $('mr-book-rail') }); return; } requestAnimationFrame(open); })();
+});
 
 /* a boat cannot be out twice: the clash is the field's own error, written so it says what to do */
 function clash() {
