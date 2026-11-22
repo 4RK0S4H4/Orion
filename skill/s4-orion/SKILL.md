@@ -1,6 +1,6 @@
 ---
 name: s4-orion
-description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 81 components (app shell, nav bar/rail, buttons, FAB, cards, lists, data tables, filters, meters, boards, fields, chips, menus, dialogs, sheets, code, chat, desktop menu bar, tree…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates (landing, pricing, blog, docs), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
+description: "S4 Orion, the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 78 components (app shell, nav bar/rail, buttons, FAB, cards, lists, data tables, filters, meters, boards, fields, menus, dialogs, sheets, code, chat, desktop menu bar…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates (landing, pricing, blog, docs, studio), tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
 ---
 
 # S4 Orion
@@ -77,12 +77,18 @@ from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` 
   is fluid, app type is not. Start-aligned; center only short blocks (a short hero, the pricing heading, a closing band).
 - **One accent a page:** the featured plan, the call-to-action band, one bento cell or a cover. Toned bands are inset
   rounded blocks, never full-bleed stripes. Bento spans add up to 12 per row; equal grids use `data-columns`.
+- **Selection:** one filled selection per screen; a second "you are here" mark (a table of contents, a header beside a
+  docs sidebar) is quieter. A site header never opens with a nav item selected.
 - **Pictures:** no network fetches, no gray boxes, no gradients. Show real Orion components in a phone or browser frame
   (`inert`, `role="img"`, an `aria-label`), covers set in type on a tone, or the media empty state. Real images get
   `width`, `height`, `loading="lazy"` below the first screen, inside a `.s4-media-box` with a ratio.
 - **Glass** only on the site header (once content scrolls under it) and the phone menu panel. No shadows or outlines.
-- **Files:** sites load the lighter `orion.min.css`, `orion.min.js` and `icons-solar.js` (all scripts `defer`; keep
-  the font preload). Every page has the skip link, landmarks, a meta description, Open Graph tags and `theme-color`
+- **Files (decision 0066):** link `inter-site.woff2` (preload), `orion.site.min.css`, the brand file, then
+  `icons-solar.js` and `orion.site.min.js` (both `defer`): 173 KB gzip in all. It has the site kit and what a site
+  normally shows (buttons, groups, tabs, cards, lists, accordion, static table, stat, ring, meter, prose, code, field
+  basics, chips, slider, menu, snackbar, tooltip, glass). A site that needs an app part (dialog, sheet, data table,
+  filter, chart, board, rich inputs) loads `orion.min.css` and `orion.min.js` instead. Text outside Latin: use
+  `inter-variable.woff2` with its own `@font-face` (same family name) after the stylesheet. Every page has the skip link, landmarks, a meta description, Open Graph tags and `theme-color`
   for light and dark. `data-density="roomy"` widens margins, gaps and section rhythm for content-heavy sites.
 
 ## Make it this app's own (brand dials)
@@ -104,11 +110,13 @@ S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft
 | `display` | `inter` (default), `serif`, `rounded`, `mono`, `system`, `geometric`, `humanist`, or a font-family | headings and big numbers carry the brand |
 | `displayWeight` | `semibold` (default), `medium`, `regular` | a display face drawn lighter than Inter (Didone, book serif, geometric) |
 | `text` | the same | only when the brand truly has a text face; otherwise keep Inter |
+| `scale` | `compact`, `large` | type and spacing step together: compact for dense tools read at a desk, large for reading-first or older audiences. Never to fix one component |
+| `headings` | `tight`, `editorial` | tight: bold, tracked in (product, tool); editorial: regular weight, open leading (magazine, studio). Use it instead of weight or tracking on headings; pair editorial with a serif display, tight with Inter |
 | `data-density` | comfortable, `compact`, `auto` | desktop tools |
 
 Pick at most three dials beyond the accent; an app that turns every dial stops looking designed. Pair them with intent:
 editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mono display for numbers); friendly
-consumer = tinted + rounded display + round. What an app can never change: filled (no outlines), no shadows, glass only
+consumer = tinted + rounded display + round. A danger zone is the last pane of settings, neutral, with `<button class="s4-button" data-variant="tonal" data-color="error" data-dialog="confirm">`: never `data-color="error"` on the pane, never a filled red button. What an app can never change: filled (no outlines), no shadows, glass only
 on floating chrome, the motion patterns, the behaviours. Elements only this app has are drawn from Orion's rules in the
 app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on `:root`, 10px or more.
 

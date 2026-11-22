@@ -14,8 +14,18 @@ stop, Home/End, Tab out); the page checker and suite fail silent failures (unkno
 their component, loud statuses); bare tables and rail FABs render right; `.s4-num` right-aligns; statuses are tints;
 one tonal tool in the filter bar; Parley's inspector and list; a banned-phrase check; issues 61, 62, 64, 65 Done.
 **Workstream B** (decision 0066): light site bundle, Showcase and hub for wide windows, grabber and scrim, firm corners,
-`scale` and `headings` dials. Next: merge B, then the owner's device pass (Linnea's keyboard at 1280, Parley at 1280 and
-1600, a phone pass of the filter bar).
+`scale` and `headings` dials. **Both merged, checked and tested.** Next: publish, then the owner's device pass and
+review 3 (see below and `PLAN.md`).
+
+**Workstream B on a device (notes: [`history/round-0058/b.md`](history/round-0058/b.md)):** (1) the hub at 390: its live
+preview's dials change only the preview; (2) Sprig on cellular: the 67 KB font arrives before the hero text swaps, and
+Sprig, Tidewater and the hub show no missing glyph or wrong weight in Safari (the subset font); (3) the Showcase: swipe a
+note (Archive with Undo), hold a note to pick several, open a note (Back returns), See All 480 Notes, the Board; (4) a
+modal panel (Controls, Floating Panel): the grabber, then drag down slowly, the scrim lightens with the finger, let go
+short and it settles, past a quarter and it leaves from there; a dialog has no grabber; (5) Settings, Delete All Notes
+in light mode: no pink smudge behind the card; (6) Larkline settings: a calm pane with a pink tonal button.
+**Not verified:** Firefox and WebKit (the subset font; the following scrim needs Safari 17.4+ or Firefox 120+); icons are
+now the biggest site file (37 KB), per-page subsetting later.
 
 ## Earlier (2026-11-21, round 0056 finished): everything built, needs the owner's look
 
@@ -38,7 +48,7 @@ your judgement", 2026-11-16). Round 0056 built all of it in workstreams and merg
   editing in place; filters and saved views in the address; code blocks and syntax tokens; chart ranges; Linnea.
 - **Desktop anatomy** (0062, issue 60): `S4.commands`, menu bar, status bar, document tabs, tree, the rail as a source
   list, inspector, settings as a view, window states, `examples/` shells; Parley.
-79 components, 20 templates (15 app, five site); 81 components after round 0057 (0063).
+78 components (81 folders with glass, motion and icons), 20 templates (15 app, five site) after round 0057 (0063).
 
 **Needs the owner's look on an iPhone:**
 1. `templates/data-table.html` (Linnea): stacked rows, scrolling the 5,000, details, tapping a Drawer cell to edit, the
@@ -70,7 +80,7 @@ lead on this … do anything you feel like it is for the best"); we took every r
 the first frame (and a cache for visitor-picked colors), `.s4-kicker` and `figure.s4-figure`, the meter, the board,
 quiet resting checkboxes in tables, one label rule for colored FABs and the vibrant toolbar, `data-dense` for maps of
 real things, calmer selection in vivid accents; Inter stays the only bundled face; rename, the tab ellipsis and centred
-wide content as built. 81 components. **Needs the owner's look on an iPhone:** the meter in Tally, Relay, Pressroom,
+wide content as built. 78 components (81 folders with glass, motion and icons). **Needs the owner's look on an iPhone:** the meter in Tally, Relay, Pressroom,
 Moorings and Larkline; Pressroom's board (lanes snapping, hold-to-drag, add in place); The Velvet's seat plan; Linnea's
 quiet checkboxes; Parley's selected row in dark mode; Tidewater's kicker and byline in Safari's serif (real small caps).
 
@@ -210,6 +220,7 @@ Still waiting on the owner's device looks: iPhone for 0037, 0040 and 0043 to 005
 
 ## Session log
 
+- 2026-11-22 (round 0058, workstream B, merged): a light site bundle (`orion.site.min.*`, Latin Inter, 173 KB gzip against a 180 KB budget, was 375 KB), the Showcase and hub for wide windows, quiet danger zones, grabber and following scrim on modal panels, firm corners reach containers, `scale` and `headings` dials (0066); merged into A, check and test green. Next: publish, the owner's device pass, review 3.
 - 2026-11-22 (round 0058, workstream A): place, focus and silent failures (0065): Back restores scroll and focus, focus never on body, the grid keyboard for data tables, silent-failure checks in the checker and suite, bare tables and rail FABs, `.s4-num`, statuses are tints, one tonal tool per toolbar, Parley finish, drift and `check:words`. Next: merge workstream B (0066).
 
 - 2026-11-21 (round 0057, calm): calm dialogs, phone cards with swipe-down, lighter scrim, firmer modal glass, docked bars with one hairline (0064, issues 67 and 68); merged with the decisions branch and published.

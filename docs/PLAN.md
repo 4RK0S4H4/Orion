@@ -59,7 +59,7 @@ accessibility, so some scores fell although nothing got worse.
 2. **Round 0057** (done, 8ca40e5): the eleven owner calls taken on our recommendation (0063: brand files, kicker,
    meter, board, quiet table checkbox, one FAB label rule, data-dense, calmer selection); the owner's feedback (0064:
    calm dialogs as bottom cards on phones, docked glass without the edge glow). Review 2 run.
-3. **Round 0058** (done: A built and checked on `round58/a`, decision 0065; B, decision 0066, merged into A before publishing): review 2's blockers, in two workstreams.
+3. **Round 0058** (done: A, decision 0065, and B, decision 0066, merged on `round58/a`; checked and tested): review 2's blockers, in two workstreams.
    - **A** (branch `round58/a`, worktree `r58-a`, decision 0065, owns shared docs): Back keeps place and focus;
      focus never drops to body (board add, mod+comma, menubar Escape, palette duplicate); Linnea grid keyboard (one
      header stop, one body stop, Home/End, Tab out) and quiet Select All; page checker fails unknown `s4-` classes,
@@ -71,7 +71,8 @@ accessibility, so some scores fell although nothing got worse.
      a front page; Tally and Relay at 1600; no filled home-nav item on sites; one filled selection in Mallet; quiet
      danger zones; grabber and drag-following scrim on modal panels; firm corners reach containers; `scale` and
      `headings` dials.
-   - Then: A merges B, full tests, the main session publishes, links to the owner.
+   - Measured (B, gzip): site bundle 42.4 KB css + 26.4 KB js + 67.4 KB font + 36.9 KB icons = 173 KB (budget 180; the app bundle was 375 KB). Landing loads 185 KB over the network, docs 181 KB.
+   - Then: A merged B, full tests green, the main session publishes, links to the owner.
 4. **Owner device pass — current stage** (needs the owner; runs alongside review 3): iPhone (dialog swipe and corners, docked hairline while scrolling, Linnea
    and Parley at phone width, the rich inputs, real faces), a desktop (Parley's menu bar and shortcuts, Linnea's grid,
    the Electron example), VoiceOver on a dialog and the table. Device-only bugs come before anything new.

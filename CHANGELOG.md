@@ -8,6 +8,21 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 
 ## [1.1.0] - Unreleased
 
+Round 0058, workstream B: a light site bundle, a wide Showcase and the new dials (decision 0066):
+
+- Added: the site bundle, `orion.site.min.css` and `orion.site.min.js` (what a `body.s4-site` page uses: 42 KB + 26 KB gzip, was 63 + 114), and `inter-site.woff2` (Inter cut to Latin and weights 400 to 900: 67 KB, was 161), written by a dependency-free subsetter (`scripts/font-subset.mjs`). The five site templates and the hub load it; `npm run check` holds a size budget (CSS 44, JS 30, font 70, total 180 KB) and fails a site template that needs something the site bundle leaves out.
+- Added: two brand dials, `scale` (`compact`, `large`: type and spacing step together; `components/base/scale.css`, generated from the tokens) and `headings` (`tight`, `editorial`: weight, tracking and leading of the heading roles), through `S4.theme`, `data-*` on any element and `data-brand-dial`. Tally uses compact and tight; Tidewater uses editorial in place of its own heading CSS.
+- Added: a grabber on modal panels on a phone, and a scrim that follows a downward drag and leaves from where the finger let go (`S4.transition.scrim(d, open, { from })`). Dialogs keep their scrim.
+- Added: the Showcase covers every element again: pages (a note opens as a page), states, swipe and select several, a table at scale with filters and saved views (All Notes), a board, a chart, a meter and the command palette.
+- Changed: `corners: firm` reaches containers (cards 8, panes 12, list groups 16, menus, dialogs and panels 20, bands 32); `soft` goes halfway. The default look is unchanged.
+- Changed: danger zones are neutral panes with a tonal error button; the dialog carries the weight (`data-color="error"` on a pane is old markup).
+- Changed: modal dialogs and panels on a phone are tinted 96% (no show-through of the button behind them).
+- Changed: the hub is a front page: a live preview with dials, the templates as specimens, the component groups and labs written by the build, counts and version stamped from the repo (78 components, 81 folders with glass, motion and icons).
+- Changed: Showcase Home is two columns on a wide window; Controls flows in two columns.
+- Changed: a site header marks the section being read and nothing over the hero; on a docs page only the sidebar's page wears the selection fill.
+- Fixed: Tally's chart no longer stretches to its neighbour's height and its period switch sits beside the main action; Relay's queue no longer wraps titles to four lines at 1600; Sprig and Hollis & Vane no longer open with a nav item selected; Mallet no longer shows three accent fills at once.
+- Fixed: swipeable rows in a segmented list keep the segment fill and corners.
+
 Round 0058, workstream A: your place, your focus and silent failures (decision 0065):
 
 - Added: the page checker and the suite fail silent failures (`skill/s4-orion/scripts/silent.mjs`): an `s4-` class nothing defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill.
