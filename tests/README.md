@@ -10,7 +10,7 @@
    **uses the page**: opens and closes every dialog, panel, menu, expand, inline confirm, accordion, tab and date
    picker, visits every view. Overlays must fit the screen, close with Escape and give focus back; nothing may be left
    open or stuck mid-animation.
-2. **`npm run test:pages`**: the skill's page checker (`skill/s4-orion/scripts/check.mjs`) over the templates and the
+2. **`npm run test:pages`**: the skill's page checker (`skill/orion/scripts/check.mjs`) over the templates and the
    showcase: text contrast as rendered (on glass too), and lint of each page's own CSS.
 
 3. **`npm run test:checker`** (`tests/checker.mjs`, decision 0067): known-bad pages in `tests/fixtures` (a table nothing

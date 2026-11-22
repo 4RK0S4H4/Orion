@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en" data-gray="warm" data-type-display="custom" data-energy="lively" style="--md-ref-typeface-brand: Futura, 'Futura PT', 'Century Gothic', 'Avenir Next', 'URW Gothic', 'Trebuchet MS', sans-serif">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crate · Stock Room</title>
+<!-- Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.direct.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Media Gallery, as a product (issue 66). Crate is the stock room of a second-hand record shop: every record
+     on the shelves as a sleeve, filtered by section, sorted for the job at hand, opened as a page with its tracklist and
+     grading, picked several at a time to print labels or move to the sale bin. For photos, files, products, designs and
+     anything browsed as a grid: keep the tile grid, the filter chips, hold or Ctrl-click to select several with the bar
+     in the top app bar, the viewer page with next and previous, and Undo.
+     Brand through the dials only: a sticker-gold accent, warm grays (cardboard sleeves), a geometric display face (a
+     system font stack: Futura on Apple devices), the stock round corners, lively motion.
+     Its own elements, drawn from Orion's rules: sleeves drawn from shapes in the chart palette (no image files), the
+     record sliding out of its sleeve, grading pills, and the listening booth: a scoped dark region that takes the
+     record's own color as its accent (data-accent; surfaces stay neutral so the sleeve looks the same everywhere). -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.direct.min.css">
+<link rel="stylesheet" href="brand/gallery.css?v=c90a0a6">
+<style>
+  /* Crate's own layout and elements: tokens only; nothing here restyles an Orion component */
+  .cr-kicker { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); letter-spacing: 0.08em; text-transform: uppercase; }
+  .cr-sub { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .cr-h { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-small-weight); }
+  .cr-mono { font-family: var(--md-ref-typeface-mono); font-size: 0.92em; }
+
+  /* ---------- a sleeve, drawn from shapes in the chart palette; text never sits on it ---------- */
+  /* artwork keeps its look in light and dark: the grounds are the fixed roles, which do not change with the mode */
+  .cr-sleeve { display: block; inline-size: 100%; aspect-ratio: 1; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-secondary-fixed); overflow: hidden; }
+  .cr-sleeve[data-ground="dark"] { background: var(--md-sys-color-on-secondary-fixed); }
+  .cr-sleeve svg { display: block; inline-size: 100%; block-size: 100%; }
+  .cr-sleeve .c1 { fill: var(--_c1); } .cr-sleeve .c2 { fill: var(--_c2); } .cr-sleeve .c3 { fill: var(--md-sys-color-secondary-fixed); }
+  .cr-sleeve .ln { fill: none; stroke: var(--_c1); stroke-width: 6; }
+  [data-c1="1"] { --_c1: var(--s4-chart-1); } [data-c1="2"] { --_c1: var(--s4-chart-2); } [data-c1="3"] { --_c1: var(--s4-chart-3); } [data-c1="4"] { --_c1: var(--s4-chart-4); } [data-c1="5"] { --_c1: var(--s4-chart-5); } [data-c1="6"] { --_c1: var(--s4-chart-6); }
+  [data-c2="1"] { --_c2: var(--s4-chart-1); } [data-c2="2"] { --_c2: var(--s4-chart-2); } [data-c2="3"] { --_c2: var(--s4-chart-3); } [data-c2="4"] { --_c2: var(--s4-chart-4); } [data-c2="5"] { --_c2: var(--s4-chart-5); } [data-c2="6"] { --_c2: var(--s4-chart-6); }
+
+  /* ---------- the stock room ---------- */
+  .cr-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--s4-space-4) var(--s4-space-8); }
+  .cr-title { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-emphasized-display-small-weight, 600); }
+  .cr-numbers { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-8); margin: 0; }
+  .cr-numbers div { display: grid; }
+  .cr-numbers dt { order: 2; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .cr-numbers dd { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight); font-variant-numeric: tabular-nums; }
+  .cr-tools { display: grid; gap: var(--s4-space-3); }
+  .cr-sortrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-2) var(--s4-space-4); }
+  .cr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(44%, 11.5rem), 1fr)); gap: var(--s4-space-4) var(--s4-space-3); margin: 0; padding: 0; list-style: none; }
+  .cr-tile { display: grid; gap: var(--s4-space-2); inline-size: 100%; padding: var(--s4-space-2) var(--s4-space-2) var(--s4-space-3); border: 0; border-radius: var(--md-sys-shape-corner-large); background: none; color: var(--md-sys-color-on-surface); font: inherit; text-align: start; cursor: pointer; transition: background-color var(--s4-motion-state); }
+  @media (hover: hover) { .cr-tile:hover { background: var(--md-sys-color-surface-container); } }
+  .cr-tile:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: 0; }
+  .cr-tile .cr-sleeve { position: relative; }
+  .cr-artist { font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight, 600); overflow-wrap: anywhere; }
+  .cr-album { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); overflow-wrap: anywhere; }
+  .cr-tag { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-2); }
+  .cr-price { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; }
+  .cr-price s { margin-inline-end: var(--s4-space-1); color: var(--md-sys-color-on-surface-variant); font-weight: 400; font-size: var(--md-sys-typescale-body-small-size); }
+  /* a grade: media / sleeve, the shop's own shorthand, in a pill */
+  .cr-grade { display: inline-flex; align-items: center; padding: 0 var(--s4-space-2); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-medium-line-height); white-space: nowrap; }
+  .cr-grade[data-mint] { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  /* picked: the tile fills and a check sits on the sleeve's corner */
+  .cr-grid > [data-picked] > .cr-tile { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .cr-grid > [data-picked] .cr-album { color: inherit; }
+  .cr-check { position: absolute; inset-block-start: var(--s4-space-2); inset-inline-end: var(--s4-space-2); display: none; place-items: center; inline-size: var(--s4-space-8); block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); --s4-icon-size: var(--s4-space-5); }
+  .cr-grid > [data-picked] .cr-check { display: grid; }
+
+  /* ---------- the listening booth: a dark region in the record's own color ---------- */
+  .cr-booth { display: grid; gap: var(--s4-space-6); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  @container s4-app (width >= 840px) { .cr-booth { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; padding: var(--s4-space-8); gap: var(--s4-space-10); } }
+  /* the record slides half out of its sleeve: the disc sits behind, shifted to the end; it does not move */
+  .cr-disc-wrap { position: relative; display: block; inline-size: min(76%, 24rem); }   /* the disc reaches 22% past the sleeve, so the sleeve takes 76% of its column */
+  .cr-disc { position: absolute; inset-block: 4%; inset-inline-start: 22%; aspect-ratio: 1; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-lowest); }
+  .cr-disc svg { display: block; inline-size: 100%; block-size: 100%; }
+  .cr-disc .g { fill: none; stroke: var(--md-sys-color-surface-container-high); stroke-width: 0.6; }
+  .cr-disc .lb { fill: var(--md-sys-color-primary); }
+  .cr-disc .hole { fill: var(--md-sys-color-surface-container); }
+  .cr-disc-wrap .cr-sleeve { position: relative; border-radius: var(--md-sys-shape-corner-medium); }
+  .cr-booth-info { display: grid; gap: var(--s4-space-4); align-content: start; }
+  .cr-booth-artist { margin: 0; font-family: var(--md-sys-typescale-display-medium-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-emphasized-display-small-weight, 600); }
+  @container s4-app (width >= 840px) { .cr-booth-artist { font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); } }
+  .cr-booth-album { margin: 0; color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); }
+  .cr-booth-price { font-family: var(--md-sys-typescale-headline-large-font); font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-large-weight, 600); font-variant-numeric: tabular-nums; }
+  .cr-pills { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+
+  /* the record of the week on the stock room: the booth, smaller; from 1200 the week's arrivals beside it */
+  .cr-top { display: grid; gap: var(--s4-layout-gap); }
+  .cr-arrivals { display: none; }
+  @container s4-app (width >= 1200px) { .cr-top { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } .cr-arrivals { display: flex; } }
+  .cr-thumb { flex: none; inline-size: var(--s4-space-12); }
+  .cr-week .cr-booth-artist { font-size: var(--md-sys-typescale-headline-large-size); line-height: var(--md-sys-typescale-headline-large-line-height); }   /* never louder than the page title */
+  .cr-week .cr-disc-wrap { inline-size: min(76%, 17rem); }
+
+  /* tracklist: two sides */
+  .cr-sides { display: grid; gap: var(--s4-layout-gap); }
+  @container s4-app (width >= 600px) { .cr-sides { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .cr-tracks { display: grid; gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; counter-reset: t; }
+  .cr-tracks li { display: grid; grid-template-columns: var(--s4-space-8) minmax(0, 1fr) auto; gap: var(--s4-space-3); align-items: baseline; counter-increment: t; font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  .cr-tracks li::before { content: attr(data-side) counter(t); color: var(--md-sys-color-on-surface-variant); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-label-medium-size); }
+  .cr-tracks li span:last-child { color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; }
+  .cr-two { display: grid; gap: var(--s4-layout-gap); }
+  @container s4-app (width >= 840px) { .cr-two { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: start; } }
+  .s4-subpage > article { max-inline-size: 72rem; margin-inline: auto; }
+
+  /* crates: one row a bin, a stack of sleeve spines beside its name */
+  .cr-spines { flex: none; display: flex; gap: 2px; block-size: var(--s4-space-10); inline-size: var(--s4-space-12); }
+  .cr-spines > i { flex: 1; border-radius: var(--md-sys-shape-corner-extra-small); background: var(--_c1); }
+  .cr-spines > i:nth-child(2n) { background: var(--_c2); }
+  .cr-spines > i:nth-child(3n) { background: var(--md-sys-color-surface-container-highest); }
+  @media (forced-colors: active) { .cr-sleeve, .cr-tile, .cr-booth { border: 1px solid CanvasText; } .cr-grid > [data-picked] > .cr-tile { border: 3px solid Highlight; } }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#stock" data-view="stock" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="image"></span></span><span class="s4-nav-label">Stock</span></a>
+      <a class="s4-nav-item" href="#crates" data-view="crates"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="archive"></span></span><span class="s4-nav-label">Crates</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Stock</h1><p class="s4-app-bar-subtitle">Spindle &amp; Groove · Leith</p></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Add Records" data-tooltip="Add Records" id="cr-add"><span class="s4-icon" data-icon="add"></span></button></div>
+      <!-- while sleeves are picked this bar takes the top app bar's place -->
+      <div class="s4-selection-bar" id="cr-bar" hidden><button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button><span class="s4-selection-count" data-selection-count>0 Selected</span><button class="s4-icon-button" type="button" aria-label="Print Price Labels" data-tooltip="Print Price Labels" id="cr-labels"><span class="s4-icon" data-icon="tag"></span></button><button class="s4-icon-button" type="button" aria-label="Move to Sale Bin" data-tooltip="Move to Sale Bin" id="cr-sale"><span class="s4-icon" data-icon="archive"></span></button><button class="s4-icon-button" type="button" aria-label="Mark Sold" data-tooltip="Mark Sold" id="cr-sold"><span class="s4-icon" data-icon="check"></span></button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <!-- Stock: the record of the week, then every sleeve -->
+      <section class="s4-view s4-stack" data-view="stock" data-title="Stock">
+        <div class="cr-head">
+          <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><p class="cr-kicker">Stock Room</p><h2 class="cr-title">On the Shelves</h2></div>
+          <dl class="cr-numbers"><div><dt>Records</dt><dd id="cr-n">14</dd></div><div><dt>Shelf Value</dt><dd id="cr-v">£0</dd></div><div><dt>New This Week</dt><dd id="cr-new">4</dd></div></dl>
+        </div>
+
+        <div class="cr-top">
+        <section class="cr-booth cr-week" data-theme="dark" id="cr-week" aria-labelledby="cr-week-h">
+          <a class="cr-disc-wrap" id="cr-week-art" href="#stock/record/5" data-page-open="record" data-page-id="5" aria-label="Open the record of the week"></a>
+          <div class="cr-booth-info">
+            <p class="cr-kicker" id="cr-week-h">Record of the Week</p>
+            <div><p class="cr-booth-artist" id="cr-week-artist">Ines Okoro</p><p class="cr-booth-album" id="cr-week-album">Kola Night</p></div>
+            <p class="cr-sub" id="cr-week-note">Spiritual jazz from Lagos by way of Leeds. First pressing, the gatefold still tight. Play side B first.</p>
+            <div class="s4-row"><a class="s4-button" data-variant="filled" href="#stock/record/5" data-page-open="record" data-page-id="5">Open Record</a><span class="cr-booth-price" id="cr-week-price">£64</span></div>
+          </div>
+        </section>
+        <!-- from 1200 the week's arrivals sit beside the booth (the same records as the New This Week chip) -->
+        <section class="s4-pane cr-arrivals" aria-labelledby="cr-arr-h">
+          <h2 class="s4-pane-title" id="cr-arr-h">Came In This Week</h2>
+          <ul class="s4-list" id="cr-arrivals" aria-labelledby="cr-arr-h"></ul>
+        </section>
+        </div>
+
+        <div class="cr-tools">
+          <!-- no "All" chip: none pressed is every record, pressing the pressed chip clears it (decision 0070) -->
+          <div class="s4-chip-set" data-select="single" data-clearable data-scroll aria-label="Section" id="cr-filter">
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Jazz">Jazz</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Soul &amp; Funk">Soul &amp; Funk</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Electronic">Electronic</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Folk">Folk</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="new">New This Week</button>
+            <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="sale">Sale Bin</button>
+          </div>
+          <div class="cr-sortrow">
+          <p class="cr-sub" id="cr-showing" aria-live="polite">Showing all 14 records</p>
+          <!-- how the same sleeves are ordered: a value, so a button group (decision 0059) -->
+          <div class="s4-button-group" data-connected data-select="single" data-fit="content" aria-label="Sort By" id="cr-sort">
+            <button class="s4-button" data-variant="tonal" data-size="s" type="button" value="new" aria-pressed="true">Newest</button>
+            <button class="s4-button" data-variant="tonal" data-size="s" type="button" value="artist">Artist</button>
+            <button class="s4-button" data-variant="tonal" data-size="s" type="button" value="price">Price</button>
+          </div>
+          </div>
+        </div>
+        <div class="s4-states" id="cr-states" data-state="ready">
+          <ul class="cr-grid" data-when="ready" data-selectable data-selection-bar="#cr-bar" id="cr-grid" aria-label="Records"></ul>
+          <div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="archive"></span></span><h2 class="s4-empty-title" id="cr-empty-t">Nothing in This Section</h2><p class="s4-empty-text" id="cr-empty-p">Every record here has sold. The Tuesday buy-in usually refills it.</p><button class="s4-button" data-variant="tonal" type="button" id="cr-all">Show All Records</button></div>
+        </div>
+      </section>
+
+      <!-- Crates: the bins on the shop floor, and the web shop that mirrors them -->
+      <section class="s4-view s4-stack" data-view="crates" data-title="Crates" hidden>
+        <div class="s4-stack" style="--s4-gap: var(--s4-space-1)"><h2 class="cr-h">The Shop Floor</h2><p class="cr-sub">Seven bins and the wall. Counts include the stock room.</p></div>
+        <div class="cr-two">
+          <ul class="s4-list" data-style="segmented" id="cr-crates" aria-label="Crates"></ul>
+          <section class="s4-pane" aria-labelledby="cr-web-h">
+            <h2 class="s4-pane-title" id="cr-web-h">Web Shop</h2>
+            <div class="s4-states" id="cr-web" data-state="error">
+              <div data-when="loading" data-rows="3"></div>
+              <ul class="s4-list" data-when="ready" data-dividers aria-label="Listed online">
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">9 Records Listed</span><span class="s4-list-supporting">Synced just now</span></span></div></li>
+                <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">2 Sold Online Today</span><span class="s4-list-supporting">Pull them from the bins before noon</span></span></div></li>
+              </ul>
+              <div data-when="error" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="error"></span></span><h3 class="s4-empty-title">Couldn’t Reach the Web Shop</h3><p class="s4-empty-text">Prices on the site may be a day old. Nothing in the stock room has changed.</p><button class="s4-button" data-variant="tonal" type="button" data-retry>Try Again</button></div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- a record: a page with its own URL (#stock/record/7), next and previous -->
+      <section class="s4-subpage" data-page="record" data-title="Record" hidden>
+        <article class="s4-stack">
+          <section class="cr-booth" data-theme="dark" id="v-booth" aria-labelledby="v-artist">
+            <div class="cr-disc-wrap" id="v-art"></div>
+            <div class="cr-booth-info">
+              <p class="cr-kicker" id="v-section">Jazz</p>
+              <div><h2 class="cr-booth-artist" id="v-artist">Artist</h2><p class="cr-booth-album" id="v-album">Album</p></div>
+              <div class="cr-pills" id="v-grades"></div>
+              <span class="cr-booth-price" id="v-price"></span>
+              <div class="s4-row"><button class="s4-button" data-variant="filled" type="button" data-expand="v-hold">Hold for a Customer</button><span class="s4-status" id="v-held" hidden></span></div>
+              <div class="s4-expand" id="v-hold" data-variant="inset" hidden>
+                <form class="s4-form s4-expand-body" id="v-hold-form">
+                  <div class="s4-text-field"><input id="h-name" name="name" autocomplete="off" required data-msg-required="Write who it is for, so the counter can find it."><label for="h-name">Customer</label></div>
+                  <div class="s4-expand-actions"><button class="s4-button" data-variant="text" type="button" data-expand-close="cancel">Cancel</button><button class="s4-button" type="submit">Hold Until Saturday</button></div>
+                </form>
+              </div>
+            </div>
+          </section>
+          <div class="cr-two">
+            <section class="s4-pane" aria-labelledby="v-tracks-h">
+              <h3 class="s4-pane-title" id="v-tracks-h">Tracklist</h3>
+              <div class="cr-sides" id="v-tracks"></div>
+            </section>
+            <section class="s4-pane" aria-label="Pressing">
+              <dl class="s4-dl" id="v-dl"></dl>
+              <div class="s4-row"><button class="s4-button" data-variant="tonal" type="button" id="v-prev"><span class="s4-icon" data-icon="chevron-left"></span>Previous</button><button class="s4-button" data-variant="tonal" type="button" id="v-next">Next<span class="s4-icon" data-icon="chevron-right"></span></button><span class="s4-body-small s4-on-surface-variant s4-num" id="v-pos"></span></div>
+            </section>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#stock" data-view="stock" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="image"></span></span><span class="s4-nav-label">Stock</span></a>
+    <a class="s4-nav-item" href="#crates" data-view="crates"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="archive"></span></span><span class="s4-nav-label">Crates</span></a>
+  </nav>
+</div>
+<script src="icons.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.direct.min.js"></script>
+<script>
+/* Crate's brand: a sticker-gold accent over the dials set on <html>. The light/dark choice follows the templates hub. */
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e8b400' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
+
+/* the data (a real app loads and saves this). Artists, labels and records are invented. */
+var CHART = ['', '#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300'];   /* the chart palette's light values: each record's booth takes its sleeve's main color as its accent */
+function R(id, artist, album, section, year, label, cat, media, sleeve, price, art, c1, c2, ground, isNew, note) { return { id: String(id), artist: artist, album: album, section: section, year: year, label: label, cat: cat, media: media, sleeve: sleeve, price: price, art: art, c1: c1, c2: c2, ground: ground, isNew: isNew, sale: false, note: note }; }
+var records = [
+  R(1, 'Mara Quist Quartet', 'Low Light Hours', 'Jazz', 1961, 'Calder Records', 'CR-114', 'NM', 'VG+', 48, 'sun', 4, 2, 'dark', false, 'Mono pressing. A faint hairline on side A, track 2; plays through.'),
+  R(2, 'The Saltings', 'Harbour Lights', 'Folk', 1972, 'Ferrous', 'FE 22', 'VG+', 'VG', 22, 'stripes', 1, 3, 'light', false, 'Sleeve has a shop sticker from 1974 and a corner bump.'),
+  R(3, 'Deon Vale', 'Slow Burn Sermon', 'Soul & Funk', 1969, 'Halcyon', 'H-301', 'VG', 'VG', 35, 'half', 2, 4, 'dark', false, 'Light surface marks, no skips. Original inner sleeve.'),
+  R(4, 'Unit Seven', 'Signal Path', 'Electronic', 1994, 'Lowfield', 'LF009', 'NM', 'NM', 28, 'grid', 3, 1, 'dark', false, 'Twelve-inch, 45 rpm. Barely played.'),
+  R(5, 'Ines Okoro', 'Kola Night', 'Jazz', 1975, 'Calder Records', 'CR-188', 'VG+', 'VG+', 64, 'arcs', 2, 6, 'light', false, 'First pressing, gatefold still tight. Play side B first.'),
+  R(6, 'The Brambles', 'Nettle & Rose', 'Folk', 1968, 'Ferrous', 'FE 9', 'VG', 'G+', 18, 'sun', 6, 5, 'light', false, 'Ring wear on the sleeve; the record is cleaner than it looks.'),
+  R(7, 'Velvet Static', 'Pulse Theory', 'Electronic', 1998, 'Lowfield', 'LF031', 'NM', 'VG+', 24, 'stripes', 5, 2, 'dark', false, 'Double LP. Disc two never played.'),
+  R(8, 'Rosa Delmar', 'Turn the Lamp Down', 'Soul & Funk', 1971, 'Halcyon', 'H-355', 'VG+', 'VG', 42, 'arcs', 5, 4, 'light', false, 'Promo stamp on the back. Warm, quiet pressing.'),
+  R(9, 'Arno Felt Trio', 'Snowfield', 'Jazz', 1966, 'Nordlys', 'NL 7', 'VG+', 'NM', 38, 'half', 1, 6, 'light', false, 'Laminated Scandinavian sleeve, glossy as new.'),
+  R(10, 'Harper Lane', 'Tidewrack', 'Folk', 1979, 'Ferrous', 'FE 41', 'NM', 'NM', 16, 'grid', 4, 3, 'light', true, 'Came in a box of folk on Tuesday. Still shrink-wrapped.'),
+  R(11, 'Kestrel Drive', 'Night Bus Home', 'Electronic', 2003, 'Lowfield', 'LF077', 'VG+', 'VG+', 19, 'sun', 1, 5, 'dark', true, 'Coloured vinyl, numbered 212 of 500.'),
+  R(12, 'The Wexford Six', 'Hot Pavement', 'Soul & Funk', 1973, 'Halcyon', 'H-390', 'VG', 'VG', 30, 'stripes', 2, 6, 'dark', true, 'Writing on the label (“Pat’s”). Plays loud and clean.'),
+  R(13, 'Sol Amari', 'Blue Hours in Lisbon', 'Jazz', 1982, 'Nordlys', 'NL 31', 'NM', 'NM', 26, 'half', 3, 5, 'dark', true, 'Japanese insert included.'),
+  R(14, 'Glass Harbour', 'Driftwood Dub', 'Electronic', 1996, 'Lowfield', 'LF040', 'VG', 'VG+', 21, 'arcs', 6, 1, 'light', false, 'Some crackle in the run-out groove of side A.')
+];
+var CRATES = [['Jazz A–K', 'Jazz', 4, 2], ['Jazz L–Z', 'Jazz', 1, 6], ['Soul & Funk', 'Soul & Funk', 2, 5], ['Folk & Acoustic', 'Folk', 3, 4], ['Electronic', 'Electronic', 1, 3], ['Sale Bin', 'sale', 2, 4], ['The Wall', 'wall', 6, 5]];
+var FLOOR = { 'Jazz A–K': 212, 'Jazz L–Z': 186, 'Soul & Funk': 241, 'Folk & Acoustic': 158, 'Electronic': 307, 'Sale Bin': 96, 'The Wall': 31 };
+var TITLES = ['Ebb', 'Lantern', 'Sea Glass', 'Third Hour', 'Coal Road', 'Paper Moon Over Leith', 'Undertow', 'Saint Brigid', 'Copper Wire', 'After the Rain', 'Low Sun', 'Keepsake', 'Long Way Round', 'Ferryman', 'Brass Lamp', 'Turning Tide'];
+var app = document.querySelector('.s4-app'), grid = document.getElementById('cr-grid'), states = document.getElementById('cr-states'), filter = 'all', sort = 'new';
+var $ = function (id) { return document.getElementById(id); };
+function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function gbp(n) { return '£' + (Math.round(n * 100) / 100).toFixed(n % 1 ? 2 : 0); }
+function price(r) { return r.sale ? r.price * 0.8 : r.price; }
+
+/* a sleeve: one of five layouts, two colors from the chart palette, on a light or dark ground */
+function sleeve(r) {
+  var s = { sun: '<circle class="c1" cx="100" cy="92" r="58"/><rect class="c2" x="0" y="150" width="200" height="50"/>',
+    stripes: '<rect class="c1" x="0" y="40" width="200" height="22"/><rect class="c2" x="0" y="80" width="200" height="22"/><rect class="c1" x="0" y="120" width="200" height="22"/><circle class="c3" cx="160" cy="170" r="10"/>',
+    half: '<path class="c1" d="M20 110 A80 80 0 0 1 180 110 Z"/><path class="c2" d="M20 120 A80 80 0 0 0 180 120 Z"/>',
+    grid: Array.apply(null, Array(16)).map(function (_, i) { return '<circle class="' + (i % 5 ? 'c1' : 'c2') + '" cx="' + (40 + (i % 4) * 40) + '" cy="' + (40 + Math.floor(i / 4) * 40) + '" r="' + (i % 3 ? 12 : 16) + '"/>'; }).join(''),
+    arcs: '<path class="c1" d="M0 200 A200 200 0 0 1 200 0 L200 60 A140 140 0 0 0 60 200 Z"/><path class="c2" d="M100 200 A100 100 0 0 1 200 100 L200 150 A50 50 0 0 0 150 200 Z"/>' }[r.art];
+  return '<span class="cr-sleeve" data-c1="' + r.c1 + '" data-c2="' + r.c2 + '" data-ground="' + r.ground + '" aria-hidden="true"><svg viewBox="0 0 200 200">' + s + '</svg></span>';
+}
+/* the record half out of its sleeve: grooves drawn as rings, the label in the booth's accent */
+function disc(r) {
+  var g = ''; for (var i = 0; i < 9; i++) g += '<circle class="g" cx="50" cy="50" r="' + (46 - i * 2.6) + '"/>';
+  return '<span class="cr-disc" aria-hidden="true"><svg viewBox="0 0 100 100">' + g + '<circle class="lb" cx="50" cy="50" r="15"/><circle class="hole" cx="50" cy="50" r="1.6"/></svg></span>' + sleeve(r);
+}
+function grades(r) { return '<span class="cr-grade"' + (r.media === 'NM' ? ' data-mint' : '') + ' title="Record">' + r.media + '</span><span class="cr-grade"' + (r.sleeve === 'NM' ? ' data-mint' : '') + ' title="Sleeve">' + r.sleeve + '</span>'; }
+function shown() {
+  var list = records.filter(function (r) { return filter === 'all' || (filter === 'new' ? r.isNew : filter === 'sale' ? r.sale : r.section === filter); });
+  return list.sort(function (a, b) { return sort === 'price' ? price(b) - price(a) : sort === 'artist' ? a.artist.replace(/^The /, '').localeCompare(b.artist.replace(/^The /, '')) : +b.id - +a.id; });
+}
+function render() {
+  var list = shown();
+  grid.innerHTML = list.map(function (r) {
+    return '<li data-id="' + r.id + '"><button class="cr-tile" type="button" aria-label="' + esc(r.artist + ', ' + r.album + ', ' + gbp(price(r)) + ', record ' + r.media + ', sleeve ' + r.sleeve) + '">' +
+      '<span style="position:relative;display:block">' + sleeve(r) + '<span class="cr-check" aria-hidden="true"><span class="s4-icon" data-icon="check"></span></span></span>' +
+      '<span class="cr-artist">' + esc(r.artist) + '</span><span class="cr-album">' + esc(r.album) + ' · ' + r.year + '</span>' +
+      '<span class="cr-tag"><span class="cr-price">' + (r.sale ? '<s>' + gbp(r.price) + '</s>' : '') + gbp(price(r)) + '</span><span class="cr-pills">' + grades(r) + '</span></span></button></li>';
+  }).join('');
+  S4.init(grid); S4.states.set(states, list.length ? 'ready' : 'empty');
+  $('cr-showing').textContent = filter === 'all' ? 'Showing all ' + list.length + ' records' : list.length + (list.length === 1 ? ' record' : ' records') + ' in ' + (filter === 'new' ? 'New This Week' : filter === 'sale' ? 'the Sale Bin' : filter);
+  $('cr-empty-t').textContent = filter === 'sale' ? 'The Sale Bin Is Empty' : 'Nothing in This Section';
+  $('cr-empty-p').textContent = filter === 'sale' ? 'Pick a few slow sellers and choose Move to Sale Bin.' : 'Every record here has sold. The Tuesday buy-in usually refills it.';
+  $('cr-n').textContent = records.length;
+  $('cr-v').textContent = gbp(records.reduce(function (n, r) { return n + price(r); }, 0));
+  $('cr-new').textContent = records.filter(function (r) { return r.isNew; }).length;
+  crates(); week();
+}
+/* the record of the week: the booth takes the sleeve's own color */
+function week() {
+  var r = records.filter(function (x) { return x.id === '5'; })[0]; if (!r) return;
+  S4.theme({ seed: CHART[r.c1] }, $('cr-week'));
+  $('cr-week-art').innerHTML = disc(r); $('cr-week-price').textContent = gbp(price(r));
+  $('cr-arrivals').innerHTML = records.filter(function (x) { return x.isNew; }).map(function (x) { return '<li><a class="s4-list-item" href="#stock/record/' + x.id + '" data-page-open="record" data-page-id="' + x.id + '"><span class="cr-thumb">' + sleeve(x) + '</span><span class="s4-list-content"><span class="s4-list-headline">' + esc(x.artist) + '</span><span class="s4-list-supporting">' + esc(x.album) + '</span></span><span class="s4-list-trailing s4-num">' + gbp(price(x)) + '</span></a></li>'; }).join(''); S4.init($('cr-arrivals'));
+}
+render();
+$('cr-filter').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; filter = c.getAttribute('aria-pressed') === 'true' ? c.dataset.value : 'all'; S4.selection.clear(grid); render(); });
+$('cr-sort').addEventListener('s4-change', function (e) { sort = e.detail.value; render(); });
+$('cr-all').addEventListener('click', function () { var on = $('cr-filter').querySelector('[aria-pressed="true"]'); if (on) on.click(); });
+/* a tap opens the record (while picking, the tap picks instead: direct.js handles that first) */
+grid.addEventListener('click', function (e) { var li = e.target.closest('li[data-id]'); if (li && !grid.hasAttribute('data-selecting')) S4.pages.open(app, 'record', { id: li.dataset.id }); });
+
+/* ---------- a record, as a page ---------- */
+var page = document.querySelector('.s4-subpage[data-page="record"]'), cur = null;
+function sides(r) {
+  var n = +r.id, side = function (s, k) { var out = ''; for (var i = 0; i < 4; i++) { var t = TITLES[(n * 3 + i + k) % TITLES.length], len = 2 + ((n + i * 7 + k) % 5), sec = (n * 13 + i * 17 + k) % 60; out += '<li data-side="' + s + '"><span>' + esc(t) + '</span><span>' + len + ':' + String(sec).padStart(2, '0') + '</span></li>'; } return out; };
+  return '<div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side A</h4><ol class="cr-tracks">' + side('A', 0) + '</ol></div><div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side B</h4><ol class="cr-tracks">' + side('B', 4) + '</ol></div>';
+}
+page.addEventListener('s4-open', function (e) {
+  cur = records.filter(function (r) { return r.id === e.detail.id; })[0] || records[0];
+  var list = shown().indexOf(cur) >= 0 ? shown() : records, i = list.indexOf(cur);
+  page.dataset.title = cur.album;
+  S4.theme({ seed: CHART[cur.c1] }, $('v-booth'));
+  $('v-art').innerHTML = disc(cur);
+  $('v-section').textContent = cur.section + (cur.isNew ? ' · New This Week' : '') + (cur.sale ? ' · Sale Bin' : '');
+  $('v-artist').textContent = cur.artist; $('v-album').textContent = cur.album + ' (' + cur.year + ')';
+  $('v-grades').innerHTML = '<span class="cr-grade"' + (cur.media === 'NM' ? ' data-mint' : '') + '>Record ' + cur.media + '</span><span class="cr-grade"' + (cur.sleeve === 'NM' ? ' data-mint' : '') + '>Sleeve ' + cur.sleeve + '</span>';
+  $('v-price').innerHTML = (cur.sale ? '<s class="cr-sub">' + gbp(cur.price) + '</s> ' : '') + gbp(price(cur));
+  $('v-held').hidden = !cur.held; $('v-held').textContent = cur.held ? 'Held for ' + cur.held : '';
+  $('v-tracks').innerHTML = sides(cur);
+  $('v-dl').innerHTML = [['Label', cur.label], ['Catalogue', '<span class="cr-mono">' + cur.cat + '</span>'], ['Year', cur.year], ['Section', cur.section], ['Condition', esc(cur.note)]].map(function (x) { return '<div class="s4-dl-row"><dt>' + x[0] + '</dt><dd>' + (typeof x[1] === 'string' && x[0] !== 'Catalogue' && x[0] !== 'Condition' ? esc(x[1]) : x[1]) + '</dd></div>'; }).join('');
+  $('v-pos').textContent = (i + 1) + ' of ' + list.length;
+  $('v-prev').disabled = i === 0; $('v-next').disabled = i === list.length - 1;
+});
+function step(d) { var list = shown().indexOf(cur) >= 0 ? shown() : records, n = list[list.indexOf(cur) + d]; if (n) { history.replaceState(history.state, '', '#stock/record/' + n.id); page.dispatchEvent(new CustomEvent('s4-open', { detail: { id: n.id } })); S4.transition.enter($('v-booth'), d, { distance: 16 }); app.querySelector('.s4-app-bar-title').textContent = n.album; } }
+$('v-prev').addEventListener('click', function () { step(-1); });
+$('v-next').addEventListener('click', function () { step(1); });
+document.addEventListener('keydown', function (e) { if (page.hidden || e.target.closest('input, textarea, select, [contenteditable]')) return; var rtl = getComputedStyle(page).direction === 'rtl'; if (e.key === 'ArrowRight') step(rtl ? -1 : 1); if (e.key === 'ArrowLeft') step(rtl ? 1 : -1); });
+$('v-hold-form').addEventListener('s4-submit', function (e) {
+  e.preventDefault(); var r = cur, name = e.detail.values.name.trim();
+  r.held = name; S4.expand.close('v-hold', 'hold'); e.target.reset(); $('v-held').hidden = false; $('v-held').textContent = 'Held for ' + name;
+  S4.snackbar({ text: r.album + ' held for ' + name, action: 'Undo', onAction: function () { r.held = null; if (cur === r) $('v-held').hidden = true; } });
+});
+
+/* ---------- several at once: labels, the sale bin, sold. Each can be undone. ---------- */
+function picked() { return S4.selection.items(grid).map(function (li) { return records.filter(function (r) { return r.id === li.dataset.id; })[0]; }); }
+$('cr-labels').addEventListener('click', function () { var n = picked().length; S4.selection.clear(grid); S4.snackbar(n + (n === 1 ? ' price label' : ' price labels') + ' sent to the counter printer'); });
+$('cr-sale').addEventListener('click', function () {
+  var list = picked().filter(function (r) { return !r.sale; }); S4.selection.clear(grid);
+  list.forEach(function (r) { r.sale = true; }); render();
+  S4.snackbar({ text: list.length + ' moved to the sale bin at 20% off', action: 'Undo', onAction: function () { list.forEach(function (r) { r.sale = false; }); render(); } });
+});
+$('cr-sold').addEventListener('click', function () {
+  var list = picked(), before = records.slice(); S4.selection.clear(grid);
+  records = records.filter(function (r) { return list.indexOf(r) < 0; }); render();
+  S4.snackbar({ text: list.length + ' marked sold', action: 'Undo', onAction: function () { records = before; render(); } });
+});
+$('cr-add').addEventListener('click', function () { S4.snackbar('Scan a barcode or type a catalogue number to add records'); });
+
+/* ---------- crates ---------- */
+function crates() {
+  $('cr-crates').innerHTML = CRATES.map(function (c) {
+    var here = records.filter(function (r) { var k = r.artist.replace(/^The /, ''); return c[1] === 'sale' ? r.sale : r.section === c[1] && (c[0] === 'Jazz A–K' ? k < 'L' : c[0] === 'Jazz L–Z' ? k >= 'L' : true); }).length, total = FLOOR[c[0]] + (c[1] === 'sale' ? here : 0);
+    return '<li><div class="s4-list-item"><span class="cr-spines" data-c1="' + c[2] + '" data-c2="' + c[3] + '" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="s4-list-content"><span class="s4-list-headline">' + esc(c[0]) + '</span><span class="s4-list-supporting">' +
+      total + ' records · ' + (c[1] === 'wall' ? 'rare and signed, behind the counter' : c[1] === 'sale' ? 'everything 20% off' : here + ' waiting in the stock room') + '</span></span></div></li>';
+  }).join('');
+}
+crates();
+$('cr-web').addEventListener('s4-retry', function () { S4.states.load($('cr-web'), new Promise(function (res) { setTimeout(function () { res({}); }, 900); })); });
+</script>
+</body>
+</html>

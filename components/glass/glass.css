@@ -1,4 +1,4 @@
-/* S4 Orion glass layer (decision 0004). Loaded after components, so it only changes how floating chrome is painted:
+/* Orion glass layer (decision 0004). Loaded after components, so it only changes how floating chrome is painted:
    components give these surfaces a solid M3 role; this layer turns them into very clear glass.
 
    Where glass goes: floating chrome and overlays only. Never content (cards, panes, lists, fields, tables).

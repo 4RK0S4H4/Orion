@@ -1,4 +1,4 @@
-# S4 Orion design review (2026-11-11)
+# Orion design review (2026-11-11)
 
 Goal from the owner: a theme **based on M3 Expressive, but very much my own**, with simpler, less bug-prone animation.
 Reviewed: the gallery, the reference pages, the demo at 390 (light and dark) and 1280, the token sources and

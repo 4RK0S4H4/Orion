@@ -1,6 +1,6 @@
 # Components
 
-Reference implementations of S4 Orion components. Each one is plain HTML and CSS built only from tokens, with a small
+Reference implementations of Orion components. Each one is plain HTML and CSS built only from tokens, with a small
 shared runtime for theming and motion. React wrappers are added only where state or motion make them worth having.
 
 ## Using them
@@ -32,7 +32,7 @@ Core first, then each pack once. `node scripts/packs.mjs page.html` (shipped in 
 prints the packs it needs and the tags to paste; the page checker and `npm run check` fail a lean page that links too few
 or too many, and `npm run test:lean` proves a lean page's computed styles and runtime match the full bundle. Websites load
 the site bundle instead (decision 0066). Budgets for core, each pack and each lean template are in `scripts/build.mjs`.
-Browse every component on the [gallery](https://4rk0s4h4.github.io/s4-orion/components/).
+Browse every component on the [gallery](https://4rk0s4h4.github.io/Orion/components/).
 
 ## Layout
 

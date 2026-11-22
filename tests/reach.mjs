@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* S4 Orion reach suite (round 0056): who can use a page, beyond the default phone and desktop.
+/* Orion reach suite (round 0056): who can use a page, beyond the default phone and desktop.
    Passes (all driven by page lists and selectors, so new components are covered without edits here):
      rtl       every page with dir="rtl" at 390 and 1280: no sideways scroll, the nav rail on the inline-start (right)
                side, leading icons before their text, menus, dialogs, panels and tooltips open inside the screen

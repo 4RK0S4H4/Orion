@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to S4 Orion are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/):
+All notable changes to Orion are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/):
 
 - **Major**: a token is renamed or removed, a component's markup or class names change, or a rule in the skill changes what existing apps should look like.
 - **Minor**: new tokens, components, variants or skill guidance that existing apps can ignore.
@@ -9,6 +9,8 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 ## [1.2.0] - Unreleased
 
 Rounds 0059 and 0060 (decisions 0067 to 0070; the dated release and its git tag come after review 5).
+
+Renamed (decision 0071): the design language is **Orion** (formerly S4 Orion). The skill is `skill/orion/` and packages as `orion.skill`; the repository is `4RK0S4H4/Orion` and Pages is `https://4rk0s4h4.github.io/Orion/` (the old Pages address no longer works). The `s4-` classes, `--s4-` tokens, `data-s4-*`, `S4.*` and file names are unchanged. `npm run check:words` fails a stray "S4 Orion".
 
 Round 0060, workstream A, review 4's blockers (decision 0069):
 
@@ -58,7 +60,7 @@ Released as the state of the repository at the end of round 0058 (the section gr
 
 Round 0058, workstream A: your place, your focus and silent failures (decision 0065):
 
-- Added: the page checker and the suite fail silent failures (`skill/s4-orion/scripts/silent.mjs`): an `s4-` class nothing defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill.
+- Added: the page checker and the suite fail silent failures (`skill/orion/scripts/silent.mjs`): an `s4-` class nothing defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill.
 - Added: `npm run check:words` (in `npm run check`): phrases that describe the old look fail in docs, the skill, component READMEs and reference pages (decisions, history and the issue log exempt).
 - Added: `data-cmd-plain` runs a check command without showing its pressed state (a panel's own Close button).
 - Changed: data tables have two Tab stops, the header and the body (WAI-ARIA grid): arrows move along the header, a grip resizes with Shift+arrows or Enter then arrows, Home/End within a row, Ctrl+Home/End for the first and last row, Up from the first row to the header; the same header order in every column; Select All rests as the quiet dot (amends 0063).
@@ -377,15 +379,15 @@ The first version of S4 Orion, a leaner rebuild of S4 Material 1.3 on Material 3
 - Runtime (`orion.js`): auto-init, theme (seed, mode, contrast, saving), icons, and the transition patterns (container transform, unfold, shared axis, slide from edge).
 - Set-neutral icon vocabulary (`components/icons/names.json`) built from Solar.
 - `scripts/build.mjs`: bundles `components/orion.css` and `orion.js` and copies assets into the skill.
-- The S4 Orion skill (`skill/s4-orion/`, packaged as `skill/dist/s4-orion.skill`), replacing the S4 Material skill:
+- The S4 Orion skill (`skill/orion/`, packaged as `skill/dist/orion.skill`), replacing the S4 Material skill:
   `SKILL.md` (trigger, philosophy, page shape, decision rules, common mistakes, worked example), hand-written
   `references/patterns.md` (screen patterns, theme controls, saving data, theming API), and references generated from
   the repo (components, tokens, icons, foundations).
-- `skill/s4-orion/scripts/check.mjs`: loads a page at 390px dark and 1280px light and reports console errors, unknown
+- `skill/orion/scripts/check.mjs`: loads a page at 390px dark and 1280px light and reports console errors, unknown
   icons, sideways scroll, rendered contrast (including worst case on glass), unnamed controls, glass on content, and app
   CSS that breaks the rules; warns on extra filled buttons and non-Title Case labels; saves screenshots.
-- `skill/s4-orion/scripts/inline.mjs`: turns a page into one self-contained HTML file (CSS, JS, icons, font, color).
-- Three eval cases for the skill (`skill/s4-orion/evals/`).
+- `skill/orion/scripts/inline.mjs`: turns a page into one self-contained HTML file (CSS, JS, icons, font, color).
+- Three eval cases for the skill (`skill/orion/evals/`).
 
 ### Fixed (during 1.0.0)
 

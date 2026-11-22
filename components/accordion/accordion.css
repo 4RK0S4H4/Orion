@@ -1,4 +1,4 @@
-/* Accordion (S4 Orion addition): sections that open and close. Built on native <details>, so it works without JS.
+/* Accordion (Orion addition): sections that open and close. Built on native <details>, so it works without JS.
    <div class="s4-accordion">
      <details class="s4-accordion-item" name="faq" open>
        <summary>What is autopay?<span class="s4-icon" data-icon="chevron-down"></span></summary>

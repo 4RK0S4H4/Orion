@@ -6,7 +6,7 @@ the "Status" table and "Current stage" whenever a stage moves.
 
 ## The goal
 
-The owner asked (2026-11-16) for S4 Orion to be "polished fully until I get a solid 10 for each area you graded it",
+The owner asked (2026-11-16) for Orion to be "polished fully until I get a solid 10 for each area you graded it",
 for apps and websites on phone and desktop, and desktop applications: great as-is and deeply customizable per app.
 On 2026-11-21 the owner handed over the lead: "I'll let you take the lead on this, and feel free to change past rules
 as well and do anything you feel like it is for the best, including glass rules ... I am only here to look at results
@@ -117,5 +117,5 @@ action now. The owner can overrule any of these; otherwise they stand.
   header keys surfaced, 0049 wording for shortcut-opened palettes, one-glyph-box rule fixed and proven on known-bad
   fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
   the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.
-- 2026-11-22 (round 0060, workstream A): decision 0069 built (lean app bundle: `orion.core.min.*` plus six packs, `scripts/packs.mjs`, budgets in check, `test:lean`; 15 templates on it; palette Escape lands on main via `S4.util.land`; Linnea's Columns button confirmed outside the grid; grid hint after the first key on touch). A merged B (0070; Linnea's All Records chip now hidden, filter `hidden: true` view). Next: full tests, publish, review 5.
+- 2026-11-22 (round 0060, workstream A): decision 0069 built (lean app bundle: `orion.core.min.*` plus six packs, `scripts/packs.mjs`, budgets in check, `test:lean`; 15 templates on it; palette Escape lands on main via `S4.util.land`; Linnea's Columns button confirmed outside the grid; grid hint after the first key on touch). A merged B (0070; Linnea's All Records chip now hidden, filter `hidden: true` view). Decision 0071 renamed the product to Orion (skill folder, links, check:words). Next: full tests, publish, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.

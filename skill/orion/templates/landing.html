@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en" data-type-display="rounded" data-energy="lively">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sprig · Your Plants Will Tell You When They’re Thirsty</title>
+<!-- Orion template (copy orion.site.min.css, orion.site.min.js, icons-site.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066; icons-site.js holds the icons the site templates draw and fetches icons-solar.js for any other, decision 0068). Landing Page. A consumer product launch from the website kit (components/site): announcement bar, glass
+     site header with a phone menu, split hero with a drawn product, press row, the product's anatomy, how it works,
+     an interactive plant matcher in a real phone screen, bento, a large quote and numbers, FAQ beside its heading, the
+     one accent band (a pre-order with a pack picker) and a footer.
+     Brand: Sprig, a soil sensor for houseplants. Tinted color mode from a leaf green, rounded display face, lively
+     motion energy, round corners (the dials on <html> and in S4.theme.restore at the end). Drawings are inline SVG
+     filled with color roles (the fixed roles, so the product looks the same in light and dark), never image files.
+     Swap the content; keep the order of sections and the one accent band. -->
+<meta name="description" content="Sprig is a soil sensor for houseplants. Push it into the pot and your phone knows when to water, how much, and when to leave it alone. Pre-order for €39.">
+<meta name="theme-color" content="#f9faef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11140e" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sprig">
+<meta property="og:title" content="Sprig · Your Plants Will Tell You When They’re Thirsty">
+<meta property="og:description" content="A soil sensor the size of a lollipop stick. Your phone knows when to water, how much, and when to leave it alone.">
+<meta property="og:image" content="https://example.com/og/sprig-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('sprig-site-theme');</script>
+<link rel="preload" href="inter-site.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.site.min.css">
+<link rel="stylesheet" href="brand/landing.css?v=717dbb3">
+<style>
+  /* ---------- Sprig's own pieces: drawings, the anatomy, steps, the plant matcher, the pack picker ---------- */
+  /* the drawing palette: fixed roles stay the same in light and dark, like a photograph of the real thing */
+  .sp-art { display: block; inline-size: 100%; block-size: auto; }
+  .sp-art .leaf { fill: var(--md-sys-color-primary-fixed-dim); }
+  .sp-art .leaf-deep { fill: var(--md-sys-color-on-primary-fixed-variant); }
+  .sp-art .leaf-light { fill: var(--md-sys-color-primary-fixed); }
+  .sp-art .vein { fill: none; stroke: var(--md-sys-color-primary-fixed); stroke-width: 3; stroke-linecap: round; opacity: 0.7; }
+  .sp-art .stem { fill: none; stroke: var(--md-sys-color-on-primary-fixed-variant); stroke-width: 6; stroke-linecap: round; }
+  .sp-art .pot { fill: var(--md-sys-color-tertiary-fixed-dim); }
+  .sp-art .pot-rim { fill: var(--md-sys-color-tertiary-fixed); }
+  .sp-art .pot-band { fill: var(--md-sys-color-on-tertiary-fixed-variant); opacity: 0.18; }
+  .sp-art .soil { fill: var(--md-sys-color-on-tertiary-fixed-variant); }
+  .sp-art .device { fill: var(--md-sys-color-secondary-fixed); }
+  .sp-art .device-shade { fill: var(--md-sys-color-secondary-fixed-dim); }
+  .sp-art .probe { fill: var(--md-sys-color-secondary-fixed-dim); }
+  .sp-art .led { fill: var(--md-sys-color-primary); }
+  .sp-art .led-halo { fill: var(--md-sys-color-primary); opacity: 0.22; }
+  .sp-art .drop { fill: var(--md-sys-color-tertiary); }
+  .sp-art .ground { fill: var(--md-sys-color-surface-container-high); }
+  .sp-art .num { fill: var(--md-sys-color-primary); }
+  .sp-art .num-text { fill: var(--md-sys-color-on-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: 15px; font-weight: 700; }
+
+  /* hero: the drawing on a soft stage with two real notifications resting on it */
+  .sp-hero-stage { position: relative; display: grid; place-items: end center; inline-size: 100%; aspect-ratio: 1 / 1; padding: var(--s4-space-6) var(--s4-space-6) 0; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-extra-large); background: var(--md-sys-color-surface-container); }
+  .sp-hero-stage > .sp-art { inline-size: min(92%, calc(var(--s4-space-16) * 8)); }
+  .sp-float { position: absolute; display: flex; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4) var(--s4-space-3) var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); color: var(--md-sys-color-on-surface); max-inline-size: calc(100% - var(--s4-space-8)); }
+  .sp-float > span:last-child { display: grid; min-inline-size: 0; }
+  .sp-float[data-at="top"] { inset-block-start: var(--s4-space-6); inset-inline-start: var(--s4-space-6); }
+  .sp-float[data-at="mid"] { inset-block-start: 30%; inset-inline-end: var(--s4-space-6); }
+  .sp-logo-art { inline-size: var(--s4-space-8); }
+  .sp-glyph[data-size="l"] { inline-size: var(--s4-space-16); block-size: var(--s4-space-16); --s4-icon-size: var(--s4-size-icon-large); }
+  .sp-glyph { display: grid; place-items: center; flex: none; inline-size: var(--s4-space-10); block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: 700; font-variant-numeric: tabular-nums; --s4-icon-size: var(--s4-size-icon-small); }
+  .sp-glyph[data-tone="tertiary"] { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
+  @container s4-site-section (width >= 600px) { .sp-hero-stage { aspect-ratio: 5 / 4; } }
+  @container s4-site-section (width >= 840px) { .sp-hero-stage { aspect-ratio: 4 / 5; } }
+
+  /* a big, friendly hero line: the rounded face at a larger step than stock, tight leading */
+  .sp-hero .s4-hero-title { font-size: calc(var(--s4-site-hero-size) * 1.12); line-height: calc(var(--s4-site-hero-line-height) * 1.08); max-inline-size: 14ch; }
+  .sp-price { display: inline-flex; align-items: baseline; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .sp-price strong { color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); font-variant-numeric: tabular-nums; }
+
+  /* anatomy: the sensor drawn big, its four parts numbered beside it */
+  .sp-anatomy { display: grid; gap: var(--s4-site-section-gap); align-items: center; }
+  .sp-anatomy-art { display: grid; place-items: end center; padding: var(--s4-space-10) var(--s4-space-6) 0; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-extra-large); background: var(--md-sys-color-surface-container-low); }
+  .sp-anatomy-art > .sp-art { inline-size: min(100%, calc(var(--s4-space-16) * 5)); overflow: visible; }
+  .sp-art .grain { fill: var(--md-sys-color-tertiary-fixed-dim); opacity: 0.5; }
+  .sp-art .root { fill: none; stroke: var(--md-sys-color-tertiary-fixed-dim); stroke-width: 4; stroke-linecap: round; opacity: 0.6; }
+  .sp-art .callout { fill: none; stroke: var(--md-sys-color-primary); stroke-width: 2; stroke-dasharray: 2 5; stroke-linecap: round; }
+  .sp-parts { display: grid; gap: var(--s4-space-6); margin: 0; padding: 0; list-style: none; counter-reset: part; }
+  .sp-parts > li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s4-space-1) var(--s4-space-4); counter-increment: part; }
+  .sp-parts > li::before { content: counter(part); grid-row: span 2; display: grid; place-items: center; inline-size: var(--s4-space-8); block-size: var(--s4-space-8); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); font-weight: 700; }
+  .sp-parts h3 { margin: 0; align-self: center; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-title-large-weight); }
+  .sp-parts p { margin: 0; grid-column: 2; color: var(--md-sys-color-on-surface-variant); }
+  .sp-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-3); margin: var(--s4-space-8) 0 0; }
+  .sp-specs > div { display: grid; gap: var(--s4-space-1); padding: var(--s4-space-4) var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); }
+  .sp-specs dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .sp-specs dd { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); font-variant-numeric: tabular-nums; }
+  @container s4-site-section (width >= 600px) { .sp-specs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @container s4-site-section (width >= 840px) { .sp-anatomy { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); } }
+
+  /* how it works: three steps, each with its own little picture on a tinted card */
+  .sp-steps { display: grid; gap: var(--s4-space-4); margin: 0; padding: 0; list-style: none; counter-reset: step; }
+  .sp-steps > li { display: grid; align-content: start; gap: var(--s4-space-3); padding: var(--s4-space-4) var(--s4-space-4) var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); counter-increment: step; }
+  .sp-steps > li > :not(.sp-step-art) { margin: 0; padding-inline: var(--s4-space-2); }
+  .sp-step-art { display: grid; place-items: center; aspect-ratio: 4 / 3; margin-block-end: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-high); overflow: hidden; }
+  .sp-step-art > .sp-art { inline-size: 70%; }
+  .sp-step-n { color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-label-large-font); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: 700; }
+  .sp-step-n::before { content: "Step " counter(step); }
+  .sp-steps h3 { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); }
+  .sp-steps p { color: var(--md-sys-color-on-surface-variant); }
+  .sp-curve { display: flex; align-items: flex-end; gap: var(--s4-space-1); inline-size: 70%; block-size: 56%; }
+  .sp-curve > span { flex: 1; max-inline-size: var(--s4-space-6); block-size: calc(var(--h) * 1%); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-primary-fixed-dim); }
+  .sp-curve > span[data-now] { background: var(--md-sys-color-tertiary-fixed-dim); }
+  .sp-ping { display: grid; gap: var(--s4-space-2); inline-size: 82%; }
+  .sp-ping > div { display: flex; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-3) var(--s4-space-2) var(--s4-space-2); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-lowest); }
+  .sp-ping > div > span:last-child { display: grid; min-inline-size: 0; }
+  .sp-ping > div + div { margin-inline-start: var(--s4-space-6); }
+  @container s4-site-section (width >= 840px) { .sp-steps { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* the plant matcher: pick a plant, the phone screen answers in place */
+  .sp-matcher { display: grid; gap: var(--s4-site-section-gap); align-items: center; }
+  .sp-matcher-text { display: grid; justify-items: start; gap: var(--s4-space-5); }
+  .sp-matcher-text > * { margin: 0; }
+  .sp-care { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s4-space-3); inline-size: 100%; margin: 0; }
+  .sp-care > div { display: grid; gap: var(--s4-space-1); align-content: start; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .sp-care dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .sp-care dd { margin: 0; font-family: var(--md-sys-typescale-title-medium-font); font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight); font-variant-numeric: tabular-nums; }
+  .sp-phone-stage { display: grid; place-items: start center; padding: var(--s4-site-section-gap) var(--s4-space-6) 0; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-extra-large); background: var(--md-sys-color-surface-container); block-size: calc(var(--s4-space-16) * 8.5); }
+  .sp-app { display: flex; flex-direction: column; align-items: stretch; gap: var(--s4-space-4); inline-size: 100%; block-size: 100%; padding: var(--s4-space-10) var(--s4-space-4) var(--s4-space-4); }
+  .sp-app-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); }
+  .sp-app-head > * { margin: 0; }
+  .sp-app-ring { display: grid; justify-items: center; gap: var(--s4-space-3); padding: var(--s4-space-5) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); text-align: center; }
+  .sp-app-ring > p { margin: 0; }
+  .sp-next { display: flex; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+  .sp-next > span:last-child { display: grid; min-inline-size: 0; }
+  @container s4-site-section (width >= 840px) { .sp-matcher { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
+
+  /* bento pictures */
+  .sp-battery { display: flex; align-items: center; gap: var(--s4-space-1); inline-size: min(100%, calc(var(--s4-space-16) * 4)); }
+  .sp-battery > span { flex: 1; block-size: var(--s4-space-10); border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-on-primary-container); }
+  .sp-battery > span[data-empty] { opacity: 0.25; }
+  .sp-battery > span:first-child { border-start-start-radius: var(--md-sys-shape-corner-medium); border-end-start-radius: var(--md-sys-shape-corner-medium); }
+  .sp-battery > span:last-child { flex: 0 0 var(--s4-space-2); block-size: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-full); }
+  .sp-away { display: grid; grid-template-columns: repeat(7, minmax(0, var(--s4-space-12))); gap: var(--s4-space-2) var(--s4-space-1); inline-size: 100%; }
+  .sp-away > small { grid-row: 2; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); text-align: center; }
+  .sp-away > span { display: grid; place-items: center; aspect-ratio: 1; border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); font-variant-numeric: tabular-nums; }
+  .sp-away > span[data-away] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  .sp-away > span[data-water] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); font-weight: 700; }
+  .sp-chips { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+
+  /* the accent band: words, a pack picker and the price that follows it */
+  .sp-order { display: grid; gap: var(--s4-space-8); }
+  .sp-order-pick { display: grid; justify-items: start; gap: var(--s4-space-4); }
+  .sp-order-price { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s4-space-1) var(--s4-space-3); margin: 0; }
+  .sp-order-price > span:first-child { font-family: var(--s4-site-hero-font); font-size: var(--s4-site-hero-size); line-height: var(--s4-site-hero-line-height); font-weight: var(--s4-site-hero-weight); font-variant-numeric: tabular-nums; }
+  .sp-order-price > span:last-child { font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); }
+  @container s4-site-section (width >= 840px) { .sp-order { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--s4-site-section-gap); } }
+  .sp-fine { margin: 0; font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  /* phones: one notification on the hero stage, the care facts as rows */
+  @container s4-site-section (width < 600px) { .sp-float[data-at="mid"] { display: none; } .sp-care { grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-2); } .sp-care > div { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4-space-3); padding-block: var(--s4-space-3); } }
+</style>
+</head>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+
+<div class="s4-announce">
+  <span class="s4-status" data-tone="primary">Batch Two</span>
+  <span>Ships in March. Pre-orders close on December 15, or sooner if the batch fills.</span>
+  <a href="#order">Reserve Yours<span class="s4-icon" data-icon="forward"></span></a>
+</div>
+
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="#top" aria-label="Sprig Home">
+      <svg class="sp-art sp-logo-art" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" class="led-halo"/><path class="leaf-deep" d="M16 25 C 16 17, 11 12, 5 11 C 5 18, 10 22, 16 22 Z"/><path class="leaf" d="M16 24 C 16 15, 20 9, 27 7 C 28 15, 23 20, 16 20 Z"/><rect x="15" y="17" width="2" height="10" rx="1" class="leaf-deep"/></svg>
+      Sprig
+    </a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#sensor">Sensor</a></li>
+        <li><a class="s4-button" data-variant="text" href="#how">How It Works</a></li>
+        <li><a class="s4-button" data-variant="text" href="#plants">Plants</a></li>
+        <li><a class="s4-button" data-variant="text" href="#reviews">Reviews</a></li>
+        <li><a class="s4-button" data-variant="text" href="docs.html">Help</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" data-variant="text" href="#account">Your Plants</a>
+      <a class="s4-button" href="#order" data-keep>Pre-Order</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- hero: text beside the drawn product, two real notifications resting on the stage -->
+  <section class="s4-site-section sp-hero" id="top" aria-labelledby="hero-h">
+    <div class="s4-hero" data-layout="split">
+      <div class="s4-hero-text">
+        <p class="s4-eyebrow">A Soil Sensor for Houseplants</p>
+        <h1 class="s4-hero-title" id="hero-h">Your Plants Will Tell You When They’re Thirsty</h1>
+        <p class="s4-site-lead">Sprig is the size of a lollipop stick. Push it into the pot, and your phone knows when to water, how much, and when to leave it alone.</p>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="#order">Pre-Order Sprig</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="#how"><span class="s4-icon" data-icon="play"></span>Watch the 40-Second Film</a>
+        </div>
+        <p class="s4-hero-trust">
+          <span class="sp-price"><strong>€39</strong> each, or three for €99.</span>
+          <span>Free returns for 60 days.</span>
+        </p>
+      </div>
+      <div class="s4-hero-media">
+        <div class="sp-hero-stage" role="img" aria-label="A fern in a clay pot with a Sprig sensor in the soil. Two notifications: Fern is thirsty at 18 percent moisture; give it about 300 ml today.">
+          <svg class="sp-art" viewBox="0 0 400 470" aria-hidden="true">
+            <path class="stem" d="M200 300 C 196 240, 170 200, 120 168"/>
+            <path class="stem" d="M204 300 C 210 230, 240 180, 296 150"/>
+            <path class="stem" d="M200 300 C 200 220, 204 150, 214 92"/>
+            <path class="leaf-deep" d="M120 168 C 80 150, 48 120, 36 80 C 82 84, 116 116, 124 162 Z"/>
+            <path class="leaf" d="M126 172 C 92 196, 50 204, 18 192 C 46 160, 90 152, 126 168 Z"/>
+            <path class="leaf" d="M296 150 C 320 112, 356 92, 392 92 C 380 130, 344 152, 300 154 Z"/>
+            <path class="leaf-deep" d="M292 156 C 330 168, 360 194, 372 228 C 330 226, 300 198, 290 160 Z"/>
+            <path class="leaf-light" d="M214 92 C 196 60, 196 28, 214 0 C 238 26, 238 62, 218 92 Z"/>
+            <path class="leaf" d="M210 120 C 176 112, 152 92, 142 62 C 178 64, 202 86, 212 116 Z"/>
+            <path class="leaf-deep" d="M216 132 C 246 114, 280 110, 306 120 C 288 146, 254 152, 218 136 Z"/>
+            <path class="vein" d="M126 168 C 96 176, 64 184, 30 190"/>
+            <path class="vein" d="M300 152 C 330 126, 356 106, 384 96"/>
+            <path class="vein" d="M216 90 C 210 64, 210 36, 214 10"/>
+            <rect class="probe" x="268" y="250" width="14" height="70" rx="7"/>
+            <rect class="device" x="258" y="196" width="34" height="74" rx="17"/>
+            <rect class="device-shade" x="276" y="196" width="16" height="74" rx="8"/>
+            <circle class="led-halo" cx="275" cy="216" r="11"/>
+            <circle class="led" cx="275" cy="216" r="5"/>
+            <rect class="pot-rim" x="96" y="300" width="208" height="40" rx="16"/>
+            <path class="pot" d="M112 336 H288 L268 452 Q265 470 247 470 H153 Q135 470 132 452 Z"/>
+            <path class="pot-band" d="M118 372 H282 L278 392 H122 Z"/>
+            <rect class="soil" x="112" y="300" width="176" height="12" rx="6"/>
+          </svg>
+          <div class="sp-float" data-at="top"><span class="sp-glyph">18%</span><span><span class="s4-title-small">Fern Is Thirsty</span><span class="s4-body-small s4-on-surface-variant">Living room · just now</span></span></div>
+          <div class="sp-float" data-at="mid"><span class="sp-glyph" data-tone="tertiary">300</span><span><span class="s4-title-small">About 300 ml</span><span class="s4-body-small s4-on-surface-variant">Then nothing till Sunday</span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- press row -->
+  <section class="s4-site-section" data-space="compact" aria-label="Press">
+    <div class="s4-logos">
+      <p>Grown on 4,800 windowsills in the beta, and written about in</p>
+      <ul>
+        <li class="s4-logo">Apartment Notes</li>
+        <li class="s4-logo">The Potting Bench</li>
+        <li class="s4-logo">Gadget Weekly</li>
+        <li class="s4-logo">Homeroom</li>
+        <li class="s4-logo">Leaf &amp; Lamp</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- the product itself: anatomy -->
+  <section class="s4-site-section" id="sensor" aria-labelledby="anatomy-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">The Sensor</p>
+      <h2 class="s4-site-title" id="anatomy-h">Small Enough to Forget. Clever Enough That You Can.</h2>
+    </div>
+    <div class="sp-anatomy">
+      <div class="sp-anatomy-art" role="img" aria-label="The Sprig sensor drawn upright, with its four parts numbered: the light sensor in the cap, the status light, the moisture probe and the root thermometer at the tip.">
+        <svg class="sp-art" viewBox="0 0 320 440" aria-hidden="true">
+          <rect class="ground" x="-800" y="262" width="1920" height="400"/>
+          <circle class="grain" cx="40" cy="300" r="5"/><circle class="grain" cx="72" cy="356" r="4"/><circle class="grain" cx="268" cy="318" r="6"/><circle class="grain" cx="240" cy="392" r="4"/><circle class="grain" cx="96" cy="410" r="6"/><circle class="grain" cx="290" cy="420" r="5"/>
+          <path class="root" d="M118 270 C 100 320, 60 340, 36 400"/><path class="root" d="M210 270 C 230 330, 266 350, 284 380"/>
+          <rect class="probe" x="142" y="180" width="36" height="250" rx="18"/>
+          <rect class="device-shade" x="148" y="372" width="24" height="44" rx="12"/>
+          <rect class="device" x="112" y="24" width="96" height="196" rx="48"/>
+          <rect class="device-shade" x="160" y="24" width="48" height="196" rx="24"/>
+          <rect class="leaf-light" x="130" y="44" width="60" height="30" rx="15"/>
+          <circle class="led-halo" cx="160" cy="118" r="20"/>
+          <circle class="led" cx="160" cy="118" r="9"/>
+          <path class="callout" d="M194 59 H246"/><circle class="num" cx="262" cy="59" r="16"/><text class="num-text" x="262" y="64" text-anchor="middle">1</text>
+          <path class="callout" d="M140 118 H74"/><circle class="num" cx="58" cy="118" r="16"/><text class="num-text" x="58" y="123" text-anchor="middle">2</text>
+          <path class="callout" d="M180 300 H246"/><circle class="num" cx="262" cy="300" r="16"/><text class="num-text" x="262" y="305" text-anchor="middle">3</text>
+          <path class="callout" d="M146 394 H74"/><circle class="num" cx="58" cy="394" r="16"/><text class="num-text" x="58" y="399" text-anchor="middle">4</text>
+        </svg>
+      </div>
+      <div>
+        <ol class="sp-parts">
+          <li><h3>Light Sensor</h3><p>Under the frosted cap. Tells you if the spot you chose is too dark, measured in real hours of useful light.</p></li>
+          <li><h3>One Small Light</h3><p>Blinks once, slowly, when the plant needs you. No beeps, no glow at night.</p></li>
+          <li><h3>Moisture Probe</h3><p>Capacitive, sealed in glass-filled nylon, so it never rusts and never leaches anything into the soil.</p></li>
+          <li><h3>Root Thermometer</h3><p>At the tip, where the roots are. Warns you before a cold windowsill does damage.</p></li>
+        </ol>
+        <dl class="sp-specs">
+          <div><dt>Length</dt><dd>9 cm</dd></div>
+          <div><dt>Weight</dt><dd>11 g</dd></div>
+          <div><dt>Battery</dt><dd>14 mo</dd></div>
+          <div><dt>Rated</dt><dd>IPX5</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <!-- how it works: three steps -->
+  <section class="s4-site-section" id="how" aria-labelledby="how-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">How It Works</p>
+      <h2 class="s4-site-title" id="how-h">Push It In. Pair It. Stop Guessing.</h2>
+      <p class="s4-site-lead">Setup takes a minute per plant. After a week Sprig knows how fast your pot dries out in your light, and its advice gets specific.</p>
+    </div>
+    <ol class="sp-steps">
+      <li>
+        <div class="sp-step-art" role="img" aria-label="A Sprig pushed into the soil of a pot, up to the line on its probe.">
+          <svg class="sp-art" viewBox="0 0 200 150" aria-hidden="true"><rect class="probe" x="93" y="40" width="14" height="80" rx="7"/><rect class="device" x="84" y="10" width="32" height="60" rx="16"/><circle class="led" cx="100" cy="28" r="5"/><rect class="pot-rim" x="30" y="92" width="140" height="26" rx="12"/><path class="pot" d="M42 116 H158 L150 150 H50 Z"/><rect class="soil" x="42" y="92" width="116" height="8" rx="4"/></svg>
+        </div>
+        <p class="sp-step-n"></p>
+        <h3>Push It Into the Soil</h3>
+        <p>Halfway between the stem and the rim, down to the line. Any pot from 8 cm wide.</p>
+      </li>
+      <li>
+        <div class="sp-step-art" role="img" aria-label="A week of moisture readings as bars, falling from 62 percent to 18 percent today.">
+          <div class="sp-curve" aria-hidden="true"><span style="--h: 92"></span><span style="--h: 84"></span><span style="--h: 72"></span><span style="--h: 63"></span><span style="--h: 52"></span><span style="--h: 41"></span><span style="--h: 27" data-now></span></div>
+        </div>
+        <p class="sp-step-n"></p>
+        <h3>It Learns Your Plant</h3>
+        <p>Pick the plant in the app, or scan a leaf. Sprig watches how quickly the pot dries in your light and your season.</p>
+      </li>
+      <li>
+        <div class="sp-step-art" role="img" aria-label="Two notifications: water the fern with 300 ml, and the snake plant is fine for another two weeks.">
+          <div class="sp-ping" aria-hidden="true">
+            <div><span class="sp-glyph">18%</span><span><span class="s4-title-small">Water the Fern</span><span class="s4-body-small s4-on-surface-variant">About 300 ml</span></span></div>
+            <div><span class="sp-glyph" data-tone="tertiary">OK</span><span><span class="s4-title-small">Snake Plant</span><span class="s4-body-small s4-on-surface-variant">Fine till Dec 2</span></span></div>
+          </div>
+        </div>
+        <p class="sp-step-n"></p>
+        <h3>Your Phone Nudges You</h3>
+        <p>Once, on the right day, with an amount. Quiet the rest of the time, even when you forget to open the app.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- the plant matcher: pick a plant, the real app screen answers in place -->
+  <section class="s4-site-section" id="plants" data-tone="low" aria-labelledby="plants-h">
+    <div class="sp-matcher">
+      <div class="sp-matcher-text">
+        <p class="s4-eyebrow">Plant Library</p>
+        <h2 class="s4-site-title" id="plants-h">What Are You Growing?</h2>
+        <p class="s4-site-lead">Sprig knows 640 houseplants, from the easy ones to the drama queens. Pick one to see what it would tell you this week; the app knows the other 637.</p>
+        <div class="s4-button-group" data-connected data-select="single" id="plant-pick" aria-label="Plant">
+          <button class="s4-button" type="button" value="fern" aria-pressed="true">Fern</button>
+          <button class="s4-button" type="button" value="monstera">Monstera</button>
+          <button class="s4-button" type="button" value="fig">Fig</button>
+        </div>
+        <dl class="sp-care" aria-live="polite">
+          <div><dt>Likes</dt><dd data-care="range">55–75%</dd></div>
+          <div><dt>Water Every</dt><dd data-care="every">4–6 days</dd></div>
+          <div><dt>Light</dt><dd data-care="light">Bright, Soft</dd></div>
+        </dl>
+      </div>
+      <div class="sp-phone-stage">
+        <div class="s4-frame" data-device="phone" role="img" aria-label="The Sprig app showing the chosen plant: its soil moisture now and what to do next." id="plant-screen">
+          <div class="s4-frame-screen" inert>
+            <div class="sp-app">
+              <div class="sp-app-head"><h3 class="s4-title-large" data-care="name">Boston Fern</h3><span class="s4-status" data-tone="primary" data-care="room">Bathroom</span></div>
+              <div class="sp-app-ring">
+                <div class="s4-ring" data-value="0.18" aria-label="Soil Moisture" data-care-ring><span class="s4-ring-value" data-care="now">18%</span><span class="s4-ring-label">Moisture</span></div>
+                <p class="s4-body-medium s4-on-surface-variant" data-care="mood">Thirsty. It likes to stay damp.</p>
+              </div>
+              <div class="sp-next"><span class="sp-glyph" data-tone="tertiary"><span class="s4-icon" data-icon="schedule"></span></span><span><span class="s4-title-small" data-care="next">Water Today</span><span class="s4-body-small" data-care="amount">About 300 ml, at the base</span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- the rest: bento -->
+  <section class="s4-site-section" aria-labelledby="more-h">
+    <div class="s4-site-section-head">
+      <p class="s4-eyebrow">Also in the Box</p>
+      <h2 class="s4-site-title" id="more-h">Thought Through, Down to the Coin Cell</h2>
+    </div>
+    <div class="s4-bento">
+      <article class="s4-bento-cell" data-span="5" data-tone="accent">
+        <h3 class="s4-bento-title">Fourteen Months on One Battery</h3>
+        <p>A standard CR2032. Sprig tells you a month ahead, and the cap twists off without tools.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><div class="sp-battery"><span></span><span></span><span></span><span></span><span></span><span data-empty></span><span></span></div></div>
+      </article>
+      <article class="s4-bento-cell" data-span="7">
+        <h3 class="s4-bento-title">Away Mode</h3>
+        <p>Going on holiday? Sprig plans one big watering before you leave and tells your plant-sitter which day to come.</p>
+        <div class="s4-bento-visual" aria-hidden="true">
+          <div class="sp-away"><span>8</span><span data-water>9</span><span data-away>10</span><span data-away>11</span><span data-away>12</span><span data-water>13</span><span data-away>14</span><small style="grid-column: 2">Water</small><small style="grid-column: 6">Sitter</small></div>
+        </div>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">Works With Your Home</h3>
+        <p>Matter over Thread, or plain Bluetooth. No hub to buy.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><div class="sp-chips"><span class="s4-status" data-tone="secondary">Matter</span><span class="s4-status" data-tone="secondary">Thread</span><span class="s4-status" data-tone="secondary">Bluetooth</span></div></div>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">Share the Watering</h3>
+        <p>Housemates see the same plants. Whoever waters taps once, and everyone else stops getting nudged.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><span class="s4-avatar-group"><span class="s4-avatar">MO</span><span class="s4-avatar" data-tone="secondary">TJ</span><span class="s4-avatar" data-tone="tertiary">AL</span></span></div>
+      </article>
+      <article class="s4-bento-cell" data-span="4">
+        <h3 class="s4-bento-title">No Account Needed</h3>
+        <p>Your readings stay on your phone unless you turn on sync. We never sell or share them.</p>
+        <div class="s4-bento-visual" aria-hidden="true"><span class="sp-glyph" data-size="l"><span class="s4-icon" data-icon="lock"></span></span></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- proof: one large quote, then the beta's numbers -->
+  <section class="s4-site-section" id="reviews" aria-label="What Beta Testers Say">
+    <figure class="s4-quote">
+      <blockquote><p>“I have killed four calatheas. The fifth is now taller than my cat, and the only thing that changed is a little stick that blinks at me on Thursdays.”</p></blockquote>
+      <figcaption class="s4-quote-cite"><span class="s4-avatar" data-size="l" data-tone="tertiary">MO</span><span><span class="s4-quote-name">Mariam Osei</span><span class="s4-quote-role">Beta tester, 31 plants in a flat in Rotterdam</span></span></figcaption>
+    </figure>
+  </section>
+  <section class="s4-site-section" data-space="compact" aria-label="The Beta in Numbers">
+    <dl class="s4-numbers">
+      <div class="s4-number"><dt>fewer plants lost during the six-month beta</dt><dd>83%</dd></div>
+      <div class="s4-number"><dt>plants on the beta, across 2,100 homes</dt><dd>4,800</dd></div>
+      <div class="s4-number"><dt>nudges a month for a typical plant</dt><dd>3</dd></div>
+      <div class="s4-number"><dt>from 900 beta reviews</dt><dd>4.8</dd></div>
+    </dl>
+  </section>
+
+  <!-- FAQ beside its heading -->
+  <section class="s4-site-section" aria-labelledby="faq-h">
+    <div class="s4-site-split">
+      <div class="s4-site-section-head">
+        <h2 class="s4-site-title" id="faq-h">Good Questions</h2>
+        <p class="s4-site-lead">Ask us anything else. A gardener on our team answers within a day, usually with a photo.</p>
+        <a class="s4-site-more" href="docs.html">Visit Help<span class="s4-icon" data-icon="forward"></span></a>
+      </div>
+      <div class="s4-accordion">
+        <details class="s4-accordion-item" name="faq" open><summary>Does it work in any soil?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Potting mix, cactus mix, bark, coir and LECA. For semi-hydro, switch the plant to Reservoir in the app and Sprig reads the water line instead.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>How far from my phone can it be?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">About 10 metres over Bluetooth. With a Thread border router at home, anywhere in the house, and you get nudges when you’re out.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>When will mine ship?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Batch two ships in the first half of March 2027, in order of reservation. You pay nothing until it leaves our warehouse in Utrecht.</div></details>
+        <details class="s4-accordion-item" name="faq"><summary>What if it doesn’t help?<span class="s4-icon" data-icon="chevron-down"></span></summary><div class="s4-accordion-body">Send it back within 60 days of delivery for a full refund, postage included. Keep the plant.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- the one accent band: reserve, with a pack picker whose price follows it -->
+  <section class="s4-site-section" data-tone="accent" id="order" aria-labelledby="order-h" data-period-scope>
+    <div class="sp-order">
+      <div class="sp-order-pick">
+        <h2 class="s4-site-title" id="order-h">Reserve a Sprig for Every Pot</h2>
+        <p class="s4-site-lead">Nothing to pay until it ships in March. Cancel with one tap before then.</p>
+        <div class="s4-button-group" data-connected data-select="single" data-period data-fit="content" aria-label="Pack">
+          <button class="s4-button" type="button" value="one">One</button>
+          <button class="s4-button" type="button" value="three" aria-pressed="true">Three</button>
+          <button class="s4-button" type="button" value="six">Six</button>
+        </div>
+        <p class="sp-order-price" aria-live="polite"><span data-period-one="€39" data-period-three="€99" data-period-six="€179">€99</span><span data-period-one="for one sensor" data-period-three="for three, €33 each" data-period-six="for six, €29.83 each">for three, €33 each</span></p>
+      </div>
+      <div class="s4-site-actions-row">
+        <a class="s4-button" data-size="m" href="#checkout">Reserve Now</a>
+        <a class="s4-button" data-variant="tonal" data-size="m" href="#compare">Compare Colors</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="#top" aria-label="Sprig Home">
+        <svg class="sp-art sp-logo-art" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" class="led-halo"/><path class="leaf-deep" d="M16 25 C 16 17, 11 12, 5 11 C 5 18, 10 22, 16 22 Z"/><path class="leaf" d="M16 24 C 16 15, 20 9, 27 7 C 28 15, 23 20, 16 20 Z"/><rect x="15" y="17" width="2" height="10" rx="1" class="leaf-deep"/></svg>
+        Sprig
+      </a>
+      <p>Designed in Utrecht by two people and a monstera. Made in Eindhoven from 40% recycled nylon.</p>
+      <form class="s4-site-signup" action="#subscribed" aria-label="Newsletter">
+        <div class="s4-text-field"><input id="news-email" type="email" autocomplete="email" required><label for="news-email">Email for the Monthly Care Letter</label></div>
+        <button class="s4-button" data-variant="tonal" type="submit">Subscribe</button>
+      </form>
+    </div>
+    <nav class="s4-site-footer-links" aria-label="Footer">
+      <div><h2>Sprig</h2><ul><li><a href="#sensor">The Sensor</a></li><li><a href="#how">How It Works</a></li><li><a href="#plants">Plant Library</a></li><li><a href="#order">Pre-Order</a></li></ul></div>
+      <div><h2>Help</h2><ul><li><a href="docs.html">Setup Guide</a></li><li><a href="#shipping">Shipping</a></li><li><a href="#returns">Returns</a></li><li><a href="#contact">Ask a Gardener</a></li></ul></div>
+      <div><h2>Company</h2><ul><li><a href="site.html">About Us</a></li><li><a href="blog.html">Journal</a></li><li><a href="#press">Press Kit</a></li><li><a href="#careers">Careers</a></li></ul></div>
+      <div><h2>Legal</h2><ul><li><a href="#privacy">Privacy</a></li><li><a href="#terms">Terms</a></li><li><a href="#warranty">Warranty</a></li><li><a href="#recycling">Recycling</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 Sprig B.V. · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="icons-site.js" defer></script>
+<script src="orion.site.min.js" defer></script>
+<script>
+addEventListener('DOMContentLoaded', function () {
+  /* Sprig's brand: tinted from a leaf green, rounded display face, lively motion (decisions 0052, 0055, 0056) */
+  S4.theme.restore('sprig-site-theme', { mode: 'system', seed: '#4c7a2a', surfaces: 'tinted', display: 'rounded', energy: 'lively' });
+
+  /* the plant matcher: the chosen plant's care card and phone screen change in place (no new page, no dialog) */
+  var PLANTS = {
+    fern: { name: 'Boston Fern', room: 'Bathroom', now: 0.18, range: '55–75%', every: '4–6 days', light: 'Bright, Soft', mood: 'Thirsty. It likes to stay damp.', next: 'Water Today', amount: 'About 300 ml, at the base' },
+    monstera: { name: 'Monstera', room: 'Living Room', now: 0.41, range: '35–60%', every: '8–10 days', light: 'Bright, Indirect', mood: 'Comfortable. Drying out on schedule.', next: 'Water on Thursday', amount: 'About 600 ml, until it drains' },
+    snake: { name: 'Snake Plant', room: 'Bedroom', now: 0.12, range: '5–25%', every: '3–4 weeks', light: 'Any', mood: 'Happy. Dry is how it likes it.', next: 'Leave It Alone', amount: 'Next check in 16 days' },
+    calathea: { name: 'Calathea', room: 'Study', now: 0.52, range: '50–70%', every: '5–6 days', light: 'Medium, No Sun', mood: 'Fine, but the air is dry today.', next: 'Mist the Leaves', amount: 'Water on Saturday, 250 ml' },
+    fig: { name: 'Fiddle-Leaf Fig', room: 'Hallway', now: 0.28, range: '35–55%', every: '7–9 days', light: 'Bright, Some Sun', mood: 'A little thirsty, and a little dark.', next: 'Water Today', amount: 'About 500 ml, then move it 1 m closer to the window' }
+  };
+  var pick = document.getElementById('plant-pick'), screen = document.getElementById('plant-screen');
+  function show(id) {
+    var p = PLANTS[id]; if (!p) return;
+    document.querySelectorAll('[data-care]').forEach(function (el) {
+      var k = el.getAttribute('data-care');
+      el.textContent = k === 'now' ? Math.round(p.now * 100) + '%' : p[k];
+    });
+    var ring = document.querySelector('[data-care-ring]'); if (ring) ring.setAttribute('data-value', String(p.now));
+    screen.setAttribute('aria-label', 'The Sprig app for a ' + p.name + ': soil moisture ' + Math.round(p.now * 100) + ' percent. ' + p.mood + ' ' + p.next + ': ' + p.amount + '.');
+  }
+  pick.addEventListener('s4-change', function (e) { if (e.detail && e.detail.value) show(e.detail.value); });
+});
+</script>
+</body>
+</html>

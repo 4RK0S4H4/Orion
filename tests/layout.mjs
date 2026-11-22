@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* S4 Orion wide windows and hierarchy pass (issues 54 and 56). Loads the showcase (every view) and every app template
+/* Orion wide windows and hierarchy pass (issues 54 and 56). Loads the showcase (every view) and every app template
    as a light desktop at 1280, 1600 and 1920 (and 390 dark for the surface steps) and checks what can be measured:
      fill      a card grid (.s4-grid) never leaves more than one column's width empty at its inline end
      reading   a paragraph that runs over more than one line never runs wider than the reading measure

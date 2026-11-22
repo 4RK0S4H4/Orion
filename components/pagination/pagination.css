@@ -1,4 +1,4 @@
-/* Pagination (S4 Orion addition): move between pages of a long list or table.
+/* Pagination (Orion addition): move between pages of a long list or table.
    <nav class="s4-pagination" aria-label="Pagination">
      <a class="s4-page" href="?page=2" aria-label="Previous Page"><span class="s4-icon" data-icon="chevron-left"></span></a>
      <a class="s4-page" href="?page=1">1</a>

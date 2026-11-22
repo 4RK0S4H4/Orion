@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="en" data-gray="cool" data-energy="calm" data-type-display="custom" style="--md-ref-typeface-brand: Didot, 'Bodoni 72', 'Bodoni Moda', 'Noto Serif Display', 'Playfair Display', 'Bodoni MT', Georgia, serif">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Six Minutes in Luxor · Penumbra</title>
+<!-- Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Article, as a product (issue 66). Penumbra is an app and almanac for people who travel to stand under
+     the sky; this is one of its guides, on where to watch the total eclipse of 2 August 2027. For help centers, docs,
+     blogs, release notes and anything people read: breadcrumbs, a title and byline, prose at reading width, the
+     pictures the text needs inside it, and related reading in a supporting pane (after the text on a phone).
+     Brand through the dials: a corona-gold accent (fidelity, so it stays ochre, not yellow), cool grays, a Didone
+     display face (a system stack: Didot on Apple devices) with Inter for reading, calm motion, stock round corners.
+     Every sky is a scoped dark region (data-theme="dark"), so the eclipse is night in light mode too.
+     Its own elements, drawn from Orion's rules: the eclipse over Luxor's temple (shapes in color roles), totality by
+     place (a bar a city, its time written beside it), the day minute by minute for a chosen city (a button group sets
+     the city: a value, decision 0059) with the phases drawn as discs, and the countdown. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('penumbra-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="brand/article.css?v=d920f80">
+<style>
+  /* Penumbra's own layout and elements: tokens only; nothing here restyles an Orion component */
+  .pn-main { display: grid; gap: var(--s4-space-6); min-inline-size: 0; }
+
+  /* ---------- the sky: a scoped dark block; the drawing is decoration, the caption says what it shows ---------- */
+  .pn-sky-art { position: relative; aspect-ratio: 16 / 10; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); overflow: hidden; }
+  .pn-sky-art svg { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; }
+  .pn-sky-art .star { fill: var(--md-sys-color-on-surface); }
+  .pn-sky-art .glow { fill: var(--md-sys-color-primary); }
+  .pn-sky-art .moon { fill: var(--md-sys-color-surface-container-lowest); }
+  .pn-sky-art .bead { fill: var(--md-sys-color-on-surface); }
+  .pn-sky-art .land { fill: var(--md-sys-color-surface-container-low); }
+  .pn-sky-art .temple { fill: var(--md-sys-color-surface-container-lowest); }
+  .pn-sky-art .river { fill: var(--md-sys-color-surface-container-highest); }
+
+  /* ---------- title, lead and byline: a magazine head above the prose ---------- */
+  .pn-head { display: grid; gap: var(--s4-space-4); max-inline-size: 70ch; }
+  .pn-title { margin: 0; font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: 500; text-wrap: balance; }
+  @container s4-app (width >= 600px) { .pn-title { font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); } }
+  .pn-lead { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-title-large-size); line-height: calc(var(--md-sys-typescale-title-large-line-height) + var(--s4-space-1)); }
+  .pn-by { display: flex; align-items: center; gap: var(--s4-space-3); }
+  .pn-by > span:last-child { display: grid; }
+  .pn-by strong { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-body-medium-weight, 600); }
+  .pn-by small { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* ---------- totality by place: a bar a city, its length written beside it ---------- */
+  .pn-dur { display: grid; gap: var(--s4-space-3); margin: 0; padding: var(--s4-space-4) var(--s4-space-5); list-style: none; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); }
+  .pn-dur li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 5.5rem; align-items: center; gap: var(--s4-space-3); margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .pn-dur li + li { margin: 0; }
+  .pn-dur i { block-size: var(--s4-space-3); inline-size: calc(var(--d) / 383 * 100%); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
+  .pn-dur li[data-best] i { background: var(--md-sys-color-primary); }
+  .pn-dur li[data-best] { font-weight: var(--md-sys-typescale-emphasized-body-medium-weight, 600); }
+  .pn-dur b { font-weight: inherit; text-align: end; font-variant-numeric: tabular-nums; }
+
+  /* ---------- the day, minute by minute: a city picker, the phases as discs, the times ---------- */
+  .pn-day { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); }
+  .pn-day-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); }
+  .pn-day-head h3 { margin: 0; font-family: var(--md-sys-typescale-title-large-font); font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight, 600); }
+  .pn-day-head > span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .pn-phases { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .pn-phases li { display: grid; justify-items: center; gap: var(--s4-space-2); margin: 0; text-align: center; }
+  .pn-phases li + li { margin: 0; }
+  .pn-phases svg { inline-size: 100%; max-inline-size: var(--s4-space-16); block-size: auto; }
+  .pn-phases .sun { fill: var(--md-sys-color-primary); }
+  .pn-phases .corona { fill: var(--md-sys-color-primary); opacity: .3; }
+  .pn-phases .moon { fill: var(--md-sys-color-surface-container-lowest); }
+  .pn-phases strong { display: block; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-title-medium-weight, 600); font-variant-numeric: tabular-nums; }
+  .pn-phases span { display: block; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-small-size); line-height: var(--md-sys-typescale-label-small-line-height); }
+  .pn-phases li[data-total] strong { color: var(--md-sys-color-primary); }
+  .pn-day-note { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+
+  /* ---------- the supporting pane: countdown, contents, related ---------- */
+  .pn-aside { display: grid; gap: var(--s4-space-4); align-content: start; }
+  .pn-count { display: grid; gap: var(--s4-space-1); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); }
+  .pn-count-label { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); }
+  .pn-count-n { display: flex; align-items: baseline; gap: var(--s4-space-2); }
+  .pn-count-n b { font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); font-weight: 500; color: var(--md-sys-color-primary); font-variant-numeric: tabular-nums; }
+  .pn-count-n span { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); }
+  .pn-count p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .pn-toc ol { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; counter-reset: toc; }
+  .pn-toc a { display: grid; grid-template-columns: var(--s4-space-6) minmax(0, 1fr); gap: var(--s4-space-2); padding: var(--s4-space-2) var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); color: var(--md-sys-color-on-surface); text-decoration: none; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); counter-increment: toc; transition: background-color var(--s4-motion-state); }
+  .pn-toc a::before { content: counter(toc, upper-roman); color: var(--md-sys-color-primary); font-family: var(--md-sys-typescale-display-large-font); }
+  .pn-toc a:hover { background: var(--md-sys-color-surface-container-high); }
+  .pn-toc a:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  @container s4-app (width < 840px) { .pn-toc { display: none; } }
+  @media (forced-colors: active) { .pn-sky-art, .pn-day, .pn-count, .pn-dur { border: 1px solid CanvasText; } .pn-dur i { background: CanvasText; } .pn-dur li[data-best] i { background: Highlight; } }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <a class="s4-icon-button" href="#guides" aria-label="Back to Guides"><span class="s4-icon" data-icon="back"></span></a>
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Penumbra</h1><p class="s4-app-bar-subtitle">Sky Guides</p></div>
+      <div class="s4-app-bar-actions">
+        <button class="s4-icon-button" type="button" aria-label="Save for Offline" aria-pressed="false" data-tooltip="Save for Offline" id="save"><span class="s4-icon" data-icon="bookmark"></span></button>
+        <button class="s4-icon-button" type="button" aria-label="Share" data-tooltip="Share" id="share"><span class="s4-icon" data-icon="share"></span></button>
+      </div>
+    </header>
+    <main class="s4-content">
+      <div class="s4-split" data-layout="supporting">
+        <div class="s4-split-pane pn-main">
+          <nav class="s4-breadcrumbs" aria-label="Breadcrumb"><ol>
+            <li><a class="s4-breadcrumb-link" href="#guides">Guides</a></li>
+            <li><a class="s4-breadcrumb-link" href="#eclipses">Eclipses</a></li>
+            <li aria-current="page">Six Minutes in Luxor</li>
+          </ol></nav>
+
+          <!-- The title first, the picture after: a reader knows what this is before the art -->
+          <header class="pn-head">
+            <p class="s4-kicker">Total Solar Eclipse · 2 August 2027</p>
+            <h2 class="pn-title" id="top">Six Minutes in Luxor</h2>
+            <p class="pn-lead">The longest totality on land this century crosses the Nile at lunchtime. Here is where to stand, what the sky will do, and how to keep the day from going wrong.</p>
+            <div class="pn-by"><span class="s4-avatar" aria-hidden="true">AN</span><span><strong>Amara Nwosu</strong><small>Eleven totalities, two of them clouded out · 9 min read · Updated 12 Nov 2026</small></span></div>
+          </header>
+
+          <figure class="s4-figure">
+            <div class="pn-sky-art" data-theme="dark">
+              <svg viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" id="sky"></svg>
+            </div>
+            <figcaption>Totality over the Temple of Karnak at 13:07, drawn by Penumbra. Venus sits low to the left; the brightest stars come out for six minutes.</figcaption>
+          </figure>
+
+          <article class="s4-prose" aria-labelledby="top">
+            <p>On 2 August 2027 the Moon’s shadow comes ashore at Cádiz, crosses the Strait of Gibraltar, runs the length of North Africa and leaves over the Red Sea. Anywhere under it, the day goes dark for minutes. Under the middle of it, in Luxor, it stays dark for <strong>six minutes and twenty seconds</strong>, longer than anyone standing on land will see again until 2114.</p>
+            <p>That length is the reason to go. The first two minutes of any totality go by in a blur of shouting. The last four are the ones you remember.</p>
+
+            <h2 id="where">Why Luxor, and Not the Coast</h2>
+            <p>The shadow is fastest where it first touches the Earth and slowest near the point of greatest eclipse, which falls in the desert just outside Luxor. Every city on the path gets its own length of darkness:</p>
+            <ol class="pn-dur" aria-label="Totality by place, about">
+              <li><span>Cádiz</span><i style="--d: 270" aria-hidden="true"></i><b>4 m 30 s</b></li>
+              <li><span>Tangier</span><i style="--d: 285" aria-hidden="true"></i><b>4 m 45 s</b></li>
+              <li><span>Benghazi</span><i style="--d: 350" aria-hidden="true"></i><b>5 m 50 s</b></li>
+              <li data-best><span>Luxor</span><i style="--d: 380" aria-hidden="true"></i><b>6 m 20 s</b></li>
+              <li><span>Jeddah</span><i style="--d: 340" aria-hidden="true"></i><b>5 m 40 s</b></li>
+            </ol>
+            <p>The coast has its own pull: Cádiz is a short flight for most of Europe and the Sun stands high over the sea. But Atlantic mornings in August can bring a bank of sea fog, and in Luxor the chance of a cloud in early August is close to none.</p>
+
+            <h2 id="day">The Day, Minute by Minute</h2>
+            <p>An eclipse is a slow hour, a fast six minutes and a slow hour again. Pick where you will stand to see your times.</p>
+            <section class="pn-day" data-theme="dark" aria-labelledby="day-h">
+              <div class="pn-day-head"><h3 id="day-h">Your Eclipse in <span id="city-name">Luxor</span></h3><span id="city-tz">Local time, Egypt (UTC+3)</span></div>
+              <div class="s4-button-group" data-connected data-select="single" id="city" aria-label="Watch From">
+                <button class="s4-button" data-size="s" type="button" value="cadiz">Cádiz</button>
+                <button class="s4-button" data-size="s" type="button" value="tangier">Tangier</button>
+                <button class="s4-button" data-size="s" type="button" value="benghazi">Benghazi</button>
+                <button class="s4-button" data-size="s" type="button" value="luxor" aria-pressed="true">Luxor</button>
+              </div>
+              <ol class="pn-phases" id="phases" aria-label="The phases"></ol>
+              <p class="pn-day-note" id="city-note"></p>
+            </section>
+            <div class="s4-banner" role="note" data-tone="primary"><span class="s4-icon" data-icon="warning"></span><p class="s4-banner-text">Wear eclipse glasses for every minute of the partial phases. Take them off only when the last bead of light is gone, and put them back on the moment it returns.</p></div>
+
+            <h2 id="pack">What to Pack</h2>
+            <ul>
+              <li><strong>Two pairs of eclipse glasses</strong> marked ISO 12312-2. Someone always sits on the first pair.</li>
+              <li><strong>A white cloth or a straw hat.</strong> Through the gaps in a hat brim the ground fills with little crescent Suns.</li>
+              <li><strong>Water, and shade until the last minute.</strong> Luxor in August passes 40 °C by noon; totality cools it by about five degrees.</li>
+              <li><strong>A phone on a tripod, set to record and left alone.</strong> Look up, not at the screen.</li>
+            </ul>
+            <blockquote>“I photographed my first totality and remember nothing of it. I watched the second one and can still tell you the colour of the horizon.”</blockquote>
+
+            <h2 id="cloud">If It Clouds Over</h2>
+            <p>In Luxor it almost certainly won’t. On the coast, check the forecast the evening before and be ready to drive inland at dawn: sea fog rarely reaches more than 20 km from the shore, and the shadow is 250 km wide. Penumbra’s cloud map updates every hour on the day, and works offline once you have saved this guide.</p>
+            <hr>
+            <h3>Going With Us?</h3>
+            <p>Our Luxor group has 14 places left, on the west bank with a clear view east over the temples. <a href="#trips">See the trip</a>.</p>
+          </article>
+        </div>
+
+        <!-- The supporting pane: what the reader needs beside the text. On a phone it follows the article. -->
+        <aside class="s4-split-pane pn-aside" data-sticky aria-label="About This Guide">
+          <section class="pn-count" data-theme="dark" aria-labelledby="count-h">
+            <span class="pn-count-label" id="count-h">Totality in Luxor</span>
+            <span class="pn-count-n"><b id="days">257</b><span>days</span></span>
+            <p>Monday 2 August 2027, 13:07 local time. Hotels on the west bank are filling now.</p>
+          </section>
+          <nav class="pn-toc s4-pane" aria-labelledby="toc-h">
+            <h2 class="s4-pane-title" id="toc-h">In This Guide</h2>
+            <ol>
+              <li><a href="#where">Why Luxor, and Not the Coast</a></li>
+              <li><a href="#day">The Day, Minute by Minute</a></li>
+              <li><a href="#pack">What to Pack</a></li>
+              <li><a href="#cloud">If It Clouds Over</a></li>
+            </ol>
+          </nav>
+          <section class="s4-pane" aria-labelledby="rel-h">
+            <h2 class="s4-pane-title" id="rel-h">Read Next</h2>
+            <ul class="s4-list">
+              <li><a class="s4-list-item" href="#glasses"><span class="s4-list-leading"><span class="s4-icon" data-icon="visible"></span></span><span class="s4-list-content"><span class="s4-list-headline">Glasses That Are Safe</span><span class="s4-list-supporting">How to read the label</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
+              <li><a class="s4-list-item" href="#ring"><span class="s4-list-leading"><span class="s4-icon" data-icon="camera"></span></span><span class="s4-list-content"><span class="s4-list-headline">The Diamond Ring on a Phone</span><span class="s4-list-supporting">No tracker, no filters at totality</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
+              <li><a class="s4-list-item" href="#sydney"><span class="s4-list-leading"><span class="s4-icon" data-icon="sun"></span></span><span class="s4-list-content"><span class="s4-list-headline">Sydney, 22 July 2028</span><span class="s4-list-supporting">The next one, in winter</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
+            </ul>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="icons.js"></script>
+<script src="orion.core.min.js"></script>
+<script>
+/* Penumbra's brand, under its own key: corona gold over the dials set on <html>. */
+var DIDONE = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();
+S4.theme.restore('penumbra-theme', { mode: 'system', seed: '#94680a', variant: 'fidelity', gray: 'cool', energy: 'calm', display: DIDONE });
+
+var $ = function (id) { return document.getElementById(id); };
+
+/* ---------- the sky over Karnak: stars, the corona, the Moon with one last bead, Venus, the temple and the Nile ---------- */
+(function () {
+  var o = [], s = 3; function r() { s = (s * 9301 + 49297) % 233280; return s / 233280; }
+  for (var i = 0; i < 60; i++) o.push('<circle class="star" cx="' + Math.round(r() * 800) + '" cy="' + Math.round(r() * 330) + '" r="' + (0.6 + r() * 1.2).toFixed(1) + '" opacity="' + (0.25 + r() * 0.5).toFixed(2) + '"/>');
+  o.push('<circle class="star" cx="196" cy="268" r="4"/>');                                   /* Venus */
+  var cx = 470, cy = 170;
+  [150, 112, 90, 78].forEach(function (rad, n) { o.push('<circle class="glow" cx="' + cx + '" cy="' + cy + '" r="' + rad + '" opacity="' + [0.05, 0.08, 0.14, 0.3][n] + '"/>'); });
+  /* streamers: long thin petals of the corona, drawn as filled shapes */
+  [[-20, 230, 9], [28, 160, 6], [70, 120, 5], [104, 200, 8], [150, 130, 5], [196, 250, 10], [240, 140, 6], [300, 180, 7], [338, 120, 5]].forEach(function (p) {
+    o.push('<path class="glow" opacity=".12" d="M70 -' + p[2] + ' C' + p[1] * 0.5 + ' -' + p[2] + ' ' + p[1] * 0.85 + ' -2 ' + p[1] + ' 0 C' + p[1] * 0.85 + ' 2 ' + p[1] * 0.5 + ' ' + p[2] + ' 70 ' + p[2] + ' Z" transform="translate(' + cx + ' ' + cy + ') rotate(' + p[0] + ')"/>');
+  });
+  o.push('<circle class="moon" cx="' + cx + '" cy="' + cy + '" r="72"/>', '<circle class="bead" cx="' + (cx + 50) + '" cy="' + (cy - 52) + '" r="3.2"/>');
+  /* the land: west bank, the Nile, then Karnak's pylon, obelisk and columns on the east bank */
+  o.push('<path class="land" d="M0 392 C160 380 300 396 420 388 C560 380 680 392 800 384 V500 H0 Z"/>', '<path class="river" d="M0 430 C200 418 420 440 800 424 V452 C420 470 200 446 0 460 Z"/>');
+  o.push('<path class="temple" d="M80 392 L96 318 H190 L206 392 Z M226 392 L242 318 H336 L352 392 Z"/>', '<path class="temple" d="M182 392 V330 H244 V392 Z"/>');
+  o.push('<path class="temple" d="M398 392 L404 262 L410 254 L416 262 L422 392 Z"/>');
+  for (var c = 0; c < 9; c++) { var x = 470 + c * 30; o.push('<rect class="temple" x="' + x + '" y="' + (338 + (c % 2) * 6) + '" width="18" height="' + (54 - (c % 2) * 6) + '" rx="3"/><rect class="temple" x="' + (x - 4) + '" y="' + (332 + (c % 2) * 6) + '" width="26" height="8" rx="4"/>'); }
+  o.push('<rect class="temple" x="462" y="324" width="270" height="10" rx="5"/>');
+  $('sky').innerHTML = o.join('');
+})();
+
+/* ---------- the day, minute by minute: the same five moments for whichever city is chosen ---------- */
+var CITIES = {
+  cadiz: { name: 'Cádiz', tz: 'Local time, Spain (UTC+2)', t: ['09:36', '10:44', '10:46', '10:49', '12:01'], total: '4 m 30 s', note: 'The Sun is 50° up over the Atlantic. Watch from the old town walls, facing south-east.' },
+  tangier: { name: 'Tangier', tz: 'Local time, Morocco (UTC+1)', t: ['08:38', '09:46', '09:48', '09:51', '11:04'], total: '4 m 45 s', note: 'Cap Spartel, west of the city, has the clearest horizon and the least traffic.' },
+  benghazi: { name: 'Benghazi', tz: 'Local time, Libya (UTC+2)', t: ['10:52', '12:07', '12:10', '12:13', '13:32'], total: '5 m 50 s', note: 'High noon and a high Sun: lie down and look straight up.' },
+  luxor: { name: 'Luxor', tz: 'Local time, Egypt (UTC+3)', t: ['11:47', '13:04', '13:07', '13:10', '14:30'], total: '6 m 20 s', note: 'The Sun is almost overhead at 82°. Bring a mat; the stone is hot.' }
+};
+var PHASE = [['First Bite', 0.7], ['Totality', 0], ['Mid-Eclipse', 0], ['Light Returns', 0], ['Last Bite', -0.7]];
+function disc(dx, total) {
+  return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' + (total ? '<circle class="corona" cx="32" cy="32" r="30"/>' : '') +
+    '<circle class="sun" cx="32" cy="32" r="22"/><circle class="moon" cx="' + (32 + dx * 44) + '" cy="32" r="' + (total ? 23 : 22.5) + '"/></svg>';
+}
+function showCity(k) {
+  var c = CITIES[k];
+  $('city-name').textContent = c.name; $('city-tz').textContent = c.tz;
+  $('phases').innerHTML = PHASE.map(function (p, i) {
+    var total = i >= 1 && i <= 3;
+    return '<li' + (total ? ' data-total' : '') + '>' + disc(p[1], total) + '<span><strong>' + c.t[i] + '</strong><span>' + (i === 2 ? c.total + ' dark' : p[0]) + '</span></span></li>';
+  }).join('');
+  $('city-note').textContent = c.note;
+}
+$('city').addEventListener('s4-change', function (e) { showCity(e.detail.value); });
+showCity('luxor');
+
+/* ---------- countdown: whole days to 2 August 2027 ---------- */
+(function () { var d = Math.ceil((Date.UTC(2027, 7, 2, 10, 7) - Date.now()) / 864e5); $('days').textContent = d > 0 ? d : 0; })();
+
+/* save for offline, with Undo; share */
+$('save').addEventListener('click', function () {
+  var b = this, on = b.getAttribute('aria-pressed') !== 'true';
+  function set(v) { b.setAttribute('aria-pressed', String(v)); b.setAttribute('aria-label', v ? 'Saved for Offline' : 'Save for Offline'); }
+  set(on);
+  if (on) S4.snackbar({ text: 'Saved. This guide and its cloud map work offline.', action: 'Undo', onAction: function () { set(false); } });
+});
+$('share').addEventListener('click', function () { try { navigator.clipboard && navigator.clipboard.writeText(location.href); } catch (e) {} S4.snackbar('Link copied'); });
+</script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 # Color
 
-**Tokens:** `--md-sys-color-*` (49 M3 roles) · source `tokens/src/color.tokens.json` · live: [tokens page](https://4rk0s4h4.github.io/s4-orion/tokens/#color)
+**Tokens:** `--md-sys-color-*` (49 M3 roles) · source `tokens/src/color.tokens.json` · live: [tokens page](https://4rk0s4h4.github.io/Orion/tokens/#color)
 
 ## How color works
-Every color in S4 Orion is an **M3 color role** generated from one **seed** by Material Color Utilities. Components only
+Every color in Orion is an **M3 color role** generated from one **seed** by Material Color Utilities. Components only
 ever use roles (`primary`, `on-surface`, `surface-container-high`…), never hex values, so any seed produces a complete,
 accessible scheme and no component changes.
 

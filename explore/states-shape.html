@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>S4 Orion: States and Shape</title>
+<title>Orion: States and Shape</title>
 <style>
 @font-face{font-family:Inter;font-weight:100 900;font-display:block;src:url(lib/inter-variable.woff2) format("woff2")}
 :root{color-scheme:light;font-family:Inter,system-ui,sans-serif;--ease:cubic-bezier(.2,0,0,1)}
@@ -129,7 +129,7 @@ h1,h2,h3,p{margin:0}
 </head>
 <body>
 <div class="bar">
-  <h1>S4 Orion: States and Shape</h1>
+  <h1>Orion: States and Shape</h1>
   <div class="ctl"><span>Theme</span><div class="seg" id="theme"><button value="light" aria-pressed="true">Light</button><button value="dark" aria-pressed="false">Dark</button></div></div>
   <div class="ctl"><span>Seed</span><div class="seg" id="seed"><button value="mono" aria-pressed="true">Mono</button><button value="mono-red" aria-pressed="false">Mono + Red</button><button value="#4f46e5" aria-pressed="false">Indigo</button><button value="#00796b" aria-pressed="false">Teal</button><button value="#c2410c" aria-pressed="false">Orange</button></div></div>
   <button class="rv-pick" id="pickColor" data-pick="color:Mono">Pick as Default Color</button>
@@ -220,8 +220,8 @@ h1,h2,h3,p{margin:0}
 
 <script src="lib/m3color.js?v=0fd6cc5"></script>
 <script src="lib/theme.js?v=d41cede"></script>
-<script src="lib/questions.js?v=9c78837"></script>
-<script src="lib/review.js?v=c12ab1a"></script>
+<script src="lib/questions.js?v=a033d5b"></script>
+<script src="lib/review.js?v=6adf197"></script>
 <script src="lib/icons.js?v=d9cbb51"></script>
 <script>
 const STATES=[
@@ -246,7 +246,7 @@ for(const id of ['theme','seed'])document.getElementById(id).addEventListener('c
 document.querySelectorAll('.chip:not(.h):not(.f)').forEach(c=>c.addEventListener('click',()=>{const on=c.getAttribute('aria-pressed')==='true';c.setAttribute('aria-pressed',!on);if(!on&&!c.querySelector('.ic'))c.insertAdjacentHTML('afterbegin','<span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS.check+'</svg></span>');if(on)c.querySelector('.ic')?.remove()}));
 apply();
 </script>
-<footer style="max-width:1500px;margin:0 auto;padding:0 24px 32px;font-size:12px;color:var(--md-sys-color-on-surface-variant)"><a href="../" style="color:inherit">S4 Orion</a> exploration · Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</footer>
+<footer style="max-width:1500px;margin:0 auto;padding:0 24px 32px;font-size:12px;color:var(--md-sys-color-on-surface-variant)"><a href="../" style="color:inherit">Orion</a> exploration · Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</footer>
 <script>S4Review.page('states-shape');</script>
 </body>
 </html>

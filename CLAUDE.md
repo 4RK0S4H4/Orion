@@ -1,8 +1,8 @@
-# S4 Orion: working notes for Claude
+# Orion: working notes for Claude
 
-S4 Orion is the owner's personal design system for web apps and pages: Material 3 Expressive plus a very clear,
+Orion is the owner's personal design system for web apps and pages: Material 3 Expressive plus a very clear,
 contrast-guaranteed glass layer on floating chrome. It replaces the older **S4 Material** skill. **S4 Glass is a separate,
-unrelated system**; don't mix the two. The repo was renamed from `s4-material` to `s4-orion` (2026-11); the product is **S4 Orion**.
+unrelated system**; don't mix the two. The repo was renamed from `s4-material` to `s4-orion` (2026-11) and again to `Orion` (2026-11-22, decision 0071); the product is **Orion**, formerly S4 Orion. The `s4` prefix stays as a technical namespace (below).
 
 **Start every session by reading [`docs/NEXT.md`](docs/NEXT.md) and [`docs/PLAN.md`](docs/PLAN.md)** (the goal, current stage, how workstreams run) (and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the long view and what Orion will not become): current phase, the plan for what's left, the backlog
 and the open questions. Update it (and the README phase table and CHANGELOG) before ending any session that changed
@@ -10,7 +10,7 @@ something, so the next session can pick up cold.
 
 ## How the owner works
 
-- **Publish everything reviewable to GitHub Pages** and link it in the reply: https://4rk0s4h4.github.io/s4-orion/
+- **Publish everything reviewable to GitHub Pages** and link it in the reply: https://4rk0s4h4.github.io/Orion/
   (deploys from `main`, repo root). The owner reviews on an iPhone, so check pages at 390px as well as desktop.
 - **Drafts go on GitHub Pages** as quiz-style review labs, not Claude Design canvases (owner preference, 2026-11-11). Plain quiz layout, no toggles up top. Whole layouts: mobile only, the real demo restyled in 390px frames (`explore/lib/phone-review.js`, template `explore/review-direction.html`). Ask big questions (overall direction), not small tweaks.
 - **Design decisions are made through review labs** in `explore/` (questionnaire style: options picked by tapping the
@@ -25,7 +25,7 @@ something, so the next session can pick up cold.
   how to fix that) before continuing.**
 - Keep replies short and plain; lead with links and what needs a decision.
 - **Subagents do the building** (owner, 2026-11-16): the main session orchestrates and reviews; give building, running builds and tests, and bulk edits to Opus or Sonnet subagents (Sonnet for mechanical work, Opus for design-sensitive work), so the main model's usage is not spent on execution.
-- Recorded decisions live in `docs/decisions/` (0001 audit, 0002 repo, 0003 tokens, 0004 glass, 0005 phase 6 review, 0006 liquid glass, 0007 icons, 0008 owner critique, 0009 style lab, 0010 critique round 2, 0011 style lab 2, 0012 liquid glass webkit, 0013 glass edge and no shadow, 0014 calmer glass color, 0015 items on glass, 0016 thinner frost line, 0017 no shadows, 0018 menu emerges, 0019 liquid glass mirror, abandoned, 0020 own language, not adopted except glass, 0021 glass from the playground, 0022 simpler motion, 0023 filled and pills, 0024 tray groups and inputs, 0025 no sharp corners, glass FAB, more components, 0026 joined capsule groups, 0027 glass edge matches the playground, 0028 owner's latest glass numbers, edge glow and sheen, 0029 dynamic edge width, 0030 glow follows the edge light, 0031 edge light color from the surface, 0032 colored FABs at 90%, 0033 evenly lit edge, 0034 iOS-calibrated edge, 0035 owner's tailored glass set and light edge quiz, 0036 glow inverts into an edge shade on light surfaces, 0037 glow/shade flip at a lightness threshold, 0038 floating bars, tried and reverted, 0039 docked glass gets the full glass edge, 0040 docked glass lights only its free edge, 0041 framework layer, 0042 liquid ink motion, 0043 the overhaul (neutral color, density, side navigation, items on glass, floating panels, date picker, desktop apps), 0044 overhaul accepted, row hover Edges Lean, palette contrast, 0045 Crisper grays, any accent, list dividers, 0046 one motion philosophy, 0047 placement ladder, 0048 quizzes are Orion, 0049 never focus a field, 0050 pages, 0051 the eight ideas built, 0052 concentric corners, two color modes, dragging on a phone, 0053 the app is the app, 0054 tool panels, 0055 brand dials, 0056 themes on any container, energy, app defaults, roomy, 0057 website kit, 0058 reach and proven dials, 0059 button groups and tabs, 0060 lessons from the templates, 0061 data at scale, 0062 desktop anatomy, 0063 the eleven calls, 0064 calm dialogs and docked glass, 0065 place, focus and silent failures, 0066 light sites, wide showcase, scale and headings, 0067 dial values, header keys and proofs, 0068 one accent fill per job, wide windows, site icons, 0069 lean app bundle, focus lands on main, grid cue on touch, 0070 one accent job per screen, a balanced Showcase, brand trial; status of each in `docs/decisions/README.md`). Don't reopen a
+- Recorded decisions live in `docs/decisions/` (0001 audit, 0002 repo, 0003 tokens, 0004 glass, 0005 phase 6 review, 0006 liquid glass, 0007 icons, 0008 owner critique, 0009 style lab, 0010 critique round 2, 0011 style lab 2, 0012 liquid glass webkit, 0013 glass edge and no shadow, 0014 calmer glass color, 0015 items on glass, 0016 thinner frost line, 0017 no shadows, 0018 menu emerges, 0019 liquid glass mirror, abandoned, 0020 own language, not adopted except glass, 0021 glass from the playground, 0022 simpler motion, 0023 filled and pills, 0024 tray groups and inputs, 0025 no sharp corners, glass FAB, more components, 0026 joined capsule groups, 0027 glass edge matches the playground, 0028 owner's latest glass numbers, edge glow and sheen, 0029 dynamic edge width, 0030 glow follows the edge light, 0031 edge light color from the surface, 0032 colored FABs at 90%, 0033 evenly lit edge, 0034 iOS-calibrated edge, 0035 owner's tailored glass set and light edge quiz, 0036 glow inverts into an edge shade on light surfaces, 0037 glow/shade flip at a lightness threshold, 0038 floating bars, tried and reverted, 0039 docked glass gets the full glass edge, 0040 docked glass lights only its free edge, 0041 framework layer, 0042 liquid ink motion, 0043 the overhaul (neutral color, density, side navigation, items on glass, floating panels, date picker, desktop apps), 0044 overhaul accepted, row hover Edges Lean, palette contrast, 0045 Crisper grays, any accent, list dividers, 0046 one motion philosophy, 0047 placement ladder, 0048 quizzes are Orion, 0049 never focus a field, 0050 pages, 0051 the eight ideas built, 0052 concentric corners, two color modes, dragging on a phone, 0053 the app is the app, 0054 tool panels, 0055 brand dials, 0056 themes on any container, energy, app defaults, roomy, 0057 website kit, 0058 reach and proven dials, 0059 button groups and tabs, 0060 lessons from the templates, 0061 data at scale, 0062 desktop anatomy, 0063 the eleven calls, 0064 calm dialogs and docked glass, 0065 place, focus and silent failures, 0066 light sites, wide showcase, scale and headings, 0067 dial values, header keys and proofs, 0068 one accent fill per job, wide windows, site icons, 0069 lean app bundle, focus lands on main, grid cue on touch, 0070 one accent job per screen, a balanced Showcase, brand trial, 0071 the name is Orion; status of each in `docs/decisions/README.md`). Don't reopen a
   decision without the owner; add a new numbered record for new ones.
 
 ## Git and publishing
@@ -44,16 +44,16 @@ something, so the next session can pick up cold.
 ```sh
 npm run build    # tokens -> tokens.css/ts/json; icons -> icons.js; components -> orion.css/js; skill assets + generated references
 npm run check    # token validation + WCAG pairs, icons, glass guarantee (97 schemes), any-accent check (216 schemes), FAB labels with any seed, motion patterns, banned phrases, stale-output check
-node skill/s4-orion/scripts/check.mjs page.html [--out dir]   # page checker: 390 dark + 1280 light, contrast, overflow, lint
+node skill/orion/scripts/check.mjs page.html [--out dir]   # page checker: 390 dark + 1280 light, contrast, overflow, lint
 ```
 
 Generated files are committed (Pages serves them) and never edited by hand: `tokens/tokens.*`, `components/orion.*`,
-`components/base/gray.css`, `components/assets/icons.js`, `skill/s4-orion/assets/*`, and `skill/s4-orion/references/*` **except** `patterns.md`.
+`components/base/gray.css`, `components/assets/icons.js`, `skill/orion/assets/*`, and `skill/orion/references/*` **except** `patterns.md`.
 
 After changing the skill, re-package it with skill-creator's packager (path varies per environment; find it with
 `find / -name package_skill.py -path '*skill-creator*' 2>/dev/null`), run from the skill-creator folder:
-`python3 -m scripts.package_skill <repo>/skill/s4-orion <repo>/skill/dist` → `skill/dist/s4-orion.skill`.
-Validate with `scripts/quick_validate.py <repo>/skill/s4-orion`. Keep `SKILL.md` under ~500 lines.
+`python3 -m scripts.package_skill <repo>/skill/orion <repo>/skill/dist` → `skill/dist/orion.skill`.
+Validate with `scripts/quick_validate.py <repo>/skill/orion`. Keep `SKILL.md` under ~500 lines.
 
 ## Map
 
@@ -63,7 +63,7 @@ Validate with `scripts/quick_validate.py <repo>/skill/s4-orion`. Keep `SKILL.md`
 | `scripts/` | `build-tokens.mjs`, `generate-color.mjs`, `check-glass.mjs`, `build-icons.mjs`, `build.mjs` (bundle + skill). |
 | `components/` | One folder per component (`.css`, `.js`, reference `.html`, `README.md`). Rules: `components/CONVENTIONS.md`. Gallery: `components/index.html`. |
 | `docs/` | `framework.md` (layers, public API, versioning), `philosophy.md`, `foundations/*.md` (copied into the skill), `decisions/` (+ README index), `NEXT.md`, `history/`. |
-| `skill/s4-orion/` | The Claude skill: `SKILL.md`, `references/`, `assets/`, `scripts/check.mjs`, `scripts/inline.mjs`, `evals/`. |
+| `skill/orion/` | The Claude skill: `SKILL.md`, `references/`, `assets/`, `scripts/check.mjs`, `scripts/inline.mjs`, `evals/`. |
 | `templates/` | Starter apps per archetype (copied into the skill by the build). Start new apps here. |
 | `demo/` | Orion Showcase app (every element). |
 | `explore/` | Review labs (not part of the system). |
@@ -110,6 +110,7 @@ Validate with `scripts/quick_validate.py <repo>/skill/s4-orion`. Keep `SKILL.md`
 - Decision 0068: one accent fill per job in a region (at rest a rail, pane, card or header shows at most one accent selection fill and one filled main action; other selections neutral, other buttons `elevated` or `text`; a tree's selection in a rail with a current item is neutral); a wide window gets more real content, not a capped shell; site pages load `icons-site.js` (the icons the site templates draw; any other name fetches `icons-solar.js` once), site budget 150 KB.
 - Decision 0069 (lean app bundle, focus landing): an app links `orion.core.min.*` plus only the packs it uses (`data`, `commands`, `desktop`, `direct`, `inputs`, `sitekit`; core first, packs after; `node scripts/packs.mjs page.html` lists them, the page checker and `npm run check` fail a page that links too few or too many); `orion.css`/`orion.js` and `orion.min.*` still load everything (prototypes, the Showcase). Budgets live in `scripts/build.mjs`; `npm run test:lean` proves a lean page equals the full bundle. A pack never relies on another except through core (`desktop` on `commands`). Closing a dialog, sheet or palette with no opener returns focus to what had it, else to main (`S4.util.land()`), never `<body>`. The grid-keys hint shows on a touch screen after the first navigation key in the table.
 - Decision 0070: one accent job per screen (refines 0068): at rest the window shows one filled action (the next act on the work in front of you; the rail's action steps down to elevated by itself while the open view shows a filled button) and one accent selection, the navigation's (the open row beside its detail and the picked day beside its pane are neutral; `data-split-open` rows do it by themselves); no pressed chip at rest (no "All" chip: `data-select="single" data-clearable`); chart columns at most 16 wide; the page checker warns on a second filled action on the first screen.
+- Decision 0071 (the name): the product is **Orion** (formerly S4 Orion); never write "S4 Orion" outside decisions, history, old CHANGELOG entries and the skill's "formerly" line (`npm run check:words` fails it). The skill lives in `skill/orion/` and packages to `skill/dist/orion.skill`. The `s4` prefix (classes, tokens, `data-s4-*`, `S4.*`, `s4-` storage keys) is a technical namespace and never changes. Repo `4RK0S4H4/Orion`, Pages `https://4rk0s4h4.github.io/Orion/` (the old `/s4-orion/` address no longer works); the branch is still `s4-orion`.
 - Before naming a class or attribute, grep for it: `s4-page`, `s4-page-header` and `data-expand` all clashed with existing ones on 2026-11-15.
 - Inter; Solar icons (Bold Duotone, Linear arrows)
   behind semantic names in `components/icons/names.json`. Title Case labels, sentence case sentences.

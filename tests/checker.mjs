@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-/* S4 Orion checker proofs (round 0059, decision 0067): a rule is only a rule if a known-bad page fails it. Runs the page
-   checker (skill/s4-orion/scripts/check.mjs) over the pages in tests/fixtures and expects each to fail with the named
+/* Orion checker proofs (round 0059, decision 0067): a rule is only a rule if a known-bad page fails it. Runs the page
+   checker (skill/orion/scripts/check.mjs) over the pages in tests/fixtures and expects each to fail with the named
    message, so the claim "the checker catches it" is regression tested; then proves the dial values at runtime:
    S4.theme with a value off a dial's list warns, names the allowed values and writes nothing.
      bad-words.html     a table nothing wraps or stacks, squeezed at 390 until its words break across lines
@@ -30,7 +30,7 @@ const CASES = [
 const ran = {};
 console.log('known-bad pages fail the page checker');
 for (const [file, re, what] of CASES) {
-  if (!ran[file]) ran[file] = spawnSync(process.execPath, [join(root, 'skill/s4-orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
+  if (!ran[file]) ran[file] = spawnSync(process.execPath, [join(root, 'skill/orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
   const r = ran[file];
   expect(r.status === 1 && re.test(r.stdout), `${file}: ${what} is an error (exit ${r.status})`);
 }
@@ -40,7 +40,7 @@ const WARN_CASES = [
   ['loud-screen.html', /more than one filled action on one screen at rest \(decision 0070[^\n]*3 accent fills: "All", "Next Untranslated", "Approve"/, 'two filled actions and a pressed All chip'],
 ];
 for (const [file, re, what] of WARN_CASES) {
-  const r = spawnSync(process.execPath, [join(root, 'skill/s4-orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
+  const r = spawnSync(process.execPath, [join(root, 'skill/orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
   expect(re.test(r.stdout), `${file}: ${what} is a warning (exit ${r.status})`);
 }
 

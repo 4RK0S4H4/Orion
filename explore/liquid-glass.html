@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>S4 Orion: Liquid Glass Lab</title>
-<link rel="stylesheet" href="../tokens/tokens.css?v=e4373e9">
+<title>Orion: Liquid Glass Lab</title>
+<link rel="stylesheet" href="../tokens/tokens.css?v=cfb888b">
 <style>
 @font-face{font-family:Inter;font-weight:100 900;font-display:swap;src:url(../components/assets/inter-variable.woff2) format("woff2")}
 *{box-sizing:border-box}
@@ -44,7 +44,7 @@ button:not([class*="s4-"]){font:inherit;color:inherit}
 footer{max-width:1500px;margin:0 auto;padding:0 24px 32px;font-size:12px;color:var(--md-sys-color-on-surface-variant)}
 footer a{color:inherit}
 
-/* ================= stages (the demo, all S4 Orion tokens) ================= */
+/* ================= stages (the demo, all Orion tokens) ================= */
 .lg-stage{--lg-tint:var(--md-sys-color-surface-container);--lg-text:var(--md-sys-color-on-surface);
   position:relative;overflow:hidden;isolation:isolate;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface);
   -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -60,7 +60,7 @@ footer a{color:inherit}
 /* engine: SVG backdrop refraction (Chromium) */
 [data-lg-mode=svg] .lgx{background:color-mix(in srgb,var(--md-sys-color-surface-container) var(--lg-tint-a,20%),transparent);box-shadow:0 4px 18px rgb(0 0 0/.14)}
 [data-lg-mode=svg] .lgx::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--lg-spec) 0 0/100% 100% no-repeat;pointer-events:none}
-/* engine off: S4 Orion glass as shipped today (decision 0004) */
+/* engine off: Orion glass as shipped today (decision 0004) */
 [data-lg-mode=off] .lgx{background-color:color-mix(in srgb,var(--s4-glass-tint-float) calc(var(--s4-glass-tint-opacity-float) * 100%),transparent);
   -webkit-backdrop-filter:blur(var(--s4-glass-blur-float)) saturate(var(--s4-glass-saturation-float)) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
   backdrop-filter:blur(var(--s4-glass-blur-float)) saturate(var(--s4-glass-saturation-float)) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
@@ -131,20 +131,20 @@ footer a{color:inherit}
 </head>
 <body>
 <div class="bar">
-  <h1>S4 Orion: Liquid Glass Lab</h1>
+  <h1>Orion: Liquid Glass Lab</h1>
   <div class="ctl"><span>Theme</span><div class="seg" id="theme"><button value="light" aria-pressed="true">Light</button><button value="dark" aria-pressed="false">Dark</button></div></div>
   <div class="ctl"><span>Color</span><div class="seg" id="seed"><button value="mono" aria-pressed="true">Mono</button><button value="#4f46e5" aria-pressed="false">Indigo</button><button value="#0f766e" aria-pressed="false">Teal</button></div></div>
 </div>
 <main class="page">
   <div class="intro">
-    <p>Today’s S4 Orion glass is a blur with a tint. This lab tries a <b>liquid</b> glass, close to Apple’s Liquid Glass: each glass shape behaves like a thick slab whose edges curve down, so what’s behind it <b>bends</b> near the rim (light refracts as it would through real glass), with a light blur, a specular highlight on the edge and a soft shadow. Nearby glass shapes can <b>melt</b> into each other like drops.</p>
+    <p>Today’s Orion glass is a blur with a tint. This lab tries a <b>liquid</b> glass, close to Apple’s Liquid Glass: each glass shape behaves like a thick slab whose edges curve down, so what’s behind it <b>bends</b> near the rim (light refracts as it would through real glass), with a light blur, a specular highlight on the edge and a soft shadow. Nearby glass shapes can <b>melt</b> into each other like drops.</p>
     <p><b>Try it below:</b> scroll the app so photos and text slide under the bars, open the menu (top right), press and slide along the nav bar, and drag the shapes in the playground. Switch theme and color at the top. Then pick one option per question by tapping its card (not the preview); answers are saved with your other labs.</p>
     <p id="engineNote"></p>
   </div>
 
   <section class="sec">
     <h2>Try It</h2>
-    <p>The app on the left is plain S4 Orion (M3 app bar, nav bar, menu and FAB); only the glass material is new: content bends at the edge of each raised surface and shows through, frosted. Open the menu (filter icon). The controls change both the app and the playground.</p>
+    <p>The app on the left is plain Orion (M3 app bar, nav bar, menu and FAB); only the glass material is new: content bends at the edge of each raised surface and shows through, frosted. Open the menu (filter icon). The controls change both the app and the playground.</p>
     <div class="try">
       <div class="lg-stage phone m3" id="app">
         <div class="lg-scroll"><canvas class="lg-scene"></canvas></div>
@@ -177,7 +177,7 @@ footer a{color:inherit}
   <div id="sections"></div>
 
   <section class="sec how">
-    <h2>How It Would Ship in S4 Orion</h2>
+    <h2>How It Would Ship in Orion</h2>
     <ul>
       <li><b>Same places as today.</b> Liquid glass replaces the material of the surfaces decision 0004 already makes glass (nav bar, toolbars, top app bar when scrolled, menus, sheets, dialogs). Content stays solid.</li>
       <li><b>Same guarantee.</b> Text on glass stays <code>on-surface</code> at WCAG AA. “Fixed Tint” reuses today’s proof unchanged; “Adaptive Tint” checks every pixel and raises the tint only where needed, so the floor holds by construction.</li>
@@ -187,14 +187,14 @@ footer a{color:inherit}
     </ul>
   </section>
 </main>
-<footer><a href="../">S4 Orion</a> exploration · Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</footer>
+<footer><a href="../">Orion</a> exploration · Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</footer>
 
 <script src="../components/assets/m3color.js"></script>
 <script src="lib/theme.js?v=d41cede"></script>
 <script src="lib/icons.js?v=d9cbb51"></script>
-<script src="lib/questions.js?v=9c78837"></script>
-<script src="lib/review.js?v=c12ab1a"></script>
-<script src="lib/liquid-glass.js?v=ff6454b"></script>
+<script src="lib/questions.js?v=a033d5b"></script>
+<script src="lib/review.js?v=6adf197"></script>
+<script src="lib/liquid-glass.js?v=b9f31be"></script>
 <script>
 const h=html=>{const t=document.createElement('template');t.innerHTML=html.trim();return t.content.firstElementChild};
 const ic=n=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||''}</svg>`;
@@ -354,7 +354,7 @@ const SECTIONS=[
   {k:'A',name:'Subtle',desc:'A thin bevel that bends only the outer few pixels, with more blur. Calm, close to frosted glass with a lit edge.',set:{look:'subtle'}},
   {k:'B',name:'Liquid',tag:'Closest to Apple',desc:'A wide, rounded bevel: lines bow noticeably near the rim, a slight blur so nothing looks pixelated, and a bright edge.',set:{look:'liquid'}},
   {k:'C',name:'Extra Liquid',desc:'Thick glass: strong bending with a slight blur. The most dramatic.',set:{look:'extra'}},
-  {k:'D',name:'Keep Today’s Glass',tag:'S4 Orion today',desc:'No refraction: 60% tint over a 16px blur with a hairline edge.',set:{engine:'off'}}]},
+  {k:'D',name:'Keep Today’s Glass',tag:'Orion today',desc:'No refraction: 60% tint over a 16px blur with a hairline edge.',set:{engine:'off'}}]},
  {id:'text',title:'Keeping Text Readable',desc:'Clearer glass shows more of the bending, but text on it must stay readable. Each option shows its guarantee for the current theme and color.',opts:[
   {k:'A',name:'Fixed Tint',tag:'Today’s guarantee',desc:'60% tint and the backdrop is gently compressed, exactly as today. AA over anything, but the tint hides much of the refraction.',set:{text:'fixed'}},
   {k:'B',name:'Adaptive Tint',desc:'Very clear (12% tint) over calm content; wherever what’s behind would make text hard to read, the tint rises just enough to keep 4.5:1. Clear and guaranteed.',set:{text:'adaptive'}},

@@ -1,5 +1,5 @@
-/* S4 Orion base: cascade layers, font, element defaults, type utilities, icons, focus, and the shared state layer.
-   Everything in S4 Orion lives in these layers, so an app's own unlayered CSS always wins without !important.
+/* Orion base: cascade layers, font, element defaults, type utilities, icons, focus, and the shared state layer.
+   Everything in Orion lives in these layers, so an app's own unlayered CSS always wins without !important.
    Order: tokens -> base -> components -> glass -> motion -> utilities. */
 @layer s4.tokens, s4.base, s4.components, s4.glass, s4.motion, s4.utilities;
 

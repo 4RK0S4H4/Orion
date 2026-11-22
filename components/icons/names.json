@@ -1,5 +1,5 @@
 {
-  "$description": "S4 Orion icon vocabulary. Apps and the skill use these semantic names; each set maps them to its own icon ids. Solar Bold Duotone is the default (arrows and chevrons in Solar Linear so they stay light). Phosphor sets are alternatives the owner can switch to (S4.icon.use('phosphor-duotone')); 'phosphor-bold-duotone' is Phosphor's bold outline over its duotone tint, (chevrons are plain bold strokes, no tint) composed at import time from the MIT assets of @phosphor-icons/core 2.1.1.",
+  "$description": "Orion icon vocabulary. Apps and the skill use these semantic names; each set maps them to its own icon ids. Solar Bold Duotone is the default (arrows and chevrons in Solar Linear so they stay light). Phosphor sets are alternatives the owner can switch to (S4.icon.use('phosphor-duotone')); 'phosphor-bold-duotone' is Phosphor's bold outline over its duotone tint, (chevrons are plain bold strokes, no tint) composed at import time from the MIT assets of @phosphor-icons/core 2.1.1.",
   "set": "solar",
   "sets": {
     "solar": {

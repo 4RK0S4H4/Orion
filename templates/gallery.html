@@ -16,9 +16,9 @@
      record's own color as its accent (data-accent; surfaces stay neutral so the sleeve looks the same everywhere). -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=3f4151c">
-<link rel="stylesheet" href="../components/orion.direct.min.css?v=4fb061a">
-<link rel="stylesheet" href="brand/gallery.css?v=ff477a2">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=a4bb296">
+<link rel="stylesheet" href="../components/orion.direct.min.css?v=a0c88f7">
+<link rel="stylesheet" href="brand/gallery.css?v=c90a0a6">
 <style>
   /* Crate's own layout and elements: tokens only; nothing here restyles an Orion component */
   .cr-kicker { margin: 0; color: var(--md-sys-color-primary); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -233,9 +233,9 @@
     <a class="s4-nav-item" href="#crates" data-view="crates"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="archive"></span></span><span class="s4-nav-label">Crates</span></a>
   </nav>
 </div>
-<script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.core.min.js?v=2c0caca"></script>
-<script src="../components/orion.direct.min.js?v=d8fa438"></script>
+<script src="../components/assets/icons.js?v=90a5120"></script>
+<script src="../components/orion.core.min.js?v=f755144"></script>
+<script src="../components/orion.direct.min.js?v=ebca165"></script>
 <script>
 /* Crate's brand: a sticker-gold accent over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e8b400' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

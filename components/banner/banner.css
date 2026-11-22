@@ -1,4 +1,4 @@
-/* Banner (S4 Orion addition): a message that stays on the page until it is dealt with or dismissed. Not a toast (that is the snackbar).
+/* Banner (Orion addition): a message that stays on the page until it is dealt with or dismissed. Not a toast (that is the snackbar).
    <div class="s4-banner" role="status" data-tone="primary|secondary|tertiary|error">
      <span class="s4-icon" data-icon="info"></span>
      <p class="s4-banner-text">Your plan renews on Nov 28.</p>

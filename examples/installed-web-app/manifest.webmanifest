@@ -1,7 +1,7 @@
 {
   "name": "Parley (example)",
   "short_name": "Parley",
-  "description": "An S4 Orion desktop app installed from the browser, drawing into the title bar area (window controls overlay).",
+  "description": "An Orion desktop app installed from the browser, drawing into the title bar area (window controls overlay).",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

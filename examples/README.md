@@ -1,4 +1,4 @@
-# Desktop shells for S4 Orion
+# Desktop shells for Orion
 
 Two small, real starting points for putting an Orion desktop app ([`templates/desktop-app.html`](../templates/desktop-app.html),
 [`components/desktop/`](../components/desktop/)) into a desktop window. **Neither is installed or run in this

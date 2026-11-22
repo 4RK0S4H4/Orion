@@ -1,4 +1,4 @@
-/* S4 Orion runtime core: window.S4.
+/* Orion runtime core: window.S4.
    - S4.register(name, init): components register an init(root) that wires up every instance inside root. Inits run on
      DOMContentLoaded and again for anything added to the page later, so markup works without any app code.
    - S4.motion: springs read from the tokens (so reduced motion is respected automatically) and an animate helper.

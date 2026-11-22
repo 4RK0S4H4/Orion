@@ -1,4 +1,4 @@
-/* S4 Orion review questionnaire.
+/* Orion review questionnaire.
    One shared store in localStorage, so answers from every demo page (and every open tab) end up together.
    Questions live in questions.js (window.S4_REVIEW_DEMOS).
    Page:  S4Review.page(id, { capture: { 'qid:v': () => 'text saved with the answer' } })
@@ -33,7 +33,7 @@
   function allText(s) {
     var ids = Object.keys(s.pages).filter(function (id) { var p = s.pages[id]; return Object.keys(p.answers || {}).length || (p.note || '').trim(); });
     if (!ids.length) return '';
-    return 'S4 Orion review answers (' + new Date().toISOString().slice(0, 10) + ')\n\n' + ids.map(function (id) { return pageText(id, s.pages[id]); }).join('\n\n');
+    return 'Orion review answers (' + new Date().toISOString().slice(0, 10) + ')\n\n' + ids.map(function (id) { return pageText(id, s.pages[id]); }).join('\n\n');
   }
   function copy(text, btn, done) {
     function ok() { var t = btn.textContent; btn.textContent = 'Copied'; btn.dataset.done = ''; setTimeout(function () { btn.textContent = t; delete btn.dataset.done; }, 1600); if (done) done(); }
@@ -42,7 +42,7 @@
   }
   function remember(s, text) { if (!text) return; if (s.history[0] && s.history[0].text === text) return; s.history.unshift({ at: new Date().toISOString(), text: text }); s.history = s.history.slice(0, HISTORY_MAX); save(s); }
 
-  /* The quiz UI is S4 Orion itself (decision 0048): the live bundle, so a decision made in one quiz shows in the next.
+  /* The quiz UI is Orion itself (decision 0048): the live bundle, so a decision made in one quiz shows in the next.
      Labs that predate the bundle get it added here (it sits in cascade layers, so a lab's own styles still win).
      review.css sits next to this script and only adds layout. */
   var SRC = (document.currentScript && document.currentScript.src) || '';
@@ -122,7 +122,7 @@
     });
     var note = sec.querySelector('.rv-note'), status = sec.querySelector('.rv-status');
     note.addEventListener('input', function () { var st = load(); st.pages[cfg.id].note = note.value; st.pages[cfg.id].updated = new Date().toISOString(); save(st); renderFab(); });
-    sec.querySelector('[data-copy-page]').onclick = function (e) { var st = load(); var t = 'S4 Orion review answers (' + new Date().toISOString().slice(0, 10) + ')\n\n' + pageText(cfg.id, st.pages[cfg.id]); copy(t, e.currentTarget, function () { remember(st, t); }); };
+    sec.querySelector('[data-copy-page]').onclick = function (e) { var st = load(); var t = 'Orion review answers (' + new Date().toISOString().slice(0, 10) + ')\n\n' + pageText(cfg.id, st.pages[cfg.id]); copy(t, e.currentTarget, function () { remember(st, t); }); };
     sec.querySelector('[data-copy-all]').onclick = function (e) { var st = load(), t = allText(st); if (!t) { status.textContent = 'Nothing answered yet.'; return; } copy(t, e.currentTarget, function () { remember(st, t); }); };
     sec.querySelector('[data-clear]').onclick = function () { var st = load(); st.pages[cfg.id].answers = {}; st.pages[cfg.id].note = ''; save(st); note.value = ''; render(); };
     var footer = document.querySelector('body > footer'); document.body.insertBefore(sec, footer || null);

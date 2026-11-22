@@ -1,11 +1,11 @@
 # Philosophy
 
-S4 Orion is a personal design language for the apps and pages its owner builds. It should make a new app look
+Orion is a personal design language for the apps and pages its owner builds. It should make a new app look
 finished on day one and make the hundredth app look like it belongs with the first.
 
 ## 1. Material 3 Expressive first
 
-S4 Orion is Material 3 Expressive. It uses the same color roles, type scale, shape scale, state layers, springs and
+Orion is Material 3 Expressive. It uses the same color roles, type scale, shape scale, state layers, springs and
 components, under the same names. When a question isn't answered here, the answer is "do what stock M3 Expressive does".
 That keeps the system predictable, lets Google's guidance and tooling apply directly, and avoids a pile of personal
 exceptions that drift over time.

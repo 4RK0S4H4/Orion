@@ -1,4 +1,4 @@
-/* Layout for component reference pages only (not part of S4 Orion). Built from tokens like everything else. */
+/* Layout for component reference pages only (not part of Orion). Built from tokens like everything else. */
 .ex-bar{position:sticky;top:0;z-index:var(--s4-z-app-bar);display:flex;flex-wrap:wrap;align-items:center;gap:var(--s4-space-3) var(--s4-space-6);
   padding:var(--s4-space-3) var(--s4-layout-margin);background:var(--md-sys-color-surface-container);color:var(--md-sys-color-on-surface)}
 .ex-bar h1{margin:0 auto 0 0;font-family:var(--md-sys-typescale-title-large-font);font-size:var(--md-sys-typescale-title-large-size);line-height:var(--md-sys-typescale-title-large-line-height);font-weight:var(--md-sys-typescale-emphasized-title-large-weight)}

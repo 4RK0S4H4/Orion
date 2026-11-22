@@ -1,8 +1,8 @@
 # Motion
 
 **One page, ten named patterns** (decision [0046](../decisions/0046-one-motion-philosophy.md)). Every transition and
-animation in S4 Orion is one of the patterns below. Nothing else may set a duration or an easing: `npm run check:motion`
-rejects it. Live, with the scrubber: [motion page](https://4rk0s4h4.github.io/s4-orion/components/motion/motion.html).
+animation in Orion is one of the patterns below. Nothing else may set a duration or an easing: `npm run check:motion`
+rejects it. Live, with the scrubber: [motion page](https://4rk0s4h4.github.io/Orion/components/motion/motion.html).
 
 ## The philosophy
 

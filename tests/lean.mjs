@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* S4 Orion lean-bundle test (round 0060, decision 0069): a page that links orion.core.min.* plus its packs behaves exactly
+/* Orion lean-bundle test (round 0060, decision 0069): a page that links orion.core.min.* plus its packs behaves exactly
    like the same page on the full bundle. For every page that links the lean files, at 390 dark and 1280 light, it is
    loaded twice: as written, and with the lean files swapped for orion.min.css/js (requests intercepted, so the page is
    untouched). Compared: page errors and console errors, the S4 runtime (every public name), the element count, and the

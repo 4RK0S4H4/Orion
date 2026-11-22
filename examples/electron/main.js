@@ -1,4 +1,4 @@
-/* A minimal Electron shell for an S4 Orion desktop app (issue 60). It is an example: nothing here is installed or run
+/* A minimal Electron shell for an Orion desktop app (issue 60). It is an example: nothing here is installed or run
    in this repository. To try it: cd examples/electron && npm install && npm start.
    What it shows:
    - a frameless window whose title bar is the page's .s4-titlebar (it drags because the CSS says app-region: drag):

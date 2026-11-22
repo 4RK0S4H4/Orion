@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* One motion philosophy (decision 0046): every transition and animation in S4 Orion names one of the motion patterns.
+/* One motion philosophy (decision 0046): every transition and animation in Orion names one of the motion patterns.
    This check rejects anything off-pattern:
      CSS  - a transition or animation may only take its timing from a pattern token (--s4-motion-<pattern>), and only
             for the properties that pattern is for; `all`, raw durations, easings and spring tokens are refused;

@@ -1,4 +1,4 @@
-/* Connects an S4 Orion page to a desktop shell, from inside the page. The shell exposes window.orionShell (Electron:
+/* Connects an Orion page to a desktop shell, from inside the page. The shell exposes window.orionShell (Electron:
    preload.js; another shell can expose the same few functions):
      { name, platform, setMenu(menus), windowAction(action), onMenu(fn), onWindowState(fn) }
    What it does:

@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en" data-gray="cool" data-corners="soft" data-type-display="mono">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Layers · Mallet Docs</title>
+<!-- Orion template (copy orion.site.min.css, orion.site.min.js, icons-site.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066; icons-site.js holds the icons the site templates draw and fetches icons-solar.js for any other, decision 0068). Docs. A documentation page from the website kit (components/site): a sidebar of every page (a floating
+     glass panel on a phone), a dark page head, the page in prose at reading width with a live diagram, callouts, code
+     per platform in tabs and a table, "Was this page helpful?" answered in place, "On This Page" contents that follow
+     the reader from 1200, and previous and next.
+     Brand: Mallet, open-source firmware for split keyboards. Cyan accent on cool grays, a monospace display face,
+     soft corners, standard motion. The keymap is real markup (each key a cell whose legend swaps with the layer, through
+     the kit's [data-period] switch), not an image. -->
+<meta name="description" content="Layers let a 42-key Mallet keyboard do the work of a full-size one. How layers stack, how to define one in mallet.toml, and how to flash it to your board.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e0f10" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Mallet Docs">
+<meta property="og:title" content="Layers · Mallet Docs">
+<meta property="og:description" content="How layers stack, how to define one in mallet.toml, and how to flash it to your board.">
+<meta property="og:image" content="https://example.com/og/mallet-docs-layers-1200x630.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://example.com/docs/concepts/layers">
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('mallet-docs-theme');</script>
+<link rel="preload" href="inter-site.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.site.min.css">
+<link rel="stylesheet" href="brand/docs.css?v=f2330bc">
+<style>
+  /* ---------- Mallet: the logo, the page head, the keymap, the feedback row ---------- */
+  .ml-logo { display: inline-grid; grid-template-columns: repeat(2, var(--s4-space-3)); gap: var(--s4-space-1); }
+  .ml-logo > span { block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-on-surface); }
+  .ml-logo > span:nth-child(2) { background: var(--md-sys-color-primary); }
+  .ml-wordmark { font-family: var(--md-ref-typeface-brand); letter-spacing: -0.02em; }
+
+  /* the page head: a dark band at the top of the page, in light mode too (a scoped theme, decision 0056) */
+  .ml-head { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .ml-head > * { margin: 0; }
+  .ml-head h1 { font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-display-small-weight); letter-spacing: -0.02em; }
+  .ml-head h1::before { content: "# "; color: var(--md-sys-color-primary); }
+  .ml-head .s4-prose-lead, .ml-lead { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); max-inline-size: 60ch; }
+  .ml-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2) var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
+  .ml-meta a { color: var(--md-sys-color-on-surface); text-underline-offset: 0.2em; }
+  @media (width >= 600px) { .ml-head { padding: var(--s4-space-8) var(--s4-space-10); } }
+
+  /* the keymap: two halves, columns staggered like the real board, legends follow the layer */
+  .ml-keymap { margin: 0; display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-low); }
+  .ml-keymap-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-3); }
+  .ml-keymap-bar > p { margin: 0; font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .ml-board { display: grid; gap: var(--s4-space-6); padding-block: var(--s4-space-4) var(--s4-space-2); }
+  .ml-half { --_k: minmax(0, 1fr); display: grid; gap: var(--s4-space-1); }
+  .ml-keys { display: grid; grid-template-columns: repeat(6, var(--_k)); gap: var(--s4-space-1); }
+  .ml-thumbs { display: grid; grid-template-columns: repeat(6, var(--_k)); gap: var(--s4-space-1); margin-block-start: var(--s4-space-2); }
+  .ml-half[data-side="left"] .ml-thumbs > :first-child { grid-column: 4; }
+  .ml-key { display: grid; place-items: center; aspect-ratio: 1; min-inline-size: 0; overflow: hidden; border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-label-medium-size); line-height: 1; font-weight: 600; text-align: center; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
+  /* modifiers are told apart by a quieter fill, not the accent: the card's one accent fill is the layer switch (decision 0068) */
+  .ml-key[data-mod] { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); }
+  .ml-thumbs > .ml-key { aspect-ratio: 1 / 1.25; }
+  /* column stagger: the middle fingers sit higher, as on the board itself */
+  .ml-half[data-side="left"] .ml-keys > .ml-key:nth-child(6n+3), .ml-half[data-side="left"] .ml-keys > .ml-key:nth-child(6n+5) { transform: translateY(calc(var(--s4-space-2) * -1)); }
+  .ml-half[data-side="left"] .ml-keys > :nth-child(6n+4) { transform: translateY(calc(var(--s4-space-3) * -1)); }
+  .ml-half[data-side="right"] .ml-keys > .ml-key:nth-child(6n+2), .ml-half[data-side="right"] .ml-keys > .ml-key:nth-child(6n+4) { transform: translateY(calc(var(--s4-space-2) * -1)); }
+  .ml-half[data-side="right"] .ml-keys > :nth-child(6n+3) { transform: translateY(calc(var(--s4-space-3) * -1)); }
+  /* the thumb key that holds the shown layer lights up */
+  .ml-keymap:has([value="lower"][aria-pressed="true"]) .ml-key[data-hold="lower"],
+  .ml-keymap:has([value="raise"][aria-pressed="true"]) .ml-key[data-hold="raise"] { background: var(--md-sys-color-inverse-surface); color: var(--md-sys-color-inverse-on-surface); }
+  .ml-keymap figcaption { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  @container (width >= 560px) {
+    .ml-board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-10); }
+  }
+  .ml-board-wrap { container-type: inline-size; }
+
+  /* per-platform commands */
+  .ml-tabs { display: grid; gap: var(--s4-space-3); }
+  .ml-tabs .s4-tab-panel > pre { margin: 0; }
+  .ml-tabs > *, .ml-keymap > *, .ml-keymap-bar > * { min-inline-size: 0; }
+
+  /* was this page helpful: answered in place */
+  .ml-helpful { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s4-space-3) var(--s4-space-6); padding: var(--s4-space-4) var(--s4-space-5); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); }
+  .ml-helpful > p { margin: 0; font-family: var(--md-sys-typescale-title-small-font); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .ml-helpful[data-answered] .ml-answers { display: none; }
+  .ml-answers { flex-wrap: nowrap; }
+  .ml-thanks { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .ml-thanks a { color: var(--md-sys-color-on-surface); }
+</style>
+</head>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="landing.html" aria-label="Mallet Home"><span class="ml-logo" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="ml-wordmark">mallet</span></a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="docs.html" aria-current="page">Docs</a></li>
+        <li><a class="s4-button" data-variant="text" href="#boards">Boards</a></li>
+        <li><a class="s4-button" data-variant="text" href="#configurator">Configurator</a></li>
+        <li><a class="s4-button" data-variant="text" href="#forum">Forum</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <a class="s4-button" data-variant="text" href="#github"><span class="s4-icon" data-icon="code"></span>GitHub · 8.4k</a>
+      <a class="s4-button" href="#download" data-keep>Download</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="s4-docs">
+  <div class="s4-docs-bar">
+    <button class="s4-button" data-variant="tonal" type="button" data-site-panel="docs-nav"><span class="s4-icon" data-icon="sidebar"></span>Browse Docs</button>
+    <span class="s4-status" data-tone="primary">v3.2</span>
+  </div>
+  <nav class="s4-docs-nav" id="docs-nav" aria-label="Documentation">
+    <div>
+      <h2>Getting Started</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#intro">Introduction</a></li>
+        <li><a class="s4-button" data-variant="text" href="#install">Install the Flasher</a></li>
+        <li><a class="s4-button" data-variant="text" href="#first-keymap">Your First Keymap</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Concepts</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#top" aria-current="page">Layers</a></li>
+        <li><a class="s4-button" data-variant="text" href="#tap-hold">Tap and Hold</a></li>
+        <li><a class="s4-button" data-variant="text" href="#combos">Combos</a></li>
+        <li><a class="s4-button" data-variant="text" href="#macros">Macros</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Hardware</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#boards">Supported Boards</a></li>
+        <li><a class="s4-button" data-variant="text" href="#split">Wiring a Split</a></li>
+        <li><a class="s4-button" data-variant="text" href="#pinouts">Pinouts</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>Reference</h2>
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#keycodes">Keycodes</a></li>
+        <li><a class="s4-button" data-variant="text" href="#config">mallet.toml</a></li>
+        <li><a class="s4-button" data-variant="text" href="#cli">Command Line</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="s4-docs-main" id="main">
+    <header class="ml-head" data-theme="dark">
+      <nav class="s4-breadcrumbs" aria-label="Breadcrumb"><ol>
+        <li><a class="s4-breadcrumb-link" href="#docs">Docs</a></li>
+        <li><a class="s4-breadcrumb-link" href="#concepts">Concepts</a></li>
+        <li aria-current="page">Layers</li>
+      </ol></nav>
+      <h1 id="top">Layers</h1>
+      <p class="ml-lead">Layers let a 42-key board do the work of a full-size one. Hold a thumb key and every other key changes meaning; let go and it changes back.</p>
+      <p class="ml-meta"><span class="s4-status" data-tone="primary">Mallet 3.2</span><span>Updated 9 November 2026</span><a href="#edit">Edit This Page on GitHub</a></p>
+    </header>
+
+    <article class="s4-prose">
+      <figure class="ml-keymap" data-period-scope>
+        <div class="ml-keymap-bar">
+          <p>The Default Corne Keymap</p>
+          <div class="s4-button-group" data-connected data-select="single" data-period data-fit="content" aria-label="Layer">
+            <button class="s4-button" type="button" value="base" aria-pressed="true">Base</button>
+            <button class="s4-button" type="button" value="lower">Lower</button>
+            <button class="s4-button" type="button" value="raise">Raise</button>
+          </div>
+        </div>
+        <div class="ml-board-wrap">
+          <div class="ml-board" role="img" aria-label="A split keyboard with 21 keys on each half: three rows of six and three thumb keys. The legends show the layer chosen above; the caption below says what is on it.">
+            <div class="ml-half" data-side="left"><div class="ml-keys"><span class="ml-key" data-period-base="Tab" data-period-lower="Esc" data-period-raise="`">Tab</span><span class="ml-key" data-period-base="Q" data-period-lower="1" data-period-raise="!">Q</span><span class="ml-key" data-period-base="W" data-period-lower="2" data-period-raise="@">W</span><span class="ml-key" data-period-base="E" data-period-lower="3" data-period-raise="#">E</span><span class="ml-key" data-period-base="R" data-period-lower="4" data-period-raise="$">R</span><span class="ml-key" data-period-base="T" data-period-lower="5" data-period-raise="%">T</span><span class="ml-key">Ctrl</span><span class="ml-key" data-period-base="A" data-period-lower="F1" data-period-raise="~">A</span><span class="ml-key" data-period-base="S" data-period-lower="F2" data-period-raise="|">S</span><span class="ml-key" data-period-base="D" data-period-lower="F3" data-period-raise="\">D</span><span class="ml-key" data-period-base="F" data-period-lower="F4" data-period-raise="[">F</span><span class="ml-key" data-period-base="G" data-period-lower="F5" data-period-raise="{">G</span><span class="ml-key">Shift</span><span class="ml-key" data-period-base="Z" data-period-lower="F6" data-period-raise="Undo">Z</span><span class="ml-key" data-period-base="X" data-period-lower="F7" data-period-raise="Cut">X</span><span class="ml-key" data-period-base="C" data-period-lower="F8" data-period-raise="Copy">C</span><span class="ml-key" data-period-base="V" data-period-lower="F9" data-period-raise="Paste">V</span><span class="ml-key" data-period-base="B" data-period-lower="F10" data-period-raise="F11">B</span></div><div class="ml-thumbs"><span class="ml-key" data-mod>Gui</span><span class="ml-key" data-hold="lower">Lower</span><span class="ml-key" data-mod>Space</span></div></div>
+            <div class="ml-half" data-side="right"><div class="ml-keys"><span class="ml-key" data-period-base="Y" data-period-lower="6" data-period-raise="^">Y</span><span class="ml-key" data-period-base="U" data-period-lower="7" data-period-raise="&amp;">U</span><span class="ml-key" data-period-base="I" data-period-lower="8" data-period-raise="*">I</span><span class="ml-key" data-period-base="O" data-period-lower="9" data-period-raise="(">O</span><span class="ml-key" data-period-base="P" data-period-lower="0" data-period-raise=")">P</span><span class="ml-key" data-period-base="Bksp" data-period-lower="Bksp" data-period-raise="Del">Bksp</span><span class="ml-key" data-period-base="H" data-period-lower="←" data-period-raise="}">H</span><span class="ml-key" data-period-base="J" data-period-lower="↓" data-period-raise="]">J</span><span class="ml-key" data-period-base="K" data-period-lower="↑" data-period-raise="-">K</span><span class="ml-key" data-period-base="L" data-period-lower="→" data-period-raise="=">L</span><span class="ml-key" data-period-base=";" data-period-lower="Home" data-period-raise="+">;</span><span class="ml-key" data-period-base="&#x27;" data-period-lower="End" data-period-raise="_">&#x27;</span><span class="ml-key" data-period-base="N" data-period-lower="PgDn" data-period-raise="F12">N</span><span class="ml-key" data-period-base="M" data-period-lower="PgUp" data-period-raise="Prev">M</span><span class="ml-key" data-period-base="," data-period-lower="Vol−" data-period-raise="Play">,</span><span class="ml-key" data-period-base="." data-period-lower="Vol+" data-period-raise="Next">.</span><span class="ml-key" data-period-base="/" data-period-lower="Mute" data-period-raise="?">/</span><span class="ml-key">Enter</span></div><div class="ml-thumbs"><span class="ml-key" data-mod>Enter</span><span class="ml-key" data-hold="raise">Raise</span><span class="ml-key" data-mod>Alt</span></div></div>
+          </div>
+        </div>
+        <figcaption aria-live="polite" data-period-base="Base: letters and the usual modifiers. Hold Lower or Raise with your thumbs to change layer." data-period-lower="Lower, held with the left thumb: numbers across the top, F-keys below, arrows and media on the right." data-period-raise="Raise, held with the right thumb: symbols, brackets and editing shortcuts.">Base: letters and the usual modifiers. Hold Lower or Raise with your thumbs to change layer.</figcaption>
+      </figure>
+
+      <h2 id="stack">How Layers Stack</h2>
+      <p>Mallet keeps layers in a stack, with <code>base</code> at the bottom. When you hold a layer key, its layer goes on top. A key that the top layer leaves empty falls through to the layer below, so you only define what changes.</p>
+      <ul>
+        <li><strong>Hold</strong> a layer key to use it for as long as you hold it. This is what most people want.</li>
+        <li><strong>Tap</strong> a layer key twice quickly to lock the layer on. Tap once more to drop it.</li>
+        <li>Hold <kbd>Lower</kbd> and <kbd>Raise</kbd> together to reach a fourth layer, <code>adjust</code>, for settings and the bootloader.</li>
+      </ul>
+      <aside class="s4-callout"><span class="s4-icon" data-icon="info"></span><p class="s4-callout-title">Up to 16 Layers</p><p>Most people use three or four. Every layer costs 84 bytes of flash per half, so even small controllers have room.</p></aside>
+
+      <h2 id="define">Define a Layer</h2>
+      <p>Layers live in <code>mallet.toml</code>, next to your board’s name. Write the keys in rows the way they sit on the board; <code>__</code> means “fall through to the layer below”.</p>
+      <pre><code>[board]
+name = "corne-v4"
+
+[layers.lower]
+hold = "left_thumb_middle"
+keys = """
+  esc  1   2   3   4   5      6   7    8    9    0   bspc
+  __   f1  f2  f3  f4  f5     left down up  right home end
+  __   f6  f7  f8  f9  f10    pgdn pgup vold volu mute __
+                 __  __  __     __  __  __
+"""</code></pre>
+
+      <h2 id="flash">Flash It</h2>
+      <p>Plug in the left half, then run the flasher. It checks the file, builds the firmware and waits for the board to enter its bootloader.</p>
+      <div class="ml-tabs">
+        <div class="s4-tabs" role="tablist" aria-label="Your Computer">
+          <button class="s4-tab" type="button" role="tab" id="tab-mac" aria-controls="panel-mac" aria-selected="true">macOS</button>
+          <button class="s4-tab" type="button" role="tab" id="tab-linux" aria-controls="panel-linux" aria-selected="false">Linux</button>
+          <button class="s4-tab" type="button" role="tab" id="tab-win" aria-controls="panel-win" aria-selected="false">Windows</button>
+        </div>
+        <div class="s4-tab-panel" role="tabpanel" id="panel-mac" aria-labelledby="tab-mac"><pre><code>brew install mallet
+mallet flash mallet.toml --side left</code></pre></div>
+        <div class="s4-tab-panel" role="tabpanel" id="panel-linux" aria-labelledby="tab-linux" hidden><pre><code>curl -fsSL https://get.mallet.example | sh
+sudo mallet udev install   # once, so you can flash without sudo
+mallet flash mallet.toml --side left</code></pre></div>
+        <div class="s4-tab-panel" role="tabpanel" id="panel-win" aria-labelledby="tab-win" hidden><pre><code>winget install Mallet.Mallet
+mallet flash mallet.toml --side left</code></pre></div>
+      </div>
+      <aside class="s4-callout" data-tone="warning"><span class="s4-icon" data-icon="warning"></span><p class="s4-callout-title">Unplug the Cable Between the Halves</p><p>Flash one half at a time, with the TRRS cable out. Plugging it in while powered can short the controller on some boards.</p></aside>
+      <p>Repeat with <code>--side right</code> for the other half. Both halves must run the same version, or the right half will refuse to pair and blink twice.</p>
+
+      <h2 id="boards">Boards With Layer Support</h2>
+      <div class="s4-table-wrap">
+        <table class="s4-table">
+          <thead><tr><th scope="col" data-primary>Board</th><th scope="col">Controller</th><th scope="col">Keys</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            <tr><td>Corne v4</td><td>RP2040</td><td data-num>42</td><td><span class="s4-status" data-tone="primary">Stable</span></td></tr>
+            <tr><td>Sofle RGB</td><td>RP2040</td><td data-num>58</td><td><span class="s4-status" data-tone="primary">Stable</span></td></tr>
+            <tr><td>Ferris Sweep</td><td>nRF52840</td><td data-num>34</td><td><span class="s4-status" data-tone="primary">Stable</span></td></tr>
+            <tr><td>Lily58 Pro</td><td>Pro Micro</td><td data-num>58</td><td><span class="s4-status">Beta</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="trouble">If a Layer Won’t Stay On</h2>
+      <p>Check that the layer key is a <code>hold</code>, not a <code>toggle</code>, and that nothing above it in the stack uses the same key. <code>mallet check mallet.toml</code> prints every key that two layers both claim.</p>
+    </article>
+
+    <div class="ml-helpful" id="helpful">
+      <p>Was This Page Helpful?</p>
+      <div class="s4-site-actions-row ml-answers">
+        <button class="s4-button" data-variant="tonal" type="button" value="yes">Yes</button>
+        <button class="s4-button" data-variant="tonal" type="button" value="no">Not Really</button>
+      </div>
+      <p class="ml-thanks" aria-live="polite" hidden></p>
+    </div>
+
+    <nav class="s4-docs-pager" aria-label="Previous and Next">
+      <a class="s4-card" href="#first-keymap" rel="prev"><span>Previous</span><span>Your First Keymap</span></a>
+      <a class="s4-card" href="#tap-hold" rel="next"><span>Next</span><span>Tap and Hold</span></a>
+    </nav>
+  </main>
+
+  <aside class="s4-toc" aria-labelledby="toc-h">
+    <h2 id="toc-h">On This Page</h2>
+    <ul>
+      <li><a class="s4-button" data-variant="text" href="#stack">How Layers Stack</a></li>
+      <li><a class="s4-button" data-variant="text" href="#define">Define a Layer</a></li>
+      <li><a class="s4-button" data-variant="text" href="#flash">Flash It</a></li>
+      <li><a class="s4-button" data-variant="text" href="#boards">Boards With Layer Support</a></li>
+      <li><a class="s4-button" data-variant="text" href="#trouble">If a Layer Won’t Stay On</a></li>
+    </ul>
+  </aside>
+</div>
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-top">
+    <div class="s4-site-footer-brand">
+      <a class="s4-site-logo" href="landing.html" aria-label="Mallet Home"><span class="ml-logo" aria-hidden="true"><span></span><span></span><span></span><span></span></span><span class="ml-wordmark">mallet</span></a>
+      <p>Free, open-source keyboard firmware under the MIT licence. Made by 340 contributors and kept going by people who sponsor it.</p>
+    </div>
+    <nav class="s4-site-footer-links" data-columns="3" aria-label="Footer">
+      <div><h2>Docs</h2><ul><li><a href="#intro">Introduction</a></li><li><a href="#keycodes">Keycodes</a></li><li><a href="#cli">Command Line</a></li></ul></div>
+      <div><h2>Project</h2><ul><li><a href="#github">GitHub</a></li><li><a href="#releases">Releases</a></li><li><a href="#sponsor">Sponsor</a></li></ul></div>
+      <div><h2>Community</h2><ul><li><a href="#forum">Forum</a></li><li><a href="#chat">Chat</a></li><li><a href="#conduct">Code of Conduct</a></li></ul></div>
+    </nav>
+  </div>
+  <div class="s4-site-footer-base">
+    <p>© 2026 The Mallet Contributors · Icons by 480 Design (CC BY 4.0)</p>
+    <div class="s4-button-group" data-connected data-select="single" data-theme-mode data-fit="content" aria-label="Theme">
+      <button class="s4-icon-button" data-size="s" type="button" value="light" aria-label="Light"><span class="s4-icon" data-icon="light-mode"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="system" aria-label="System" aria-pressed="true"><span class="s4-icon" data-icon="settings"></span></button>
+      <button class="s4-icon-button" data-size="s" type="button" value="dark" aria-label="Dark"><span class="s4-icon" data-icon="dark-mode"></span></button>
+    </div>
+  </div>
+</footer>
+<script src="icons-site.js" defer></script>
+<script src="orion.site.min.js" defer></script>
+<script>
+addEventListener('DOMContentLoaded', function () {
+  /* the project's brand: cyan on cool grays, a monospace display face, soft corners (0055) */
+  S4.theme.restore('mallet-docs-theme', { mode: 'system', seed: '#0088a3', gray: 'cool', corners: 'soft', display: 'mono' });
+
+  /* was this page helpful: the answer is taken in place, with a way to say more */
+  var box = document.getElementById('helpful'), thanks = box.querySelector('.ml-thanks');
+  box.addEventListener('click', function (e) {
+    var chip = e.target.closest('.ml-answers > button'); if (!chip) return;
+    box.setAttribute('data-answered', '');
+    thanks.hidden = false;
+    thanks.innerHTML = chip.value === 'yes' ? 'Thanks. It helps us decide what to write next.' : 'Sorry about that. <a href="#issue">Tell us what was missing</a> and we will fix the page.';
+  });
+});
+</script>
+</body>
+</html>

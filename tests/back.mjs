@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* S4 Orion Back test (round 0059, decision 0067): coming back from a page keeps your place. The production suite checks it
+/* Orion Back test (round 0059, decision 0067): coming back from a page keeps your place. The production suite checks it
    in passing on every page; this test makes it the point, on the three places where it was lost before (the editor's script
    page, the calendar's booking page, the Showcase's note page). For each, at 390 dark and 1280 light, and by both ways back
    (the browser's Back, and the Back button in the top app bar):

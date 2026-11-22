@@ -1,4 +1,4 @@
-/* The motion patterns (decision 0046). Every transition in S4 Orion names one of these; nothing else may set a duration
+/* The motion patterns (decision 0046). Every transition in Orion names one of these; nothing else may set a duration
    or an easing (npm run check:motion rejects it). Each token is a "<duration> <easing>" pair for the transition and
    animation shorthands: `transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state);`
    The patterns that make a surface appear (reveal, follow, pop, rise, switch) live in motion.js as S4.transition.*.

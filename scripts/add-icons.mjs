@@ -5,7 +5,7 @@
    - Phosphor: read from @phosphor-icons/core (npm pack @phosphor-icons/core@2.1.1 and untar it; pass the package dir).
      phosphor-duotone       = the duotone SVG as is (fill="currentColor" on each path)
      phosphor-bold-duotone  = the duotone tint (opacity .25) under the bold outline
-   Then run npm run build:icons and add the names to skill/s4-orion/references/icons.md. */
+   Then run npm run build:icons and add the names to skill/orion/references/icons.md. */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';

@@ -1,8 +1,8 @@
 # Elevation
 
-**Tokens:** `--md-sys-elevation-level0` … `level5` · live: [tokens page](https://4rk0s4h4.github.io/s4-orion/tokens/#elevation)
+**Tokens:** `--md-sys-elevation-level0` … `level5` · live: [tokens page](https://4rk0s4h4.github.io/Orion/tokens/#elevation)
 
-**S4 Orion has no shadows** (decision 0017). Every elevation level is flat; the names stay so components and apps keep
+**Orion has no shadows** (decision 0017). Every elevation level is flat; the names stay so components and apps keep
 working, and nothing in the system draws a drop shadow. Depth comes from two things only:
 
 1. **Tonal surfaces.** A card is `surface-container-low` on a `surface` page, a dialog is `surface-container-high`, and

@@ -1,6 +1,6 @@
 # Review labs
 
-Interactive pages used to make S4 Orion's design decisions with the owner. They are **not** part of the design system,
+Interactive pages used to make Orion's design decisions with the owner. They are **not** part of the design system,
 but since decision 0048 they are **built with it**: the quiz UI (`lib/review.css`, `lib/review.js`) is the live Orion
 bundle, so a decision made in one quiz shows in the next. What is being judged sits in a "Preview" well inside its
 option card. Answers are saved in the browser so several labs can be worked through at once.

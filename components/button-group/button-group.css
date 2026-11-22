@@ -1,4 +1,4 @@
-/* Button group (S4 Orion: Ink Track, decision 0059)
+/* Button group (Orion: Ink Track, decision 0059)
    Standard: <div class="s4-button-group"> <button class="s4-button">…</button> … </div>
      Buttons 8dp apart. Pressing one widens it a little while its neighbours give way (M3 Expressive press interaction).
    Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="Period">

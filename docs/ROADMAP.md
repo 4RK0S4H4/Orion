@@ -1,4 +1,4 @@
-# Where S4 Orion is going
+# Where Orion is going
 
 The long view (written 2026-11-15). [`NEXT.md`](NEXT.md) says what to do next session; this says **why, in what order,
 and what Orion will not become**. Change it only with the owner.

@@ -1,4 +1,4 @@
-/* S4 Orion motion patterns in script (decision 0046, one motion philosophy; builds on 0022 and 0042).
+/* Orion motion patterns in script (decision 0046, one motion philosophy; builds on 0022 and 0042).
    Components never call element.animate or pick a spring themselves: they name a pattern here (npm run check:motion).
      Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
      Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow

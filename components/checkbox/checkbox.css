@@ -1,4 +1,4 @@
-/* Checkbox (S4 Orion, Soft Square)
+/* Checkbox (Orion, Soft Square)
    <label class="s4-checkbox"><input type="checkbox"><span class="s4-checkbox-box"></span>Remind Me</label>
    Bare in a table cell: <label class="s4-checkbox"><input type="checkbox" aria-label="Select Electric Co."><span class="s4-checkbox-box"></span></label>
    States: checked, indeterminate (input.indeterminate, or data-indeterminate on the label, set by checkbox.js),

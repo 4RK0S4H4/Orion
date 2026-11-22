@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en" data-type-display="mono" data-buttons="tonal" data-energy="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pressroom · Story Board</title>
+<!-- Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.commands.min.css and .js, orion.data.min.css and .js, orion.direct.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Board (kanban), as a product (issue 66). Pressroom is the story board of a city newsroom: the night editor
+     moves tonight's stories from pitch to published and watches one clock, the edition's close. Brand through the
+     dials: a press orange accent on the stock neutral page, round corners, a monospaced display face (the wire, the
+     typewriter), tonal buttons by default, and one scoped dark band for the edition (data-theme="dark" on a region).
+     Its own elements, drawn from Orion's rules: the edition bar with front page slots, desk tags in the chart palette
+     (always with their name), a word count meter per story and a limit on the Editing lane. Cards move with a mouse,
+     a finger (hold, then drag) or the keyboard; a story opens as a page; a new pitch is typed in place. -->
+<script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
+<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.commands.min.css">
+<link rel="stylesheet" href="orion.data.min.css">
+<link rel="stylesheet" href="orion.direct.min.css">
+<link rel="stylesheet" href="brand/kanban.css?v=c06523d">
+<style>
+  /* the app's own elements: tokens only. The board and its lanes are Orion's (.s4-board, decision 0063); the cards are Pressroom's */
+  .kb-card { display: flex; flex-direction: column; gap: var(--s4-space-2); padding: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface); cursor: grab; touch-action: manipulation; }
+  .kb-card-title { border: 0; padding: 0; background: none; color: inherit; font: inherit; font-weight: var(--md-sys-typescale-label-large-weight); text-align: start; cursor: pointer; overflow-wrap: anywhere; border-radius: var(--md-sys-shape-corner-extra-small); }
+  .kb-card-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-small-size); }
+  /* the edition: a dark band at the top of the board (a scoped theme for one region, decision 0056) */
+  .pr-edition { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-4); margin-block-end: var(--s4-space-4); padding: var(--s4-space-4) var(--s4-space-5); border-radius: var(--s4-shape-pane); background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface); }
+  @container s4-app (width >= 840px) { .pr-edition { grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: var(--s4-space-8); } }
+  .pr-edition h2, .pr-edition p { margin: 0; }
+  .pr-close { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .pr-close-time { font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); font-weight: var(--md-sys-typescale-headline-small-weight); font-variant-numeric: tabular-nums; }
+  .pr-caption { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
+  .pr-slots { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+  .pr-slots > div { display: grid; grid-template-columns: repeat(4, var(--s4-space-8)); gap: var(--s4-space-1); }
+  .pr-slots i { block-size: var(--s4-space-3); border-radius: var(--s4-shape-chip); background: var(--md-sys-color-surface-container-highest); }
+  .pr-slots i[data-filled] { background: var(--md-sys-color-primary); }
+  /* a story card's parts */
+  .pr-card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); }
+  .pr-desk { display: inline-flex; align-items: center; gap: var(--s4-space-2); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
+  .pr-desk::before { content: ""; inline-size: var(--s4-space-2); block-size: var(--s4-space-2); border-radius: var(--s4-shape-chip); background: var(--desk); }
+  .pr-front { --s4-icon-size: var(--s4-space-4); color: var(--md-sys-color-primary); }
+  .pr-late { color: var(--md-sys-color-error); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .s4-subpage > article { max-inline-size: var(--s4-layout-content-reading); margin-inline: auto; }
+  @media (forced-colors: active) { .kb-card-title { border: 1px solid ButtonText; } }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation" data-label-expand="Expand Navigation" data-label-collapse="Collapse Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#board" data-view="board" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Tonight</span></a>
+      <a class="s4-nav-item" href="#progress" data-view="progress"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Desk Stats</span></a>
+      <a class="s4-nav-item" href="#team" data-view="team"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">Reporters</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Pressroom</h1></div>
+      <div class="s4-app-bar-actions"><button class="s4-icon-button" type="button" aria-label="Search And Commands" data-tooltip="Search And Commands" data-palette><span class="s4-icon" data-icon="search"></span></button></div>
+    </header>
+    <main class="s4-content" data-width="wide">
+      <section class="s4-view" data-view="board" data-title="Pressroom">
+        <section class="pr-edition" data-theme="dark" aria-labelledby="pr-ed-h">
+          <div><p class="pr-caption">Thursday, November 19</p><h2 class="s4-headline-small" id="pr-ed-h">Tonight’s Edition</h2></div>
+          <div class="pr-close"><span class="pr-caption">Closes At 22:30</span><span class="pr-close-time">3h 20m</span></div>
+          <div class="pr-slots"><span class="pr-caption">Front Page · 3 Of 4</span><div role="img" aria-label="Front page: 3 of 4 slots filled"><i data-filled></i><i data-filled></i><i data-filled></i><i></i></div></div>
+        </section>
+        <div class="s4-board" id="board" aria-label="Tonight’s Stories">
+          <section class="s4-lane" aria-labelledby="l-pitched"><header class="s4-lane-head"><h2 class="s4-lane-title" id="l-pitched">Pitched</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="board" aria-label="Pitched" data-lane="Pitched"></ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer></section>
+          <section class="s4-lane" aria-labelledby="l-reporting"><header class="s4-lane-head"><h2 class="s4-lane-title" id="l-reporting">Reporting</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="board" aria-label="Reporting" data-lane="Reporting"></ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer></section>
+          <section class="s4-lane" aria-labelledby="l-editing" data-limit="3"><header class="s4-lane-head"><h2 class="s4-lane-title" id="l-editing">Editing</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="board" aria-label="Editing" data-lane="Editing"></ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer></section>
+          <section class="s4-lane" aria-labelledby="l-ready"><header class="s4-lane-head"><h2 class="s4-lane-title" id="l-ready">Ready</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="board" aria-label="Ready" data-lane="Ready"></ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer></section>
+          <section class="s4-lane" aria-labelledby="l-published"><header class="s4-lane-head"><h2 class="s4-lane-title" id="l-published">Published</h2><span class="s4-lane-count"></span></header>
+            <ul class="s4-lane-items" data-reorder data-reorder-group="board" aria-label="Published" data-lane="Published"></ul>
+            <footer class="s4-lane-foot"><button class="s4-button" data-variant="text" data-size="s" type="button" data-lane-add="Working headline"><span class="s4-icon" data-icon="add"></span>Add Story</button></footer></section>
+        </div>
+      </section>
+
+      <section class="s4-view s4-stack" data-view="progress" data-title="Progress" hidden>
+        <div class="s4-grid">
+          <section class="s4-pane"><figure class="s4-chart" data-type="column" data-labels="Mon,Tue,Wed,Thu,Fri" data-values="11,14,9,16,12" data-name="Stories Published"><figcaption class="s4-chart-title">Stories Published This Week</figcaption></figure></section>
+          <section class="s4-pane"><figure class="s4-chart" data-type="donut" id="kb-donut" data-labels="Pitched,Reporting,Editing,Ready,Published" data-values="2,3,4,2,2" data-total-label="Stories"><figcaption class="s4-chart-title">Where Tonight’s Stories Are</figcaption></figure></section>
+        </div>
+      </section>
+
+      <section class="s4-view" data-view="team" data-title="Team" hidden>
+        <div class="s4-states" data-state="empty"><div data-when="empty" class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="people"></span></span><h2 class="s4-empty-title">No Reporters On Shift</h2><p class="s4-empty-text">The night desk starts at 18:00. Invite a stringer to file tonight.</p><button class="s4-button" data-variant="filled" type="button" id="kb-invite">Invite A Stringer</button></div></div>
+      </section>
+
+      <!-- A card is a page you go into (decision 0050): its own URL, Back in the bar -->
+      <section class="s4-subpage" data-page="card" data-title="Card" hidden>
+        <article class="s4-stack">
+          <header class="s4-subpage-header"><h2 class="s4-subpage-title" id="c-title">Card</h2><div class="s4-subpage-meta"><span class="s4-status" id="c-lane">To Do</span><span id="c-who"></span><span id="c-due"></span></div></header>
+          <section class="s4-pane">
+            <form class="s4-form" id="c-form" data-autosave>
+              <div class="s4-text-field"><textarea id="c-notes" name="notes" rows="4"></textarea><label for="c-notes">Notes For The Desk</label></div>
+              <div class="s4-form-actions"><span class="s4-form-status"></span></div>
+            </form>
+            <div class="s4-row"><button class="s4-button" data-variant="filled" type="button" id="c-next">Move To Next Stage</button><button class="s4-button" type="button" id="c-remove">Spike Story</button></div>
+          </section>
+        </article>
+      </section>
+    </main>
+  </div>
+  <nav class="s4-nav-bar" aria-label="Main">
+    <a class="s4-nav-item" href="#board" data-view="board" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Tonight</span></a>
+    <a class="s4-nav-item" href="#progress" data-view="progress"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chart"></span></span><span class="s4-nav-label">Desk Stats</span></a>
+    <a class="s4-nav-item" href="#team" data-view="team"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="people"></span></span><span class="s4-nav-label">Reporters</span></a>
+  </nav>
+</div>
+<script src="icons.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.commands.min.js"></script>
+<script src="orion.data.min.js"></script>
+<script src="orion.direct.min.js"></script>
+<script>
+/* the hub's light or dark choice carries over; Pressroom's accent is its own and is not saved over the hub's */
+S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#d9480f' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
+/* desks use the chart palette in a fixed order, always next to their name */
+var DESKS = { City: 1, Climate: 2, Politics: 3, Culture: 4, Sports: 5 };
+/* the data (a real app loads and saves this) */
+var cards = [
+  { id: 'c1', lane: 'Pitched', desk: 'Culture', title: 'The last video shop on Canal Street', who: 'LF', words: 0, target: 800, due: 'Fri' },
+  { id: 'c2', lane: 'Pitched', desk: 'Sports', title: 'Why the derby moved to a Tuesday', who: 'SO', words: 0, target: 600, due: 'Sat' },
+  { id: 'c3', lane: 'Reporting', desk: 'City', title: 'Night buses cut on four routes', who: 'PN', words: 420, target: 900, due: '20:00', front: true },
+  { id: 'c4', lane: 'Reporting', desk: 'Climate', title: 'River flood barrier fails its first test', who: 'MC', words: 610, target: 1200, due: '19:30', front: true },
+  { id: 'c5', lane: 'Reporting', desk: 'Politics', title: 'Council budget: who loses most', who: 'JW', words: 150, target: 1000, due: '21:00' },
+  { id: 'c6', lane: 'Editing', desk: 'City', title: 'Rents rise fastest in the north', who: 'AK', words: 980, target: 900, due: '18:00', late: true },
+  { id: 'c7', lane: 'Editing', desk: 'Culture', title: 'Review: the new opera house sounds right', who: 'LF', words: 750, target: 750, due: '19:00' },
+  { id: 'c8', lane: 'Editing', desk: 'Politics', title: 'Mayor’s race tightens after debate', who: 'JW', words: 1100, target: 1100, due: '20:30', front: true },
+  { id: 'c9', lane: 'Editing', desk: 'Sports', title: 'Rovers sign a 17-year-old keeper', who: 'SO', words: 520, target: 500, due: '21:00' },
+  { id: 'c10', lane: 'Ready', desk: 'Climate', title: 'Heat map: the city’s hottest streets', who: 'MC', words: 640, target: 650, due: 'Done' },
+  { id: 'c11', lane: 'Ready', desk: 'City', title: 'Library hours return to normal', who: 'PN', words: 300, target: 300, due: 'Done' },
+  { id: 'c12', lane: 'Published', desk: 'Politics', title: 'Turnout hits a ten-year high', who: 'JW', words: 700, target: 700, due: '16:05' },
+  { id: 'c13', lane: 'Published', desk: 'Sports', title: 'Marathon closes the bridge on Sunday', who: 'SO', words: 350, target: 350, due: '14:40' }
+];
+var app = document.querySelector('.s4-app'), lanes = Array.prototype.slice.call(document.querySelectorAll('#board .s4-lane-items')), LANES = lanes.map(function (l) { return l.dataset.lane; });
+function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function cardEl(c) {
+  var li = document.createElement('li'); li.className = 'kb-card'; li.dataset.id = c.id; li.setAttribute('data-reorder-surface', '');
+  var desk = DESKS[c.desk] || 1;
+  li.innerHTML = '<div class="pr-card-top"><span class="pr-desk" style="--desk: var(--s4-chart-' + desk + ')">' + esc(c.desk || 'Desk') + '</span>' + (c.front ? '<span class="s4-icon pr-front" data-icon="star" role="img" aria-label="Front page"></span>' : '') + '</div>' +
+    '<button class="kb-card-title" type="button" data-page-open="card" data-page-id="' + c.id + '" data-reorder-label>' + esc(c.title) + '</button>' +
+    (c.target && c.lane !== 'Published' ? '<div class="s4-meter" data-size="s" data-value="' + c.words + '" data-max="' + c.target + '"' + (c.words > c.target ? ' data-state="over"' : '') + ' aria-label="Words" aria-valuetext="' + c.words + ' of ' + c.target + ' words"><div class="s4-meter-track"><i class="s4-meter-fill"' + (c.words > c.target ? '' : ' data-tone="quiet"') + '></i></div></div>' : '') +   /* the word count: a quiet Orion meter (decision 0063) */
+    '<div class="kb-card-meta"><span>' + (c.late ? '<span class="pr-late">Late · was due ' + esc(c.due) + '</span>' : (c.lane === 'Published' ? 'Published ' + esc(c.due) : c.lane === 'Ready' ? 'Ready' : (c.lane === 'Pitched' ? 'For ' : 'Due ') + esc(c.due)) + (c.target && c.lane !== 'Published' ? ' · <span class="s4-num">' + c.words + '/' + c.target + '</span>' : '')) + '</span><span class="s4-avatar" data-size="s">' + esc(c.who) + '</span></div>';
+  return li;
+}
+function counts() {
+  S4.chart(document.getElementById('kb-donut'), { labels: LANES, series: [{ values: lanes.map(function (l) { return l.querySelectorAll(':scope > .kb-card').length; }) }] });
+}
+cards.forEach(function (c) { lanes[LANES.indexOf(c.lane)].appendChild(cardEl(c)); });
+counts();
+/* dropped somewhere new: remember the lane, say so, offer the way back */
+document.getElementById('board').addEventListener('s4-reorder', function (e) {
+  var d = e.detail, c = cards.filter(function (x) { return x.id === d.item.dataset.id; })[0];
+  if (c && d.toList !== d.fromList) { c.lane = d.toList.dataset.lane; S4.snackbar({ text: c.title + ' moved to ' + c.lane, action: 'Undo', onAction: function () { S4.reorder.move(d.item, d.from, d.fromList); c.lane = d.fromList.dataset.lane; counts(); } }); }
+  counts();
+});
+/* a new card is typed in place, at the foot of its lane (decision 0047): the board opens the draft, Pressroom makes the card */
+document.getElementById('board').addEventListener('s4-lane-add', function (e) {
+  var list = e.detail.list, c = { id: 'c' + Date.now(), lane: list.dataset.lane, desk: 'City', title: e.detail.value, who: 'ME', words: 0, target: 600, due: 'Tonight' };
+  cards.push(c); list.appendChild(cardEl(c)); counts();
+});
+/* the card page fills itself from the id in the URL */
+var page = document.querySelector('.s4-subpage[data-page="card"]'), open = null;
+page.addEventListener('s4-open', function (e) {
+  open = cards.filter(function (x) { return x.id === e.detail.id; })[0] || cards[0];
+  page.dataset.title = open.title;
+  document.getElementById('c-title').textContent = open.title;
+  document.getElementById('c-lane').textContent = open.lane;
+  document.getElementById('c-who').textContent = open.desk + ' desk · ' + open.who;
+  document.getElementById('c-due').textContent = open.words + ' of ' + open.target + ' words';
+  document.getElementById('c-notes').value = open.notes || '';
+  document.getElementById('c-next').hidden = open.lane === 'Published';
+});
+document.getElementById('c-form').addEventListener('s4-save', function (e) { if (open) open.notes = e.detail.values.notes; });
+function el(c) { return document.querySelector('.kb-card[data-id="' + c.id + '"]'); }
+document.getElementById('c-next').addEventListener('click', function () {
+  var c = open, to = LANES[Math.min(LANES.length - 1, LANES.indexOf(c.lane) + 1)]; c.lane = to;
+  lanes[LANES.indexOf(to)].appendChild(el(c)); counts(); S4.pages.back(app); S4.snackbar(c.title + ' moved to ' + to);
+});
+document.getElementById('c-remove').addEventListener('click', function () {
+  var c = open, node = el(c), list = node.parentElement, next = node.nextElementSibling;
+  node.remove(); counts(); S4.pages.back(app);
+  S4.snackbar({ text: 'Story spiked', action: 'Undo', onAction: function () { list.insertBefore(node, next); counts(); } });
+});
+document.getElementById('kb-invite').addEventListener('click', function () { S4.snackbar('Invite link copied for a stringer'); });
+S4.palette.register([{ label: 'Pitch A Story', group: 'Tonight', icon: 'add', run: function () { S4.app.go(app, 'board'); document.querySelector('[data-lane-add]').click(); } }]);
+</script>
+</body>
+</html>

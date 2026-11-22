@@ -1,11 +1,11 @@
 # Accessibility
 
-S4 Orion builds accessibility into tokens and components so apps get it without extra work. These are the guarantees, and
+Orion builds accessibility into tokens and components so apps get it without extra work. These are the guarantees, and
 the few things an app still has to do.
 
 ## Built in
 
-| Area | What S4 Orion does | Where |
+| Area | What Orion does | Where |
 |---|---|---|
 | Color contrast | 83 pairs pass WCAG AA in light, dark and both high-contrast modes; the build fails otherwise | `scripts/build-tokens.mjs` |
 | Contrast on glass | Text on glass is ≥ 4.5:1 over any backdrop for every seed (backdrop compression + `on-surface` only) | `glass.css`, `scripts/check-glass.mjs` |

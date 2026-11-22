@@ -1,4 +1,4 @@
-/* Stepper (S4 Orion addition): progress through a fixed sequence of steps, such as a checkout or setup.
+/* Stepper (Orion addition): progress through a fixed sequence of steps, such as a checkout or setup.
    <ol class="s4-stepper" aria-label="Setup Progress">
      <li data-state="done"><span class="s4-step-dot"><span class="s4-icon" data-icon="check"></span></span><span class="s4-step-label">Account</span></li>
      <li data-state="current" aria-current="step"><span class="s4-step-dot">2</span><span class="s4-step-label">Payment</span></li>

@@ -1,6 +1,6 @@
 # Component conventions
 
-Every S4 Orion component follows these rules, so components look and behave like one system. The [button](button/) is
+Every Orion component follows these rules, so components look and behave like one system. The [button](button/) is
 the reference implementation: copy its structure.
 
 ## Files

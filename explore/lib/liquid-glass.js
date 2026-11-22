@@ -1,4 +1,4 @@
-/* Liquid glass for the S4 Orion review lab: real refraction, not just blur.
+/* Liquid glass for the Orion review lab: real refraction, not just blur.
 
    Model: every glass shape is a slab of glass with a flat bottom lying on the content and a top that is flat in the
    middle and curves down to the edge over a "bezel" (a convex squircle profile, h(t) = (1 - (1 - t)^4)^(1/4)). Looking

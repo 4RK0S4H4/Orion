@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* S4 Orion production suite (issue 41): every component page, every template, the showcase, the hub and the tokens
+/* Orion production suite (issue 41): every component page, every template, the showcase, the hub and the tokens
    page, in Chromium and WebKit, as a 390px dark phone and a 1280px light desktop (plus one reduced-motion pass).
    On each page it checks:
      load      no script errors, console errors or failed requests; no sideways scroll; every icon drawn; no duplicate
@@ -17,7 +17,7 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
-import { knownClasses, silentAudit } from '../skill/s4-orion/scripts/silent.mjs';
+import { knownClasses, silentAudit } from '../skill/orion/scripts/silent.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
@@ -263,7 +263,7 @@ function dialAudit(opts) {
 }
 
 /* (c) text contrast as rendered, AA: 4.5, or 3 for large text; text on glass is checked against the worst backdrop
-   after the glass's own filter and tint (the same method as skill/s4-orion/scripts/check.mjs) */
+   after the glass's own filter and tint (the same method as skill/orion/scripts/check.mjs) */
 function contrastAudit() {
   const out = [];      /* no exemptions: FABs and the vibrant toolbar are proven with or without a seed (decisions 0060 and 0063: their tint rises only as far as the label needs) */
   const cv = document.createElement('canvas').getContext('2d', { willReadFrequently: true });

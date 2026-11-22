@@ -1,4 +1,4 @@
-# Where S4 Orion stands (resume here)
+# Where Orion stands (resume here)
 
 **The plan to a 10 in every area, the current stage (round 0060) and how sessions work is in [`PLAN.md`](PLAN.md). Read it next.**
 
@@ -14,7 +14,7 @@ holds budgets and fails a page that links too few or too many packs; `npm run te
 bundle (computed styles of every element, runtime names, errors). Also: Escape from a palette opened with nothing focused lands
 on main (`S4.util.land()`, the suite fails the old behaviour); Linnea's toolbar Columns button is outside the grid (the
 reviewer hit the header's per-column buttons; the suite guards it); the grid-keys hint shows on a touch screen after the
-first navigation key. **Workstream B** (decision 0070, merged): one accent job per screen (Parley's four reds are gone; the rail action steps down by itself; no pressed chip at rest, Linnea's All Records chip included), a balanced Showcase at 1600, the Dosewise brand trial in `examples/brand-trial/` and the skill fixes it taught. **Next:** full tests, publish (the main session tags 1.2.0 after review 5), review 5.
+first navigation key. **Workstream B** (decision 0070, merged): one accent job per screen (Parley's four reds are gone; the rail action steps down by itself; no pressed chip at rest, Linnea's All Records chip included), a balanced Showcase at 1600, the Dosewise brand trial in `examples/brand-trial/` and the skill fixes it taught. **Rename (0071):** the product is Orion, the skill `skill/orion/`, the repo `4RK0S4H4/Orion`, Pages `.../Orion/` (the old URL is dead); the `s4` prefix stays. **Next:** the owner updates the git remote, then full tests, publish (the main session tags 1.2.0 after review 5), review 5.
 
 ## Before (2026-11-22, round 0059): review 3's Top 10, in two workstreams
 

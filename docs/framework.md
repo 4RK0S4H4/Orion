@@ -1,4 +1,4 @@
-# S4 Orion as a framework
+# Orion as a framework
 
 How Orion is put together, what an app may rely on, and how to grow it without forking it. Read this before building a
 new kind of app or changing the system.
@@ -15,7 +15,7 @@ Everything flows one way. A change at one layer is picked up by every layer afte
 | 4. Layout | `components/app/`, `components/layout/`, `components/desktop/`, `components/site/` | The app shell (window classes, nav bar / rail, sticky bars), page widths, canonical two-pane layouts, desktop windows (title bar and its variants, pane scrolling, shortcuts, context menus, the inspector, window states; with the menu bar, status bar, document tabs, tree and the command registry beside it, issue 60); for websites, the site shell and sections (a page that scrolls as a document, no app shell; sites load the lighter site bundle, `orion.site.min.css` and `orion.site.min.js` with `inter-site.woff2`, decision 0066). |
 | 5. Glass and motion | `components/glass/`, `components/motion/` | The glass layer on chrome and overlays; the ten named motion patterns: pattern tokens in CSS and `S4.transition.*` in script (decision 0046; `npm run check:motion`). |
 | 6. Templates | `templates/` | Twenty complete starters, each its own product: one per kind of app (fifteen), and four site pages (landing, pricing, blog, docs) plus a studio site. |
-| 7. Skill | `skill/s4-orion/` | Decision rules for Claude, generated references, the bundled assets and templates, the page checker. |
+| 7. Skill | `skill/orion/` | Decision rules for Claude, generated references, the bundled assets and templates, the page checker. |
 
 CSS cascade layers mirror this: `s4.tokens, s4.base, s4.components, s4.glass, s4.motion, s4.utilities`. An app's own
 unlayered CSS always wins, so apps never need `!important` or edits to `orion.css`.
@@ -102,7 +102,7 @@ site bundle (`orion.site.min.*`, one document with no app shell) and the lean ap
 (`data`, `commands`, `desktop`, `direct`, `inputs`, `sitekit`) listed in `components/README.md`. A pack never depends on
 another except through core, apart from `desktop` calling `commands` (declared in `PACK_NEEDS`); every cross-pack call in
 a script is guarded, so a missing pack loses a feature and never throws. `components/packs.json` (generated) says which
-classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` and the page checker read pages with it. Re-package the skill (`skill/dist/s4-orion.skill`) on every release.
+classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` and the page checker read pages with it. Re-package the skill (`skill/dist/orion.skill`) on every release.
 
 ## Extending without forking
 
@@ -127,7 +127,7 @@ classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` an
 | Icons | `npm run check:icons` | Every semantic name resolves in every set. |
 | Glass | `npm run check:glass` | Text on glass stays AA over pure black and white backdrops across 97 color schemes; text on the tints of items on glass; FAB icons 3:1. |
 | Bundle | `npm run check:bundle` | Every generated file (bundle, skill assets, references, templates, cache stamps) is fresh. |
-| Pages | `node skill/s4-orion/scripts/check.mjs page.html` | Console errors, unknown icons, overflow, rendered contrast (also on glass), app-CSS rule lint; 390 dark + 1280 light. |
+| Pages | `node skill/orion/scripts/check.mjs page.html` | Console errors, unknown icons, overflow, rendered contrast (also on glass), app-CSS rule lint; 390 dark + 1280 light. |
 
 CI runs the first four on every push. Run the page checker on every template, the showcase and any new page.
 

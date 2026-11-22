@@ -1,8 +1,10 @@
 {
-  "name": "s4-orion",
+  "name": "orion",
   "version": "1.1.0",
   "private": true,
-  "description": "S4 Orion: a personal design language on Material 3 Expressive, with a glass layer for floating chrome.",
+  "homepage": "https://4rk0s4h4.github.io/Orion/",
+  "repository": { "type": "git", "url": "https://github.com/4RK0S4H4/Orion" },
+  "description": "Orion: a personal design language on Material 3 Expressive, with a glass layer for floating chrome.",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -28,7 +30,7 @@
     "test:checker": "node tests/checker.mjs",
     "test:back": "node tests/back.mjs",
     "test:lean": "node tests/lean.mjs",
-    "test:pages": "node skill/s4-orion/scripts/check.mjs templates/*.html demo/index.html --out tests/out/pages",
+    "test:pages": "node skill/orion/scripts/check.mjs templates/*.html demo/index.html --out tests/out/pages",
     "check:scopes": "node scripts/check-scopes.mjs",
     "check:words": "node scripts/check-words.mjs"
   }

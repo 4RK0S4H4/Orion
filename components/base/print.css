@@ -1,4 +1,4 @@
-/* S4 Orion print (round 0056): what a page looks like on paper. No attributes, no opt-in: it applies to every page.
+/* Orion print (round 0056): what a page looks like on paper. No attributes, no opt-in: it applies to every page.
    Paper is white with dark text, so the dark scheme never prints (tokens.css draws dark on screens only). Chrome that
    only makes sense on a screen is gone (navigation bars and rails, FABs, toolbars, snackbars, tooltips, scrims, window
    controls, swipe actions, drag handles); the page's own title and content stay. Glass is solid. Cards, panes, rows and

@@ -1,4 +1,4 @@
-# S4 Orion framework review (2026-11-13)
+# Orion framework review (2026-11-13)
 
 Asked: review the design language end to end and overhaul it into a real framework for designing future apps of all
 kinds. Reviewed: tokens, all components and their docs, the build and check scripts, the skill, the showcase at 390 and

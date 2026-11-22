@@ -1,4 +1,4 @@
-/* The review lab UI, built on the live S4 Orion bundle (decision 0048, reversing the old "review blue").
+/* The review lab UI, built on the live Orion bundle (decision 0048, reversing the old "review blue").
    The questionnaire is Orion itself: Orion tokens, buttons, chips, radios, fields, panes and motion patterns, loaded
    from ../components/orion.css, so a decision made in one quiz shows in the next. review.js adds that stylesheet to
    labs that predate the bundle. What is being judged always sits inside .rv-preview, in a recessed "Preview" well;
