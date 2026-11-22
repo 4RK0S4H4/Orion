@@ -57,9 +57,9 @@
     photos: { title: 'Photo album', by: 'Lena Fischer', when: 'Oct 28', folder: 'Personal', tags: ['Family', 'Photos'], body: ['Pick forty from the summer, print the best twelve. Ask Grandma which ones she wants framed.'] },
     weekend: { title: 'Weekend Plans', by: 'You', when: 'Today', folder: 'Personal', tags: ['Home'], body: ['Fix the shelf, return the library books, call Mum about Sunday lunch.'] },
     reading: { title: 'Reading List', by: 'You', when: 'This week', folder: 'Reading', tags: ['Reading'], body: ['Nine articles saved this week: three on city gardens, two on sleep, four you will probably never open.'] },
-    garden: { title: 'Community garden plan', by: 'Maya Chen', when: '2 days ago', folder: 'Personal', tags: ['Garden', 'Shared'], body: ['Beds one to four go to the school; five and six are ours. Water rota on the shed door, one evening each.', 'Seeds to buy: beans, chard, two kinds of squash. Ask Jonas about the compost bins.'] },
-    offsite: { title: 'Team offsite agenda', by: 'Jonas Weber', when: 'Yesterday', folder: 'Work', tags: ['Team', 'Shared'], body: ['Morning: what shipped this year, in ten minutes each. Afternoon: three bets for next year, then a walk.', 'Bring one thing you would stop doing.'] },
-    lunches: { title: 'Lunches for the week', by: 'Priya Nair', when: 'Monday', folder: 'Recipes', tags: ['Food', 'Shared'], body: ['Monday lentil soup, Tuesday leftovers, Wednesday the big salad, Thursday noodles, Friday out.'] }
+    garden: { title: 'Community Garden Plan', by: 'Maya Chen', when: '2 days ago', folder: 'Personal', tags: ['Garden', 'Shared'], body: ['Beds one to four go to the school; five and six are ours. Water rota on the shed door, one evening each.', 'Seeds to buy: beans, chard, two kinds of squash. Ask Jonas about the compost bins.'] },
+    offsite: { title: 'Team Offsite Agenda', by: 'Jonas Weber', when: 'Yesterday', folder: 'Work', tags: ['Team', 'Shared'], body: ['Morning: what shipped this year, in ten minutes each. Afternoon: three bets for next year, then a walk.', 'Bring one thing you would stop doing.'] },
+    lunches: { title: 'Lunches for the Week', by: 'Priya Nair', when: 'Monday', folder: 'Recipes', tags: ['Food', 'Shared'], body: ['Monday lentil soup, Tuesday leftovers, Wednesday the big salad, Thursday noodles, Friday out.'] }
   };
   var libRows = [];
   function noteFor(id) {
