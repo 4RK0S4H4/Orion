@@ -3899,6 +3899,12 @@
       inline-size var(--s4-motion-ink),
       block-size var(--s4-motion-ink);
   }
+  /* under 600 the highlight holds the icon over the label, a box about as tall as it is wide: half its height would make
+     it a circle that the label's corners poke out of (round 0061). It takes the corner of the 32dp icon pill instead, so it
+     reads as the usual rounded rectangle, and the corner dial still makes it squarer, never rounder. */
+  @container s4-nav-bar (width < 600px) {
+    .s4-nav-bar > .s4-nav-pill { border-radius: min(calc(var(--_h, 0px) / 2), var(--s4-shape-nav-indicator), calc(var(--s4-size-nav-indicator-height) / 2)); }
+  }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
   /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
   .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Round Nav Highlight</title>
+<!-- Known-bad fixture (round 0061, decision 0067). tests/checker.mjs expects the page checker to FAIL this page with the
+     message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires.
+     Five destinations in a 340 wide bar: the highlight under the icon and label is given half its height as its corner (what the
+     Showcase drew on 2026-11-22), so it is a circle and the corners of "Settings" poke out of it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .s4-nav-bar > .s4-nav-pill { border-radius: calc(var(--_h, 0px) / 2); }
+</style>
+</head>
+<body>
+<nav class="s4-nav-bar" aria-label="Main" style="inline-size: 340px">
+  <a class="s4-nav-item" href="#home"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+  <a class="s4-nav-item" href="#board"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="columns"></span></span><span class="s4-nav-label">Board</span></a>
+  <a class="s4-nav-item" href="#controls"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Controls</span></a>
+  <a class="s4-nav-item" href="#forms"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="edit"></span></span><span class="s4-nav-label">Forms</span></a>
+  <a class="s4-nav-item" href="#settings" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+</nav>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

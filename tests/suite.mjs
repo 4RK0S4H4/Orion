@@ -1200,6 +1200,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       quiet.broken.forEach((x) => add(x));
       quiet.container.forEach((x) => add(x));
       quiet.loud.forEach((x) => add(`${x} (decision 0065: a status is a tint)`));
+      (quiet.nav || []).forEach((x) => add(`${x} (round 0061: the highlight holds icon and label)`));
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);

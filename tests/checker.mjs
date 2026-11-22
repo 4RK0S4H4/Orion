@@ -5,6 +5,7 @@
    S4.theme with a value off a dial's list warns, names the allowed values and writes nothing.
      bad-words.html     a table nothing wraps or stacks, squeezed at 390 until its words break across lines
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
+     bad-nav-pill.html  five destinations at 390 with the highlight's corner at half its height: a circle "Settings" pokes out of
      bad-dial.html      data-scale="roomy" and data-corners="square" on <html>
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
    Usage: node tests/checker.mjs */
@@ -24,6 +25,8 @@ const CASES = [
   ['bad-words.html', /breaks across lines/, 'a word split across lines'],
   ['bad-fab-rail.html', /breaks across lines in div\.s4-nav-rail-items/, 'a rail label squeezed by a FAB straight in the rail'],
   ['bad-fab-rail.html', /"Add Bill" is squeezed into a box \d+px wide, one glyph/, 'a box one glyph wide'],
+  ['bad-nav-pill.html', /the nav bar's highlight on "Settings" is a circle, not a rounded rectangle/, 'a nav bar highlight drawn as a circle'],
+  ['bad-nav-pill.html', /the label "Settings" sticks out of the nav bar's highlight/, 'a nav label poking out of its highlight'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
 ];
