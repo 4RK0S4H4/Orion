@@ -18,19 +18,19 @@ A 10 means: a top-tier professional team would ship it without reservations, che
 
 ## Status
 
-| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Target |
-|---|---|---|---|
-| Foundations | 9 | 8.5 | 10 |
-| Behaviour | 9 | 8 | 10 |
-| Accessibility | 8 | 7.5 | 10 |
-| App Components | 8 | 8.5 | 10 |
-| Visual Hierarchy | 6 | 7.5 | 10 |
-| Desktop Apps | 6 | 7.5 | 10 |
-| Websites | 4 | 7.5 | 10 |
-| Per-App Customization | 4 | 8 | 10 |
+| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Review 3 (11-22, c089ade) | Target |
+|---|---|---|---|---|
+| Foundations | 9 | 8.5 | 9 | 10 |
+| Behaviour | 9 | 8 | 8.5 | 10 |
+| Accessibility | 8 | 7.5 | 8.5 | 10 |
+| App Components | 8 | 8.5 | 9 | 10 |
+| Visual Hierarchy | 6 | 7.5 | 8.5 | 10 |
+| Desktop Apps | 6 | 7.5 | 8.5 | 10 |
+| Websites | 4 | 7.5 | 8.5 | 10 |
+| Per-App Customization | 4 | 8 | 9 | 10 |
 
 Review 1 is `explore/design-review.html` (issues 51-60). Review 2, with every blocker ranked and tagged, is
-[`history/round-0058/regrade-2.md`](history/round-0058/regrade-2.md). Review 2 was stricter on behaviour and
+[`history/round-0058/regrade-2.md`](history/round-0058/regrade-2.md). Review 3 is [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md); its Top 10 plans round 0059. Review 2 was stricter on behaviour and
 accessibility, so some scores fell although nothing got worse.
 
 ## How we work (owner's rules plus what we learned)
@@ -73,14 +73,20 @@ accessibility, so some scores fell although nothing got worse.
      `headings` dials.
    - Measured (B, gzip): site bundle 42.4 KB css + 26.4 KB js + 67.4 KB font + 36.9 KB icons = 173 KB (budget 180; the app bundle was 375 KB). Landing loads 185 KB over the network, docs 181 KB.
    - Then: A merged B, full tests green, the main session publishes, links to the owner.
-4. **Owner device pass — current stage** (needs the owner; runs alongside review 3): iPhone (dialog swipe and corners, docked hairline while scrolling, Linnea
-   and Parley at phone width, the rich inputs, real faces), a desktop (Parley's menu bar and shortcuts, Linnea's grid,
+4. **Owner device pass** (needs the owner; runs alongside round 0059, device bugs jump the queue): iPhone (dialog swipe and corners, modal-panel drag with the following scrim, docked hairline while scrolling, Linnea
+   and Parley at phone width, the rich inputs, subset Inter in Safari), a desktop (Parley's menu bar and shortcuts, Linnea's grid,
    the Electron example), VoiceOver on a dialog and the table. Device-only bugs come before anything new.
-5. **Review 3 — current stage, with the device pass**: an independent re-grade on the published round 0058. Anything under 10 becomes round 0059.
-6. **Round 0059+ until every area is 10**: likely remaining from review 2's "close behind": WebKit and Firefox runs in
-   CI or by hand, screen-reader passes, the Electron and Tauri shells run for real, print pagination, full bundle
-   weight for apps (split by component), more proof that a new app built from the skill alone looks bespoke (skill
-   evals).
+5. **Review 3** (done, c089ade, [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md)): 9 / 8.5 / 8.5 / 9 / 8.5 / 8.5 / 8.5 / 9; nothing a 10 yet.
+6. **Round 0059 — current stage**: review 3's Top 10, in two workstreams.
+   - **A** (branch `round59/a`, worktree `r59-a`, decision 0067, owns shared docs): dial values validated (dev warning
+     and page checker); grid header keys surfaced (hint, aria-description, README); 0049 wording for shortcut-opened
+     palettes; checker rules for mid-word breaks and one-glyph boxes proven on a known-bad page and added to evals; a
+     suite test for Back scroll restore; CHANGELOG dates for 1.0.0/1.1.0 (the main session tags at publish).
+   - **B** (branch `round59/b`, worktree `r59-b`, decision 0068, notes `history/round-0059/b.md`): Parley list column
+     wider and resizable; one filled selection per region (Parley, Mallet docs); wide-window emptiness (Tally, Showcase
+     at 1600); per-page icon subset for sites and a lower landing budget; app bundle split by component if it fits.
+   - Then A merges B, full tests, publish, review 4. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
+     run for real, print pagination, skill evals proving bespoke results.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 with a git tag and a re-packaged skill (CHANGELOG 1.0.0 and 1.1.0 are still "Unreleased").
 
