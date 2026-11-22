@@ -44,6 +44,13 @@
   document.addEventListener('keydown', function (e) { if (NAV_KEY.test(e.key) || ((e.metaKey || e.ctrlKey) && e.key.length === 1)) input('key'); }, true);
   document.addEventListener('pointerdown', function () { input('pointer'); }, true);
 
+  var layoutFns = [], layoutQueued = false;
+  function layoutChanged() {
+    if (layoutQueued) return; layoutQueued = true;
+    requestAnimationFrame(function () { layoutQueued = false; layoutFns.slice().forEach(function (f) { try { f(); } catch (e) { /* one script's failure never stops the rest */ } }); });
+  }
+  if (window.MutationObserver) new MutationObserver(layoutChanged).observe(root, { attributes: true, subtree: true, attributeFilter: ['dir', 'lang', 'data-scale', 'data-density', 'data-headings', 'data-corners', 'data-type-display', 'data-type-text', 'data-type-display-weight'] });
+
   /* ---------- small utilities ---------- */
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },
@@ -81,6 +88,10 @@
       var p; try { p = cb.writeText(String(text)); } catch (e) { return Promise.resolve(say(false)); }
       return Promise.resolve(p).then(function () { return say(true); }, function () { return say(false); });
     },
+    /* Decision 0073 (issue 77): a script that measures the layout once (the sliding ink and highlights) calls this to measure again
+       when something changes that no ResizeObserver sees: dir flipped on <html> or an ancestor (a live language switch), the
+       language, a type or density dial, or a theme change. fn runs once per frame at most, after the change has been laid out. */
+    onLayoutChange: function (fn) { layoutFns.push(fn); },
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }

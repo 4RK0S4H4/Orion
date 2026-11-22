@@ -119,5 +119,6 @@ S4.register('tabs', function (scope) {
     place(false);
     if ('ResizeObserver' in window) new ResizeObserver(function () { place(false); }).observe(list);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(false); });
+    S4.util.onLayoutChange(function () { if (list.isConnected) place(false); });   /* dir flipped after load (issue 77) */
   });
 });

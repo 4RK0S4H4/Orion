@@ -130,10 +130,28 @@
     --_fg: var(--md-sys-color-on-secondary-container);
     --_icon-fg: var(--md-sys-color-on-secondary-container);
   }
+  /* Issue 81 (owner, 2026-11-22): hover, focus and pressed answer on the same box the selected highlight has, never on the icon
+     alone. With the sliding highlight the item itself draws the state layer: the highlight's box (nav-bar.js writes its insets and
+     height per item), the same corner, a State fade; on the selected tab it lies on the highlight. No halo beyond that box. */
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--_hl-iy, 0px);
+    inset-inline: var(--_hl-ix, 0px);
+    z-index: -1;
+    border-radius: min(calc(var(--_hl-h, 0px) / 2), var(--s4-shape-nav-indicator), var(--_hl-cap, 9999px));
+    background: var(--_fg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--s4-motion-state);
+  }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::before { display: none; }
   @media (hover: hover) {
     .s4-nav-item:hover .s4-nav-indicator::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
-    :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-item[aria-current]:not([aria-current="false"]):hover .s4-nav-indicator::before { opacity: 0; }
+    :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
   }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
   .s4-nav-item:focus-visible .s4-nav-indicator::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
   .s4-nav-item:active .s4-nav-indicator::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
   /* focus ring around the indicator, not the whole cell */
@@ -143,7 +161,7 @@
   }
   .s4-nav-label {
     max-inline-size: 100%;
-    overflow-wrap: anywhere;   /* a destination's name is never cut: the label wraps and the bar grows */
+    overflow-wrap: normal;     /* a destination's name is never cut, not even at 200% text (issue 78): it wraps between words and the item is as wide as its longest word */
     text-align: center;
   }
   /* badge slot: top-end of the icon */
@@ -164,6 +182,7 @@
   .s4-nav-bar > .s4-nav-item {
     flex: 1 1 0;
     block-size: max-content;                 /* a long label wraps and the bar grows */
+    min-inline-size: min-content;            /* ...and a word is never split: the item is at least its longest word (issue 78) */
     min-block-size: var(--s4-size-nav-bar);
     padding: var(--s4-space-3) var(--s4-space-1) var(--s4-space-4);
   }

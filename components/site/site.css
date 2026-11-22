@@ -107,7 +107,7 @@
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
     text-decoration: none;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* the name is whole at any text size (issue 78) */
   }
   .s4-site-logo-mark { flex: none; }
   .s4-site-logo :where(img, svg) { block-size: var(--s4-size-icon-large); inline-size: auto; }
@@ -628,7 +628,7 @@
   }
   .s4-logos > ul {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(calc(50% - var(--s4-space-2)), 8em)), 1fr));   /* two a row; one with large text, so no name is split (issue 78) */
     gap: var(--s4-space-6) var(--s4-space-4);
     margin: 0;
     padding: 0;

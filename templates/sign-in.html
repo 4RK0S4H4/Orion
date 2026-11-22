@@ -15,7 +15,7 @@
      problem in the accent, lighting hold by hold as the form is filled in) and the busy meter. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('overhang-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=7edd53c">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=b402088">
 <link rel="stylesheet" href="brand/sign-in.css?v=78c1970">
 <style>
   /* Overhang's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -48,7 +48,7 @@
   .oh-art .tape-text { fill: var(--md-sys-color-surface-container-lowest); font-family: var(--md-sys-typescale-label-small-font); font-size: var(--md-sys-typescale-label-small-size); font-weight: 700; }
 
   .oh-mark { display: grid; gap: var(--s4-space-2); }
-  .oh-word { margin: 0; font-family: var(--md-sys-typescale-display-large-font); font-size: var(--md-sys-typescale-display-medium-size); line-height: .9; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+  .oh-word { margin: 0; font-family: var(--md-sys-typescale-display-large-font); font-size: min(var(--md-sys-typescale-display-medium-size), 12.5vw); line-height: .9; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
   .oh-word span { color: var(--md-sys-color-primary); }
   .oh-where { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-emphasized-label-large-weight, 600); }
   @container s4-app (width >= 840px) { .oh-word { font-size: var(--md-sys-typescale-display-large-size); } }
@@ -151,7 +151,7 @@
   </div>
 </div>
 <script src="../components/assets/icons.js?v=90a5120"></script>
-<script src="../components/orion.core.min.js?v=3340a37"></script>
+<script src="../components/orion.core.min.js?v=2667f1a"></script>
 <script>
 /* Overhang's brand, under its own key: magenta over the dials set on <html>. */
 var CONDENSED = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();

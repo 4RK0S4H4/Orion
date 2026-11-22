@@ -57,6 +57,12 @@ notes, not committed.
   colors; the pagination arrows were reported too, but their 44px was the 48px touch-target pseudo-element, not content
   (found by QA pass 1). Rule: the page checker and suite fail a button, link, tab or chip whose content (not its hit
   area) sticks out of its box.
+- **81.** Open (round 0062; owner, 2026-11-22). Nav bar hover: "When hovering over a nav bar tab I notice that only the icon
+  gets a chip hover effect. I actually prefer if the hover effect was basically the size of the selected tab that way it's
+  consistent." Root: the state layer lived on the 56x32 icon indicator while the selected highlight is the box round icon
+  and label. Now an item draws its hover, focus and pressed layer on exactly the highlight's box (same size, corner and
+  inset, at every width; the rail's rows already were); a selected tab layers its state on the highlight. Rule: the page
+  checker fails a layer that is not the highlight's box within 1px (two known-bad fixtures).
 
 ## Owner notes (2026-11-22)
 

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Icon Chip Hover</title>
+<!-- Known-bad fixture (issue 81, decision 0073). tests/checker.mjs expects the page checker to FAIL this page with the
+     message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires.
+     The hover layer is the icon's own chip again (what the nav bar drew until 2026-11-22), not the selected highlight's box. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .s4-nav-bar .s4-nav-indicator { display: inline-grid; }
+  .s4-nav-bar .s4-nav-indicator::before { display: block; }
+</style>
+</head>
+<body>
+<nav class="s4-nav-bar" aria-label="Main" style="inline-size: 340px">
+  <a class="s4-nav-item" href="#home"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+  <a class="s4-nav-item" href="#board"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="columns"></span></span><span class="s4-nav-label">Board</span></a>
+  <a class="s4-nav-item" href="#controls"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Controls</span></a>
+  <a class="s4-nav-item" href="#forms"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="edit"></span></span><span class="s4-nav-label">Forms</span></a>
+  <a class="s4-nav-item" href="#settings" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+</nav>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

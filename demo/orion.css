@@ -3915,10 +3915,28 @@
     --_fg: var(--md-sys-color-on-secondary-container);
     --_icon-fg: var(--md-sys-color-on-secondary-container);
   }
+  /* Issue 81 (owner, 2026-11-22): hover, focus and pressed answer on the same box the selected highlight has, never on the icon
+     alone. With the sliding highlight the item itself draws the state layer: the highlight's box (nav-bar.js writes its insets and
+     height per item), the same corner, a State fade; on the selected tab it lies on the highlight. No halo beyond that box. */
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item::before {
+    content: "";
+    position: absolute;
+    inset-block: var(--_hl-iy, 0px);
+    inset-inline: var(--_hl-ix, 0px);
+    z-index: -1;
+    border-radius: min(calc(var(--_hl-h, 0px) / 2), var(--s4-shape-nav-indicator), var(--_hl-cap, 9999px));
+    background: var(--_fg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--s4-motion-state);
+  }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::before { display: none; }
   @media (hover: hover) {
     .s4-nav-item:hover .s4-nav-indicator::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
-    :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-item[aria-current]:not([aria-current="false"]):hover .s4-nav-indicator::before { opacity: 0; }
+    :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:hover::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
   }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:focus-visible::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+  :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item:active::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
   .s4-nav-item:focus-visible .s4-nav-indicator::before { opacity: var(--md-sys-state-focus-state-layer-opacity); }
   .s4-nav-item:active .s4-nav-indicator::before { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
   /* focus ring around the indicator, not the whole cell */
@@ -3928,7 +3946,7 @@
   }
   .s4-nav-label {
     max-inline-size: 100%;
-    overflow-wrap: anywhere;   /* a destination's name is never cut: the label wraps and the bar grows */
+    overflow-wrap: normal;     /* a destination's name is never cut, not even at 200% text (issue 78): it wraps between words and the item is as wide as its longest word */
     text-align: center;
   }
   /* badge slot: top-end of the icon */
@@ -3949,6 +3967,7 @@
   .s4-nav-bar > .s4-nav-item {
     flex: 1 1 0;
     block-size: max-content;                 /* a long label wraps and the bar grows */
+    min-inline-size: min-content;            /* ...and a word is never split: the item is at least its longest word (issue 78) */
     min-block-size: var(--s4-size-nav-bar);
     padding: var(--s4-space-3) var(--s4-space-1) var(--s4-space-4);
   }
@@ -5693,8 +5712,9 @@
     --_radius: var(--md-sys-shape-corner-large);   /* decision 0025: no sharp corners, so hover and press layers are rounded too */
 
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s4-space-4);
+    gap: var(--s4-space-2) var(--s4-space-4);
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
@@ -5715,6 +5735,11 @@
     text-decoration: none;
     transition:
       background-color var(--s4-motion-state), color var(--s4-motion-state);
+  }
+  /* a 320-wide screen (decision 0073, issue 75): a row spends a third of its width on gaps and insets, so a checkbox or
+     avatar, a count and a 12-letter word did not fit; tighter gaps give the words their room back at every text size */
+  @media (width < 360px) {
+    .s4-list-item { column-gap: var(--s4-space-3); padding-inline-end: var(--s4-space-3); }
   }
   :is(a, button, label).s4-list-item,
   .s4-list-item[tabindex] { cursor: pointer; user-select: none; }
@@ -5780,7 +5805,7 @@
 
   .s4-list-content {
     display: flex;
-    flex: 1 1 auto;
+    flex: 1 1 6em;   /* a row whose headline would get less than six ems lets the trailing slot move under it (issue 79) */
     flex-direction: column;
     justify-content: center;
     min-width: 0;
@@ -5821,7 +5846,13 @@
     letter-spacing: var(--md-sys-typescale-label-small-tracking);
     font-weight: var(--md-sys-typescale-label-small-weight);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    /* long text in the slot (a status, a tag, a note) wraps inside the row and, when the row is cramped, moves under the
+       headline; it never widens the page (decision 0073, issue 79). Amounts and counts stay on one line (.s4-list-amount, .s4-num). */
+    flex: 0 1 auto;
+    max-inline-size: 100%;
+    margin-inline-start: auto;
+    text-align: end;
+    overflow-wrap: anywhere;
   }
   .s4-list-amount {
     color: var(--_fg);
@@ -6638,7 +6669,7 @@
     padding: 0 var(--s4-space-4);
     text-align: start;
     vertical-align: middle;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* a word is never split to squeeze a column (issue 78): the column keeps its longest word and the table scrolls in its wrap */
   }
   .s4-table :is(th, td):is(.s4-num, .num) { white-space: nowrap; }
   .s4-table th {
@@ -6794,9 +6825,10 @@
     .s4-table tfoot tr { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
     .s4-table :is(tbody, tfoot) :is(td, th) {
       display: flex;
+      flex-wrap: wrap;   /* a value too long for the rest of the line moves under its label instead of being split (issue 78) */
       align-items: baseline;
       justify-content: space-between;
-      gap: var(--s4-space-4);
+      gap: var(--s4-space-1) var(--s4-space-4);
       height: auto;
       min-height: var(--s4-space-6);
       padding: 0;
@@ -7162,7 +7194,7 @@
     /* paper has its own width: the columns share it, and nothing is pinned (also when a phone-width screen had stacked the rows, so there was no fixed layout) */
     /* resizable data tables have many columns: on paper they share the width equally (auto layout kept each cell's padding and longest word, wider than the sheet) */
     .s4-table:is([data-fixed], [data-s4-cols]) { table-layout: fixed; inline-size: 100%; }
-    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td) { white-space: normal; overflow-wrap: anywhere; }
+    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td) { white-space: normal; overflow-wrap: break-word; }
     .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td)[data-pin] { position: static; }
     .s4-table:is([data-fixed], [data-s4-cols]) > colgroup { display: none; }
     .s4-table :is(th, td):is([data-check], [data-row-expand], [data-row-actions]) { display: none; }
@@ -7315,10 +7347,11 @@
     line-height: var(--md-sys-typescale-body-small-line-height);
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
   }
-  /* a row of stats: as many as fit, at least two per row even on a phone */
+  /* a row of stats: as many as fit, at least two per row even on a phone; with larger text a column is at least 8em, so a figure
+     or a label is never squeezed into a box narrower than its words (issue 78: one per row at 200% text on a 320 screen) */
   .s4-stat-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(var(--s4-stat-min, 160px), calc(50% - var(--s4-space-2))), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(min(var(--s4-stat-min, 160px), calc(50% - var(--s4-space-2))), 8em)), 1fr));
     gap: var(--s4-space-6) var(--s4-space-4);
   }
 }
@@ -8638,7 +8671,7 @@
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
     text-decoration: none;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* the name is whole at any text size (issue 78) */
   }
   .s4-site-logo-mark { flex: none; }
   .s4-site-logo :where(img, svg) { block-size: var(--s4-size-icon-large); inline-size: auto; }
@@ -9159,7 +9192,7 @@
   }
   .s4-logos > ul {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(calc(50% - var(--s4-space-2)), 8em)), 1fr));   /* two a row; one with large text, so no name is split (issue 78) */
     gap: var(--s4-space-6) var(--s4-space-4);
     margin: 0;
     padding: 0;
@@ -10237,10 +10270,10 @@
   .s4-upload-list { display: flex; flex-direction: column; gap: var(--s4-space-2); margin: var(--s4-space-3) 0 0; padding: 0; list-style: none; }
   .s4-upload-list:empty { display: none; }
   .s4-upload-item {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
+    flex-wrap: wrap;   /* the file's name keeps at least 7em; at a big text size the actions move under it (issue 79) */
     align-items: center;
-    gap: var(--s4-space-3);
+    gap: var(--s4-space-2) var(--s4-space-3);
     min-block-size: var(--s4-size-touch-target);
     padding: var(--s4-space-2);
     border-radius: var(--md-sys-shape-corner-large);
@@ -10258,7 +10291,7 @@
     color: var(--md-sys-color-on-secondary-container);
   }
   .s4-upload-thumb > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
-  .s4-upload-text { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); min-inline-size: 0; }
+  .s4-upload-text { display: flex; flex: 1 1 7em; flex-direction: column; gap: calc(var(--s4-space-1) / 2); min-inline-size: 0; }
   .s4-upload-name {
     overflow-wrap: anywhere;
     font-family: var(--md-sys-typescale-body-medium-font);
@@ -10277,7 +10310,7 @@
   }
   .s4-upload-progress { margin-block-start: var(--s4-space-1); }
   .s4-upload-progress[hidden] { display: none; }
-  .s4-upload-actions { display: flex; align-items: center; }
+  .s4-upload-actions { display: flex; flex: none; align-items: center; margin-inline-start: auto; }
   .s4-upload-item[data-state="error"] .s4-upload-meta { color: var(--md-sys-color-error); }
   .s4-upload-item[data-state="error"] .s4-upload-thumb { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
   .s4-upload-item[data-state="done"] .s4-upload-meta { color: var(--s4-color-success); }

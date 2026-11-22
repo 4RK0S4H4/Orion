@@ -110,10 +110,10 @@
   .s4-upload-list { display: flex; flex-direction: column; gap: var(--s4-space-2); margin: var(--s4-space-3) 0 0; padding: 0; list-style: none; }
   .s4-upload-list:empty { display: none; }
   .s4-upload-item {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
+    flex-wrap: wrap;   /* the file's name keeps at least 7em; at a big text size the actions move under it (issue 79) */
     align-items: center;
-    gap: var(--s4-space-3);
+    gap: var(--s4-space-2) var(--s4-space-3);
     min-block-size: var(--s4-size-touch-target);
     padding: var(--s4-space-2);
     border-radius: var(--md-sys-shape-corner-large);
@@ -131,7 +131,7 @@
     color: var(--md-sys-color-on-secondary-container);
   }
   .s4-upload-thumb > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
-  .s4-upload-text { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); min-inline-size: 0; }
+  .s4-upload-text { display: flex; flex: 1 1 7em; flex-direction: column; gap: calc(var(--s4-space-1) / 2); min-inline-size: 0; }
   .s4-upload-name {
     overflow-wrap: anywhere;
     font-family: var(--md-sys-typescale-body-medium-font);
@@ -150,7 +150,7 @@
   }
   .s4-upload-progress { margin-block-start: var(--s4-space-1); }
   .s4-upload-progress[hidden] { display: none; }
-  .s4-upload-actions { display: flex; align-items: center; }
+  .s4-upload-actions { display: flex; flex: none; align-items: center; margin-inline-start: auto; }
   .s4-upload-item[data-state="error"] .s4-upload-meta { color: var(--md-sys-color-error); }
   .s4-upload-item[data-state="error"] .s4-upload-thumb { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
   .s4-upload-item[data-state="done"] .s4-upload-meta { color: var(--s4-color-success); }

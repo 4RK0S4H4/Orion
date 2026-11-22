@@ -53,10 +53,11 @@
     line-height: var(--md-sys-typescale-body-small-line-height);
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
   }
-  /* a row of stats: as many as fit, at least two per row even on a phone */
+  /* a row of stats: as many as fit, at least two per row even on a phone; with larger text a column is at least 8em, so a figure
+     or a label is never squeezed into a box narrower than its words (issue 78: one per row at 200% text on a 320 screen) */
   .s4-stat-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(var(--s4-stat-min, 160px), calc(50% - var(--s4-space-2))), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, max(min(var(--s4-stat-min, 160px), calc(50% - var(--s4-space-2))), 8em)), 1fr));
     gap: var(--s4-space-6) var(--s4-space-4);
   }
 }

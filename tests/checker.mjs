@@ -7,6 +7,7 @@
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
      bad-nav-pill.html  five destinations at 390 with the highlight's corner at half its height: a circle "Settings" pokes out of
      bad-dial.html      data-scale="roomy" and data-corners="square" on <html>
+     bad-nav-hover.html / bad-nav-hover-box.html  a tab's hover layer that is the icon chip, or narrower than the selected highlight (issue 81)
      bad-rail-motion.html  a rail whose labels follow its moving edge and wrap mid-motion (issue 70)
      bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
@@ -29,6 +30,8 @@ const CASES = [
   ['bad-fab-rail.html', /"Add Bill" is squeezed into a box \d+px wide, one glyph/, 'a box one glyph wide'],
   ['bad-nav-pill.html', /the nav bar's highlight on "Settings" is a circle, not a rounded rectangle/, 'a nav bar highlight drawn as a circle'],
   ['bad-nav-pill.html', /the label "Settings" sticks out of the nav bar's highlight/, 'a nav label poking out of its highlight'],
+  ['bad-nav-hover.html', /the state layer of "Settings" is the icon's own chip/, 'a nav tab hover layer drawn as the icon chip'],
+  ['bad-nav-hover-box.html', /the hover layer of "Settings" is \d+x\d+ at -?\d+,-?\d+ from the selected highlight/, 'a nav tab hover layer narrower than the selected highlight'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
   ['bad-rail-motion.html', /mid-motion \(rail [a-z ]+, (25|50|75)%\): "(Scripts|Starred|Translations)" breaks across lines/, 'rail labels that wrap while the rail widens'],

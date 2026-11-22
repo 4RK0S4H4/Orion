@@ -11,7 +11,7 @@
        loud           a status drawn as a fill rather than a tint (more than 2:1 against the surface it sits on): a
                       status is a tint, and only the state that needs action now is warm (error, warning)
        nav            a nav bar highlight (icon over label) that is a circle, or that a corner of its label pokes out of
-                      (round 0061)
+                      (round 0061), or a hover layer that is not the selected highlight's box (issue 81)
        overfull       a button, link, tab, chip or pagination control whose content is wider than its own box
                       (scrollWidth > clientWidth + 1) and is not clipped or scrolled on purpose: a ring or a forced-colors
                       outline drawn at the edge clips, and a hit area that is smaller than what it holds misleads (decision 0073)
@@ -146,6 +146,23 @@ export function silentAudit() {
       return Math.hypot(x - cx, y - cy) <= rad + t;
     };
     if (![[l.left, l.top], [l.right, l.top], [l.left, l.bottom], [l.right, l.bottom]].every(([x, y]) => inside(x, y))) out.nav.push(`the label ${name} sticks out of the nav bar's highlight (label ${Math.round(l.width)}x${Math.round(l.height)}, highlight ${Math.round(p.width)}x${Math.round(p.height)}, corner ${Math.round(rad)}px) in ${path(bar)}`);
+  }
+
+  /* the state layer of a tab is the selected highlight's box (issue 81, decision 0073): hover, focus and press fill the same
+     rectangle the sliding highlight fills, never the icon alone. Read from the layer's computed box, so no pointer is needed. */
+  for (const pill of document.querySelectorAll('.s4-nav-bar > .s4-nav-pill, .s4-nav-rail-items > .s4-nav-pill')) {
+    const box = pill.parentElement, cur = box.querySelector('.s4-nav-item[aria-current]:not([aria-current="false"])');
+    if (!cur || skip(box) || !shown(pill) || !shown(cur)) continue;
+    const name = `"${(cur.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 20)}"`;
+    const chip = getComputedStyle(cur.querySelector('.s4-nav-indicator') || cur, '::before');
+    if (cur.querySelector('.s4-nav-indicator') && chip.content !== 'none' && chip.display !== 'none' && getComputedStyle(cur.querySelector('.s4-nav-indicator')).display !== 'contents')
+      out.nav.push(`the state layer of ${name} is the icon's own chip (${chip.width} by ${chip.height}), not the highlight's box in ${path(box)} (issue 81)`);
+    const cs = getComputedStyle(cur, '::before');
+    if (cs.content === 'none' || cs.position !== 'absolute') { out.nav.push(`the tab ${name} has no state layer on the highlight's box in ${path(box)} (issue 81)`); continue; }
+    const ir = cur.getBoundingClientRect(), p = pill.getBoundingClientRect();
+    const L = ir.left + cur.clientLeft + parseFloat(cs.left), T = ir.top + cur.clientTop + parseFloat(cs.top), W = parseFloat(cs.width), H = parseFloat(cs.height);
+    const d = Math.max(Math.abs(L - p.left), Math.abs(T - p.top), Math.abs(W - p.width), Math.abs(H - p.height));
+    if (!(d <= 1)) out.nav.push(`the hover layer of ${name} is ${Math.round(W)}x${Math.round(H)} at ${Math.round(L - p.left)},${Math.round(T - p.top)} from the selected highlight (${Math.round(p.width)}x${Math.round(p.height)}); it must be the same box within 1px in ${path(box)} (issue 81)`);
   }
 
   /* parts outside the component they belong to */

@@ -64,7 +64,7 @@
     padding: 0 var(--s4-space-4);
     text-align: start;
     vertical-align: middle;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* a word is never split to squeeze a column (issue 78): the column keeps its longest word and the table scrolls in its wrap */
   }
   .s4-table :is(th, td):is(.s4-num, .num) { white-space: nowrap; }
   .s4-table th {
@@ -220,9 +220,10 @@
     .s4-table tfoot tr { border-block-start: var(--s4-size-divider) solid var(--md-sys-color-outline-variant); }
     .s4-table :is(tbody, tfoot) :is(td, th) {
       display: flex;
+      flex-wrap: wrap;   /* a value too long for the rest of the line moves under its label instead of being split (issue 78) */
       align-items: baseline;
       justify-content: space-between;
-      gap: var(--s4-space-4);
+      gap: var(--s4-space-1) var(--s4-space-4);
       height: auto;
       min-height: var(--s4-space-6);
       padding: 0;
@@ -588,7 +589,7 @@
     /* paper has its own width: the columns share it, and nothing is pinned (also when a phone-width screen had stacked the rows, so there was no fixed layout) */
     /* resizable data tables have many columns: on paper they share the width equally (auto layout kept each cell's padding and longest word, wider than the sheet) */
     .s4-table:is([data-fixed], [data-s4-cols]) { table-layout: fixed; inline-size: 100%; }
-    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td) { white-space: normal; overflow-wrap: anywhere; }
+    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td) { white-space: normal; overflow-wrap: break-word; }
     .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td)[data-pin] { position: static; }
     .s4-table:is([data-fixed], [data-s4-cols]) > colgroup { display: none; }
     .s4-table :is(th, td):is([data-check], [data-row-expand], [data-row-actions]) { display: none; }

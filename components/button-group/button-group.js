@@ -131,5 +131,6 @@ S4.register('button-group', function (scope) {
     }
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(false); });
     document.addEventListener('s4-theme', function () { requestAnimationFrame(function () { place(false); }); });
+    S4.util.onLayoutChange(function () { if (g.isConnected) place(false); });   /* dir flipped after load: the pill is measured again (issue 77) */
   }
 });

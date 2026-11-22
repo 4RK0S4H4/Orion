@@ -38,8 +38,9 @@
     --_radius: var(--md-sys-shape-corner-large);   /* decision 0025: no sharp corners, so hover and press layers are rounded too */
 
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s4-space-4);
+    gap: var(--s4-space-2) var(--s4-space-4);
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
@@ -64,7 +65,7 @@
   /* a 320-wide screen (decision 0073, issue 75): a row spends a third of its width on gaps and insets, so a checkbox or
      avatar, a count and a 12-letter word did not fit; tighter gaps give the words their room back at every text size */
   @media (width < 360px) {
-    .s4-list-item { gap: var(--s4-space-3); padding-inline-end: var(--s4-space-3); }
+    .s4-list-item { column-gap: var(--s4-space-3); padding-inline-end: var(--s4-space-3); }
   }
   :is(a, button, label).s4-list-item,
   .s4-list-item[tabindex] { cursor: pointer; user-select: none; }
@@ -130,7 +131,7 @@
 
   .s4-list-content {
     display: flex;
-    flex: 1 1 auto;
+    flex: 1 1 6em;   /* a row whose headline would get less than six ems lets the trailing slot move under it (issue 79) */
     flex-direction: column;
     justify-content: center;
     min-width: 0;
@@ -171,7 +172,13 @@
     letter-spacing: var(--md-sys-typescale-label-small-tracking);
     font-weight: var(--md-sys-typescale-label-small-weight);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    /* long text in the slot (a status, a tag, a note) wraps inside the row and, when the row is cramped, moves under the
+       headline; it never widens the page (decision 0073, issue 79). Amounts and counts stay on one line (.s4-list-amount, .s4-num). */
+    flex: 0 1 auto;
+    max-inline-size: 100%;
+    margin-inline-start: auto;
+    text-align: end;
+    overflow-wrap: anywhere;
   }
   .s4-list-amount {
     color: var(--_fg);

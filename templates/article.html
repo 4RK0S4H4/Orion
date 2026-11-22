@@ -16,11 +16,11 @@
      the city: a value, decision 0059) with the phases drawn as discs, and the countdown. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('penumbra-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=7edd53c">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=b402088">
 <link rel="stylesheet" href="brand/article.css?v=d920f80">
 <style>
   /* Penumbra's own layout and elements: tokens only; nothing here restyles an Orion component */
-  .pn-main { display: grid; gap: var(--s4-space-6); min-inline-size: 0; }
+  .pn-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-6); min-inline-size: 0; }
 
   /* ---------- the sky: a scoped dark block; the drawing is decoration, the caption says what it shows ---------- */
   .pn-sky-art { position: relative; aspect-ratio: 16 / 10; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); overflow: hidden; }
@@ -45,7 +45,7 @@
 
   /* ---------- totality by place: a bar a city, its length written beside it ---------- */
   .pn-dur { display: grid; gap: var(--s4-space-3); margin: 0; padding: var(--s4-space-4) var(--s4-space-5); list-style: none; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); }
-  .pn-dur li { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr) 5.5rem; align-items: center; gap: var(--s4-space-3); margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .pn-dur li { display: grid; grid-template-columns: minmax(0, 6.5rem) minmax(1rem, 1fr) minmax(0, 5.5rem); align-items: center; gap: var(--s4-space-3); margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   .pn-dur li + li { margin: 0; }
   .pn-dur i { block-size: var(--s4-space-3); inline-size: calc(var(--d) / 383 * 100%); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline); }
   .pn-dur li[data-best] i { background: var(--md-sys-color-primary); }
@@ -198,7 +198,7 @@
   </div>
 </div>
 <script src="../components/assets/icons.js?v=90a5120"></script>
-<script src="../components/orion.core.min.js?v=3340a37"></script>
+<script src="../components/orion.core.min.js?v=2667f1a"></script>
 <script>
 /* Penumbra's brand, under its own key: corona gold over the dials set on <html>. */
 var DIDONE = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();
