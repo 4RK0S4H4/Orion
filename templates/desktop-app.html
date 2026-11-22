@@ -22,7 +22,7 @@
      game's dialogue box, which shows when a translation is too long for it), the length meter, placeholder pills,
      translation-memory matches with their percentage, language progress. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=13dfbdb">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=7edd53c">
 <link rel="stylesheet" href="../components/orion.commands.min.css?v=95e98da">
 <link rel="stylesheet" href="../components/orion.desktop.min.css?v=34025ca">
 <link rel="stylesheet" href="../components/orion.direct.min.css?v=a0c88f7">
@@ -367,11 +367,11 @@
 </div>
 
 <script src="../components/assets/icons.js?v=90a5120"></script>
-<script src="../components/orion.core.min.js?v=f924641"></script>
+<script src="../components/orion.core.min.js?v=3340a37"></script>
 <script src="../components/orion.commands.min.js?v=584c847"></script>
 <script src="../components/orion.desktop.min.js?v=f4a99b5"></script>
 <script src="../components/orion.direct.min.js?v=ebca165"></script>
-<script src="../components/orion.inputs.min.js?v=b9659b6"></script>
+<script src="../components/orion.inputs.min.js?v=49798a0"></script>
 <script>
 /* Parley's look: vermilion (fidelity: the signal color itself, not a muted cousin) on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e4572e', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -570,7 +570,7 @@ S4.commands.add([
     if ($('set-split').querySelector('[data-setting="Move on after approving"]').checked) step(1, true); } },
   { id: 'string.review', label: 'Mark For Review', group: 'Line', icon: 'warning', enabled: function () { return !!current && current.status !== 'review'; }, run: function (ctx) { var l = rowLine(ctx) || current, was = l.status; l.status = 'review'; renderList(); S4.snackbar({ text: 'Marked for review', action: 'Undo', onAction: function () { l.status = was; renderList(); } }); } },
   { id: 'string.copySource', label: 'Copy Source To Translation', group: 'Line', icon: 'copy', shortcut: 'mod+shift+c', run: function () { $('d-target').value = current.src; $('d-target').dispatchEvent(new Event('input')); } },
-  { id: 'string.copyKey', label: 'Copy Key', group: 'Line', icon: 'link', run: function (ctx) { var l = rowLine(ctx) || current; if (navigator.clipboard) navigator.clipboard.writeText(l.key).catch(function () {}); S4.snackbar({ text: 'Copied ' + l.key }); } },
+  { id: 'string.copyKey', label: 'Copy Key', group: 'Line', icon: 'link', run: function (ctx) { var l = rowLine(ctx) || current; S4.util.copy(l.key, { done: 'Copied ' + l.key }); } },
   { id: 'string.next', label: 'Next Untranslated', group: 'Line', icon: 'forward', shortcut: 'mod+j', run: function () { S4.app.go(app, 'strings'); step(1, true); } },
   { id: 'string.prev', label: 'Previous Line', group: 'Line', icon: 'back', shortcut: 'mod+shift+j', run: function () { step(-1, false); } },
   { id: 'ph.player', label: '{player}', palette: false, run: function () { insert('{player}'); } },

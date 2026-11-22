@@ -570,7 +570,7 @@ S4.commands.add([
     if ($('set-split').querySelector('[data-setting="Move on after approving"]').checked) step(1, true); } },
   { id: 'string.review', label: 'Mark For Review', group: 'Line', icon: 'warning', enabled: function () { return !!current && current.status !== 'review'; }, run: function (ctx) { var l = rowLine(ctx) || current, was = l.status; l.status = 'review'; renderList(); S4.snackbar({ text: 'Marked for review', action: 'Undo', onAction: function () { l.status = was; renderList(); } }); } },
   { id: 'string.copySource', label: 'Copy Source To Translation', group: 'Line', icon: 'copy', shortcut: 'mod+shift+c', run: function () { $('d-target').value = current.src; $('d-target').dispatchEvent(new Event('input')); } },
-  { id: 'string.copyKey', label: 'Copy Key', group: 'Line', icon: 'link', run: function (ctx) { var l = rowLine(ctx) || current; if (navigator.clipboard) navigator.clipboard.writeText(l.key).catch(function () {}); S4.snackbar({ text: 'Copied ' + l.key }); } },
+  { id: 'string.copyKey', label: 'Copy Key', group: 'Line', icon: 'link', run: function (ctx) { var l = rowLine(ctx) || current; S4.util.copy(l.key, { done: 'Copied ' + l.key }); } },
   { id: 'string.next', label: 'Next Untranslated', group: 'Line', icon: 'forward', shortcut: 'mod+j', run: function () { S4.app.go(app, 'strings'); step(1, true); } },
   { id: 'string.prev', label: 'Previous Line', group: 'Line', icon: 'back', shortcut: 'mod+shift+j', run: function () { step(-1, false); } },
   { id: 'ph.player', label: '{player}', palette: false, run: function () { insert('{player}'); } },

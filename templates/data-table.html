@@ -16,7 +16,7 @@
      state in the address, the filters tool panel (decision 0054), pages for a record (decision 0050), states, charts. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=13dfbdb">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=7edd53c">
 <link rel="stylesheet" href="../components/orion.data.min.css?v=15b1a8b">
 <link rel="stylesheet" href="../components/orion.direct.min.css?v=a0c88f7">
 <link rel="stylesheet" href="../components/orion.inputs.min.css?v=5b846da">
@@ -309,10 +309,10 @@
 </dialog>
 
 <script src="../components/assets/icons.js?v=90a5120"></script>
-<script src="../components/orion.core.min.js?v=f924641"></script>
-<script src="../components/orion.data.min.js?v=da516a5"></script>
+<script src="../components/orion.core.min.js?v=3340a37"></script>
+<script src="../components/orion.data.min.js?v=3668d7e"></script>
 <script src="../components/orion.direct.min.js?v=ebca165"></script>
-<script src="../components/orion.inputs.min.js?v=b9659b6"></script>
+<script src="../components/orion.inputs.min.js?v=49798a0"></script>
 <script>
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#24573f', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
 
@@ -422,7 +422,7 @@ tableEl.addEventListener('s4-row-action', function (e) {
   var r = e.detail.row, a = e.detail.action;
   if (a === 'open') S4.pages.open(document.querySelector('.s4-app'), 'record', { id: r.id, title: r.catalogue });
   else if (a === 'conserve') conserve([r]);
-  else if (a === 'copy') { if (navigator.clipboard) navigator.clipboard.writeText(r.catalogue).catch(function () {}); S4.snackbar(r.catalogue + ' copied'); }
+  else if (a === 'copy') S4.util.copy(r.catalogue, { done: r.catalogue + ' copied' });
   else if (a === 'delete') remove([r.id]);
 });
 document.getElementById('ln-conserve').addEventListener('click', function () { var sel = table.selectedRows(); table.clear(); conserve(sel); });

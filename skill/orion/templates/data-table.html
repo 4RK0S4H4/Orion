@@ -422,7 +422,7 @@ tableEl.addEventListener('s4-row-action', function (e) {
   var r = e.detail.row, a = e.detail.action;
   if (a === 'open') S4.pages.open(document.querySelector('.s4-app'), 'record', { id: r.id, title: r.catalogue });
   else if (a === 'conserve') conserve([r]);
-  else if (a === 'copy') { if (navigator.clipboard) navigator.clipboard.writeText(r.catalogue).catch(function () {}); S4.snackbar(r.catalogue + ' copied'); }
+  else if (a === 'copy') S4.util.copy(r.catalogue, { done: r.catalogue + ' copied' });
   else if (a === 'delete') remove([r.id]);
 });
 document.getElementById('ln-conserve').addEventListener('click', function () { var sel = table.selectedRows(); table.clear(); conserve(sel); });

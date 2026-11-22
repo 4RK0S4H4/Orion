@@ -3,7 +3,7 @@
    the page (pass it to page.evaluate); none of them changes the page.
      knownClasses()   async: every s4- name the page's stylesheets and scripts know (Orion's and the app's own), kept on
                       window.__s4known for the audit below
-     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...], nav: [...] }
+     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...], nav: [...], overfull: [...] }
        unknown        an s4- class nothing defines (a misremembered name such as .s4-card-content styles nothing)
        broken         a word split across lines, or a box one glyph wide (a column too narrow for its words: a table
                       that cannot stack, a FAB squeezed into a rail)
@@ -11,7 +11,12 @@
        loud           a status drawn as a fill rather than a tint (more than 2:1 against the surface it sits on): a
                       status is a tint, and only the state that needs action now is warm (error, warning)
        nav            a nav bar highlight (icon over label) that is a circle, or that a corner of its label pokes out of
-                      (round 0061) */
+                      (round 0061)
+       overfull       a button, link, tab, chip or pagination control whose content is wider than its own box
+                      (scrollWidth > clientWidth + 1) and is not clipped or scrolled on purpose: a ring or a forced-colors
+                      outline drawn at the edge clips, and a hit area that is smaller than what it holds misleads (decision 0073)
+   Words that may truncate (decision 0058: the timeline label, top app bar title, title bar title, text field value and date
+   value) never count as split: they stay on one line behind an ellipsis. */
 
 export async function knownClasses() {
   const set = new Set();
@@ -27,7 +32,8 @@ export async function knownClasses() {
 }
 
 export function silentAudit() {
-  const out = { unknown: [], broken: [], container: [], loud: [], nav: [] };
+  const out = { unknown: [], broken: [], container: [], loud: [], nav: [], overfull: [] };
+  const TRUNCATES = '.s4-timeline-label, .s4-app-bar-title, .s4-app-bar-collapsed-title, .s4-titlebar-title, .s4-date-picker-value';   /* the five places (decision 0058) */
   const known = new Set(window.__s4known || []);
   const skip = (e) => !!e.closest('[data-s4-skip], iframe, template, pre, code, .s4-code, svg, [hidden], [inert], [aria-hidden="true"], .s4-visually-hidden');
   const shown = (e) => { const r = e.getBoundingClientRect(); if (!(r.width > 0 && r.height > 0)) return false; return e.checkVisibility ? e.checkVisibility({ opacityProperty: true, visibilityProperty: true }) : getComputedStyle(e).visibility !== 'hidden'; };
@@ -52,7 +58,7 @@ export function silentAudit() {
   let words = 0;
   for (let t; (t = walker.nextNode()) && words < 6000;) {
     const el = t.parentElement;
-    if (!el || flagged.has(el) || skip(el) || !shown(el)) continue;
+    if (!el || flagged.has(el) || skip(el) || !shown(el) || el.closest(TRUNCATES)) continue;
     const cs = getComputedStyle(el);
     if (cs.hyphens === 'auto' || /^(SCRIPT|STYLE|TEXTAREA|OPTION)$/.test(el.tagName)) continue;
     for (const m of t.nodeValue.matchAll(/[A-Za-z]{4,14}/g)) {
@@ -77,10 +83,51 @@ export function silentAudit() {
     const lh = parseFloat(cs.lineHeight) || fs * 1.3, cw = Math.max(0, r.width - ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((a, k) => a + (parseFloat(cs[k]) || 0), 0));   /* the room the words have */
     if (cw >= fs * 1.2 || (cw < 2 && /hidden|clip/.test(cs.overflow))) continue;   /* clipped away on purpose */
     if (cw >= 2 && r.height < lh * 1.8) continue;   /* one line in a small box (a letter badge) is not a stack of letters */
-    if (cs.clipPath !== 'none' || (cs.position === 'absolute' && cs.clip !== 'auto') || (r.width <= 1.5 && r.height <= 1.5)) continue;   /* visually hidden on purpose: the name stays for screen readers */
+    if (cs.clipPath !== 'none' || (cs.position === 'absolute' || cs.position === 'fixed') || (r.width <= 1.5 && r.height <= 1.5)) continue;   /* visually hidden on purpose: the name stays for screen readers */
     if (el.closest('[aria-expanded="false"], [data-collapsed], [data-s4-collapsed]') && cs.overflow !== 'visible') continue;
     narrow++; flagged.add(el);
     out.broken.push(`"${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}" is squeezed into a box ${Math.round(cw)}px wide, one glyph, in ${path(el)}`);
+  }
+
+  /* the box around what a control holds: its text runs and child boxes, leaving out anything hidden on purpose (visually
+     hidden labels, clipped or zero-size parts, out-of-flow decoration such as a drawing hung off the box, the ::after hit area,
+     which is not an element) */
+  const contentBox = (root) => {
+    let L = Infinity, R = -Infinity, T = Infinity, B = -Infinity;
+    const take = (r) => { if (r.width > 0 || r.height > 0) { L = Math.min(L, r.left); R = Math.max(R, r.right); T = Math.min(T, r.top); B = Math.max(B, r.bottom); } };
+    const rg = document.createRange();
+    const walk = (n) => {
+      for (const k of n.childNodes) {
+        if (k.nodeType === 3) { if (!k.nodeValue.trim()) continue; rg.selectNodeContents(k); for (const r of rg.getClientRects()) take(r); }
+        else if (k.nodeType === 1) {
+          const cs = getComputedStyle(k), r = k.getBoundingClientRect();
+          if (cs.display === 'none' || cs.visibility === 'hidden' || (cs.clipPath !== 'none') || (cs.position === 'absolute' || cs.position === 'fixed') || (r.width <= 1.5 && r.height <= 1.5) || +cs.opacity === 0) continue;
+          if (cs.display === 'contents' || k.matches('svg *')) { walk(k); continue; }
+          take(r);
+        }
+      }
+    };
+    walk(root);
+    return L === Infinity ? null : { left: L, right: R, top: T, bottom: B, width: R - L, height: B - T };
+  };
+  /* a control whose content is wider than its box (decision 0073): the box is what draws the state layer, the ring and the
+     forced-colors outline, and what a finger hits, so what it holds must fit inside it. A control that clips or scrolls
+     its content on purpose (overflow other than visible) is a different thing and not counted. */
+  let wide = 0;
+  for (const el of document.body.querySelectorAll('button, a[href], [role="button"], [role="tab"], [role="menuitem"], [role="option"], .s4-button, .s4-icon-button, .s4-chip, .s4-page, .s4-fab, .s4-segment, .s4-month-day, summary')) {
+    if (wide >= 8 || skip(el) || !shown(el) || flagged.has(el)) continue;
+    const cs = getComputedStyle(el);
+    if (cs.display === 'inline' || cs.display === 'contents' || cs.overflowX !== 'visible' || cs.position === 'fixed') continue;
+    if (el.closest('[aria-expanded="false"], [data-collapsed], [data-s4-collapsed]') && el.matches('.s4-fab, [data-collapsed]')) continue;
+    const r = el.getBoundingClientRect();
+    if (r.width < 8) continue;
+    /* what the control holds, measured by its content's own boxes and text runs (a Range over its children). Its ::after hit area
+       (the 48px touch target) is a pseudo-element and not content, so it is not counted, and scrollWidth would count it. */
+    const c = contentBox(el);
+    if (!c) continue;
+    const tol = 1;
+    const side = c.left < r.left - tol ? 'start' : c.right > r.right + tol ? 'end' : '';
+    if (side) { wide++; out.overfull.push(`${path(el)} holds ${Math.round(c.width)}px of content in a ${Math.round(r.width)}px box, ${Math.round(Math.max(r.left - c.left, c.right - r.right))}px past its ${side} edge ("${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 20)}")`); }
   }
 
   /* the nav bar's highlight (round 0061): where the icon sits over the label it holds both, so it is a rounded rectangle

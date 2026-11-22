@@ -5716,6 +5716,11 @@
     transition:
       background-color var(--s4-motion-state), color var(--s4-motion-state);
   }
+  /* a 320-wide screen (decision 0073, issue 75): a row spends a third of its width on gaps and insets, so a checkbox or
+     avatar, a count and a 12-letter word did not fit; tighter gaps give the words their room back at every text size */
+  @media (width < 360px) {
+    .s4-list-item { gap: var(--s4-space-3); padding-inline-end: var(--s4-space-3); }
+  }
   :is(a, button, label).s4-list-item,
   .s4-list-item[tabindex] { cursor: pointer; user-select: none; }
   /* the focus ring sits inside the row, so it isn't clipped by a scrolling parent or hidden by the next row */

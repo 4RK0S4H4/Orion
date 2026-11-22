@@ -280,6 +280,15 @@ for (const page of pages) {
         if (/orion(\.min)?\.(css|js)\b/.test(html.replace(/orion\.(core|[a-z]+)\.min\.(css|js)/g, ''))) errors.add('lean bundle: the page links the full orion.css/orion.js beside orion.core.min.*; use one or the other');
       } catch (e) { warnings.add('lean bundle: could not read packs.mjs/packs.json beside the checker (' + e.message + ')'); }
     }
+    /* one clipboard helper (decision 0073): S4.util.copy(text, { done, fail }) is the only caller of clipboard.writeText */
+    const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].map((m, i) => [`<script> #${i + 1}`, m[1]]);
+    for (const m of html.matchAll(/<script[^>]*\bsrc=["']?([^"'\s>]+)/gi)) {
+      const href = m[1].split('?')[0];
+      if (/^(https?:)?\/\//.test(href) || /(^|\/)(orion|icons)[\w.-]*\.js$/.test(href)) continue;
+      const f = resolve(dirname(resolve(page)), href); if (existsSync(f)) scripts.push([href, readFileSync(f, 'utf8')]);
+    }
+    for (const [where, code] of scripts) if (/\bwriteText\s*\(|\[\s*['"]writeText['"]\s*\]/.test(code.replace(/\/\*[\s\S]*?\*\/|(^|\n)\s*\/\/[^\n]*/g, '')))
+      errors.add(`${where}: calls clipboard.writeText directly; use S4.util.copy(text, { done: 'Copied', fail: '…' }) (it never rejects, and says when the browser refuses; decision 0073)`);
     for (const m of html.matchAll(/\sstyle="([^"]*)"/gi)) lintCss(`.x{${m[1]}}`, `style=""`).forEach((e) => errors.add(e.replace(/: \.x → /, " → ")));
   }
 

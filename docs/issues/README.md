@@ -24,6 +24,40 @@ labelled `from-app` (form `.github/ISSUE_TEMPLATE/from-app.yml`) or as entries i
 `issues/<app>-<date>`. Every round starts by moving each of them here, numbered, with its image in `img/` (the Triage step
 in [`../PLAN.md`](../PLAN.md)).
 
+## Found by QA pass 1 (2026-11-22, round 0062)
+
+The first Full QA pass ([`history/round-0062/qa-1.md`](../history/round-0062/qa-1.md), a fresh agent, Chromium, ~100 pages).
+Each finding is fixed at its root and proven by a rule (decision 0073). Screenshots before and after are in the round's
+notes, not committed.
+
+- **73.** Open (round 0062). Combobox: Escape does not close the list when focus is on the Show Options toggle (found by
+  QA pass 1; any width, mouse or touch). Root: the Escape handlers lived on the input only and the document handler stood
+  down for anything inside the field. Rule: the suite opens every opener that has `aria-haspopup` or controls a popup
+  and requires Escape to close it with focus on the opener, on every page.
+- **74.** Open (round 0062). Share and Copy Recipe: an uncaught `writeText` rejection and a false "copied" when the
+  clipboard refuses (found by QA pass 1; article, tool; data-table and desktop-app swallowed the failure and still said
+  "copied"; the code block did it right). Root: four ways to do one job. Rule: `S4.util.copy` is the one helper; `npm run
+  check:clipboard` and the page checker fail any other `writeText`; the suite runs with the clipboard refused.
+- **75.** Open (round 0062). Filter panel at 320: "Conservation" breaks mid-word (found by QA pass 1). Root: a list row
+  spent a third of a 320 screen on gaps and insets. Rule: the split-word rule runs at 320, at 320 with 200% text and with
+  the modal panels and menus opened.
+- **76.** Open (round 0062). Article at 320 with 200% text scrolls sideways by 144px (found by QA pass 1). Root: a
+  one-column grid whose column is `auto` grows to the widest child (a fixed-column row), carrying breadcrumbs and
+  headline past the edge. Rule: a reach pass at 320 with 200% text (the browser's text size and the doubled-text
+  method) over every page fails on sideways scroll.
+- **77.** Open (round 0062). Ink Track pill stays at its left-to-right offset when `dir` flips after load (found by QA
+  pass 1; button group, motion page). Root: positions measured once. Rule: reach test flips `dir` after load and compares
+  each selected option with its ink.
+- **78.** Open (round 0062). 200% text at 320: nav-bar labels and stat figures split mid-word (found by QA pass 1).
+  Rule: the split-word rule at 320 with 200% text, with the five truncation places of decision 0058 as its allow-list.
+- **79.** Open (round 0062). Trailing and meta slots (`.s4-list-trailing`, `.s4-timeline-meta`, `.s4-tree-trailing`,
+  upload meta, banners, buttons) widen the page when the text is long (found by QA pass 1, 320 wide, 50-character
+  phrases). Rule: the inject-long-text pass fails any page that scrolls sideways.
+- **80.** Open (round 0062). Controls whose content is wider than their box: month days at 200% text and in forced
+  colors; the pagination arrows were reported too, but their 44px was the 48px touch-target pseudo-element, not content
+  (found by QA pass 1). Rule: the page checker and suite fail a button, link, tab or chip whose content (not its hit
+  area) sticks out of its box.
+
 ## Owner notes (2026-11-22)
 
 - **69.** Done 2026-11-22 (decision 0072). Title bar window controls: "I really like how it's unique from windows, but I

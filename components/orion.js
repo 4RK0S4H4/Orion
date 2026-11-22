@@ -66,6 +66,24 @@
       m.focus({ preventScroll: true });
       return m;
     },
+    /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
+       refused write, an insecure page, an iframe or a browser with no clipboard is "false", not an uncaught error), and says
+       what happened in a snackbar: opts.done on success (default "Copied"), opts.fail on refusal (default says to copy it by
+       hand), opts.silent to say nothing (the caller shows its own state). Nothing else calls clipboard.writeText
+       (npm run check:clipboard and the page checker fail it). No hidden field is selected: a script never puts the cursor in one. */
+    copy: function (text, opts) {
+      opts = opts || {};
+      var say = function (ok) {
+        if (opts.silent || !S4.snackbar) return ok;
+        try { S4.snackbar(ok ? (opts.done || 'Copied') : (opts.fail || 'Couldn\u2019t copy. Select the text and copy it yourself.')); } catch (e) { /* the message is a courtesy */ }
+        return ok;
+      };
+      var cb = null;
+      try { cb = navigator.clipboard; } catch (e) { /* a sandboxed frame throws on access */ }
+      if (!cb || !cb.writeText) return Promise.resolve(say(false));
+      var p; try { p = cb.writeText(String(text)); } catch (e) { return Promise.resolve(say(false)); }
+      return Promise.resolve(p).then(function () { return say(true); }, function () { return say(false); });
+    },
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }
@@ -5794,8 +5812,7 @@ S4.register('month', function (scope) {
           clearTimeout(copy._s4t); copy._s4t = setTimeout(function () { S4.icon.set(copy.firstElementChild, 'copy'); said.textContent = ''; }, 1800);
           S4.util.emit(fig, 's4-copy', { text: t, ok: ok });
         };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); });
-        else done(false);
+        S4.util.copy(t, { silent: true }).then(done);   /* the button and the live region say it (decision 0073) */
       });
       S4.init(bar);
     }
@@ -6340,8 +6357,11 @@ S4.register('text-field', function (scope) {
   }, true);
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape' || !openLists.length) return;
-    if (openLists.some(function (l) { return l.field.contains(document.activeElement); })) return;   /* the field handles its own */
-    openLists.slice().forEach(function (l) { l.close(); });
+    if (openLists.some(function (l) { return l.input === document.activeElement; })) return;   /* the input handles its own */
+    /* anywhere else (the Show Options button, the page): put every open list away; focus stays where it was (issue 73) */
+    var any = false;
+    openLists.slice().forEach(function (l) { any = true; l.close(); });
+    if (any) e.preventDefault();
   });
 
   /* ---------- the combobox ---------- */

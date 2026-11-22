@@ -261,7 +261,7 @@ $('save').addEventListener('click', function () {
   set(on);
   if (on) S4.snackbar({ text: 'Saved. This guide and its cloud map work offline.', action: 'Undo', onAction: function () { set(false); } });
 });
-$('share').addEventListener('click', function () { try { navigator.clipboard && navigator.clipboard.writeText(location.href); } catch (e) {} S4.snackbar('Link copied'); });
+$('share').addEventListener('click', function () { S4.util.copy(location.href, { done: 'Link copied' }); });
 </script>
 </body>
 </html>

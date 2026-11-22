@@ -116,8 +116,7 @@
           clearTimeout(copy._s4t); copy._s4t = setTimeout(function () { S4.icon.set(copy.firstElementChild, 'copy'); said.textContent = ''; }, 1800);
           S4.util.emit(fig, 's4-copy', { text: t, ok: ok });
         };
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); });
-        else done(false);
+        S4.util.copy(t, { silent: true }).then(done);   /* the button and the live region say it (decision 0073) */
       });
       S4.init(bar);
     }

@@ -192,8 +192,7 @@ $('reset').addEventListener('click', function () {
 });
 $('copy').addEventListener('click', function () {
   var text = $('total-meta').textContent + '\n' + Array.prototype.map.call($('ing').children, function (li) { return li.children[1].textContent + ': ' + li.children[3].textContent; }).join('\n') + '\n\n' + Array.prototype.map.call($('plan').children, function (li) { return li.querySelector('.pf-time').textContent + '  ' + li.querySelector('strong').textContent; }).join('\n');
-  try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
-  S4.snackbar('Recipe copied. Paste it on the fridge.');
+  S4.util.copy(text, { done: 'Recipe copied. Paste it on the fridge.' });
 });
 calc();
 </script>

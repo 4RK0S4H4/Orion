@@ -214,8 +214,11 @@
   }, true);
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape' || !openLists.length) return;
-    if (openLists.some(function (l) { return l.field.contains(document.activeElement); })) return;   /* the field handles its own */
-    openLists.slice().forEach(function (l) { l.close(); });
+    if (openLists.some(function (l) { return l.input === document.activeElement; })) return;   /* the input handles its own */
+    /* anywhere else (the Show Options button, the page): put every open list away; focus stays where it was (issue 73) */
+    var any = false;
+    openLists.slice().forEach(function (l) { any = true; l.close(); });
+    if (any) e.preventDefault();
   });
 
   /* ---------- the combobox ---------- */
