@@ -23,7 +23,7 @@
     --_start: 0;
     --_end: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) fit-content(50%);   /* a long meta wraps in its half; it never widens the page (issue 79) */
     align-items: baseline;
     gap: var(--s4-space-1) var(--s4-space-3);
     min-inline-size: 0;
@@ -49,7 +49,9 @@
     line-height: var(--md-sys-typescale-body-small-line-height);
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    min-inline-size: 0;
+    text-align: end;
+    overflow-wrap: anywhere;
   }
   .s4-timeline-track {
     position: relative;

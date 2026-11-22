@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Content Wider Than Its Box</title>
+<!-- Known-bad fixture (issue 80, decision 0073). tests/checker.mjs expects the page checker to FAIL this page: a button and a pagination
+     arrow whose label is wider than the box that draws their state layer, ring and forced-colors outline. Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .bf-day { inline-size: 28px; white-space: nowrap; padding: 0; }
+</style>
+</head>
+<body>
+<main style="padding: 16px; display: grid; gap: 16px">
+  <h1>Days</h1>
+  <button class="s4-button bf-day" data-variant="tonal" type="button">1000</button>
+</main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

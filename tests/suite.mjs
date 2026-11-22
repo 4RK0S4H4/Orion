@@ -1060,10 +1060,82 @@ async function desktopKeys(page, add) {
 /* ---------- script APIs that follow the page (decision 0060) ----------
    run once per page that has them: a seed's default variant, restore keeping a fixed brand, data-accent set by
    setAttribute, S4.buttonGroup.set moving the ink, and a select changed from script redrawing its picker */
+
+/* Escape closes every opener's popup and leaves focus on the opener (decision 0073, issue 73): any button that has
+   aria-haspopup, or controls a popover, dialog, listbox, menu or expand, is clicked; if something opened, Escape must close it
+   and focus must be on the button. The combobox's Show Options toggle did not (Escape was handled on the input only). */
+async function openerAudit(page, add) {
+  const n = await page.evaluate(() => {
+    const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[hidden], [inert], dialog:not([open]), [popover]:not(:popover-open), [aria-hidden="true"], [data-s4-skip]'); };
+    const popupish = (e) => {
+      const hp = e.getAttribute('aria-haspopup'); if (hp && hp !== 'false') return true;
+      const t = document.getElementById((e.getAttribute('aria-controls') || '').split(' ')[0]);
+      return !!t && (t.matches('[popover], dialog, [role="listbox"], [role="menu"], [role="dialog"], .s4-expand') || !!t.closest('[popover]'));
+    };
+    let i = 0;
+    document.querySelectorAll('button, [role="button"], a[href], input[role="combobox"]').forEach((e) => { e.removeAttribute('data-qa-opener'); if (i < 8 && !e.disabled && e.getAttribute('aria-disabled') !== 'true' && vis(e) && (e.hasAttribute('aria-haspopup') || e.hasAttribute('aria-expanded')) && popupish(e)) e.setAttribute('data-qa-opener', String(i++)); });
+    return i;
+  });
+  const state = () => page.evaluate(() => ({ popups: document.querySelectorAll('[popover]:popover-open, dialog[open]').length, expanded: [...document.querySelectorAll('[data-qa-opener]')].map((e) => e.getAttribute('aria-expanded')) }));
+  for (let i = 0; i < n; i++) {
+    const l = page.locator(`[data-qa-opener="${i}"]`);
+    if (!(await l.count())) continue;
+    const name = await l.evaluate((e) => (e.getAttribute('aria-label') || e.textContent || e.id || e.tagName).trim().replace(/\s+/g, ' ').slice(0, 30)).catch(() => '?');
+    try { await l.scrollIntoViewIfNeeded({ timeout: 2000 }); await page.keyboard.press('Escape'); await page.waitForTimeout(250); } catch (e) { continue; }
+    const before = await state();
+    try { await l.click({ timeout: 2500 }); } catch (e) { continue; }
+    await page.waitForTimeout(500);
+    const opened = await l.evaluate((e, b) => e.getAttribute('aria-expanded') === 'true' || document.querySelectorAll('[popover]:popover-open, dialog[open]').length > b, before.popups);
+    if (!opened) { await page.keyboard.press('Escape'); await page.waitForTimeout(300); continue; }
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(650);
+    const after = await l.evaluate((e, b) => ({ expanded: e.getAttribute('aria-expanded'), popups: document.querySelectorAll('[popover]:popover-open, dialog[open]').length, focus: document.activeElement === e || e.contains(document.activeElement), body: document.activeElement === document.body }), before.popups);
+    if (after.expanded === 'true' || after.popups > before.popups) { add(`opener "${name}": Escape did not close what it opened (decision 0073)`); await page.mouse.click(2, 2).catch(() => {}); await page.waitForTimeout(300); }
+    else if (!after.focus) add(`opener "${name}": after Escape focus is ${after.body ? 'on <body>' : 'not on the button'} (it goes back to the opener; decision 0073)`);
+  }
+}
+
+/* A copy or share button, with the clipboard refusing (the init script in runPage): no script error, and a message that says it
+   could not, never "copied" (decision 0073, issue 74). */
+async function copyAudit(page, add) {
+  const names = await page.evaluate(() => {
+    const vis = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !e.closest('[hidden], [inert], dialog:not([open]), [popover]:not(:popover-open), [data-s4-skip]'); };
+    let i = 0;
+    document.querySelectorAll('[data-qa-copy]').forEach((e) => e.removeAttribute('data-qa-copy'));
+    document.querySelectorAll('button, [role="button"]').forEach((e) => { const t = (e.getAttribute('aria-label') || e.textContent || '').trim(); if (i < 3 && !e.disabled && /^(copy|share)\b|\bcopy (code|link|key|recipe|settings|answers)\b/i.test(t) && vis(e)) { e.setAttribute('data-qa-copy', String(i++)); } });
+    return i;
+  });
+  for (let i = 0; i < names; i++) {
+    const l = page.locator(`[data-qa-copy="${i}"]`); if (!(await l.count())) continue;
+    const name = await l.evaluate((e) => (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 30));
+    try { await l.scrollIntoViewIfNeeded({ timeout: 2000 }); await l.click({ timeout: 2500 }); } catch (e) { continue; }
+    await page.waitForTimeout(500);
+    const said = await page.evaluate(() => [...document.querySelectorAll('.s4-snackbar, [role="status"], [role="alert"]')].map((e) => e.textContent.trim()).filter(Boolean).join(' | '));
+    if (!/could ?n.t|could not|can.t|unable|copy it yourself|select/i.test(said)) add(`"${name}" with the clipboard refusing says ${said ? `"${said.slice(0, 50)}"` : 'nothing'} (it must say it could not copy; S4.util.copy, decision 0073)`);
+    await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+  }
+}
+
 async function apiAudit(page, add) {
   const out = await page.evaluate(async () => {
     const o = [], wait = (ms) => new Promise((r) => setTimeout(r, ms));
     const frame = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    /* S4.util.copy (decision 0073): a promise that never rejects; false when the browser refuses (this page's clipboard does), true when it writes */
+    if (window.S4 && S4.util && S4.util.copy) {
+      try {
+        const refused = await S4.util.copy('x', { silent: true });
+        if (refused !== false) o.push('S4.util.copy resolved ' + refused + ' although the clipboard refused');
+        const said = []; const real = S4.snackbar; if (real) S4.snackbar = (m) => { said.push(typeof m === 'string' ? m : m && m.text); };
+        await S4.util.copy('x'); await S4.util.copy('x', { fail: 'No luck' });
+        const failMsgs = said.slice();
+        Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.resolve() } });
+        const ok = await S4.util.copy('x', { done: 'Link copied' }); await S4.util.copy('x');
+        if (real) S4.snackbar = real;
+        if (ok !== true) o.push('S4.util.copy resolved ' + ok + ' when the clipboard accepted the text');
+        if (real && (!/copy it yourself/.test(failMsgs[0] || '') || failMsgs[1] !== 'No luck')) o.push('S4.util.copy did not say it could not copy: ' + JSON.stringify(failMsgs));
+        if (real && (said[2] !== 'Link copied' || said[3] !== 'Copied')) o.push('S4.util.copy did not say Copied on success: ' + JSON.stringify(said.slice(2)));
+      } catch (e) { o.push('S4.util.copy threw: ' + e.message); }
+    } else o.push('S4.util.copy is missing (decision 0073)');
     if (document.querySelector('.th-brand, [data-api-probe="theme"]') || location.pathname.endsWith('/components/base/themes.html')) {
       const keep = S4.theme(), key = S4.theme.key, only = S4.theme.only;
       try {
@@ -1187,6 +1259,9 @@ async function runPage(browser, bname, rel, mode, reduced) {
   const page = await ctx.newPage();
   const found = new Set(), add = (m) => found.add(m);
   page.on('pageerror', (e) => add('script error: ' + String(e.message).split('\n')[0]));
+  /* decision 0073: every page runs with the clipboard refusing writes (headless, an insecure origin, an iframe): a button that
+     calls writeText bare is an uncaught rejection (a script error above), and one that says "copied" anyway fails copyAudit */
+  await page.addInitScript(() => { try { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new DOMException('Write permission denied', 'NotAllowedError')), readText: () => Promise.reject(new DOMException('Read permission denied', 'NotAllowedError')) } }); } catch (e) { /* already fixed */ } });
   page.on('console', (m) => { if (m.type() === 'error' && !QUIET.some((q) => q.test(m.text()))) add('console error: ' + m.text().slice(0, 160)); });
   page.on('requestfailed', (r) => { if (!QUIET.some((q) => q.test(r.url())) && !/ERR_ABORTED|cancelled|Load cannot follow/.test(r.failure() ? r.failure().errorText : '')) add('request failed: ' + r.url().replace(ORIGIN, '')); });
   page.on('response', (r) => { if (r.status() >= 400 && !QUIET.some((q) => q.test(r.url()))) add(`request ${r.status()}: ` + r.url().replace(ORIGIN, '')); });
@@ -1212,6 +1287,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
     }
     await use(page, add, mode.phone);
+    if (!reduced) { await openerAudit(page, add); await copyAudit(page, add); }
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
     if (!reduced && !mode.phone) await desktopKeys(page, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));

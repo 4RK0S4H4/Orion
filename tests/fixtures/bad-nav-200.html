@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Nav Labels Split At 200 Percent</title>
+<!-- Known-bad fixture (issue 78, decision 0073). tests/checker.mjs runs the reach pass "reflowz" (320 wide, text at 200%) on this page and
+     expects it to FAIL: the nav bar's labels may break anywhere again (what it drew until 2026-11-22), so "Settings" splits mid-word.
+     Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .s4-nav-bar > .s4-nav-item { min-inline-size: 0; }
+  .s4-nav-bar .s4-nav-label { overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<nav class="s4-nav-bar" aria-label="Main" style="position: static">
+  <a class="s4-nav-item" href="#home" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Home</span></a>
+  <a class="s4-nav-item" href="#bills"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="dashboard"></span></span><span class="s4-nav-label">Bills</span></a>
+  <a class="s4-nav-item" href="#reports"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="columns"></span></span><span class="s4-nav-label">Reports</span></a>
+  <a class="s4-nav-item" href="#settings"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Settings</span></a>
+</nav>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

@@ -10,6 +10,9 @@
      bad-nav-hover.html / bad-nav-hover-box.html  a tab's hover layer that is the icon chip, or narrower than the selected highlight (issue 81)
      bad-rail-motion.html  a rail whose labels follow its moving edge and wrap mid-motion (issue 70)
      bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
+     bad-clipboard.html a bare clipboard.writeText (page checker and npm run check:clipboard; decision 0073)
+     bad-overfull.html  a control whose label is wider than its box (decision 0073)
+     bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
    Usage: node tests/checker.mjs */
 import { spawnSync } from 'node:child_process';
@@ -32,6 +35,8 @@ const CASES = [
   ['bad-nav-pill.html', /the label "Settings" sticks out of the nav bar's highlight/, 'a nav label poking out of its highlight'],
   ['bad-nav-hover.html', /the state layer of "Settings" is the icon's own chip/, 'a nav tab hover layer drawn as the icon chip'],
   ['bad-nav-hover-box.html', /the hover layer of "Settings" is \d+x\d+ at -?\d+,-?\d+ from the selected highlight/, 'a nav tab hover layer narrower than the selected highlight'],
+  ['bad-clipboard.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a bare clipboard.writeText call'],
+  ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its end edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
   ['bad-rail-motion.html', /mid-motion \(rail [a-z ]+, (25|50|75)%\): "(Scripts|Starred|Translations)" breaks across lines/, 'rail labels that wrap while the rail widens'],
@@ -54,6 +59,22 @@ const WARN_CASES = [
 for (const [file, re, what] of WARN_CASES) {
   const r = spawnSync(process.execPath, [join(root, 'skill/orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });
   expect(re.test(r.stdout), `${file}: ${what} is a warning (exit ${r.status})`);
+}
+
+/* 1c. the repo-wide clipboard lint, and the reach passes that need a known-bad page (decision 0073) */
+console.log('clipboard lint and reach passes fail known-bad pages');
+const clip = spawnSync(process.execPath, [join(root, 'scripts/check-clipboard.mjs'), join(root, 'tests/fixtures/bad-clipboard.html')], { encoding: 'utf8' });
+expect(clip.status === 1 && /bad-clipboard\.html:\d+: .*writeText/.test(clip.stderr), `check:clipboard fails a bare writeText (exit ${clip.status})`);
+const clipOk = spawnSync(process.execPath, [join(root, 'scripts/check-clipboard.mjs')], { encoding: 'utf8' });
+expect(clipOk.status === 0, `check:clipboard passes the repo (exit ${clipOk.status})`);
+const REACH = [
+  ['reflowz', 'bad-nav-200.html', /text size 200%\] "(Settings|Reports)" breaks across lines/, 'nav labels that split at 200% text on a 320 screen'],
+  ['dirflip', 'bad-dirflip.html', /the Ink Track pill is \d+px from its selected option after dir changed/, 'an ink that is not measured again when dir flips'],
+  ['long320', 'bad-long-slot.html', /long text in a slot: sideways scroll/, 'a trailing slot that widens the page with a long phrase'],
+];
+for (const [pass, file, re, what] of REACH) {
+  const r = spawnSync(process.execPath, [join(root, 'tests/reach.mjs'), `--pass=${pass}`, `--file=tests/fixtures/${file}`], { encoding: 'utf8', timeout: 120000 });
+  expect(r.status === 1 && re.test(r.stderr + r.stdout), `reach ${pass}: ${file}: ${what} is an error (exit ${r.status})`);
 }
 
 /* 2. dial values at runtime */

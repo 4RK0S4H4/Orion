@@ -88,8 +88,9 @@
   }
   .s4-site-bar {
     display: flex;
+    flex-wrap: wrap;   /* with large text on a narrow screen the actions move under the logo instead of squeezing a button's word (issue 78) */
     align-items: center;
-    gap: var(--s4-space-2);
+    gap: 0 var(--s4-space-2);
     min-block-size: var(--s4-size-top-app-bar);   /* grows with larger text, never cuts it (0058) */
     padding-inline: max(var(--_wrap), env(safe-area-inset-left, 0px));
   }
@@ -98,7 +99,8 @@
     align-items: center;
     gap: var(--s4-space-2);
     min-block-size: var(--s4-size-touch-target);
-    min-inline-size: 0;                  /* a long name or larger text wraps instead of pushing the bar sideways */
+    min-inline-size: 0;
+    max-inline-size: 100%;               /* the bar wraps before it squeezes: the name keeps its whole width until it is alone on its line (issue 78), and only then does a word wider than the screen break */
     margin-inline-end: auto;
     color: var(--md-sys-color-on-surface);
     font-family: var(--md-sys-typescale-title-large-font);
@@ -107,7 +109,7 @@
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
     text-decoration: none;
-    overflow-wrap: break-word;   /* the name is whole at any text size (issue 78) */
+    overflow-wrap: anywhere;
   }
   .s4-site-logo-mark { flex: none; }
   .s4-site-logo :where(img, svg) { block-size: var(--s4-size-icon-large); inline-size: auto; }
@@ -148,7 +150,7 @@
     --_fg: var(--md-sys-color-on-surface);
     --_weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
-  .s4-site-actions { display: flex; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-site-actions { display: flex; flex: 0 1 auto; max-inline-size: 100%; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
   .s4-site-menu-button { display: none; }
 
   /* the phone menu: a floating glass panel under the header (decision 0043: nothing slides in from an edge) */
@@ -823,10 +825,10 @@
   .s4-site-footer-top { display: grid; gap: var(--s4-site-section-gap); }
   .s4-site-footer-brand { display: grid; justify-items: start; align-content: start; gap: var(--s4-space-4); max-inline-size: calc(var(--s4-site-measure) * 0.7); }
   .s4-site-footer-brand > p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
-  .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
+  .s4-site-signup { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
   .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
   .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-signup > .s4-button { flex: none; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup > .s4-button { flex: 0 1 auto; max-inline-size: 100%; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links :is(h2, h3) {
     margin: 0 0 var(--s4-space-3);
@@ -996,7 +998,7 @@
     padding: var(--s4-space-6) var(--_wrap) var(--s4-site-section-gap);
     max-inline-size: none;
   }
-  .s4-docs-bar { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-docs-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .s4-docs-main { min-inline-size: 0; display: grid; gap: var(--s4-space-8); align-content: start; }
   .s4-docs-main > * { min-inline-size: 0; }
   .s4-docs-nav { display: grid; align-content: start; gap: var(--s4-space-6); }

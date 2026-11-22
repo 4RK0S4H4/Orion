@@ -56,7 +56,7 @@
   }
   .s4-tree-row > .s4-icon { flex: none; color: var(--md-sys-color-on-surface-variant); }
   .s4-tree-label { flex: 1 1 auto; min-inline-size: 0; overflow-wrap: anywhere; }
-  .s4-tree-trailing { display: inline-flex; flex: none; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  .s4-tree-trailing { display: inline-flex; flex: 0 1 auto; align-items: center; gap: var(--s4-space-1); min-inline-size: 0; max-inline-size: 60%; margin-inline-start: auto; overflow-wrap: anywhere; }   /* long text in the slot wraps, it never widens the page (issue 79) */
   .s4-tree-count {
     color: var(--md-sys-color-on-surface-variant);
     font-family: var(--md-sys-typescale-label-medium-font);

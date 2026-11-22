@@ -29,11 +29,11 @@
   .pf-dial .pf-sub { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); }
 
   /* ---------- the result: a tinted region ---------- */
-  .pf-result { display: grid; gap: var(--s4-space-5); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
-  .pf-total { display: grid; gap: var(--s4-space-1); }
+  .pf-result { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-5); padding: var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .pf-total { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s4-space-1); }
   .pf-total-label { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); }
   .pf-total-value { font-family: var(--md-sys-typescale-display-medium-font); font-size: var(--md-sys-typescale-display-medium-size); line-height: var(--md-sys-typescale-display-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-display-medium-weight, 600); font-variant-numeric: tabular-nums; }
-  .pf-total-value small { margin-inline-start: var(--s4-space-1); font-size: var(--md-sys-typescale-title-large-size); color: var(--md-sys-color-on-surface-variant); font-weight: 400; }
+  .pf-total-value small { display: inline-block; margin-inline-start: var(--s4-space-1); font-size: var(--md-sys-typescale-title-large-size); color: var(--md-sys-color-on-surface-variant); font-weight: 400; }
 
   /* the dough bar: one segment an ingredient, its share of the weight; the names and grams are the list under it */
   .pf-bar { display: flex; gap: 2px; block-size: var(--s4-space-6); }

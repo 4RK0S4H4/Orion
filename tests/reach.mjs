@@ -10,6 +10,13 @@
      longtext  very long words and sentences injected into labels, headlines, chips, buttons, cells, titles, values:
                nothing spills out of its container, nothing overlaps
      forced    forced-colors: active: every interactive control keeps a visible boundary (border or outline)
+     reflowz   320 CSS px wide with text at 200%, two ways (the browser's text size, html { font-size: 200% }; and every element's
+               text doubled, as textZoom does): no sideways scroll; with the browser's text size also no word split across lines and
+               no control whose content sticks out of its box, the five truncation places of decision 0058 excepted (decision 0073)
+     dirflip   dir flipped from ltr to rtl after load (a live language switch): the Ink Track pill, the tabs indicator and the nav
+               highlight sit under their selected option again (issue 77)
+     long320   50-character phrases and unbroken words injected into every trailing, meta and supporting slot at 320: the page
+               must not scroll sideways (issue 79)
      motion    reduced motion: no looping animation keeps running
      keys      Tab through the page: everything reachable, a focus ring of at least 3:1 against what is behind it,
                focus order follows the visual order
@@ -28,7 +35,10 @@ import { dirname, join, extname, resolve } from 'node:path';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
 const ONLY = arg('only', ''), WORKERS = +arg('workers', 4), SHOTS = arg('shots', '');
-const PASSES = arg('pass', 'rtl,print,zoom,reflow,longtext,forced,motion,keys').split(',');
+const PASSES = arg('pass', 'rtl,print,zoom,reflow,reflowz,dirflip,long320,longtext,forced,motion,keys').split(',');
+const FILE = arg('file', '');   /* run the named page(s) only (tests/checker.mjs proves a rule on a known-bad fixture this way) */
+
+import { silentAudit } from '../skill/orion/scripts/silent.mjs';
 
 let pw;
 try { pw = await import('playwright'); } catch { try { pw = createRequire(resolve('x.js'))('playwright'); } catch { try { pw = createRequire(import.meta.url)('playwright'); } catch {} } }
@@ -38,7 +48,7 @@ if (!pw) { console.error('Playwright is not installed'); process.exit(2); }
 const pages = ['demo/index.html'];
 for (const f of readdirSync(join(root, 'templates'))) if (f.endsWith('.html') && f !== 'index.html') pages.push('templates/' + f);
 for (const d of readdirSync(join(root, 'components'))) { const f = `components/${d}/${d}.html`; if (existsSync(join(root, f))) pages.push(f); }
-const targets = pages.filter((p) => !ONLY || p.includes(ONLY));
+const targets = FILE ? FILE.split(',') : pages.filter((p) => !ONLY || p.includes(ONLY));
 const isApp = (p) => /^(demo|templates)\//.test(p);
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
@@ -249,12 +259,12 @@ function textZoom(f) {
 const LONG_WORD = 'Supercalifragilisticexpialidocious'.repeat(4);
 const LONG_TEXT = 'This label has been written to be much longer than any designer would ever plan for in the layout';
 function injectLong(arg) {
-  const sels = ['.s4-button', '.s4-chip', '.s4-list-headline', '.s4-list-supporting', '.s4-nav-label', 'td', 'th', '.s4-app-bar-title', '.s4-stat-value', '.s4-stat-label', '.s4-card-title', '.s4-card-subhead', '.s4-menu-item', '.s4-tab', 'h1', 'h2', 'h3', '.s4-segment', '.s4-breadcrumb-link', '.s4-message-bubble', '.s4-banner'];
+  const sels = ['.s4-button', '.s4-chip', '.s4-list-headline', '.s4-list-supporting', '.s4-nav-label', 'td', 'th', '.s4-app-bar-title', '.s4-stat-value', '.s4-stat-label', '.s4-card-title', '.s4-card-subhead', '.s4-menu-item', '.s4-tab', 'h1', 'h2', 'h3', '.s4-segment', '.s4-breadcrumb-link', '.s4-message-bubble', '.s4-banner', ...(arg.slots ? ['.s4-list-trailing', '.s4-list-supporting', '.s4-list-overline', '.s4-timeline-meta', '.s4-timeline-label', '.s4-tree-trailing', '.s4-tree-label', '.s4-upload-meta', '.s4-upload-name', '.s4-stat-meta', '.s4-meter-legend li', '.s4-description-term', 'dt', 'dd', '.s4-status', '.s4-nav-label', '.s4-site-logo', '.s4-card-supporting', '.s4-menu-item-supporting', '.s4-kicker'] : [])];
   const h = window.__h; let n = 0;
   sels.forEach((s, si) => {
     let k = 0;
     document.querySelectorAll(s).forEach((el) => {
-      if (k >= 3 || !h.vis(el) || el.matches('.s4-num')) return;   /* amounts and counts are not labels: .s4-num is nowrap by design, badges hold counts */
+      if (k >= (arg.slots ? 4 : 3) || !h.vis(el) || el.matches('.s4-num')) return;   /* amounts and counts are not labels: .s4-num is nowrap by design, badges hold counts */
       const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
       for (let t = tw.nextNode(); t; t = tw.nextNode()) {
         if (!t.textContent.trim() || t.parentElement.closest('.s4-icon, svg, .s4-badge, .s4-kbd')) continue;
@@ -276,6 +286,46 @@ function longAudit() {
       if (!scrolls) out.push(`long ${el.dataset.long} runs off the screen: ${h.tag(el)}`);
     }
   });
+  return out;
+}
+
+
+/* ---------- text at 200% on a 320 screen (issue 76, 78) ---------- */
+function sidewaysAudit() {
+  const h = window.__h, ov = document.documentElement.scrollWidth - innerWidth;
+  if (ov <= 1) return [];
+  const wide = [...document.querySelectorAll('body *')].filter((e) => h.vis(e) && e.getBoundingClientRect().right > innerWidth + 1 && !e.closest('[data-scroll], .s4-table-wrap, .s4-tabs, .s4-nav-bar, [style*="overflow"]'))
+    .filter((e, _, all) => !all.some((p) => p !== e && p.contains(e))).slice(0, 3).map(h.tag);
+  /* nothing outside a scroller sticks out on its own: name the innermost boxes past the edge (their parent clips or lays them out) */
+  const deep = wide.length ? [] : [...document.querySelectorAll('body *')].filter((e) => h.vis(e) && e.getBoundingClientRect().right > innerWidth + 1 && ![...e.children].some((c) => c.getBoundingClientRect().right > innerWidth + 1)).slice(0, 3).map(h.tag);
+  return [`sideways scroll: ${ov}px (${wide.concat(deep).join(', ')})`];
+}
+
+/* ---------- dir flipped after load (issue 77) ---------- */
+function dirflipAudit() {
+  const out = [], h = window.__h;
+  /* Ink Track: the ink's offset is the selected option's offset in its group */
+  for (const g of document.querySelectorAll('.s4-button-group[data-s4-ink]')) {
+    const ink = g.querySelector(':scope > .s4-button-group-ink'), b = g.querySelector(':scope > [aria-pressed="true"]');
+    if (!ink || ink.hidden || !b || !h.vis(g)) continue;
+    const gr = g.getBoundingClientRect(), br = b.getBoundingClientRect();
+    const d = Math.abs(parseFloat(ink.style.getPropertyValue('--_ix')) - (br.left - gr.left - g.clientLeft));
+    if (!(d <= 1.5)) out.push(`the Ink Track pill is ${Math.round(d)}px from its selected option after dir changed: ${h.tag(g)}`);
+  }
+  /* the sliding nav highlight sits inside the current item */
+  for (const pill of document.querySelectorAll('.s4-nav-bar > .s4-nav-pill, .s4-nav-rail-items > .s4-nav-pill')) {
+    const cur = pill.parentElement.querySelector('.s4-nav-item[aria-current]:not([aria-current="false"])');
+    if (!cur || !h.vis(cur) || !pill.getClientRects().length) continue;
+    const p = pill.getBoundingClientRect(), r = cur.getBoundingClientRect();
+    if (Math.abs((p.left + p.width / 2) - (r.left + r.width / 2)) > 2) out.push(`the nav highlight is ${Math.round(Math.abs((p.left + p.width / 2) - (r.left + r.width / 2)))}px off its current item after dir changed: ${h.tag(pill.parentElement)}`);
+  }
+  /* the tabs indicator is under the selected tab */
+  for (const l of document.querySelectorAll('.s4-tabs')) {
+    const ind = l.querySelector(':scope > .s4-tabs-indicator, .s4-tabs-indicator'), t = l.querySelector('.s4-tab[aria-selected="true"]');
+    if (!ind || !t || !h.vis(t) || !ind.getClientRects().length) continue;
+    const p = ind.getBoundingClientRect(), r = t.getBoundingClientRect();
+    if (Math.abs((p.left + p.width / 2) - (r.left + r.width / 2)) > 2) out.push(`the tabs indicator is ${Math.round(Math.abs((p.left + p.width / 2) - (r.left + r.width / 2)))}px off its tab after dir changed: ${h.tag(l)}`);
+  }
   return out;
 }
 
@@ -417,7 +467,8 @@ async function runOne(browser, pass, rel, mode) {
   if (pass === 'rtl') opts.locale = 'ar';
   if (pass === 'forced') opts.forcedColors = 'active';
   if (pass === 'motion') opts.reducedMotion = 'reduce';
-  if (pass === 'reflow') opts.viewport = { width: 320, height: 640 };
+  if (pass === 'reflow' || pass === 'reflowz' || pass === 'long320') opts.viewport = { width: 320, height: 640 };
+  if (pass === 'dirflip') opts.viewport = { width: 390, height: 844 };
   if (pass === 'print') { opts.viewport = { width: 794, height: 1123 }; opts.colorScheme = 'dark'; }
   const ctx = await browser.newContext(opts);
   const page = await ctx.newPage();
@@ -431,7 +482,7 @@ async function runOne(browser, pass, rel, mode) {
     await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 });
     await page.waitForTimeout(500);
     /* the reference pages' own toolbar (theme, contrast, color) is not part of the system */
-    if (['zoom', 'reflow', 'longtext'].includes(pass)) await page.addStyleTag({ content: '.ex-bar, .ex-ctl { display: none !important; }' });
+    if (['zoom', 'reflow', 'reflowz', 'long320', 'longtext'].includes(pass)) await page.addStyleTag({ content: '.ex-bar, .ex-ctl { display: none !important; }' });
     const shot = async (tag) => { if (SHOTS) { mkdirSync(SHOTS, { recursive: true }); await page.screenshot({ path: join(SHOTS, `${pass}-${mode.key}-${rel.replace(/[^\w.-]+/g, '_')}${tag || ''}.png`), fullPage: ['print', 'zoom', 'longtext'].includes(pass) }).catch(() => {}); } };
     if (pass === 'rtl') {
       if ((await page.evaluate(() => document.documentElement.dir)) !== 'rtl') add('rtl: the page replaced dir="rtl"');
@@ -452,6 +503,29 @@ async function runOne(browser, pass, rel, mode) {
     } else if (pass === 'reflow') {
       const ov = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (ov > 1) add(`reflow: sideways scroll at 320px (${ov}px)`);
+    } else if (pass === 'reflowz') {
+      if (mode.key === 'rem') await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+      else await page.evaluate(textZoom, 2);
+      await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+      await page.waitForTimeout(450);
+      await shot();
+      const run = async (v) => {
+        const at = (m) => add(`[${mode.key === 'rem' ? 'text size 200%' : 'text doubled'}${v ? ', ' + v : ''}] ${m}`);
+        (await page.evaluate(sidewaysAudit)).forEach(at);
+        if (mode.key === 'rem') { const q = await page.evaluate(silentAudit); q.broken.forEach((m) => at(m)); q.overfull.forEach((m) => at(`control content outside its box: ${m}`)); }
+      };
+      if (isApp(rel)) await eachView(page, run); else await run(null);
+    } else if (pass === 'dirflip') {
+      await page.addStyleTag({ content: '.ex-bar, .ex-ctl { display: none !important; }' });
+      await page.evaluate(() => document.documentElement.setAttribute('dir', 'rtl'));
+      await page.waitForTimeout(700);
+      await shot();
+      if (isApp(rel)) await eachView(page, async (v) => { (await page.evaluate(dirflipAudit)).forEach((m) => add((v ? `[${v}] ` : '') + m)); });
+      else (await page.evaluate(dirflipAudit)).forEach(add);
+    } else if (pass === 'long320') {
+      const run = async (v) => { const n = await page.evaluate(injectLong, { word: LONG_WORD, text: LONG_TEXT, slots: true }); if (!n) return; await page.waitForTimeout(300); (await page.evaluate(sidewaysAudit)).forEach((m) => add((v ? `[${v}] ` : '') + 'long text in a slot: ' + m)); };
+      if (isApp(rel)) await eachView(page, run); else await run(null);
+      await shot();
     } else if (pass === 'longtext') {
       /* a desktop window app (data-window) is not a phone layout: its 390px run is skipped */
       if (mode.phone && await page.evaluate(() => !!document.querySelector('.s4-app[data-window]'))) { await ctx.close(); ran++; return; }
@@ -478,7 +552,8 @@ let browser;
 try { browser = await pw.chromium.launch(); } catch (e) { console.error('chromium is not installed'); process.exit(2); }
 const jobs = [];
 for (const pass of PASSES) for (const rel of targets) {
-  if (pass === 'print' || pass === 'reflow') { jobs.push([pass, rel, MODES[0]]); continue; }
+  if (pass === 'print' || pass === 'reflow' || pass === 'dirflip' || pass === 'long320') { jobs.push([pass, rel, MODES[0]]); continue; }
+  if (pass === 'reflowz') { jobs.push([pass, rel, { key: 'rem' }], [pass, rel, { key: 'x2' }]); continue; }
   if (pass === 'forced' || pass === 'motion') { jobs.push([pass, rel, MODES[isApp(rel) ? 0 : 1]]); continue; }
   for (const mode of MODES) { if (pass === 'keys' && !isApp(rel) && mode.phone) continue; jobs.push([pass, rel, mode]); }
 }

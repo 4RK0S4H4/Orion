@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Ink Measured Once</title>
+<!-- Known-bad fixture (issue 77, decision 0073). tests/checker.mjs runs the reach pass "dirflip" on this page and expects it to FAIL: the
+     connected button group is drawn by hand with its ink placed once (no Orion script measures it again), so after dir flips to rtl
+     the ink is still at its left-to-right offset. Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<main style="padding: 16px">
+  <div class="s4-button-group" data-connected data-s4-ink aria-label="Theme" role="group" style="inline-size: 240px">
+    <span class="s4-button-group-ink" aria-hidden="true" style="--_ix: 4px; --_iy: 4px; --_iw: 70px; --_ih: 40px"></span>
+    <button class="s4-button" type="button" aria-pressed="true">Light</button>
+    <button class="s4-button" type="button" aria-pressed="false">Dark</button>
+    <button class="s4-button" type="button" aria-pressed="false">Auto</button>
+  </div>
+</main>
+</body>
+</html>

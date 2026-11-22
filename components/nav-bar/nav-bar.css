@@ -16,7 +16,7 @@
     position: relative;   /* anchors the sliding pill; the app shell and fixed bars override it */
     container: s4-nav-bar / inline-size;
     display: flex;
-    justify-content: center;
+    justify-content: safe center;
     min-block-size: calc(var(--s4-size-nav-bar) + env(safe-area-inset-bottom, 0px));
     padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     background: var(--md-sys-color-surface-container);
@@ -123,7 +123,7 @@
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
   /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
-  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: auto; scrollbar-width: none; }   /* auto, not clip: at 200% text on a narrow screen whole words fill more than the bar and it scrolls inside itself (issue 78) */
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {

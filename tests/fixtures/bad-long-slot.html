@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Trailing Slot Widens The Page</title>
+<!-- Known-bad fixture (issue 79, decision 0073). tests/checker.mjs runs the reach pass "long320" on this page and expects it to FAIL: the
+     list's trailing slot is made nowrap and unshrinkable again (what it was until 2026-11-22), so a long status pushes the page sideways at 320.
+     Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .s4-list-trailing { white-space: nowrap; flex: none; max-inline-size: none; }
+  .s4-list-item { flex-wrap: nowrap; }
+</style>
+</head>
+<body>
+<main style="padding: 16px">
+  <ul class="s4-list">
+    <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Electric Co.</span></span><span class="s4-list-trailing">Paid</span></div></li>
+    <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Water</span></span><span class="s4-list-trailing">Due soon</span></div></li>
+  </ul>
+</main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

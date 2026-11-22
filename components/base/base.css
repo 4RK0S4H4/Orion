@@ -153,6 +153,9 @@
 
   /* ---------- layout helpers ---------- */
   .s4-stack { display: flex; flex-direction: column; gap: var(--s4-gap, var(--s4-layout-gap)); }
+  /* a child of a stack or a pane is never wider than its parent because of its content (issue 76): without this a fixed-column
+     row inside one widens every sibling, and with 200% text on a 320 screen the page scrolls sideways */
+  :is(.s4-stack, .s4-split-pane) > * { min-inline-size: 0; }
   .s4-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-gap, var(--s4-space-2)); }
   /* a grid of cards or tiles fills its row (issue 56): as many columns of at least --s4-min as fit, and the items share
      the row, so two cards never float at the start of a wide window. A collection that filters (a gallery, search

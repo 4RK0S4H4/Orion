@@ -60,6 +60,7 @@
     font-weight: var(--md-sys-typescale-title-medium-weight);
   }
 
+  .s4-table .s4-status { overflow-wrap: break-word; }   /* a column keeps the status's whole words (issue 78); only a word wider than its cell breaks */
   .s4-table :is(th, td) {
     padding: 0 var(--s4-space-4);
     text-align: start;

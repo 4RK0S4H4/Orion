@@ -1741,6 +1741,9 @@
 
   /* ---------- layout helpers ---------- */
   .s4-stack { display: flex; flex-direction: column; gap: var(--s4-gap, var(--s4-layout-gap)); }
+  /* a child of a stack or a pane is never wider than its parent because of its content (issue 76): without this a fixed-column
+     row inside one widens every sibling, and with 200% text on a 320 screen the page scrolls sideways */
+  :is(.s4-stack, .s4-split-pane) > * { min-inline-size: 0; }
   .s4-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-gap, var(--s4-space-2)); }
   /* a grid of cards or tiles fills its row (issue 56): as many columns of at least --s4-min as fit, and the items share
      the row, so two cards never float at the start of a wide window. A collection that filters (a gallery, search
@@ -3801,7 +3804,7 @@
     position: relative;   /* anchors the sliding pill; the app shell and fixed bars override it */
     container: s4-nav-bar / inline-size;
     display: flex;
-    justify-content: center;
+    justify-content: safe center;
     min-block-size: calc(var(--s4-size-nav-bar) + env(safe-area-inset-bottom, 0px));
     padding: 0 env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
     background: var(--md-sys-color-surface-container);
@@ -3908,7 +3911,7 @@
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
   /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */
-  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: clip; }
+  .s4-nav-bar:has(> .s4-nav-pill) { overflow-x: auto; scrollbar-width: none; }   /* auto, not clip: at 200% text on a narrow screen whole words fill more than the bar and it scrolls inside itself (issue 78) */
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item { position: relative; z-index: 1; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) .s4-nav-indicator::after { display: none; }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) > .s4-nav-item[aria-current]:not([aria-current="false"]) {
@@ -4430,7 +4433,8 @@
     align-items: center;
     gap: var(--s4-space-1);
     flex: none;
-    block-size: var(--_size);
+    min-block-size: var(--_size);   /* never a fixed height on what holds text (decision 0058): labelled tools wrap to a second row at 200% text on a phone (issue 78) */
+    flex-wrap: wrap;
     max-inline-size: 100%;
     padding-inline: var(--s4-space-2);
     border-radius: var(--s4-shape-toolbar);
@@ -4459,6 +4463,7 @@
 
   .s4-toolbar[data-orientation="vertical"] {
     flex-direction: column;
+    flex-wrap: nowrap;
     block-size: auto;
     inline-size: var(--_size);
     padding: var(--s4-space-2) 0;
@@ -5340,7 +5345,7 @@
   }
   .s4-tree-row > .s4-icon { flex: none; color: var(--md-sys-color-on-surface-variant); }
   .s4-tree-label { flex: 1 1 auto; min-inline-size: 0; overflow-wrap: anywhere; }
-  .s4-tree-trailing { display: inline-flex; flex: none; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  .s4-tree-trailing { display: inline-flex; flex: 0 1 auto; align-items: center; gap: var(--s4-space-1); min-inline-size: 0; max-inline-size: 60%; margin-inline-start: auto; overflow-wrap: anywhere; }   /* long text in the slot wraps, it never widens the page (issue 79) */
   .s4-tree-count {
     color: var(--md-sys-color-on-surface-variant);
     font-family: var(--md-sys-typescale-label-medium-font);
@@ -6665,6 +6670,7 @@
     font-weight: var(--md-sys-typescale-title-medium-weight);
   }
 
+  .s4-table .s4-status { overflow-wrap: break-word; }   /* a column keeps the status's whole words (issue 78); only a word wider than its cell breaks */
   .s4-table :is(th, td) {
     padding: 0 var(--s4-space-4);
     text-align: start;
@@ -7877,7 +7883,7 @@
     --_start: 0;
     --_end: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) fit-content(50%);   /* a long meta wraps in its half; it never widens the page (issue 79) */
     align-items: baseline;
     gap: var(--s4-space-1) var(--s4-space-3);
     min-inline-size: 0;
@@ -7903,7 +7909,9 @@
     line-height: var(--md-sys-typescale-body-small-line-height);
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    min-inline-size: 0;
+    text-align: end;
+    overflow-wrap: anywhere;
   }
   .s4-timeline-track {
     position: relative;
@@ -8652,8 +8660,9 @@
   }
   .s4-site-bar {
     display: flex;
+    flex-wrap: wrap;   /* with large text on a narrow screen the actions move under the logo instead of squeezing a button's word (issue 78) */
     align-items: center;
-    gap: var(--s4-space-2);
+    gap: 0 var(--s4-space-2);
     min-block-size: var(--s4-size-top-app-bar);   /* grows with larger text, never cuts it (0058) */
     padding-inline: max(var(--_wrap), env(safe-area-inset-left, 0px));
   }
@@ -8662,7 +8671,8 @@
     align-items: center;
     gap: var(--s4-space-2);
     min-block-size: var(--s4-size-touch-target);
-    min-inline-size: 0;                  /* a long name or larger text wraps instead of pushing the bar sideways */
+    min-inline-size: 0;
+    max-inline-size: 100%;               /* the bar wraps before it squeezes: the name keeps its whole width until it is alone on its line (issue 78), and only then does a word wider than the screen break */
     margin-inline-end: auto;
     color: var(--md-sys-color-on-surface);
     font-family: var(--md-sys-typescale-title-large-font);
@@ -8671,7 +8681,7 @@
     letter-spacing: var(--md-sys-typescale-title-large-tracking);
     font-weight: var(--md-sys-typescale-title-large-weight);
     text-decoration: none;
-    overflow-wrap: break-word;   /* the name is whole at any text size (issue 78) */
+    overflow-wrap: anywhere;
   }
   .s4-site-logo-mark { flex: none; }
   .s4-site-logo :where(img, svg) { block-size: var(--s4-size-icon-large); inline-size: auto; }
@@ -8712,7 +8722,7 @@
     --_fg: var(--md-sys-color-on-surface);
     --_weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
-  .s4-site-actions { display: flex; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
+  .s4-site-actions { display: flex; flex: 0 1 auto; max-inline-size: 100%; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
   .s4-site-menu-button { display: none; }
 
   /* the phone menu: a floating glass panel under the header (decision 0043: nothing slides in from an edge) */
@@ -9387,10 +9397,10 @@
   .s4-site-footer-top { display: grid; gap: var(--s4-site-section-gap); }
   .s4-site-footer-brand { display: grid; justify-items: start; align-content: start; gap: var(--s4-space-4); max-inline-size: calc(var(--s4-site-measure) * 0.7); }
   .s4-site-footer-brand > p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
-  .s4-site-signup { display: flex; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
+  .s4-site-signup { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s4-space-2); inline-size: 100%; }
   .s4-cta > .s4-site-signup { inline-size: min(100%, calc(var(--s4-space-16) * 6)); }
   .s4-site-signup > .s4-text-field { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-site-signup > .s4-button { flex: none; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
+  .s4-site-signup > .s4-button { flex: 0 1 auto; max-inline-size: 100%; margin-block-end: calc((var(--s4-size-touch-target) - var(--s4-size-button)) / 2); }
   .s4-site-footer-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-8) var(--s4-space-6); }
   .s4-site-footer-links :is(h2, h3) {
     margin: 0 0 var(--s4-space-3);
@@ -9560,7 +9570,7 @@
     padding: var(--s4-space-6) var(--_wrap) var(--s4-site-section-gap);
     max-inline-size: none;
   }
-  .s4-docs-bar { display: flex; align-items: center; gap: var(--s4-space-2); }
+  .s4-docs-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .s4-docs-main { min-inline-size: 0; display: grid; gap: var(--s4-space-8); align-content: start; }
   .s4-docs-main > * { min-inline-size: 0; }
   .s4-docs-nav { display: grid; align-content: start; gap: var(--s4-space-6); }
@@ -12000,7 +12010,8 @@
     letter-spacing: var(--md-sys-typescale-label-medium-tracking);
     font-weight: var(--md-sys-typescale-label-medium-weight);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: break-word;   /* words stay whole (a column is sized to them); only a word wider than its box breaks */
+    min-inline-size: 0;
+    overflow-wrap: anywhere;   /* a status wraps inside its row; a word wider than the row breaks, it never widens the page (issue 79) */
     vertical-align: middle;
     --s4-icon-size: var(--s4-space-4);
   }

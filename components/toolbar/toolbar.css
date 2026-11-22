@@ -18,7 +18,8 @@
     align-items: center;
     gap: var(--s4-space-1);
     flex: none;
-    block-size: var(--_size);
+    min-block-size: var(--_size);   /* never a fixed height on what holds text (decision 0058): labelled tools wrap to a second row at 200% text on a phone (issue 78) */
+    flex-wrap: wrap;
     max-inline-size: 100%;
     padding-inline: var(--s4-space-2);
     border-radius: var(--s4-shape-toolbar);
@@ -47,6 +48,7 @@
 
   .s4-toolbar[data-orientation="vertical"] {
     flex-direction: column;
+    flex-wrap: nowrap;
     block-size: auto;
     inline-size: var(--_size);
     padding: var(--s4-space-2) 0;

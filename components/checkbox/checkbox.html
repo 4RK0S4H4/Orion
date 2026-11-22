@@ -8,7 +8,8 @@
 <link rel="stylesheet" href="../_example/example.css">
 <style>
   .cb-table { border-collapse: collapse; width: 100%; max-width: 560px; }
-  .cb-table th, .cb-table td { overflow-wrap: anywhere; }
+  .cb-table th, .cb-table td { overflow-wrap: break-word; }   /* a word is never split; the demo scrolls inside its box (issue 78) */
+  .cb-scroll { overflow-x: auto; max-inline-size: 100%; }
   .cb-table th, .cb-table td { padding: 0 var(--s4-space-2); height: var(--s4-size-table-row); text-align: start; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
   .cb-table th { font-size: var(--md-sys-typescale-title-small-size); font-weight: var(--md-sys-typescale-title-small-weight); color: var(--md-sys-color-on-surface-variant); }
   .cb-table td:last-child, .cb-table th:last-child { text-align: end; }
@@ -57,6 +58,7 @@
     <h2>In a Table</h2>
     <p>Bare checkboxes (no visible text) select rows; give each input an <code>aria-label</code>.</p>
     <div class="ex-board">
+      <div class="cb-scroll" tabindex="0" role="region" aria-label="Bare checkbox table">
       <table class="cb-table">
         <thead><tr><th><label class="s4-checkbox"><input type="checkbox" aria-label="Select All Bills"><span class="s4-checkbox-box"></span></label></th><th>Vendor</th><th>Amount</th></tr></thead>
         <tbody>
@@ -65,6 +67,7 @@
           <tr><td><label class="s4-checkbox"><input type="checkbox" aria-label="Select Northwind Office Supply"><span class="s4-checkbox-box"></span></label></td><td>Northwind Office Supply</td><td class="s4-num">$312.75</td></tr>
         </tbody>
       </table>
+      </div>
     </div>
   </section>
   <p class="ex-foot">Source: <code>components/checkbox/</code> · Solar icons by 480 Design (CC BY 4.0)</p>

@@ -30,7 +30,8 @@
     letter-spacing: var(--md-sys-typescale-label-medium-tracking);
     font-weight: var(--md-sys-typescale-label-medium-weight);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: break-word;   /* words stay whole (a column is sized to them); only a word wider than its box breaks */
+    min-inline-size: 0;
+    overflow-wrap: anywhere;   /* a status wraps inside its row; a word wider than the row breaks, it never widens the page (issue 79) */
     vertical-align: middle;
     --s4-icon-size: var(--s4-space-4);
   }
