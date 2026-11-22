@@ -57,7 +57,7 @@
       text-align: start;
       white-space: normal;
     }
-    .s4-table :is(td, th).num { text-align: end; }
+    .s4-table :is(td, th):is(.s4-num, .num) { text-align: end; }
     .s4-table :is(tbody, tfoot) :is(td, th)[data-label]::before { content: none; }
     .s4-table thead th:not([aria-sort]):not([data-check]) { display: table-cell; }
     .s4-table tbody td[data-check], .s4-table thead th[data-check] { display: none; }

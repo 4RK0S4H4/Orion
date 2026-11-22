@@ -215,8 +215,8 @@
       btn.addEventListener('click', function () { var on = wrap.hidden; wrap.hidden = !on; btn.setAttribute('aria-expanded', String(on)); btn.textContent = on ? 'Chart' : 'Table'; el.toggleAttribute('data-table', on); });
     }
     var heads = d.series.length > 1 || d.series[0].name ? d.series.map(function (s) { return s.name || 'Value'; }) : ['Value'];
-    wrap.innerHTML = '<table class="s4-table"><caption class="s4-visually-hidden">' + esc(name) + '</caption><thead><tr><th scope="col"></th>' + heads.map(function (h) { return '<th scope="col" class="num">' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
-      d.labels.map(function (l, i) { return '<tr><th scope="row">' + esc(l) + '</th>' + d.series.map(function (s) { return '<td class="num">' + esc(fmt(s.values[i] || 0)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
+    wrap.innerHTML = '<table class="s4-table"><caption class="s4-visually-hidden">' + esc(name) + '</caption><thead><tr><th scope="col"></th>' + heads.map(function (h) { return '<th scope="col" class="s4-num">' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      d.labels.map(function (l, i) { return '<tr><th scope="row">' + esc(l) + '</th>' + d.series.map(function (s) { return '<td class="s4-num">' + esc(fmt(s.values[i] || 0)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table>';
   }
   S4.chart = function (el, data) { draw(el, data); };
 

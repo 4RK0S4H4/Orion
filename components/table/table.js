@@ -7,7 +7,8 @@
      rows into place and fires s4-change { type: 'sort', column, label, direction } on the table.
    - Selection: a checkbox in th[data-check] selects all rows (indeterminate when some are); row checkboxes in
      td[data-check]. Fires s4-change { type: 'select', rows } with the selected rows.
-   - Clickable rows: tr[tabindex] fires s4-select { row } on click or Enter (and follows the row's first link, if any). */
+   - Clickable rows: tr[tabindex] fires s4-select { row } on click or Enter (and follows the row's first link, if any).
+   - A table written without its .s4-table-wrap gets one (so it scrolls and stacks on a phone like any other). */
 /* ---------- Tables at scale (round 0056) ----------
    Opt-in, on top of the plain table below; markup that does not ask for these behaves exactly as before.
    Columns (any table):
@@ -29,6 +30,20 @@
     return null;
   }
   var rtl = function (el) { return getComputedStyle(el).direction === 'rtl'; };
+  /* a table needs its wrap (the scroller, and the container that stacks rows on a phone): a bare one gets it here
+     (decision 0065), so it never squeezes a phone into broken words */
+  function wrapOf(table) {
+    var w = table.closest('.s4-table-wrap');
+    if (w || !table.parentNode || table.parentNode.nodeType !== 1) return w;
+    if (/auto|scroll/.test(getComputedStyle(table.parentNode).overflowX)) return null;   /* the page gave it its own scroller */
+    w = document.createElement('div'); w.className = 's4-table-wrap'; w.setAttribute('data-s4-wrapped', '');
+    table.parentNode.insertBefore(w, table); w.appendChild(table);
+    return w;
+  }
+  S4.tableWrap = wrapOf;
+  /* right-aligned figures: .s4-num (the documented class) or .num (the older name, still read) */
+  function isNum(el) { return el.classList.contains('s4-num') || el.classList.contains('num'); }
+  S4.tableIsNum = isNum;
   /* icons drawn into row markup directly (rows come and go while scrolling; the page-wide icon pass never has to visit them) */
   function icon(name) {
     var reg = window.S4_ICONS, body = reg && reg.icons[name];
@@ -47,7 +62,7 @@
   /* ======================= columns: resize, pin, order, hide (any table) ======================= */
   function Columns(table) {
     var self = this;
-    this.table = table; this.wrap = table.closest('.s4-table-wrap');
+    this.table = table; this.wrap = wrapOf(table);
     this.key = table.getAttribute('data-key');
     this.resizable = table.hasAttribute('data-resizable');
     var saved = store(this.key) || {};
@@ -110,10 +125,11 @@
     layout: function () {
       var t = this.table, self = this, vis = this.visible();
       if (!this.wrap || getComputedStyle(t).display !== 'table') { t.removeAttribute('data-fixed'); return; }
+      if (!this.wrap.clientWidth) return;   /* not on screen (a view not shown yet): measure when it shows (the wrap's ResizeObserver) */
       if (t._s4data && !t._s4data.sized) return;   /* a data table takes its first widths from its data */
       if (!this.measured) {
         var w = vis.map(function (c) { return c.width || c.th.getBoundingClientRect().width; });
-        vis.forEach(function (c, i) { c.width = Math.max(self.min(c), Math.round(w[i])); });
+        vis.forEach(function (c, i) { c.width = Math.max(self.min(c), Math.ceil(w[i]));   /* never round a column below its text: the last letter would wrap */ });
         this.measured = true;
       }
       /* the fill column takes what is left when the columns are narrower than the table */
@@ -278,7 +294,7 @@
   function Data(table, opts) {
     var self = this;
     this.table = table; this.opts = opts || {};
-    this.wrap = table.closest('.s4-table-wrap');
+    this.wrap = wrapOf(table);
     this.states = table.closest('.s4-states');
     table._s4data = this;
     if (table._s4mo) table._s4mo.disconnect();
@@ -489,7 +505,7 @@
           var pin = self.c.style(c);
           if (c === firstField) return '<th scope="rowgroup"' + pin + '><button type="button" class="s4-table-group-toggle" aria-expanded="' + !collapsed + '" tabindex="-1">' + icon('chevron-down') + '<span class="s4-table-group-name">' + esc(it.key) + '</span><span class="s4-table-group-count">' + it.list.length.toLocaleString() + '</span></button></th>';
           var agg = c.th.getAttribute('data-total');
-          if (agg && AGG[agg] && c.kind === 'field') { var vals = it.list.map(function (i) { return self.rows[i][c.field]; }); return '<td class="num"' + pin + ' data-label="' + esc(c.label) + '">' + esc(formatter(agg === 'count' ? 'integer' : c.th.getAttribute('data-format'))(AGG[agg](vals))) + '</td>'; }
+          if (agg && AGG[agg] && c.kind === 'field') { var vals = it.list.map(function (i) { return self.rows[i][c.field]; }); return '<td class="s4-num"' + pin + ' data-label="' + esc(c.label) + '">' + esc(formatter(agg === 'count' ? 'integer' : c.th.getAttribute('data-format'))(AGG[agg](vals))) + '</td>'; }
           return '<td' + pin + ' data-label=""></td>';
         }).join('');
         return tr;
@@ -524,7 +540,7 @@
       if (c.kind === 'check') return '<td data-check' + pin + '><label class="s4-checkbox"><input type="checkbox" tabindex="-1" aria-label="Select ' + esc(name) + '"' + (this.selected.has(id) ? ' checked' : '') + '><span class="s4-checkbox-box"></span></label></td>';
       if (c.kind === 'expand') { var open = this.expanded.has(id); return '<td data-row-expand data-label=""' + pin + '><button type="button" class="s4-icon-button s4-table-expand" data-size="xs" tabindex="-1" aria-expanded="' + open + '" aria-controls="' + this.detailId(id) + '" aria-label="Details for ' + esc(name) + '">' + icon('chevron-down') + '</button></td>'; }
       if (c.kind === 'actions') return '<td data-row-actions data-label=""' + pin + '><button type="button" class="s4-icon-button s4-table-row-menu" data-size="xs" tabindex="-1" aria-haspopup="menu" aria-expanded="false"' + (this.menu ? ' aria-controls="' + this.menu.id + '"' : '') + ' aria-label="Actions for ' + esc(name) + '">' + icon('more-vert') + '</button></td>';
-      var v = row[c.field], th = c.th, cls = th.classList.contains('num') ? ' class="num"' : '';
+      var v = row[c.field], th = c.th, cls = isNum(th) ? ' class="s4-num"' : '';
       var attrs = cls + pin + ' data-label="' + esc(c.label) + '"' + (th.hasAttribute('data-primary') ? ' data-primary' : '') + (th.hasAttribute('data-wrap') ? ' data-wrap' : '');
       var edit = th.getAttribute('data-edit');
       if (edit != null) {
@@ -545,7 +561,7 @@
       foot.innerHTML = '<tr aria-rowindex="' + (this.items.length + 2) + '">' + vis.map(function (c) {
         var pin = self.c.style(c), agg = c.th.getAttribute('data-total');
         if (c === first) return '<th scope="row"' + pin + '>Total <span class="s4-table-foot-count">' + view.length.toLocaleString() + ' ' + title(view.length === 1 ? (self.opts.noun || 'row') : (self.opts.nouns || 'rows')) + '</span></th>';
-        if (agg && AGG[agg]) { var v = AGG[agg](view.map(function (i) { return rows[i][c.field]; })); return '<td class="num"' + pin + ' data-label="' + esc((agg === 'avg' ? 'Average ' : agg === 'count' ? 'Count of ' : '') + c.label) + '">' + esc(formatter(agg === 'count' ? 'integer' : c.th.getAttribute('data-format'))(v)) + '</td>'; }
+        if (agg && AGG[agg]) { var v = AGG[agg](view.map(function (i) { return rows[i][c.field]; })); return '<td class="s4-num"' + pin + ' data-label="' + esc((agg === 'avg' ? 'Average ' : agg === 'count' ? 'Count of ' : '') + c.label) + '">' + esc(formatter(agg === 'count' ? 'integer' : c.th.getAttribute('data-format'))(v)) + '</td>'; }
         return '<td' + pin + ' data-label=""></td>';
       }).join('') + '</tr>';
     },
@@ -900,11 +916,12 @@
 S4.register('table', function (scope) {
   S4.util.all(scope, 'table.s4-table').forEach(function (table) {
     if (!S4.util.once(table, 'table')) return;
+    if (S4.tableWrap) S4.tableWrap(table);
     var slice = function (l) { return Array.prototype.slice.call(l); };
     var bodies = function () { return slice(table.tBodies); };
     var bodyRows = function () { return bodies().reduce(function (a, b) { return a.concat(slice(b.rows)); }, []); };
     var headRow = function () { var h = table.tHead; return h && h.rows.length ? h.rows[h.rows.length - 1] : null; };
-    var counter = 0;
+    var counter = 0, isNum = S4.tableIsNum;
 
     /* header cell for each column index, honouring colspan */
     function columns() {
@@ -921,6 +938,12 @@ S4.register('table', function (scope) {
     /* ---------- column names on cells, original order ---------- */
     function label() {
       var cols = columns();
+      /* a column whose every body cell is a figure (.s4-num) right-aligns its header too */
+      cols.forEach(function (th, i) {
+        if (isNum(th) || th.hasAttribute('data-check')) return;
+        var cells = bodyRows().map(function (tr) { return cellAt(tr, i); }).filter(Boolean);
+        if (cells.length && cells.every(function (c) { return isNum(c) && (c.colSpan || 1) === 1; })) th.classList.add('s4-num');
+      });
       var rows = bodyRows().concat(table.tFoot ? slice(table.tFoot.rows) : []);
       rows.forEach(function (tr) {
         if (tr.parentNode.tagName === 'TBODY' && !tr.dataset.s4Order) tr.dataset.s4Order = String(counter++);
@@ -930,7 +953,7 @@ S4.register('table', function (scope) {
           if (!th || th.hasAttribute('data-check') || cell.hasAttribute('data-check')) return;
           if (!cell.hasAttribute('data-label') && (cell.colSpan || 1) === 1) cell.setAttribute('data-label', th.textContent.trim());
           if (th.hasAttribute('data-primary')) cell.setAttribute('data-primary', '');
-          if (th.classList.contains('num') && (cell.colSpan || 1) === 1) cell.classList.add('num');
+          if (isNum(th) && (cell.colSpan || 1) === 1) cell.classList.add('s4-num');
         });
       });
     }

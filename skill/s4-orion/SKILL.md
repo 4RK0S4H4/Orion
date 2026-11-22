@@ -146,7 +146,10 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 </head>
 <body>
 <div class="s4-app">
-  <nav class="s4-nav-rail" aria-label="Main">…same items as the nav bar…</nav>        <!-- shown from 840 -->
+  <nav class="s4-nav-rail" aria-label="Main">                                          <!-- shown from 840 -->
+    <div class="s4-nav-rail-header">…menu button, then the main action (.s4-fab) here…</div>
+    <div class="s4-nav-rail-items">…same items as the nav bar…</div>
+  </nav>
   <div class="s4-app-body">
     <header class="s4-top-app-bar">
       <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Bills</h1></div>
@@ -210,11 +213,12 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - A **FAB** only when one action dominates a screen (Add Bill); never two FABs.
 - Icon-only actions are icon buttons with `aria-label` and usually a `data-tooltip`.
 - **Tabs, button group or chips** (decision 0059): if it swaps what is on the screen, it is **tabs** (`.s4-tabs`, every tab with a `tabpanel`); if it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid, units), it is a **connected button group** (`data-connected data-select="single|multi"`, 2 to 5 short options, the Ink Track); if it narrows a collection and there can be many, it is **filter chips**. Never a button group with `aria-controls` panels, never tabs without panels: the page checker fails both.
-- Destructive confirm buttons get `data-color="error"`; a per-row delete stays a plain icon button.
+- A destructive answer is `data-variant="tonal" data-color="error"` (the error container, never a red slab) and Cancel is `tonal` (decision 0064); a per-row delete stays a plain icon button.
 
 **Showing data**
 - Items people scan and open: a **list** (`data-style="segmented"` for grouped rows on a card-like surface).
-- Rows people compare across columns: a **table** (it stacks into rows on phones by itself). Right-align numbers.
+- Rows people compare across columns: a **table** (it stacks into rows on phones by itself, in its `.s4-table-wrap`, which
+  table.js adds when it is missing). Right-align numbers with `.s4-num` on their cells.
 - A few rich, independent things: **cards** in an `.s4-grid`. Sections of settings or a dashboard: **panes**.
 - State of a thing: a **status** pill with a tone and a word ("Overdue"), never color alone.
 - Numbers people check over time (KPIs): **stats** (`.s4-stat`) in one pane's `.s4-stat-row`, not a pane per number.
@@ -289,7 +293,8 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 **Type and writing**
 - Use the type scale classes (`.s4-headline-small`, `.s4-title-medium`, `.s4-body-medium`, `.s4-label-large`…) or the
   `--md-sys-typescale-*` tokens; add `.s4-emphasized` for the M3 Expressive weight on a key number or title.
-- Numbers people compare (amounts, counts, dates, IDs) get `.s4-num` (tabular figures). Tables and inputs already do.
+- Numbers people compare (amounts, counts, dates, IDs) get `.s4-num` (tabular figures); in a table cell or header it also
+  right-aligns the column (a column of `.s4-num` cells right-aligns its header by itself; `.num` is the older name).
 - Editorial pages: `.s4-kicker` above a title or as a post's section (real small capitals where the face has them,
   never faked), `figure.s4-figure` for a picture with its caption, `.s4-post-byline` under a post.
 - Inter is the only bundled face. A brand face is one `@font-face` file with `font-display: swap`, named first in a
@@ -360,7 +365,7 @@ Request: "Add a screen to my expenses app listing this month's bills, with a way
     <div class="s4-text-field"><input id="vendor"><label for="vendor">Vendor</label></div>
     <div class="s4-text-field"><span class="s4-text-field-affix" data-prefix>$</span><input id="amount" inputmode="decimal"><label for="amount">Amount</label></div>
   </div>
-  <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-close="save" type="button">Save Bill</button></div>
+  <div class="s4-sheet-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-close="save" type="button">Save Bill</button></div>
 </dialog>
 ```
 
@@ -373,8 +378,9 @@ sentence-case nothing here; amounts in tabular figures; no colors, sizes or moti
 
 Run `node <skill>/scripts/check.mjs page.html` (Playwright). It loads the page as a 390px dark phone and a 1280px light
 desktop (every app-shell view, not just the first) and reports console errors, unknown icons, sideways scroll, text below WCAG AA as rendered (including on glass),
-and app CSS that breaks the rules above (hex colors, `!important`, glass on content, raw durations, bare element
-selectors). Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
+app CSS that breaks the rules above (hex colors, `!important`, glass on content, raw durations, bare element
+selectors), and silent failures: an `s4-` class nothing defines (a misremembered name styles nothing), a word split
+across lines or a box one glyph wide, a part outside its component. Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
 
 Also check by eye: one filled button per area, Title Case labels, status words, the nav bar on a phone and the rail on a
 desktop, and both themes.

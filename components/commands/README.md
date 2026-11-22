@@ -55,6 +55,7 @@ S4.commands.menu('row-menu', ['edit.copy', 'edit.rename', '-', 'edit.delete']); 
 | `S4.commands.native(name)` | The menu as plain data (`{ label, submenu }`, `{ id, label, accelerator, enabled, type, checked }`, `{ type: 'separator' }`) with Electron-style accelerators (`CmdOrCtrl+S`), for a shell's native menu (see `examples/`) |
 | `S4.commands.accelerator('mod+s')` | `CmdOrCtrl+S` |
 | `[data-cmd="id"]` | Clicking runs it; label, disabled, `aria-pressed` (check commands) and an empty `<kbd class="s4-kbd">` follow the command |
+| `[data-cmd][data-cmd-plain]` | Runs a check command without showing its state: a panel's own Close button (it runs `view.inspector` but is an action, not a pressed toggle in the accent) |
 | Events on `document` | `s4-command { command, context }` after one runs; `s4-commands` when the list or a state changed |
 
 **When to use:** every app with more than a handful of actions, and every desktop app. Write the app's actions once

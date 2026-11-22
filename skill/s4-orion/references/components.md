@@ -1185,6 +1185,7 @@ S4.commands.menu('row-menu', ['edit.copy', 'edit.rename', '-', 'edit.delete']); 
 | `S4.commands.native(name)` | The menu as plain data (`{ label, submenu }`, `{ id, label, accelerator, enabled, type, checked }`, `{ type: 'separator' }`) with Electron-style accelerators (`CmdOrCtrl+S`), for a shell's native menu (see `examples/`) |
 | `S4.commands.accelerator('mod+s')` | `CmdOrCtrl+S` |
 | `[data-cmd="id"]` | Clicking runs it; label, disabled, `aria-pressed` (check commands) and an empty `<kbd class="s4-kbd">` follow the command |
+| `[data-cmd][data-cmd-plain]` | Runs a check command without showing its state: a panel's own Close button (it runs `view.inspector` but is an action, not a pressed toggle in the accent) |
 | Events on `document` | `s4-command { command, context }` after one runs; `s4-commands` when the list or a state changed |
 
 **When to use:** every app with more than a handful of actions, and every desktop app. Write the app's actions once
@@ -2233,8 +2234,8 @@ can be saved, updated, renamed and deleted with Undo. The state is in the addres
     <div class="s4-search" role="search">…<input class="s4-search-input" type="search" aria-label="Search records">…</div>
     <button class="s4-button" data-variant="tonal" type="button" data-filter-add data-menu="add-filter">Add Filter</button>
     <div class="s4-menu" id="add-filter" aria-label="Add a filter"></div>
-    <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="filters">All Filters<span class="s4-badge" hidden></span></button>
-    <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+    <button class="s4-button" data-variant="text" type="button" data-filter-panel data-sheet="filters"><span class="s4-icon" data-icon="filter"></span><span class="s4-filter-label">All Filters</span><span class="s4-badge" hidden></span></button>
+    <button class="s4-button" data-variant="text" type="button" data-filter-sort data-menu="sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
     <div class="s4-menu" id="sort" aria-label="Sort"></div>
     <button class="s4-icon-button" type="button" data-filter-views data-menu="view-options" aria-label="View Options">…</button>
     <div class="s4-menu" id="view-options" data-align="end" aria-label="View options"></div>
@@ -2290,6 +2291,9 @@ Script: `S4.filter(el, options)` returns the controller: `.state` (`{ q, f, sort
 **Do**
 - Keep the count next to the results; show the no-results state (`.s4-states` with a `no-results` part) with Clear Filters.
 - Name views after the question they answer, in Title Case.
+- One tonal tool: Add Filter (the main thing the bar is for); All Filters, Sort and Columns are `text` buttons with their
+  label in `.s4-filter-label`, and View Options a plain icon button. On a phone the quiet tools show their icon only
+  (the label stays for screen readers), so the tools fit one row under the search (decision 0065).
 
 **Don't**
 - Don't add an Apply button: filters act at once (decision 0054).

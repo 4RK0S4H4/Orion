@@ -9,6 +9,8 @@
        .s4-menubar[data-menus="app"] and into <div class="s4-menu" id="row-menu"> (made if missing), so
        data-context-menu="row-menu" and data-menu="row-menu" just work.
      <button data-cmd="file.save">…</button>   clicking runs the command; label, disabled, pressed and its <kbd> follow it.
+     data-cmd-plain on such a button runs a check command without showing its state (a panel's own Close button that
+     runs view.inspector is an action, not a pressed toggle drawn in the accent).
    Item forms in a menu: 'id', '-' (divider), { heading: 'Label' }, { label, icon, items: [...] } (a submenu),
    { id, label } (another label for the same command here).
    State: enabled() and checked() are asked again whenever S4.commands.refresh() runs (after every command, on every
@@ -97,7 +99,7 @@
       else if (on) el.removeAttribute('aria-disabled'); else el.setAttribute('aria-disabled', 'true');
       if (chk !== null) {
         if (el.matches('[role="menuitemcheckbox"], [role="menuitemradio"]')) el.setAttribute('aria-checked', String(chk));
-        else if (el.tagName === 'BUTTON') el.setAttribute('aria-pressed', String(chk));
+        else if (el.tagName === 'BUTTON' && !el.hasAttribute('data-cmd-plain')) el.setAttribute('aria-pressed', String(chk));
       }
       var k = el.querySelector(':scope > .s4-kbd');
       if (k && c.shortcut && S4.desktop) k.textContent = S4.desktop.format(c.shortcut);

@@ -6,13 +6,15 @@
                 (on glass: against the worst backdrop after the glass's own filter and tint), icon-only controls with
                 no name, a button group that swaps panels or tabs without panels (decision 0059), a dialog that does not ask (one
                 answer, or a form: decision 0064), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
-                easings, glass on content, bare element selectors)
+                easings, glass on content, bare element selectors), and silent failures (decision 0065): an s4- class nothing
+                defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill
      warnings – more than one filled button in one area, labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, basename, join, parse, sep } from 'node:path';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
+import { knownClasses, silentAudit } from './silent.mjs';
 
 const argv = process.argv.slice(2);
 const outIdx = argv.indexOf('--out');
@@ -273,10 +275,16 @@ for (const page of pages) {
       r.names.forEach((x) => errors.add(`${at} control with no accessible name (add aria-label): ${x}`));
       r.glassContent.forEach((x) => errors.add(`${at} glass on content: ${x}`));
       r.roles.forEach((x) => errors.add(`${at} ${x}`));
+      (r.unknown || []).forEach((x) => errors.add(`${at} unknown class ${x}: nothing in Orion or the page defines it (check the name in the component's README)`));
+      (r.broken || []).forEach((x) => errors.add(`${at} ${x}: the box is too narrow for its words (a fixed width, a column that cannot stack, or a part outside its component)`));
+      (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
+      (r.loud || []).forEach((x) => errors.add(`${at} ${x}: a status is a tint (no data-tone, or success, warning, info, error; the accent tones draw as a wash); only the state that needs action now is warm`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };
-    report(await p.evaluate(audit));
+    await p.evaluate(knownClasses);
+    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit));
+    report(await audited());
     const shot = join(OUT, `${label}-${v.name}.png`);
     await p.screenshot({ path: shot, fullPage: true });
     /* app shell views that were hidden on load get the same audit (screenshots show the first view only) */
@@ -285,7 +293,7 @@ for (const page of pages) {
     for (const name of views) {
       await p.evaluate((n) => S4.app.go(document.querySelector('.s4-app'), n), name);
       await p.waitForTimeout(900);
-      report(await p.evaluate(audit), `view "${name}"`);
+      report(await audited(), `view "${name}"`);
     }
     await ctx.close();
   }

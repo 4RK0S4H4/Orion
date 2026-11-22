@@ -1,13 +1,16 @@
 /* Status (S4 addition): a small pill that names the state of a thing.
    <span class="s4-status">Draft</span>
    <span class="s4-status" data-tone="primary|secondary|tertiary|error" data-dot>Overdue</span>
-   Neutral by default (surface-container-high / on-surface-variant); a tone uses the matching container role. The
-   label always says the status: tone and dot only reinforce it, so it never relies on color alone.
+   Neutral by default (surface-container-high / on-surface-variant). A status is always a tint (decision 0065): the
+   status colors (success, warning, info, error) use their pale containers, the accent tones (primary, secondary,
+   tertiary) a 16% wash of their color; only the one state that needs action now takes error (or warning for soon).
+   The label always says the status: tone and dot only reinforce it, so it never relies on color alone.
    Not interactive: to filter by status use a filter chip. */
 @layer s4.components {
   .s4-status {
     --_bg: var(--md-sys-color-surface-container-high);
     --_fg: var(--md-sys-color-on-surface-variant);
+    --_wash: calc(var(--md-sys-state-dragged-state-layer-opacity) * 100%);   /* the accent tones' tint: 16% */
 
     display: inline-flex;
     flex: none;
@@ -27,7 +30,7 @@
     letter-spacing: var(--md-sys-typescale-label-medium-tracking);
     font-weight: var(--md-sys-typescale-label-medium-weight);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* words stay whole (a column is sized to them); only a word wider than its box breaks */
     vertical-align: middle;
     --s4-icon-size: var(--s4-space-4);
   }
@@ -43,9 +46,12 @@
     background: currentColor;
   }
 
-  .s4-status[data-tone="primary"] { --_bg: var(--md-sys-color-primary-container); --_fg: var(--md-sys-color-on-primary-container); }
-  .s4-status[data-tone="secondary"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
-  .s4-status[data-tone="tertiary"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); }
+  /* Decision 0065: a status is a tint, never a fill of the accent. The accent tones are a wash of their color with the
+     surface's own text (a container fill was a black, white or brand slab in some accents: monochrome's primary
+     container is near black, so "Approved" shouted louder than the state that needed action) */
+  .s4-status[data-tone="primary"] { --_bg: color-mix(in srgb, var(--md-sys-color-primary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="secondary"] { --_bg: color-mix(in srgb, var(--md-sys-color-secondary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="tertiary"] { --_bg: color-mix(in srgb, var(--md-sys-color-tertiary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
   /* plain status colors (decision 0043): fixed green, amber and blue that never change with the accent */
   .s4-status[data-tone="success"] { --_bg: var(--s4-color-success-container); --_fg: var(--s4-color-on-success-container); }
   .s4-status[data-tone="warning"] { --_bg: var(--s4-color-warning-container); --_fg: var(--s4-color-on-warning-container); }

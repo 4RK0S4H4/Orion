@@ -12,8 +12,8 @@ can be saved, updated, renamed and deleted with Undo. The state is in the addres
     <div class="s4-search" role="search">…<input class="s4-search-input" type="search" aria-label="Search records">…</div>
     <button class="s4-button" data-variant="tonal" type="button" data-filter-add data-menu="add-filter">Add Filter</button>
     <div class="s4-menu" id="add-filter" aria-label="Add a filter"></div>
-    <button class="s4-button" data-variant="tonal" type="button" data-filter-panel data-sheet="filters">All Filters<span class="s4-badge" hidden></span></button>
-    <button class="s4-button" data-variant="tonal" type="button" data-filter-sort data-menu="sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
+    <button class="s4-button" data-variant="text" type="button" data-filter-panel data-sheet="filters"><span class="s4-icon" data-icon="filter"></span><span class="s4-filter-label">All Filters</span><span class="s4-badge" hidden></span></button>
+    <button class="s4-button" data-variant="text" type="button" data-filter-sort data-menu="sort"><span class="s4-icon" data-icon="sort"></span><span class="s4-filter-sort-label">Sort</span></button>
     <div class="s4-menu" id="sort" aria-label="Sort"></div>
     <button class="s4-icon-button" type="button" data-filter-views data-menu="view-options" aria-label="View Options">…</button>
     <div class="s4-menu" id="view-options" data-align="end" aria-label="View options"></div>
@@ -69,6 +69,9 @@ Script: `S4.filter(el, options)` returns the controller: `.state` (`{ q, f, sort
 **Do**
 - Keep the count next to the results; show the no-results state (`.s4-states` with a `no-results` part) with Clear Filters.
 - Name views after the question they answer, in Title Case.
+- One tonal tool: Add Filter (the main thing the bar is for); All Filters, Sort and Columns are `text` buttons with their
+  label in `.s4-filter-label`, and View Options a plain icon button. On a phone the quiet tools show their icon only
+  (the label stays for screen readers), so the tools fit one row under the search (decision 0065).
 
 **Don't**
 - Don't add an Apply button: filters act at once (decision 0054).

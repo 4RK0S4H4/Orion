@@ -66,7 +66,7 @@
     vertical-align: middle;
     overflow-wrap: anywhere;
   }
-  .s4-table :is(th, td).num { white-space: nowrap; }
+  .s4-table :is(th, td):is(.s4-num, .num) { white-space: nowrap; }
   .s4-table th {
     height: var(--s4-size-table-header);
     color: var(--md-sys-color-on-surface-variant);
@@ -90,7 +90,7 @@
     letter-spacing: var(--md-sys-typescale-title-small-tracking);
     font-weight: var(--md-sys-typescale-title-small-weight);
   }
-  .s4-table :is(th, td).num { text-align: end; }
+  .s4-table :is(th, td):is(.s4-num, .num) { text-align: end; }
   /* a column that may wrap (descriptions, notes) */
   .s4-table :is(th, td)[data-wrap] { min-width: calc(var(--s4-space-16) * 3); white-space: normal; }
 
@@ -123,7 +123,7 @@
     transition: color var(--s4-motion-state);
   }
   /* numbers: the arrow goes before the label so the label stays aligned with the figures */
-  .s4-table th.num .s4-table-sort { flex-direction: row-reverse; }
+  .s4-table th:is(.s4-num, .num) .s4-table-sort { flex-direction: row-reverse; }
   .s4-table-sort .s4-icon {
     opacity: 0;
     transition:
@@ -275,7 +275,7 @@
       margin-inline-start: calc(var(--s4-space-2) * -1);
     }
     .s4-table thead tr:not(:has(th:is([aria-sort], [data-check]))) { display: none; }
-    .s4-table thead th.num .s4-table-sort { flex-direction: row; }
+    .s4-table thead th:is(.s4-num, .num) .s4-table-sort { flex-direction: row; }
     .s4-table-sort .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
 
     .s4-table-wrap:is([data-sticky], :has(> .s4-table[data-sticky])) thead {
@@ -384,7 +384,7 @@
 
   /* ---------- a column's menu button: there for touch and the keyboard, quiet until pointed at ---------- */
   .s4-table-col-menu { vertical-align: middle; margin-inline-start: var(--s4-space-1); }
-  .s4-table th.num .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
+  .s4-table th:is(.s4-num, .num) .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
   /* with a pointer it floats over the header's end (start for numbers) and shows on hover or focus */
   @media (hover: hover) {
     .s4-table-col-menu {
@@ -396,7 +396,7 @@
       translate: 0 -50%;
       background: var(--_table-bg, var(--md-sys-color-surface-container-low));
     }
-    .s4-table th.num .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
+    .s4-table th:is(.s4-num, .num) .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
     .s4-table thead th:not(:hover, :focus-within) .s4-table-col-menu:not([aria-expanded="true"]) { opacity: 0; }
     .s4-table[data-column-menu] thead th { position: relative; }
     .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-column-menu] thead th { position: sticky; }
@@ -429,7 +429,7 @@
     text-overflow: ellipsis;
     transition: background-color var(--s4-motion-state);
   }
-  td.num > .s4-table-input { text-align: end; }
+  td:is(.s4-num, .num) > .s4-table-input { text-align: end; }
   @media (hover: hover) { .s4-table-input:hover { background: var(--md-sys-color-surface-container-high); cursor: text; } }
   @media (hover: none) { .s4-table-input { background: var(--md-sys-color-surface-container); } }
   .s4-table-input:focus { background: var(--md-sys-color-surface-container-highest); outline: 0; }

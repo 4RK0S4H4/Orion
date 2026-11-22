@@ -75,6 +75,11 @@
     .s4-filter > :is(.s4-filter-views, .s4-filter-active) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1); }
     .s4-filter > :is(.s4-filter-views, .s4-filter-active) > * { flex: none; }
     .s4-filter-bar > .s4-search { flex-basis: 100%; }
+    /* decision 0065: one row of tools on a phone. The quiet tools keep their names for screen readers and show their icon */
+    .s4-filter-bar .s4-button:not([data-variant="tonal"], [data-variant="filled"]) > :is(.s4-filter-label, .s4-filter-sort-label) {
+      position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    .s4-filter-bar .s4-button:not([data-variant="tonal"], [data-variant="filled"]):has(> :is(.s4-filter-label, .s4-filter-sort-label)) { padding-inline: var(--s4-space-3); }
   }
   @media print { .s4-filter-bar, .s4-filter-views { display: none; } }
 }

@@ -17,6 +17,7 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
+import { knownClasses, silentAudit } from '../skill/s4-orion/scripts/silent.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
@@ -1172,6 +1173,13 @@ async function runPage(browser, bname, rel, mode, reduced) {
     await page.waitForTimeout(450);
     if (!reduced) {
       (await page.evaluate(audit, { phone: mode.phone })).forEach(add);
+      /* silent failures (decision 0065): unknown s4- classes, words split across lines, parts outside their component */
+      await page.evaluate(knownClasses);
+      const quiet = await page.evaluate(silentAudit);
+      quiet.unknown.forEach((x) => add(`unknown class ${x}`));
+      quiet.broken.forEach((x) => add(x));
+      quiet.container.forEach((x) => add(x));
+      quiet.loud.forEach((x) => add(`${x} (decision 0065: a status is a tint)`));
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);

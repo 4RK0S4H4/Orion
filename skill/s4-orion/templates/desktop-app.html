@@ -35,7 +35,8 @@
   .pl-lang-pct { color: var(--md-sys-color-on-surface-variant); }
 
   /* the strings view fills the window's body: list and detail each scroll on their own */
-  #split { --s4-split-list: calc(var(--s4-space-16) * 5); }
+  /* the list takes a good share of the window (lines wrap to two or three rows, not five); its grip resizes it */
+  #split { --s4-split-list: clamp(calc(var(--s4-space-16) * 5), 44%, calc(var(--s4-space-16) * 8)); }
   .pl-strings { display: flex; flex-direction: column; gap: var(--s4-space-3); }
   .pl-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .pl-filters > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
@@ -315,9 +316,9 @@
 
   <!-- the inspector: the selected line's properties, at the window's end (from 840) -->
   <aside class="s4-inspector" aria-label="Line properties" id="inspector" data-resize-key="parley-inspector" data-density="compact">
-    <header class="s4-inspector-header"><h2 class="s4-inspector-title">Line</h2><button class="s4-icon-button" type="button" aria-label="Hide Inspector" data-tooltip="Hide Inspector" data-cmd="view.inspector"><span class="s4-icon" data-icon="close"></span></button></header>
+    <header class="s4-inspector-header"><h2 class="s4-inspector-title">Line</h2><button class="s4-icon-button" type="button" aria-label="Hide Inspector" data-tooltip="Hide Inspector" data-cmd="view.inspector" data-cmd-plain><span class="s4-icon" data-icon="close"></span></button></header>
     <div class="s4-inspector-body">
-      <details class="s4-inspector-group" open><summary>Line</summary>
+      <details class="s4-inspector-group" open><summary>Details</summary>
         <div class="s4-inspector-fields">
           <div class="s4-inspector-row"><span>Key</span><span class="pl-mono" id="i-key"></span></div>
           <div class="s4-inspector-row"><span>File</span><span id="i-file"></span></div>
@@ -405,7 +406,8 @@ var LINES = [
     note: 'Main menu button. Twenty characters at most.', src: 'Continue', tr: { fr: 'Continuer', de: 'Weiter', ja: 'つづける', pt: 'Continuar' }, tm: [] },
   { key: 'ui.menu.ferry', file: 'ui-menus', title: 'Fast travel', speaker: 'Narrator', max: 32, status: 'review', changed: 'Today, 9:41',
     note: 'Map button. The ferry is the fast travel.', src: 'Take the ferry to {place}', tr: { fr: 'Prendre le ferry pour {place}' }, tm: [] }];
-var STATUS = { new: ['Untranslated', 'secondary'], draft: ['Draft', 'tertiary'], review: ['Needs Review', 'error'], ok: ['Approved', 'primary'] };
+/* statuses are tints (decision 0065): the one state that needs someone now (review) is warm, finished work is quiet */
+var STATUS = { new: ['Untranslated', ''], draft: ['Draft', 'secondary'], review: ['Needs Review', 'warning'], ok: ['Approved', ''] };
 var lang = 'fr', file = 'lh-dialogue', filter = 'all', current = LINES[0];
 
 function langOf(c) { return LANGS.filter(function (l) { return l.code === c; })[0]; }
@@ -526,7 +528,10 @@ function step(d, untranslated) {
   S4.snackbar({ text: 'Every line in this file has a ' + langOf(lang).name + ' translation' });
 }
 function select(l) { current = l; var row = list.querySelector('[data-value="' + l.key + '"]'); if (row) { row.click(); } else renderDetail(); }
-var inspectorOn = true, sidebarOn = true, statusOn = true, zoom = 100;
+/* the inspector starts open only where list, detail and inspector all have room (from 1440); View > Inspector or
+   mod+alt+i opens it anywhere from 840 */
+var inspectorOn = window.innerWidth >= 1440, sidebarOn = true, statusOn = true, zoom = 100;
+S4.desktop.inspector($('inspector'), inspectorOn);
 S4.commands.add([
   { id: 'file.open', label: 'Open File…', group: 'File', icon: 'folder', shortcut: 'mod+o', run: function () { var next = FILES.filter(function (f) { return !tabFor(f.id); })[0] || FILES[0]; openFile(next.id); } },
   { id: 'recent.journal', label: 'journal.json', palette: false, run: function () { openFile('lh-journal'); } },

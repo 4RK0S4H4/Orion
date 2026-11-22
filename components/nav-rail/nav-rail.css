@@ -67,8 +67,10 @@
   /* the menu button's icon lines up with the item icons */
   .s4-nav-rail-header > [data-rail-toggle] { align-self: flex-start; margin-inline-start: calc((var(--_row) - var(--s4-size-icon-button)) / 2); }
 
-  /* ---------- the main action: a solid primary button, the same row as the items ---------- */
-  .s4-nav-rail-header > .s4-fab {
+  /* ---------- the main action: a solid primary button, the same row as the items ----------
+     It belongs in .s4-nav-rail-header; a .s4-fab anywhere else in the rail (straight in it, in the footer) is drawn the
+     same way, never as the floating FAB squeezed into the rail (decision 0065). */
+  .s4-nav-rail .s4-fab {
     --_h: var(--_row);
     --_bg: var(--md-sys-color-primary);
     --_fg: var(--md-sys-color-on-primary);
@@ -88,10 +90,10 @@
     letter-spacing: var(--md-sys-typescale-label-large-tracking);
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
-  .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
-  .s4-nav-rail:not([data-expanded]) .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { white-space: nowrap; }
-  .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
+  .s4-nav-rail:not([data-expanded]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
+  .s4-nav-rail[data-expanded] .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {
@@ -204,12 +206,20 @@
 
   /* ---------- labels: beside the icon, shown when the rail is expanded ---------- */
   .s4-nav-rail .s4-nav-label,
-  .s4-nav-rail-header > .s4-fab > :not(.s4-icon),
+  .s4-nav-rail .s4-fab > :not(.s4-icon),
   .s4-nav-rail-title {
     transition: opacity var(--s4-motion-state);
   }
-  .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-nav-rail-header > .s4-fab > :not(.s4-icon)) { opacity: 0; }
+  .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-fab > :not(.s4-icon)) { opacity: 0; }
   .s4-nav-rail:not([data-expanded]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
+  /* written straight into the rail (without its header or items group), the main action and the items keep the inset
+     they have in their groups (decision 0065); the inset is the rail's own, not the FAB's --_pad */
+  .s4-nav-rail > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) {
+    margin-inline: calc((var(--s4-size-nav-rail) - var(--s4-size-nav-row)) / 2);
+    inline-size: auto;
+    align-self: stretch;
+    flex: none;
+  }
   @media (forced-colors: active) {
     .s4-nav-rail { border-inline-end: 1px solid CanvasText; }
   }

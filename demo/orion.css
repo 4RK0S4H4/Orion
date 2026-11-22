@@ -1711,6 +1711,10 @@
   /* ---------- numbers ---------- */
   /* long words and names never push a layout wider than the screen */
   :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, th, td, caption, figcaption, legend, label, summary, blockquote) { overflow-wrap: anywhere; }
+  /* a table that does not stack keeps words whole: a column is at least as wide as its longest word and the wrap scrolls
+     sideways, instead of "Exhibition" split over three lines (decision 0065); stacked, a cell has the whole width */
+  :where(.s4-table) :where(th, td) { overflow-wrap: break-word; }
+  @container s4-table (width < 600px) { :where(.s4-table) :where(th, td) { overflow-wrap: anywhere; } }
   .s4-num { font-variant-numeric: tabular-nums; white-space: nowrap; }   /* amounts, counts, dates, IDs */
   .s4-on-surface-variant { color: var(--md-sys-color-on-surface-variant); }
   .s4-visually-hidden { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
@@ -2440,7 +2444,7 @@
       text-align: start;
       white-space: normal;
     }
-    .s4-table :is(td, th).num { text-align: end; }
+    .s4-table :is(td, th):is(.s4-num, .num) { text-align: end; }
     .s4-table :is(tbody, tfoot) :is(td, th)[data-label]::before { content: none; }
     .s4-table thead th:not([aria-sort]):not([data-check]) { display: table-cell; }
     .s4-table tbody td[data-check], .s4-table thead th[data-check] { display: none; }
@@ -3766,8 +3770,10 @@
   /* the menu button's icon lines up with the item icons */
   .s4-nav-rail-header > [data-rail-toggle] { align-self: flex-start; margin-inline-start: calc((var(--_row) - var(--s4-size-icon-button)) / 2); }
 
-  /* ---------- the main action: a solid primary button, the same row as the items ---------- */
-  .s4-nav-rail-header > .s4-fab {
+  /* ---------- the main action: a solid primary button, the same row as the items ----------
+     It belongs in .s4-nav-rail-header; a .s4-fab anywhere else in the rail (straight in it, in the footer) is drawn the
+     same way, never as the floating FAB squeezed into the rail (decision 0065). */
+  .s4-nav-rail .s4-fab {
     --_h: var(--_row);
     --_bg: var(--md-sys-color-primary);
     --_fg: var(--md-sys-color-on-primary);
@@ -3787,10 +3793,10 @@
     letter-spacing: var(--md-sys-typescale-label-large-tracking);
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
-  .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
+  .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
-  .s4-nav-rail:not([data-expanded]) .s4-nav-rail-header > .s4-fab > :not(.s4-icon) { white-space: nowrap; }
-  .s4-nav-rail[data-expanded] .s4-nav-rail-header > .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
+  .s4-nav-rail:not([data-expanded]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
+  .s4-nav-rail[data-expanded] .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {
@@ -3903,12 +3909,20 @@
 
   /* ---------- labels: beside the icon, shown when the rail is expanded ---------- */
   .s4-nav-rail .s4-nav-label,
-  .s4-nav-rail-header > .s4-fab > :not(.s4-icon),
+  .s4-nav-rail .s4-fab > :not(.s4-icon),
   .s4-nav-rail-title {
     transition: opacity var(--s4-motion-state);
   }
-  .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-nav-rail-header > .s4-fab > :not(.s4-icon)) { opacity: 0; }
+  .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-fab > :not(.s4-icon)) { opacity: 0; }
   .s4-nav-rail:not([data-expanded]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
+  /* written straight into the rail (without its header or items group), the main action and the items keep the inset
+     they have in their groups (decision 0065); the inset is the rail's own, not the FAB's --_pad */
+  .s4-nav-rail > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) {
+    margin-inline: calc((var(--s4-size-nav-rail) - var(--s4-size-nav-row)) / 2);
+    inline-size: auto;
+    align-self: stretch;
+    flex: none;
+  }
   @media (forced-colors: active) {
     .s4-nav-rail { border-inline-end: 1px solid CanvasText; }
   }
@@ -6231,7 +6245,7 @@
     vertical-align: middle;
     overflow-wrap: anywhere;
   }
-  .s4-table :is(th, td).num { white-space: nowrap; }
+  .s4-table :is(th, td):is(.s4-num, .num) { white-space: nowrap; }
   .s4-table th {
     height: var(--s4-size-table-header);
     color: var(--md-sys-color-on-surface-variant);
@@ -6255,7 +6269,7 @@
     letter-spacing: var(--md-sys-typescale-title-small-tracking);
     font-weight: var(--md-sys-typescale-title-small-weight);
   }
-  .s4-table :is(th, td).num { text-align: end; }
+  .s4-table :is(th, td):is(.s4-num, .num) { text-align: end; }
   /* a column that may wrap (descriptions, notes) */
   .s4-table :is(th, td)[data-wrap] { min-width: calc(var(--s4-space-16) * 3); white-space: normal; }
 
@@ -6288,7 +6302,7 @@
     transition: color var(--s4-motion-state);
   }
   /* numbers: the arrow goes before the label so the label stays aligned with the figures */
-  .s4-table th.num .s4-table-sort { flex-direction: row-reverse; }
+  .s4-table th:is(.s4-num, .num) .s4-table-sort { flex-direction: row-reverse; }
   .s4-table-sort .s4-icon {
     opacity: 0;
     transition:
@@ -6440,7 +6454,7 @@
       margin-inline-start: calc(var(--s4-space-2) * -1);
     }
     .s4-table thead tr:not(:has(th:is([aria-sort], [data-check]))) { display: none; }
-    .s4-table thead th.num .s4-table-sort { flex-direction: row; }
+    .s4-table thead th:is(.s4-num, .num) .s4-table-sort { flex-direction: row; }
     .s4-table-sort .s4-icon { opacity: var(--md-sys-state-disabled-content-opacity); }
 
     .s4-table-wrap:is([data-sticky], :has(> .s4-table[data-sticky])) thead {
@@ -6549,7 +6563,7 @@
 
   /* ---------- a column's menu button: there for touch and the keyboard, quiet until pointed at ---------- */
   .s4-table-col-menu { vertical-align: middle; margin-inline-start: var(--s4-space-1); }
-  .s4-table th.num .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
+  .s4-table th:is(.s4-num, .num) .s4-table-col-menu { margin-inline: 0 var(--s4-space-1); }
   /* with a pointer it floats over the header's end (start for numbers) and shows on hover or focus */
   @media (hover: hover) {
     .s4-table-col-menu {
@@ -6561,7 +6575,7 @@
       translate: 0 -50%;
       background: var(--_table-bg, var(--md-sys-color-surface-container-low));
     }
-    .s4-table th.num .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
+    .s4-table th:is(.s4-num, .num) .s4-table-col-menu { inset-inline: var(--s4-space-2) auto; margin: 0; }
     .s4-table thead th:not(:hover, :focus-within) .s4-table-col-menu:not([aria-expanded="true"]) { opacity: 0; }
     .s4-table[data-column-menu] thead th { position: relative; }
     .s4-table-wrap:is([data-sticky], [data-virtual]) .s4-table[data-column-menu] thead th { position: sticky; }
@@ -6594,7 +6608,7 @@
     text-overflow: ellipsis;
     transition: background-color var(--s4-motion-state);
   }
-  td.num > .s4-table-input { text-align: end; }
+  td:is(.s4-num, .num) > .s4-table-input { text-align: end; }
   @media (hover: hover) { .s4-table-input:hover { background: var(--md-sys-color-surface-container-high); cursor: text; } }
   @media (hover: none) { .s4-table-input { background: var(--md-sys-color-surface-container); } }
   .s4-table-input:focus { background: var(--md-sys-color-surface-container-highest); outline: 0; }
@@ -6828,6 +6842,11 @@
     .s4-filter > :is(.s4-filter-views, .s4-filter-active) { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: var(--s4-space-2); margin: calc(var(--s4-space-2) * -1); }
     .s4-filter > :is(.s4-filter-views, .s4-filter-active) > * { flex: none; }
     .s4-filter-bar > .s4-search { flex-basis: 100%; }
+    /* decision 0065: one row of tools on a phone. The quiet tools keep their names for screen readers and show their icon */
+    .s4-filter-bar .s4-button:not([data-variant="tonal"], [data-variant="filled"]) > :is(.s4-filter-label, .s4-filter-sort-label) {
+      position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+    }
+    .s4-filter-bar .s4-button:not([data-variant="tonal"], [data-variant="filled"]):has(> :is(.s4-filter-label, .s4-filter-sort-label)) { padding-inline: var(--s4-space-3); }
   }
   @media print { .s4-filter-bar, .s4-filter-views { display: none; } }
 }
@@ -11501,13 +11520,16 @@
 /* Status (S4 addition): a small pill that names the state of a thing.
    <span class="s4-status">Draft</span>
    <span class="s4-status" data-tone="primary|secondary|tertiary|error" data-dot>Overdue</span>
-   Neutral by default (surface-container-high / on-surface-variant); a tone uses the matching container role. The
-   label always says the status: tone and dot only reinforce it, so it never relies on color alone.
+   Neutral by default (surface-container-high / on-surface-variant). A status is always a tint (decision 0065): the
+   status colors (success, warning, info, error) use their pale containers, the accent tones (primary, secondary,
+   tertiary) a 16% wash of their color; only the one state that needs action now takes error (or warning for soon).
+   The label always says the status: tone and dot only reinforce it, so it never relies on color alone.
    Not interactive: to filter by status use a filter chip. */
 @layer s4.components {
   .s4-status {
     --_bg: var(--md-sys-color-surface-container-high);
     --_fg: var(--md-sys-color-on-surface-variant);
+    --_wash: calc(var(--md-sys-state-dragged-state-layer-opacity) * 100%);   /* the accent tones' tint: 16% */
 
     display: inline-flex;
     flex: none;
@@ -11527,7 +11549,7 @@
     letter-spacing: var(--md-sys-typescale-label-medium-tracking);
     font-weight: var(--md-sys-typescale-label-medium-weight);
     font-variant-numeric: tabular-nums;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;   /* words stay whole (a column is sized to them); only a word wider than its box breaks */
     vertical-align: middle;
     --s4-icon-size: var(--s4-space-4);
   }
@@ -11543,9 +11565,12 @@
     background: currentColor;
   }
 
-  .s4-status[data-tone="primary"] { --_bg: var(--md-sys-color-primary-container); --_fg: var(--md-sys-color-on-primary-container); }
-  .s4-status[data-tone="secondary"] { --_bg: var(--md-sys-color-secondary-container); --_fg: var(--md-sys-color-on-secondary-container); }
-  .s4-status[data-tone="tertiary"] { --_bg: var(--md-sys-color-tertiary-container); --_fg: var(--md-sys-color-on-tertiary-container); }
+  /* Decision 0065: a status is a tint, never a fill of the accent. The accent tones are a wash of their color with the
+     surface's own text (a container fill was a black, white or brand slab in some accents: monochrome's primary
+     container is near black, so "Approved" shouted louder than the state that needed action) */
+  .s4-status[data-tone="primary"] { --_bg: color-mix(in srgb, var(--md-sys-color-primary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="secondary"] { --_bg: color-mix(in srgb, var(--md-sys-color-secondary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
+  .s4-status[data-tone="tertiary"] { --_bg: color-mix(in srgb, var(--md-sys-color-tertiary) var(--_wash), transparent); --_fg: var(--md-sys-color-on-surface); }
   /* plain status colors (decision 0043): fixed green, amber and blue that never change with the accent */
   .s4-status[data-tone="success"] { --_bg: var(--s4-color-success-container); --_fg: var(--s4-color-on-success-container); }
   .s4-status[data-tone="warning"] { --_bg: var(--s4-color-warning-container); --_fg: var(--s4-color-on-warning-container); }
@@ -12440,7 +12465,7 @@
   /* FLOATING ACTION BUTTONS (decision 0025): glass too, tinted with the FAB's own color (--_bg) instead of the surface color, so
      it keeps its identity (primary-container by default, or the data-color it sets). Its icon and label keep the FAB's own
      on-color; scripts/check-glass.mjs proves that pair too. */
-  :where(.s4-fab:not([data-glass="off"], .s4-nav-rail-header > *)) {
+  :where(.s4-fab:not([data-glass="off"], .s4-nav-rail *)) {
     --_surface: var(--_bg);   /* the floating button's own color */
     --_edge-hi: color-mix(in oklab, var(--_surface), white calc(var(--s4-glass-edge-lift) * 100%));
     --_glass-tint: var(--s4-glass-tint-opacity-fab);
@@ -12459,7 +12484,7 @@
     backdrop-filter: blur(var(--s4-glass-blur-float)) saturate(var(--s4-glass-saturation-float)) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
   }
   @supports (color: color-mix(in oklab, red, white calc(50% * 1))) and (color: color-mix(in srgb, red min(100%, calc(1 * 100%)), transparent)) {
-    :where(.s4-fab:not([data-glass="off"], .s4-nav-rail-header > *)) {
+    :where(.s4-fab:not([data-glass="off"], .s4-nav-rail *)) {
       box-shadow:
       inset 0 calc(var(--s4-glass-edge-width) * var(--_edge-scale)) calc(var(--s4-glass-edge-width) * var(--_edge-scale)) 0 color-mix(in srgb, var(--_edge-hi) calc(var(--_aT) * 100%), transparent),
       inset 0 calc(-1 * calc(var(--s4-glass-edge-width) * var(--_edge-scale))) calc(var(--s4-glass-edge-width) * var(--_edge-scale)) 0 color-mix(in srgb, var(--_edge-hi) calc(var(--_aB) * 100%), transparent),
@@ -12472,7 +12497,7 @@
     }
   }
   @supports (color: oklch(from red calc(1 - l) c h)) and (color: color-mix(in oklab, red, white calc(50% * 1))) {
-    :where(.s4-fab:not([data-glass="off"], .s4-nav-rail-header > *)) {
+    :where(.s4-fab:not([data-glass="off"], .s4-nav-rail *)) {
       box-shadow:
       inset 0 calc(var(--s4-glass-edge-width) * var(--_edge-scale)) calc(var(--s4-glass-edge-width) * var(--_edge-scale)) 0 color-mix(in srgb, var(--_edge-hi) calc(var(--_aT) * 100%), transparent),
       inset 0 calc(-1 * calc(var(--s4-glass-edge-width) * var(--_edge-scale))) calc(var(--s4-glass-edge-width) * var(--_edge-scale)) 0 color-mix(in srgb, var(--_edge-hi) calc(var(--_aB) * 100%), transparent),
@@ -12484,7 +12509,7 @@
       inset calc(-1 * var(--s4-glass-glow-size)) 0 var(--s4-glass-glow-size) calc(-1 * var(--s4-glass-glow-size)) oklch(from var(--_surface) calc(.99 - .96 * clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1)) calc(c * .3) h / calc(var(--s4-glass-glow-alpha) * min(1, var(--_aR) / max(var(--s4-glass-edge-top-alpha), .001)) * (1 - clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1)) + var(--s4-glass-glow-shade-alpha) * min(1, var(--_aR) / max(var(--s4-glass-edge-top-alpha), .001)) * clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1)));
     }
   }
-  :where(.s4-fab[data-color]:not([data-glass="off"], .s4-nav-rail-header > *)) { --_glass-tint: var(--s4-glass-tint-opacity-fab-color); }   /* decision 0032 */
+  :where(.s4-fab[data-color]:not([data-glass="off"], .s4-nav-rail *)) { --_glass-tint: var(--s4-glass-tint-opacity-fab-color); }   /* decision 0032 */
   :where(:root[data-contrast="high"]) :where(.s4-fab) { background-color: var(--_bg); box-shadow: var(--_elevation); -webkit-backdrop-filter: none; backdrop-filter: none; }
   @media (prefers-reduced-transparency: reduce) {
     :where(.s4-fab) { background-color: var(--_bg); box-shadow: var(--_elevation); -webkit-backdrop-filter: none; backdrop-filter: none; }
