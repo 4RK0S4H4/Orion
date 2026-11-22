@@ -892,10 +892,14 @@ async function use(page, add, phone) {
         if (after !== before) add(`filter: clearing the search left ${after} of ${before} rows`);
       }
       const views = await f.locator('.s4-filter-views .s4-chip[aria-pressed="false"]').all();
-      if (views.length && await click(views[0], 'saved view')) {
-        await settle(300);
-        if ((await views[0].getAttribute('aria-pressed').catch(() => 'true')) === 'false' && !(await f.evaluate((x) => x.querySelector('.s4-filter-views .s4-chip[aria-pressed="true"]') !== x.querySelector('.s4-filter-views .s4-chip')))) add('filter: choosing a saved view did not select it');
-        await click(f.locator('.s4-filter-views .s4-chip').first(), 'first saved view'); await settle(300);
+      if (views.length) {
+        const want = await views[0].getAttribute('data-view');
+        if (await click(views[0], 'saved view')) {
+          await settle(300);
+          const got = await f.evaluate((x) => { const c = x.querySelector('.s4-filter-views .s4-chip[aria-pressed="true"]'); return c ? c.dataset.view : null; });
+          if (got !== want) add(`filter: choosing a saved view did not select it (pressed: ${got})`);
+          await click(f.locator('.s4-filter-views .s4-chip').first(), 'first saved view'); await settle(300);
+        }
       }
     }
     for (const c of (await visible('.s4-code .s4-code-actions')).slice(0, 1)) {

@@ -116,7 +116,7 @@
          to the main landmark, never <body> (decisions 0065 and 0069) */
       var back = [from, d._s4prev].filter(function (x) { return x && x.isConnected && x.getClientRects().length && !x.closest('[hidden]'); })[0];
       d._s4prev = null;
-      if (back) back.focus({ preventScroll: true }); else if (!document.activeElement || document.activeElement === document.body) S4.util.land();
+      if (back) back.focus({ preventScroll: true }); else { var a = document.activeElement; if (!a || a === document.body || d.contains(a)) S4.util.land(); }   /* a closed dialog can still hold focus for a moment */
       S4.util.emit(d, 's4-close', { value: value || '' });
     });
   }

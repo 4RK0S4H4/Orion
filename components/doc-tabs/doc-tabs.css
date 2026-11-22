@@ -42,7 +42,7 @@
     app-region: no-drag;
   }
   .s4-doc-tabs-list::-webkit-scrollbar { display: none; }
-  .s4-doc-tabs > .s4-icon-button { flex: none; -webkit-app-region: no-drag; app-region: no-drag; }
+  .s4-doc-tabs > .s4-icon-button, .s4-doc-tabs-new { flex: none; -webkit-app-region: no-drag; app-region: no-drag; }   /* .s4-doc-tabs-new is the New File button; it is named here so the class is defined (the unknown-class check reads minified bundles, which lose comments) */
   /* rings are drawn inside: the row is short and scrolls sideways, so a ring outside would be cut */
   .s4-doc-tabs > .s4-icon-button:focus-visible, .s4-doc-tab-close:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
 
