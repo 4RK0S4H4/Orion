@@ -133,6 +133,15 @@ Right and Left move through the row's controls and cells that edit, Home and End
 extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
 On a group row, Enter or Right and Left open and close the group.
 
+**Header keys, said out loud (decision 0067):** the header's sort, options and resize controls have no Tab stop, so
+nothing on screen shows how to reach them: the way is **Up from the first row**, then Left and Right, then Down to come
+back. A data table therefore says so twice. `table.js` gives the table an `aria-description` with the same words (a
+screen reader reads it with the table's name; write your own `aria-description` to replace it), and puts a one-line
+`p.s4-table-hint` under the wrap that fades in while focus is visibly inside the table (keyboard focus only; its line is
+reserved so nothing moves; never on a touch screen or in print). `data-hint="off"` on the table leaves the visible line
+out when the page explains the keys itself (the description stays). Don't tell the person the keys in a tooltip on each
+header: the hint is one place.
+
 **The wrap:** a table always sits in `.s4-table-wrap` (the scroller, and the container that stacks rows under 600);
 table.js adds one around a bare `.s4-table`, unless its parent already scrolls sideways. Cells that do not stack keep
 words whole: a column is at least as wide as its longest word and the wrap scrolls (decision 0065).

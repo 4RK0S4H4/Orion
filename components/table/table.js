@@ -323,6 +323,7 @@
     this.wire();
     this.columnMenus();
     this.headKeys();
+    this.hint();
     this.skeletons();
   }
   Data.prototype = {
@@ -801,6 +802,17 @@
     headTargets: function () {
       var row = this.table.tHead && this.table.tHead.rows[this.table.tHead.rows.length - 1]; if (!row) return [];
       return slice(row.querySelectorAll('input, button, a[href], .s4-table-grip')).filter(function (x) { return !x.disabled && !x.closest('th[hidden]') && x.getClientRects().length; });
+    },
+    /* the grid's header keys are not on screen anywhere, so they are said: aria-description on the table for a screen reader,
+       and a short line under the wrap that fades in while the keyboard is inside the table (decision 0067). data-hint="off"
+       on the table leaves the visible line out (the description stays). */
+    hint: function () {
+      var t = this.table;
+      if (!t.hasAttribute('aria-description')) t.setAttribute('aria-description', 'Arrow keys move between rows and cells. Up from the first row reaches the column headers: Left and Right move between each column\'s sort, options and resize controls, and Down returns to the rows.');
+      if (t.getAttribute('data-hint') === 'off' || !this.wrap || (this.wrap.nextElementSibling && this.wrap.nextElementSibling.classList.contains('s4-table-hint'))) return;
+      var h = document.createElement('p'); h.className = 's4-table-hint'; h.setAttribute('aria-hidden', 'true');
+      h.textContent = 'Up from the first row reaches the column headers: Left and Right choose sort, options or resize, Down comes back.';
+      this.wrap.parentNode.insertBefore(h, this.wrap.nextSibling);
     },
     headRove: function (to) {
       var ts = this.headTargets(); if (!ts.length) return;

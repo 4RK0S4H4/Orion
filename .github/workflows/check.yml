@@ -27,6 +27,8 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:suite
       - run: npm run test:pages
+      - run: npm run test:checker
+      - run: npm run test:back
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

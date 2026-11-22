@@ -496,6 +496,16 @@ async function use(page, add, phone) {
         (await page.evaluate(nestAudit)).forEach(add);
         await page.keyboard.press('Escape'); await settle(420);
         if (!(await until(() => !document.querySelector('.s4-palette').open))) add('the command palette did not close with Escape');
+        /* decision 0067: the one place a script may put the cursor in a field is a palette the person's own shortcut opened
+           (they are already typing). The same palette opened by a click above must not; opened by mod+K the box has it. */
+        await page.evaluate(() => document.activeElement && document.activeElement.blur && document.activeElement.blur());
+        await page.keyboard.press('Control+k'); await settle(520);
+        const ks = await page.evaluate(() => { const d = document.querySelector('.s4-palette'); return { open: !!d && d.open, inBox: !!d && d.contains(document.activeElement) && document.activeElement.matches('input') }; });
+        if (!ks.open) add('the command palette did not open with mod+K');
+        else {
+          if (!ks.inBox) add('the command palette opened by mod+K did not put the cursor in its box (decision 0067: a shortcut the person typed is their own action)');
+          await page.keyboard.press('Escape'); await settle(420);
+        }
       }
     }
     /* inline confirm */

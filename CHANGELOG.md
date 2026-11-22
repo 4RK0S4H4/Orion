@@ -6,9 +6,20 @@ All notable changes to S4 Orion are recorded here. The format follows [Keep a Ch
 - **Minor**: new tokens, components, variants or skill guidance that existing apps can ignore.
 - **Patch**: fixes that bring output back in line with the documented rules (contrast, bugs, docs).
 
-## [1.1.0] - Unreleased
+## [1.2.0] - Unreleased
 
-Round 0058, workstream B: a light site bundle, a wide Showcase and the new dials (decision 0066):
+Round 0059 (decisions 0067 and 0068; the dated release and its git tag come after review 4).
+
+Workstream A, the small things review 3 found (decision 0067):
+
+- Added: dial values are validated. `S4.theme` (and `S4.theme(options, element)`) with a value off a dial's list (`scale: 'roomy'`, `corners: 'square'`, `mode: 'sepia'`, a bad `variant` or `contrast`) warns in the console, names the allowed values and does not write the attribute. `S4.theme.dials` is the list and `S4.theme.audit()` returns the dial attributes in the page with a bad value (a page that writes `data-scale="roomy"` in its markup is warned too). The page checker fails them. Covers every dial of decisions 0055, 0056 and 0066 and the app defaults (`data-buttons`, `data-cards`, `data-lists`, `data-rail`, `data-density`).
+- Added: a data table says its header keys out loud: `aria-description` on the table, and a one-line `p.s4-table-hint` under the wrap that shows while the keyboard is in the table (`data-hint="off"` leaves the line out). A "Header keys" section in the table README and the skill reference.
+- Added: the page checker's one-glyph-wide rule now fires on a box with no width at all (a FAB straight in a rail), not only on a split word; known-bad pages in `tests/fixtures` (a table nothing stacks, a FAB in a rail, unknown dial values) and `npm run test:checker`, which expects the checker to fail each with its message. `npm run test:back` proves Back restores scroll and returns focus in the editor, the calendar and the Showcase, by the browser's Back and the bar's.
+- Changed: decision 0049 words its one exception: a palette or search that the person's own keyboard shortcut opens (mod+K, mod+comma into the palette) may put the cursor in its search field; by tap or click it never does. The suite proves both halves.
+
+## [1.1.0] - 2026-11-22
+
+Released as the state of the repository at the end of round 0058 (the section grew from 2026-11-14, when it was opened, to this date). Round 0058, workstream B: a light site bundle, a wide Showcase and the new dials (decision 0066):
 
 - Added: the site bundle, `orion.site.min.css` and `orion.site.min.js` (what a `body.s4-site` page uses: 42 KB + 26 KB gzip, was 63 + 114), and `inter-site.woff2` (Inter cut to Latin and weights 400 to 900: 67 KB, was 161), written by a dependency-free subsetter (`scripts/font-subset.mjs`). The five site templates and the hub load it; `npm run check` holds a size budget (CSS 44, JS 30, font 70, total 180 KB) and fails a site template that needs something the site bundle leaves out.
 - Added: two brand dials, `scale` (`compact`, `large`: type and spacing step together; `components/base/scale.css`, generated from the tokens) and `headings` (`tight`, `editorial`: weight, tracking and leading of the heading roles), through `S4.theme`, `data-*` on any element and `data-brand-dial`. Tally uses compact and tight; Tidewater uses editorial in place of its own heading CSS.
@@ -181,7 +192,7 @@ The overhaul (decision 0043): one language for phones, desktop windows and deskt
 - Empty checkboxes and radios keep 3:1 against their surface (`--s4-color-control`); placeholder text keeps 4.5:1.
 - Slider reaches both ends; stop dots no longer peek out beside the handle. The composer's buttons line up with its field. The select on the text field reference page opens the glass menu.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-11-13
 
 The first version of S4 Orion, a leaner rebuild of S4 Material 1.3 on Material 3 Expressive.
 

@@ -17,6 +17,10 @@ pages, the command palette, validation errors, and anything built later.
 - A failed form shows its error on the field; it does not jump the cursor there.
 - `S4.util.typable(el)` tells a component whether an element would bring up a keyboard.
 
+## Amended by 0067
+A palette or search that the person's own keyboard shortcut opens (mod+K, mod+comma into the palette) may put the cursor in its
+search field: that is the person's own action, the same as tapping it. By tap or click it still never does. Nothing else changes.
+
 ## Checked by
 The production suite fails if a text field holds the cursor after a dialog, panel, expand or page opens.
 
