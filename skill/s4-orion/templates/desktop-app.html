@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Parley · Saltreach, French</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Desktop App, as a product (issue 66). Parley is a translation workbench for game studios: translators
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.commands.min.css and .js, orion.desktop.min.css and .js, orion.direct.min.css and .js, orion.inputs.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Desktop App, as a product (issue 66). Parley is a translation workbench for game studios: translators
      work through every line of a game, file by file, with the source, a place to write, the context, and a picture of
      how the line will look in the game. This window is Inès Moreau, the French lead at Lanternfish Games, translating
      their lighthouse game Saltreach.
@@ -22,7 +22,11 @@
      game's dialogue box, which shows when a translation is too long for it), the length meter, placeholder pills,
      translation-memory matches with their percentage, language progress. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.commands.min.css">
+<link rel="stylesheet" href="orion.desktop.min.css">
+<link rel="stylesheet" href="orion.direct.min.css">
+<link rel="stylesheet" href="orion.inputs.min.css">
 <link rel="stylesheet" href="brand/desktop-app.css?v=f18d6dc">
 <style>
   /* Parley's own elements and layout: tokens only; nothing here restyles an Orion component */
@@ -361,7 +365,11 @@
 </div>
 
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.commands.min.js"></script>
+<script src="orion.desktop.min.js"></script>
+<script src="orion.direct.min.js"></script>
+<script src="orion.inputs.min.js"></script>
 <script>
 /* Parley's look: vermilion (fidelity: the signal color itself, not a muted cousin) on cool grays, firm corners, the system typeface, calm motion (the dials are on <html>) */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e4572e', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

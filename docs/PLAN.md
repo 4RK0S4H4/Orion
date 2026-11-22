@@ -89,7 +89,7 @@ accessibility, so some scores fell although nothing got worse.
      if the owner creates them on GitHub.
    - Review 4 ([`history/round-0059/regrade-4.md`](history/round-0059/regrade-4.md)): 9 / 9 / 8.5 / 9 / 8.5 / 8.5 / 9 / 9.5.
 6b. **Round 0060 — current stage**: review 4's blockers.
-   - **A** (branch `round60/a`, worktree `r60-a`, decision 0069, owns shared docs): app bundle split by component
+   - **A** (built, decision 0069; branch `round60/a`, worktree `r60-a`, owns shared docs): app bundle split by component
      (apps load only what they use; a budget in check); palette Escape with nothing focused lands on main, not body;
      confirm Linnea's toolbar is outside the grid; grid-keys cue for a touch device with a keyboard.
    - **B** (branch `round60/b`, worktree `r60-b`, decision 0070, notes `history/round-0060/b.md`): one accent job per
@@ -117,4 +117,5 @@ action now. The owner can overrule any of these; otherwise they stand.
   header keys surfaced, 0049 wording for shortcut-opened palettes, one-glyph-box rule fixed and proven on known-bad
   fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
   the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.
+- 2026-11-22 (round 0060, workstream A): decision 0069 built (lean app bundle: `orion.core.min.*` plus six packs, `scripts/packs.mjs`, budgets in check, `test:lean`; 15 templates on it; palette Escape lands on main via `S4.util.land`; Linnea's Columns button confirmed outside the grid; grid hint after the first key on touch). Next: A merges B (0070), full tests, publish, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.

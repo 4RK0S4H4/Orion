@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Six Minutes in Luxor · Penumbra</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Article, as a product (issue 66). Penumbra is an app and almanac for people who travel to stand under
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Article, as a product (issue 66). Penumbra is an app and almanac for people who travel to stand under
      the sky; this is one of its guides, on where to watch the total eclipse of 2 August 2027. For help centers, docs,
      blogs, release notes and anything people read: breadcrumbs, a title and byline, prose at reading width, the
      pictures the text needs inside it, and related reading in a supporting pane (after the text on a phone).
@@ -16,7 +16,7 @@
      the city: a value, decision 0059) with the phases drawn as discs, and the countdown. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('penumbra-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
 <link rel="stylesheet" href="brand/article.css?v=6082ebe">
 <style>
   /* Penumbra's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -198,7 +198,7 @@
   </div>
 </div>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
 <script>
 /* Penumbra's brand, under its own key: corona gold over the dials set on <html>. */
 var DIDONE = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();

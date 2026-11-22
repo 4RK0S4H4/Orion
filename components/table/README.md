@@ -138,7 +138,8 @@ nothing on screen shows how to reach them: the way is **Up from the first row**,
 back. A data table therefore says so twice. `table.js` gives the table an `aria-description` with the same words (a
 screen reader reads it with the table's name; write your own `aria-description` to replace it), and puts a one-line
 `p.s4-table-hint` under the wrap that fades in while focus is visibly inside the table (keyboard focus only; its line is
-reserved so nothing moves; never on a touch screen or in print). `data-hint="off"` on the table leaves the visible line
+reserved so nothing moves; in print never; on a touch screen it stays collapsed until the first navigation key is pressed in
+the table, so a tablet with a keyboard gets it too, decision 0069). `data-hint="off"` on the table leaves the visible line
 out when the page explains the keys itself (the description stays). Don't tell the person the keys in a tooltip on each
 header: the hint is one place.
 

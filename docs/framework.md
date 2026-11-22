@@ -94,7 +94,15 @@ Semantic versioning on the public API above, recorded in `CHANGELOG.md`:
   and are listed under "Deprecated".
 
 The skill ships the matching `orion.css`/`orion.js`, so a page built by the skill always matches the rules it was built
-with. Re-package the skill (`skill/dist/s4-orion.skill`) on every release.
+with.
+
+**Bundles (decisions 0066 and 0069).** Three ways to load Orion, all built from the same folders and held by budgets in
+`scripts/build.mjs`: the full bundle (`orion.css`/`orion.js`, or `.min` for lighter copies; prototypes and the Showcase), the
+site bundle (`orion.site.min.*`, one document with no app shell) and the lean app bundle: `orion.core.min.*` plus packs
+(`data`, `commands`, `desktop`, `direct`, `inputs`, `sitekit`) listed in `components/README.md`. A pack never depends on
+another except through core, apart from `desktop` calling `commands` (declared in `PACK_NEEDS`); every cross-pack call in
+a script is guarded, so a missing pack loses a feature and never throws. `components/packs.json` (generated) says which
+classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` and the page checker read pages with it. Re-package the skill (`skill/dist/s4-orion.skill`) on every release.
 
 ## Extending without forking
 

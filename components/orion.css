@@ -3390,6 +3390,7 @@
 
   /* ---------- views: sibling destinations switched by app.js with the shared axis pattern ---------- */
   .s4-view { display: block; }
+  main[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }   /* the main landmark takes focus when nothing is left to give it back to (S4.util.land, decision 0069); a pointer shows no ring on a whole region */
   .s4-view:focus:not(:focus-visible) { outline: none; }   /* a view takes the focus as a region when code switches to it; a mouse tap or a tap shows no ring on a whole screen, a keyboard does (an empty view scrolls by keyboard, so it is a real stop) */
   /* a view sliding in (Switch) must never make the page wider than the screen, even for a moment */
   .s4-content:has(> .s4-view) { overflow-x: clip; }
@@ -4567,17 +4568,7 @@
      .s4-menu-item[data-check]       a check or radio item: its check mark shows only when aria-checked="true"
      .s4-menu-item-sub               the chevron of an item that opens a submenu */
 @layer s4.components {
-  .s4-menu-item > .s4-icon[data-slot] { visibility: hidden; }
-  .s4-menu-item[data-check][aria-checked="true"] { background: transparent; }
-  .s4-menu-item[data-check][aria-checked="true"]:not([aria-disabled="true"]) { color: inherit; }
-  .s4-menu-item[data-check] > .s4-icon:first-child { opacity: 0; color: inherit; transition: opacity var(--s4-motion-state); }
-  .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { opacity: 1; }
-  .s4-menu-item[data-check][aria-checked="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
-  .s4-menu-item > .s4-menu-item-text { flex: 1 1 auto; min-inline-size: 0; }
-  .s4-menu-item > .s4-menu-item-sub { margin-inline-start: auto; --s4-icon-size: var(--s4-size-icon-small); }
-  .s4-menu-item[aria-expanded="true"]::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
-  .s4-menu-item > .s4-kbd { background: transparent; padding-inline-end: 0; }
-  @media (forced-colors: active) { .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { forced-color-adjust: auto; } }
+  /* the menu item rules this file once held moved to menu/menu.css (decision 0069) */
 }
 
 /* ---- desktop/desktop.css ---- */
@@ -6654,7 +6645,7 @@
   }
 
   /* the keyboard hint under a data table (decision 0067): its line is always reserved, so nothing moves when it appears; it
-     shows while focus is visibly inside the table and never on a phone, where there is no keyboard */
+     shows while focus is visibly inside the table; on a touch screen it stays collapsed until the first navigation key is pressed in the table (a keyboard was attached) */
   .s4-table-hint {
     margin: var(--s4-space-2) 0 0; min-block-size: var(--md-sys-typescale-label-medium-line-height);
     color: var(--md-sys-color-on-surface-variant);
@@ -6662,7 +6653,7 @@
     opacity: 0; pointer-events: none; transition: opacity var(--s4-motion-state);
   }
   .s4-table-wrap:has(:focus-visible) + .s4-table-hint { opacity: 1; }
-  @media (pointer: coarse) { .s4-table-hint { display: none; } }
+  @media (pointer: coarse) { .s4-table-hint:not([data-keys]) { min-block-size: 0; margin: 0; max-block-size: 0; overflow: hidden; } }   /* a phone has no keyboard until one is used: the first navigation key inside the table sets data-keys (table.js), on any pointer (decision 0069) */
   @media print { .s4-table-hint { display: none; } }
 
   /* ---------- compact (< 600): rows become stacked blocks ---------- */
@@ -12265,6 +12256,18 @@
   .s4-menu-item-text { flex: 1; min-width: 0; }
   .s4-menu-item-supporting { display: block; font-family: var(--md-sys-typescale-body-small-font); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); letter-spacing: var(--md-sys-typescale-body-small-tracking); font-weight: var(--md-sys-typescale-body-small-weight); color: var(--md-sys-color-on-surface-variant); }
   .s4-menu-item-trailing { margin-inline-start: auto; padding-inline-start: var(--s4-space-3); color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; }
+  /* checked items, the shortcut column and submenu chevrons (moved here from commands.css, decision 0069: the lean bundle's core menus look the same with or without the commands pack) */
+  .s4-menu-item > .s4-icon[data-slot] { visibility: hidden; }
+  .s4-menu-item[data-check][aria-checked="true"] { background: transparent; }
+  .s4-menu-item[data-check][aria-checked="true"]:not([aria-disabled="true"]) { color: inherit; }
+  .s4-menu-item[data-check] > .s4-icon:first-child { opacity: 0; color: inherit; transition: opacity var(--s4-motion-state); }
+  .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { opacity: 1; }
+  .s4-menu-item[data-check][aria-checked="true"] { font-weight: var(--md-sys-typescale-emphasized-label-large-weight); }
+  .s4-menu-item > .s4-menu-item-text { flex: 1 1 auto; min-inline-size: 0; }
+  .s4-menu-item > .s4-menu-item-sub { margin-inline-start: auto; --s4-icon-size: var(--s4-size-icon-small); }
+  .s4-menu-item[aria-expanded="true"]::before { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+  .s4-menu-item > .s4-kbd { background: transparent; padding-inline-end: 0; }
+  @media (forced-colors: active) { .s4-menu-item[data-check][aria-checked="true"] > .s4-icon:first-child { forced-color-adjust: auto; } }
   .s4-menu-item:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   /* selected (radio or checkbox items): secondary container, like every other selection in M3 */
   .s4-menu-item[aria-checked="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }

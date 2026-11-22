@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Overhang · Sign In</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Sign In, as a product (issue 66). Overhang is a bouldering gym under the railway arches; members sign in
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Sign In, as a product (issue 66). Overhang is a bouldering gym under the railway arches; members sign in
      to book a slot, check their pass and log the problems they climb. For sign-in, sign-up and any one-task screen
      with no navigation: the brand's picture on one side (on top on a phone), one short form, and what is useful before
      signing in (how busy the gym is right now).
@@ -15,7 +15,7 @@
      problem in the accent, lighting hold by hold as the form is filled in) and the busy meter. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('overhang-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
 <link rel="stylesheet" href="brand/sign-in.css?v=f712575">
 <style>
   /* Overhang's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -151,7 +151,7 @@
   </div>
 </div>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
 <script>
 /* Overhang's brand, under its own key: magenta over the dials set on <html>. */
 var CONDENSED = getComputedStyle(document.documentElement).getPropertyValue('--md-ref-typeface-brand').trim();

@@ -112,6 +112,76 @@ outputs['components/orion.site.min.css'] = minBanner('site stylesheet') + minCss
 outputs['components/orion.site.min.js'] = minBanner('site runtime') + minJs(siteJs);
 outputs['skill/s4-orion/assets/orion.site.min.css'] = minBanner('site stylesheet') + minCss(siteCssSkill);
 outputs['skill/s4-orion/assets/orion.site.min.js'] = outputs['components/orion.site.min.js'];
+/* ---------- the lean app bundle (decision 0069): a core every app needs, and packs for the heavier parts ----------
+   orion.core.min.css/js hold tokens, base, dials, the app shell, navigation, actions, containers, lists, fields, menus,
+   dialogs and sheets, feedback and the glass and motion layers. A pack adds one family: data (tables at scale, filters,
+   charts, calendars, timelines, rings, meters, code), desktop (menu bar, document tabs, tree, status bar, commands,
+   the palette), direct (reorder, swipe, select several, kanban lanes), inputs (date and time pickers, combobox, tags,
+   upload, color, number, rating, slider, password, inline edit) and sitekit (the website kit inside an app).
+   A page links core and the packs it uses, nothing else; orion.min.css/js (all of it) stay for everyone who loads them.
+   scripts/packs.mjs says which packs a page needs; this build fails a lean page that links too few. */
+const PACKS = {
+  data: ['table', 'filter', 'chart', 'month', 'timeline', 'code'],
+  commands: ['commands', 'desktop', 'palette'],
+  desktop: ['menubar', 'statusbar', 'doc-tabs', 'tree'],
+  direct: ['direct', 'board'],
+  inputs: ['date-picker', 'combobox', 'tag-input', 'upload', 'color-field', 'number-field', 'code-field', 'time-field', 'rating', 'password', 'inline-edit'],
+  sitekit: ['site'],
+};
+const PACK_NEEDS = { desktop: ['commands'] };   /* a pack whose script calls another pack's: a page that links it links that one too */
+/* the attributes that switch a pack's behaviour on (a page that writes one needs the pack); the build fails if a pack no longer knows one */
+const PACK_ATTRS = {
+  data: ['data-column-menu', 'data-pin', 'data-virtual', 'data-filter-panel', 'data-filter-views', 'data-row-expand', 'data-row-actions', 'data-facet', 'data-today', 'data-marks', 'data-series', 'data-table-columns'],
+  commands: ['data-cmd', 'data-command', 'data-context-menu', 'data-palette', 'data-shortcut', 'data-shell', 'data-window-action'],
+  desktop: [],
+  direct: ['data-reorder', 'data-selectable', 'data-swipe', 'data-select-item', 'data-lane-add'],
+  inputs: [],
+  sitekit: ['data-site-panel'],
+};
+const packOf = {};
+for (const [pk, dirs] of Object.entries(PACKS)) for (const d of dirs) { if (!imports.some((f) => f.split('/')[0] === d)) problems.push(`packs: ${d} is not a component stylesheet`); packOf[d] = pk; }
+const dirOf = (f) => (f.startsWith('../') ? 'tokens' : f.split('/')[0]);
+const APP_BUDGET = { core: { css: 44, js: 38 }, packs: { data: 42, commands: 12, desktop: 13, direct: 10, inputs: 35, sitekit: 10 }, leanTemplate: 170 };   /* gzip KB, a little above what is built; npm run check fails past any of them (the full bundle is held at FULL_BUDGET) */
+const FULL_BUDGET = { css: 66, js: 120 };
+const jsText = (f) => `/* ---- ${f} ---- */\n${readFileSync(join(comp, f), 'utf8').trim()}\n`;
+const packFiles = {};   /* name -> { css, js } as written */
+{
+  const cssRepoParts = inlineCss(comp), cssSkillParts = inlineCss(comp, '.');
+  const split = (parts) => {
+    const out = { core: [] }; for (const pk of Object.keys(PACKS)) out[pk] = [];
+    imports.forEach((f, i) => { if (parts[i] != null) out[packOf[dirOf(f)] || 'core'].push(parts[i]); });
+    return out;
+  };
+  const r = split(cssRepoParts), k = split(cssSkillParts);
+  const jsSplit = { core: [] }; for (const pk of Object.keys(PACKS)) jsSplit[pk] = [];
+  for (const f of jsOrder) jsSplit[packOf[f.split('/')[0]] || 'core'].push(f);
+  for (const pk of ['core', ...Object.keys(PACKS)]) {
+    const label = pk === 'core' ? 'core' : `${pk} pack`;
+    outputs[`components/orion.${pk}.min.css`] = minBanner(`${label} stylesheet`) + minCss(r[pk].join('\n'));
+    outputs[`skill/s4-orion/assets/orion.${pk}.min.css`] = minBanner(`${label} stylesheet`) + minCss(k[pk].join('\n'));
+    outputs[`components/orion.${pk}.min.js`] = minBanner(`${label} runtime`) + minJs(jsSplit[pk].map(jsText).join('\n'));
+    outputs[`skill/s4-orion/assets/orion.${pk}.min.js`] = outputs[`components/orion.${pk}.min.js`];
+    packFiles[pk] = { css: outputs[`components/orion.${pk}.min.css`], js: outputs[`components/orion.${pk}.min.js`] };
+  }
+  /* what each part defines, so a page's needs can be read off its markup (scripts/packs.mjs) */
+  const words = (t, re) => [...new Set(t.match(re) || [])].sort();
+  const cls = {}, att = {}, nam = {};
+  for (const pk of ['core', ...Object.keys(PACKS)]) {
+    const css = packFiles[pk].css, jsx = packFiles[pk].js;
+    cls[pk] = words(css, /(?<=\.)s4-[a-z0-9-]+/g); att[pk] = words(css + jsx, /\bdata-[a-z0-9-]+/g);
+    nam[pk] = words(jsx, /\bS4\.[A-Za-z]+(?= *=[^=])/g).map((x) => x.slice(3));
+  }
+  for (const [pk, list] of Object.entries(PACK_ATTRS)) for (const a of list) if (!att[pk].includes(a)) problems.push(`packs: ${pk} no longer knows ${a} (update PACK_ATTRS in scripts/build.mjs)`);
+  const index = { needs: PACK_NEEDS, packs: {} };
+  /* a class belongs to the component whose name it starts with (longest match: s4-code-field is the code field's, not code's); a
+     class that carries no component name belongs to a pack when only that pack styles it */
+  const compDirs = readdirSync(comp).filter((d) => existsSync(join(comp, d, d + '.css'))), ownerDir = (c) => compDirs.filter((d) => c === 's4-' + d || c.startsWith('s4-' + d + '-')).sort((a, b) => b.length - a.length)[0];
+  const ownedBy = (pk, c) => { const d = ownerDir(c); return d ? packOf[d] === pk : !cls.core.includes(c); };
+  for (const pk of Object.keys(PACKS)) index.packs[pk] = { classes: cls[pk].filter((c) => ownedBy(pk, c)), attrs: PACK_ATTRS[pk], names: nam[pk].filter((n) => !nam.core.includes(n)) };
+  outputs['components/packs.json'] = JSON.stringify(index, null, 1) + '\n';
+  outputs['skill/s4-orion/assets/packs.json'] = outputs['components/packs.json'];
+  outputs['skill/s4-orion/scripts/packs.mjs'] = readFileSync(join(root, 'scripts/packs.mjs'), 'utf8');
+}
 /* Inter for sites: Latin and Latin-1, weights 400 to 900, written by our own subsetter (scripts/font-subset.mjs) */
 const { subsetInter, decodeWoff2 } = await import('./font-subset.mjs');
 const fontSrc = readFileSync(join(comp, 'assets/inter-variable.woff2'));
@@ -224,7 +294,9 @@ for (const page of htmlIn('templates')) {
   const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   outputs['skill/s4-orion/templates/' + name] = src
     .replace(/(?:\.\.\/components\/(?:assets\/)?)([\w.-]+)\?v=[\w.-]*/g, '$1')
-    .replace(/<!-- Template: /, /orion\.site\.min\.css/.test(src)
+    .replace(/<!-- Template: /, /orion\.core\.min\.css/.test(src)
+      ? `<!-- S4 Orion template, lean bundle (decision 0069; copy ${[...src.matchAll(/orion\.([a-z]+)\.min\.css/g)].map((m) => `orion.${m[1]}.min.css and .js`).join(', ')}, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). `
+      : /orion\.site\.min\.css/.test(src)
       ? '<!-- S4 Orion template (copy orion.site.min.css, orion.site.min.js, icons-site.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066; icons-site.js holds the icons the site templates draw and fetches icons-solar.js for any other, decision 0068). '
       : /orion\.min\.css/.test(src)
       ? '<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). '
@@ -317,18 +389,52 @@ for (const page of sitePages) { const src = readFileSync(join(root, page), 'utf8
 const siteReport = `site bundle ${siteSize.css.toFixed(1)} KB css + ${siteSize.js.toFixed(1)} KB js (gzip) + ${siteSize.font.toFixed(1)} KB font + ${iconsGz.toFixed(1)} KB icons = ${siteSize.total.toFixed(1)} KB (budgets ${SITE_BUDGET.css}/${SITE_BUDGET.js}/${SITE_BUDGET.font}/${SITE_BUDGET.icons}/${SITE_BUDGET.total})`;
 if (sitePages.filter((p) => p.startsWith('templates/')).length < 5) problems.push(`site bundle: only ${sitePages.length} templates load it (expected the five site templates)`);
 
-if (problems.length) { console.error(problems.map((p) => '  x ' + p).join('\n')); process.exit(1); }
+/* ---------- lean app bundle: coverage and budget (decision 0069) ----------
+   A page that links orion.core.min.* links exactly the packs its markup and script need (scripts/packs.mjs reads the
+   page the same way the page checker does), loads the files in order, and no other Orion bundle; then each part and each
+   page's total must stay inside the budget, and the full bundle must not grow past its own. */
+const { needsOf, linkedPacks } = await import('./packs.mjs');
+const packIndex = JSON.parse(outputs['components/packs.json']);
+const closure = (set) => { const out = new Set(set); for (const p of [...out]) for (const n of PACK_NEEDS[p] || []) out.add(n); return out; };
+const leanPages = ['index.html', 'demo/index.html'].concat(htmlIn('templates')).filter((p) => existsSync(join(root, p)) && /orion\.core\.min\.css/.test(readFileSync(join(root, p), 'utf8')));
+const leanSizes = {};
+for (const page of leanPages) {
+  const src = outputs[page] || readFileSync(join(root, page), 'utf8');
+  const need = closure(needsOf(src, packIndex).packs), have = linkedPacks(src, packIndex);
+  for (const p of need) if (!have.has(p)) problems.push(`${page}: uses ${(needsOf(src, packIndex).why[p] || [`the ${p} pack's need`]).slice(0, 3).join(', ')} but does not link orion.${p}.min.css and .js (node scripts/packs.mjs ${page})`);
+  for (const p of have) if (p !== 'core' && !need.has(p)) problems.push(`${page}: links orion.${p}.min.* but uses nothing from it (a lean page links only what it uses)`);
+  for (const kind of ['css', 'js']) {
+    const order = [...src.matchAll(new RegExp(`orion\\.([a-z]+)\\.min\\.${kind}`, 'g'))].map((m) => m[1]);
+    if (order[0] !== 'core' || new Set(order).size !== order.length) problems.push(`${page}: orion.core.min.${kind} comes first, then each pack once`);
+    for (const p of order) if (p !== 'core' && order.indexOf(p) < order.indexOf('core')) problems.push(`${page}: a pack before core`);
+    for (const n of PACK_NEEDS[order[1]] ? order.slice(1) : []) for (const d of PACK_NEEDS[n] || []) if (order.indexOf(d) > order.indexOf(n)) problems.push(`${page}: orion.${d}.min.${kind} comes before orion.${n}.min.${kind}, which calls it`);
+  }
+  if (/orion(\.min)?\.(css|js)\b/.test(src.replace(/orion\.[a-z]+\.min\.(css|js)/g, '').replace(/<!--[\s\S]*?-->/g, ''))) problems.push(`${page}: loads the full bundle beside the lean one`);
+  leanSizes[page] = [...have].reduce((n, p) => n + gz(packFiles[p].css) + gz(packFiles[p].js), 0);
+}
+const appSize = { core: [gz(packFiles.core.css), gz(packFiles.core.js)], full: [gz(outputs['components/orion.min.css']), gz(outputs['components/orion.min.js'])] };
+if (appSize.core[0] > APP_BUDGET.core.css) problems.push(`app core over budget: css ${appSize.core[0].toFixed(1)} KB > ${APP_BUDGET.core.css} KB`);
+if (appSize.core[1] > APP_BUDGET.core.js) problems.push(`app core over budget: js ${appSize.core[1].toFixed(1)} KB > ${APP_BUDGET.core.js} KB`);
+const packSizes = {};
+for (const pk of Object.keys(PACKS)) { packSizes[pk] = gz(packFiles[pk].css) + gz(packFiles[pk].js); if (packSizes[pk] > APP_BUDGET.packs[pk]) problems.push(`${pk} pack over budget: ${packSizes[pk].toFixed(1)} KB > ${APP_BUDGET.packs[pk]} KB`); }
+if (appSize.full[0] > FULL_BUDGET.css || appSize.full[1] > FULL_BUDGET.js) problems.push(`full bundle over budget: ${appSize.full[0].toFixed(1)} KB css / ${appSize.full[1].toFixed(1)} KB js > ${FULL_BUDGET.css}/${FULL_BUDGET.js}`);
+for (const [pg, n] of Object.entries(leanSizes)) if (n > APP_BUDGET.leanTemplate) problems.push(`${pg}: lean page total ${n.toFixed(1)} KB > ${APP_BUDGET.leanTemplate} KB`);
+if (leanPages.filter((p) => p.startsWith('templates/')).length < 8) problems.push(`lean bundle: only ${leanPages.length} templates use it (expected the app templates)`);
+const worst = Math.max(0, ...Object.values(leanSizes)), best = Math.min(...Object.values(leanSizes));
+const appReport = `app core ${appSize.core[0].toFixed(1)} + ${appSize.core[1].toFixed(1)} KB (css + js gzip; budgets ${APP_BUDGET.core.css}/${APP_BUDGET.core.js}), packs ${Object.entries(packSizes).map(([k, v]) => `${k} ${v.toFixed(1)}`).join(', ')}; ${leanPages.length} lean pages ${best.toFixed(0)} to ${worst.toFixed(0)} KB (budget ${APP_BUDGET.leanTemplate}) against the full bundle ${(appSize.full[0] + appSize.full[1]).toFixed(0)} KB`;
+
+if (problems.length) { console.error(problems.map((p) => '  x ' + p).join('\n')); if (!process.env.S4_WRITE_ANYWAY || CHECK) process.exit(1); }   /* S4_WRITE_ANYWAY=1: still write the files, so scripts/packs.mjs can answer while a page's links are being fixed */
 if (CHECK) {
   const stale = Object.entries(outputs).filter(([f, c]) => !existsSync(join(root, f)) || readFileSync(join(root, f), 'utf8') !== c).map(([f]) => f)
     .concat(Object.entries(binaries).filter(([, b]) => b.stale).map(([f]) => f))
     .concat(Object.entries(copies).filter(([to, from]) => !existsSync(join(root, to)) || !readFileSync(join(root, to)).equals(readFileSync(join(root, from)))).map(([f]) => f));
   if (stale.length) { console.error(`Stale bundle (run npm run build): ${stale.join(', ')}`); process.exit(1); }
-  console.log(`Bundle up to date: ${imports.length} stylesheets, ${jsOrder.length} scripts; ${siteReport}.`);
+  console.log(`Bundle up to date: ${imports.length} stylesheets, ${jsOrder.length} scripts; ${siteReport}; ${appReport}.`);
 } else {
   mkdirSync(skillAssets, { recursive: true }); mkdirSync(join(root, 'skill/s4-orion/references'), { recursive: true });
   for (const [f, c] of Object.entries(outputs)) { mkdirSync(dirname(join(root, f)), { recursive: true }); writeFileSync(join(root, f), c); }
   for (const [to, from] of Object.entries(copies)) copyFileSync(join(root, from), join(root, to));
   for (const [f, b] of Object.entries(binaries)) if (b.stale) writeFileSync(join(root, f), b);
   const kb = (s) => (Buffer.byteLength(s) / 1024).toFixed(0) + ' KB';
-  console.log(`Built components/orion.css (${kb(cssRepo)}) and orion.js (${kb(js)}) from ${imports.length} stylesheets and ${jsOrder.length} scripts; copied assets to skill/s4-orion/assets/; ${siteReport}`);
+  console.log(`Built components/orion.css (${kb(cssRepo)}) and orion.js (${kb(js)}) from ${imports.length} stylesheets and ${jsOrder.length} scripts; copied assets to skill/s4-orion/assets/; ${siteReport}; ${appReport}`);
 }

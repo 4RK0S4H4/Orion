@@ -189,7 +189,7 @@
   }
 
   /* the keyboard hint under a data table (decision 0067): its line is always reserved, so nothing moves when it appears; it
-     shows while focus is visibly inside the table and never on a phone, where there is no keyboard */
+     shows while focus is visibly inside the table; on a touch screen it stays collapsed until the first navigation key is pressed in the table (a keyboard was attached) */
   .s4-table-hint {
     margin: var(--s4-space-2) 0 0; min-block-size: var(--md-sys-typescale-label-medium-line-height);
     color: var(--md-sys-color-on-surface-variant);
@@ -197,7 +197,7 @@
     opacity: 0; pointer-events: none; transition: opacity var(--s4-motion-state);
   }
   .s4-table-wrap:has(:focus-visible) + .s4-table-hint { opacity: 1; }
-  @media (pointer: coarse) { .s4-table-hint { display: none; } }
+  @media (pointer: coarse) { .s4-table-hint:not([data-keys]) { min-block-size: 0; margin: 0; max-block-size: 0; overflow: hidden; } }   /* a phone has no keyboard until one is used: the first navigation key inside the table sets data-keys (table.js), on any pointer (decision 0069) */
   @media print { .s4-table-hint { display: none; } }
 
   /* ---------- compact (< 600): rows become stacked blocks ---------- */

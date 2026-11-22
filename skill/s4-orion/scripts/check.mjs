@@ -14,6 +14,7 @@
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, basename, join, parse, sep } from 'node:path';
 import { createServer } from 'node:http';
+import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { knownClasses, silentAudit } from './silent.mjs';
 
@@ -28,7 +29,7 @@ try { ({ chromium } = await import('playwright')); }
 catch { try { ({ chromium } = createRequire(resolve('x.js'))('playwright')); } catch { try { ({ chromium } = createRequire(import.meta.url)('playwright')); } catch {} } }
 if (!chromium) { console.error('Playwright is not installed: npm i -D playwright && npx playwright install chromium'); process.exit(2); }
 
-const SYSTEM_CSS = /(^|\/)orion(\.site)?(\.min)?\.css$/;
+const SYSTEM_CSS = /(^|\/)orion(\.(site|core|data|commands|desktop|direct|inputs|sitekit))?(\.min)?\.css$/;
 const SAFE_SELECTOR = /^(html|body|:root|\*|::?[a-z-]+|from|to|\d+(\.\d+)?%)$/;
 
 /* ---------------- static lint of the app's own CSS ---------------- */
@@ -251,6 +252,17 @@ for (const page of pages) {
       const text = readFileSync(f, 'utf8');
       if (/^\s*\/\* S4 Orion brand: /.test(text)) continue;   /* a brand file from brand.mjs (decision 0063) is Orion's own generated scheme, not app CSS */
       lintCss(text, href).forEach((e) => errors.add(e));
+    }
+    /* the lean app bundle (decision 0069): a page that links orion.core.min.* links exactly the packs it uses */
+    if (/orion\.core\.min\.(css|js)/.test(html)) {
+      try {
+        const { needsOf, linkedPacks } = await import('./packs.mjs');
+        const index = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../assets/packs.json'), 'utf8'));
+        const need = needsOf(html, index), have = linkedPacks(html, index);
+        for (const p of need.packs) if (!have.has(p)) errors.add(`lean bundle: the page uses ${need.why[p].slice(0, 3).join(', ')} but does not link orion.${p}.min.css and orion.${p}.min.js (node scripts/packs.mjs page.html lists them)`);
+        for (const p of have) if (p !== 'core' && !need.packs.includes(p)) warnings.add(`lean bundle: orion.${p}.min.* is linked but nothing on the page uses it`);
+        if (/orion(\.min)?\.(css|js)\b/.test(html.replace(/orion\.(core|[a-z]+)\.min\.(css|js)/g, ''))) errors.add('lean bundle: the page links the full orion.css/orion.js beside orion.core.min.*; use one or the other');
+      } catch (e) { warnings.add('lean bundle: could not read packs.mjs/packs.json beside the checker (' + e.message + ')'); }
     }
     for (const m of html.matchAll(/\sstyle="([^"]*)"/gi)) lintCss(`.x{${m[1]}}`, `style=""`).forEach((e) => errors.add(e.replace(/: \.x → /, " → ")));
   }

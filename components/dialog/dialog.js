@@ -5,7 +5,8 @@
      { value } (value is "" for Escape or a click on the scrim).
    - Focus: the dialog itself, never a text field (decisions 0043 and 0049: there is no opt-in for fields any more);
      [data-autofocus] on a button picks that button.
-     Focus returns to the opener. Bottom and side sheets are floating panels and open the same way.
+     Focus returns to the opener, else to what had it, else to the main landmark (S4.util.land, decision 0069), never <body>.
+     Bottom and side sheets are floating panels and open the same way.
    - Tool panels (decision 0054): data-modeless on a floating panel opens it without a scrim and leaves the page behind
      it live (scroll it, tap it), from 600 wide. It closes with its Close button, Escape while focus is inside it, or
      its opener (a second tap). On a phone it is modal like any other panel. Dialogs are always modal.
@@ -34,6 +35,7 @@
     opts = opts || {};
     var from = opts.from || null;
     d._s4from = from; d.style.visibility = '';
+    d._s4prev = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;   /* what had focus, for the way back */
     d._s4modeless = modeless(d);
     /* the attribute, not show(): show() would put the cursor in the panel's first field (decision 0049) */
     if (d._s4modeless) { d.setAttribute('open', ''); d.setAttribute('aria-modal', 'false'); } else { d.removeAttribute('aria-modal'); d.showModal(); }
@@ -110,7 +112,11 @@
       d.style.transform = '';
       d.style.removeProperty('--s4-sheet-drag');
       d._s4closing = false;
-      if (from && from.isConnected) from.focus({ preventScroll: true });
+      /* focus goes back to the opener; with none (opened by a shortcut with nothing focused) to what had focus; with neither
+         to the main landmark, never <body> (decisions 0065 and 0069) */
+      var back = [from, d._s4prev].filter(function (x) { return x && x.isConnected && x.getClientRects().length && !x.closest('[hidden]'); })[0];
+      d._s4prev = null;
+      if (back) back.focus({ preventScroll: true }); else if (!document.activeElement || document.activeElement === document.body) S4.util.land();
       S4.util.emit(d, 's4-close', { value: value || '' });
     });
   }

@@ -96,6 +96,7 @@
 
   /* ---------- views: sibling destinations switched by app.js with the shared axis pattern ---------- */
   .s4-view { display: block; }
+  main[tabindex="-1"]:focus:not(:focus-visible) { outline: none; }   /* the main landmark takes focus when nothing is left to give it back to (S4.util.land, decision 0069); a pointer shows no ring on a whole region */
   .s4-view:focus:not(:focus-visible) { outline: none; }   /* a view takes the focus as a region when code switches to it; a mouse tap or a tap shows no ring on a whole screen, a keyboard does (an empty view scrolls by keyboard, so it is a real stop) */
   /* a view sliding in (Switch) must never make the page wider than the screen, even for a moment */
   .s4-content:has(> .s4-view) { overflow-x: clip; }

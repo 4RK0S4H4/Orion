@@ -13,7 +13,10 @@
      a finger (hold, then drag) or the keyboard; a story opens as a page; a new pitch is typed in place. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=0ece780">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=e83925f">
+<link rel="stylesheet" href="../components/orion.commands.min.css?v=c443203">
+<link rel="stylesheet" href="../components/orion.data.min.css?v=4b292d6">
+<link rel="stylesheet" href="../components/orion.direct.min.css?v=4fb061a">
 <link rel="stylesheet" href="brand/kanban.css?v=03ffe66">
 <style>
   /* the app's own elements: tokens only. The board and its lanes are Orion's (.s4-board, decision 0063); the cards are Pressroom's */
@@ -115,7 +118,10 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=579aa29"></script>
+<script src="../components/orion.core.min.js?v=415efc6"></script>
+<script src="../components/orion.commands.min.js?v=3ff9bea"></script>
+<script src="../components/orion.data.min.js?v=5f0a373"></script>
+<script src="../components/orion.direct.min.js?v=d8fa438"></script>
 <script>
 /* the hub's light or dark choice carries over; Pressroom's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#d9480f' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

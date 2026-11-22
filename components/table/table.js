@@ -813,6 +813,13 @@
       var h = document.createElement('p'); h.className = 's4-table-hint'; h.setAttribute('aria-hidden', 'true');
       h.textContent = 'Up from the first row reaches the column headers: Left and Right choose sort, options or resize, Down comes back.';
       this.wrap.parentNode.insertBefore(h, this.wrap.nextSibling);
+      /* a touch screen with a keyboard (decision 0069): the line stays out of the way until a navigation key is pressed inside
+         the table, whatever the pointer, then it shows like anywhere else (data-keys, table.css) */
+      var wrap = this.wrap;
+      wrap.addEventListener('keydown', function onKey(e) {
+        if (!/^(Arrow(Up|Down|Left|Right)|Tab|Home|End|PageUp|PageDown)$/.test(e.key)) return;
+        h.setAttribute('data-keys', ''); wrap.removeEventListener('keydown', onKey);
+      });
     },
     headRove: function (to) {
       var ts = this.headTargets(); if (!ts.length) return;

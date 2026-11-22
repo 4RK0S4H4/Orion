@@ -4,14 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tally · Studio Cash</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Dashboard, as a product (issue 66). Tally is cash and invoices for a small design studio: the owner opens it
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.data.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Dashboard, as a product (issue 66). Tally is cash and invoices for a small design studio: the owner opens it
      on Monday morning to answer three questions in order: how much cash is there and how long does it last, is money
      coming in faster than it goes out, and who owes us. Brand through the dials only: a deep green accent, warm grays,
      the soft page tone, firm corners, a serif display face (a ledger, not a cockpit), calm motion, filled cards.
      Its own elements, drawn from Orion's rules: the runway (an Orion meter since 0063), paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.data.min.css">
 <link rel="stylesheet" href="brand/dashboard.css?v=3872ddf">
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -294,7 +295,8 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Save Draft</button></div>
 </dialog>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.data.min.js"></script>
 <script>
 /* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#1d6b52', variant: 'tonal' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

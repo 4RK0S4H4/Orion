@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Puck · Welcome</title>
 <meta name="description" content="Puck, an espresso dial-in coach: log every shot, change one thing at a time by taste, and know when your beans are at their best.">
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Onboarding, as a product (issue 66). The first minute of an app: three short screens that say what it
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.data.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Onboarding, as a product (issue 66). The first minute of an app: three short screens that say what it
      does, one that sets it up (the things worth asking), and a door into the app. Always skippable, never more than
      four steps, and each step is one idea with one button.
      Puck is an espresso dial-in coach for people with a grinder and a scale at home. Brand through the dials only:
@@ -16,7 +16,8 @@
      from 960 each step is a split: the picture on a big tinted tile, the words and controls beside it. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('puck-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.data.min.css">
 <link rel="stylesheet" href="brand/onboarding.css?v=9c52ec5">
 <script>(function (k) { try { var c = localStorage.getItem(k + ':color'); if (c) { var s = document.createElement('style'); s.id = 's4-dynamic-color'; s.textContent = c; document.head.appendChild(s); } } catch (e) {} })('puck-theme');</script>   <!-- the visitor's own color, before the first paint (decision 0063) -->
 <style>
@@ -216,7 +217,8 @@
   </div>
 </main>
 <script src="icons-phosphor-duotone.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.data.min.js"></script>
 <script>
 /* Puck's brand: tinted from an espresso brown (fidelity keeps it coffee), a humanist display face (decisions 0052, 0055) */
 S4.theme.restore('puck-theme', { mode: 'system', seed: '#6f4e37', variant: 'fidelity', surfaces: 'tinted', display: "'Gill Sans', 'Gill Sans MT', Seravek, Candara, 'Trebuchet MS', sans-serif" });

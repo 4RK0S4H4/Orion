@@ -1,11 +1,22 @@
 # Where S4 Orion stands (resume here)
 
-**The plan to a 10 in every area, the current stage (round 0058) and how sessions work is in [`PLAN.md`](PLAN.md). Read it next.**
+**The plan to a 10 in every area, the current stage (round 0060) and how sessions work is in [`PLAN.md`](PLAN.md). Read it next.**
 
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-22, round 0059): review 3's Top 10, in two workstreams
+## Now (2026-11-22, round 0060): review 4's blockers, in two workstreams
+
+**Workstream A** (decision 0069, built; B is decision 0070, notes in `history/round-0060/b.md`): the app bundle is split. An
+app links `orion.core.min.css/js` (78 KB gzip, everything is 178) plus the packs it uses (`data`, `commands`, `desktop`,
+`direct`, `inputs`, `sitekit`); `node scripts/packs.mjs page.html` says which; the 15 app templates use it; `npm run check`
+holds budgets and fails a page that links too few or too many packs; `npm run test:lean` proves a lean page equals the full
+bundle (computed styles of every element, runtime names, errors). Also: Escape from a palette opened with nothing focused lands
+on main (`S4.util.land()`, the suite fails the old behaviour); Linnea's toolbar Columns button is outside the grid (the
+reviewer hit the header's per-column buttons; the suite guards it); the grid-keys hint shows on a touch screen after the
+first navigation key. **Next:** A merges B, full tests, publish (the main session tags 1.2.0 after review 5), review 5.
+
+## Before (2026-11-22, round 0059): review 3's Top 10, in two workstreams
 
 **Workstream A** (decision 0067, built; B is decision 0068, notes in `history/round-0059/b.md`): dial values are validated
 (`S4.theme` warns and writes nothing for a value off a dial's list, the page checker fails bad `data-*` values); a data

@@ -15,7 +15,7 @@
      timetable. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=0ece780">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=e83925f">
 <link rel="stylesheet" href="brand/tool.css?v=bcd5956">
 <style>
   /* Proof's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -130,7 +130,7 @@
   </div>
 </div>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=579aa29"></script>
+<script src="../components/orion.core.min.js?v=415efc6"></script>
 <script>
 /* Proof's brand: a bakery navy over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#24406b', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

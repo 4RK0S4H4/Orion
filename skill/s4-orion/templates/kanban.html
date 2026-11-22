@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pressroom · Story Board</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Board (kanban), as a product (issue 66). Pressroom is the story board of a city newsroom: the night editor
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.commands.min.css and .js, orion.data.min.css and .js, orion.direct.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Board (kanban), as a product (issue 66). Pressroom is the story board of a city newsroom: the night editor
      moves tonight's stories from pitch to published and watches one clock, the edition's close. Brand through the
      dials: a press orange accent on the stock neutral page, round corners, a monospaced display face (the wire, the
      typewriter), tonal buttons by default, and one scoped dark band for the edition (data-theme="dark" on a region).
@@ -13,7 +13,10 @@
      a finger (hold, then drag) or the keyboard; a story opens as a page; a new pitch is typed in place. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.commands.min.css">
+<link rel="stylesheet" href="orion.data.min.css">
+<link rel="stylesheet" href="orion.direct.min.css">
 <link rel="stylesheet" href="brand/kanban.css?v=03ffe66">
 <style>
   /* the app's own elements: tokens only. The board and its lanes are Orion's (.s4-board, decision 0063); the cards are Pressroom's */
@@ -115,7 +118,10 @@
   </nav>
 </div>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.commands.min.js"></script>
+<script src="orion.data.min.js"></script>
+<script src="orion.direct.min.js"></script>
 <script>
 /* the hub's light or dark choice carries over; Pressroom's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#d9480f' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

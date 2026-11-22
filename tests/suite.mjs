@@ -505,6 +505,10 @@ async function use(page, add, phone) {
         else {
           if (!ks.inBox) add('the command palette opened by mod+K did not put the cursor in its box (decision 0067: a shortcut the person typed is their own action)');
           await page.keyboard.press('Escape'); await settle(420);
+          /* decision 0069: opened with nothing focused, there is no opener to go back to; focus lands on the main landmark, never <body> */
+          const fb = await page.evaluate(() => { const a = document.activeElement, m = [...document.querySelectorAll('main, [role="main"]')].find((x) => x.getClientRects().length && !x.closest('[hidden]')); return { body: !a || a === document.body, hasMain: !!m, inMain: !!m && !!a && m.contains(a) }; });
+          if (fb.body) add('the command palette opened by mod+K with nothing focused left focus on <body> after Escape (decision 0069: focus goes to the main landmark)');
+          else if (fb.hasMain && !fb.inMain) add('the command palette opened by mod+K with nothing focused did not return focus to the main landmark after Escape (decision 0069)');
         }
       }
     }
@@ -840,6 +844,8 @@ async function use(page, add, phone) {
         return o;
       });
       grid.forEach(add);
+      /* decision 0069: a toolbar button that opens a table's column menu belongs to the toolbar, never to the grid (its header holds the per-column controls only) */
+      (await page.evaluate(() => [...document.querySelectorAll('[data-table-columns]')].flatMap((m) => [...document.querySelectorAll(`[data-menu="${m.id}"]`)].filter((b) => b.closest('table, [role="grid"], [role="table"], [role="treegrid"]')).map(() => `data table: the toolbar button for "${m.id}" sits inside the table (a grid holds rows and cells only)`)))).forEach(add);
       const headStop = await t.evaluate((x) => { const e = x.tHead && [...x.tHead.querySelectorAll('[tabindex="0"], button, input')].find((b) => b.tabIndex === 0 && b.getClientRects().length); if (!e) return false; e.setAttribute('data-kt-head', ''); return true; });
       if (headStop) {
         await t.locator('[data-kt-head]').focus();
@@ -1330,6 +1336,29 @@ if (!process.argv.includes('--no-dials') && want.includes('chromium')) {
     let i = 0;
     await Promise.all(Array.from({ length: WORKERS }, async () => { while (i < jobs.length) { const [pr, rel, mode] = jobs[i++]; await runDialPage(b2, pr, rel, mode); } }));
     await b2.close();
+  }
+}
+/* decision 0069: a touch screen with a keyboard. The grid-keys hint stays collapsed on a coarse pointer until the first
+   navigation key is pressed inside the table, then shows like anywhere else. */
+if (want.includes('chromium') && !arg('preset', '') && targets.includes('templates/data-table.html')) {
+  let b3 = null; try { b3 = await pw.chromium.launch(); } catch (e) {}
+  if (b3) {
+    const ctx = await b3.newContext({ viewport: { width: 820, height: 1000 }, hasTouch: true, isMobile: true, colorScheme: 'light' }), page = await ctx.newPage(), add = (m) => failures.push({ label: 'touch keyboard  templates/data-table.html', list: [m] });
+    try {
+      await page.goto(ORIGIN + '/templates/data-table.html', { waitUntil: 'load', timeout: 30000 }); await page.waitForTimeout(900);
+      const probe = () => page.evaluate(() => { const h = document.querySelector('.s4-table-hint'); if (!h) return null; const r = h.getBoundingClientRect(); return { coarse: matchMedia('(pointer: coarse)').matches, h: Math.round(r.height), op: +getComputedStyle(h).opacity, keys: h.hasAttribute('data-keys') }; });
+      const a = await probe();
+      if (!a) add('the data table has no keyboard hint');
+      else if (!a.coarse) add('could not emulate a coarse pointer for the touch keyboard check');
+      else {
+        if (a.h > 1) add(`the grid-keys hint takes ${a.h}px on a touch screen before any key is pressed (it stays collapsed until a keyboard is used)`);
+        await page.evaluate(() => document.querySelector('.s4-table tbody tr[data-n]').focus());
+        await page.keyboard.press('ArrowDown'); await page.waitForTimeout(500);
+        const b = await probe();
+        if (!b.keys || b.h < 8 || b.op < 0.99) add(`the grid-keys hint did not appear on a touch screen after a key was used in the table (data-keys ${b.keys}, height ${b.h}px, opacity ${b.op})`);
+      }
+    } catch (e) { add('touch keyboard check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+    await ctx.close(); await b3.close(); ran++;
   }
 }
 server.close();

@@ -43,6 +43,18 @@
     /* true for anything that brings up a keyboard. Decision 0049: a script never moves focus into one of these;
        only the person does, by tapping it (opening something with a key press is the one exception, see S4.palette) */
     typable: function (el) { return !!el && el.matches && el.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]), textarea, select, [contenteditable]'); },
+    /* Decision 0069: where focus lands when whatever held it goes away and there is nothing to give it back to (a palette
+       opened by Ctrl+K from a fresh load, then Escape): the main landmark of what is on screen, made focusable; never <body>.
+       A pointer or touch shows no ring on it (app.css), the keyboard does. Returns the element, or null on a page with no main. */
+    land: function () {
+      var c = document.querySelectorAll('main, [role="main"]'), m = null;
+      for (var i = 0; i < c.length && !m; i++) if (c[i].getClientRects().length && !c[i].closest('[hidden]')) m = c[i];
+      m = m || document.querySelector('.s4-view:not([hidden])');
+      if (!m) return null;
+      if (!m.hasAttribute('tabindex')) m.setAttribute('tabindex', '-1');
+      m.focus({ preventScroll: true });
+      return m;
+    },
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }
@@ -4611,6 +4623,13 @@ S4.register('accordion', function (scope) {
       var h = document.createElement('p'); h.className = 's4-table-hint'; h.setAttribute('aria-hidden', 'true');
       h.textContent = 'Up from the first row reaches the column headers: Left and Right choose sort, options or resize, Down comes back.';
       this.wrap.parentNode.insertBefore(h, this.wrap.nextSibling);
+      /* a touch screen with a keyboard (decision 0069): the line stays out of the way until a navigation key is pressed inside
+         the table, whatever the pointer, then it shows like anywhere else (data-keys, table.css) */
+      var wrap = this.wrap;
+      wrap.addEventListener('keydown', function onKey(e) {
+        if (!/^(Arrow(Up|Down|Left|Right)|Tab|Home|End|PageUp|PageDown)$/.test(e.key)) return;
+        h.setAttribute('data-keys', ''); wrap.removeEventListener('keydown', onKey);
+      });
     },
     headRove: function (to) {
       var ts = this.headTargets(); if (!ts.length) return;
@@ -8784,7 +8803,8 @@ S4.register('skeleton', function (scope) {
      { value } (value is "" for Escape or a click on the scrim).
    - Focus: the dialog itself, never a text field (decisions 0043 and 0049: there is no opt-in for fields any more);
      [data-autofocus] on a button picks that button.
-     Focus returns to the opener. Bottom and side sheets are floating panels and open the same way.
+     Focus returns to the opener, else to what had it, else to the main landmark (S4.util.land, decision 0069), never <body>.
+     Bottom and side sheets are floating panels and open the same way.
    - Tool panels (decision 0054): data-modeless on a floating panel opens it without a scrim and leaves the page behind
      it live (scroll it, tap it), from 600 wide. It closes with its Close button, Escape while focus is inside it, or
      its opener (a second tap). On a phone it is modal like any other panel. Dialogs are always modal.
@@ -8813,6 +8833,7 @@ S4.register('skeleton', function (scope) {
     opts = opts || {};
     var from = opts.from || null;
     d._s4from = from; d.style.visibility = '';
+    d._s4prev = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;   /* what had focus, for the way back */
     d._s4modeless = modeless(d);
     /* the attribute, not show(): show() would put the cursor in the panel's first field (decision 0049) */
     if (d._s4modeless) { d.setAttribute('open', ''); d.setAttribute('aria-modal', 'false'); } else { d.removeAttribute('aria-modal'); d.showModal(); }
@@ -8889,7 +8910,11 @@ S4.register('skeleton', function (scope) {
       d.style.transform = '';
       d.style.removeProperty('--s4-sheet-drag');
       d._s4closing = false;
-      if (from && from.isConnected) from.focus({ preventScroll: true });
+      /* focus goes back to the opener; with none (opened by a shortcut with nothing focused) to what had focus; with neither
+         to the main landmark, never <body> (decisions 0065 and 0069) */
+      var back = [from, d._s4prev].filter(function (x) { return x && x.isConnected && x.getClientRects().length && !x.closest('[hidden]'); })[0];
+      d._s4prev = null;
+      if (back) back.focus({ preventScroll: true }); else if (!document.activeElement || document.activeElement === document.body) S4.util.land();
       S4.util.emit(d, 's4-close', { value: value || '' });
     });
   }

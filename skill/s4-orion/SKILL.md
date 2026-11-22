@@ -25,6 +25,11 @@ Everything ships in this skill's `assets/` folder: `orion.css` (tokens, every co
 (runtime), `icons.js` (icon registry), `m3color.js` (seed → roles, loaded on demand), `inter-variable.woff2`.
 
 - **App or repo:** copy the five files next to the page (or into the project's static folder) and link them as below.
+- **Lean app (decision 0069, prefer it for a finished app):** instead of `orion.css` and `orion.js`, link
+  `orion.core.min.css` / `orion.core.min.js` and one pair per pack the page uses (`data`, `commands`, `desktop`, `direct`,
+  `inputs`, `sitekit`), core first, packs after it. `node <skill>/scripts/packs.mjs page.html` lists exactly which and
+  prints the tags; the page checker fails a lean page that links too few. Core is about 78 KB gzip, everything 178 KB.
+  Most templates already use it (see their header comment). Prototypes and one-file pages keep `orion.css`/`orion.js`.
 - **One self-contained HTML file** (only when asked for a single file): build the page with the normal links, then run
   `node <skill>/scripts/inline.mjs page.html` to inline the CSS, JS, icons and font. Run it again after edits.
 - **A fixed brand color** (decision 0063): write its brand file once, `node <skill>/scripts/brand.mjs --seed '#4c7a2a'

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Slugline · Scripts</title>
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Editor, as a product (issue 66). Slugline is where a small TV writers' room writes its scripts: a series
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, orion.commands.min.css and .js, orion.direct.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Editor, as a product (issue 66). Slugline is where a small TV writers' room writes its scripts: a series
      with its episodes, each episode a script page that knows the shape of a screenplay (scene headings, action,
      character, dialogue, transitions), numbers its scenes, lists its cast and saves by itself. For notes, docs, wikis,
      posts and anything people write: keep the document list (reorderable), the document as a page with its own URL,
@@ -16,7 +16,9 @@
      the cast count. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
+<link rel="stylesheet" href="orion.commands.min.css">
+<link rel="stylesheet" href="orion.direct.min.css">
 <link rel="stylesheet" href="brand/editor.css?v=af856b7">
 <style>
   /* Slugline's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -186,7 +188,9 @@
   </nav>
 </div>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
+<script src="orion.commands.min.js"></script>
+<script src="orion.direct.min.js"></script>
 <script>
 /* Slugline's brand: a plum accent over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#6e2a5e', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */

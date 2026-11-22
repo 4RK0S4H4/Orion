@@ -40,6 +40,18 @@
     /* true for anything that brings up a keyboard. Decision 0049: a script never moves focus into one of these;
        only the person does, by tapping it (opening something with a key press is the one exception, see S4.palette) */
     typable: function (el) { return !!el && el.matches && el.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]), textarea, select, [contenteditable]'); },
+    /* Decision 0069: where focus lands when whatever held it goes away and there is nothing to give it back to (a palette
+       opened by Ctrl+K from a fresh load, then Escape): the main landmark of what is on screen, made focusable; never <body>.
+       A pointer or touch shows no ring on it (app.css), the keyboard does. Returns the element, or null on a page with no main. */
+    land: function () {
+      var c = document.querySelectorAll('main, [role="main"]'), m = null;
+      for (var i = 0; i < c.length && !m; i++) if (c[i].getClientRects().length && !c[i].closest('[hidden]')) m = c[i];
+      m = m || document.querySelector('.s4-view:not([hidden])');
+      if (!m) return null;
+      if (!m.hasAttribute('tabindex')) m.setAttribute('tabindex', '-1');
+      m.focus({ preventScroll: true });
+      return m;
+    },
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }

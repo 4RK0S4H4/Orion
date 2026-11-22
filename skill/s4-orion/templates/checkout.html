@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Velvet · Book Tickets</title>
 <meta name="description" content="Book seats for The Quiet Hours at The Velvet, Leith: pick your seats on the plan, add a drink for your seat, pay, and get your ticket.">
-<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). Checkout (a multi-step form), as a product (issue 66). For checkout, booking, sign-up, applications and
+<!-- S4 Orion template, lean bundle (decision 0069; copy orion.core.min.css and .js, icons.js, m3color.js and inter-variable.woff2 next to it; add a pack only when the page uses it: node scripts/packs.mjs page.html). Checkout (a multi-step form), as a product (issue 66). For checkout, booking, sign-up, applications and
      any task done in a few steps. One step on screen at a time, a stepper that shows where you are, the order summary
      beside it (under it on a phone), errors only when you leave a field, and a small reward at the end.
      The Velvet is a three-screen independent cinema in Leith; this is its seat booking. Brand through the dials only:
@@ -15,7 +15,7 @@
      keeps the running total and the seat hold, and the e-ticket with its door code (a scoped light tile, so it scans). -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('velvet-theme');</script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css">
+<link rel="stylesheet" href="orion.core.min.css">
 <link rel="stylesheet" href="brand/checkout.css?v=5fa3e54">
 <style>
   /* The Velvet's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -317,7 +317,7 @@
   </div>
 </div>
 <script src="icons.js"></script>
-<script src="orion.js"></script>
+<script src="orion.core.min.js"></script>
 <script>
 /* The Velvet's brand: crimson (fidelity keeps it crimson), warm grays, soft corners, a Didone display face (decision 0055) */
 S4.theme.restore('velvet-theme', { mode: 'system', seed: '#8f1d2c', variant: 'fidelity', gray: 'warm', corners: 'soft', display: "Didot, 'Bodoni 72', 'Bodoni MT', 'Bodoni Moda', ui-serif, Georgia, serif" });
