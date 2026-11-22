@@ -21,7 +21,8 @@ const expect = (ok, what) => { if (!ok) fails.push(what); console.log(`  ${ok ? 
 /* 1. known-bad pages must fail the checker with the right message */
 const CASES = [
   ['bad-words.html', /breaks across lines/, 'a word split across lines'],
-  ['bad-fab-rail.html', /squeezed into a box \d+px wide, one glyph/, 'a box one glyph wide (a FAB straight in a rail)'],
+  ['bad-fab-rail.html', /breaks across lines in div\.s4-nav-rail-items/, 'a rail label squeezed by a FAB straight in the rail'],
+  ['bad-fab-rail.html', /"Add Bill" is squeezed into a box \d+px wide, one glyph/, 'a box one glyph wide'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
 ];

@@ -72,11 +72,13 @@ export function silentAudit() {
     if (cs.display === 'none' || cs.display === 'inline' || cs.display === 'contents') continue;
     if (!(el.checkVisibility ? el.checkVisibility({ opacityProperty: true, visibilityProperty: true }) : cs.visibility !== 'hidden')) continue;
     const r = el.getBoundingClientRect(), fs = parseFloat(cs.fontSize) || 16;
-    if (r.width >= fs * 1.2 || r.height === 0 && r.width === 0 && cs.overflow !== 'visible') continue;
+    const lh = parseFloat(cs.lineHeight) || fs * 1.3, cw = Math.max(0, r.width - ['paddingLeft', 'paddingRight', 'borderLeftWidth', 'borderRightWidth'].reduce((a, k) => a + (parseFloat(cs[k]) || 0), 0));   /* the room the words have */
+    if (cw >= fs * 1.2 || (cw < 2 && /hidden|clip/.test(cs.overflow))) continue;   /* clipped away on purpose */
+    if (cw >= 2 && r.height < lh * 1.8) continue;   /* one line in a small box (a letter badge) is not a stack of letters */
     if (cs.clipPath !== 'none' || (cs.position === 'absolute' && cs.clip !== 'auto') || (r.width <= 1.5 && r.height <= 1.5)) continue;   /* visually hidden on purpose: the name stays for screen readers */
     if (el.closest('[aria-expanded="false"], [data-collapsed], [data-s4-collapsed]') && cs.overflow !== 'visible') continue;
     narrow++; flagged.add(el);
-    out.broken.push(`"${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}" is squeezed into a box ${Math.round(r.width)}px wide, one glyph, in ${path(el)}`);
+    out.broken.push(`"${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}" is squeezed into a box ${Math.round(cw)}px wide, one glyph, in ${path(el)}`);
   }
 
   /* parts outside the component they belong to */
