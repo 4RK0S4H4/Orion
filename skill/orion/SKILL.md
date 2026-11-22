@@ -404,7 +404,7 @@ selectors), and silent failures: an `s4-` class nothing defines (a misremembered
 across lines or a box one glyph wide, a part outside its component, window controls short of the window's edges, and the
 same word and overflow checks frozen in the middle of every motion (rail, dialog, panel, menu, expand, page). Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
 
-It also warns on more than one filled action on the first screen (0070).
+It also warns on more than one filled action on the first screen (0070), and fails a control whose content is wider than its box and any direct `clipboard.writeText` (decision 0073): copy with `S4.util.copy(text, { done: 'Link copied' })`, which never rejects and says when the browser refused. A nav tab's hover is the selected highlight's box. An app's own grid names its column (`grid-template-columns: minmax(0, 1fr)`), and trailing or meta text wraps (it never truncates or widens the page).
 
 Also check by eye: one filled button per area, Title Case labels, status words, the nav bar on a phone and the rail on a
 desktop, and both themes.

@@ -16,7 +16,11 @@
 3. **`npm run test:checker`** (`tests/checker.mjs`, decision 0067): known-bad pages in `tests/fixtures` (a table nothing
    stacks, a FAB straight in a rail, unknown dial values) must fail the page checker with the named message, and
    `S4.theme` with a value off a dial's list must warn and write nothing. A rule that no known-bad page fails is not a rule.
-4. **`npm run test:back`** (`tests/back.mjs`): Back from a page (the browser's Back and the top bar's) restores the
+4. **`npm run test:reach`** also runs (decision 0073) `reflowz` (320 wide, text at 200% two ways: no sideways scroll, no split word, no control
+   whose content sticks out of its box), `dirflip` (dir flipped after load: ink, tabs and nav highlight re-measure) and `long320` (long phrases and
+   words in every trailing, meta and label slot at 320). `test:suite` clicks every popup opener and requires Escape to close it with focus on it,
+   and runs every page with the clipboard refusing. `test:checker` proves each on a known-bad fixture.
+5. **`npm run test:back`** (`tests/back.mjs`): Back from a page (the browser's Back and the top bar's) restores the
    view's scroll and returns focus to the opener, in the editor, the calendar and the Showcase, at 390 and a short desktop window.
 
 Options: `node tests/suite.mjs --browser=chromium --only=list-detail --shots --workers=4`. Screenshots of failing

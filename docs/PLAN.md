@@ -108,7 +108,7 @@ accessibility, so some scores fell although nothing got worse.
    iPhone. Window controls like Windows' and nothing wrapping mid-motion (decision 0072, issues 69 and 70, with
    `midmotion.mjs`); a ring round the whole phone screen and the round nav bar highlight (issues 71 and 72); intake from
    app sessions (this file's Triage step, `from-app` form, `docs/issues/inbox.md`).
-6d. **Full QA pass** (next, before any area counts as a 10 and before release 1.2): a bug hunt separate from the design
+6d. **Full QA pass** (current: pass 1 done and its findings fixed in round 0062, decision 0073, issues 73 to 81; pass 2 next, before any area counts as a 10 and before release 1.2): a bug hunt separate from the design
    reviews, by a fresh agent that did not build the work, over every component page, template, example and the Showcase.
    - **Covers:** every interactive state (hover, press, focus, disabled, selected, error, loading, empty); mid-motion
      frames with `midmotion.mjs` for every motion; phone 320 to 430 and desktop 1280 to 1920; dark and light; every dial
@@ -123,7 +123,10 @@ accessibility, so some scores fell although nothing got worse.
      paths. **What the pass adds:** a fresh reader's eye for what no rule describes yet (a state nobody scripted, an odd
      width, a screen that is correct but wrong), more browsers and widths than CI runs, combinations (a dial with a
      motion with a long label), and the real-device gaps the builders cannot see; every miss it finds becomes a rule.
-   - Exit: no open issue from the pass; then re-grade (review 5), then the dated 1.2.0 release.
+   - **Pass 1** (done, `history/round-0062/qa-1.md`): eight findings and the owner's nav hover request, fixed at their root with rules and known-bad
+     fixtures (0073). **Pass 2 next**, on what pass 1 did not exercise: field typing and blur errors, table resize/edit/undo, board moves, swipe and
+     reorder keyboard alternatives, snackbar Undo, the palette, each dial alone, 360 and 430 wide, WebKit and Firefox where installable.
+   - Exit: no open issue from the passes; then re-grade (review 5), then the dated 1.2.0 release.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 with a git tag and a re-packaged skill (CHANGELOG 1.0.0 and 1.1.0 are still "Unreleased").
 
@@ -145,5 +148,6 @@ action now. The owner can overrule any of these; otherwise they stand.
   fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
   the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.
 - 2026-11-22 (round 0060, workstream A): decision 0069 built (lean app bundle: `orion.core.min.*` plus six packs, `scripts/packs.mjs`, budgets in check, `test:lean`; 15 templates on it; palette Escape lands on main via `S4.util.land`; Linnea's Columns button confirmed outside the grid; grid hint after the first key on touch). A merged B (0070; Linnea's All Records chip now hidden, filter `hidden: true` view). Decision 0071 renamed the product to Orion (skill folder, links, check:words). Next: full tests, publish, review 5.
+- 2026-11-22 (round 0062, QA pass 1): the first Full QA pass found eight things; all fixed at their root (decision 0073, issues 73 to 81 with the owner's nav-bar hover request): combobox Escape, `S4.util.copy`, list gaps at 320, stack and pane children may shrink, `S4.util.onLayoutChange`, no split words at 320 with 200% text, trailing slots wrap, overfull-control lint, the nav tab's state layer is the highlight's box. New rules: suite opener and clipboard audits, reach `reflowz`, `dirflip`, `long320`, `check:clipboard`, seven known-bad fixtures. Pass 2 is next.
 - 2026-11-22 (round 0061, integration): merged the titlebar branch (decision 0072, issues 69 and 70) and the mobile branch (issues 71 and 72, renumbered because both had used 69 and 70), added intake from app sessions (CLAUDE.md, SKILL.md, from-app form, inbox, the Triage step above) and the Full QA pass stage. Next: publish, the owner's device looks, the QA pass, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.

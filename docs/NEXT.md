@@ -5,7 +5,18 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-22, round 0061, integrated on `round61/int`, not yet published)
+## Now (2026-11-22, round 0062, branch `round62/qa`, not yet published): the first Full QA pass, findings fixed
+
+A fresh agent read the work cold (`history/round-0062/qa-1.md`): eight findings, all fixed at their root and recorded as issues 73 to 80, plus the
+owner's nav-bar hover request (issue 81, the hover layer is the selected highlight's box). Decision 0073 lists the rules that came out of it:
+every opener closes on Escape (suite), one clipboard helper `S4.util.copy` (lint, page checker, suite with the clipboard refusing), `S4.util.onLayoutChange`
+for layout measured once, no split word at 320 with 200% text and no sideways scroll (reach `reflowz`, `dirflip`, `long320`), controls whose content sticks out of
+their box fail the checker, and a known-bad fixture proves each (`npm run test:checker`). **Next:** publish this branch (the main session), then **QA pass 2**
+on what pass 1 did not exercise: field typing and error-on-blur, table resize, edit and Undo, board moves, swipe and reorder keyboard alternatives, snackbar Undo,
+the palette, each dial alone, 360 and 430 wide, and WebKit and Firefox where they can be installed. Exit of stage 6d: no open issue from either pass, then review 5 and the dated 1.2.0.
+**Needs the owner:** an iPhone look at the nav bar hover (a mouse or an iPad) and at 200% text on a phone (Settings, Larger Text).
+
+## Before (2026-11-22, round 0061, integrated on `round61/int`, not yet published)
 
 Four things landed together. **Window controls and mid-motion** (decision 0072, issues 69 and 70; notes in the decision): Windows-style full cells that hit Close in the corner; nothing wraps while a size changes; `skill/orion/scripts/midmotion.mjs` freezes every motion at 25/50/75% and the page checker and suite use it. **Two iPhone fixes** (issues 71 and 72, notes `history/round-0061/mobile.md`): a place-holding container rings only for the keyboard (`data-s4-input`), and the nav bar highlight is a rounded rectangle holding its label again. **Intake from app sessions:** CLAUDE.md, SKILL.md, `.github/ISSUE_TEMPLATE/from-app.yml` and `docs/issues/inbox.md` tell the owner's app-building sessions to log Orion problems instead of patching around them; PLAN.md's Triage step reads them first each round. **PLAN.md has a new stage, "Full QA pass"** before anything counts as a 10 and before release 1.2.
 **Needs the owner:** an iPhone look at Dosewise (switch tabs, open a medicine, swipe Back: is there still a ring round a button or row after Back?) and the Showcase nav bar with Settings selected; a Windows or Linux shell for the window controls. WebKit could not be installed in the build session, so the phone fixes were replayed in Chromium. **Next:** publish (the main session), tag 1.2.0 only after the Full QA pass, review 5.

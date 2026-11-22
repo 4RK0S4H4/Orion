@@ -226,6 +226,12 @@ An app that offers appearance settings uses exactly these, so every app feels th
   `data-size="s"` inside a pane), `data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight"`.
 - Template: `templates/settings.html`.
 
+## Copying text (decision 0073)
+
+- `S4.util.copy(text, { done: 'Copied', fail: '…' })` is the only way to write to the clipboard: it returns a promise of true or false
+  that never rejects and shows the snackbar. Never call `navigator.clipboard.writeText` yourself; the page checker fails it.
+- Code that measures layout once (a custom sliding highlight) calls `S4.util.onLayoutChange(fn)` to measure again when `dir`, `lang` or a type dial changes.
+
 ## Saving data
 
 - Small apps: `localStorage` under one key per app (`'<app-name>-data'`), JSON, written after each change. Wrap reads in

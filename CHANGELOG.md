@@ -8,7 +8,19 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 ## [1.2.0] - Unreleased
 
-Rounds 0059, 0060 and 0061 (decisions 0067 to 0072; the dated release and its git tag come after review 5 and the full QA pass).
+Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
+
+Round 0062, the first Full QA pass (decision 0073, issues 73 to 81):
+
+- Fixed: the combobox's list closed on Escape only from its input; now from the Show Options button too (issue 73). The suite clicks every popup opener on every page and requires Escape to close it with focus on the opener.
+- Added: `S4.util.copy(text, { done, fail, silent })`, the one clipboard helper (a promise that never rejects, a snackbar that says "Copied" or that it could not); the article, tool, data table, desktop app and code block use it (issue 74). `npm run check:clipboard` and the page checker fail any other `clipboard.writeText`; the suite runs every page with the clipboard refusing.
+- Fixed: list rows have tighter gaps under 360 wide, so the filter panel's labels fit (issue 75); children of `.s4-stack` and `.s4-split-pane` may shrink, so a fixed-column row no longer widens the article at 320 with larger text (issue 76).
+- Added: `S4.util.onLayoutChange(fn)`; the Ink Track, tabs indicator and nav highlight are measured again when `dir`, `lang` or a type, density or corner dial changes after load (issue 77).
+- Fixed: at 320 with 200% text, nav-bar labels and stat figures no longer split mid-word (the bar scrolls inside itself, a stat row goes to one column), nor table cells, upload names, site logos, toolbars and several template layouts (issue 78).
+- Fixed: trailing, meta and status text wraps inside its row and never widens the page (list, tree, timeline, upload, status, site header and sign-up, docs bar) (issue 79).
+- Added: the page checker and suite fail a control whose content sticks out of its box (issue 80); the pagination arrows' 44px was the touch-target pseudo-element, not content, and is not counted.
+- Changed: a nav tab's hover, focus and pressed layer is exactly the selected highlight's box, at every width, and lies on the highlight for the selected tab; the rail's rows already were (issue 81, owner, 2026-11-22).
+- Added: reach passes `reflowz`, `dirflip` and `long320`; known-bad fixtures `bad-clipboard`, `bad-overfull`, `bad-nav-200`, `bad-dirflip`, `bad-long-slot`, `bad-nav-hover`, `bad-nav-hover-box` with proofs in `tests/checker.mjs`.
 
 Renamed (decision 0071): the design language is **Orion** (formerly S4 Orion). The skill is `skill/orion/` and packages as `orion.skill`; the repository is `4RK0S4H4/Orion` and Pages is `https://4rk0s4h4.github.io/Orion/` (the old Pages address no longer works). The `s4-` classes, `--s4-` tokens, `data-s4-*`, `S4.*` and file names are unchanged. `npm run check:words` fails a stray "S4 Orion".
 
