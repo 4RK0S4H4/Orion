@@ -201,7 +201,8 @@ for (const page of htmlIn('templates')) {
   }
 }
 const fileText = (rel) => (rel in outputs ? outputs[rel] : rel in binaries ? binaries[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
-for (const page of pages) {
+/* the hub links pages (templates) whose own stamps change in this pass, so it is stamped last: one build is enough */
+for (const page of pages.filter((p) => p !== 'index.html').concat(pages.includes('index.html') ? ['index.html'] : [])) {
   const dir = page.includes('/') ? page.slice(0, page.lastIndexOf('/')) : '';
   const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   const out = src.replace(/((?:src|href)=")([^"?#:]+)\?v=[\w.-]*(")/g, (m, a, path, c) => {
