@@ -7,7 +7,7 @@ are kept small enough to read in a few minutes. Try them on your own computer.
 
 | Folder | What |
 |---|---|
-| [`electron/`](electron/) | An Electron shell: frameless window, drag regions, traffic lights (Mac) or the window controls overlay (Windows, Linux), the native Mac menu built from the page's commands, window state |
+| [`electron/`](electron/) | An Electron shell: frameless window, drag regions, traffic lights (Mac) or Orion's own window controls (Windows, Linux; the overlay as an option), the native Mac menu built from the page's commands, window state |
 | [`installed-web-app/`](installed-web-app/) | A web app manifest with `display_override: ["window-controls-overlay"]` and a page whose `.s4-titlebar` takes the place of the window's title bar |
 | [`shell-bridge.js`](shell-bridge.js) | Runs in the page; connects `S4.commands` and the window state to any shell that exposes `window.orionShell` |
 
@@ -24,17 +24,19 @@ How the pieces meet:
 | Need | Page (Orion) | Shell (Electron) |
 |---|---|---|
 | Drag the window | `.s4-titlebar` is `app-region: drag`; its buttons, fields, menu bar and tabs are `no-drag` | `titleBarStyle: 'hidden'` |
-| Window buttons | Mac: room at the start (`data-shell` + `data-platform="mac"`); Windows/Linux: `env(titlebar-area-*)` | Mac: `trafficLightPosition`; Windows/Linux: `titleBarOverlay` (the system draws them over the bar's end) |
+| Window buttons | Mac: room at the start (`data-shell` + `data-platform="mac"`); Windows/Linux: Orion's own controls, or `env(titlebar-area-*)` with the overlay | Mac: `trafficLightPosition`; Windows/Linux: a frameless window (default), or `titleBarOverlay` with `ORION_CONTROLS=system` |
 | Menu | `S4.commands.menu('parley', …)` fills the in-window `.s4-menubar`; `S4.commands.native('parley')` gives the same menu as data | Mac: `Menu.buildFromTemplate` from that data, with Settings (⌘,) and Quit in the app menu and the Window menu added; clicks send the command id back. Windows/Linux: `Menu.setApplicationMenu(null)`, the page's menu bar is the menu |
 | Shortcuts | `S4.commands` shortcuts run in the page (mod = ⌘ on a Mac, Ctrl elsewhere) | The Mac menu shows the same accelerators (`CmdOrCtrl+S`) |
 | In front, full screen | `<html data-window-blurred>`, `data-window-state="fullscreen maximized"` | `focus`, `blur`, `enter-full-screen`, `maximize` events, sent over IPC |
-| Frameless buttons | `.s4-window-control[data-window-action]` fires `s4-window` | `minimize()`, `maximize()`, `close()` |
+| Frameless buttons (Windows, Linux; the default) | `.s4-window-controls[data-shell-controls]` shown by the bridge when the state says `controls: 'own'`; each fires `s4-window` (decision 0072) | `frame: false`; `minimize()`, `maximize()` / `unmaximize()`, `close()`; `ORION_CONTROLS=system` uses `titleBarOverlay` instead |
+| Resize a frameless window | The bar's top 4px are not a drag region while the window is not maximized | The system's resize borders; Electron's resize band inside the top edge |
 
 Security: `contextIsolation` and `sandbox` stay on; the preload exposes four functions and two listeners, never Node or
 `ipcRenderer` itself. The bridge is injected with `executeJavaScript` so the template needs no change; in your own app,
 include `shell-bridge.js` with a `<script>` tag instead.
 
-Not verified here: the exact look of `titleBarOverlay` colors on every Windows and Linux desktop, and the traffic light
+Not verified here: a frameless window's top resize band and the window controls in a real Windows or Linux window
+(the suite checks them in a browser with a stubbed shell), the exact look of `titleBarOverlay` colors on every Windows and Linux desktop, and the traffic light
 position for a 40px title bar (`trafficLightPosition: { x: 16, y: 13 }` is a starting point; adjust by eye).
 
 ## Tauri
@@ -44,7 +46,9 @@ either to check them. What carries over, with names to confirm against the Tauri
 
 - A window with `decorations: false` (or `titleBarStyle: "Overlay"` and `hiddenTitle: true` on a Mac) in
   `tauri.conf.json`.
-- Tauri drags by an attribute, not CSS: add `data-tauri-drag-region` to `.s4-titlebar` (and keep it off its buttons).
+- Tauri drags by an attribute, not CSS: add `data-tauri-drag-region` to `.s4-titlebar` (and keep it off its buttons and
+  `.s4-window-controls`). With `decorations: false` on Windows or Linux, send `controls: 'own'` in the window state so
+  the page's window controls show (decision 0072).
 - The native menu from the page's data: the JavaScript menu API (`Menu`, `Submenu`, `MenuItem`, `PredefinedMenuItem`
   in `@tauri-apps/api/menu`, then `setAsAppMenu()`) can be built from `S4.commands.native(name)`; each item's action
   calls `S4.commands.run(id)`. Accelerators use the same `CmdOrCtrl+S` spelling.

@@ -28,6 +28,7 @@ with an optional menu button and FAB. Uses the same `.s4-nav-item` as the [navig
 |---|---|
 | `data-expanded` | Expanded rail: wider (`--s4-nav-rail-expanded-width`, default 240), labels beside icons, label-large, a 56dp pill spanning icon and label, surface-container. |
 | `[data-rail-toggle]` | Button that flips `data-expanded`; `aria-expanded` and the optional `data-label-expand/collapse` labels follow. |
+| `data-s4-moving` (set by the script) | While the edge moves (Morph), the contents keep the expanded layout and the edge clips them, so no label wraps or reflows mid-motion (issue 70); cleared when the width arrives. Don't set it yourself. |
 | `.s4-nav-rail-header` | Menu button and FAB slot. In the collapsed rail the FAB's label is hidden (icon FAB); expanded it shows (extended FAB). |
 | `.s4-nav-rail-items` | The destinations (`.s4-nav-item`, see nav bar). |
 
