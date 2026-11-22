@@ -117,7 +117,8 @@
       /* x labels: as many as fit */
       if (!spark) { var every = Math.max(1, Math.ceil(count / Math.max(1, Math.floor(pw / 56)))); d.labels.forEach(function (l, i) { if (i % every) return; var tx = svgEl('text', { x: X(i), y: H - 6, class: 's4-chart-axis', 'text-anchor': lineLike && i === 0 ? 'start' : lineLike && i === count - 1 ? 'end' : 'middle' }, svg); tx.textContent = l; }); }
       if (!lineLike) {
-        var gw = Math.min(24 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
+        /* columns are 16 wide at most: marks are thin (a wide window spaces them, it does not fatten them; decision 0070) */
+        var gw = Math.min(16 * n + 2 * (n - 1), band2 - 8), bw = (gw - 2 * (n - 1)) / n;
         d.series.forEach(function (s, si) { s.values.forEach(function (v, i) {
           var h = Math.max(1, (top ? v / top : 0) * ph), x = X(i) - gw / 2 + si * (bw + 2);
           svgEl('path', { d: column(x, padT + ph - h, bw, h, 4), class: 's4-chart-mark', style: 'fill:' + colorOf(si), 'data-i': i }, svg);

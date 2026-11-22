@@ -1,6 +1,9 @@
 /* Chip behaviour.
    Filter chips (data-type="filter"): click toggles aria-pressed and fires s4-change { pressed } on the chip. In a
    .s4-chip-set[data-select="single"] exactly one can be pressed (radio-like). A .s4-chip-check is added for the check.
+   Add data-clearable to a single set that narrows a collection: at most one is pressed, pressing the pressed chip
+   clears it, and none pressed means everything, so the set needs no "All" chip and shows no accent fill at rest
+   (decision 0070).
    Input chips: .s4-chip-remove gets a close icon if empty; click (or Delete / Backspace on it) fires a cancelable
    s4-remove { chip } on the chip, then the chip collapses and is removed, and focus moves to a neighbour. */
 S4.register('chip', function (scope) {
@@ -17,7 +20,7 @@ S4.register('chip', function (scope) {
       var single = set && set.dataset.select === 'single';
       var on = c.getAttribute('aria-pressed') === 'true';
       if (single) {
-        if (on) return;
+        if (on && !set.hasAttribute('data-clearable')) return;
         S4.util.all(set, '.s4-chip[data-type="filter"][aria-pressed="true"]').forEach(function (o) {
           if (o.closest('.s4-chip-set') !== set) return;
           o.setAttribute('aria-pressed', 'false');

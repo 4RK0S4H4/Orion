@@ -8,7 +8,7 @@
 (function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-showcase-theme');
 </script>
 <link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="orion.css?v=af3291a">
+<link rel="stylesheet" href="orion.css?v=46493fc">
 <link rel="stylesheet" href="demo.css">
 </head>
 <body>
@@ -60,8 +60,8 @@
             <input class="s4-search-input" type="search" placeholder="Search Notes" aria-label="Search notes">
             <button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Search" hidden><span class="s4-icon" data-icon="close"></span></button>
           </div>
-          <div class="s4-chip-set" data-select="single" data-scroll aria-label="Filter notes" id="note-filters">
-            <button class="s4-chip" data-type="filter" aria-pressed="true" type="button" data-filter-value="all"><span class="s4-chip-check"></span>All</button>
+          <!-- no "All" chip: none pressed is every note, pressing the pressed chip clears it (decision 0070) -->
+          <div class="s4-chip-set" data-select="single" data-clearable data-scroll aria-label="Filter notes" id="note-filters">
             <button class="s4-chip" data-type="filter" aria-pressed="false" type="button" data-filter-value="recent"><span class="s4-chip-check"></span>Recent</button>
             <button class="s4-chip" data-type="filter" aria-pressed="false" type="button" data-filter-value="shared"><span class="s4-chip-check"></span>Shared</button>
             <button class="s4-chip" data-type="filter" aria-pressed="false" type="button" data-filter-value="starred"><span class="s4-chip-check"></span>Starred</button>
@@ -156,18 +156,6 @@
               <figcaption class="s4-chart-title">Notes Written</figcaption>
             </figure>
           </section>
-          <section class="s4-pane" aria-labelledby="storage-h">
-            <h2 class="s4-pane-title" id="storage-h">Storage</h2>
-            <div class="s4-meter" data-segmented data-max="5" data-size="l">
-              <div class="s4-meter-head"><span class="s4-meter-label">In This Browser</span><span class="s4-meter-value"><strong>2.1 GB</strong> of 5 GB</span></div>
-              <div class="s4-meter-track">
-                <i class="s4-meter-fill" data-value="1.2" data-category="1"></i>
-                <i class="s4-meter-fill" data-value="0.6" data-category="2"></i>
-                <i class="s4-meter-fill" data-value="0.3" data-category="3"></i>
-              </div>
-              <ul class="s4-meter-legend"><li data-category="1">Photos <b>1.2 GB</b></li><li data-category="2">Voice Notes <b>0.6 GB</b></li><li data-category="3">Text <b>0.3 GB</b></li><li data-track>Free <b>2.9 GB</b></li></ul>
-            </div>
-          </section>
           <section class="s4-pane" aria-labelledby="folders-h">
             <h2 class="s4-pane-title" id="folders-h">Folders</h2>
             <ul class="s4-list" aria-labelledby="folders-h" id="folder-list" data-density="compact">
@@ -177,6 +165,16 @@
               <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Travel"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Travel</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
               <li><button class="s4-list-item" type="button" data-page-open="library" data-page-title="All Notes" data-folder="Recipes"><span class="s4-list-leading"><span class="s4-icon" data-icon="folder"></span></span><span class="s4-list-content"><span class="s4-list-headline">Recipes</span></span><span class="s4-list-trailing" data-folder-count></span></button></li>
             </ul>
+            <!-- what the notes take up sits under the folders, so the side column stays shorter than the notes beside it (decision 0070) -->
+            <div class="s4-meter" data-segmented data-max="5" data-size="l">
+              <div class="s4-meter-head"><span class="s4-meter-label">Stored In This Browser</span><span class="s4-meter-value"><strong>2.1 GB</strong> of 5 GB</span></div>
+              <div class="s4-meter-track">
+                <i class="s4-meter-fill" data-value="1.2" data-category="1"></i>
+                <i class="s4-meter-fill" data-value="0.6" data-category="2"></i>
+                <i class="s4-meter-fill" data-value="0.3" data-category="3"></i>
+              </div>
+              <ul class="s4-meter-legend"><li data-category="1">Photos <b>1.2 GB</b></li><li data-category="2">Voice Notes <b>0.6 GB</b></li><li data-category="3">Text <b>0.3 GB</b></li><li data-track>Free <b>2.9 GB</b></li></ul>
+            </div>
           </section>
         </aside>
         </div>
@@ -744,7 +742,7 @@
 
 <script src="icons.js"></script>
 <script>if (/[?&]scrub\b/.test(location.search)) document.write('<script src="../explore/lib/scrub.js"><\/script>');</script>
-<script src="orion.js?v=579aa29"></script>
+<script src="orion.js?v=46dd516"></script>
 <script>S4.theme.restore('orion-showcase-theme', { mode: 'system' }); S4.icon.restore('orion-showcase-icons');</script>
 <script src="demo.js"></script>
 </body>

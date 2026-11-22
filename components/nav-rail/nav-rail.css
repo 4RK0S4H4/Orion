@@ -90,6 +90,12 @@
     letter-spacing: var(--md-sys-typescale-label-large-tracking);
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
+  /* one filled action per screen (decision 0070): when the open view has a filled main action of its own (Approve,
+     Reply), the rail's action steps down to the elevated look, a neutral fill with the accent label and icon */
+  .s4-nav-rail .s4-fab[data-variant="elevated"] {
+    --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--md-sys-color-surface-container-low));
+    --_fg: var(--md-sys-color-primary);
+  }
   .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
   .s4-nav-rail:not([data-expanded]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }

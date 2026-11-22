@@ -255,6 +255,19 @@
     --_fg: var(--md-sys-color-on-secondary-container);
     --_fg-variant: var(--md-sys-color-on-secondary-container);
   }
+  /* the open item of a list beside its detail (data-split-open) is marked neutral: the detail's heading already names
+     it, and the screen's one accent selection belongs to the navigation (decision 0070). The highest container and the
+     heavier headline, as a tree's selection in a rail (0068). */
+  .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])),
+  .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] {
+    --_bg: var(--md-sys-color-surface-container-highest);
+    --_fg: var(--md-sys-color-on-surface);
+    --_fg-variant: var(--md-sys-color-on-surface-variant);
+  }
+  .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) .s4-list-headline,
+  .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] .s4-list-headline {
+    font-weight: var(--md-sys-typescale-emphasized-body-large-weight);
+  }
 
   /* ---------- disabled ---------- */
   .s4-list-item:is(:disabled, [aria-disabled="true"], :has(input:disabled)) {

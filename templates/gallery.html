@@ -16,7 +16,7 @@
      record's own color as its accent (data-accent; surfaces stay neutral so the sleeve looks the same everywhere). -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=0ece780">
+<link rel="stylesheet" href="../components/orion.css?v=674f42e">
 <link rel="stylesheet" href="brand/gallery.css?v=ff477a2">
 <style>
   /* Crate's own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -150,8 +150,8 @@
         </div>
 
         <div class="cr-tools">
-          <div class="s4-chip-set" data-select="single" data-scroll aria-label="Section" id="cr-filter">
-            <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" data-value="all">All</button>
+          <!-- no "All" chip: none pressed is every record, pressing the pressed chip clears it (decision 0070) -->
+          <div class="s4-chip-set" data-select="single" data-clearable data-scroll aria-label="Section" id="cr-filter">
             <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Jazz">Jazz</button>
             <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Soul &amp; Funk">Soul &amp; Funk</button>
             <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" data-value="Electronic">Electronic</button>
@@ -233,7 +233,7 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=579aa29"></script>
+<script src="../components/orion.js?v=46dd516"></script>
 <script>
 /* Crate's brand: a sticker-gold accent over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e8b400' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -310,9 +310,9 @@ function week() {
   $('cr-arrivals').innerHTML = records.filter(function (x) { return x.isNew; }).map(function (x) { return '<li><a class="s4-list-item" href="#stock/record/' + x.id + '" data-page-open="record" data-page-id="' + x.id + '"><span class="cr-thumb">' + sleeve(x) + '</span><span class="s4-list-content"><span class="s4-list-headline">' + esc(x.artist) + '</span><span class="s4-list-supporting">' + esc(x.album) + '</span></span><span class="s4-list-trailing s4-num">' + gbp(price(x)) + '</span></a></li>'; }).join(''); S4.init($('cr-arrivals'));
 }
 render();
-$('cr-filter').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; filter = c.dataset.value; S4.selection.clear(grid); render(); });
+$('cr-filter').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; filter = c.getAttribute('aria-pressed') === 'true' ? c.dataset.value : 'all'; S4.selection.clear(grid); render(); });
 $('cr-sort').addEventListener('s4-change', function (e) { sort = e.detail.value; render(); });
-$('cr-all').addEventListener('click', function () { var all = $('cr-filter').querySelector('[data-value="all"]'); all.click(); });
+$('cr-all').addEventListener('click', function () { var on = $('cr-filter').querySelector('[aria-pressed="true"]'); if (on) on.click(); });
 /* a tap opens the record (while picking, the tap picks instead: direct.js handles that first) */
 grid.addEventListener('click', function (e) { var li = e.target.closest('li[data-id]'); if (li && !grid.hasAttribute('data-selecting')) S4.pages.open(app, 'record', { id: li.dataset.id }); });
 
