@@ -35,6 +35,13 @@ accessibility, so some scores fell although nothing got worse.
 
 ## How we work (owner's rules plus what we learned)
 
+- **Triage first.** Every round starts by reading the open problems that came from outside the round: GitHub issues
+  labelled `from-app` on `4RK0S4H4/Orion` (`gh api -X GET search/issues -f q='repo:4RK0S4H4/Orion is:issue is:open label:from-app'`)
+  and `docs/issues/inbox.md` (entries pushed on `issues/<app>-<date>` branches: `git fetch origin 'refs/heads/issues/*:refs/remotes/origin/issues/*'`
+  and read their inbox). Move each into `docs/issues/README.md` as a numbered issue (fields and image copied, the GitHub
+  issue linked or closed with the number), clear it from the inbox, and plan it into the round. Owner-reported device bugs
+  come first, then from-app issues, then the review's blockers. The app sessions' rules are in CLAUDE.md ("If you are a
+  session building another app with Orion").
 - **The main session orchestrates; subagents build** (owner, 2026-11-16). Opus subagents for design-sensitive work,
   Sonnet for mechanical work. **At most two subagents at a time** (owner, after repeated usage limits).
 - Each workstream gets its own git worktree under `.claude/worktrees/<name>` and branch `roundNN/<name>`, created from
@@ -88,7 +95,7 @@ accessibility, so some scores fell although nothing got worse.
    - Published 032c225. Tag push was refused by GitHub (403); tags v1.0.0 (8f7d23f) and v1.1.0 (383dedb) exist only
      if the owner creates them on GitHub.
    - Review 4 ([`history/round-0059/regrade-4.md`](history/round-0059/regrade-4.md)): 9 / 9 / 8.5 / 9 / 8.5 / 8.5 / 9 / 9.5.
-6b. **Round 0060 — current stage**: review 4's blockers.
+6b. **Round 0060** (built, merged): review 4's blockers.
    - **A** (built, decision 0069; branch `round60/a`, worktree `r60-a`, owns shared docs): app bundle split by component
      (apps load only what they use; a budget in check); palette Escape with nothing focused lands on main, not body;
      confirm Linnea's toolbar is outside the grid; grid-keys cue for a touch device with a keyboard.
@@ -97,6 +104,26 @@ accessibility, so some scores fell although nothing got worse.
      third-party-brand trial: a new app built from the skill alone, checked for a bespoke look, its lessons fed back.
    - Then A merges B, publish, review 5. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
      run for real, print pagination, skill evals proving bespoke results.
+6c. **Round 0061 — current stage** (integrated on `round61/int`): the owner's notes from a Windows desktop app and an
+   iPhone. Window controls like Windows' and nothing wrapping mid-motion (decision 0072, issues 69 and 70, with
+   `midmotion.mjs`); a ring round the whole phone screen and the round nav bar highlight (issues 71 and 72); intake from
+   app sessions (this file's Triage step, `from-app` form, `docs/issues/inbox.md`).
+6d. **Full QA pass** (next, before any area counts as a 10 and before release 1.2): a bug hunt separate from the design
+   reviews, by a fresh agent that did not build the work, over every component page, template, example and the Showcase.
+   - **Covers:** every interactive state (hover, press, focus, disabled, selected, error, loading, empty); mid-motion
+     frames with `midmotion.mjs` for every motion; phone 320 to 430 and desktop 1280 to 1920; dark and light; every dial
+     preset; RTL; 200% text; long text and long words; forced colors; reduced motion and reduced transparency; keyboard
+     only; touch (a tap that moves no focus, as iOS does); WebKit and Firefox when they can be installed, else say so.
+   - **Output:** each finding becomes a numbered issue in `docs/issues/README.md` with a screenshot, is fixed, and where
+     it is a rule is proven by a known-bad fixture in `tests/fixtures` (`npm run test:checker`) before it counts as done.
+   - **What automation already covers:** token and contrast pairs, the glass guarantee (97 schemes), any-accent schemes,
+     motion patterns, banned phrases, stale generated files, the page checker (390 dark and 1280 light, contrast as
+     rendered, overflow, lint, silent failures, mid-motion words and overflow), the production suite in Chromium and
+     WebKit on CI, reach (RTL, print, text size, forced colors), dial presets, lean-bundle equivalence, Back, keyboard
+     paths. **What the pass adds:** a fresh reader's eye for what no rule describes yet (a state nobody scripted, an odd
+     width, a screen that is correct but wrong), more browsers and widths than CI runs, combinations (a dial with a
+     motion with a long label), and the real-device gaps the builders cannot see; every miss it finds becomes a rule.
+   - Exit: no open issue from the pass; then re-grade (review 5), then the dated 1.2.0 release.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 with a git tag and a re-packaged skill (CHANGELOG 1.0.0 and 1.1.0 are still "Unreleased").
 
@@ -118,4 +145,5 @@ action now. The owner can overrule any of these; otherwise they stand.
   fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
   the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.
 - 2026-11-22 (round 0060, workstream A): decision 0069 built (lean app bundle: `orion.core.min.*` plus six packs, `scripts/packs.mjs`, budgets in check, `test:lean`; 15 templates on it; palette Escape lands on main via `S4.util.land`; Linnea's Columns button confirmed outside the grid; grid hint after the first key on touch). A merged B (0070; Linnea's All Records chip now hidden, filter `hidden: true` view). Decision 0071 renamed the product to Orion (skill folder, links, check:words). Next: full tests, publish, review 5.
+- 2026-11-22 (round 0061, integration): merged the titlebar branch (decision 0072, issues 69 and 70) and the mobile branch (issues 71 and 72, renumbered because both had used 69 and 70), added intake from app sessions (CLAUDE.md, SKILL.md, from-app form, inbox, the Triage step above) and the Full QA pass stage. Next: publish, the owner's device looks, the QA pass, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.

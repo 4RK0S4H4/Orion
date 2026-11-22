@@ -17,6 +17,13 @@ enough to never be in the way, but never looking instant. This amends 0022 (simp
 (transform and opacity, one transition per element, nothing cloned) unless the owner agrees otherwise; record as a new
 decision and show options in a motion lab with the scrubber before building.
 
+## Intake from app sessions
+
+The owner builds his own apps in other sessions with this repo attached. They log Orion problems as GitHub issues
+labelled `from-app` (form `.github/ISSUE_TEMPLATE/from-app.yml`) or as entries in [`inbox.md`](inbox.md) on a branch
+`issues/<app>-<date>`. Every round starts by moving each of them here, numbered, with its image in `img/` (the Triage step
+in [`../PLAN.md`](../PLAN.md)).
+
 ## Owner notes (2026-11-22)
 
 - **69.** Done 2026-11-22 (decision 0072). Title bar window controls: "I really like how it's unique from windows, but I
@@ -31,6 +38,13 @@ decision and show options in a motion lab with the scrubber before building.
   every motion at 25, 50 and 75%. Images: `img/2026-11-22-rail-expand-wrap-1.png` (collapsed),
   `img/2026-11-22-rail-expand-wrap-2.png` (mid-way: "New Script" one letter per line), `img/2026-11-22-rail-expand-wrap-3.png`
   (expanded).
+
+- **71.** Done 2026-11-22 (round 0061). A ring round the whole screen on the phone (Dosewise and others): a view, main or
+  page that takes focus only to hold the place rings only for the keyboard (`data-s4-input`); WebKit counts a script's
+  focus after a tap as `:focus-visible`. Image: `img/2026-11-22-mobile-region-border.jpg`.
+- **72.** Done 2026-11-22 (round 0061). The nav bar's selected tab was a circle the label poked out of (regression from
+  2a746b0): under 600 the highlight is a rounded rectangle with the 32dp pill's corner and holds its label; the checker
+  fails a round one. Image: `img/2026-11-22-nav-bar-round-indicator.jpg`.
 
 ## Owner notes (2026-11-21)
 

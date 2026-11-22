@@ -1,0 +1,62 @@
+name: Problem found while building an app
+description: A defect, gap or surprise in Orion (a component, a rule, the checker, the skill) found while building another app with it.
+title: "[from-app] "
+labels: ["from-app"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One issue per problem. Do not patch Orion from the app and do not work around it silently: log it here, then
+        keep any workaround in the app's own stylesheet with a comment linking this issue.
+  - type: input
+    id: app
+    attributes:
+      label: App name
+      description: The app that found it.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Component or page
+      description: The Orion component, template, rule or checker involved (for example `s4-nav-bar`, `data-table`, `check.mjs`).
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What was expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open ...\n2. Tap ...\n3. See ..."
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag the image in. Mid-motion problems: the frames before, during and after.
+  - type: input
+    id: device
+    attributes:
+      label: Browser, device and shell
+      description: For example iPhone 15, Safari 18; Chrome 131 on Windows; Electron 33 shell.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Orion version
+      description: The top version in CHANGELOG.md, or the commit of the repo the app used.
+    validations:
+      required: true

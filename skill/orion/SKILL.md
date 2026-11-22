@@ -409,6 +409,10 @@ It also warns on more than one filled action on the first screen (0070).
 Also check by eye: one filled button per area, Title Case labels, status words, the nav bar on a phone and the rail on a
 desktop, and both themes.
 
+## Found a problem in Orion?
+
+If a component, token, rule or the checker is broken, missing something the app needs, or surprising: do not patch Orion's files from the app and do not work around it silently. Log it. Where the repo `4RK0S4H4/Orion` is attached, follow "If you are a session building another app with Orion" in its `CLAUDE.md`: a GitHub issue with the `from-app` form (app name, component or page, what happened, what was expected, steps, screenshot, browser/device/shell, Orion version from `CHANGELOG.md`), else an entry in `docs/issues/inbox.md` on a branch `issues/<app>-<date>` (never push `s4-orion` or `main`). With only this skill, tell the owner in chat in that same shape. One problem per report. The app's workaround goes in its own stylesheet with a comment naming the issue. A missing element Orion's rules can make is not a defect: build it in the app's stylesheet (decision 0053).
+
 ## References (read when needed)
 
 | File | Read it when |

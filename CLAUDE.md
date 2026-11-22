@@ -1,10 +1,28 @@
 # Orion: working notes for Claude
 
+## If you are a session building another app with Orion
+
+You have this repo attached as a secondary repo (or only the skill) and are building the owner's own app. Orion's own
+rules in the rest of this file are for sessions working on Orion; yours is this: **do not patch Orion's components,
+tokens or checks from the app, and do not work around a defect silently. Log it**, so it feeds a future round.
+
+- **Where.** A GitHub issue on `4RK0S4H4/Orion` with the form `.github/ISSUE_TEMPLATE/from-app.yml` (label `from-app`) if
+  the session can (`gh issue create`, or the GitHub tools). If it cannot, append an entry (format in
+  [`docs/issues/inbox.md`](docs/issues/inbox.md)) to `docs/issues/inbox.md` on a branch `issues/<app>-<date>` and push
+  that branch. **Never push `s4-orion` or `main` from an app session.** Save screenshots in `docs/issues/img/`
+  (`<date>-<app>-<short-name>.png`) on the same branch, or attach them to the issue.
+- **One issue per problem**, with: app name, component or page, what happened, what was expected, steps, screenshot,
+  browser/device/shell, Orion version (top of `CHANGELOG.md`, or the commit of this repo).
+- **Workarounds** live in the app's own stylesheet, with a comment linking the issue (`/* Orion issue #123: ... */`),
+  never in a copy of Orion's files. Tell the owner in chat what you logged and where.
+- A gap that Orion's rules already cover ("the app is the app", decision 0053: make the element from Orion's rules in the
+  app's stylesheet) is not a defect; log only what is broken, missing from the system, or surprising.
+
 Orion is the owner's personal design system for web apps and pages: Material 3 Expressive plus a very clear,
 contrast-guaranteed glass layer on floating chrome. It replaces the older **S4 Material** skill. **S4 Glass is a separate,
 unrelated system**; don't mix the two. The repo was renamed from `s4-material` to `s4-orion` (2026-11) and again to `Orion` (2026-11-22, decision 0071); the product is **Orion**, formerly S4 Orion. The `s4` prefix stays as a technical namespace (below).
 
-**Start every session by reading [`docs/NEXT.md`](docs/NEXT.md) and [`docs/PLAN.md`](docs/PLAN.md)** (the goal, current stage, how workstreams run) (and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the long view and what Orion will not become): current phase, the plan for what's left, the backlog
+**Start every session working on Orion by reading [`docs/NEXT.md`](docs/NEXT.md) and [`docs/PLAN.md`](docs/PLAN.md)** (the goal, current stage, how workstreams run) (and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the long view and what Orion will not become): current phase, the plan for what's left, the backlog
 and the open questions. Update it (and the README phase table and CHANGELOG) before ending any session that changed
 something, so the next session can pick up cold.
 
@@ -112,6 +130,7 @@ Validate with `scripts/quick_validate.py <repo>/skill/orion`. Keep `SKILL.md` un
 - Decision 0070: one accent job per screen (refines 0068): at rest the window shows one filled action (the next act on the work in front of you; the rail's action steps down to elevated by itself while the open view shows a filled button) and one accent selection, the navigation's (the open row beside its detail and the picked day beside its pane are neutral; `data-split-open` rows do it by themselves); no pressed chip at rest (no "All" chip: `data-select="single" data-clearable`); chart columns at most 16 wide; the page checker warns on a second filled action on the first screen.
 - Decision 0071 (the name): the product is **Orion** (formerly S4 Orion); never write "S4 Orion" outside decisions, history, old CHANGELOG entries and the skill's "formerly" line (`npm run check:words` fails it). The skill lives in `skill/orion/` and packages to `skill/dist/orion.skill`. The `s4` prefix (classes, tokens, `data-s4-*`, `S4.*`, `s4-` storage keys) is a technical namespace and never changes. Repo `4RK0S4H4/Orion`, Pages `https://4rk0s4h4.github.io/Orion/` (the old `/s4-orion/` address no longer works); the branch is still `s4-orion`.
 - Decision 0072 (window controls, mid-motion): `.s4-window-control`s are full cells like Windows' (46 wide, the bar's height, no gap to the window's top and end edges, so the corner pixel hits Close; mirrored to the start in right-to-left), drawn in Orion (a firm 8 layer on hover and press, drawn glyphs, Close `error` only on hover and press, Restore while maximized); only in a frameless Windows or Linux shell, never beside the system's buttons. While anything changes size, its contents keep their end layout and are clipped or faded, never re-wrapped; the page checker and suite freeze every motion at 25/50/75% (`skill/orion/scripts/midmotion.mjs`).
+- Round 0061 (issues 71, 72, no decision): a container that takes focus only to hold the place (`tabindex="-1"` on a non-control: main, a view, a page, a dialog's box) rings only while `<html data-s4-input="key">` (set by core.js from the last key or tap); never write a ring on `:focus` alone and never rely on `:focus-visible` for such containers (WebKit matches it after a tap, which drew a ring round the whole phone screen). The nav bar's highlight is never given its own corner (under 600 it is the 32dp pill's rounded rectangle holding its label; the checker fails a round one).
 - Before naming a class or attribute, grep for it: `s4-page`, `s4-page-header` and `data-expand` all clashed with existing ones on 2026-11-15.
 - Inter; Solar icons (Bold Duotone, Linear arrows)
   behind semantic names in `components/icons/names.json`. Title Case labels, sentence case sentences.

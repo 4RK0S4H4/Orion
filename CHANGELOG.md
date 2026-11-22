@@ -8,9 +8,17 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 ## [1.2.0] - Unreleased
 
-Rounds 0059 and 0060 (decisions 0067 to 0070; the dated release and its git tag come after review 5).
+Rounds 0059, 0060 and 0061 (decisions 0067 to 0072; the dated release and its git tag come after review 5 and the full QA pass).
 
 Renamed (decision 0071): the design language is **Orion** (formerly S4 Orion). The skill is `skill/orion/` and packages as `orion.skill`; the repository is `4RK0S4H4/Orion` and Pages is `https://4rk0s4h4.github.io/Orion/` (the old Pages address no longer works). The `s4-` classes, `--s4-` tokens, `data-s4-*`, `S4.*` and file names are unchanged. `npm run check:words` fails a stray "S4 Orion".
+
+Round 0061 (decision 0072 and issues 69 to 72, the owner's notes from a Windows desktop app and an iPhone):
+
+- Changed: window controls act like Windows' (decision 0072, issue 69): full 46-wide cells to the window's top and end edges, a firm layer inside, drawn glyphs, Close `error` only on hover, Restore while maximized, mirrored in right-to-left.
+- Fixed: the rail's text wrapped letter by letter while it expanded (issue 70). Contents keep their end layout while a size changes. `skill/orion/scripts/midmotion.mjs` freezes every motion at 25, 50 and 75% and the page checker and suite fail a split word or sideways scroll there (`tests/fixtures/bad-rail-motion.html`, `bad-window-controls.html`).
+- Fixed: on an iPhone a ring no longer outlines the whole screen after a view switch, Back or a closed panel (issue 71); containers that hold the place ring only for the keyboard (`data-s4-input` on `<html>`, set by core.js).
+- Fixed: the nav bar's selected tab is a rounded rectangle again under 600 (it had become a circle at five tabs) and always holds its label (issue 72). The page checker and suite fail a round highlight or a label poking out of it (`tests/fixtures/bad-nav-pill.html`).
+- Added: intake from app sessions: `.github/ISSUE_TEMPLATE/from-app.yml`, `docs/issues/inbox.md`, a section in CLAUDE.md and SKILL.md ("Found a problem in Orion?"), and a Triage step and a Full QA pass stage in `docs/PLAN.md`.
 
 Round 0060, workstream A, review 4's blockers (decision 0069):
 
