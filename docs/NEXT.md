@@ -1,5 +1,7 @@
 # Where S4 Orion stands (resume here)
 
+**The plan to a 10 in every area, the current stage (round 0058) and how sessions work is in [`PLAN.md`](PLAN.md). Read it next.**
+
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
