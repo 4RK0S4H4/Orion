@@ -35,6 +35,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | height | automatic: 56 one line; 72 with supporting text or overline; 88 with both (leading and trailing align to the top) | — |
 | `data-lines` (list or item) | `2` (72, supporting text clamped to 1 line), `3` (88, clamped to 2 lines) | automatic |
 | `aria-current` / `aria-selected="true"` | on the item (or its `li`): secondary-container, on-secondary-container | — |
+| the same on an item with `data-split-open` | the open item of a list beside its detail is marked neutral (surface-container-highest, the heavier headline): the detail's heading names it and the screen's one accent selection is the navigation's (decision 0070) | — |
 | `aria-disabled="true"`, `:disabled`, or a disabled input inside | content at 38% | — |
 | `data-dividers` (list) | 1px outline-variant line between items | — |
 | `data-style="segmented"` (list) | M3E segmented: items 2 apart on surface-container-low (`--s4-list-segment-color`), extra-small inner corners, large outer corners per group | — |

@@ -24,6 +24,7 @@ chips in a chip set.
 | `data-elevated` | surface-container-low + level 1 shadow instead of the outline | — |
 | `disabled` / `aria-disabled="true"` | disabled | — |
 | `.s4-chip-set[data-select="single"]` | exactly one filter chip pressed | multi |
+| `.s4-chip-set[data-select="single"][data-clearable]` | at most one pressed: pressing the pressed chip clears it and none pressed means everything, so a set that narrows a collection needs no "All" chip and shows no accent fill at rest (decision 0070) | — |
 | `.s4-chip-set[data-scroll]` | one horizontally scrolling row | wraps |
 
 32dp, corner `--s4-shape-chip`, label-large, 1dp outline-variant outline, 18dp icons. Selected filter chips are

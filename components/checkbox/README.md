@@ -16,9 +16,10 @@ Picks any number of options, or confirms one thing before submitting. M3 checkbo
 | `input.indeterminate = true`, or `data-indeterminate` on the label | dash mark (checkbox.js sets the property; the first click clears it) |
 | `data-error` on the label, or `aria-invalid="true"` on the input | error color |
 
-18dp box, 2dp corners, 2dp on-surface-variant border; checked / indeterminate = primary fill with an on-primary mark that
-wipes in on the fast-spatial spring. 40dp circular state layer (on-surface, primary when checked, error in error);
-the bare checkbox is a 40dp square with a 48dp hit area.
+A 20dp filled circle, no outline (decisions 0023, 0025): empty it is `--s4-color-control` (3:1 against its surface,
+decision 0044), checked or indeterminate it is the primary fill with a thin on-primary mark that settles in on the ink
+spring. No state-layer halo: on hover the box grows a touch, on press it dips (decision 0043); 48dp touch target. In a
+table's check column an empty box at rest is a quiet dot until the row is hovered or focused (decision 0063).
 
 **Do:** use for multi-select lists, table row selection, and "I agree" confirmations; give bare checkboxes an `aria-label`.
 **Don't:** use a checkbox for an instant setting (use a [switch](../switch/)) or for one-of-many (use a [radio](../radio/)).

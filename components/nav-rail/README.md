@@ -63,6 +63,9 @@ height from 840 and mirrors the nav bar.
 
 **Do**
 - Put the screen's main action in the FAB slot; give the FAB an `aria-label` (the label is hidden when collapsed).
+- One filled action per screen (decision 0070): while the open view or page shows a filled button of its own (Approve,
+  Reply, Order Refill), the rail's action steps down by itself to the elevated look (a neutral fill, the accent label
+  and icon) and is filled again on a view with none. `data-variant="elevated"` on the FAB keeps it elevated.
 - Keep destinations identical to the nav bar.
 
 **Don't**

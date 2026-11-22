@@ -645,6 +645,9 @@ height from 840 and mirrors the nav bar.
 
 **Do**
 - Put the screen's main action in the FAB slot; give the FAB an `aria-label` (the label is hidden when collapsed).
+- One filled action per screen (decision 0070): while the open view or page shows a filled button of its own (Approve,
+  Reply, Order Refill), the rail's action steps down by itself to the elevated look (a neutral fill, the accent label
+  and icon) and is filled again on a view with none. `data-variant="elevated"` on the FAB keeps it elevated.
 - Keep destinations identical to the nav bar.
 
 **Don't**
@@ -1463,6 +1466,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | height | automatic: 56 one line; 72 with supporting text or overline; 88 with both (leading and trailing align to the top) | — |
 | `data-lines` (list or item) | `2` (72, supporting text clamped to 1 line), `3` (88, clamped to 2 lines) | automatic |
 | `aria-current` / `aria-selected="true"` | on the item (or its `li`): secondary-container, on-secondary-container | — |
+| the same on an item with `data-split-open` | the open item of a list beside its detail is marked neutral (surface-container-highest, the heavier headline): the detail's heading names it and the screen's one accent selection is the navigation's (decision 0070) | — |
 | `aria-disabled="true"`, `:disabled`, or a disabled input inside | content at 38% | — |
 | `data-dividers` (list) | 1px outline-variant line between items | — |
 | `data-style="segmented"` (list) | M3E segmented: items 2 apart on surface-container-low (`--s4-list-segment-color`), extra-small inner corners, large outer corners per group | — |
@@ -2439,7 +2443,7 @@ Script: `S4.chart(el, { labels, series })` draws or redraws. Charts redraw when 
 | Which way a stat is going | `spark` beside the number |
 | One number | not a chart: a [stat](#stat) |
 
-**What every chart gets:** round axis ticks, hairline gridlines, thin marks with rounded data ends, a legend when
+**What every chart gets:** round axis ticks, hairline gridlines, thin marks with rounded data ends (columns 16 wide at most; a wide pane spaces them, decision 0070), a legend when
 there are two or more series (none for one: the title names it), one value label on what matters, a tooltip on hover,
 tap or arrow keys, and a **Table** button with the same numbers as rows.
 
@@ -3545,6 +3549,7 @@ chips in a chip set.
 | `data-elevated` | surface-container-low + level 1 shadow instead of the outline | — |
 | `disabled` / `aria-disabled="true"` | disabled | — |
 | `.s4-chip-set[data-select="single"]` | exactly one filter chip pressed | multi |
+| `.s4-chip-set[data-select="single"][data-clearable]` | at most one pressed: pressing the pressed chip clears it and none pressed means everything, so a set that narrows a collection needs no "All" chip and shows no accent fill at rest (decision 0070) | — |
 | `.s4-chip-set[data-scroll]` | one horizontally scrolling row | wraps |
 
 32dp, corner `--s4-shape-chip`, label-large, 1dp outline-variant outline, 18dp icons. Selected filter chips are
@@ -3625,9 +3630,10 @@ Picks any number of options, or confirms one thing before submitting. M3 checkbo
 | `input.indeterminate = true`, or `data-indeterminate` on the label | dash mark (checkbox.js sets the property; the first click clears it) |
 | `data-error` on the label, or `aria-invalid="true"` on the input | error color |
 
-18dp box, 2dp corners, 2dp on-surface-variant border; checked / indeterminate = primary fill with an on-primary mark that
-wipes in on the fast-spatial spring. 40dp circular state layer (on-surface, primary when checked, error in error);
-the bare checkbox is a 40dp square with a 48dp hit area.
+A 20dp filled circle, no outline (decisions 0023, 0025): empty it is `--s4-color-control` (3:1 against its surface,
+decision 0044), checked or indeterminate it is the primary fill with a thin on-primary mark that settles in on the ink
+spring. No state-layer halo: on hover the box grows a touch, on press it dips (decision 0043); 48dp touch target. In a
+table's check column an empty box at rest is a quiet dot until the row is hovered or focused (decision 0063).
 
 **Do:** use for multi-select lists, table row selection, and "I agree" confirmations; give bare checkboxes an `aria-label`.
 **Don't:** use a checkbox for an instant setting (use a [switch](#switch)) or for one-of-many (use a [radio](#radio)).
@@ -4182,7 +4188,7 @@ it an `aria-label`. Under reduced motion both show their end state at once.
 
 ## Snackbar
 
-A short message after an action, often with Undo. **Slides up from the bottom edge**, above a nav bar, docked toolbar or FAB.
+A short message after an action, often with Undo. **Rises a few pixels into place near the bottom** (it never slides in from the screen's edge), above a nav bar, docked toolbar or FAB.
 Glass (decision 0042): a notification is a raised object. Text and the action are `on-surface` (the action in the
 emphasized weight), which the glass guarantee keeps at AA. Rises 14px into place on the `rise` spring.
 
