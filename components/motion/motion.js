@@ -3,7 +3,7 @@
      Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
      Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow
      Pop      S4.transition.pop(surface, { open, from })       floating glass (dialogs, panels): rises 16px and fades in; from: px a finger pulled it down
-              S4.transition.scrim(dialog, open)                the dimmed page behind a modal fades with it
+              S4.transition.scrim(dialog, open, { from })      the dimmed page behind a modal fades with it (from: its opacity now)
      Rise     S4.transition.rise(el, { open })                 notices (snackbars, a new message): rise 14px and fade in
               S4.transition.tip(el, { open })                  the small rise (tooltips): 4px
      Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
@@ -153,10 +153,11 @@
   }
 
   /* ---------- scrim: the page behind a modal dims with it ---------- */
-  function scrim(dialog, open) {
+  function scrim(dialog, open, opts) {
     open = open !== false;
     var s = M.spring(open ? 'effects' : 'fast-effects');
-    return dialog.animate([{ opacity: open ? 0 : 1 }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
+    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* a dragged panel's scrim leaves from where the finger left it */
+    return dialog.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
   }
 
   /* ---------- enter: one view arriving on its own (the second half of a switch) ---------- */

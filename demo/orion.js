@@ -325,7 +325,9 @@
     { key: 'display', attr: 'data-type-display', base: 'inter', prop: '--md-ref-typeface-brand' },
     { key: 'text', attr: 'data-type-text', base: 'inter', prop: '--md-ref-typeface-plain' },
     { key: 'displayWeight', attr: 'data-type-display-weight', base: 'semibold' },   /* regular, medium: for a display face lighter than Inter (decision 0060) */
-    { key: 'energy', attr: 'data-energy', base: 'standard' }   /* motion energy: calm, standard, lively (motion.css, motion.js) */
+    { key: 'energy', attr: 'data-energy', base: 'standard' },   /* motion energy: calm, standard, lively (motion.css, motion.js) */
+    { key: 'scale', attr: 'data-scale', base: 'default' },   /* type and spacing together: compact, default, large (scale.css, decision 0066) */
+    { key: 'headings', attr: 'data-headings', base: 'default' }   /* heading style: default, tight, editorial (brand.css, decision 0066) */
   ];
   /* S4.theme(opts, element): the same dials on one container (issue 52). Nothing is saved; the attributes are the state.
      A key set to null or '' removes the attribute (the container follows the page again); a default value ('round',
@@ -355,7 +357,8 @@
   S4.theme = function (opts, el) {
     if (el && el !== root) return themeElement(el, opts);
     if (!opts) return { seed: state.seed, variant: state.variantSet ? state.variant : 'auto', mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
-      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold' };
+      corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold',
+      scale: state.scale || 'default', headings: state.headings || 'default' };
     var colorChanged = false;
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
@@ -443,7 +446,7 @@
      Reveal   S4.transition.reveal(el, { open })               content opens in place and pushes what is below; what is inside follows
      Follow   S4.transition.follow(menu, { open })             anchored glass (menus, pickers): fades in where it sits, items follow
      Pop      S4.transition.pop(surface, { open, from })       floating glass (dialogs, panels): rises 16px and fades in; from: px a finger pulled it down
-              S4.transition.scrim(dialog, open)                the dimmed page behind a modal fades with it
+              S4.transition.scrim(dialog, open, { from })      the dimmed page behind a modal fades with it (from: its opacity now)
      Rise     S4.transition.rise(el, { open })                 notices (snackbars, a new message): rise 14px and fade in
               S4.transition.tip(el, { open })                  the small rise (tooltips): 4px
      Switch   S4.transition.sharedAxis(outView, inView, dir)   sibling views (tabs, destinations, steps)
@@ -593,10 +596,11 @@
   }
 
   /* ---------- scrim: the page behind a modal dims with it ---------- */
-  function scrim(dialog, open) {
+  function scrim(dialog, open, opts) {
     open = open !== false;
     var s = M.spring(open ? 'effects' : 'fast-effects');
-    return dialog.animate([{ opacity: open ? 0 : 1 }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
+    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* a dragged panel's scrim leaves from where the finger left it */
+    return dialog.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
   }
 
   /* ---------- enter: one view arriving on its own (the second half of a switch) ---------- */
@@ -5661,9 +5665,22 @@ S4.register('month', function (scope) {
    - [data-site-panel="id"] on a button: the same for another panel (the docs sidebar on a phone).
    - [data-period] on a joined capsule group: each element with data-period-<value> in the same section shows that text.
    - .s4-compare: its button group (values 1..4) picks the plan column shown under 600.
-   - .s4-toc: the link of the section being read gets aria-current="location". */
+   - .s4-toc: the link of the section being read gets aria-current="location".
+   - .s4-site-nav links to sections of this page: the same, never while the hero is in view (decision 0066). */
 S4.register('site', function (scope) {
   var wide = window.matchMedia('(width >= 840px)');
+
+  /* ---------- tables on the site bundle (decision 0066) ----------
+     The site runtime leaves table.js out; a site table still needs its column names on each cell to stack on a
+     phone. Only when table.js is absent, and a cell's own data-label always wins. */
+  if (!S4.table) S4.util.all(scope, 'table.s4-table').forEach(function (t) {
+    var heads = S4.util.all(t, 'thead th').map(function (th) { return th.textContent.trim(); });
+    S4.util.all(t, 'tbody tr, tfoot tr').forEach(function (tr) {
+      Array.prototype.forEach.call(tr.cells, function (td, i) { if (heads[i] && !td.hasAttribute('data-label')) td.setAttribute('data-label', heads[i]); });
+    });
+    var p = t.querySelector('thead th[data-primary]');
+    if (p) S4.util.all(t, 'tbody tr').forEach(function (tr) { var c = tr.cells[p.cellIndex]; if (c) c.setAttribute('data-primary', ''); });
+  });
 
   /* ---------- a floating panel opened by a button ---------- */
   function panel(button, el) {
@@ -5778,6 +5795,32 @@ S4.register('site', function (scope) {
     var on = group.querySelector('[aria-pressed="true"][value]');
     if (on && !c.dataset.show) c.dataset.show = on.value;
     group.addEventListener('s4-change', function (e) { if (e.detail && e.detail.value) c.dataset.show = e.detail.value; });
+  });
+
+  /* ---------- the header on a one-page site (decision 0066) ----------
+     Links to sections of this page mark the section being read (aria-current="location"), and nothing while the
+     first section (the hero) fills the top: the home page never opens with a nav item already selected. A link to
+     another page keeps the aria-current="page" the markup gives it. */
+  S4.util.all(scope, '.s4-site-header').forEach(function (header) {
+    if (!S4.util.once(header, 'sitespy')) return;
+    var links = Array.prototype.filter.call(header.querySelectorAll('.s4-site-nav a[href^="#"]'), function (a) { return a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1))); });
+    if (!links.length) return;
+    links.forEach(function (a) { if (a.getAttribute('aria-current') === 'page') a.removeAttribute('aria-current'); });
+    var first = document.querySelector('main .s4-site-section');
+    var queued = false;
+    function update() {
+      queued = false;
+      var line = window.innerHeight * 0.4, current = null;
+      links.forEach(function (a) {
+        var t = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+        if (!t || t === first || t.contains(first) || (first && first.contains(t))) return;
+        var r = t.getBoundingClientRect(); if (r.top <= line && r.bottom > line) current = a;
+      });
+      links.forEach(function (a) { if (a === current) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    }
+    window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
   });
 
   /* ---------- on this page ---------- */
@@ -8038,11 +8081,11 @@ S4.register('swatches', function (scope) {
 });
 
 /* Theme controls without app code: a connected button group with data-theme-mode (values system|light|dark),
-   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight" (values as
+   data-theme-contrast (values 0|0.5|1) or data-brand-dial="surfaces|gray|page|corners|display|text|energy|displayWeight|scale|headings" (values as
    S4.theme takes them, e.g. tinted|neutral, serif|inter) calls S4.theme when picked and follows S4.theme() (restored
    or changed elsewhere). So an app's own Appearance section needs no script. */
 S4.register('theme-controls', function (scope) {
-  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight'];
+  var DIALS = ['surfaces', 'gray', 'page', 'corners', 'display', 'text', 'energy', 'displayWeight', 'scale', 'headings'];
   S4.util.all(scope, '[data-theme-mode], [data-theme-contrast], [data-brand-dial]').forEach(function (g) {
     if (!S4.util.once(g, 'themectl')) return;
     var key = g.hasAttribute('data-theme-mode') ? 'mode' : g.hasAttribute('data-theme-contrast') ? 'contrast' : g.getAttribute('data-brand-dial');
@@ -8726,6 +8769,9 @@ S4.register('skeleton', function (scope) {
       e.preventDefault();
       dy = Math.max(0, y);
       d.style.transform = 'translateY(' + dy + 'px)';
+      /* a modal panel's scrim follows the finger (decision 0066; opacity under direct manipulation, not a transition);
+         a dialog's stays: it is a question, not a surface you move */
+      if (!d.classList.contains('s4-dialog')) { d.setAttribute('data-s4-dragging', ''); d.style.setProperty('--s4-sheet-drag', String(Math.min(1, dy / Math.max(1, d.offsetHeight)))); }
     }, { passive: false });
     function end(e) {
       if (y0 === null) return;
@@ -8733,7 +8779,9 @@ S4.register('skeleton', function (scope) {
       if (!dragging) return;
       dragging = false;
       var flick = dy > 24 && dy / Math.max(1, e.timeStamp - t0) > 0.5;
+      d.removeAttribute('data-s4-dragging');
       if (!d.hasAttribute('data-persistent') && (dy > d.offsetHeight / 4 || flick)) { close(d, '', { pulled: dy }); return; }
+      d.style.removeProperty('--s4-sheet-drag');   /* the scrim settles back with State (sheet.css) */
       d.style.transform = '';
       S4.transition.shift(d, 'translateY(' + dy + 'px)', 'none');   /* settles back */
     }
@@ -8744,13 +8792,15 @@ S4.register('skeleton', function (scope) {
     var d = el(id); if (!d || !d.open || d._s4closing) return Promise.resolve();
     d._s4closing = true;
     var from = d._s4from;
-    if (!d._s4modeless) S4.transition.scrim(d, false);
+    var drag = parseFloat(d.style.getPropertyValue('--s4-sheet-drag')) || 0;
+    if (!d._s4modeless) S4.transition.scrim(d, false, drag ? { from: 1 - drag } : undefined);   /* from where the finger left it */
     var p = motion(d, false, opts && opts.pulled);
     return p.then(function () {
       d.close(value || '');
       S4.transition.restore(d);
       d.getAnimations({ subtree: true }).forEach(function (a) { a.cancel(); });
       d.style.transform = '';
+      d.style.removeProperty('--s4-sheet-drag');
       d._s4closing = false;
       if (from && from.isConnected) from.focus({ preventScroll: true });
       S4.util.emit(d, 's4-close', { value: value || '' });

@@ -82,6 +82,49 @@ outputs['components/orion.min.css'] = minBanner('stylesheet') + minCss(cssRepo);
 outputs['components/orion.min.js'] = minBanner('runtime') + minJs(js);
 outputs['skill/s4-orion/assets/orion.min.css'] = minBanner('stylesheet') + minCss(cssSkill);
 outputs['skill/s4-orion/assets/orion.min.js'] = outputs['components/orion.min.js'];
+/* ---------- the site bundle (decision 0066): what a body.s4-site page uses, nothing an app shell needs ----------
+   Base, tokens, type, the site kit, actions, the header's glass, menu, chips, cards, lists, prose and code, a static
+   table, form basics, the quiet data pictures sites show in frames (ring, meter, milestones, stat), status and feedback.
+   Left out: the app shell, navigation chrome, desktop anatomy, dialogs, sheets, the palette, tables at scale, filters,
+   charts, boards, direct manipulation, the rich inputs. A site that needs one of those loads the full bundle instead. */
+const SITE_CSS = ['../tokens/tokens.css', 'base/base.css', 'base/scale.css', 'base/density.css', 'base/gray.css', 'base/brand.css', 'base/defaults.css', 'base/print.css',
+  'button/button.css', 'icon-button/icon-button.css', 'button-group/button-group.css', 'tabs/tabs.css',
+  'card/card.css', 'list/list.css', 'divider/divider.css', 'avatar/avatar.css', 'accordion/accordion.css', 'breadcrumbs/breadcrumbs.css', 'pagination/pagination.css',
+  'table/table.css', 'stat/stat.css', 'ring/ring.css', 'meter/meter.css', 'milestones/milestones.css', 'description-list/description-list.css', 'prose/prose.css', 'code/code.css',
+  'site/site.css', 'text-field/text-field.css', 'form/form.css', 'switch/switch.css', 'checkbox/checkbox.css', 'radio/radio.css', 'chip/chip.css', 'slider/slider.css',
+  'badge/badge.css', 'status/status.css', 'banner/banner.css', 'empty-state/empty-state.css',
+  'menu/menu.css', 'snackbar/snackbar.css', 'tooltip/tooltip.css', 'glass/glass.css', 'motion/motion.css'];
+const SITE_JS = ['core/core.js', 'motion/motion.js', 'button/button.js', 'icon-button/icon-button.js', 'button-group/button-group.js', 'tabs/tabs.js',
+  'list/list.js', 'accordion/accordion.js', 'ring/ring.js', 'meter/meter.js', 'milestones/milestones.js', 'code/code.js', 'site/site.js',
+  'text-field/text-field.js', 'form/form.js', 'checkbox/checkbox.js', 'chip/chip.js', 'slider/slider.js', 'banner/banner.js', 'menu/menu.js', 'snackbar/snackbar.js', 'tooltip/tooltip.js'];
+/* budgets, gzip level 9 (what a server sends), and the font as shipped: npm run check fails past any of them */
+const SITE_BUDGET = { css: 44, js: 30, font: 70, total: 180 };
+for (const f of SITE_CSS) if (!imports.includes(f)) problems.push(`site bundle: ${f} is not in components/index.css`);
+for (const f of SITE_JS) if (!jsOrder.includes(f)) problems.push(`site bundle: ${f} is not a component script`);
+const siteFont = (css, url) => css.replace(/(@font-face\s*\{[^}]*?font-weight:\s*)100 900([^}]*?src:\s*url\(")[^"]*inter-variable\.woff2("\))/, `$1400 900$2${url}$3`);
+const sitePartsRepo = inlineCss(comp).filter((p, i) => SITE_CSS.includes(imports[i]));
+const sitePartsSkill = inlineCss(comp, '.').filter((p, i) => SITE_CSS.includes(imports[i]));
+const siteCssRepo = siteFont(banner('site stylesheet') + sitePartsRepo.join('\n'), 'assets/inter-site.woff2');
+const siteCssSkill = siteFont(banner('site stylesheet') + sitePartsSkill.join('\n'), 'inter-site.woff2');
+if (siteCssRepo.includes('inter-variable.woff2') || !siteCssRepo.includes('inter-site.woff2')) problems.push('site bundle: the @font-face in base.css no longer matches; point it at inter-site.woff2');
+const siteJs = banner('site runtime') + jsOrder.filter((f) => SITE_JS.includes(f)).map((f) => `/* ---- ${f} ---- */\n${readFileSync(join(comp, f), 'utf8').trim()}\n`).join('\n');
+outputs['components/orion.site.min.css'] = minBanner('site stylesheet') + minCss(siteCssRepo);
+outputs['components/orion.site.min.js'] = minBanner('site runtime') + minJs(siteJs);
+outputs['skill/s4-orion/assets/orion.site.min.css'] = minBanner('site stylesheet') + minCss(siteCssSkill);
+outputs['skill/s4-orion/assets/orion.site.min.js'] = outputs['components/orion.site.min.js'];
+/* Inter for sites: Latin and Latin-1, weights 400 to 900, written by our own subsetter (scripts/font-subset.mjs) */
+const { subsetInter, decodeWoff2 } = await import('./font-subset.mjs');
+const fontSrc = readFileSync(join(comp, 'assets/inter-variable.woff2'));
+const siteFontBuilt = subsetInter(fontSrc);
+const binaries = {};
+for (const f of ['components/assets/inter-site.woff2', 'skill/s4-orion/assets/inter-site.woff2']) {
+  /* Brotli can differ between Node versions: compare the font's tables, and keep the file on disk when they match */
+  const onDisk = existsSync(join(root, f)) ? readFileSync(join(root, f)) : null;
+  let same = false;
+  if (onDisk) { try { const d = decodeWoff2(onDisk).tables; same = d.size === siteFontBuilt.tables.size && [...siteFontBuilt.tables].every(([k, v]) => d.has(k) && d.get(k).equals(v)); } catch (e) { same = false; } }
+  binaries[f] = same ? onDisk : siteFontBuilt.woff2;
+  binaries[f].stale = !same;
+}
 /* one icon set per file (Horizon 2): a page that never switches sets loads only the set it draws */
 {
   const I = JSON.parse(readFileSync(join(comp, 'icons/names.json'), 'utf8'));
@@ -120,10 +163,33 @@ for (const page of htmlIn('templates')) {
   if (!get('seed')) { problems.push(`${page}: links ${link[1]} but names no seed ({ seed: '#rrggbb', … } in its script)`); continue; }
   outputs['templates/' + link[1]] = brandCss({ seed: get('seed'), variant: get('variant') || 'auto', surfaces: get('surfaces') || 'neutral' });
 }
-const fileText = (rel) => (rel in outputs ? outputs[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
+/* ---------- the hub (index.html, decision 0066): counts, version, the component groups and the labs come from the repo,
+   so the front page can never state a stale number ---------- */
+{
+  const page = 'index.html', src0 = existsSync(join(root, page)) ? (outputs[page] || readFileSync(join(root, page), 'utf8')) : null;
+  if (src0 && src0.includes('<!-- HUB:COMPONENTS -->')) {
+    const GROUPS_ = (await import('node:fs')).readFileSync(join(root, 'scripts/build.mjs'), 'utf8').match(/const GROUPS = \[([\s\S]*?)\n\];/)[1];
+    const groups = [...GROUPS_.matchAll(/\['([^']+)', \[([^\]]*)\]\]/g)].map((m) => [m[1], m[2].match(/'[^']+'/g).map((x) => x.slice(1, -1))]);
+    const nComp = groups.reduce((n, [, v]) => n + v.length, 0);
+    const tpl = htmlIn('templates').filter((f) => !f.endsWith('/index.html')).length;
+    const title = (n) => { const f = join(comp, n, 'README.md'); const t = existsSync(f) ? (readFileSync(f, 'utf8').match(/^# (.+)$/m) || [])[1] : n; return (t || n).replace(/\s*\(.*\)$/, ''); };
+    const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+    const cards = groups.map(([g, names]) => `<section class="s4-card" aria-labelledby="hc-${g.toLowerCase().replace(/[^a-z]+/g, '-')}"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-${g.toLowerCase().replace(/[^a-z]+/g, '-')}">${esc(g)} <span class="hb-count">${names.length}</span></h3><div class="s4-chip-set">` +
+      names.map((n) => `<a class="s4-chip" href="components/${n}/${n}.html?v=0">${esc(title(n))}</a>`).join('') + `</div></div></section>`).join('');
+    const labs = htmlIn('explore').filter((f) => !/-frame\.html$|\/index\.html$/.test(f)).map((f) => {
+      const t = (readFileSync(join(root, f), 'utf8').match(/<title>([^<]*)<\/title>/) || [])[1] || f;
+      return [t.replace(/\s*[·|–-]\s*S4 Orion.*$/i, '').trim(), f];
+    }).sort((a, b) => a[0].localeCompare(b[0])).map(([t, f]) => `<li><a class="s4-list-item" href="${f}?v=0"><span class="s4-list-content"><span class="s4-list-headline">${esc(t)}</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>`).join('');
+    let src = src0.replace(/(<!-- HUB:COMPONENTS -->)[\s\S]*?(<!-- \/HUB:COMPONENTS -->)/, `$1${cards}$2`).replace(/(<!-- HUB:LABS -->)[\s\S]*?(<!-- \/HUB:LABS -->)/, `$1${labs}$2`);
+    const vals = { components: String(nComp), templates: String(tpl), version: pkg.version };
+    src = src.replace(/(<[^>]+data-hub="(\w+)"[^>]*>)[^<]*(<)/g, (m, a, k, c) => (k in vals ? a + vals[k] + c : m));
+    if (src !== src0) outputs[page] = src;
+  }
+}
+const fileText = (rel) => (rel in outputs ? outputs[rel] : rel in binaries ? binaries[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
 for (const page of pages) {
   const dir = page.includes('/') ? page.slice(0, page.lastIndexOf('/')) : '';
-  const src = readFileSync(join(root, page), 'utf8');
+  const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   const out = src.replace(/((?:src|href)=")([^"?#:]+)\?v=[\w.-]*(")/g, (m, a, path, c) => {
     const rel = join(dir, path).split('\\').join('/'), t = fileText(rel);
     return t == null ? m : a + path + '?v=' + hash(t) + c;
@@ -143,7 +209,9 @@ for (const page of htmlIn('templates')) {
   const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
   outputs['skill/s4-orion/templates/' + name] = src
     .replace(/(?:\.\.\/components\/(?:assets\/)?)([\w.-]+)\?v=[\w.-]*/g, '$1')
-    .replace(/<!-- Template: /, /orion\.min\.css/.test(src)
+    .replace(/<!-- Template: /, /orion\.site\.min\.css/.test(src)
+      ? '<!-- S4 Orion template (copy orion.site.min.css, orion.site.min.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066). '
+      : /orion\.min\.css/.test(src)
       ? '<!-- S4 Orion template (copy orion.min.css, orion.min.js, icons-solar.js, m3color.js and inter-variable.woff2 next to it: the lighter files a website loads). '
       : '<!-- S4 Orion template (copy orion.css, orion.js, icons.js, m3color.js and inter-variable.woff2 next to it). ');
 }
@@ -205,16 +273,44 @@ for (const f of ['color', 'typography', 'shape', 'spacing', 'elevation', 'motion
 }
 for (const [f, c] of Object.entries(refs)) outputs['skill/s4-orion/references/' + f] = c;
 
+/* ---------- site bundle: coverage and budget ----------
+   Every s4- class a site template writes must be styled by the site stylesheet, and no site template may use a
+   component whose behaviour the site runtime leaves out; then the sizes must stay inside the budget. */
+import { gzipSync } from 'node:zlib';
+const siteMinCss = outputs['components/orion.site.min.css'];
+const siteClasses = new Set([...siteMinCss.matchAll(/\.(s4-[a-z0-9-]+)/g)].map((m) => m[1]));
+const scriptDirs = new Set(jsOrder.map((f) => f.split('/')[0])), siteDirs = new Set(SITE_JS.map((f) => f.split('/')[0]));
+const classDir = new Map();
+for (const rel of imports) { const d = rel.split('/')[0]; for (const m of readFileSync(join(comp, rel), 'utf8').matchAll(/\.(s4-[a-z0-9-]+)/g)) if (!classDir.has(m[1]) && m[1].startsWith('s4-' + d)) classDir.set(m[1], d); }
+const sitePages = ['index.html'].concat(htmlIn('templates')).filter((p) => /orion\.site\.min\.css/.test(readFileSync(join(root, p), 'utf8')));
+for (const page of sitePages) {
+  const src = outputs[page] || readFileSync(join(root, page), 'utf8'), own = (src.match(/<style>[\s\S]*?<\/style>/g) || []).join('');
+  for (const m of src.matchAll(/class="([^"]*)"/g)) for (const c of m[1].split(/\s+/)) {
+    if (!c.startsWith('s4-')) continue;
+    if (!siteClasses.has(c) && !own.includes('.' + c)) problems.push(`${page}: .${c} is not in the site bundle (add its component to SITE_CSS in scripts/build.mjs, or load orion.min.css)`);
+    const d = classDir.get(c); if (d && scriptDirs.has(d) && !siteDirs.has(d) && d !== 'table') problems.push(`${page}: .${c} needs ${d}.js, which the site runtime leaves out`);
+  }
+}
+const gz = (t) => gzipSync(t, { level: 9 }).length / 1024;
+const siteSize = { css: gz(siteMinCss), js: gz(outputs['components/orion.site.min.js']), font: binaries['components/assets/inter-site.woff2'].length / 1024 };
+const iconsGz = gz(outputs['components/assets/icons-solar.js'] || '');
+siteSize.total = siteSize.css + siteSize.js + siteSize.font + iconsGz;
+for (const k of ['css', 'js', 'font', 'total']) if (siteSize[k] > SITE_BUDGET[k]) problems.push(`site bundle over budget: ${k} ${siteSize[k].toFixed(1)} KB > ${SITE_BUDGET[k]} KB`);
+const siteReport = `site bundle ${siteSize.css.toFixed(1)} KB css + ${siteSize.js.toFixed(1)} KB js (gzip) + ${siteSize.font.toFixed(1)} KB font + ${iconsGz.toFixed(1)} KB icons = ${siteSize.total.toFixed(1)} KB (budgets ${SITE_BUDGET.css}/${SITE_BUDGET.js}/${SITE_BUDGET.font}/${SITE_BUDGET.total})`;
+if (sitePages.filter((p) => p.startsWith('templates/')).length < 5) problems.push(`site bundle: only ${sitePages.length} templates load it (expected the five site templates)`);
+
 if (problems.length) { console.error(problems.map((p) => '  x ' + p).join('\n')); process.exit(1); }
 if (CHECK) {
   const stale = Object.entries(outputs).filter(([f, c]) => !existsSync(join(root, f)) || readFileSync(join(root, f), 'utf8') !== c).map(([f]) => f)
+    .concat(Object.entries(binaries).filter(([, b]) => b.stale).map(([f]) => f))
     .concat(Object.entries(copies).filter(([to, from]) => !existsSync(join(root, to)) || !readFileSync(join(root, to)).equals(readFileSync(join(root, from)))).map(([f]) => f));
   if (stale.length) { console.error(`Stale bundle (run npm run build): ${stale.join(', ')}`); process.exit(1); }
-  console.log(`Bundle up to date: ${imports.length} stylesheets, ${jsOrder.length} scripts.`);
+  console.log(`Bundle up to date: ${imports.length} stylesheets, ${jsOrder.length} scripts; ${siteReport}.`);
 } else {
   mkdirSync(skillAssets, { recursive: true }); mkdirSync(join(root, 'skill/s4-orion/references'), { recursive: true });
   for (const [f, c] of Object.entries(outputs)) { mkdirSync(dirname(join(root, f)), { recursive: true }); writeFileSync(join(root, f), c); }
   for (const [to, from] of Object.entries(copies)) copyFileSync(join(root, from), join(root, to));
+  for (const [f, b] of Object.entries(binaries)) if (b.stale) writeFileSync(join(root, f), b);
   const kb = (s) => (Buffer.byteLength(s) / 1024).toFixed(0) + ' KB';
-  console.log(`Built components/orion.css (${kb(cssRepo)}) and orion.js (${kb(js)}) from ${imports.length} stylesheets and ${jsOrder.length} scripts; copied assets to skill/s4-orion/assets/`);
+  console.log(`Built components/orion.css (${kb(cssRepo)}) and orion.js (${kb(js)}) from ${imports.length} stylesheets and ${jsOrder.length} scripts; copied assets to skill/s4-orion/assets/; ${siteReport}`);
 }

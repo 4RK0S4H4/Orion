@@ -246,6 +246,8 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-size-top-app-bar` | 64px |  |  |
 | `--s4-size-nav-bar` | 80px |  |  |
 | `--s4-size-nav-rail` | 72px |  | Collapsed navigation rail: one icon wide (decision 0043). |
+| `--s4-size-grabber-width` | 32px |  | Decision 0066: the grabber on a modal panel on a phone (M3 drag handle, iOS sheet grabber). |
+| `--s4-size-grabber-height` | 4px |  | Decision 0066: the grabber's thickness. |
 | `--s4-size-nav-indicator-width` | 56px |  |  |
 | `--s4-size-nav-indicator-height` | 32px |  |  |
 | `--s4-size-table-row` | 52px |  |  |
@@ -443,6 +445,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-glass-tint-opacity-medium-contrast` | 0.86 |  | Float tint when the app runs at medium contrast (contrast level 0.5). |
 | `--s4-glass-tint-opacity-fab-color` | 0.9 |  | Decision 0032: floating buttons in a color other than the default (secondary, tertiary, primary, or a container of those) are tinted 90%. Their own color pair is lower contrast than the default's, and at 75% the page checker found labels at 2.9:1 and 3.6:1 over a pure black or white backdrop. The default FAB keeps the owner's 75%. |
 | `--s4-glass-tint-opacity-modal` | 0.9 |  | Decision 0064: a modal dialog or panel is tinted 90%. It already sits over a scrim that sets it apart, so the page showing through it only added noise behind its question or its form. Still glass (it blurs and lets the color through), firmer than the 75% float, so the contrast guarantee holds with room to spare. |
+| `--s4-glass-tint-opacity-modal-phone` | 0.96 |  | Decision 0066: on a phone a modal dialog or panel is a card in the bottom of the screen, often over the very button that opened it; at 90% a saturated button (a red Delete) showed through as a smudge. 96% keeps it glass (blur, a hint of the page) without show-through. |
 | `--s4-glass-tint-float` | var(--md-sys-color-surface-container) |  | App bars over scrolled content, nav bar, nav rail, toolbars, menus, sheets, dialogs, rich tooltips. |
 | `--s4-glass-tint-fill` | var(--md-sys-color-surface-container-highest) |  | Tonal fills inside a glass surface (no blur of their own). |
 | `--s4-glass-blur-float` | 8px |  | Backdrop blur radius. Decision 0021: 8px (owner's playground pick; was 16px). |

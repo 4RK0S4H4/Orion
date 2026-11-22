@@ -4,174 +4,260 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>S4 Orion</title>
+<meta name="description" content="S4 Orion: a design language for web apps and sites. Material 3 Expressive, made calm, with a contrast-guaranteed glass layer and any accent on a neutral base.">
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
-<link rel="preload" href="components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="components/orion.css?v=1035e1e">
+<link rel="preload" href="components/assets/inter-site.woff2?v=ccb9f71" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="components/orion.site.min.css?v=5eb9687">
 <style>
-  .hub { display: grid; gap: var(--s4-space-12); padding-block: var(--s4-space-6) var(--s4-space-16); }
-  .hub-hero { display: grid; gap: var(--s4-space-3); justify-items: start; }
-  .hub-hero h1 { margin: 0; font-family: var(--md-sys-typescale-display-medium-font); font-size: clamp(var(--md-sys-typescale-display-small-size), 9vw, var(--md-sys-typescale-display-medium-size)); line-height: 1.1; font-weight: var(--md-sys-typescale-emphasized-display-medium-weight); }
-  .hub-hero p { margin: 0; max-inline-size: 56ch; }
-  .hub-h2 { margin: 0 0 var(--s4-space-4); }
-  .hub-icon { --s4-icon-size: var(--s4-size-icon-large); margin-block-end: var(--s4-space-2); }
-  .hub-steps { margin: 0; padding-inline-start: var(--s4-space-6); display: grid; gap: var(--s4-space-2); }
+  /* The hub (decision 0066): Orion's own front page, monochrome (issue 66), on the site bundle it describes.
+     Layout and the template specimens only; every control is an Orion component. */
+  .hb-hero { display: grid; gap: var(--s4-space-10); align-items: center; }
+  @container s4-site-section (width >= 960px) { .hb-hero { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); } }
+  .hb-hero-text { display: grid; gap: var(--s4-space-5); justify-items: start; }
+  .hb-hero-text > * { margin: 0; }
+  .hb-facts { display: flex; flex-wrap: wrap; gap: var(--s4-space-2) var(--s4-space-5); margin: 0; padding: 0; list-style: none; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .hb-facts b { color: var(--md-sys-color-on-surface); font-weight: var(--md-sys-typescale-title-medium-weight); font-variant-numeric: tabular-nums; }
+
+  /* the live preview: a region whose dials the visitor turns (themes on any container, decision 0056) */
+  .hb-preview { display: grid; gap: var(--s4-space-4); }
+  .hb-dials { display: grid; gap: var(--s4-space-3); }
+  .hb-dial { display: grid; grid-template-columns: minmax(0, 6rem) minmax(0, 1fr); align-items: center; gap: var(--s4-space-3); }
+  .hb-dial > span { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-large-size); line-height: var(--md-sys-typescale-label-large-line-height); font-weight: var(--md-sys-typescale-label-large-weight); }
+  .hb-dial .s4-button-group { justify-self: start; max-inline-size: 100%; }
+  .hb-stage { display: grid; gap: var(--s4-space-4); padding: var(--s4-space-5); border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container); color: var(--md-sys-color-on-surface); }
+  .hb-stage-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s4-space-3); flex-wrap: wrap; }
+  .hb-stage-head > div { display: grid; gap: var(--s4-space-1); }
+  .hb-stage-head h2 { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); letter-spacing: var(--md-sys-typescale-headline-small-tracking); font-weight: var(--md-sys-typescale-headline-small-weight); }
+  .hb-stage-head p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .hb-stage .s4-card { --s4-surface-here: var(--md-sys-color-surface-container-lowest); background: var(--md-sys-color-surface-container-lowest); }
+  .hb-stage-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
+  .hb-ring-row { display: flex; align-items: center; gap: var(--s4-space-4); }
+  .hb-ring-row p { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+
+  /* templates: a specimen per product, set with that product's own dials (face, corners, grays) on the card itself */
+  .hb-group-title { margin: 0 0 var(--s4-space-4); color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-title-small-size); line-height: var(--md-sys-typescale-title-small-line-height); font-weight: var(--md-sys-typescale-emphasized-title-small-weight); }
+  .hb-templates { display: grid; gap: var(--s4-space-3); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); margin: 0 0 var(--s4-space-10); padding: 0; list-style: none; }
+  .hb-tpl { display: grid; grid-template-rows: auto 1fr auto; gap: var(--s4-space-2); block-size: 100%; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); color: var(--md-sys-color-on-surface); text-decoration: none; box-sizing: border-box; }
+  .hb-tpl-name { margin: 0; font-family: var(--md-sys-typescale-headline-small-font); font-size: var(--md-sys-typescale-headline-small-size); line-height: var(--md-sys-typescale-headline-small-line-height); letter-spacing: var(--md-sys-typescale-headline-small-tracking); font-weight: var(--md-sys-typescale-headline-small-weight); overflow-wrap: anywhere; }
+  .hb-tpl-job { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+  .hb-tpl-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); }
+  .hb-tpl-kind { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .hb-tpl:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: var(--s4-focus-ring-offset); }
+  @media (hover: hover) { .hb-tpl:hover { background: var(--md-sys-color-surface-container); } }
+  @media (forced-colors: active) { .hb-tpl { border: 1px solid CanvasText; } }
+
+  /* components: the groups, each a short list of names that link to the reference pages */
+  .hb-comp { columns: 3 17rem; column-gap: var(--s4-space-3); }
+  .hb-comp > .s4-card { break-inside: avoid; margin-block-end: var(--s4-space-3); --s4-surface-here: var(--md-sys-color-surface-container-lowest); background: var(--md-sys-color-surface-container-lowest); }
+  .hb-comp .s4-card-body { gap: var(--s4-space-3); }
+  .hb-comp .s4-chip-set { gap: var(--s4-space-1); }
+  .hb-count { color: var(--md-sys-color-on-surface-variant); font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-body-medium-weight); }
+  .hb-foot { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+  /* phones: two specimens a row (the list of twenty would be a long single file otherwise) */
+  @container s4-site-section (width < 600px) {
+    .hb-templates { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-2); }
+    .hb-tpl { padding: var(--s4-space-3); }
+    .hb-tpl-name { font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); }
+  }
 </style>
 </head>
-<body>
-<div class="s4-app">
-  <div class="s4-app-body">
-    <header class="s4-top-app-bar">
-      <div class="s4-app-bar-title-group"><span class="s4-app-bar-title">S4 Orion</span></div>
-      <div class="s4-app-bar-actions">
-        <button class="s4-icon-button" type="button" aria-label="Theme" data-menu="hub-theme" data-tooltip="Theme"><span class="s4-icon" data-icon="dark-mode"></span></button>
-        <a class="s4-icon-button" href="https://github.com/4rk0s4h4/s4-orion" aria-label="Source on GitHub" data-tooltip="Source"><span class="s4-icon" data-icon="code"></span></a>
-      </div>
-    </header>
-    <main class="s4-content hub">
-      <section class="hub-hero">
-        <span class="s4-status">1.0 Release Candidate</span>
-        <h1>Design Any App in Orion</h1>
-        <p class="s4-title-large s4-on-surface-variant">Material 3 Expressive with a contrast-guaranteed glass layer, any accent on a neutral base. Tokens, 62 components, 14 app templates and five site templates, ten named motion patterns, canonical layouts and app templates, applied the same way every time by a Claude skill.</p>
-        <div class="s4-row"><a class="s4-button" data-size="m" href="templates/index.html?v=f85d72b">Browse Templates</a><a class="s4-button" data-variant="tonal" data-size="m" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/framework.md">Read the Guide</a></div>
-      </section>
-
-      <section aria-labelledby="start-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="start-h">Start Here</h2>
-        <div class="s4-grid" style="--s4-min: 240px">
-          <a class="s4-card" href="templates/index.html?v=f85d72b"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="dashboard"></span><h3 class="s4-card-title">Templates</h3><p class="s4-card-supporting">Twenty starters, each its own product: fifteen apps (dashboard, data table, desktop app, board, calendar, editor…) and five websites.</p></div></a>
-          <a class="s4-card" href="components/index.html"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="list"></span><h3 class="s4-card-title">Components</h3><p class="s4-card-supporting">Every component with its reference page: markup, variants, states.</p></div></a>
-          <a class="s4-card" href="tokens/index.html?v=64b7cff"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="tune"></span><h3 class="s4-card-title">Tokens</h3><p class="s4-card-supporting">Color roles, type, shape, spacing, layout, motion springs and glass, in every mode.</p></div></a>
-          <a class="s4-card" href="demo/index.html?v=36f64ca"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="sparkle"></span><h3 class="s4-card-title">Showcase</h3><p class="s4-card-supporting">One app with every element, to try on a phone.</p></div></a>
-        </div>
-      </section>
-
-      <section aria-labelledby="web-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="web-h">Websites and Themes</h2>
-        <section class="s4-pane">
-              <ul class="s4-list">
-          <li><a class="s4-list-item" href="templates/landing.html?v=acbf7f5"><span class="s4-list-content"><span class="s4-list-headline">Landing Page</span><span class="s4-list-supporting">templates/landing.html · a product home page on the website kit</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/pricing.html?v=2fa553e"><span class="s4-list-content"><span class="s4-list-headline">Pricing</span><span class="s4-list-supporting">templates/pricing.html · plans, period switch, comparison table</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/blog.html?v=e064a00"><span class="s4-list-content"><span class="s4-list-headline">Blog</span><span class="s4-list-supporting">templates/blog.html · featured post and post list</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/docs.html?v=2b56cd9"><span class="s4-list-content"><span class="s4-list-headline">Docs</span><span class="s4-list-supporting">templates/docs.html · sidebar, prose, On This Page</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/site.html?v=0d9b922"><span class="s4-list-content"><span class="s4-list-headline">Studio Site</span><span class="s4-list-supporting">templates/site.html · a studio or portfolio</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/site/site.html?v=583c6e2"><span class="s4-list-content"><span class="s4-list-headline">Website Kit</span><span class="s4-list-supporting">components/site/site.html · every site section, with its variants</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/base/themes.html?v=2fb1203"><span class="s4-list-content"><span class="s4-list-headline">Themes On Any Container</span><span class="s4-list-supporting">components/base/themes.html · dials on a region: dark sidebar, branded band</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-              </ul>
-        </section>
-      </section>
-
-      <section aria-labelledby="r57-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="r57-h">Round 0057: The Eleven Calls and Calm Dialogs</h2>
-        <section class="s4-pane">
-              <ul class="s4-list">
-          <li><a class="s4-list-item" href="components/meter/meter.html?v=36a8320"><span class="s4-list-content"><span class="s4-list-headline">Meter</span><span class="s4-list-supporting">components/meter/meter.html · a reading against a whole, a limit or a target: tone by state, segments, steps, ranges</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/board/board.html?v=c9cf0be"><span class="s4-list-content"><span class="s4-list-headline">Board</span><span class="s4-list-supporting">components/board/board.html · lanes with counts and limits, add in place, Alt and the arrow keys to move a card</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/kanban.html?v=68e37f6"><span class="s4-list-content"><span class="s4-list-headline">Board: Pressroom</span><span class="s4-list-supporting">templates/kanban.html · a newsroom’s story board on the board, with word count meters</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/prose/prose.html?v=551ceb2"><span class="s4-list-content"><span class="s4-list-headline">Kicker and Figure</span><span class="s4-list-supporting">components/prose/prose.html · an editorial label in real small capitals, a picture with its caption</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/checkout.html?v=f9252a2"><span class="s4-list-content"><span class="s4-list-headline">Dense Seat Plan: The Velvet</span><span class="s4-list-supporting">templates/checkout.html · data-dense: seats drawn 18px or more, 24px apart</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/calm-dialogs.html?v=98d6014"><span class="s4-list-content"><span class="s4-list-headline">Calm Dialogs and Docked Glass</span><span class="s4-list-supporting">explore/calm-dialogs.html · phone dialogs as a card in reach, swipe down, one hairline under docked bars (0064)</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-              </ul>
-        </section>
-      </section>
-
-      <section aria-labelledby="data-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="data-h">Data and Desktop Apps</h2>
-        <section class="s4-pane">
-              <ul class="s4-list">
-          <li><a class="s4-list-item" href="templates/data-table.html?v=9523de5"><span class="s4-list-content"><span class="s4-list-headline">Data Table: Linnea</span><span class="s4-list-supporting">templates/data-table.html · a museum’s collections register: 5,000 rows, filters and saved views, pinned and resizable columns</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="templates/desktop-app.html?v=ce5ee85"><span class="s4-list-content"><span class="s4-list-headline">Desktop App: Parley</span><span class="s4-list-supporting">templates/desktop-app.html · a translation workbench: menu bar, document tabs, tree, inspector, status bar, settings view</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/table/table.html?v=f7e3382"><span class="s4-list-content"><span class="s4-list-headline">Tables At Scale</span><span class="s4-list-supporting">components/table/table.html · virtual rows, pinned and resizable columns, column menus, groups, editing in place</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/filter/filter.html?v=6e800a1"><span class="s4-list-content"><span class="s4-list-headline">Filters and Views</span><span class="s4-list-supporting">components/filter/filter.html · search, filters in force as chips, a tool panel with counts, saved views in the address</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/code/code.html?v=b09fd14"><span class="s4-list-content"><span class="s4-list-headline">Code</span><span class="s4-list-supporting">components/code/code.html · code blocks with file name, line numbers, marked lines, diff and Copy; inline code and keys</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/commands/commands.html?v=daf7df0"><span class="s4-list-content"><span class="s4-list-headline">Commands</span><span class="s4-list-supporting">components/commands/commands.html · one list of actions for menus, shortcuts, buttons, the palette and a native menu</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/menubar/menubar.html?v=9e3c7bd"><span class="s4-list-content"><span class="s4-list-headline">Menu Bar</span><span class="s4-list-supporting">components/menubar/menubar.html · the in-window menu bar with submenus, by keyboard and pointer</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/doc-tabs/doc-tabs.html?v=b13f287"><span class="s4-list-content"><span class="s4-list-headline">Document Tabs</span><span class="s4-list-supporting">components/doc-tabs/doc-tabs.html · open files as tabs, unsaved dots, close with Reopen</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/tree/tree.html?v=eeac333"><span class="s4-list-content"><span class="s4-list-headline">Tree</span><span class="s4-list-supporting">components/tree/tree.html · folders and files: open, rename, move, lazy children</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="components/statusbar/statusbar.html?v=c6e532d"><span class="s4-list-content"><span class="s4-list-headline">Status Bar</span><span class="s4-list-supporting">components/statusbar/statusbar.html · a desktop window’s state in words along its foot</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-              </ul>
-        </section>
-      </section>
-
-      <section aria-labelledby="how-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="how-h">How a New App Gets Built</h2>
-        <section class="s4-pane">
-          <ol class="hub-steps s4-body-large">
-            <li><strong>Pick the template</strong> closest to the app (or combine two: a dashboard with a list-detail view).</li>
-            <li><strong>Pick the layout</strong> per screen: plain views, list-detail or supporting pane; reading, default or wide width.</li>
-            <li><strong>Fill it with components</strong> and the decision rules in the skill. Monochrome unless the app asks for color.</li>
-            <li><strong>Run the page checker</strong>: 390 dark and 1280 light, contrast as rendered, overflow and rule lint.</li>
-          </ol>
-        </section>
-      </section>
-
-      <section aria-labelledby="docs-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="docs-h">Docs and Skill</h2>
-        <div class="s4-grid" style="--s4-min: 240px">
-          <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/framework.md"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="book"></span><h3 class="s4-card-title">Framework Guide</h3><p class="s4-card-supporting">Layers, the public API, versioning, how to extend Orion without forking it.</p></div></a>
-          <a class="s4-card" href="skill/dist/s4-orion.skill"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="download"></span><h3 class="s4-card-title">Claude Skill</h3><p class="s4-card-supporting">Download the skill: SKILL.md, references, assets, templates and the page checker.</p></div></a>
-          <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/philosophy.md"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="document"></span><h3 class="s4-card-title">Philosophy</h3><p class="s4-card-supporting">Why Orion looks and behaves the way it does.</p></div></a>
-          <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/decisions/README.md"><div class="s4-card-body"><span class="s4-icon hub-icon" data-icon="history"></span><h3 class="s4-card-title">Decisions</h3><p class="s4-card-supporting">Every recorded decision with its status: active, superseded or abandoned.</p></div></a>
-        </div>
-      </section>
-
-      <section aria-labelledby="arch-h">
-        <h2 class="hub-h2 s4-headline-small s4-emphasized" id="arch-h">Archive</h2>
-        <div class="s4-accordion">
-          <details class="s4-accordion-item"><summary>Review Labs (28)<span class="s4-icon" data-icon="chevron-down"></span></summary>
-            <div class="s4-accordion-body"><p class="s4-body-medium s4-on-surface-variant" style="margin:0 0 var(--s4-space-3)">Where past decisions were made. Not part of the system; the decisions page says which choices stand.</p>
-              <ul class="s4-list">
-          <li><a class="s4-list-item" href="explore/calm-dialogs.html?v=98d6014"><span class="s4-list-content"><span class="s4-list-headline">Calm Dialogs and Docked Glass</span><span class="s4-list-supporting">calm-dialogs.html · before and after on the live Showcase in phone frames (0064)</span></span></a></li>
-          <li><a class="s4-list-item" href="explore/degree-tracker.html?v=3a4c627"><span class="s4-list-content"><span class="s4-list-headline">Degree Tracker Mockup</span><span class="s4-list-supporting">degree-tracker.html · a real app in Orion, tinted mode</span></span></a></li>
-          <li><a class="s4-list-item" href="explore/design-review.html"><span class="s4-list-content"><span class="s4-list-headline">Design Review</span><span class="s4-list-supporting">design-review.html · open: end-to-end review, comparison and eight big questions</span></span></a></li>
-          <li><a class="s4-list-item" href="explore/ideas.html?v=2b94fcd"><span class="s4-list-content"><span class="s4-list-headline">What To Build Next</span><span class="s4-list-supporting">ideas.html · open: pick from idea list B</span></span></a></li>
-          <li><a class="s4-list-item" href="explore/direction.html?v=69e0872"><span class="s4-list-content"><span class="s4-list-headline">Direction Lab</span><span class="s4-list-supporting">direction.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/glass-playground.html?v=1781d3e"><span class="s4-list-content"><span class="s4-list-headline">Glass Playground</span><span class="s4-list-supporting">glass-playground.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/glass.html?v=f39641b"><span class="s4-list-content"><span class="s4-list-headline">Glass Lab</span><span class="s4-list-supporting">glass.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/icons.html?v=058dd73"><span class="s4-list-content"><span class="s4-list-headline">Icon Lab</span><span class="s4-list-supporting">icons.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/liquid-glass.html?v=b356de5"><span class="s4-list-content"><span class="s4-list-headline">Liquid Glass Lab</span><span class="s4-list-supporting">liquid-glass.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/liquid3.html?v=0991077"><span class="s4-list-content"><span class="s4-list-headline">Liquid Glass Lab 3</span><span class="s4-list-supporting">liquid3.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/liquid4.html?v=0e15249"><span class="s4-list-content"><span class="s4-list-headline">Liquid Glass Lab 4</span><span class="s4-list-supporting">liquid4.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/liquid5.html?v=cf36c1a"><span class="s4-list-content"><span class="s4-list-headline">Liquid Glass Lab 5</span><span class="s4-list-supporting">liquid5.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/menu-motion.html?v=2ef6916"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab 3</span><span class="s4-list-supporting">menu-motion.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/motion-liquid-2.html?v=0a1143d"><span class="s4-list-content"><span class="s4-list-headline">Liquid Motion Lab 2</span><span class="s4-list-supporting">motion-liquid-2.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/motion-liquid.html?v=772538d"><span class="s4-list-content"><span class="s4-list-headline">Liquid Motion Lab</span><span class="s4-list-supporting">motion-liquid.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/motion.html?v=0b92f1e"><span class="s4-list-content"><span class="s4-list-headline">Motion Lab</span><span class="s4-list-supporting">motion.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-button-group.html?v=2202ccd"><span class="s4-list-content"><span class="s4-list-headline">Button Groups</span><span class="s4-list-supporting">review-button-group.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-depth.html?v=2caf8e0"><span class="s4-list-content"><span class="s4-list-headline">Depth With Glass</span><span class="s4-list-supporting">review-depth.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-direction.html?v=29b526e"><span class="s4-list-content"><span class="s4-list-headline">Design Direction</span><span class="s4-list-supporting">review-direction.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-edge-refract.html?v=5f5ca41"><span class="s4-list-content"><span class="s4-list-headline">Glass Rim Line</span><span class="s4-list-supporting">review-edge-refract.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-icon-set.html?v=5b5d67b"><span class="s4-list-content"><span class="s4-list-headline">Icon Set</span><span class="s4-list-supporting">review-icon-set.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/review-light-edge.html?v=fb0d01f"><span class="s4-list-content"><span class="s4-list-headline">Light Mode Glass Edge</span><span class="s4-list-supporting">review-light-edge.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/states-shape.html?v=a9ed221"><span class="s4-list-content"><span class="s4-list-headline">States and Shape</span><span class="s4-list-supporting">states-shape.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/style.html?v=651f6e8"><span class="s4-list-content"><span class="s4-list-headline">Style Lab</span><span class="s4-list-supporting">style.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/style2.html?v=b6feeb8"><span class="s4-list-content"><span class="s4-list-headline">Style Lab 2</span><span class="s4-list-supporting">style2.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transitions.html?v=0708fb9"><span class="s4-list-content"><span class="s4-list-headline">Transitions Lab</span><span class="s4-list-supporting">transitions.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transparency.html?v=00e707d"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab</span><span class="s4-list-supporting">transparency.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transparency2.html?v=08fb5bd"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab 2</span><span class="s4-list-supporting">transparency2.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transparency3.html?v=8402b65"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab 3</span><span class="s4-list-supporting">transparency3.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transparency4.html?v=0425c84"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab 3</span><span class="s4-list-supporting">transparency4.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-          <li><a class="s4-list-item" href="explore/transparency5.html?v=9e1efae"><span class="s4-list-content"><span class="s4-list-headline">Transparency Lab 3</span><span class="s4-list-supporting">transparency5.html</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li>
-              </ul>
-            </div>
-          </details>
-        </div>
-      </section>
-      <p class="s4-body-small s4-on-surface-variant">Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</p>
-    </main>
+<body class="s4-site">
+<a class="s4-skip-link" href="#main">Skip to Content</a>
+<header class="s4-site-header">
+  <div class="s4-site-bar">
+    <a class="s4-site-logo" href="#main" aria-label="S4 Orion Home"><span class="s4-icon" data-icon="sparkle" aria-hidden="true"></span>S4 Orion</a>
+    <nav class="s4-site-nav" aria-label="Main">
+      <ul>
+        <li><a class="s4-button" data-variant="text" href="#templates">Templates</a></li>
+        <li><a class="s4-button" data-variant="text" href="#components">Components</a></li>
+        <li><a class="s4-button" data-variant="text" href="tokens/index.html?v=3d240ef">Tokens</a></li>
+        <li><a class="s4-button" data-variant="text" href="#docs">Docs</a></li>
+      </ul>
+    </nav>
+    <div class="s4-site-actions">
+      <button class="s4-icon-button" type="button" aria-label="Theme" data-menu="hub-theme" data-tooltip="Theme"><span class="s4-icon" data-icon="dark-mode"></span></button>
+      <a class="s4-button" href="demo/index.html?v=ccfe448" data-keep>Open Showcase</a>
+      <button class="s4-icon-button s4-site-menu-button" type="button" aria-label="Menu"><span class="s4-icon" data-icon="menu"></span></button>
+    </div>
   </div>
-</div>
+</header>
+
+<main id="main">
+  <!-- hero: what it is, in one breath, beside a part of it you can turn yourself -->
+  <section class="s4-site-section" aria-labelledby="hero-h">
+    <div class="hb-hero">
+      <div class="hb-hero-text">
+        <p class="s4-eyebrow">Version <span data-hub="version">1.1.0</span></p>
+        <h1 class="s4-hero-title" id="hero-h">A Design Language for Apps That Feel Made</h1>
+        <p class="s4-site-lead">Material 3 Expressive, made calm: filled shapes, no shadows, a contrast-guaranteed glass layer on what floats, and any accent on a neutral base. One stylesheet, one script and a Claude skill that applies it the same way every time.</p>
+        <div class="s4-site-actions-row">
+          <a class="s4-button" data-size="m" href="demo/index.html?v=ccfe448">Open the Showcase</a>
+          <a class="s4-button" data-variant="tonal" data-size="m" href="#templates">See the Templates</a>
+        </div>
+        <ul class="hb-facts" aria-label="What is in it">
+          <li><b data-hub="components">78</b> components</li>
+          <li><b data-hub="templates">20</b> templates</li>
+          <li><b>10</b> motion patterns</li>
+          <li><b>216</b> accents proven</li>
+        </ul>
+      </div>
+
+      <div class="hb-preview">
+        <div class="hb-dials" aria-label="Preview Dials">
+          <div class="hb-dial"><span id="d-corners">Corners</span>
+            <div class="s4-button-group" data-connected data-select="single" aria-labelledby="d-corners" data-dial="corners">
+              <button class="s4-button" data-variant="tonal" type="button" value="round" aria-pressed="true">Round</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="soft">Soft</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="firm">Firm</button>
+            </div></div>
+          <div class="hb-dial"><span id="d-headings">Headings</span>
+            <div class="s4-button-group" data-connected data-select="single" aria-labelledby="d-headings" data-dial="headings">
+              <button class="s4-button" data-variant="tonal" type="button" value="default" aria-pressed="true">Default</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="tight">Tight</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="editorial">Editorial</button>
+            </div></div>
+          <div class="hb-dial"><span id="d-mode">Mode</span>
+            <div class="s4-button-group" data-connected data-select="single" aria-labelledby="d-mode" data-dial="mode">
+              <button class="s4-button" data-variant="tonal" type="button" value="" aria-pressed="true">Page</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="light">Light</button>
+              <button class="s4-button" data-variant="tonal" type="button" value="dark">Dark</button>
+            </div></div>
+        </div>
+        <!-- a real region: the dials above are set on it alone (S4.theme(opts, element)), never on this page -->
+        <div class="hb-stage" id="hb-stage" aria-label="Live Preview">
+          <div class="hb-stage-head">
+            <div><h2>Morning Run</h2><p>Tuesday · 6.2 km along the river</p></div>
+            <span class="s4-status">Personal Best</span>
+          </div>
+          <div class="s4-card" data-variant="filled">
+            <div class="s4-card-body">
+              <div class="hb-ring-row">
+                <div class="s4-ring" data-value="78" aria-label="Weekly goal" aria-valuetext="78 percent of the weekly goal"><span class="s4-ring-value">78%</span></div>
+                <p>Of this week’s 30 km. Two easy runs finish it.</p>
+              </div>
+            </div>
+          </div>
+          <div class="s4-button-group" data-connected data-select="single" aria-label="Range">
+            <button class="s4-button" data-variant="tonal" type="button" value="day">Day</button>
+            <button class="s4-button" data-variant="tonal" type="button" value="week" aria-pressed="true">Week</button>
+            <button class="s4-button" data-variant="tonal" type="button" value="month">Month</button>
+          </div>
+          <div class="hb-stage-row">
+            <button class="s4-chip" data-type="filter" aria-pressed="true" type="button"><span class="s4-chip-check"></span>Trails</button>
+            <button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Road</button>
+            <button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Track</button>
+          </div>
+          <div class="hb-stage-row">
+            <button class="s4-button" type="button">Plan a Run</button>
+            <button class="s4-button" data-variant="tonal" type="button">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- templates: each one its own product (issue 66), as a specimen in its own face and corners -->
+  <section class="s4-site-section" id="templates" aria-labelledby="tpl-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">Start Here</p>
+      <h2 class="s4-site-title" id="tpl-h">Twenty Products, One Language</h2>
+      <p class="s4-site-lead">Every template is a real product with its own brand, set through Orion’s dials. Start a new app from the one closest to it.</p>
+    </div>
+    <h3 class="hb-group-title">Apps</h3>
+    <ul class="hb-templates">
+      <li><a class="hb-tpl" href="templates/dashboard.html?v=91d3a21" data-type-display="serif" data-corners="firm" data-gray="warm" data-headings="tight"><p class="hb-tpl-name">Tally</p><p class="hb-tpl-job">Cash and invoices for a small design studio.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Dashboard</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/list-detail.html?v=0280ca2" data-type-display="system" data-corners="soft" data-gray="cool"><p class="hb-tpl-name">Relay</p><p class="hb-tpl-job">The support desk of a shipping app.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">List and Detail</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/data-table.html?v=e7468c2" data-type-display="serif" data-corners="firm" data-gray="cool"><p class="hb-tpl-name">Linnea</p><p class="hb-tpl-job">A museum’s collections register, 5,000 rows.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Data Table</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/desktop-app.html?v=1cb7d32" data-type-display="system" data-corners="firm" data-gray="cool"><p class="hb-tpl-name">Parley</p><p class="hb-tpl-job">A translation workbench with a menu bar.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Desktop App</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/kanban.html?v=e99b1dc" data-type-display="mono"><p class="hb-tpl-name">Pressroom</p><p class="hb-tpl-job">Tonight’s stories, from pitch to print.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Board</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/calendar.html?v=00f5b6a" data-type-display="rounded"><p class="hb-tpl-name">Moorings</p><p class="hb-tpl-job">A sailing club’s boat bookings.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Calendar</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/editor.html?v=d0c6c89" data-corners="firm"><p class="hb-tpl-name">Slugline</p><p class="hb-tpl-job">A TV writers’ room, scene by scene.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Editor</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/gallery.html?v=3827ff4" data-gray="warm" data-type-display="serif"><p class="hb-tpl-name">Crate</p><p class="hb-tpl-job">A record shop’s stock room, sleeve first.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Gallery</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/chat.html?v=b064070" data-type-display="rounded" data-gray="cool"><p class="hb-tpl-name">Fetch</p><p class="hb-tpl-job">A dog walker and an owner, during the walk.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Chat</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/tool.html?v=0f691b1" data-gray="warm" data-type-display="serif"><p class="hb-tpl-name">Proof</p><p class="hb-tpl-job">A sourdough calculator for home bakers.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Tool</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/checkout.html?v=11d5a9e" data-gray="warm" data-corners="soft" data-type-display="serif"><p class="hb-tpl-name">The Velvet</p><p class="hb-tpl-job">Tickets and seats for a small cinema.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Checkout</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/settings.html?v=a8e2c98" data-corners="soft"><p class="hb-tpl-name">Larkline</p><p class="hb-tpl-job">A birdsong notebook’s settings.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Settings</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/sign-in.html?v=66d9dd3" data-gray="cool" data-type-display="rounded"><p class="hb-tpl-name">Overhang</p><p class="hb-tpl-job">Signing in at a bouldering gym.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Sign In</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/onboarding.html?v=c3ef73a" data-type-display="rounded"><p class="hb-tpl-name">Puck</p><p class="hb-tpl-job">The first minute with an espresso coach.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Onboarding</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/article.html?v=26e8b79" data-gray="cool" data-type-display="serif" data-headings="editorial"><p class="hb-tpl-name">Penumbra</p><p class="hb-tpl-job">A long read for eclipse travellers.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Article</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+    </ul>
+    <h3 class="hb-group-title">Websites</h3>
+    <ul class="hb-templates">
+      <li><a class="hb-tpl" href="templates/landing.html?v=f9ae1f3" data-type-display="rounded"><p class="hb-tpl-name">Sprig</p><p class="hb-tpl-job">A soil sensor that says when to water.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Product Home</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/pricing.html?v=996419d" data-type-display="system"><p class="hb-tpl-name">Spool</p><p class="hb-tpl-job">Plans and a cost calculator for a developer tool.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Pricing</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/blog.html?v=12249f4" data-gray="warm" data-corners="soft" data-type-display="serif" data-headings="editorial"><p class="hb-tpl-name">Tidewater</p><p class="hb-tpl-job">A journal of coasts, rivers and their people.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Blog</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/docs.html?v=bcab73d" data-gray="cool" data-corners="soft" data-type-display="mono"><p class="hb-tpl-name">Mallet</p><p class="hb-tpl-job">Docs for a keyboard firmware.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Docs</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+      <li><a class="hb-tpl" href="templates/site.html?v=d535fef" data-gray="warm" data-corners="firm" data-type-display="serif"><p class="hb-tpl-name">Hollis &amp; Vane</p><p class="hb-tpl-job">Architects in Glasgow, and their work.</p><span class="hb-tpl-foot"><span class="hb-tpl-kind">Studio Site</span><span class="s4-icon" data-icon="chevron-right" aria-hidden="true"></span></span></a></li>
+    </ul>
+    <a class="s4-site-more" href="templates/index.html?v=cb95de2">Every Template With a Live Preview</a>
+  </section>
+
+  <!-- components: grouped, each name a link to its reference page -->
+  <section class="s4-site-section" id="components" data-tone="low" aria-labelledby="comp-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">The Parts</p>
+      <h2 class="s4-site-title" id="comp-h"><span data-hub="components">78</span> Components</h2>
+      <p class="s4-site-lead">Each with a reference page: every variant and state, real content, the keyboard, both color modes. Glass, motion and icons sit under all of them.</p>
+    </div>
+    <div class="hb-comp" id="hb-comp"><!-- HUB:COMPONENTS --><section class="s4-card" aria-labelledby="hc-actions"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-actions">Actions <span class="hb-count">4</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/button/button.html?v=15f1525">Button</a><a class="s4-chip" href="components/icon-button/icon-button.html?v=9e23b9b">Icon Button</a><a class="s4-chip" href="components/button-group/button-group.html?v=b8a71c1">Button Group</a><a class="s4-chip" href="components/fab/fab.html?v=f31fdc0">FAB</a></div></div></section><section class="s4-card" aria-labelledby="hc-navigation-and-shell"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-navigation-and-shell">Navigation and shell <span class="hb-count">17</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/app/app.html?v=aa639b1">App Shell</a><a class="s4-chip" href="components/layout/layout.html?v=bce4d40">Layout</a><a class="s4-chip" href="components/page/page.html?v=5401968">Pages</a><a class="s4-chip" href="components/top-app-bar/top-app-bar.html?v=170d3e3">Top App Bar</a><a class="s4-chip" href="components/nav-bar/nav-bar.html?v=ff695b1">Navigation Bar</a><a class="s4-chip" href="components/nav-rail/nav-rail.html?v=d220fe7">Navigation Rail</a><a class="s4-chip" href="components/tabs/tabs.html?v=734b12e">Tabs</a><a class="s4-chip" href="components/toolbar/toolbar.html?v=79d1e89">Toolbar</a><a class="s4-chip" href="components/search/search.html?v=24ccff0">Search</a><a class="s4-chip" href="components/desktop/desktop.html?v=3a46792">Desktop Windows</a><a class="s4-chip" href="components/menubar/menubar.html?v=9e3c7bd">Menu Bar</a><a class="s4-chip" href="components/doc-tabs/doc-tabs.html?v=b13f287">Document Tabs</a><a class="s4-chip" href="components/statusbar/statusbar.html?v=c6e532d">Status Bar</a><a class="s4-chip" href="components/commands/commands.html?v=daf7df0">Commands</a><a class="s4-chip" href="components/breadcrumbs/breadcrumbs.html?v=79f97e6">Breadcrumbs</a><a class="s4-chip" href="components/pagination/pagination.html?v=4c6189b">Pagination</a><a class="s4-chip" href="components/stepper/stepper.html?v=ed8100b">Stepper</a></div></div></section><section class="s4-card" aria-labelledby="hc-containment-and-data"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-containment-and-data">Containment and data <span class="hb-count">22</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/card/card.html?v=0fa274e">Card</a><a class="s4-chip" href="components/pane/pane.html?v=b944ea5">Pane</a><a class="s4-chip" href="components/list/list.html?v=ca28d40">List</a><a class="s4-chip" href="components/table/table.html?v=f7e3382">Table</a><a class="s4-chip" href="components/stat/stat.html?v=3a0160a">Stat</a><a class="s4-chip" href="components/meter/meter.html?v=36a8320">Meter</a><a class="s4-chip" href="components/board/board.html?v=c9cf0be">Board</a><a class="s4-chip" href="components/description-list/description-list.html?v=d33666e">Description List</a><a class="s4-chip" href="components/divider/divider.html?v=09f89ae">Divider</a><a class="s4-chip" href="components/avatar/avatar.html?v=5c427ce">Avatar</a><a class="s4-chip" href="components/accordion/accordion.html?v=9fd0614">Accordion</a><a class="s4-chip" href="components/expand/expand.html?v=19d2c57">Expand in place</a><a class="s4-chip" href="components/empty-state/empty-state.html?v=bfb021e">Empty State</a><a class="s4-chip" href="components/states/states.html?v=e99a990">States</a><a class="s4-chip" href="components/direct/direct.html?v=adede73">Direct manipulation</a><a class="s4-chip" href="components/filter/filter.html?v=6e800a1">Filters and Views</a><a class="s4-chip" href="components/tree/tree.html?v=eeac333">Tree View</a><a class="s4-chip" href="components/chart/chart.html?v=4b1cd2d">Charts</a><a class="s4-chip" href="components/ring/ring.html?v=c0679dd">Ring</a><a class="s4-chip" href="components/milestones/milestones.html?v=8dac8f1">Milestones</a><a class="s4-chip" href="components/timeline/timeline.html?v=92e8c30">Timeline</a><a class="s4-chip" href="components/month/month.html?v=7878c14">Month</a></div></div></section><section class="s4-card" aria-labelledby="hc-content"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-content">Content <span class="hb-count">3</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/prose/prose.html?v=551ceb2">Prose</a><a class="s4-chip" href="components/message/message.html?v=cb3b56a">Messages</a><a class="s4-chip" href="components/code/code.html?v=b09fd14">Code</a></div></div></section><section class="s4-card" aria-labelledby="hc-websites"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-websites">Websites <span class="hb-count">1</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/site/site.html?v=583c6e2">Website Kit</a></div></div></section><section class="s4-card" aria-labelledby="hc-inputs"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-inputs">Inputs <span class="hb-count">19</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/form/form.html?v=ece6a60">Forms</a><a class="s4-chip" href="components/text-field/text-field.html?v=81d6be0">Text Field</a><a class="s4-chip" href="components/combobox/combobox.html?v=053b62d">Combobox</a><a class="s4-chip" href="components/tag-input/tag-input.html?v=d8d4d17">Tag Input</a><a class="s4-chip" href="components/number-field/number-field.html?v=d30c387">Number Field</a><a class="s4-chip" href="components/code-field/code-field.html?v=ac594a7">One-Time Code</a><a class="s4-chip" href="components/upload/upload.html?v=fcb9e8a">File Upload</a><a class="s4-chip" href="components/time-field/time-field.html?v=5ef093e">Time Field</a><a class="s4-chip" href="components/rating/rating.html?v=cb88eeb">Rating</a><a class="s4-chip" href="components/date-picker/date-picker.html?v=be72fcd">Date Picker</a><a class="s4-chip" href="components/chip/chip.html?v=35363ad">Chip</a><a class="s4-chip" href="components/switch/switch.html?v=863906b">Switch</a><a class="s4-chip" href="components/checkbox/checkbox.html?v=e2fa93f">Checkbox</a><a class="s4-chip" href="components/radio/radio.html?v=0e2a1f9">Radio Button</a><a class="s4-chip" href="components/slider/slider.html?v=7fd5968">Slider</a><a class="s4-chip" href="components/swatches/swatches.html?v=e7ed419">Swatches</a><a class="s4-chip" href="components/color-field/color-field.html?v=3916b2d">Color Field</a><a class="s4-chip" href="components/password/password.html?v=da50aa6">Password Field</a><a class="s4-chip" href="components/inline-edit/inline-edit.html?v=5802a76">Inline Edit</a></div></div></section><section class="s4-card" aria-labelledby="hc-feedback"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-feedback">Feedback <span class="hb-count">8</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/badge/badge.html?v=a0b2475">Badge</a><a class="s4-chip" href="components/status/status.html?v=e82472f">Status</a><a class="s4-chip" href="components/progress/progress.html?v=74a35ee">Progress</a><a class="s4-chip" href="components/banner/banner.html?v=379c2eb">Banner</a><a class="s4-chip" href="components/skeleton/skeleton.html?v=e43a4a4">Skeleton</a><a class="s4-chip" href="components/reward/reward.html?v=435d2a9">Small rewards</a><a class="s4-chip" href="components/snackbar/snackbar.html?v=8da5768">Snackbar</a><a class="s4-chip" href="components/tooltip/tooltip.html?v=e734da1">Tooltips</a></div></div></section><section class="s4-card" aria-labelledby="hc-overlays"><div class="s4-card-body"><h3 class="s4-card-title" id="hc-overlays">Overlays <span class="hb-count">4</span></h3><div class="s4-chip-set"><a class="s4-chip" href="components/menu/menu.html?v=22f8cff">Menu</a><a class="s4-chip" href="components/dialog/dialog.html?v=2caafc5">Dialog</a><a class="s4-chip" href="components/sheet/sheet.html?v=7c949ae">Floating Panels</a><a class="s4-chip" href="components/palette/palette.html?v=f1ed66f">Command palette</a></div></div></section><!-- /HUB:COMPONENTS --></div>
+  </section>
+
+  <!-- docs, the skill and the labs where decisions were made -->
+  <section class="s4-site-section" id="docs" aria-labelledby="docs-h">
+    <div class="s4-site-section-head" data-layout="split">
+      <p class="s4-eyebrow">Read</p>
+      <h2 class="s4-site-title" id="docs-h">How It Is Made</h2>
+      <p class="s4-site-lead">The guide, the rules behind every choice, and the skill that builds with them.</p>
+    </div>
+    <div class="s4-grid" style="--s4-min: 15rem">
+      <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/framework.md"><div class="s4-card-body"><span class="s4-icon" data-icon="book"></span><h3 class="s4-card-title">Framework Guide</h3><p class="s4-card-supporting">Layers, the public API, versioning, and how an app loads Orion.</p></div></a>
+      <a class="s4-card" href="skill/dist/s4-orion.skill"><div class="s4-card-body"><span class="s4-icon" data-icon="download"></span><h3 class="s4-card-title">Claude Skill</h3><p class="s4-card-supporting">SKILL.md, references, assets, templates and the page checker.</p></div></a>
+      <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/philosophy.md"><div class="s4-card-body"><span class="s4-icon" data-icon="document"></span><h3 class="s4-card-title">Philosophy</h3><p class="s4-card-supporting">What Orion is for, and what it will not become.</p></div></a>
+      <a class="s4-card" href="https://github.com/4rk0s4h4/s4-orion/blob/main/docs/decisions/README.md"><div class="s4-card-body"><span class="s4-icon" data-icon="history"></span><h3 class="s4-card-title">Decisions</h3><p class="s4-card-supporting">Every recorded call, from the audit to today, and which still stand.</p></div></a>
+      <a class="s4-card" href="components/index.html?v=5bc787a"><div class="s4-card-body"><span class="s4-icon" data-icon="list"></span><h3 class="s4-card-title">Component Gallery</h3><p class="s4-card-supporting">All the reference pages on one page.</p></div></a>
+      <a class="s4-card" href="tokens/index.html?v=3d240ef"><div class="s4-card-body"><span class="s4-icon" data-icon="tune"></span><h3 class="s4-card-title">Tokens</h3><p class="s4-card-supporting">Color roles, type, shape, spacing, motion and glass, in every mode.</p></div></a>
+    </div>
+    <div class="s4-accordion" style="margin-block-start: var(--s4-space-6)">
+      <details class="s4-accordion-item"><summary>Review Labs<span class="s4-icon" data-icon="chevron-down"></span></summary>
+        <div class="s4-accordion-body">
+          <p class="s4-body-medium s4-on-surface-variant">Where past decisions were made. Not part of the system; the decisions page says which choices stand.</p>
+          <ul class="s4-list"><!-- HUB:LABS --><li><a class="s4-list-item" href="explore/degree-tracker.html?v=445bd79"><span class="s4-list-content"><span class="s4-list-headline">Degree Tracker · Orion Mockup</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid5-app.html?v=f4000eb"><span class="s4-list-content"><span class="s4-list-headline">Liquid Glass Lab 5: Phone</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/accents.html?v=668099f"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Accents</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-button-group.html?v=a4a7043"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Button Groups</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-button-group-2.html?v=350a922"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Button Groups, Round 2</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/calm-dialogs.html?v=90f341f"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Calm Dialogs and Docked Glass</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-depth.html?v=2caf8e0"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Depth With Glass</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-direction.html?v=29b526e"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Design Direction</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/design-review.html?v=5b11ebf"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Design Review</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/direction.html?v=69e0872"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Direction Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/glass.html?v=d8cab98"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Glass Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/glass-playground.html?v=1781d3e"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Glass Playground</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-edge-refract.html?v=c4076d4"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Glass Rim Line</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/icons.html?v=5449cbc"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Icon Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-icon-set.html?v=442ae6e"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Icon Set</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-light-edge.html?v=6954c18"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Light Mode Glass Edge</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid-glass.html?v=adf3105"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Glass Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid3.html?v=70f9148"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Glass Lab 3</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid4.html?v=28a09c1"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Glass Lab 4</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid5.html?v=7d3c2e9"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Glass Lab 5</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/liquid5-diag.html?v=d802e3e"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Glass Lab 5 Check</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/motion-liquid.html?v=c308c6f"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Motion Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/motion-liquid-2.html?v=de3d281"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Liquid Motion Lab 2</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/motion.html?v=0b92f1e"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Motion Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-orion-2.html?v=1c08902"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Overhaul Review</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/review-palette.html?v=83d9299"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Palette Review</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/states-shape.html?v=a9ed221"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: States and Shape</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/style.html?v=1986c17"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Style Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/style2.html?v=cac3162"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Style Lab 2</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transitions.html?v=0708fb9"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transitions Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transparency.html?v=f09cb5d"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transparency2.html?v=40065f0"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab 2</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/menu-motion.html?v=265da09"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab 3</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transparency3.html?v=748616c"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab 3</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transparency4.html?v=c9a4b0f"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab 3</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/transparency5.html?v=4671626"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: Transparency Lab 3</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><li><a class="s4-list-item" href="explore/ideas.html?v=5cd1538"><span class="s4-list-content"><span class="s4-list-headline">S4 Orion: What To Build Next</span></span><span class="s4-list-trailing"><span class="s4-icon" data-icon="chevron-right"></span></span></a></li><!-- /HUB:LABS --></ul>
+        </div>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="s4-site-footer">
+  <div class="s4-site-footer-base">
+    <p class="hb-foot s4-body-small">S4 Orion <span data-hub="version">1.1.0</span> · Inter (SIL OFL 1.1) · Solar icons by 480 Design (CC BY 4.0) · Material Color Utilities (Apache 2.0)</p>
+  </div>
+</footer>
+
 <div class="s4-menu" id="hub-theme" aria-label="Theme">
   <button class="s4-menu-item" type="button" role="menuitemradio" data-mode="system"><span class="s4-icon" data-icon="settings"></span>System</button>
   <button class="s4-menu-item" type="button" role="menuitemradio" data-mode="light"><span class="s4-icon" data-icon="light-mode"></span>Light</button>
   <button class="s4-menu-item" type="button" role="menuitemradio" data-mode="dark"><span class="s4-icon" data-icon="dark-mode"></span>Dark</button>
 </div>
-<script src="components/assets/icons.js?v=9b1efac"></script>
-<script src="components/orion.js?v=54cde07"></script>
+<script src="components/assets/icons-solar.js?v=2233020" defer></script>
+<script src="components/orion.site.min.js?v=e772ca4" defer></script>
 <script>
-S4.theme.restore('orion-template-theme', { mode: 'system' });
-function markMode() { var m = S4.theme().mode || 'system'; document.querySelectorAll('[data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === m)); }); }
-document.querySelectorAll('[data-mode]').forEach(function (b) { b.addEventListener('click', function () { S4.theme({ mode: b.dataset.mode }); markMode(); }); });
-markMode();
+addEventListener('DOMContentLoaded', function () {
+  S4.theme.restore('orion-template-theme', { mode: 'system' });
+  function markMode() { var m = S4.theme().mode || 'system'; document.querySelectorAll('[data-mode]').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.mode === m)); }); }
+  document.querySelectorAll('[data-mode]').forEach(function (b) { b.addEventListener('click', function () { S4.theme({ mode: b.dataset.mode }); markMode(); }); });
+  markMode();
+  /* the preview's dials: set on the preview region only (decision 0056); the page keeps its own */
+  var stage = document.getElementById('hb-stage');
+  document.querySelectorAll('[data-dial]').forEach(function (g) {
+    g.addEventListener('s4-change', function (e) {
+      if (e.target !== g || !e.detail || e.detail.value == null) return;
+      var o = {}, k = g.getAttribute('data-dial'), v = e.detail.value;
+      o[k] = k === 'mode' ? (v || null) : (v === 'default' || v === 'round' ? null : v);
+      S4.theme(o, stage);
+    });
+  });
+});
 </script>
 </body>
 </html>

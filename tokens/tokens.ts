@@ -206,6 +206,16 @@ export const tokens = {
       "reduced-transparency": "1"
     }
   },
+  "--s4-glass-tint-opacity-modal-phone": {
+    "type": "number",
+    "value": "0.96",
+    "description": "Decision 0066: on a phone a modal dialog or panel is a card in the bottom of the screen, often over the very button that opened it; at 90% a saturated button (a red Delete) showed through as a smudge. 96% keeps it glass (blur, a hint of the page) without show-through.",
+    "modes": {
+      "high-contrast": "1",
+      "dark-high-contrast": "1",
+      "reduced-transparency": "1"
+    }
+  },
   "--s4-glass-tint-float": {
     "type": "color",
     "value": "var(--md-sys-color-surface-container)",
@@ -1004,6 +1014,16 @@ export const tokens = {
     "type": "dimension",
     "value": "72px",
     "description": "Collapsed navigation rail: one icon wide (decision 0043)."
+  },
+  "--s4-size-grabber-width": {
+    "type": "dimension",
+    "value": "32px",
+    "description": "Decision 0066: the grabber on a modal panel on a phone (M3 drag handle, iOS sheet grabber)."
+  },
+  "--s4-size-grabber-height": {
+    "type": "dimension",
+    "value": "4px",
+    "description": "Decision 0066: the grabber's thickness."
   },
   "--s4-size-nav-indicator-width": {
     "type": "dimension",

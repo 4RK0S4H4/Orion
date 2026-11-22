@@ -7,9 +7,22 @@
    - [data-site-panel="id"] on a button: the same for another panel (the docs sidebar on a phone).
    - [data-period] on a joined capsule group: each element with data-period-<value> in the same section shows that text.
    - .s4-compare: its button group (values 1..4) picks the plan column shown under 600.
-   - .s4-toc: the link of the section being read gets aria-current="location". */
+   - .s4-toc: the link of the section being read gets aria-current="location".
+   - .s4-site-nav links to sections of this page: the same, never while the hero is in view (decision 0066). */
 S4.register('site', function (scope) {
   var wide = window.matchMedia('(width >= 840px)');
+
+  /* ---------- tables on the site bundle (decision 0066) ----------
+     The site runtime leaves table.js out; a site table still needs its column names on each cell to stack on a
+     phone. Only when table.js is absent, and a cell's own data-label always wins. */
+  if (!S4.table) S4.util.all(scope, 'table.s4-table').forEach(function (t) {
+    var heads = S4.util.all(t, 'thead th').map(function (th) { return th.textContent.trim(); });
+    S4.util.all(t, 'tbody tr, tfoot tr').forEach(function (tr) {
+      Array.prototype.forEach.call(tr.cells, function (td, i) { if (heads[i] && !td.hasAttribute('data-label')) td.setAttribute('data-label', heads[i]); });
+    });
+    var p = t.querySelector('thead th[data-primary]');
+    if (p) S4.util.all(t, 'tbody tr').forEach(function (tr) { var c = tr.cells[p.cellIndex]; if (c) c.setAttribute('data-primary', ''); });
+  });
 
   /* ---------- a floating panel opened by a button ---------- */
   function panel(button, el) {
@@ -124,6 +137,32 @@ S4.register('site', function (scope) {
     var on = group.querySelector('[aria-pressed="true"][value]');
     if (on && !c.dataset.show) c.dataset.show = on.value;
     group.addEventListener('s4-change', function (e) { if (e.detail && e.detail.value) c.dataset.show = e.detail.value; });
+  });
+
+  /* ---------- the header on a one-page site (decision 0066) ----------
+     Links to sections of this page mark the section being read (aria-current="location"), and nothing while the
+     first section (the hero) fills the top: the home page never opens with a nav item already selected. A link to
+     another page keeps the aria-current="page" the markup gives it. */
+  S4.util.all(scope, '.s4-site-header').forEach(function (header) {
+    if (!S4.util.once(header, 'sitespy')) return;
+    var links = Array.prototype.filter.call(header.querySelectorAll('.s4-site-nav a[href^="#"]'), function (a) { return a.hash.length > 1 && document.getElementById(decodeURIComponent(a.hash.slice(1))); });
+    if (!links.length) return;
+    links.forEach(function (a) { if (a.getAttribute('aria-current') === 'page') a.removeAttribute('aria-current'); });
+    var first = document.querySelector('main .s4-site-section');
+    var queued = false;
+    function update() {
+      queued = false;
+      var line = window.innerHeight * 0.4, current = null;
+      links.forEach(function (a) {
+        var t = document.getElementById(decodeURIComponent(a.hash.slice(1)));
+        if (!t || t === first || t.contains(first) || (first && first.contains(t))) return;
+        var r = t.getBoundingClientRect(); if (r.top <= line && r.bottom > line) current = a;
+      });
+      links.forEach(function (a) { if (a === current) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); });
+    }
+    window.addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
+    window.addEventListener('resize', update, { passive: true });
+    update();
   });
 
   /* ---------- on this page ---------- */

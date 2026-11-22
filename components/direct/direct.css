@@ -53,6 +53,11 @@
   [data-swipe] { position: relative; overflow: hidden; border-radius: var(--s4-shape-list-item, var(--md-sys-shape-corner-large)); touch-action: pan-y; }
   [data-swipe] > :is(.s4-list-item, [data-swipe-face]) { position: relative; z-index: 1; touch-action: pan-y; background: var(--_swipe-bg, var(--md-sys-color-surface)); }
   .s4-pane [data-swipe] > :is(.s4-list-item, [data-swipe-face]) { --_swipe-bg: var(--md-sys-color-surface-container-low); }
+  /* in a segmented list the row keeps its segment fill and corners (the strip under it is clipped to the same shape) */
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > [data-swipe] { border-radius: var(--s4-shape-list-segment); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > [data-swipe]:is(:first-child, .s4-list-subheader + li) { border-start-start-radius: var(--s4-shape-list-group); border-start-end-radius: var(--s4-shape-list-group); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > [data-swipe]:is(:last-child, :has(+ .s4-list-subheader)) { border-end-start-radius: var(--s4-shape-list-group); border-end-end-radius: var(--s4-shape-list-group); }
+  .s4-list:is([data-style="segmented"], :where([data-lists="segmented"] .s4-list:not([data-style]))) > [data-swipe]:not([data-picked]) > .s4-list-item:not([aria-selected="true"]) { --_swipe-bg: var(--s4-list-segment-color, var(--md-sys-color-surface-container-low)); }
   [data-swipe] > .s4-list-item[aria-selected="true"], [data-swipe][data-picked] > .s4-list-item { --_swipe-bg: var(--md-sys-color-secondary-container); }
   .s4-swipe-actions {
     position: absolute;

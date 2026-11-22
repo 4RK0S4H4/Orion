@@ -43,7 +43,8 @@ pane, a menu), a tenth of the text color mixed into that surface, so it works in
 **Do**
 - Use Title Case labels that say what happens: "Save Changes", "Export to Excel".
 - Put the icon before the label.
-- Use `data-color="error"` only for the confirm button of a destructive dialog or a danger zone.
+- Use `data-color="error"` only for a destructive answer: in a dialog and in a danger zone it is `data-variant="tonal"
+  data-color="error"` (decisions 0064, 0066). A filled red button is louder than the question it leads to.
 
 **Don't**
 - Don't put two filled buttons side by side; make one tonal.
@@ -1379,16 +1380,17 @@ supporting text, then content.
   …
 </section>
 
-<section class="s4-pane" data-color="error" aria-labelledby="danger">
+<!-- danger zone: a neutral pane, last, with a tonal error button that opens the confirm dialog -->
+<section class="s4-pane" aria-labelledby="danger">
   <h2 class="s4-pane-title" id="danger">Delete Workspace</h2>
   <p class="s4-pane-supporting">This deletes every bill, receipt and vendor. You can't undo this.</p>
-  <div class="s4-row"><button class="s4-button" data-color="error" type="button">Delete Workspace</button></div>
+  <div class="s4-row"><button class="s4-button" data-variant="tonal" data-color="error" type="button">Delete Workspace</button></div>
 </section>
 ```
 
 | Attribute / part | Values | Default |
 |---|---|---|
-| `data-color` | `lowest` (surface-container-lowest), `high` (surface-container-high), `error` (danger zone: error-container, on-error-container) | surface-container-low |
+| `data-color` | `lowest` (surface-container-lowest), `high` (surface-container-high), `error` (old: a red pane; danger zones are neutral now, decision 0066) | surface-container-low |
 | `.s4-pane-title` | title-medium | — |
 | `.s4-pane-supporting` | body-medium, on-surface-variant, 4 below the title | — |
 | `--s4-pane-padding` | override the padding | 24, or 16 under 600 |
@@ -1399,8 +1401,10 @@ viewport when there is none), so a pane works with or without a container ancest
 container, so lists, tables and grids inside it can adapt to it.
 
 **When to use what:** a **pane** groups related settings or fields under a heading; a [card](#card) is one item among
-many. Use `lowest` or `high` only to separate a pane from a neighbour or a parent of the same color. Use `error` once per
-page, last, for destructive settings.
+many. Use `lowest` or `high` only to separate a pane from a neighbour or a parent of the same color. A **danger zone**
+(delete the account, erase data) is a neutral pane, last on the page, whose button is `data-variant="tonal"
+data-color="error"`: the confirm dialog it opens carries the weight, so the pane never shouts louder than the question
+(decision 0066). `data-color="error"` on a pane is old markup; don't write it.
 
 **Do**
 - Give every pane a title in Title Case, and use supporting text in sentence case to say what the section is for.
@@ -1409,9 +1413,9 @@ page, last, for destructive settings.
 **Don't**
 - Don't nest panes of the same color.
 - Don't make panes glass; they are content surfaces.
-- Don't fill a whole page with `data-color="error"` panes.
+- Don't paint a danger zone red or give it a filled red button: it is louder than the dialog it opens.
 
-**Accessibility:** use `<section aria-labelledby>` so each pane is a named region. The error pane's text uses
+**Accessibility:** use `<section aria-labelledby>` so each pane is a named region. The old error pane's text uses
 on-error-container, which the token build checks at AA. Forced-colors mode draws a real border.
 
 **Tokens:** `--s4-shape-pane`, `--s4-space-4`, `--s4-space-6`, `--s4-breakpoint-medium`,
@@ -2923,18 +2927,40 @@ Skip link first; landmarks (`header`, `nav` with labels, `main`, `footer`); one 
 `aria-current="location"`. Frames are pictures (`role="img"` with a label, `inert` inside). Comparison cells use
 icons with labels ("Included", "Not included"). Prices that change with the period are plain text in place.
 
-### Performance (pages that count every kilobyte)
+### Performance: the site bundle (decision 0066)
 
-The site templates load the lighter files the build also writes (same code, comments and spare whitespace out;
-`npm run check:bundle` fails if they are stale). Gzipped: `orion.min.css` 42 KB (orion.css 80), `orion.min.js` 48 KB
-(orion.js 71), `icons-solar.js` 28 KB (icons.js, all three sets, 79). The font (165 KB) is the biggest file left.
+A site loads the **site bundle**, not the app bundle: `orion.site.min.css`, `orion.site.min.js` and `inter-site.woff2`,
+all written by `npm run build`. It holds what a `body.s4-site` page uses (tokens and base with every brand dial, type,
+the site kit, buttons and groups, tabs, cards, lists, accordion, breadcrumbs, pagination, a static table, stat, ring,
+meter, milestones, description list, prose and code, fields, form, switch, checkbox, radio, chips, slider, badge,
+status, banner, empty state, menu, snackbar, tooltip, glass and motion) and leaves out the app shell, navigation
+chrome, desktop anatomy, dialogs, sheets, the palette, tables at scale, filters, charts, boards, direct manipulation and
+the rich inputs. `inter-site.woff2` is Inter cut to Latin and Latin-1 (with Western European extras and the usual
+punctuation, currency and arrows) and weights 400 to 900 (Orion writes 400 to 700), by `scripts/font-subset.mjs`, a
+dependency-free subsetter: glyph IDs stay, so kerning and figures keep working; small capitals, tabular figures and
+the optical size axis are kept.
+
+| File, gzipped (font as sent) | App bundle | Site bundle | Budget (`npm run check`) |
+|---|---|---|---|
+| Stylesheet | `orion.min.css` 63 KB | `orion.site.min.css` 41 KB | 44 KB |
+| Runtime | `orion.min.js` 114 KB | `orion.site.min.js` 26 KB | 30 KB |
+| Font | `inter-variable.woff2` 161 KB | `inter-site.woff2` 67 KB | 70 KB |
+| Icons | `icons-solar.js` 37 KB | the same | |
+| **Together** | **375 KB** | **171 KB** | **180 KB** |
+
+`npm run check` fails past a budget, when a site template uses a class the site stylesheet does not have, or a
+component whose script the site runtime leaves out. A site that needs one of those (a dialog, a data table, a chart)
+loads the full `orion.min.css` and `orion.min.js` instead. Text in other scripts (Cyrillic, Greek, Vietnamese) falls
+back to the system face with the subset: such a site loads `inter-variable.woff2` (change the `@font-face` with its
+own rule, same family name, after the stylesheet).
 
 ```html
-<link rel="preload" href="inter-variable.woff2" as="font" type="font/woff2" crossorigin>   <!-- first, so text never waits -->
-<link rel="stylesheet" href="orion.min.css">                                               <!-- @font-face uses font-display: swap -->
+<link rel="preload" href="inter-site.woff2" as="font" type="font/woff2" crossorigin>   <!-- first, so text never waits -->
+<link rel="stylesheet" href="orion.site.min.css">                                       <!-- @font-face uses font-display: swap -->
+<link rel="stylesheet" href="brand.css">                                                <!-- a fixed brand (0063), right after -->
 …
-<script src="icons-solar.js" defer></script>   <!-- one icon set; load icons.js instead only if the page switches sets -->
-<script src="orion.min.js" defer></script>
+<script src="icons-solar.js" defer></script>   <!-- one icon set -->
+<script src="orion.site.min.js" defer></script>
 <script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('app-key', { mode: 'system' }); });</script>
 ```
 

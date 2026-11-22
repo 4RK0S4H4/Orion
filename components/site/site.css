@@ -140,6 +140,14 @@
     --_bg: var(--md-sys-color-secondary-container);
     --_fg: var(--md-sys-color-on-secondary-container);
   }
+  /* one filled selection per screen (decision 0066): on a docs page the sidebar's page wears the fill; the header's
+     section and "On This Page" say where you are more quietly: a neutral fill and the content color, heavier text */
+  .s4-toc .s4-button[data-variant="text"]:is([aria-current]:not([aria-current="false"])),
+  :where(body:has(.s4-docs-nav)) .s4-site-nav .s4-button[data-variant="text"]:is([aria-current]:not([aria-current="false"])) {
+    --_bg: var(--md-sys-color-surface-container-high);
+    --_fg: var(--md-sys-color-on-surface);
+    --_weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
   .s4-site-actions { display: flex; align-items: center; gap: var(--s4-space-2); min-inline-size: 0; }
   .s4-site-menu-button { display: none; }
 

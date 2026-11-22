@@ -201,6 +201,20 @@
         },
         "$description": "Collapsed navigation rail: one icon wide (decision 0043)."
       },
+      "grabber-width": {
+        "$value": {
+          "value": 32,
+          "unit": "px"
+        },
+        "$description": "Decision 0066: the grabber on a modal panel on a phone (M3 drag handle, iOS sheet grabber)."
+      },
+      "grabber-height": {
+        "$value": {
+          "value": 4,
+          "unit": "px"
+        },
+        "$description": "Decision 0066: the grabber's thickness."
+      },
       "nav-indicator-width": {
         "$value": {
           "value": 56,
