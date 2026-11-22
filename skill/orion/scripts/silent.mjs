@@ -3,13 +3,15 @@
    the page (pass it to page.evaluate); none of them changes the page.
      knownClasses()   async: every s4- name the page's stylesheets and scripts know (Orion's and the app's own), kept on
                       window.__s4known for the audit below
-     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...] }
+     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...], nav: [...] }
        unknown        an s4- class nothing defines (a misremembered name such as .s4-card-content styles nothing)
        broken         a word split across lines, or a box one glyph wide (a column too narrow for its words: a table
                       that cannot stack, a FAB squeezed into a rail)
        container      a part outside the component it belongs to (a .s4-nav-item outside a nav bar or rail …)
        loud           a status drawn as a fill rather than a tint (more than 2:1 against the surface it sits on): a
-                      status is a tint, and only the state that needs action now is warm (error, warning) */
+                      status is a tint, and only the state that needs action now is warm (error, warning)
+       nav            a nav bar highlight (icon over label) that is a circle, or that a corner of its label pokes out of
+                      (round 0061) */
 
 export async function knownClasses() {
   const set = new Set();
@@ -25,7 +27,7 @@ export async function knownClasses() {
 }
 
 export function silentAudit() {
-  const out = { unknown: [], broken: [], container: [], loud: [] };
+  const out = { unknown: [], broken: [], container: [], loud: [], nav: [] };
   const known = new Set(window.__s4known || []);
   const skip = (e) => !!e.closest('[data-s4-skip], iframe, template, pre, code, .s4-code, svg, [hidden], [inert], [aria-hidden="true"], .s4-visually-hidden');
   const shown = (e) => { const r = e.getBoundingClientRect(); if (!(r.width > 0 && r.height > 0)) return false; return e.checkVisibility ? e.checkVisibility({ opacityProperty: true, visibilityProperty: true }) : getComputedStyle(e).visibility !== 'hidden'; };
@@ -79,6 +81,24 @@ export function silentAudit() {
     if (el.closest('[aria-expanded="false"], [data-collapsed], [data-s4-collapsed]') && cs.overflow !== 'visible') continue;
     narrow++; flagged.add(el);
     out.broken.push(`"${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}" is squeezed into a box ${Math.round(cw)}px wide, one glyph, in ${path(el)}`);
+  }
+
+  /* the nav bar's highlight (round 0061): where the icon sits over the label it holds both, so it is a rounded rectangle
+     that contains the label's box, corners included; never a circle (a corner of half its height on a box about as wide
+     as it is tall) that the label pokes out of */
+  for (const pill of document.querySelectorAll('.s4-nav-bar > .s4-nav-pill')) {
+    const bar = pill.parentElement, cur = bar.querySelector('.s4-nav-item[aria-current]:not([aria-current="false"])');
+    const lab = cur && cur.querySelector('.s4-nav-label');
+    if (!lab || skip(bar) || !shown(pill) || !shown(lab) || getComputedStyle(cur).flexDirection !== 'column') continue;
+    const p = pill.getBoundingClientRect(), l = lab.getBoundingClientRect(), rad = Math.min(parseFloat(getComputedStyle(pill).borderTopLeftRadius) || 0, p.width / 2, p.height / 2);
+    const name = `"${lab.textContent.trim().slice(0, 20)}"`;
+    if (rad > Math.min(p.width, p.height) * 0.3 + 0.5) out.nav.push(`the nav bar's highlight on ${name} is a circle, not a rounded rectangle (corner ${Math.round(rad)}px on a ${Math.round(p.width)}x${Math.round(p.height)} box) in ${path(bar)}`);
+    const t = 0.5, inside = (x, y) => {
+      if (x < p.left - t || x > p.right + t || y < p.top - t || y > p.bottom + t) return false;
+      const cx = Math.min(Math.max(x, p.left + rad), p.right - rad), cy = Math.min(Math.max(y, p.top + rad), p.bottom - rad);
+      return Math.hypot(x - cx, y - cy) <= rad + t;
+    };
+    if (![[l.left, l.top], [l.right, l.top], [l.left, l.bottom], [l.right, l.bottom]].every(([x, y]) => inside(x, y))) out.nav.push(`the label ${name} sticks out of the nav bar's highlight (label ${Math.round(l.width)}x${Math.round(l.height)}, highlight ${Math.round(p.width)}x${Math.round(p.height)}, corner ${Math.round(rad)}px) in ${path(bar)}`);
   }
 
   /* parts outside the component they belong to */

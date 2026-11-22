@@ -33,6 +33,17 @@
   document.addEventListener('pointerdown', function () { lastPointer = Date.now(); }, true);
   document.addEventListener('focusin', function () { root.setAttribute('data-s4-focus', Date.now() - lastPointer < 800 ? 'pointer' : 'key'); }, true);
 
+  /* ---------- how the person is getting around (round 0061) ----------
+     data-s4-input on <html> is "key" from the first key press that navigates (Tab, arrows, Escape, Enter…) until the next
+     tap or click, "pointer" after a tap or a click, and absent until either happens. A container that takes focus only to
+     hold the place (main, a view, a page, a dialog's own box: anything with tabindex="-1" that is not a control) draws its
+     ring only while it is "key" (base.css). WebKit counts a script's focus after a tap as :focus-visible (a tap focuses no
+     link or button there), so without this every view switch, Back or closed panel outlined the whole screen on an iPhone. */
+  var NAV_KEY = /^(Tab|Escape|Enter| |Arrow\w+|Home|End|PageUp|PageDown|F6)$/;
+  function input(kind) { if (root.getAttribute('data-s4-input') !== kind) root.setAttribute('data-s4-input', kind); }
+  document.addEventListener('keydown', function (e) { if (NAV_KEY.test(e.key) || ((e.metaKey || e.ctrlKey) && e.key.length === 1)) input('key'); }, true);
+  document.addEventListener('pointerdown', function () { input('pointer'); }, true);
+
   /* ---------- small utilities ---------- */
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },

@@ -33,7 +33,13 @@ S4.navPill = function (box) {
     var b = box.getBoundingClientRect(), r = cur.getBoundingClientRect();
     var vertical = getComputedStyle(cur).flexDirection === 'column';
     var x = r.left - b.left - box.clientLeft, y = r.top - b.top - box.clientTop, w = r.width, h = r.height;
-    if (vertical) { x += padX / 2; w -= padX; y += padY; h -= padY * 2; }
+    if (vertical) {
+      /* the label keeps a gap of padX inside the highlight where the cell has room; a label as wide as the cell gets the
+         whole cell (a highlight narrower than its label is what round 0061 fixed) */
+      var lab = cur.querySelector('.s4-nav-label'), lw = lab ? lab.getBoundingClientRect().width : 0;
+      var ix = Math.max(0, Math.min(padX / 2, (w - lw) / 2 - padX));
+      x += ix; w -= ix * 2; y += padY; h -= padY * 2;
+    }
     pill.toggleAttribute('data-animate', !!animate && !S4.motion.reduced());
     pill.style.setProperty('--_x', x + 'px'); pill.style.setProperty('--_y', y + 'px');
     pill.style.setProperty('--_w', w + 'px'); pill.style.setProperty('--_h', h + 'px');

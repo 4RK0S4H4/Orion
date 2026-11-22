@@ -36,6 +36,17 @@
   document.addEventListener('pointerdown', function () { lastPointer = Date.now(); }, true);
   document.addEventListener('focusin', function () { root.setAttribute('data-s4-focus', Date.now() - lastPointer < 800 ? 'pointer' : 'key'); }, true);
 
+  /* ---------- how the person is getting around (round 0061) ----------
+     data-s4-input on <html> is "key" from the first key press that navigates (Tab, arrows, Escape, Enter…) until the next
+     tap or click, "pointer" after a tap or a click, and absent until either happens. A container that takes focus only to
+     hold the place (main, a view, a page, a dialog's own box: anything with tabindex="-1" that is not a control) draws its
+     ring only while it is "key" (base.css). WebKit counts a script's focus after a tap as :focus-visible (a tap focuses no
+     link or button there), so without this every view switch, Back or closed panel outlined the whole screen on an iPhone. */
+  var NAV_KEY = /^(Tab|Escape|Enter| |Arrow\w+|Home|End|PageUp|PageDown|F6)$/;
+  function input(kind) { if (root.getAttribute('data-s4-input') !== kind) root.setAttribute('data-s4-input', kind); }
+  document.addEventListener('keydown', function (e) { if (NAV_KEY.test(e.key) || ((e.metaKey || e.ctrlKey) && e.key.length === 1)) input('key'); }, true);
+  document.addEventListener('pointerdown', function () { input('pointer'); }, true);
+
   /* ---------- small utilities ---------- */
   S4.util = {
     emit: function (el, name, detail) { el.dispatchEvent(new CustomEvent(name, { bubbles: true, detail: detail })); },
@@ -1472,7 +1483,13 @@ S4.navPill = function (box) {
     var b = box.getBoundingClientRect(), r = cur.getBoundingClientRect();
     var vertical = getComputedStyle(cur).flexDirection === 'column';
     var x = r.left - b.left - box.clientLeft, y = r.top - b.top - box.clientTop, w = r.width, h = r.height;
-    if (vertical) { x += padX / 2; w -= padX; y += padY; h -= padY * 2; }
+    if (vertical) {
+      /* the label keeps a gap of padX inside the highlight where the cell has room; a label as wide as the cell gets the
+         whole cell (a highlight narrower than its label is what round 0061 fixed) */
+      var lab = cur.querySelector('.s4-nav-label'), lw = lab ? lab.getBoundingClientRect().width : 0;
+      var ix = Math.max(0, Math.min(padX / 2, (w - lw) / 2 - padX));
+      x += ix; w -= ix * 2; y += padY; h -= padY * 2;
+    }
     pill.toggleAttribute('data-animate', !!animate && !S4.motion.reduced());
     pill.style.setProperty('--_x', x + 'px'); pill.style.setProperty('--_y', y + 'px');
     pill.style.setProperty('--_w', w + 'px'); pill.style.setProperty('--_h', h + 'px');

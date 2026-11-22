@@ -1632,6 +1632,13 @@
     outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
     outline-offset: var(--s4-focus-ring-offset);
   }
+  /* A container that takes focus only to hold the place (main, a view, a page, a dialog's own box: tabindex="-1" on anything
+     that is not a control) rings only while the person is on the keyboard (data-s4-input, core.js). A script's focus after a
+     tap counts as :focus-visible in WebKit, and a ring round the whole screen is noise to someone who tapped (round 0061).
+     Controls keep their rings whatever the input: this never matches a link, button, field or a role you act on. */
+  :where(:root:not([data-s4-input="key"])) [tabindex="-1"]:focus:not(a[href], button, input, select, textarea, summary, [contenteditable], [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="menuitemradio"], [role="menuitemcheckbox"], [role="option"], [role="treeitem"], [role="gridcell"], [role="row"], [role="checkbox"], [role="radio"], [role="switch"], [role="slider"], tr, td, th) {
+    outline: none;
+  }
 
   /* ---------- icons: <span class="s4-icon" data-icon="search"></span>, drawn by orion.js from the icon registry ---------- */
   .s4-icon {
@@ -3892,6 +3899,12 @@
       transform var(--s4-motion-ink),
       inline-size var(--s4-motion-ink),
       block-size var(--s4-motion-ink);
+  }
+  /* under 600 the highlight holds the icon over the label, a box about as tall as it is wide: half its height would make
+     it a circle that the label's corners poke out of (round 0061). It takes the corner of the 32dp icon pill instead, so it
+     reads as the usual rounded rectangle, and the corner dial still makes it squarer, never rounder. */
+  @container s4-nav-bar (width < 600px) {
+    .s4-nav-bar > .s4-nav-pill { border-radius: min(calc(var(--_h, 0px) / 2), var(--s4-shape-nav-indicator), calc(var(--s4-size-nav-indicator-height) / 2)); }
   }
   :is(.s4-nav-bar, .s4-nav-rail-items):has(> .s4-nav-pill) { isolation: isolate; }
   /* the bar spans the screen: a spring that overshoots past the last item (lively energy) must not widen the page */

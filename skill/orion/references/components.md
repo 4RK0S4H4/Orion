@@ -546,6 +546,7 @@ Expressive horizontal items from 600 wide.
 | `.s4-nav-item` | `a` (navigates) or `button` (same page). 3 to 5 per bar. |
 | `aria-current="page"` | The current destination: secondary-container pill, on-secondary-container icon (solid), on-surface emphasized label. |
 | `.s4-nav-indicator` | The 56×32 pill around the icon; carries the state layer and focus ring. |
+| `.s4-nav-pill` | Added by `nav-bar.js`: the highlight behind the current item. Under 600 it holds the icon and the label: a rounded rectangle with the corner of the 32dp icon pill (the corner dial can make it squarer, never rounder), at least 8dp around the label where the cell has room. Never give it its own corner: the page checker fails a round highlight or a label that pokes out of it. |
 | `.s4-nav-label` | label-medium; on-surface-variant when not current. |
 | `.s4-badge-host` + `.s4-badge` | Optional badge on the icon (see [badge](#badge)). |
 | `data-view` | Ties the item to an `.s4-view` in an [app shell](#app). |

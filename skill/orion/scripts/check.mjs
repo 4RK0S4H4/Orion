@@ -10,7 +10,8 @@
                 defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill,
                 a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067),
                 window controls that are not full cells to the window's top and end edges (decision 0072), and a
-                word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs)
+                word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs),
+                a nav bar highlight drawn as a circle or narrower than its label (round 0061)
      warnings – more than one filled button in one area, more than one filled accent action on the first screen
                 (decision 0070), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -308,6 +309,7 @@ for (const page of pages) {
       (r.unknown || []).forEach((x) => errors.add(`${at} unknown class ${x}: nothing in Orion or the page defines it (check the name in the component's README)`));
       (r.broken || []).forEach((x) => errors.add(`${at} ${x}: the box is too narrow for its words (a fixed width, a column that cannot stack, or a part outside its component)`));
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
+      (r.nav || []).forEach((x) => errors.add(`${at} ${x}: the highlight is a rounded rectangle that holds the icon and the label (nav-bar.css; never give .s4-nav-pill its own corner)`));
       (r.loud || []).forEach((x) => errors.add(`${at} ${x}: a status is a tint (no data-tone, or success, warning, info, error; the accent tones draw as a wash); only the state that needs action now is warm`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));
       (r.screenFilled || []).forEach((x) => warnings.add(`${at} more than one filled action on one screen at rest (decision 0070: one filled main action; step the others down to elevated, no "All" chip pressed): ${x}`));
