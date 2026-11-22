@@ -59,7 +59,7 @@ accessibility, so some scores fell although nothing got worse.
 2. **Round 0057** (done, 8ca40e5): the eleven owner calls taken on our recommendation (0063: brand files, kicker,
    meter, board, quiet table checkbox, one FAB label rule, data-dense, calmer selection); the owner's feedback (0064:
    calm dialogs as bottom cards on phones, docked glass without the edge glow). Review 2 run.
-3. **Round 0058 — current stage**: review 2's blockers, in two workstreams.
+3. **Round 0058** (done: A built and checked on `round58/a`, decision 0065; B, decision 0066, merged into A before publishing): review 2's blockers, in two workstreams.
    - **A** (branch `round58/a`, worktree `r58-a`, decision 0065, owns shared docs): Back keeps place and focus;
      focus never drops to body (board add, mod+comma, menubar Escape, palette duplicate); Linnea grid keyboard (one
      header stop, one body stop, Home/End, Tab out) and quiet Select All; page checker fails unknown `s4-` classes,
@@ -72,10 +72,10 @@ accessibility, so some scores fell although nothing got worse.
      danger zones; grabber and drag-following scrim on modal panels; firm corners reach containers; `scale` and
      `headings` dials.
    - Then: A merges B, full tests, the main session publishes, links to the owner.
-4. **Owner device pass** (needs the owner): iPhone (dialog swipe and corners, docked hairline while scrolling, Linnea
+4. **Owner device pass — current stage** (needs the owner; runs alongside review 3): iPhone (dialog swipe and corners, docked hairline while scrolling, Linnea
    and Parley at phone width, the rich inputs, real faces), a desktop (Parley's menu bar and shortcuts, Linnea's grid,
    the Electron example), VoiceOver on a dialog and the table. Device-only bugs come before anything new.
-5. **Review 3**: an independent re-grade on the published round 0058. Anything under 10 becomes round 0059.
+5. **Review 3 — current stage, with the device pass**: an independent re-grade on the published round 0058. Anything under 10 becomes round 0059.
 6. **Round 0059+ until every area is 10**: likely remaining from review 2's "close behind": WebKit and Firefox runs in
    CI or by hand, screen-reader passes, the Electron and Tauri shells run for real, print pagination, full bundle
    weight for apps (split by component), more proof that a new app built from the skill alone looks bespoke (skill
@@ -89,3 +89,10 @@ accessibility, so some scores fell although nothing got worse.
 round 0058: grabber on modal panels only; danger zones are neutral panes with a tonal-error trigger; firm corners step
 containers down too; `scale` and `headings` dials; status pills are tints, a fill only for the one state that needs
 action now. The owner can overrule any of these; otherwise they stand.
+
+## Session log
+
+- 2026-11-22 (round 0058, workstream A): decision 0065 built (Back keeps place and focus, focus never on body, the
+  grid keyboard for data tables, silent-failure checks in the checker and suite, bare tables and rail FABs, `.s4-num`,
+  statuses are tints, one tonal tool per toolbar, Parley finish, drift and `check:words`, issues 61/62/64/65 Done);
+  merged origin/s4-orion (PLAN.md). Next: merge B, full tests, publish; then the owner device pass and review 3.
