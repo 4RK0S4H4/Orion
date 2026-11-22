@@ -35,8 +35,11 @@
   .pl-lang-pct { color: var(--md-sys-color-on-surface-variant); }
 
   /* the strings view fills the window's body: list and detail each scroll on their own */
-  /* the list takes a good share of the window (lines wrap to two or three rows, not five); its grip resizes it */
-  #split { --s4-split-list: clamp(calc(var(--s4-space-16) * 5), 44%, calc(var(--s4-space-16) * 8)); }
+  /* the list takes about half the window, so a line reads in one or two rows at 1280 and 1600 (decision 0068); its grip
+     resizes it and remembers the width. The status sits on the key's row, so the text runs the full width of the row. */
+  #split { --s4-split-list: clamp(calc(var(--s4-space-16) * 5), 52%, calc(var(--s4-space-16) * 10)); }
+  .pl-row-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); margin-block-end: var(--s4-space-1); }
+  .pl-row-head > .pl-mono { min-inline-size: 0; overflow-wrap: anywhere; }
   .pl-strings { display: flex; flex-direction: column; gap: var(--s4-space-3); }
   .pl-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .pl-filters > .s4-search { flex: 1 1 calc(var(--s4-space-16) * 3); min-inline-size: 0; }
@@ -49,8 +52,9 @@
   .pl-block { display: flex; flex-direction: column; gap: var(--s4-space-2); }
   .pl-label { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-label-medium-weight); }
   .pl-source { margin: 0; padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); overflow-wrap: anywhere; }
-  /* a placeholder the game fills in: a small mono pill that must survive translation */
-  .pl-ph { display: inline-block; padding: 0 var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); font-family: var(--md-ref-typeface-mono); font-size: 0.86em; }
+  /* a placeholder the game fills in: a small mono pill that must survive translation. Neutral: the detail's one accent
+     fill is Approve (decision 0068); a missing one turns error, a status. */
+  .pl-ph { display: inline-block; padding: 0 var(--s4-space-1); border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: 0.86em; }
   .pl-ph[data-missing] { background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); }
   .pl-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4-space-2); }
   .pl-actions > .pl-grow { flex: 1 1 auto; }
@@ -172,14 +176,14 @@
                 <button class="s4-icon-button s4-search-clear" type="button" aria-label="Clear Filter" hidden><span class="s4-icon" data-icon="close"></span></button>
               </div>
             </div>
-            <div class="s4-chip-set" data-select="single" data-scroll aria-label="Status" id="status-chips">
-              <button class="s4-chip" data-type="filter" type="button" aria-pressed="true" value="all">All</button>
-              <button class="s4-chip" data-type="filter" type="button" value="new">Untranslated</button>
-              <button class="s4-chip" data-type="filter" type="button" value="review">Needs Review</button>
-              <button class="s4-chip" data-type="filter" type="button" value="ok">Approved</button>
+            <!-- no "All" chip: nothing pressed is every line, so at rest the pane's one accent fill is the selected line (decision 0068) -->
+            <div class="s4-chip-set" data-scroll aria-label="Status" id="status-chips">
+              <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" value="new">Untranslated</button>
+              <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" value="review">Needs Review</button>
+              <button class="s4-chip" data-type="filter" type="button" aria-pressed="false" value="ok">Approved</button>
             </div>
             <ul class="s4-list" id="list" role="listbox" aria-label="Lines" data-lines="3"></ul>
-            <div class="s4-empty" id="list-empty" hidden><span class="s4-empty-icon"><span class="s4-icon" data-icon="check"></span></span><h2 class="s4-empty-title">Nothing Here</h2><p class="s4-empty-text">No lines in this file match. Try All.</p></div>
+            <div class="s4-empty" id="list-empty" hidden><span class="s4-empty-icon"><span class="s4-icon" data-icon="check"></span></span><h2 class="s4-empty-title">Nothing Here</h2><p class="s4-empty-text">No lines in this file match. Clear the status filter.</p></div>
           </section>
           <section class="s4-split-pane" data-sticky aria-label="Line">
             <div class="s4-row"><button class="s4-button" data-variant="text" type="button" data-split-back><span class="s4-icon" data-icon="back"></span>Lines</button></div>
@@ -200,7 +204,7 @@
               </div>
               <div class="pl-actions">
                 <button class="s4-button" data-variant="filled" type="button" data-cmd="string.approve">Approve<kbd class="s4-kbd"></kbd></button>
-                <button class="s4-button" type="button" data-cmd="string.copySource">Copy Source</button>
+                <button class="s4-button" data-variant="elevated" type="button" data-cmd="string.copySource">Copy Source</button>
                 <span class="pl-grow"></span>
                 <button class="s4-button" data-variant="text" type="button" data-cmd="string.prev">Previous</button>
                 <button class="s4-button" data-variant="text" type="button" data-cmd="string.next">Next</button>
@@ -424,9 +428,8 @@ function renderList() {
   list.innerHTML = rows.map(function (l) {
     var t = l.tr[lang], s = STATUS[l.tr[lang] || l.status !== 'new' ? l.status : 'new'];
     return '<li role="none"><div class="s4-list-item" role="option" aria-selected="' + (l === current) + '" data-value="' + l.key + '" data-split-open data-context-menu="row-menu">' +
-      '<span class="s4-list-content"><span class="s4-list-overline pl-mono">' + esc(l.key) + '</span><span class="s4-list-headline">' + esc(l.src) + '</span>' +
-      '<span class="s4-list-supporting">' + (t ? esc(t) : 'Not translated yet') + '</span></span>' +
-      '<span class="s4-list-trailing"><span class="s4-status" data-tone="' + s[1] + '">' + s[0] + '</span></span></div></li>';
+      '<span class="s4-list-content"><span class="s4-list-overline pl-row-head"><span class="pl-mono">' + esc(l.key) + '</span><span class="s4-status" data-tone="' + s[1] + '">' + s[0] + '</span></span><span class="s4-list-headline">' + esc(l.src) + '</span>' +
+      '<span class="s4-list-supporting">' + (t ? esc(t) : 'Not translated yet') + '</span></span></div></li>';
   }).join('');
   $('list-empty').hidden = !!rows.length;
   S4.init(list);
@@ -478,7 +481,9 @@ $('d-target').addEventListener('input', function () {
 $('d-tm').addEventListener('click', function (e) { var b = e.target.closest('[data-tm]'); if (!b) return; var before = current.tr[lang]; $('d-target').value = current.tm[+b.dataset.tm].t; $('d-target').dispatchEvent(new Event('input')); S4.snackbar({ text: 'Used the ' + current.tm[+b.dataset.tm].m + '% match', action: 'Undo', onAction: function () { current.tr[lang] = before || ''; renderDetail(); } }); });
 
 /* ---------- chips narrow the list (decision 0059) ---------- */
-$('status-chips').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; filter = c.value; renderList(); });
+/* one status at a time, or none (every line): pressing the pressed chip again clears it */
+function setFilter(v) { filter = v; $('status-chips').querySelectorAll('.s4-chip').forEach(function (o) { o.setAttribute('aria-pressed', String(o.value === v)); }); }
+$('status-chips').addEventListener('click', function (e) { var c = e.target.closest('.s4-chip'); if (!c) return; setFilter(c.getAttribute('aria-pressed') === 'true' ? c.value : 'all'); renderList(); });
 
 /* ---------- open files: document tabs ---------- */
 var tabs = $('tabs');
@@ -598,7 +603,7 @@ function renderReview() {
     : '<li><div class="s4-empty"><span class="s4-empty-icon"><span class="s4-icon" data-icon="check"></span></span><h3 class="s4-empty-title">All Reviewed</h3><p class="s4-empty-text">Nothing is waiting for you.</p></div></li>';
   S4.init($('review-list'));
 }
-$('review-list').addEventListener('click', function (e) { var b = e.target.closest('[data-open]'); if (!b) return; var l = LINES.filter(function (x) { return x.key === b.dataset.open; })[0]; file = l.file; openFile(l.file); filter = 'all'; S4.app.go(app, 'strings'); current = l; renderList(); });
+$('review-list').addEventListener('click', function (e) { var b = e.target.closest('[data-open]'); if (!b) return; var l = LINES.filter(function (x) { return x.key === b.dataset.open; })[0]; file = l.file; openFile(l.file); setFilter('all'); S4.app.go(app, 'strings'); current = l; renderList(); });
 var TERMS = [['Saltreach', 'Saltreach', 'The island. Never translated.'], ['Tidewright', 'Tidewright', 'A name. Never translated.'], ['the Lamp', 'la Lampe', 'Always capitalised, feminine.'], ['keeper', 'gardien', 'Lower case unless addressed.'], ['night ferry', 'ferry de nuit', 'Not “bac”.'], ['ledger', 'registre, comptes', '“Comptes” when the sea speaks.']];
 $('glossary-list').innerHTML = TERMS.map(function (t) { return '<li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">' + esc(t[0]) + ' → ' + esc(t[1]) + '</span><span class="s4-list-supporting">' + esc(t[2]) + '</span></span></div></li>'; }).join('');
 document.addEventListener('s4-command', function () { renderReview(); });

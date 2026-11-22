@@ -4157,6 +4157,14 @@
   /* a tree in the rail lines its icons up with the items' icons; collapsed it steps out (a tree is not icons) */
   .s4-nav-rail .s4-tree { --_pad: calc((var(--_row) - var(--s4-size-icon)) / 2 - var(--s4-size-icon-small) + var(--s4-space-1)); }
   .s4-nav-rail:not([data-expanded]) .s4-tree { display: none; }
+  /* one accent fill per region (decision 0068): the rail marks where you are once. While one of its items is current,
+     a tree's selection in the rail (the open file, the current language) is a setting of that place, so it is marked
+     neutral: the highest container and the heavier label. A rail with no current item leaves the tree its accent fill. */
+  .s4-nav-rail:has(.s4-nav-item[aria-current]:not([aria-current="false"])) .s4-tree-item[aria-selected="true"] > .s4-tree-row {
+    background: var(--md-sys-color-surface-container-highest);
+    color: var(--md-sys-color-on-surface);
+    font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
+  }
   .s4-nav-rail-grip {
     position: absolute;
     inset-block: 0;
