@@ -48,6 +48,11 @@ async function snapshot(page, url, full) {
   }
   await page.goto(url, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(1500);
+  /* read only a settled layout: the page's height and width unchanged over three looks (a slow machine finishes the two runs at different moments, and a scrollbar that appears late moves a centered column) */
+  for (let i = 0, last = '', same = 0; i < 40 && same < 3; i++) {
+    const now = await page.evaluate(() => `${document.documentElement.scrollHeight}x${document.documentElement.clientWidth}x${document.querySelector('main') ? document.querySelector('main').getBoundingClientRect().width : 0}`);
+    same = now === last ? same + 1 : 0; last = now; await page.waitForTimeout(300);
+  }
   const data = await page.evaluate(() => {
     const names = Object.keys(window.S4 || {}).sort();
     const els = [...document.querySelectorAll('body, body *')].filter((e) => !/^(SCRIPT|STYLE|LINK|META)$/.test(e.tagName));
