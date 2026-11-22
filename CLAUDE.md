@@ -4,7 +4,7 @@ S4 Orion is the owner's personal design system for web apps and pages: Material 
 contrast-guaranteed glass layer on floating chrome. It replaces the older **S4 Material** skill. **S4 Glass is a separate,
 unrelated system**; don't mix the two. The repo was renamed from `s4-material` to `s4-orion` (2026-11); the product is **S4 Orion**.
 
-**Start every session by reading [`docs/NEXT.md`](docs/NEXT.md)** (and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the long view and what Orion will not become): current phase, the plan for what's left, the backlog
+**Start every session by reading [`docs/NEXT.md`](docs/NEXT.md) and [`docs/PLAN.md`](docs/PLAN.md)** (the goal, current stage, how workstreams run) (and [`docs/ROADMAP.md`](docs/ROADMAP.md) for the long view and what Orion will not become): current phase, the plan for what's left, the backlog
 and the open questions. Update it (and the README phase table and CHANGELOG) before ending any session that changed
 something, so the next session can pick up cold.
 
