@@ -5,7 +5,17 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
-## Now (2026-11-22, round 0058): the re-grade's blockers, in two workstreams
+## Now (2026-11-22, round 0059): review 3's Top 10, in two workstreams
+
+**Workstream A** (decision 0067, built; B is decision 0068, notes in `history/round-0059/b.md`): dial values are validated
+(`S4.theme` warns and writes nothing for a value off a dial's list, the page checker fails bad `data-*` values); a data
+table says its header keys (`aria-description` and a hint line); 0049 lets a palette or search the person's own shortcut
+opened hold the cursor; the page checker's one-glyph-box rule was fixed (it missed a zero-width box) and, like mid-word
+breaks, is proven on known-bad pages in `tests/fixtures` (`npm run test:checker`); Back restoring scroll and focus has a
+test (`npm run test:back`); CHANGELOG 1.0.0 (2026-11-13) and 1.1.0 (2026-11-22) are dated, 1.2.0 collects this round.
+**For the main session at publish:** tag 1.0.0 at `b72df1a^`, 1.1.0 at `383dedb`; 1.2.0 after review 4.
+
+## Before (2026-11-22, round 0058): the re-grade's blockers, in two workstreams
 
 An independent re-grade listed what blocks a 10 in each area. Round 0058 takes them in two workstreams (owner's lead,
 2026-11-21). **Workstream A** (decision 0065, built): Back keeps your place and focus; focus never drops to `<body>`

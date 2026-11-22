@@ -78,7 +78,7 @@ accessibility, so some scores fell although nothing got worse.
    the Electron example), VoiceOver on a dialog and the table. Device-only bugs come before anything new.
 5. **Review 3** (done, c089ade, [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md)): 9 / 8.5 / 8.5 / 9 / 8.5 / 8.5 / 8.5 / 9; nothing a 10 yet.
 6. **Round 0059 — current stage**: review 3's Top 10, in two workstreams.
-   - **A** (branch `round59/a`, worktree `r59-a`, decision 0067, owns shared docs): dial values validated (dev warning
+   - **A** (built, decision 0067; branch `round59/a`, worktree `r59-a`, owns shared docs): dial values validated (dev warning
      and page checker); grid header keys surfaced (hint, aria-description, README); 0049 wording for shortcut-opened
      palettes; checker rules for mid-word breaks and one-glyph boxes proven on a known-bad page and added to evals; a
      suite test for Back scroll restore; CHANGELOG dates for 1.0.0/1.1.0 (the main session tags at publish).
@@ -103,3 +103,7 @@ action now. The owner can overrule any of these; otherwise they stand.
   grid keyboard for data tables, silent-failure checks in the checker and suite, bare tables and rail FABs, `.s4-num`,
   statuses are tints, one tonal tool per toolbar, Parley finish, drift and `check:words`, issues 61/62/64/65 Done);
   merged origin/s4-orion (PLAN.md). Next: merge B, full tests, publish; then the owner device pass and review 3.
+- 2026-11-22 (round 0059, workstream A): decision 0067 built (dial values validated in `S4.theme` and the checker, grid
+  header keys surfaced, 0049 wording for shortcut-opened palettes, one-glyph-box rule fixed and proven on known-bad
+  fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
+  the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.

@@ -114,6 +114,8 @@ S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft
 | `headings` | `tight`, `editorial` | tight: bold, tracked in (product, tool); editorial: regular weight, open leading (magazine, studio). Use it instead of weight or tracking on headings; pair editorial with a serif display, tight with Inter |
 | `data-density` | comfortable, `compact`, `auto` | desktop tools |
 
+A value that is not in this table is a mistake, not a variation (decision 0067): `S4.theme({ scale: 'roomy' })` logs a warning naming the allowed values and writes nothing, and the page checker fails `data-scale="roomy"` in markup.
+
 Pick at most three dials beyond the accent; an app that turns every dial stops looking designed. Pair them with intent:
 editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mono display for numbers); friendly
 consumer = tinted + rounded display + round. A danger zone is the last pane of settings, neutral, with `<button class="s4-button" data-variant="tonal" data-color="error" data-dialog="confirm">`: never `data-color="error"` on the pane, never a filled red button. What an app can never change: filled (no outlines), no shadows, glass only
@@ -226,7 +228,9 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 **Showing data**
 - Items people scan and open: a **list** (`data-style="segmented"` for grouped rows on a card-like surface).
 - Rows people compare across columns: a **table** (it stacks into rows on phones by itself, in its `.s4-table-wrap`, which
-  table.js adds when it is missing). Right-align numbers with `.s4-num` on their cells.
+  table.js adds when it is missing). Right-align numbers with `.s4-num` on their cells. A data table (`S4.table`) says its
+  header keys itself (an `aria-description` and a hint line while the keyboard is in it: Up from the first row reaches
+  the sort, options and resize controls); keep both, and never add a second explanation.
 - A few rich, independent things: **cards** in an `.s4-grid`. Sections of settings or a dashboard: **panes**.
 - State of a thing: a **status** pill with a word ("Overdue"), never color alone. A status is a tint (decision 0065): no
   tone for usual and finished states (Approved, Paid), `error` or `warning` only for the one state that needs action
