@@ -73,12 +73,22 @@
   };
 
   /* ---------- icons ---------- */
+  /* a page on the site icon set (icons-site.js, decision 0068) that asks for an icon outside it loads the full set file
+     from the same folder once; the full set replaces the registry and every icon is drawn again */
+  var fullIcons = null;
+  function loadFullIcons(url) {
+    if (fullIcons) return; fullIcons = document.createElement('script'); fullIcons.src = url;
+    fullIcons.onload = function () { drawIcons(document); };
+    fullIcons.onerror = function () { console.warn('S4: could not load the full icon set from ' + url); };
+    document.head.appendChild(fullIcons);
+  }
   function drawIcons(scope) {
     var reg = window.S4_ICONS; if (!reg) return;
     S4.util.all(scope, '.s4-icon[data-icon]').forEach(function (el) {
       var name = el.getAttribute('data-icon');
       if (el.dataset.s4Drawn === name) return;
       var body = reg.icons[name];
+      if (!body && reg.full) { loadFullIcons(reg.full); return; }   /* the site icon set lacks it: fetch the whole set once, then draw */
       if (!body) { console.warn('S4: unknown icon "' + name + '"'); return; }
       el.innerHTML = '<svg viewBox="' + reg.viewBox + '" aria-hidden="true" focusable="false">' + body + '</svg>';
       el.dataset.s4Drawn = name;
