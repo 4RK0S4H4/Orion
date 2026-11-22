@@ -11,7 +11,7 @@ the few things an app still has to do.
 | Color contrast | 83 pairs pass WCAG AA in light, dark and both high-contrast modes; the build fails otherwise | `scripts/build-tokens.mjs` |
 | Contrast on glass | Text on glass is ≥ 4.5:1 over any backdrop for every seed (backdrop compression + `on-surface` only) | `glass.css`, `scripts/check-glass.mjs` |
 | Contrast levels | Standard, medium, high; device "more contrast" picks high unless the app chose a level | tokens, `S4.theme({ contrast })` |
-| Focus | 3dp `secondary` ring, 2dp outside, on every interactive element (`:focus-visible`) | `base.css` |
+| Focus | 3dp `secondary` ring, 2dp outside, on every interactive element (`:focus-visible`). A container that takes focus only to hold the place (main, a view, a page, a dialog's own box: `tabindex="-1"` on a non-control) rings only while the person is on the keyboard (`data-s4-input="key"` on `<html>`, set by `core.js`), since WebKit counts a script's focus after a tap as `:focus-visible` | `base.css`, `core.js` |
 | Touch targets | ≥ 48dp on every control, even when the visual is 32 or 40dp | components (`::after` hit areas) |
 | Dense maps of real things | `data-dense` on a seat plan, a keyboard, a calendar's cells (never on ordinary controls): each target drawn ≥ 18px and ≥ 24px from the centre of its nearest neighbour (WCAG 2.5.8's spacing rule), arrow keys between them (decision 0063) | the suite's phone pass |
 | Reduced motion | Spatial springs become instant; fades remain; JS animations read the same tokens; the reach suite checks nothing keeps looping | tokens, `S4.motion` |

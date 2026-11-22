@@ -8,6 +8,7 @@
      scroll   after Back the view is where it was when the opener was tapped (within 4px), not at the top
      focus    focus is back on the opener (or inside it), never on <body>
      field    nothing put the cursor in a text field on the way (decision 0049)
+   Then (round 0061) a tapped view switch on the Showcase and Dosewise leaves no ring round the screen, and the keyboard keeps it.
    Usage: node tests/back.mjs [--browser=chromium|webkit]   (default chromium) */
 import { readFileSync, existsSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -85,6 +86,27 @@ for (const t of TARGETS) for (const v of VIEWS) {
     say(!r.onBody && r.onOpener, `${route}: focus is back on an opener (it is on ${r.onBody ? '<body>' : r.at})`);
   }
   say(!errs.length, `no script errors${errs.length ? ': ' + errs[0] : ''}`);
+  await ctx.close();
+}
+/* round 0061: a place-holder that takes focus on the way (a view, the main landmark) rings only for the keyboard. On an
+   iPhone a tap focuses no link, so the view takes focus after every switch, and WebKit counts a script's focus as
+   :focus-visible: the whole screen was outlined. The tap is replayed as iOS does it (pointerdown, then a click that moves
+   no focus), on the Showcase and Dosewise at 390 dark. */
+for (const file of ['demo/index.html', 'examples/brand-trial/index.html']) {
+  const ctx = await browser.newContext(VIEWS[0]), page = await ctx.newPage();
+  console.log(`${file}: no ring round the screen after a tap (round 0061)`);
+  await page.goto(`${ORIGIN}/${file}`, { waitUntil: 'load' }); await page.waitForTimeout(700);
+  const ring = () => page.evaluate(() => { const a = document.activeElement, cs = getComputedStyle(a); return { at: a.tagName.toLowerCase() + (typeof a.className === 'string' && a.className ? '.' + a.className.trim().split(/\s+/)[0] : ''), ring: cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0, holder: a !== document.body && !a.matches('a[href], button, input, select, textarea, [role]') }; });
+  const tap = (i) => page.evaluate((i) => { const x = document.querySelectorAll('.s4-app > .s4-nav-bar .s4-nav-item')[i]; x.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })); x.click(); }, i);
+  await tap(1); await page.waitForTimeout(800);
+  let r = await ring();
+  say(r.holder, `a tapped view switch leaves focus on a place-holder (it is on ${r.at})`);
+  say(!r.ring, `the ${r.at} it landed on draws no ring after a tap`);
+  await page.keyboard.press('Shift+Tab'); await page.keyboard.press('Tab');
+  await page.evaluate(() => { const app = document.querySelector('.s4-app'); S4.app.go(app, document.querySelector('.s4-app .s4-view[hidden]').dataset.view); });
+  await page.waitForTimeout(800);
+  r = await ring();
+  say(r.holder && r.ring, `on the keyboard the ${r.at} it lands on keeps its ring`);
   await ctx.close();
 }
 await browser.close(); server.close();
