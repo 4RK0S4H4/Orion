@@ -264,6 +264,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 **Desktop windows** (decision 0062; start from `desktop-app.html`, shells from the repo's `examples/`)
 - Write every action once: `S4.commands.add([...])`; menus come from `S4.commands.menu(name, …)`, buttons take `data-cmd`; the menu bar, right-click menus, shortcuts, the palette and a shell's native menu read the same list. Never a menu's items, a key handler and a palette entry written separately.
 - Use only the parts the app's jobs need: title bar, sidebar (the rail as a source list, `.s4-tree` inside) and content for a small tool; add `.s4-menubar`, `.s4-doc-tabs` (only for things opened and closed; a fixed set of views is tabs), `.s4-inspector` (solid, in the layout, for properties used all day) and `.s4-statusbar` when there are files, properties and state.
+- Window buttons: on a Mac and in an installed web app the system draws them. Only a frameless Windows or Linux shell draws `.s4-window-controls` (Minimize, Maximize, Close as `.s4-window-control[data-window-action]`, empty buttons with an `aria-label`): full cells to the window's top and end edges so the corner hits Close (decision 0072); never restyle them smaller or pad them away from the edge.
 - Settings is a view with categories, search and instant changes with Undo (mod+comma), never a dialog. Standard keys: mod+N/O/S/W/Z, mod+Shift+Z, mod+F, mod+comma, F2 (Enter on a Mac) to rename, Shift+F10 for the context menu. Put `data-density` on `<html>` so menus and panels follow it.
 
 **Two color modes** (decision 0052): neutral (default: white or near-black surfaces, the seed is an accent) and tinted (`S4.theme({ seed, surfaces: 'tinted' })`: every surface takes the color, the M3 Expressive look). Use tinted when the user asks for a color-themed app or the app already is one; never mix. **Nested corners are concentric:** something rounded sitting tight in a rounded container's corner has radius = outer radius minus the gap (`calc(var(--s4-shape-dialog) - var(--s4-space-2))`), or is a pill. **Glass is only for what floats over content;** a toolbar in the page flow is a solid joined button group.
@@ -400,7 +401,8 @@ Run `node <skill>/scripts/check.mjs page.html` (Playwright). It loads the page a
 desktop (every app-shell view, not just the first) and reports console errors, unknown icons, sideways scroll, text below WCAG AA as rendered (including on glass),
 app CSS that breaks the rules above (hex colors, `!important`, glass on content, raw durations, bare element
 selectors), and silent failures: an `s4-` class nothing defines (a misremembered name styles nothing), a word split
-across lines or a box one glyph wide, a part outside its component. Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
+across lines or a box one glyph wide, a part outside its component, window controls short of the window's edges, and the
+same word and overflow checks frozen in the middle of every motion (rail, dialog, panel, menu, expand, page). Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
 
 It also warns on more than one filled action on the first screen (0070).
 

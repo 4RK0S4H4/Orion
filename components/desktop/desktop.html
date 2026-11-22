@@ -26,7 +26,7 @@
     <div style="block-size:calc(var(--s4-space-16) * 6);overflow:hidden;border-radius:var(--md-sys-shape-corner-large)">
       <div class="s4-app" data-window data-density="compact" style="block-size:100%">
         <header class="s4-titlebar"><span class="s4-titlebar-title">Ledger</span>
-          <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"><span class="s4-icon" data-icon="chevron-down"></span></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"><span class="s4-icon" data-icon="close"></span></button></div>
+          <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button></div>
         </header>
         <nav class="s4-nav-rail" aria-label="Main" data-expanded>
           <div class="s4-nav-rail-header"><button class="s4-fab" type="button" data-shortcut="mod+n"><span class="s4-icon" data-icon="add"></span><span class="s4-fab-label">New Bill</span></button></div>
@@ -74,6 +74,20 @@
         <button class="s4-button" type="button" data-size="s"><span class="s4-icon" data-icon="add"></span>New Booking</button>
       </header></div>
     </div>
+  </section>
+
+  <section class="ex-sec">
+    <h2>Window Controls</h2>
+    <p>For a frameless window on Windows or Linux whose shell draws no buttons of its own. They act like Windows' own: each is a full cell, the bar's whole height and 46 wide, with no gap to the window's top and end edges, so throwing the pointer into the top corner hits Close and the top edge hits the control below it. What is drawn stays Orion: a firm filled layer on hover and press, line glyphs, Close turning error only on hover and press. Maximized, Maximize becomes Restore. Right to left, they mirror to the start, as Windows mirrors such a window. On a Mac the system draws the traffic lights; on an installed web app the window controls overlay does, and these step out.</p>
+    <div class="ex-board col dk-bars" data-density="compact">
+      <div class="dk-frame"><header class="s4-titlebar"><span class="s4-titlebar-title">Harbour Log, 2027</span>
+        <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button></div>
+      </header></div>
+      <div class="dk-frame" dir="rtl" lang="ar"><header class="s4-titlebar"><span class="s4-titlebar-title">سجل الميناء</span>
+        <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="تصغير"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="تكبير" data-label-restore="استعادة"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="إغلاق"></button></div>
+      </header></div>
+    </div>
+    <p style="margin-top:var(--s4-space-3)"><output id="dk-win" class="s4-body-medium s4-on-surface-variant">Each control fires <code>s4-window</code>; here Maximize toggles the maximized state.</output></p>
   </section>
 
   <section class="ex-sec">
@@ -132,6 +146,11 @@
 <script src="../_example/example.js"></script>
 <script>
   document.getElementById('dk-insp-hide').addEventListener('click', function () { S4.desktop.inspector(this.closest('.s4-inspector'), false); S4.snackbar && S4.snackbar({ text: 'Inspector hidden' }); });
+  document.addEventListener('s4-window', function (e) {
+    var root = document.documentElement, a = e.detail.action;
+    if (a === 'maximize') { if (e.detail.maximized) delete root.dataset.windowState; else root.dataset.windowState = 'maximized'; }
+    document.getElementById('dk-win').textContent = a === 'maximize' ? (e.detail.maximized ? 'Restore' : 'Maximize') + ' ran: the button now shows ' + (e.detail.maximized ? 'Maximize.' : 'Restore.') : (a === 'minimize' ? 'Minimize' : 'Close') + ' ran (a shell would ' + a + ' the window).';
+  });
   ['dk-save', 'dk-export'].forEach(function (id) { document.getElementById(id).addEventListener('click', function () { document.getElementById('dk-out').textContent = this.firstChild.textContent + ' ran.'; }); });
 </script>
 </body>

@@ -610,6 +610,7 @@ with an optional menu button and FAB. Uses the same `.s4-nav-item` as the [navig
 |---|---|
 | `data-expanded` | Expanded rail: wider (`--s4-nav-rail-expanded-width`, default 240), labels beside icons, label-large, a 56dp pill spanning icon and label, surface-container. |
 | `[data-rail-toggle]` | Button that flips `data-expanded`; `aria-expanded` and the optional `data-label-expand/collapse` labels follow. |
+| `data-s4-moving` (set by the script) | While the edge moves (Morph), the contents keep the expanded layout and the edge clips them, so no label wraps or reflows mid-motion (issue 70); cleared when the width arrives. Don't set it yourself. |
 | `.s4-nav-rail-header` | Menu button and FAB slot. In the collapsed rail the FAB's label is hidden (icon FAB); expanded it shows (extended FAB). |
 | `.s4-nav-rail-items` | The destinations (`.s4-nav-item`, see nav bar). |
 
@@ -882,7 +883,9 @@ step out (under 600 or 840), the rail becomes the nav bar, and each list opens i
 | `.s4-titlebar-title`, `data-align="start"` | The title, centered (or at the start) |
 | `.s4-titlebar-spacer` | Pushes what follows to the end |
 | `data-controls="start"` on the title bar | Room for the Mac's traffic lights in a frameless window (also automatic with `<html data-platform="mac" data-shell="electron\|tauri">`) |
-| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless shells that do not draw their own; each click fires `s4-window { action }` on the document. Wire it to the shell. |
+| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless Windows and Linux shells that draw none (decision 0072): empty buttons with an `aria-label`, in that order, last in the title bar. Full cells like Windows' (46 by the bar's height, touching the window's top and end edges: the corner pixel hits Close), a firm layer on hover and press, drawn glyphs, Close `error` on hover and press only. Each click fires `s4-window { action, maximized }` on the document: wire it to the shell. Hidden on a Mac shell, in the window controls overlay and in full screen. |
+| `data-label-restore` on Maximize | The label while `<html data-window-state>` holds `maximized` (default Restore); the glyph changes with it |
+| `hidden data-shell-controls` on `.s4-window-controls` | Written in the page, shown by `examples/shell-bridge.js` when the shell says it draws no buttons (`controls: 'own'`) |
 | `.s4-inspector` (+ `.s4-inspector-header`, `-title`, `-body`, `details.s4-inspector-group`, `.s4-inspector-fields`, `.s4-inspector-row`) | The properties pane at the window's end: solid, resizable from its start edge (drag, arrows, Home/End, Enter hides it), `data-resize-key` remembers the width, groups fold with Reveal. From 840 wide. `S4.desktop.inspector(el, on)`; `--s4-inspector-width`. |
 | `data-shortcut="mod+k"` | That key combination clicks the element. `mod` is ⌘ on Apple platforms, Ctrl elsewhere; also `shift`, `alt`. |
 | `<kbd class="s4-kbd">` | Shows a shortcut. Empty inside a `data-shortcut` or `data-cmd` element (or with `data-for="id"`), it is filled in the platform's spelling. |
@@ -894,7 +897,7 @@ step out (under 600 or 840), the rail becomes the nav bar, and each list opens i
 | `<html data-window-state="fullscreen overlay maximized">` | `fullscreen` (no room kept for the traffic lights), `overlay` (an installed web app draws into the title bar area); set by the script where the browser knows, or by the shell |
 
 Script: `S4.desktop.platform`, `S4.desktop.format('mod+k')` (⌘K or Ctrl+K), `S4.desktop.matches(event, 'mod+k')`,
-`S4.desktop.inspector(el, on)`. Events: `s4-window { action }`, `s4-context { target }`.
+`S4.desktop.inspector(el, on)`. Events: `s4-window { action, maximized }`, `s4-context { target }`.
 
 ### The window
 
@@ -906,6 +909,37 @@ draggable as a window.
 them (`data-controls="start"`), full screen gives it back. On Windows and Linux they are at the end: an installed web app
 with window controls overlay draws its title bar into `env(titlebar-area-*)` (`.s4-titlebar` already reads it), and
 Electron's `titleBarOverlay` does the same. Draw `.s4-window-controls` only in a frameless shell that draws none.
+
+**Orion's own window controls** (decision 0072, issue 69) look like Orion and act like Windows':
+
+```html
+<header class="s4-titlebar">
+  <span class="s4-titlebar-title">Ledger</span>
+  <div class="s4-window-controls">
+    <button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button>
+    <button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button>
+    <button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button>
+  </div>
+</header>
+```
+
+- *Hit area:* each control is a full cell, 46 wide (`--s4-size-window-control`) and the bar's whole height, with no gap
+  between them or to the window's top and end edges (the bar drops its end padding when it holds them). Throw the
+  pointer into the top corner and it is on Close; along the top edge it is on the control below (Fitts's law). The cell
+  is square on purpose: a rounded cell would miss the corner pixel.
+- *Look:* a firm filled layer (8, inset 4 and 2) on hover and press (State), never a disc or a pill; line glyphs drawn
+  by the component (any icon inside is hidden); Close turns `error` on hover and press only, never red at rest. While
+  `<html data-window-state>` holds `maximized` (the shell sets it), Maximize draws Restore and is labelled Restore.
+  A window not in front dims the glyphs.
+- *Right to left:* they mirror to the start with Close at the far start, as Windows mirrors a right-to-left window;
+  the corner rule holds for the top left.
+- *Drag and resize:* the controls are `app-region: no-drag`. In a Windows or Linux shell, while the window is neither
+  maximized nor full screen, the bar's top 4px are not a drag region, so the shell's resize band along the top edge
+  still works (Electron lets a drag region win over it); the system's invisible borders resize the other edges. So, as
+  on Windows, the very top pixel resizes a restored window and is Close's in a maximized one. Tauri: put
+  `data-tauri-drag-region` on the bar only, never on the controls.
+- *Proof:* the page checker and the suite fail a control under 40 wide or shorter than its bar, Close short of the
+  window's end edge, and a corner or top-edge pixel that hits anything else in the bar.
 
 **In front or not.** A window that is not in front dims its chrome a step and its selections turn gray, as every
 desktop does, so you can tell which window has the keyboard. Content never dims.
@@ -921,7 +955,7 @@ keep the pointing hand.
 | | Mac | Windows | Linux (GNOME, KDE) |
 |---|---|---|---|
 | Menu bar | The system's, at the top of the screen (shell builds it from the commands) | In the window (`.s4-menubar`), or none with everything in the palette and toolbars | In the window |
-| Window buttons | Traffic lights at the start | At the end | At the end (GNOME: close only, by default) |
+| Window buttons | Traffic lights at the start (the system's) | At the end; mirrored to the start in right-to-left | At the end (GNOME: close only, by default) |
 | Settings | App menu, "Settings…", ⌘, | File or Tools menu, "Settings", Ctrl+, | Main menu, "Preferences" or "Settings", Ctrl+, |
 | Quit | App menu, ⌘Q | File, Exit (Alt+F4 closes) | File, Quit, Ctrl+Q |
 | Rename | Enter | F2 | F2 |
@@ -964,7 +998,7 @@ sidebar, status bar or inspector (they don't float).
 **Accessibility:** shortcuts never fire while typing unless they use `mod`; context menus are normal menus (arrows,
 Escape, typeahead) and return focus; the grips are separators with values and arrow keys; every landmark has a name.
 
-**Tokens:** `--s4-size-titlebar`, `--s4-size-menubar-item`, `--s4-size-doc-tab`, `--s4-size-statusbar`,
+**Tokens:** `--s4-size-titlebar`, `--s4-size-window-control`, `--s4-size-menubar-item`, `--s4-size-doc-tab`, `--s4-size-statusbar`,
 `--s4-size-tree-row`, `--s4-size-tree-indent`, `--s4-size-inspector`, `--s4-density-compact-*`.
 
 **A real shell:** [`examples/`](../../examples/) has an Electron skeleton (frameless window, drag regions, traffic

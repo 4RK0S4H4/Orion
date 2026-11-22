@@ -7,7 +7,8 @@
      plain data (S4.commands.native), again whenever a command or its state changes; a native menu click runs the
      command here. Elsewhere the in-window menu bar is the menu.
    - The shell's window state becomes <html data-window-blurred> and data-window-state="fullscreen maximized".
-   - s4-window { action } from .s4-window-control buttons goes to the shell.
+   - s4-window { action } from .s4-window-control buttons goes to the shell. When the shell's state says controls: 'own'
+     (a frameless Windows or Linux window), .s4-window-controls[data-shell-controls] written hidden in the page are shown.
    Without window.orionShell (a browser tab) it does nothing. */
 (function () {
   var shell = window.orionShell, S4 = window.S4, root = document.documentElement;
@@ -28,6 +29,8 @@
   shell.onMenu(function (id) { S4.commands.run(id, { source: 'native-menu' }); });
   shell.onWindowState(function (s) {
     root.toggleAttribute('data-window-blurred', !s.focused);
+    /* a frameless window on Windows or Linux with no system buttons: show the page's own (decision 0072) */
+    if (s.controls === 'own') document.querySelectorAll('.s4-window-controls[data-shell-controls][hidden]').forEach(function (c) { c.hidden = false; });
     var words = [s.fullscreen && 'fullscreen', s.maximized && 'maximized'].filter(Boolean);
     if (words.length) root.dataset.windowState = words.join(' '); else delete root.dataset.windowState;
   });

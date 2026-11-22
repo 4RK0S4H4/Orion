@@ -213,6 +213,7 @@
     --s4-size-badge: 16px;
     --s4-size-nav-row: 48px;
     --s4-size-titlebar: 40px;
+    --s4-size-window-control: 46px;
     --s4-size-statusbar: 28px;
     --s4-size-menubar-item: 28px;
     --s4-size-doc-tab: 40px;
@@ -4027,6 +4028,11 @@
   }
   .s4-nav-rail[data-expanded] { --_w: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
   .s4-nav-rail[data-resizing] { transition: none; }
+  /* issue 70: while the edge moves (data-s4-moving, set by nav-rail.js for the length of the Morph), the contents keep
+     the expanded layout and the edge clips them: labels never wrap or reflow mid-motion, they fade (State) and are
+     revealed or covered by the edge */
+  .s4-nav-rail[data-s4-moving] > * { min-inline-size: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
+  .s4-nav-rail[data-s4-moving] > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) { min-inline-size: calc(var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)) - var(--s4-size-nav-rail) + var(--s4-size-nav-row)); }
 
   .s4-nav-rail-header,
   .s4-nav-rail-items,
@@ -4075,8 +4081,8 @@
   }
   .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
-  .s4-nav-rail:not([data-expanded]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
-  .s4-nav-rail[data-expanded] .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
+  .s4-nav-rail:is([data-expanded], [data-s4-moving]) .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {
@@ -4166,7 +4172,7 @@
   .s4-nav-rail:not([data-expanded]) button.s4-nav-rail-title { pointer-events: none; }
   /* a tree in the rail lines its icons up with the items' icons; collapsed it steps out (a tree is not icons) */
   .s4-nav-rail .s4-tree { --_pad: calc((var(--_row) - var(--s4-size-icon)) / 2 - var(--s4-size-icon-small) + var(--s4-space-1)); }
-  .s4-nav-rail:not([data-expanded]) .s4-tree { display: none; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-tree { display: none; }
   /* one accent fill per region (decision 0068): the rail marks where you are once. While one of its items is current,
      a tree's selection in the rail (the open file, the current language) is a setting of that place, so it is marked
      neutral: the highest container and the heavier label. A rail with no current item leaves the tree its accent fill. */
@@ -4202,7 +4208,7 @@
     transition: opacity var(--s4-motion-state);
   }
   .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-fab > :not(.s4-icon)) { opacity: 0; }
-  .s4-nav-rail:not([data-expanded]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
   /* written straight into the rail (without its header or items group), the main action and the items keep the inset
      they have in their groups (decision 0065); the inset is the rail's own, not the FAB's --_pad */
   .s4-nav-rail > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) {
@@ -4587,7 +4593,7 @@
    <div class="s4-app" data-window data-density="auto">
      <header class="s4-titlebar">                                   optional: a draggable title bar
        <span class="s4-titlebar-title">Ledger</span>
-       <div class="s4-window-controls">…</div>                      optional: only for frameless windows that draw their own
+       <div class="s4-window-controls">…</div>                      optional: only for frameless windows that draw none (0072)
      </header>
      <nav class="s4-nav-rail" data-expand="auto">…</nav>
      <div class="s4-app-body">…</div>
@@ -4662,6 +4668,20 @@
   .s4-titlebar :is(.s4-icon-button, .s4-button):focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
   .s4-titlebar[data-controls="start"],
   :root[data-platform="mac"][data-shell]:not([data-shell="pwa"]) .s4-titlebar { padding-inline-start: calc(var(--s4-space-16) + var(--s4-space-4)); }
+  /* a frameless window resizes from its edges (decision 0072). In a Windows or Linux shell, while the window is neither
+     maximized nor full screen, the bar's top 4 pixels are not a drag region, so the shell's resize band along the top
+     still works (Electron lets a drag region win over its resize band). Maximized, there is nothing to resize: the top
+     edge and the corner belong to the window controls, as on Windows. */
+  :root[data-shell]:not([data-shell="pwa"], [data-platform="mac"]):not([data-window-state~="maximized"], [data-window-state~="fullscreen"]) .s4-titlebar { position: relative; }
+  :root[data-shell]:not([data-shell="pwa"], [data-platform="mac"]):not([data-window-state~="maximized"], [data-window-state~="fullscreen"]) .s4-titlebar::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: var(--s4-space-1);
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
   /* full screen: the system hides its window buttons, so the bar stops keeping room for them */
   :root[data-window-state~="fullscreen"] .s4-titlebar { padding-inline: var(--s4-space-3); }
   @media (display-mode: fullscreen) { .s4-titlebar { padding-inline: var(--s4-space-3); } }
@@ -4703,28 +4723,87 @@
   /* on a phone there is no window to drag: the title bar goes away and the top app bar leads */
   @container s4-app (width < 600px) { .s4-app > .s4-titlebar { display: none; } }
 
-  /* window buttons for frameless windows that draw their own (Windows and Linux shells) */
-  .s4-window-controls { display: flex; align-items: center; gap: var(--s4-space-1); margin-inline-start: auto; }
+  /* ---------- window controls (decision 0072): Minimize, Maximize or Restore, Close ----------
+     Only for a frameless window whose shell draws none (Electron or Tauri with no frame on Windows and Linux).
+     <div class="s4-window-controls">
+       <button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button>
+       <button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button>
+       <button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button>
+     </div>
+     They behave as Windows' own: each is a full cell, the bar's whole height and 46 wide, the last one touching the
+     window's end edge and all of them its top edge with no gap, so a pointer thrown into the top corner hits Close and
+     one thrown at the top edge hits the control below it (Fitts's law; the title bar keeps no end padding for them).
+     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), line glyphs drawn here
+     (any icon inside the button is replaced), Close turning error only on hover and press (never red at rest), the
+     Restore glyph and label while the window is maximized. In right-to-left they mirror to the start with Close at the
+     far start, as Windows mirrors a right-to-left window. They step out where the system draws its own buttons: a
+     Mac shell (traffic lights), the window controls overlay of an installed web app, full screen. */
+  :root:not([data-window-state~="overlay"], [data-window-state~="fullscreen"], [data-platform="mac"][data-shell]:not([data-shell="pwa"])) .s4-titlebar:has(> .s4-window-controls:not([hidden])) { padding-inline-end: 0; }
+  .s4-window-controls {
+    display: flex;
+    flex: none;
+    align-self: stretch;
+    margin-inline-start: auto;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+  .s4-window-controls[hidden],
+  :root[data-window-state~="overlay"] .s4-window-controls,
+  :root[data-window-state~="fullscreen"] .s4-window-controls,
+  :root[data-platform="mac"][data-shell]:not([data-shell="pwa"]) .s4-window-controls { display: none; }
   .s4-window-control {
-    display: inline-grid;
+    --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.75 6h8.5'/%3E%3C/svg%3E");
+    --_fill: transparent;
+    position: relative;
+    display: grid;
+    flex: none;
     place-items: center;
-    inline-size: var(--s4-density-compact-icon-button);
-    block-size: var(--s4-density-compact-button-small);
+    inline-size: var(--s4-size-window-control);
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--md-sys-shape-corner-full);
+    border-radius: 0;                                  /* the cell is the hit box: a rounded cell would miss the corner pixel */
     background: transparent;
-    color: inherit;
+    color: var(--md-sys-color-on-surface);
     cursor: default;
-    --s4-icon-size: var(--s4-space-4);
-    transition: background-color var(--s4-motion-state), color var(--s4-motion-state);
+    -webkit-tap-highlight-color: transparent;
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+    transition: color var(--s4-motion-state);
   }
+  .s4-window-control > * { display: none; }
+  /* the drawn layer: firm (8, never sharp, never a pill), inset so neighbours stay apart */
+  .s4-window-control::before {
+    content: "";
+    position: absolute;
+    inset: var(--s4-space-1) calc(var(--s4-space-1) / 2);
+    border-radius: var(--md-sys-shape-corner-small);
+    background: var(--_fill);
+    transition: background-color var(--s4-motion-state);
+  }
+  .s4-window-control::after {
+    content: "";
+    position: relative;
+    inline-size: var(--s4-space-3);
+    block-size: var(--s4-space-3);
+    background: currentColor;
+    -webkit-mask: var(--_glyph) center / 100% no-repeat;
+    mask: var(--_glyph) center / 100% no-repeat;
+  }
+  .s4-window-control[data-window-action="maximize"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='1.75' width='8.5' height='8.5' rx='2'/%3E%3C/svg%3E"); }
+  :root[data-window-state~="maximized"] .s4-window-control[data-window-action="maximize"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='3.75' width='6.5' height='6.5' rx='1.5'/%3E%3Cpath d='M3.9 1.75h4.35a2 2 0 0 1 2 2v4.35'/%3E%3C/svg%3E"); }
+  .s4-window-control[data-window-action="maximize"]:dir(rtl)::after { transform: scaleX(-1); }
+  .s4-window-control[data-window-action="close"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.25 2.25l7.5 7.5M9.75 2.25l-7.5 7.5'/%3E%3C/svg%3E"); }
   @media (hover: hover) {
-    .s4-window-control:hover { background: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent); color: var(--md-sys-color-on-surface); }
-    .s4-window-control[data-window-action="close"]:hover { background: var(--s4-color-badge); color: var(--s4-color-on-badge); }
+    .s4-window-control:hover { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 150%), transparent); }
+    .s4-window-control[data-window-action="close"]:hover { --_fill: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
   }
-  .s4-window-control:focus-visible { outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  .s4-window-control:active { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-dragged-state-layer-opacity) * 100%), transparent); }
+  .s4-window-control[data-window-action="close"]:active { --_fill: color-mix(in srgb, var(--md-sys-color-error), var(--md-sys-color-on-error) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%)); color: var(--md-sys-color-on-error); }
+  /* the ring follows the drawn layer, not the square cell */
+  .s4-window-control:focus-visible { outline: none; }
+  .s4-window-control:focus-visible::before { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
+  :root[data-window-blurred] .s4-window-control:not(:hover, :active) { color: var(--md-sys-color-on-surface-variant); }
 
   /* ---------- inspector: the properties of the selection, a pane at the window's end ----------
      <aside class="s4-inspector" aria-label="Inspector" data-density="compact" data-resize-key="app-inspector">
@@ -4877,6 +4956,11 @@
   @media (forced-colors: active) {
     .s4-titlebar { border-block-end: 1px solid CanvasText; }
     .s4-kbd { border: 1px solid CanvasText; }
+    .s4-window-control::after { forced-color-adjust: none; background: ButtonText; }
+    .s4-window-control::before { forced-color-adjust: none; }
+    .s4-window-control:is(:hover, :active)::before { background: Highlight; }
+    .s4-window-control:is(:hover, :active)::after { background: HighlightText; }
+    .s4-window-control:focus-visible::before { outline-color: Highlight; }
   }
 }
 

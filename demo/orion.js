@@ -1520,6 +1520,24 @@ S4.register('nav-rail', function (scope) {
     }
     new MutationObserver(titles).observe(rail, { attributes: true, attributeFilter: ['data-expanded'] });
     titles();
+    /* issue 70: while the edge moves (Morph), what is inside keeps the expanded layout and the rail's edge clips it, so
+       no label wraps or reflows mid-motion; data-s4-moving holds it until the width has arrived */
+    var moving = null;
+    function settle() { clearTimeout(moving); moving = null; rail.removeAttribute('data-s4-moving'); }
+    /* the fallback for a lost transitionend: wait while the width is still on its way (or held, as the scrubber does) */
+    function check() {
+      var going = rail.getAnimations ? rail.getAnimations().some(function (a) { return /^(width|inline-size)$/.test(a.transitionProperty) && a.playState !== 'finished'; }) : false;
+      if (going) moving = setTimeout(check, 200); else settle();
+    }
+    new MutationObserver(function () {
+      if (rail.hasAttribute('data-resizing')) return;
+      var ms = Math.max.apply(null, getComputedStyle(rail).transitionDuration.split(',').map(function (d) { return (parseFloat(d) || 0) * 1000; }));
+      if (!ms) { settle(); return; }
+      rail.setAttribute('data-s4-moving', '');
+      clearTimeout(moving);
+      moving = setTimeout(check, ms + 120);
+    }).observe(rail, { attributes: true, attributeFilter: ['data-expanded'] });
+    rail.addEventListener('transitionend', function (e) { if (e.target === rail && e.propertyName === 'inline-size' && moving) settle(); });
 
     /* data-expand="auto": expanded on large windows (1200 and up, M3 Expressive), collapsed below, until the person
        uses the toggle (their choice then sticks for the page's life) */
@@ -2022,8 +2040,9 @@ S4.register('search', function (scope) {
    - data-context-menu="menu-id" on any element: right-click (or a long press on touch) opens that .s4-menu at the
      pointer instead of the browser's menu. The menu gets .contextTarget (the element) and fires s4-context { target }
      before it opens; choosing an item fires the menu's usual s4-select.
-   - [data-window-action="minimize|maximize|close"] fires s4-window { action } on the document: wire it to the shell
-     (Electron ipc, Tauri window API). Orion never talks to a shell itself.
+   - [data-window-action="minimize|maximize|close"] fires s4-window { action, maximized } on the document: wire it to the
+     shell (Electron ipc, Tauri window API); Orion never talks to a shell itself. While <html data-window-state> holds
+     "maximized", Maximize is labelled Restore (or its data-label-restore) and draws the Restore glyph (decision 0072).
    - Commands (S4.commands, components/commands/) with a shortcut run on it from anywhere, with the same rules.
    - Shift+F10 or the menu key opens an element's data-context-menu from the keyboard, under the element.
    - <html data-window-blurred> while the window is not in front; <html data-window-state="fullscreen"> in full
@@ -2123,7 +2142,7 @@ S4.register('search', function (scope) {
 
   document.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-window-action]');
-    if (b) S4.util.emit(document, 's4-window', { action: b.dataset.windowAction });
+    if (b) S4.util.emit(document, 's4-window', { action: b.dataset.windowAction, maximized: /(^|\s)maximized(\s|$)/.test(root.dataset.windowState || '') });
   });
 
   /* ---------- the window: in front or not, full screen, drawing into the title bar ---------- */
@@ -2138,6 +2157,18 @@ S4.register('search', function (scope) {
   if (window.matchMedia) { var fs = matchMedia('(display-mode: fullscreen)'); state('fullscreen', fs.matches || !!document.fullscreenElement); if (fs.addEventListener) fs.addEventListener('change', function () { state('fullscreen', fs.matches); }); }
   var wco = navigator.windowControlsOverlay;
   if (wco) { state('overlay', wco.visible); wco.addEventListener('geometrychange', function (e) { state('overlay', e.visible); }); }
+  /* window controls (decision 0072): while the window is maximized, Maximize is Restore (its glyph is the CSS's) */
+  function maximized() { return /(^|\s)maximized(\s|$)/.test(root.dataset.windowState || ''); }
+  function windowLabels() {
+    var max = maximized();
+    document.querySelectorAll('.s4-window-control[data-window-action="maximize"]').forEach(function (b) {
+      if (!b.dataset.labelMaximize) b.dataset.labelMaximize = b.getAttribute('aria-label') || 'Maximize';
+      var want = max ? (b.dataset.labelRestore || 'Restore') : b.dataset.labelMaximize;
+      if (b.getAttribute('aria-label') !== want) b.setAttribute('aria-label', want);
+    });
+  }
+  if (window.MutationObserver) new MutationObserver(windowLabels).observe(root, { attributes: true, attributeFilter: ['data-window-state'] });
+  windowLabels();
 
   /* ---------- the inspector ---------- */
   function store(key, v) { try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, String(v)); } catch (e) {} }

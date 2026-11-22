@@ -17,6 +17,21 @@ enough to never be in the way, but never looking instant. This amends 0022 (simp
 (transform and opacity, one transition per element, nothing cloned) unless the owner agrees otherwise; record as a new
 decision and show options in a motion lab with the scrubber before building.
 
+## Owner notes (2026-11-22)
+
+- **69.** Done 2026-11-22 (decision 0072). Title bar window controls: "I really like how it's unique from windows, but I
+  think we need to make it act similar to windows in some ways like how if I am in the very top right corner then the
+  hit box area still applies to the close window button despite it not being exactly over it. also I think these
+  buttons should be bigger and more firm as I don't want it to be too different from the windows buttons." The controls
+  are full 46-wide cells to the window's top and end edges, a firm layer inside, Close error only on hover.
+  Image: `img/2026-11-22-titlebar-window-buttons.png`.
+- **70.** Done 2026-11-22 (decision 0072). Rail expand: "when maximizing the side bar there is a small animation glitch
+  where it seems like the text wraps as the side bar is resizing. I would hope that glitches like these are caught during
+  bug reviews." The rail's contents keep the expanded layout while its edge moves; the checker and suite now freeze
+  every motion at 25, 50 and 75%. Images: `img/2026-11-22-rail-expand-wrap-1.png` (collapsed),
+  `img/2026-11-22-rail-expand-wrap-2.png` (mid-way: "New Script" one letter per line), `img/2026-11-22-rail-expand-wrap-3.png`
+  (expanded).
+
 ## Owner notes (2026-11-21)
 
 - **67.** Done 2026-11-21 (decision 0064). Docked glass bars "look a bit weird with the edge glow": docked bars keep tint

@@ -53,6 +53,11 @@
   }
   .s4-nav-rail[data-expanded] { --_w: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
   .s4-nav-rail[data-resizing] { transition: none; }
+  /* issue 70: while the edge moves (data-s4-moving, set by nav-rail.js for the length of the Morph), the contents keep
+     the expanded layout and the edge clips them: labels never wrap or reflow mid-motion, they fade (State) and are
+     revealed or covered by the edge */
+  .s4-nav-rail[data-s4-moving] > * { min-inline-size: var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)); }
+  .s4-nav-rail[data-s4-moving] > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) { min-inline-size: calc(var(--s4-nav-rail-expanded-width, var(--s4-size-nav-rail-expanded)) - var(--s4-size-nav-rail) + var(--s4-size-nav-row)); }
 
   .s4-nav-rail-header,
   .s4-nav-rail-items,
@@ -101,8 +106,8 @@
   }
   .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
-  .s4-nav-rail:not([data-expanded]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
-  .s4-nav-rail[data-expanded] .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-fab > :not(.s4-icon) { white-space: nowrap; }
+  .s4-nav-rail:is([data-expanded], [data-s4-moving]) .s4-fab { white-space: normal; overflow-wrap: anywhere; text-align: start; }
 
   /* ---------- items: rows ---------- */
   .s4-nav-rail .s4-nav-item {
@@ -192,7 +197,7 @@
   .s4-nav-rail:not([data-expanded]) button.s4-nav-rail-title { pointer-events: none; }
   /* a tree in the rail lines its icons up with the items' icons; collapsed it steps out (a tree is not icons) */
   .s4-nav-rail .s4-tree { --_pad: calc((var(--_row) - var(--s4-size-icon)) / 2 - var(--s4-size-icon-small) + var(--s4-space-1)); }
-  .s4-nav-rail:not([data-expanded]) .s4-tree { display: none; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-tree { display: none; }
   /* one accent fill per region (decision 0068): the rail marks where you are once. While one of its items is current,
      a tree's selection in the rail (the open file, the current language) is a setting of that place, so it is marked
      neutral: the highest container and the heavier label. A rail with no current item leaves the tree its accent fill. */
@@ -228,7 +233,7 @@
     transition: opacity var(--s4-motion-state);
   }
   .s4-nav-rail:not([data-expanded]) :is(.s4-nav-label, .s4-nav-rail-title, .s4-fab > :not(.s4-icon)) { opacity: 0; }
-  .s4-nav-rail:not([data-expanded]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
+  .s4-nav-rail:not([data-expanded], [data-s4-moving]) .s4-nav-rail-title { block-size: var(--s4-space-4); padding-block: 0; }
   /* written straight into the rail (without its header or items group), the main action and the items keep the inset
      they have in their groups (decision 0065); the inset is the rail's own, not the FAB's --_pad */
   .s4-nav-rail > :is(.s4-fab, .s4-nav-item, .s4-nav-rail-title) {

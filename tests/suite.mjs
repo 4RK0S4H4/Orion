@@ -17,7 +17,8 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
-import { knownClasses, silentAudit } from '../skill/orion/scripts/silent.mjs';
+import { knownClasses, silentAudit, windowAudit } from '../skill/orion/scripts/silent.mjs';
+import { midMotion } from '../skill/orion/scripts/midmotion.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
@@ -352,6 +353,7 @@ async function use(page, add, phone) {
       if (!isOpen) { add(`dialog "${id}" did not open`); continue; }
       const f = await fits(id); if (f) add(`dialog "${id}" ${f}`);
       (await page.evaluate(nestAudit)).forEach(add);
+      (await page.evaluate(windowAudit)).forEach(add);                    /* window controls are full cells (decision 0072) */
       const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); }, id);
       if (fieldFocused) add(`dialog "${id}" put the cursor in a text field when it opened (decision 0049)`);
       /* decision 0064: on a phone a dialog or panel sits in the bottom of the screen, in reach of the thumb, and a swipe
@@ -1204,6 +1206,9 @@ async function runPage(browser, bname, rel, mode, reduced) {
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
+      /* mid-motion (issue 70): rail, dialog, panel, menu, expand, accordion and page frozen at 25, 50 and 75% */
+      (await midMotion(page)).forEach(add);
+      await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
     }
     await use(page, add, mode.phone);
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
@@ -1363,6 +1368,51 @@ if (want.includes('chromium') && !arg('preset', '') && targets.includes('templat
       }
     } catch (e) { add('touch keyboard check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
     await ctx.close(); await b3.close(); ran++;
+  }
+}
+/* decision 0072: Parley in a frameless Windows shell (a stub of window.orionShell, the real shell-bridge.js). The page's
+   own window controls appear, the window's top right corner pixel (top left in right-to-left) hits Close, the top edge
+   above each control hits it, each is at least 40 wide and the bar's height, Close is not red at rest and is error on
+   hover, Maximize says Restore and draws another glyph while maximized, a click reaches the shell, and a Mac shell
+   shows none of them. */
+if (want.includes('chromium') && !arg('preset', '') && targets.includes('templates/desktop-app.html')) {
+  let b4 = null; try { b4 = await pw.chromium.launch(); } catch (e) {}
+  if (b4) {
+    const bridge = readFileSync(join(root, 'examples/shell-bridge.js'), 'utf8');
+    for (const [platform, dir] of [['windows', 'ltr'], ['windows', 'rtl'], ['mac', 'ltr']]) {
+      const label = `window controls (${platform}, ${dir})  templates/desktop-app.html`, add = (m) => failures.push({ label, list: [m] });
+      const ctx = await b4.newContext({ viewport: { width: 1280, height: 800 }, colorScheme: 'light' }), page = await ctx.newPage();
+      await page.addInitScript((pf) => { window.__acts = []; window.orionShell = { name: 'electron', platform: pf, setMenu() {}, windowAction(a) { window.__acts.push(a); }, onMenu() {}, onWindowState(fn) { window.__state = fn; } }; }, platform);
+      try {
+        await page.goto(ORIGIN + '/templates/desktop-app.html', { waitUntil: 'load', timeout: 30000 }); await page.waitForTimeout(600);
+        await page.evaluate(([src, d]) => { document.documentElement.dir = d; (0, eval)(src); window.__state({ focused: true, fullscreen: false, maximized: false, controls: window.orionShell.platform === 'mac' ? 'system' : 'own' }); }, [bridge, dir]);
+        await page.waitForTimeout(300);
+        const shown = await page.evaluate(() => { const c = document.querySelector('.s4-titlebar .s4-window-controls'); return !!(c && c.getClientRects().length && c.getBoundingClientRect().width); });
+        if (platform === 'mac') { if (shown) add('a Mac shell shows the page\'s window controls (the system draws the traffic lights)'); await ctx.close(); continue; }
+        if (!shown) { add('a frameless Windows shell did not show the page\'s window controls'); await ctx.close(); continue; }
+        (await page.evaluate(windowAudit)).forEach(add);
+        const corner = await page.evaluate((d) => { const h = document.elementFromPoint(d === 'rtl' ? 0 : innerWidth - 1, 0); const c = h && h.closest('.s4-window-control'); return c ? c.dataset.windowAction : (h ? h.tagName.toLowerCase() + '.' + [...h.classList].join('.') : 'nothing'); }, dir);
+        if (corner !== 'close') add(`the window's top ${dir === 'rtl' ? 'left' : 'right'} corner pixel hits ${corner}, not Close`);
+        const fill = (sel) => page.evaluate((q) => getComputedStyle(document.querySelector(q), '::before').backgroundColor, sel);
+        const probe = await page.evaluate(() => { const i = document.createElement('i'); i.style.cssText = 'position:absolute;background:var(--md-sys-color-error)'; document.body.appendChild(i); const c = getComputedStyle(i).backgroundColor; i.remove(); return c; });
+        const closeSel = '.s4-titlebar [data-window-action="close"]';
+        await page.mouse.move(640, 400); await page.waitForTimeout(300);   /* the pointer starts at 0,0: in right-to-left that is over Close */
+        if (await fill(closeSel) === probe) add('Close is red at rest (decision 0072: error only on hover and press)');
+        const box = await (await page.$(closeSel)).boundingBox();
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(400);
+        if (await fill(closeSel) !== probe) add(`Close does not turn error on hover (${await fill(closeSel)})`);
+        const maxSel = '.s4-titlebar [data-window-action="maximize"]', glyph = () => page.evaluate((q) => getComputedStyle(document.querySelector(q), '::after').maskImage || getComputedStyle(document.querySelector(q), '::after').webkitMaskImage, maxSel);
+        const g1 = await glyph();
+        await page.evaluate(() => window.__state({ focused: true, fullscreen: false, maximized: true, controls: 'own' })); await page.waitForTimeout(200);
+        const lab = await page.evaluate((q) => document.querySelector(q).getAttribute('aria-label'), maxSel);
+        if (lab !== 'Restore') add(`maximized, Maximize is labelled "${lab}", not Restore`);
+        if (await glyph() === g1) add('maximized, Maximize still draws the Maximize glyph');
+        await page.click(maxSel);
+        if (!(await page.evaluate(() => window.__acts)).includes('maximize')) add('a click on Maximize did not reach the shell');
+      } catch (e) { add('window controls check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+      await ctx.close(); ran++;
+    }
+    await b4.close();
   }
 }
 server.close();

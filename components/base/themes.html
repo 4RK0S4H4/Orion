@@ -10,6 +10,9 @@
   /* page-only: small app frames built from tokens */
   .th-window { display: flex; min-height: calc(var(--s4-size-nav-rail) * 6); overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
   .th-window > .s4-nav-rail { height: auto; }
+  /* a picture of an app window: under 600 an app has no expanded rail (the nav bar leads), so the picture keeps its rail as icons */
+  .th-window { container-type: inline-size; }
+  @container (width < 600px) { .th-window [data-rail-toggle] { display: none; } }
   .th-page { flex: 1; min-width: 0; padding: var(--s4-space-6); display: flex; flex-direction: column; gap: var(--s4-space-4); }
   .th-band { display: flex; flex-direction: column; gap: var(--s4-space-4); padding: var(--s4-space-8) var(--s4-space-6); border-radius: var(--md-sys-shape-corner-extra-large); }
   .th-band h3 { margin: 0; font-family: var(--md-sys-typescale-display-small-font); font-size: var(--md-sys-typescale-display-small-size); line-height: var(--md-sys-typescale-display-small-line-height); font-weight: var(--md-sys-typescale-display-small-weight); letter-spacing: var(--md-sys-typescale-display-small-tracking); }

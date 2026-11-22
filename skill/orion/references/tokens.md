@@ -261,6 +261,7 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-size-badge` | 16px |  |  |
 | `--s4-size-nav-row` | 48px |  | A navigation row in the rail: icon and label side by side. |
 | `--s4-size-titlebar` | 40px |  | Desktop app title bar (window controls overlay, Electron, Tauri). |
+| `--s4-size-window-control` | 46px |  | Width of one window control cell (Minimize, Maximize, Close) in a frameless window's title bar: the bar's full height, as Windows draws them (decision 0072). |
 | `--s4-size-statusbar` | 28px |  | Desktop window status bar (desktop only, from 840). |
 | `--s4-size-menubar-item` | 28px |  | A top-level item of the in-window menu bar. |
 | `--s4-size-doc-tab` | 40px |  | A document tab (open files, records) in a desktop window. |

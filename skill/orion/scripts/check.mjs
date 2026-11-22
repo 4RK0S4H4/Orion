@@ -8,7 +8,9 @@
                 answer, or a form: decision 0064), and app CSS that breaks the house rules (hex/rgb colors, !important, hand-written durations or
                 easings, glass on content, bare element selectors), and silent failures (decision 0065): an s4- class nothing
                 defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill,
-                a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067)
+                a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067),
+                window controls that are not full cells to the window's top and end edges (decision 0072), and a
+                word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs)
      warnings – more than one filled button in one area, more than one filled accent action on the first screen
                 (decision 0070), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -17,7 +19,8 @@ import { resolve, dirname, basename, join, parse, sep } from 'node:path';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { knownClasses, silentAudit } from './silent.mjs';
+import { knownClasses, silentAudit, windowAudit } from './silent.mjs';
+import { midMotion } from './midmotion.mjs';
 
 const argv = process.argv.slice(2);
 const outIdx = argv.indexOf('--out');
@@ -300,7 +303,8 @@ for (const page of pages) {
       r.names.forEach((x) => errors.add(`${at} control with no accessible name (add aria-label): ${x}`));
       r.glassContent.forEach((x) => errors.add(`${at} glass on content: ${x}`));
       r.roles.forEach((x) => errors.add(`${at} ${x}`));
-      (r.dials || []).forEach((x) => errors.add(`${at} ${x}`));   /* a dial attribute with a value Orion has no rule for (decision 0067) */
+      (r.dials || []).forEach((x) => errors.add(`${at} ${x}`));
+      (r.windows || []).forEach((x) => errors.add(`${at} ${x}`));   /* window controls are full cells to the window's edges (decision 0072) */   /* a dial attribute with a value Orion has no rule for (decision 0067) */
       (r.unknown || []).forEach((x) => errors.add(`${at} unknown class ${x}: nothing in Orion or the page defines it (check the name in the component's README)`));
       (r.broken || []).forEach((x) => errors.add(`${at} ${x}: the box is too narrow for its words (a fixed width, a column that cannot stack, or a part outside its component)`));
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
@@ -310,7 +314,7 @@ for (const page of pages) {
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };
     await p.evaluate(knownClasses);
-    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])) });
+    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])), windows: await p.evaluate(windowAudit) });
     report(await audited());
     const shot = join(OUT, `${label}-${v.name}.png`);
     await p.screenshot({ path: shot, fullPage: true });
@@ -322,6 +326,8 @@ for (const page of pages) {
       await p.waitForTimeout(900);
       report(await audited(), `view "${name}"`);
     }
+    /* mid-motion (issue 70): the rail, dialogs, panels, menus, expands, accordions and pages frozen at 25, 50 and 75% */
+    (await midMotion(p)).forEach((x) => errors.add(`[${v.name}] ${x}: nothing may wrap or reflow while it moves (lay it out at its end size and clip or fade it)`));
     await ctx.close();
   }
 
