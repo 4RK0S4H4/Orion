@@ -573,14 +573,15 @@
   }
   @media print {
     .s4-table-wrap[data-virtual] { max-height: none; overflow: visible; }
-    /* paper has its own width: the columns share it, and nothing is pinned */
-    .s4-table[data-fixed] { table-layout: auto; inline-size: 100%; }
-    .s4-table[data-fixed] :is(th, td) { white-space: normal; }
-    .s4-table[data-fixed] :is(th, td)[data-pin] { position: static; }
-    .s4-table[data-fixed] > colgroup { display: none; }
+    /* paper has its own width: the columns share it, and nothing is pinned (also when a phone-width screen had stacked the rows, so there was no fixed layout) */
+    /* resizable data tables have many columns: on paper they share the width equally (auto layout kept each cell's padding and longest word, wider than the sheet) */
+    .s4-table:is([data-fixed], [data-s4-cols]) { table-layout: fixed; inline-size: 100%; }
+    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td) { white-space: normal; overflow-wrap: anywhere; }
+    .s4-table:is([data-fixed], [data-s4-cols]) :is(th, td)[data-pin] { position: static; }
+    .s4-table:is([data-fixed], [data-s4-cols]) > colgroup { display: none; }
     .s4-table :is(th, td):is([data-check], [data-row-expand], [data-row-actions]) { display: none; }
     .s4-table th, .s4-table-sort { white-space: normal; }
-    .s4-table-input { min-inline-size: 0; }
+    .s4-table-input { min-inline-size: 0; inline-size: 100%; }   /* an input's own width must not stretch a column past the sheet */
     .s4-table-grip, .s4-table-col-menu { display: none; }
   }
 }
