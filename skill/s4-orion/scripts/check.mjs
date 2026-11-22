@@ -9,7 +9,8 @@
                 easings, glass on content, bare element selectors), and silent failures (decision 0065): an s4- class nothing
                 defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill,
                 a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067)
-     warnings – more than one filled button in one area, labels that look sentence case
+     warnings – more than one filled button in one area, more than one filled accent action on the first screen
+                (decision 0070), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, basename, join, parse, sep } from 'node:path';
@@ -194,6 +195,17 @@ function audit() {
   const filled = [...document.querySelectorAll('.s4-button:not([data-variant])')].filter((b) => !hidden(b) && b.getClientRects().length && !b.closest('.s4-button-group'));
   const byParent = new Map(); for (const b of filled) { const p = b.parentElement; byParent.set(p, (byParent.get(p) || []).concat(b)); }
   for (const [p, bs] of byParent) if (bs.length > 1) issues.filled.push(`${bs.length} filled buttons in ${path(p)}: ${bs.map((b) => '"' + b.textContent.trim() + '"').join(', ')}`);
+  /* one filled action per screen (decision 0070): on the first screen at rest, count every solid accent fill that asks
+     to be pressed (buttons and FABs drawn in the primary color, pressed chips), each against its own scope's primary.
+     A site header's action is the hero's action kept in reach as the page scrolls (one job), so it is not counted. */
+  const onScreen = (e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth; };
+  const loudFills = [...document.querySelectorAll('.s4-button, .s4-fab, .s4-chip[aria-pressed="true"]')].filter((b) => {
+    if (hidden(b) || !b.getClientRects().length || !onScreen(b) || b.closest('dialog, [popover], .s4-menu, .s4-button-group, .s4-sheet, .s4-site-header')) return false;
+    const probe = document.createElement('i'); probe.style.cssText = 'position:absolute;background:var(--md-sys-color-primary)'; b.parentElement.appendChild(probe);
+    const primary = getComputedStyle(probe).backgroundColor; probe.remove();
+    return getComputedStyle(b).backgroundColor === primary;
+  });
+  if (loudFills.length > 1) issues.screenFilled = [`${loudFills.length} accent fills: ${loudFills.map((b) => '"' + b.textContent.trim().slice(0, 30) + '"').join(', ')}`];
   /* Title Case labels */
   const small = new Set('a an the and but or nor for so yet on at to by in of up as vs via with per from into off out over'.split(' '));
   for (const e of document.querySelectorAll('.s4-button, .s4-chip, .s4-tab, .s4-nav-label, .s4-menu-item, th, .s4-app-bar-title, .s4-pane-title, .s4-card-title, .s4-dialog-title, .s4-sheet-title, .s4-text-field label')) {
@@ -282,6 +294,7 @@ for (const page of pages) {
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
       (r.loud || []).forEach((x) => errors.add(`${at} ${x}: a status is a tint (no data-tone, or success, warning, info, error; the accent tones draw as a wash); only the state that needs action now is warm`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));
+      (r.screenFilled || []).forEach((x) => warnings.add(`${at} more than one filled action on one screen at rest (decision 0070: one filled main action; step the others down to elevated, no "All" chip pressed): ${x}`));
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };
     await p.evaluate(knownClasses);
