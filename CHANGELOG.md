@@ -17,6 +17,13 @@ Round 0060, workstream A, review 4's blockers (decision 0069):
 - Fixed: closing a dialog, sheet or the palette with no opener (Ctrl+K from a fresh load, then Escape) left focus on `<body>`; it now returns to what had focus, else the main landmark (`S4.util.land()`), and the suite fails the old behaviour.
 - Fixed: the data table's hint line was hidden on every coarse pointer; a tablet with a keyboard now sees it after the first navigation key in the table (a phone keeps its space). Checked and guarded: a table's toolbar "Columns" button is not inside the table.
 
+Round 0060, workstream B, hierarchy and a brand trial (decision 0070):
+
+- Changed: one accent job per screen (refines 0068): the rail's main action steps down to elevated by itself while the open view shows a filled button (`data-variant="elevated"` pins it); the open row beside its detail is neutral (`data-split-open`); Parley, Relay, Moorings, Stock and the Showcase lose their second filled action and their pressed "All" chip.
+- Added: `data-clearable` on a single-select chip set (none pressed is everything; pressing the pressed chip clears it); the filter's first saved view may be `hidden: true` (Linnea's All Records: no chip, none pressed is every record).
+- Changed: chart columns are 16 wide at most (were 24); the Showcase's side column is two panes (Storage folded into Folders) and ends above the fold at 1280 and 1600.
+- Added: the page checker warns on more than one filled accent action on the first screen (`tests/fixtures/loud-screen.html`); `examples/brand-trial/` (Dosewise, a product built from the skill alone) and its lessons: `references/patterns.md` gained "One accent job per screen" and "Making it the app's own" and lost six statements that contradicted later decisions; SKILL.md's worked example, charts bullet and display-stack note were corrected.
+
 Round 0059 (decisions 0067 and 0068).
 
 Workstream A, the small things review 3 found (decision 0067):

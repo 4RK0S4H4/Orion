@@ -82,7 +82,7 @@ from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` 
   is fluid, app type is not. Start-aligned; center only short blocks (a short hero, the pricing heading, a closing band).
 - **One accent a page:** the featured plan, the call-to-action band, one bento cell or a cover. Toned bands are inset
   rounded blocks, never full-bleed stripes. Bento spans add up to 12 per row; equal grids use `data-columns`.
-- **Selection:** one filled selection per screen, and in a region (rail, pane, card, header) at most one accent selection fill and one filled main action (decision 0068: the rest neutral, `elevated` or `text`); a second "you are here" mark (a table of contents, a header beside a
+- **One accent job per screen (decision 0070):** one filled action and one accent selection (the navigation's) at rest; other selections neutral, other actions `elevated`, `tonal` or `text`; no pressed chip at rest. A site header's action does not count (it is the hero's, kept in reach as the page scrolls).
   docs sidebar) is quieter. A site header never opens with a nav item selected.
 - **Pictures:** no network fetches, no gray boxes, no gradients. Show real Orion components in a phone or browser frame
   (`inert`, `role="img"`, an `aria-label`), covers set in type on a tone, or the media empty state. Real images get
@@ -196,7 +196,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   `data-width="wide"` (1600) for tables, boards and editors; the default (1200) for dashboards.
 - **Two panes:** `.s4-split` (list-detail, the default) or `.s4-split[data-layout="supporting"]`: one pane at a time on
   phones, side by side from 840. Don't hand-build split grids.
-- **The rail is side navigation:** rows with the label beside the icon; it shows labels by itself from 1200 and is one icon wide below that. Add a `[data-rail-toggle]` menu button (icon `menu`, a hamburger) when there are more than four destinations. Its `.s4-fab` is the screen's main action as a solid button.
+- **The rail is side navigation:** rows with the label beside the icon; it shows labels by itself from 1200 and is one icon wide below that. Add a `[data-rail-toggle]` menu button (icon `menu`, a hamburger) when there are more than four destinations. Its `.s4-fab` is the app's main action as a solid button; while the open view shows a filled button of its own it steps down to elevated by itself (0070).
 - **Desktop apps and desktop-first tools:** `data-window data-density="auto"` on `.s4-app` (the window never scrolls as a page, controls are pointer-sized with a mouse), a `.s4-titlebar`, `data-shortcut="mod+n"` on primary actions with `<kbd class="s4-kbd"></kbd>` in their menu items, and `data-context-menu="id"` on rows. Never restyle components to make them smaller: density does it.
 - Read `references/patterns.md` for screen patterns (dashboard, list and detail, settings, forms, empty states, theming).
 
@@ -224,7 +224,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - Raise contrast with `S4.theme({ contrast: 0.5 | 1 })`, never by darkening one color.
 
 **Actions**
-- One **filled** button per area for the main action; **tonal** for a strong second; **text** for the rest. Nothing is ever outlined (decision 0023): fields, chips, checkboxes, radios and cards are filled; the old `outlined` variants draw filled. Small things are pills (chips, status, buttons, fields, FAB); no sharp or squared corners on them.
+- One **filled** button per area for the main action, and one per screen at rest (0070: the next act on the work in front of the person); **tonal** for a strong second; **text** for the rest. Nothing is ever outlined (decision 0023): fields, chips, checkboxes, radios and cards are filled; the old `outlined` variants draw filled. Small things are pills (chips, status, buttons, fields, FAB); no sharp or squared corners on them.
 - A **FAB** only when one action dominates a screen (Add Bill); never two FABs.
 - Icon-only actions are icon buttons with `aria-label` and usually a `data-tooltip`.
 - **Tabs, button group or chips** (decision 0059): if it swaps what is on the screen, it is **tabs** (`.s4-tabs`, every tab with a `tabpanel`); if it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid, units), it is a **connected button group** (`data-connected data-select="single|multi"`, 2 to 5 short options, the Ink Track); if it narrows a collection and there can be many, it is **filter chips**. Never a button group with `aria-controls` panels, never tabs without panels: the page checker fails both.
@@ -253,8 +253,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   an `<input inputmode="numeric">` inside for an exact value).
 - Long text (articles, help, AI answers): **prose** (`.s4-prose`) on a reading-width page. Conversations: **messages**
   (`.s4-thread`, `.s4-message[data-from="me"]`) with a glass `.s4-composer`.
-- Charts: draw them in the app (SVG or divs) from role colors: past values `surface-container-highest`, the current or
-  selected value `primary`, labels `on-surface-variant`, a text alternative (`role="img"` + `aria-label`).
+- Charts: `.s4-chart` (one series the accent, several `--s4-chart-1…6`, a table view always); draw by hand only a shape it lacks, from role colors, with a text alternative (`role="img"` + `aria-label`).
 
 **Data at scale** (decision 0061; markup in `references/components.md`)
 - Keyboard: a data table is two Tab stops (header, body); never add `tabindex` to cells or header controls yourself.
@@ -312,6 +311,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - A custom floating panel can opt in with `class="s4-glass"`; a card can't.
 
 **Type and writing**
+- `humanist`, `rounded` and `geometric` are system stacks: on Android and Linux they often fall back to plain sans. A brand whose face matters ships one file in a `custom` stack.
 - Use the type scale classes (`.s4-headline-small`, `.s4-title-medium`, `.s4-body-medium`, `.s4-label-large`…) or the
   `--md-sys-typescale-*` tokens; add `.s4-emphasized` for the M3 Expressive weight on a key number or title.
 - Numbers people compare (amounts, counts, dates, IDs) get `.s4-num` (tabular figures); in a table cell or header it also
@@ -365,8 +365,7 @@ Request: "Add a screen to my expenses app listing this month's bills, with a way
     <h2 class="s4-headline-small">October</h2>
     <span class="s4-num s4-title-large s4-emphasized">$4,459.13</span>
   </div>
-  <div class="s4-chip-set" data-select="single" aria-label="Filter bills">
-    <button class="s4-chip" data-type="filter" aria-pressed="true" type="button"><span class="s4-chip-check"></span>All</button>
+  <div class="s4-chip-set" data-select="single" data-clearable aria-label="Filter bills">
     <button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Due</button>
     <button class="s4-chip" data-type="filter" aria-pressed="false" type="button"><span class="s4-chip-check"></span>Overdue</button>
   </div>
@@ -402,6 +401,8 @@ desktop (every app-shell view, not just the first) and reports console errors, u
 app CSS that breaks the rules above (hex colors, `!important`, glass on content, raw durations, bare element
 selectors), and silent failures: an `s4-` class nothing defines (a misremembered name styles nothing), a word split
 across lines or a box one glyph wide, a part outside its component. Look at the two screenshots it saves too. Fix what it reports, run it once more, then hand over.
+
+It also warns on more than one filled action on the first screen (0070).
 
 Also check by eye: one filled button per area, Title Case labels, status words, the nav bar on a phone and the rail on a
 desktop, and both themes.

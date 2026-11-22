@@ -391,7 +391,7 @@ function load() {
           { field: 'year', label: 'Collected', type: 'range', icon: 'calendar', min: 1830, max: 2026, grouping: false }
         ],
         views: [
-          { id: 'all', name: 'All Records' },
+          { id: 'all', name: 'All Records', hidden: true },
           { id: 'on-loan', name: 'On Loan', state: { f: { status: ['On Loan'] }, sort: { field: 'year', dir: 'ascending' } } },
           { id: 'conservation', name: 'In Conservation', state: { f: { status: ['Conservation'] } } },
           { id: 'victorian-birds', name: 'Victorian Birds', state: { f: { group: ['Birds'], year: { min: 1837, max: 1901 } }, sort: { field: 'year', dir: 'ascending' } } }

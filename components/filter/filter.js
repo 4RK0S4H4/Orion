@@ -34,7 +34,7 @@
     this.key = el.getAttribute('data-key');
     this.noun = this.opts.noun || 'record'; this.nouns = this.opts.nouns || 'records';
     this.state = blank();
-    this.builtin = (this.opts.views || []).map(function (v) { return { id: v.id, name: v.name, state: clean(Object.assign(blank(), v.state || {})), builtin: true }; });
+    this.builtin = (this.opts.views || []).map(function (v) { return { id: v.id, name: v.name, hidden: !!v.hidden, state: clean(Object.assign(blank(), v.state || {})), builtin: true }; });
     if (!this.builtin.length) this.builtin = [{ id: 'all', name: 'All', state: clean(blank()), builtin: true }];
     var saved = this.load();
     this.views = this.builtin.concat(saved.views || []);
@@ -98,7 +98,8 @@
       }
       if (this.viewsEl) {
         this.viewsEl.classList.add('s4-chip-set'); this.viewsEl.setAttribute('role', 'group');
-        this.viewsEl.addEventListener('click', function (e) { var c = e.target.closest('.s4-chip[data-view]'); if (c) self.useView(c.dataset.view); });
+        if (this.views[0].hidden) { this.viewsEl.setAttribute('data-select', 'single'); this.viewsEl.setAttribute('data-clearable', ''); }   /* a first view with hidden: true has no chip: none pressed is everything (decision 0070) */
+        this.viewsEl.addEventListener('click', function (e) { var c = e.target.closest('.s4-chip[data-view]'); if (!c) return; self.useView(c.getAttribute('aria-pressed') === 'false' && self.views[0].hidden ? self.views[0].id : c.dataset.view); });   /* chip.js has toggled it first: an unpressed chip means the quiet first view (everything) */
       }
       if (this.activeEl) {
         this.activeEl.classList.add('s4-chip-set'); this.activeEl.setAttribute('role', 'group');
@@ -249,7 +250,7 @@
     drawViews: function () {
       if (!this.viewsEl) return;
       var self = this;
-      this.viewsEl.innerHTML = this.views.map(function (v) {
+      this.viewsEl.innerHTML = this.views.filter(function (v) { return !v.hidden; }).map(function (v) {
         var on = v.id === self.view;
         return '<button class="s4-chip" data-type="filter" type="button" data-view="' + esc(v.id) + '" aria-pressed="' + on + '">' + esc(v.name) + (on && self.modified ? '<span class="s4-filter-modified" aria-label="changed"></span>' : '') + '</button>';
       }).join('');
