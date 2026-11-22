@@ -1520,6 +1520,19 @@ S4.register('nav-rail', function (scope) {
     }
     new MutationObserver(titles).observe(rail, { attributes: true, attributeFilter: ['data-expanded'] });
     titles();
+    /* issue 70: while the edge moves (Morph), what is inside keeps the expanded layout and the rail's edge clips it, so
+       no label wraps or reflows mid-motion; data-s4-moving holds it until the width has arrived */
+    var moving = null;
+    function settle() { clearTimeout(moving); moving = null; rail.removeAttribute('data-s4-moving'); }
+    new MutationObserver(function () {
+      if (rail.hasAttribute('data-resizing')) return;
+      var ms = Math.max.apply(null, getComputedStyle(rail).transitionDuration.split(',').map(function (d) { return (parseFloat(d) || 0) * 1000; }));
+      if (!ms) { settle(); return; }
+      rail.setAttribute('data-s4-moving', '');
+      clearTimeout(moving);
+      moving = setTimeout(settle, ms + 120);
+    }).observe(rail, { attributes: true, attributeFilter: ['data-expanded'] });
+    rail.addEventListener('transitionend', function (e) { if (e.target === rail && e.propertyName === 'inline-size' && moving) settle(); });
 
     /* data-expand="auto": expanded on large windows (1200 and up, M3 Expressive), collapsed below, until the person
        uses the toggle (their choice then sticks for the page's life) */

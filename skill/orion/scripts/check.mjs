@@ -9,7 +9,8 @@
                 easings, glass on content, bare element selectors), and silent failures (decision 0065): an s4- class nothing
                 defines, a word split across lines or a box one glyph wide, a part outside its component, a status drawn as a fill,
                 a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067),
-                window controls that are not full cells to the window's top and end edges (decision 0072)
+                window controls that are not full cells to the window's top and end edges (decision 0072), and a
+                word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs)
      warnings – more than one filled button in one area, more than one filled accent action on the first screen
                 (decision 0070), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -19,6 +20,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { knownClasses, silentAudit, windowAudit } from './silent.mjs';
+import { midMotion } from './midmotion.mjs';
 
 const argv = process.argv.slice(2);
 const outIdx = argv.indexOf('--out');
@@ -324,6 +326,8 @@ for (const page of pages) {
       await p.waitForTimeout(900);
       report(await audited(), `view "${name}"`);
     }
+    /* mid-motion (issue 70): the rail, dialogs, panels, menus, expands, accordions and pages frozen at 25, 50 and 75% */
+    (await midMotion(p)).forEach((x) => errors.add(`[${v.name}] ${x}: nothing may wrap or reflow while it moves (lay it out at its end size and clip or fade it)`));
     await ctx.close();
   }
 

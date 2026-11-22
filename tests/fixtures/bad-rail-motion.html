@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Rail Motion</title>
+<!-- Known-bad fixture (issue 70, after decision 0067). tests/checker.mjs expects the page checker to FAIL this page with
+     the message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  /* what the rail did before issue 70: its contents follow the moving edge, so the labels wrap as it widens */
+  .bad-rail[data-s4-moving] > * { min-inline-size: 0; }
+  .bad-rail .s4-nav-label { white-space: normal; }
+</style>
+</head>
+<body>
+<div class="s4-app">
+  <nav class="s4-nav-rail bad-rail" aria-label="Main">
+    <div class="s4-nav-rail-header"><button class="s4-icon-button" type="button" data-rail-toggle aria-expanded="false" aria-label="Expand Navigation"><span class="s4-icon" data-icon="menu"></span></button></div>
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#scripts" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Scripts</span></a>
+      <a class="s4-nav-item" href="#starred"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="star"></span></span><span class="s4-nav-label">Starred</span></a>
+      <a class="s4-nav-item" href="#translations"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="chat"></span></span><span class="s4-nav-label">Translations</span></a>
+    </div>
+  </nav>
+  <div class="s4-app-body"><main class="s4-content"><h1 class="s4-title-large">Scripts</h1></main></div>
+</div>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

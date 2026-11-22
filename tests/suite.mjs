@@ -18,6 +18,7 @@ import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
 import { knownClasses, silentAudit, windowAudit } from '../skill/orion/scripts/silent.mjs';
+import { midMotion } from '../skill/orion/scripts/midmotion.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
@@ -1204,6 +1205,9 @@ async function runPage(browser, bname, rel, mode, reduced) {
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);
+      await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
+      /* mid-motion (issue 70): rail, dialog, panel, menu, expand, accordion and page frozen at 25, 50 and 75% */
+      (await midMotion(page)).forEach(add);
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
     }
     await use(page, add, mode.phone);
