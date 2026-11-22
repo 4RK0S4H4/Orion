@@ -56,7 +56,10 @@
     budget: { title: 'Budget draft', by: 'Sam Ortiz', when: 'Sunday', folder: 'Personal', tags: ['Money'], body: ['Rent and bills first, then savings on payday, then everything else. The holiday fund is at 60% of the goal.'] },
     photos: { title: 'Photo album', by: 'Lena Fischer', when: 'Oct 28', folder: 'Personal', tags: ['Family', 'Photos'], body: ['Pick forty from the summer, print the best twelve. Ask Grandma which ones she wants framed.'] },
     weekend: { title: 'Weekend Plans', by: 'You', when: 'Today', folder: 'Personal', tags: ['Home'], body: ['Fix the shelf, return the library books, call Mum about Sunday lunch.'] },
-    reading: { title: 'Reading List', by: 'You', when: 'This week', folder: 'Reading', tags: ['Reading'], body: ['Nine articles saved this week: three on city gardens, two on sleep, four you will probably never open.'] }
+    reading: { title: 'Reading List', by: 'You', when: 'This week', folder: 'Reading', tags: ['Reading'], body: ['Nine articles saved this week: three on city gardens, two on sleep, four you will probably never open.'] },
+    garden: { title: 'Community Garden Plan', by: 'Maya Chen', when: '2 days ago', folder: 'Personal', tags: ['Garden', 'Shared'], body: ['Beds one to four go to the school; five and six are ours. Water rota on the shed door, one evening each.', 'Seeds to buy: beans, chard, two kinds of squash. Ask Jonas about the compost bins.'] },
+    offsite: { title: 'Team Offsite Agenda', by: 'Jonas Weber', when: 'Yesterday', folder: 'Work', tags: ['Team', 'Shared'], body: ['Morning: what shipped this year, in ten minutes each. Afternoon: three bets for next year, then a walk.', 'Bring one thing you would stop doing.'] },
+    lunches: { title: 'Lunches for the Week', by: 'Priya Nair', when: 'Monday', folder: 'Recipes', tags: ['Food', 'Shared'], body: ['Monday lentil soup, Tuesday leftovers, Wednesday the big salad, Thursday noodles, Friday out.'] }
   };
   var libRows = [];
   function noteFor(id) {
@@ -114,9 +117,17 @@
           { id: 'long', name: 'Long Reads', state: { f: { words: { min: 1500, max: 3000 } }, sort: { field: 'words', dir: 'descending' } } }
         ]
       });
+      showFolder();
     }, 450);
   }
-  var libLoaded = false;
+  var libLoaded = false, libFolder = null;
+  /* a folder on Home opens All Notes narrowed to that folder (the filter's own state, so Clear All and Back work) */
+  function showFolder() { if (!libFilter || !libFolder) return; libFilter.state = { q: '', f: { folder: [libFolder] }, sort: null }; libFilter.view = null; libFolder = null; libFilter.after(); }
+  $('#folder-list').querySelectorAll('[data-folder]').forEach(function (b) {
+    var f = b.getAttribute('data-folder');
+    b.querySelector('[data-folder-count]').textContent = libRows.filter(function (r) { return r.folder === f; }).length;
+    b.addEventListener('click', function () { libFolder = f; if (libLoaded) setTimeout(showFolder); });
+  });
   $('[data-page="library"]').addEventListener('s4-open', function () { if (!libLoaded) { libLoaded = true; loadLibrary(); } });
   libStates.addEventListener('s4-retry', loadLibrary);
   $('#lib-states [data-filter-clear]').addEventListener('click', function () { if (libFilter) libFilter.clear(); });

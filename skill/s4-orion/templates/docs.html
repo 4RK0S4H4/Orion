@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Layers · Mallet Docs</title>
-<!-- S4 Orion template (copy orion.site.min.css, orion.site.min.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066). Docs. A documentation page from the website kit (components/site): a sidebar of every page (a floating
+<!-- S4 Orion template (copy orion.site.min.css, orion.site.min.js, icons-site.js, icons-solar.js and inter-site.woff2 next to it: the site bundle, decision 0066; icons-site.js holds the icons the site templates draw and fetches icons-solar.js for any other, decision 0068). Docs. A documentation page from the website kit (components/site): a sidebar of every page (a floating
      glass panel on a phone), a dark page head, the page in prose at reading width with a live diagram, callouts, code
      per platform in tabs and a table, "Was this page helpful?" answered in place, "On This Page" contents that follow
      the reader from 1200, and previous and next.
@@ -52,7 +52,8 @@
   .ml-thumbs { display: grid; grid-template-columns: repeat(6, var(--_k)); gap: var(--s4-space-1); margin-block-start: var(--s4-space-2); }
   .ml-half[data-side="left"] .ml-thumbs > :first-child { grid-column: 4; }
   .ml-key { display: grid; place-items: center; aspect-ratio: 1; min-inline-size: 0; overflow: hidden; border-radius: var(--md-sys-shape-corner-small); background: var(--md-sys-color-surface-container-highest); color: var(--md-sys-color-on-surface); font-family: var(--md-ref-typeface-mono); font-size: var(--md-sys-typescale-label-medium-size); line-height: 1; font-weight: 600; text-align: center; transition: background-color var(--s4-motion-state), color var(--s4-motion-state); }
-  .ml-key[data-mod] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+  /* modifiers are told apart by a quieter fill, not the accent: the card's one accent fill is the layer switch (decision 0068) */
+  .ml-key[data-mod] { background: var(--md-sys-color-surface-container-high); color: var(--md-sys-color-on-surface-variant); }
   .ml-thumbs > .ml-key { aspect-ratio: 1 / 1.25; }
   /* column stagger: the middle fingers sit higher, as on the board itself */
   .ml-half[data-side="left"] .ml-keys > .ml-key:nth-child(6n+3), .ml-half[data-side="left"] .ml-keys > .ml-key:nth-child(6n+5) { transform: translateY(calc(var(--s4-space-2) * -1)); }
@@ -61,7 +62,7 @@
   .ml-half[data-side="right"] .ml-keys > :nth-child(6n+3) { transform: translateY(calc(var(--s4-space-3) * -1)); }
   /* the thumb key that holds the shown layer lights up */
   .ml-keymap:has([value="lower"][aria-pressed="true"]) .ml-key[data-hold="lower"],
-  .ml-keymap:has([value="raise"][aria-pressed="true"]) .ml-key[data-hold="raise"] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+  .ml-keymap:has([value="raise"][aria-pressed="true"]) .ml-key[data-hold="raise"] { background: var(--md-sys-color-inverse-surface); color: var(--md-sys-color-inverse-on-surface); }
   .ml-keymap figcaption { margin: 0; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
   @container (width >= 560px) {
     .ml-board { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s4-space-10); }
@@ -281,7 +282,7 @@ mallet flash mallet.toml --side left</code></pre></div>
     </div>
   </div>
 </footer>
-<script src="icons-solar.js" defer></script>
+<script src="icons-site.js" defer></script>
 <script src="orion.site.min.js" defer></script>
 <script>
 addEventListener('DOMContentLoaded', function () {

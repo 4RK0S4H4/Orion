@@ -11,7 +11,7 @@
      Its own elements, drawn from Orion's rules: the runway (an Orion meter since 0063), paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=40f649a">
+<link rel="stylesheet" href="../components/orion.css?v=0ece780">
 <link rel="stylesheet" href="brand/dashboard.css?v=3872ddf">
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -22,16 +22,18 @@
   .tl-period { flex: none; }   /* the period switch keeps its own width; the header wraps instead */
 
   /* the grid: one column on a phone; hero + numbers, then the chart beside who owes us; from 1600 "Coming Up" joins as a third column */
-  .tl-grid { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "numbers" "flow" "owed" "aging" "soon"; }
+  .tl-grid { display: grid; gap: var(--s4-layout-gap); grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "numbers" "flow" "owed" "aging" "sits" "soon"; }
   .tl-grid > * { min-inline-size: 0; }
-  .tl-hero { grid-area: hero; } .tl-numbers { grid-area: numbers; } .tl-flow { grid-area: flow; } .tl-owed { grid-area: owed; } .tl-aging { grid-area: aging; } .tl-soon { grid-area: soon; }
+  .tl-hero { grid-area: hero; } .tl-numbers { grid-area: numbers; } .tl-flow { grid-area: flow; } .tl-owed { grid-area: owed; } .tl-aging { grid-area: aging; } .tl-soon { grid-area: soon; } .tl-sits { grid-area: sits; }
   /* the chart runs the width of the hero and the numbers, at a reading height (it never stretches to a taller
      neighbour); who owes us and the aging bar sit side by side under it */
   @container s4-app (width >= 840px) {
-    .tl-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "hero numbers" "flow flow" "owed aging" "owed soon"; }
+    .tl-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-areas: "hero numbers" "flow flow" "owed aging" "owed sits" "soon soon"; }
   }
   @container s4-app (width >= 1400px) {
-    .tl-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-areas: "hero numbers soon" "flow flow soon" "owed aging soon"; }
+    /* a wide window gets more to read, not more air (decision 0068): the next thirty days fill the third column beside
+       the hero and the chart, and where the cash sits closes the bottom row */
+    .tl-grid { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) minmax(0, 3fr); grid-template-areas: "hero numbers soon" "flow flow soon" "owed aging sits"; }
   }
 
   /* hero: the one number, then how long it lasts */
@@ -74,12 +76,23 @@
   .tl-ages .tl-key[data-tone="error"] { background: var(--md-sys-color-error); }
 
   /* coming up: dated tiles that fill the row on a wide page and stack in the narrow third column */
-  .tl-upcoming { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
+  .tl-upcoming { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
   .tl-upcoming > li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); }
   .tl-up-date { flex-basis: 100%; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
   .tl-up-name { flex: 1 1 6rem; min-inline-size: 0; overflow-wrap: anywhere; }   /* the amount wraps under the name when there is no room beside it */
   .tl-up-amt { font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-title-medium-weight); }
   .tl-up-amt[data-in] { color: var(--s4-color-success); }
+  .tl-soon { display: flex; flex-direction: column; }
+  .tl-soon > .tl-up-total { margin-block-start: auto; }   /* the thirty-day sum closes the pane, however tall the column */
+  .tl-up-total { display: grid; grid-template-columns: repeat(3, minmax(0, max-content)); gap: var(--s4-space-3) var(--s4-space-8); margin: 0; padding-block-start: var(--s4-space-4); }
+  .tl-up-total > div { display: flex; flex-direction: column; gap: calc(var(--s4-space-1) / 2); }
+  .tl-up-total dt { color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); }
+  .tl-up-total dd { margin: 0; font-variant-numeric: tabular-nums; font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: var(--md-sys-typescale-title-medium-weight); }
+  .tl-sits-bar { display: flex; gap: calc(var(--s4-space-1) / 2); block-size: var(--s4-space-4); }
+  .tl-sits-bar > i { flex: var(--w) 1 0; border-radius: var(--md-sys-shape-corner-extra-small); background: var(--md-sys-color-primary); }
+  .tl-sits-bar > i + i { background: var(--md-sys-color-on-surface-variant); }
+  .tl-sits-bar > i:first-child { border-start-start-radius: var(--s4-shape-chip); border-end-start-radius: var(--s4-shape-chip); }
+  .tl-sits-bar > i:last-child { border-start-end-radius: var(--s4-shape-chip); border-end-end-radius: var(--s4-shape-chip); }
   .tl-table-wrap { overflow-x: auto; }
   .tl-accounts { display: grid; gap: var(--s4-layout-gap); grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
   .tl-balance { margin: 0; font-variant-numeric: tabular-nums; }
@@ -183,16 +196,36 @@
               <div><dt><span class="tl-key" data-tone="warning"></span>1–30 Days Late</dt><dd>$3,460</dd></div>
               <div><dt><span class="tl-key" data-tone="error"></span>31–60 Days Late</dt><dd>$6,400</dd></div>
             </dl>
+            <p class="s4-pane-supporting">Clients paid in 23 days on average this year. Northwind is the one late enough to call.</p>
+          </section>
+
+          <section class="s4-pane tl-sits" aria-labelledby="sits-h">
+            <h3 class="s4-pane-title" id="sits-h">Where It Sits</h3>
+            <div class="tl-sits-bar" role="img" aria-label="Cash by account: Operating $62,140, Savings $22,180"><i style="--w: 62140"></i><i style="--w: 22180"></i></div>
+            <dl class="tl-ages">
+              <div><dt><span class="tl-key"></span>Operating ·· 4412</dt><dd>$62,140</dd></div>
+              <div><dt><span class="tl-key" data-out></span>Savings ·· 0907</dt><dd>$22,180</dd></div>
+            </dl>
+            <p class="s4-pane-supporting">The $9,200 tax set aside is in Savings.</p>
           </section>
 
           <section class="s4-pane tl-soon" aria-labelledby="soon-h">
             <h3 class="s4-pane-title" id="soon-h">Coming Up</h3>
+            <p class="s4-pane-supporting">The next thirty days, as booked.</p>
             <ol class="tl-upcoming">
               <li><span class="tl-up-date">Fri, Nov 20</span><span class="tl-up-name">Payroll</span><span class="tl-up-amt">−$8,600</span></li>
               <li><span class="tl-up-date">Tue, Dec 1</span><span class="tl-up-name">Studio rent</span><span class="tl-up-amt">−$2,400</span></li>
               <li><span class="tl-up-date">Expected Dec 3</span><span class="tl-up-name">Contoso deposit</span><span class="tl-up-amt" data-in>+$5,120</span></li>
               <li><span class="tl-up-date">Fri, Dec 4</span><span class="tl-up-name">Adobe and Figma</span><span class="tl-up-amt">−$310</span></li>
+              <li><span class="tl-up-date">Mon, Dec 7</span><span class="tl-up-name">Studio insurance</span><span class="tl-up-amt">−$640</span></li>
+              <li><span class="tl-up-date">Promised Dec 10</span><span class="tl-up-name">Northwind Coffee</span><span class="tl-up-amt" data-in>+$6,400</span></li>
+              <li><span class="tl-up-date">Fri, Dec 18</span><span class="tl-up-name">Payroll</span><span class="tl-up-amt">−$8,600</span></li>
             </ol>
+            <dl class="tl-up-total">
+              <div><dt>In</dt><dd>+$11,520</dd></div>
+              <div><dt>Out</dt><dd>−$20,550</dd></div>
+              <div><dt>Net</dt><dd>−$9,030</dd></div>
+            </dl>
           </section>
         </div>
       </section>
@@ -261,7 +294,7 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Cancel</button><button class="s4-button" data-variant="filled" data-close="save" type="button">Save Draft</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=9b1efac"></script>
-<script src="../components/orion.js?v=8e051cb"></script>
+<script src="../components/orion.js?v=579aa29"></script>
 <script>
 /* the hub's light or dark choice carries over; Tally's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#1d6b52', variant: 'tonal' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
