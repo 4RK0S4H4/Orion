@@ -88,7 +88,7 @@ function checkHtml(file, html) {
 }
 
 const ENGINE = ['components/core/core.js', 'components/motion/motion.js'];
-const GENERATED = /(^|\/)(orion(\.site)?(\.min)?\.(css|js)|icons(-[\w-]+)?\.js|m3color\.js|tokens\.css)$/;   /* generated copies of sources this check reads */
+const GENERATED = /(^|\/)(orion(\.(site|core|data|commands|desktop|direct|inputs|sitekit))?(\.min)?\.(css|js)|icons(-[\w-]+)?\.js|m3color\.js|tokens\.css)$/;   /* generated copies of sources this check reads */
 function walk(dir, out = []) {
   if (!existsSync(join(root, dir))) return out;
   for (const f of readdirSync(join(root, dir))) {

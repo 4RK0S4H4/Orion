@@ -4615,8 +4615,7 @@
   .s4-app[data-window]:has(> .s4-inspector) { grid-template-columns: auto minmax(0, 1fr) auto; }
   /* a status bar takes the last row from end to end: the sidebar stops above it */
   .s4-app[data-window]:has(> .s4-statusbar) > .s4-nav-rail { grid-row: 2; }
-  .s4-app[data-window],
-  .s4-app[data-window] * { scrollbar-width: thin; scrollbar-color: var(--md-sys-color-outline-variant) transparent; }
+  :where(.s4-app[data-window], .s4-app[data-window] *) { scrollbar-width: thin; scrollbar-color: var(--md-sys-color-outline-variant) transparent; }   /* a default: zero specificity, so a component that hides or sets its own scrollbar wins in every bundle (decision 0069: a pack's rule must not depend on file order against core's) */
   /* chrome is not text to select; content is (desktop apps do the same). Controls keep the arrow: the pointing hand
      is for links in content */
   .s4-app[data-window] :is(.s4-titlebar, .s4-nav-rail, .s4-top-app-bar, .s4-toolbar, .s4-tabs, .s4-list-subheader, label,
