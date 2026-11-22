@@ -11,7 +11,7 @@
      Its own elements, drawn from Orion's rules: the runway (an Orion meter since 0063), paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.css?v=0c2d0b2">
+<link rel="stylesheet" href="../components/orion.css?v=d40d105">
 <link rel="stylesheet" href="brand/dashboard.css?v=3872ddf">
 <style>
   /* Tally's own layout and elements: tokens only, nothing restyles an Orion component */
@@ -75,9 +75,9 @@
 
   /* coming up: dated tiles that fill the row on a wide page and stack in the narrow third column */
   .tl-upcoming { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(11rem, 100%), 1fr)); gap: var(--s4-space-2); margin: 0; padding: 0; list-style: none; }
-  .tl-upcoming > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); }
-  .tl-up-date { grid-column: 1 / -1; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
-  .tl-up-name { min-inline-size: 0; overflow-wrap: anywhere; }
+  .tl-upcoming > li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--s4-space-1) var(--s4-space-3); padding: var(--s4-space-3) var(--s4-space-4); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); }
+  .tl-up-date { flex-basis: 100%; color: var(--md-sys-color-on-surface-variant); font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); }
+  .tl-up-name { flex: 1 1 6rem; min-inline-size: 0; overflow-wrap: anywhere; }   /* the amount wraps under the name when there is no room beside it */
   .tl-up-amt { font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-title-medium-weight); }
   .tl-up-amt[data-in] { color: var(--s4-color-success); }
   .tl-table-wrap { overflow-x: auto; }
