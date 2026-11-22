@@ -77,14 +77,14 @@ from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` 
   is fluid, app type is not. Start-aligned; center only short blocks (a short hero, the pricing heading, a closing band).
 - **One accent a page:** the featured plan, the call-to-action band, one bento cell or a cover. Toned bands are inset
   rounded blocks, never full-bleed stripes. Bento spans add up to 12 per row; equal grids use `data-columns`.
-- **Selection:** one filled selection per screen; a second "you are here" mark (a table of contents, a header beside a
+- **Selection:** one filled selection per screen, and in a region (rail, pane, card, header) at most one accent selection fill and one filled main action (decision 0068: the rest neutral, `elevated` or `text`); a second "you are here" mark (a table of contents, a header beside a
   docs sidebar) is quieter. A site header never opens with a nav item selected.
 - **Pictures:** no network fetches, no gray boxes, no gradients. Show real Orion components in a phone or browser frame
   (`inert`, `role="img"`, an `aria-label`), covers set in type on a tone, or the media empty state. Real images get
   `width`, `height`, `loading="lazy"` below the first screen, inside a `.s4-media-box` with a ratio.
 - **Glass** only on the site header (once content scrolls under it) and the phone menu panel. No shadows or outlines.
 - **Files (decision 0066):** link `inter-site.woff2` (preload), `orion.site.min.css`, the brand file, then
-  `icons-solar.js` and `orion.site.min.js` (both `defer`): 173 KB gzip in all. It has the site kit and what a site
+  `icons-site.js` and `orion.site.min.js` (both `defer`; copy `icons-solar.js` beside them for an icon the templates do not use): 147 KB gzip in all. It has the site kit and what a site
   normally shows (buttons, groups, tabs, cards, lists, accordion, static table, stat, ring, meter, prose, code, field
   basics, chips, slider, menu, snackbar, tooltip, glass). A site that needs an app part (dialog, sheet, data table,
   filter, chart, board, rich inputs) loads `orion.min.css` and `orion.min.js` instead. Text outside Latin: use

@@ -2954,8 +2954,8 @@ the optical size axis are kept.
 | Stylesheet | `orion.min.css` 63 KB | `orion.site.min.css` 41 KB | 44 KB |
 | Runtime | `orion.min.js` 114 KB | `orion.site.min.js` 26 KB | 30 KB |
 | Font | `inter-variable.woff2` 161 KB | `inter-site.woff2` 67 KB | 70 KB |
-| Icons | `icons-solar.js` 37 KB | the same | |
-| **Together** | **375 KB** | **171 KB** | **180 KB** |
+| Icons | `icons-solar.js` 37 KB | `icons-site.js` 11 KB (the 37 icons the site templates draw; any other name fetches `icons-solar.js` once) | 12 KB |
+| **Together** | **375 KB** | **147 KB** | **150 KB** |
 
 `npm run check` fails past a budget, when a site template uses a class the site stylesheet does not have, or a
 component whose script the site runtime leaves out. A site that needs one of those (a dialog, a data table, a chart)
@@ -2968,7 +2968,7 @@ own rule, same family name, after the stylesheet).
 <link rel="stylesheet" href="orion.site.min.css">                                       <!-- @font-face uses font-display: swap -->
 <link rel="stylesheet" href="brand.css">                                                <!-- a fixed brand (0063), right after -->
 …
-<script src="icons-solar.js" defer></script>   <!-- one icon set -->
+<script src="icons-site.js" defer></script>   <!-- the site subset; a name outside it fetches icons-solar.js (copy it beside) -->
 <script src="orion.site.min.js" defer></script>
 <script>addEventListener('DOMContentLoaded', function () { S4.theme.restore('app-key', { mode: 'system' }); });</script>
 ```

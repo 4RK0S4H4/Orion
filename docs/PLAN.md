@@ -82,7 +82,7 @@ accessibility, so some scores fell although nothing got worse.
      and page checker); grid header keys surfaced (hint, aria-description, README); 0049 wording for shortcut-opened
      palettes; checker rules for mid-word breaks and one-glyph boxes proven on a known-bad page and added to evals; a
      suite test for Back scroll restore; CHANGELOG dates for 1.0.0/1.1.0 (the main session tags at publish).
-   - **B** (branch `round59/b`, worktree `r59-b`, decision 0068, notes `history/round-0059/b.md`): Parley list column
+   - **B** (built and merged, decision 0068; branch `round59/b`, worktree `r59-b`, decision 0068, notes `history/round-0059/b.md`): Parley list column
      wider and resizable; one filled selection per region (Parley, Mallet docs); wide-window emptiness (Tally, Showcase
      at 1600); per-page icon subset for sites and a lower landing budget; app bundle split by component if it fits.
    - Then A merges B, full tests, publish, review 4. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
@@ -107,3 +107,4 @@ action now. The owner can overrule any of these; otherwise they stand.
   header keys surfaced, 0049 wording for shortcut-opened palettes, one-glyph-box rule fixed and proven on known-bad
   fixtures, `test:checker` and `test:back`, CHANGELOG 1.0.0/1.1.0 dated and 1.2.0 started). Next: A merges B, full tests,
   the main session tags 1.0.0 at `b72df1a^` and 1.1.0 at `383dedb`, publishes; review 4.
+- 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.

@@ -17,6 +17,12 @@ Workstream A, the small things review 3 found (decision 0067):
 - Added: the page checker's one-glyph-wide rule now fires on a box with no width at all (a FAB straight in a rail), not only on a split word; known-bad pages in `tests/fixtures` (a table nothing stacks, a FAB in a rail, unknown dial values) and `npm run test:checker`, which expects the checker to fail each with its message. `npm run test:back` proves Back restores scroll and returns focus in the editor, the calendar and the Showcase, by the browser's Back and the bar's.
 - Changed: decision 0049 words its one exception: a palette or search that the person's own keyboard shortcut opens (mod+K, mod+comma into the palette) may put the cursor in its search field; by tap or click it never does. The suite proves both halves.
 
+Workstream B, hierarchy, wide windows and site weight (decision 0068):
+
+- Changed: Parley's list column is wider (`clamp(320px, 52%, 640px)`, resizable) and each line reads in one or two rows; one accent fill per job in a region: Parley loses its "All" chip, Copy Source is `elevated`; a tree's selection in a rail with a current item is neutral; Mallet docs' modifier keys are neutral and the held layer key is `inverse-surface`.
+- Changed: wide windows get more real content, not a capped shell: Tally's Coming Up covers thirty days with a foot and a new Where It Sits pane, Owed By Age has a supporting line, the grid areas at 840 and 1400 leave nothing empty; the Showcase gains Shared With You and a Folders pane (opens All Notes filtered to the folder).
+- Added: `icons-site.js`, the 37 icons the site templates draw (11 KB gzip, was 37); the five site templates and the hub load it, and `core.js` fetches `icons-solar.js` once for a name outside the subset. Budgets: icons 12 KB, the site bundle 150 KB in all (was 180; it measures 147 KB). The check fails a site page that loads another icon file.
+
 ## [1.1.0] - 2026-11-22
 
 Released as the state of the repository at the end of round 0058 (the section grew from 2026-11-14, when it was opened, to this date). Round 0058, workstream B: a light site bundle, a wide Showcase and the new dials (decision 0066):

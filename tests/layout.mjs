@@ -105,6 +105,15 @@ function measure(T) {
   return [...new Set(out)];
 }
 
+/* Wait until the layout has stopped moving, not for a fixed time: under load a spring (the rail widening, a view's shared
+   axis) outlasts a timeout and the measure reads the middle of it. The signature is where the bar's first thing, the view
+   and the content sit; it must be the same for 12 frames in a row (about 200ms). Nothing is loosened: the measure is the same. */
+const settle = (page) => page.evaluate(() => new Promise((done) => {
+  const sig = () => [...document.querySelectorAll('.s4-top-app-bar .s4-icon-button, .s4-app-bar-title, .s4-content, .s4-content > :not([hidden]), .s4-nav-rail')].filter((e) => e.getClientRects().length).map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.left * 10) + ',' + Math.round(r.width * 10) + ',' + Math.round(r.height * 10) + ',' + getComputedStyle(e).opacity; }).join(';');
+  let last = '', same = 0; const t0 = performance.now();
+  (function tick() { const now = sig(); same = now === last ? same + 1 : 0; last = now; if (same >= 12 || performance.now() - t0 > 6000) done(same >= 12); else requestAnimationFrame(tick); })();
+}));
+
 const failures = []; let runs = 0;
 const browser = await pw.chromium.launch();
 const jobs = [];
@@ -117,10 +126,10 @@ await Promise.all(Array.from({ length: 4 }, async () => {
     const page = await ctx.newPage();
     const found = new Set();
     try {
-      await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load' }); await page.waitForTimeout(400);
+      await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load' }); await page.waitForTimeout(400); await settle(page);
       const views = await page.evaluate(() => [...document.querySelectorAll('.s4-content > .s4-view')].map((v) => v.dataset.view));
       for (const v of views.length ? views : ['']) {
-        if (v) { await page.evaluate((v) => S4.app.go(document.querySelector('.s4-app'), v), v); await page.waitForTimeout(450); }
+        if (v) { await page.evaluate((v) => S4.app.go(document.querySelector('.s4-app'), v), v); await page.waitForTimeout(450); await settle(page); }
         const list = await page.evaluate(measure, T);
         for (const m of list) if (w !== 390 || m.startsWith('steps')) found.add((v ? `[${v}] ` : '') + m);
         if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', `layout_${rel.replace(/\W+/g, '_')}_${v}_${w}.png`), fullPage: true }); }
