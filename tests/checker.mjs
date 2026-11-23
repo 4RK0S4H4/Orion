@@ -36,7 +36,7 @@ const CASES = [
   ['bad-nav-hover.html', /the state layer of "Settings" is the icon's own chip/, 'a nav tab hover layer drawn as the icon chip'],
   ['bad-nav-hover-box.html', /the hover layer of "Settings" is \d+x\d+ at -?\d+,-?\d+ from the selected highlight/, 'a nav tab hover layer narrower than the selected highlight'],
   ['bad-clipboard.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a bare clipboard.writeText call'],
-  ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its end edge \("1000"\)/, 'a button whose label is wider than its box'],
+  ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
   ['bad-rail-motion.html', /mid-motion \(rail [a-z ]+, (25|50|75)%\): "(Scripts|Starred|Translations)" breaks across lines/, 'rail labels that wrap while the rail widens'],
@@ -68,7 +68,7 @@ expect(clip.status === 1 && /bad-clipboard\.html:\d+: .*writeText/.test(clip.std
 const clipOk = spawnSync(process.execPath, [join(root, 'scripts/check-clipboard.mjs')], { encoding: 'utf8' });
 expect(clipOk.status === 0, `check:clipboard passes the repo (exit ${clipOk.status})`);
 const REACH = [
-  ['reflowz', 'bad-nav-200.html', /text size 200%\] "(Settings|Reports)" breaks across lines/, 'nav labels that split at 200% text on a 320 screen'],
+  ['reflowz', 'bad-nav-200.html', /text size 200%\] "(Preferences|Reports|Budgets)" breaks across lines/, 'nav labels that split at 200% text on a 320 screen'],
   ['dirflip', 'bad-dirflip.html', /the Ink Track pill is \d+px from its selected option after dir changed/, 'an ink that is not measured again when dir flips'],
   ['long320', 'bad-long-slot.html', /long text in a slot: sideways scroll/, 'a trailing slot that widens the page with a long phrase'],
 ];

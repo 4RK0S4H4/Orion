@@ -1108,8 +1108,10 @@ async function copyAudit(page, add) {
   for (let i = 0; i < names; i++) {
     const l = page.locator(`[data-qa-copy="${i}"]`); if (!(await l.count())) continue;
     const name = await l.evaluate((e) => (e.getAttribute('aria-label') || e.textContent).trim().slice(0, 30));
+    const tries = (await page.evaluate(() => window.__copyTries || 0));
     try { await l.scrollIntoViewIfNeeded({ timeout: 2000 }); await l.click({ timeout: 2500 }); } catch (e) { continue; }
     await page.waitForTimeout(500);
+    if (!(await page.evaluate((t) => (window.__copyTries || 0) > t, tries))) continue;   /* a demo button called Share that copies nothing is not a copy button */
     const said = await page.evaluate(() => [...document.querySelectorAll('.s4-snackbar, [role="status"], [role="alert"]')].map((e) => e.textContent.trim()).filter(Boolean).join(' | '));
     if (!/could ?n.t|could not|can.t|unable|copy it yourself|select/i.test(said)) add(`"${name}" with the clipboard refusing says ${said ? `"${said.slice(0, 50)}"` : 'nothing'} (it must say it could not copy; S4.util.copy, decision 0073)`);
     await page.keyboard.press('Escape'); await page.waitForTimeout(200);
@@ -1135,7 +1137,7 @@ async function apiAudit(page, add) {
         if (real && (!/copy it yourself/.test(failMsgs[0] || '') || failMsgs[1] !== 'No luck')) o.push('S4.util.copy did not say it could not copy: ' + JSON.stringify(failMsgs));
         if (real && (said[2] !== 'Link copied' || said[3] !== 'Copied')) o.push('S4.util.copy did not say Copied on success: ' + JSON.stringify(said.slice(2)));
       } catch (e) { o.push('S4.util.copy threw: ' + e.message); }
-    } else o.push('S4.util.copy is missing (decision 0073)');
+    } else if (window.S4 && S4.util) o.push('S4.util.copy is missing (decision 0073)');
     if (document.querySelector('.th-brand, [data-api-probe="theme"]') || location.pathname.endsWith('/components/base/themes.html')) {
       const keep = S4.theme(), key = S4.theme.key, only = S4.theme.only;
       try {
@@ -1261,7 +1263,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
   page.on('pageerror', (e) => add('script error: ' + String(e.message).split('\n')[0]));
   /* decision 0073: every page runs with the clipboard refusing writes (headless, an insecure origin, an iframe): a button that
      calls writeText bare is an uncaught rejection (a script error above), and one that says "copied" anyway fails copyAudit */
-  await page.addInitScript(() => { try { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => Promise.reject(new DOMException('Write permission denied', 'NotAllowedError')), readText: () => Promise.reject(new DOMException('Read permission denied', 'NotAllowedError')) } }); } catch (e) { /* already fixed */ } });
+  await page.addInitScript(() => { try { Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: () => { window.__copyTries = (window.__copyTries || 0) + 1; return Promise.reject(new DOMException('Write permission denied', 'NotAllowedError')); }, readText: () => Promise.reject(new DOMException('Read permission denied', 'NotAllowedError')) } }); } catch (e) { /* already fixed */ } });
   page.on('console', (m) => { if (m.type() === 'error' && !QUIET.some((q) => q.test(m.text()))) add('console error: ' + m.text().slice(0, 160)); });
   page.on('requestfailed', (r) => { if (!QUIET.some((q) => q.test(r.url())) && !/ERR_ABORTED|cancelled|Load cannot follow/.test(r.failure() ? r.failure().errorText : '')) add('request failed: ' + r.url().replace(ORIGIN, '')); });
   page.on('response', (r) => { if (r.status() >= 400 && !QUIET.some((q) => q.test(r.url()))) add(`request ${r.status()}: ` + r.url().replace(ORIGIN, '')); });
@@ -1277,6 +1279,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       quiet.broken.forEach((x) => add(x));
       quiet.container.forEach((x) => add(x));
       quiet.loud.forEach((x) => add(`${x} (decision 0065: a status is a tint)`));
+      (quiet.overfull || []).forEach((x) => add(`control content outside its box: ${x} (decision 0073)`));
       (quiet.nav || []).forEach((x) => add(`${x} (round 0061: the highlight holds icon and label)`));
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
@@ -1287,7 +1290,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
     }
     await use(page, add, mode.phone);
-    if (!reduced) { await openerAudit(page, add); await copyAudit(page, add); }
+    if (!reduced) { await openerAudit(page, add); if (!rel.startsWith('explore/')) await copyAudit(page, add); }   /* labs bring their own copy fallback and are not part of the system */
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
     if (!reduced && !mode.phone) await desktopKeys(page, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));

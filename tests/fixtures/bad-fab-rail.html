@@ -7,6 +7,10 @@
 <!-- Known-bad fixture (round 0059, decision 0067). tests/checker.mjs expects the page checker to FAIL this page with the
      message named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
 <link rel="stylesheet" href="../../components/orion.css">
+<style>
+  /* labels that may break anywhere, as nav labels could until 2026-11-22 (issue 78): the squeeze splits a word */
+  .s4-nav-label { overflow-wrap: anywhere; }
+</style>
 </head>
 <body>
 <!-- a FAB directly in the rail (not in .s4-nav-rail-header): it is squeezed to one glyph wide beside the items -->
