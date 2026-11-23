@@ -1471,7 +1471,8 @@
   "upload.files",
   "upload.progress",
   "util.css",
-  "util.emit"
+  "util.emit",
+  "version"
  ],
  "events": [
   "s4-change",

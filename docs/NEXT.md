@@ -5,6 +5,14 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
+## Also now (2026-11-23, round 0063, branch `round63/upgrade`): "update to latest Orion" (decision 0075, issue 83)
+
+An app knows its Orion version (`<meta name="orion">` in every page, `orion.json` at its root; core.js and the page checker catch a mismatch), every
+version that changed anything public has `migrations/<version>.json` (1.1.0 and 1.2.0 backfilled), `npm run check:api` fails a public name that disappears
+without an entry, `releases/<version>/` holds immutable copies for pinned URLs (1.0.0 and 1.1.0 backfilled; **cut 1.2.0 with `node scripts/release.mjs` when
+it is dated**), and `skill/orion/scripts/upgrade.mjs` does the upgrade (dry run, `--write`, report); the skill's "Update to latest Orion" section and
+`docs/upgrading.md` give the steps. Proof: `npm run test:upgrade`.
+
 ## Now (2026-11-22, round 0062, branch `round62/qa`, not yet published): the first Full QA pass, findings fixed
 
 A fresh agent read the work cold (`history/round-0062/qa-1.md`): eight findings, all fixed at their root and recorded as issues 73 to 80, plus the
