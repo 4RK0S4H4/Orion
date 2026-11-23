@@ -1,0 +1,7 @@
+/* Pantry's own layout: tokens only */
+.pt-note { margin: 0; color: var(--md-sys-color-on-surface-variant); }
+.pt-actions { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+/* a name that only looks like the skill's: never renamed */
+.s4-orion-crumbs { display: none; }
+/* Orion issue #70: labels wrapped letter by letter while the rail expanded; keep them on one line */
+.pt-list .s4-list-headline { overflow-wrap: normal; }

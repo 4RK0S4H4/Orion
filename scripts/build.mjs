@@ -296,6 +296,7 @@ for (const page of htmlIn('templates')) {
     list: (d) => (existsSync(join(root, d)) && statSync(join(root, d)).isDirectory() ? readdirSync(join(root, d)) : []) };
   outputs['components/api.json'] = JSON.stringify({ ...snapshot(overlay), version: pkg.version }, null, 1) + '\n';
   if (existsSync(join(root, 'migrations'))) for (const f of readdirSync(join(root, 'migrations')).filter((f) => /^\d+\.\d+\.\d+\.json$/.test(f))) outputs['skill/orion/migrations/' + f] = readFileSync(join(root, 'migrations', f), 'utf8');
+  outputs['skill/orion/migrations/decisions.json'] = JSON.stringify(Object.fromEntries(readdirSync(join(root, 'docs/decisions')).filter((f) => /^\d{4}-.*\.md$/.test(f)).sort().map((f) => [f.slice(0, 4), f])), null, 1) + '\n';   /* so the upgrade report links each decision */
   if (existsSync(join(root, 'releases/index.json'))) outputs['skill/orion/migrations/releases.json'] = readFileSync(join(root, 'releases/index.json'), 'utf8');
   if (!existsSync(join(root, 'docs/upgrading.md'))) problems.push('missing docs/upgrading.md');
   else outputs['skill/orion/references/upgrading.md'] = '<!-- GENERATED copy of docs/upgrading.md (scripts/build.mjs). Edit the original. -->\n' + readFileSync(join(root, 'docs/upgrading.md'), 'utf8');

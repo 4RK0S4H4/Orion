@@ -1,0 +1,23 @@
+{
+ "version": "3.0.0",
+ "from": "1.2.0",
+ "date": "2027-06-01",
+ "major": true,
+ "summary": "A synthetic future major version for tests/upgrade.mjs: one rename of every kind, one removal, and a redraw.",
+ "renames": [
+  { "kind": "class", "from": "s4-chip", "to": "s4-pill", "decision": "0999" },
+  { "kind": "token", "from": "--s4-gap", "to": "--s4-space-gap", "decision": "0999" },
+  { "kind": "attr", "from": "data-sticky", "to": "data-pinned", "decision": "0999" },
+  { "kind": "value", "from": "data-variant=elevated", "to": "data-variant=raised", "decision": "0999" },
+  { "kind": "api", "from": "S4.snackbar", "to": "S4.toast", "decision": "0999" },
+  { "kind": "event", "from": "s4-change", "to": "s4-input", "decision": "0999" },
+  { "kind": "icon", "from": "search", "to": "magnifier", "decision": "0999" }
+ ],
+ "removals": [
+  { "kind": "class", "name": "s4-skeleton", "what": "Show the real layout with .s4-states loading instead", "decision": "0999" }
+ ],
+ "judgment": [
+  { "id": "3.0.0-redraw", "decision": "0999", "title": "Cards are drawn flat", "what": "Every card is flat on the page; redraw the app's own card-like elements to match.", "find": { "classes": ["s4-card"] } }
+ ],
+ "fixed": [101]
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-corners="soft">
+<head>
+<meta charset="utf-8">
+<meta name="orion" content="3.0.0">
+<title>Ledger</title>
+<link rel="stylesheet" href="https://4rk0s4h4.github.io/Orion/releases/3.0.0/orion.min.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .lg-row .s4-pill { margin: var(--s4-space-gap); }
+  .lg-row .s4-chip-set, .lg-s4-chip { margin: var(--s4-gap-large); }
+  [data-pinned] .s4-pill, [data-variant="raised"] { inline-size: auto; }
+</style>
+</head>
+<body>
+<header class="s4-top-app-bar" data-pinned>
+  <button class="s4-button" data-variant="raised" type="button">Export</button>
+  <button class="s4-button" data-variant="elevated-ish" type="button">Look-alike value</button>
+  <span class="s4-icon" data-icon="magnifier"></span><span class="s4-icon" data-icon="search-alt"></span>
+</header>
+<main class="s4-content">
+  <p>An s4-chip in a sentence, data-sticky in a sentence and S4.snackbar in a sentence are words, not names.</p>
+  <div class="s4-chip-set lg-row"><button class="s4-pill" type="button" aria-pressed="false">Paid</button><button class="s4-pill my-s4-chip" type="button">Due</button></div>
+  <div class="s4-skeleton" aria-hidden="true"></div>
+  <article class="s4-card"><h2>March</h2></article>
+</main>
+<script src="vendor/orion.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

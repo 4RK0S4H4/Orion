@@ -71,8 +71,7 @@ const releases = src.releasesIndex ? JSON.parse(readFileSync(src.releasesIndex, 
 
 /* the files of the target version: the source's assets when it is that version, else its pinned release folder */
 const targetDir = TO === srcVersion ? src.assets : (src.releasesDir && existsSync(join(src.releasesDir, TO)) ? join(src.releasesDir, TO) : null);
-if (!targetDir) { console.error(`upgrade: ${SRC} is Orion ${srcVersion} and has no releases/${TO}/; get Orion ${TO} first (see references/upgrading.md)`); process.exit(2); }
-const targetFiles = new Set(readdirSync(targetDir));
+const targetFiles = new Set(targetDir ? readdirSync(targetDir) : []);   /* checked once the app's vendored files are known */
 
 /* ---------- migrations ---------- */
 const migrations = {};
@@ -103,7 +102,7 @@ const edits = {};   /* rel -> new text, written only with --write */
 const textOf = (rel) => (rel in edits ? edits[rel] : read(rel));
 const writesBin = [], deletes = [];   /* [to, from] copies of the new version's files; files renamed away */
 const ORION_NAMES = /^(orion(\.[a-z]+)?(\.min)?\.(css|js)|icons(-[a-z-]+)?\.js|m3color\.js|inter-(variable|site)\.woff2|packs\.json)$/;
-const isOrionText = (t) => BANNER.test(t) || /^\/\* Orion icons/.test(t) || /^window\.S4_ICONS\s*=/.test(t) || /^\{\s*"needs"\s*:/.test(t);
+const isOrionText = (t) => BANNER.test(t) || /^\/\* (?:S4 )?Orion icons/.test(t) || /^window\.S4_ICONS\s*=/.test(t) || /^\{\s*"needs"\s*:/.test(t);
 /* vendored Orion files: an Orion name and an Orion banner (fonts and m3color.js: an Orion name beside an Orion file) */
 const vendored = [];
 for (const rel of all) {
@@ -114,7 +113,8 @@ for (const rel of all) {
 }
 const vendorDirs = new Set(vendored.map((r) => dirname(r)));
 for (const rel of all) { const b = basename(rel); if ((/\.woff2$/.test(b) || b === 'm3color.js') && ORION_NAMES.test(b) && vendorDirs.has(dirname(rel))) vendored.push(rel); }
-const brandFiles = all.filter((r) => r.endsWith('.css') && /^\/\* Orion brand: /.test(read(r).slice(0, 40)));
+if (vendored.length && !targetDir) { console.error(`upgrade: the app vendors Orion files, and ${SRC} is Orion ${srcVersion} with no releases/${TO}/ to copy from; get Orion ${TO} first (references/upgrading.md)`); process.exit(2); }
+const brandFiles = all.filter((r) => r.endsWith('.css') && /^\/\* (?:S4 )?Orion brand: /.test(read(r).slice(0, 40)));
 const vendoredSet = new Set(vendored.concat(brandFiles));
 const textFiles = all.filter((r) => TEXT_EXT.has(extname(r).toLowerCase()) && !vendoredSet.has(r));
 const htmlFiles = textFiles.filter((r) => MARKUP_EXT.has(extname(r).toLowerCase()));
@@ -187,8 +187,12 @@ const apiName = (n) => (n.startsWith('S4.') ? n : 'S4.' + n);
 /* one rename in one context; returns the new text */
 function renameIn(text, ctx, r) {
   const { kind } = r;
-  if (kind === 'token') return text.replace(word(r.from), r.to);
-  if (kind === 'api') return ctx === 'css' ? text : text.replace(new RegExp(`(?<![\\w$.])${esc(apiName(r.from))}(?![\\w$])`, 'g'), apiName(r.to));
+  const inTags = (fn) => text.replace(/<[a-zA-Z][^>]*>/g, fn);   /* in markup a name lives in a tag (an attribute, style="", onclick=""), never in the words between */
+  if (kind === 'token') return ctx === 'markup' ? inTags((t) => t.replace(word(r.from), r.to)) : text.replace(word(r.from), r.to);
+  if (kind === 'api') {
+    const re = new RegExp(`(?<![\\w$])${esc(apiName(r.from))}(?![\\w$])`, 'g');
+    return ctx === 'css' || ctx === 'md' || ctx === 'data' ? text : ctx === 'markup' ? inTags((t) => t.replace(re, apiName(r.to))) : text.replace(re, apiName(r.to));
+  }
   if (kind === 'url') return text.split(r.from).join(r.to);
   if (kind === 'skill') {
     const t = text.replace(new RegExp(`(?<=skills?/)${esc(r.from)}(?=/)`, 'g'), r.to).replace(new RegExp(`(?<![\\w-])${esc(r.from)}\\.skill\\b`, 'g'), `${r.to}.skill`);
@@ -218,7 +222,7 @@ function renameIn(text, ctx, r) {
   if (kind === 'event') return ctx === 'js' ? inStrings(text, (s) => (s.slice(1, -1) === r.from ? s[0] + r.to + s[s.length - 1] : s)) : text.replace(new RegExp(`(["'])${esc(r.from)}\\1`, 'g'), `$1${r.to}$1`);
   if (kind === 'icon') {
     const t = text.replace(new RegExp(`(data-icon\\s*=\\s*\\\\?["'])${esc(r.from)}(?=\\\\?["'])`, 'g'), `$1${r.to}`);
-    return ctx === 'js' ? t.replace(new RegExp(`(S4\\.icon\\.\\w+\\([^)]*?["'])${esc(r.from)}(?=["'])`, 'g'), `$1${r.to}`) : t;
+    return ctx === 'js' ? t.replace(new RegExp(`(S4\\.icon\\.\\w+\\([^;\\n]*?["'])${esc(r.from)}(?=["'])`, 'g'), `$1${r.to}`) : t;
   }
   if (kind === 'pack') return text.replace(new RegExp(`(?<=orion\\.)${esc(r.from)}(?=\\.min\\.(css|js))`, 'g'), r.to);
   return text;
@@ -274,7 +278,7 @@ for (const rel of vendored) {
 let brandCss = null;
 if (brandFiles.length && src.brand) ({ brandCss } = await import(pathToFileURL(src.brand).href));
 for (const rel of brandFiles) {
-  const m = read(rel).match(/^\/\* Orion brand: (#[0-9a-fA-F]{6}), variant (\w[\w-]*), (\w+) surfaces/);
+  const m = read(rel).match(/^\/\* (?:S4 )?Orion brand: (#[0-9a-fA-F]{6}), variant (\w[\w-]*), (\w+) surfaces/);
   if (!m || !brandCss) { report.judgment.push({ id: 'brand-file', decision: '0063', title: `Regenerate ${rel}`, what: `Run node <skill>/scripts/brand.mjs with the app's seed, variant and surfaces and --out ${rel}.`, where: [] }); continue; }
   const css = brandCss({ seed: m[1], variant: m[2], surfaces: m[3] });
   if (css !== read(rel)) { edits[rel] = css; (report.files[rel] ||= new Set()).add(`brand file regenerated (${m[1]}, ${m[2]}, ${m[3]})`); }
@@ -352,7 +356,7 @@ function buildOrionJson(version) {
   for (const m of htmlTag.matchAll(/\s(data-[a-z-]+)="([^"]*)"/g)) if (DIAL_ATTRS.includes(m[1])) dials[m[1]] = m[2];
   const seed = (first.match(/\bseed:\s*'(#[0-9a-fA-F]{6})'/) || [])[1] || null;
   return {
-    $schema: 'Orion app record (decision 0075). Kept by node <skill>/scripts/upgrade.mjs; edit "overrides" and "ignore" by hand.',
+    about: 'Orion app record (decision 0075). Kept by node <skill>/scripts/upgrade.mjs; edit "overrides" and "ignore" by hand.',
     orion: version,
     load: { files, urls, bundle: linked.has('core') ? 'lean' : files.concat(urls).some((f) => /orion\.site\.min/.test(f)) ? 'site' : 'full' },
     packs: [...linked].filter((p) => p !== 'core').sort(),
@@ -370,7 +374,8 @@ if (!orionJson || JSON.stringify(orionJson) !== JSON.stringify(nextJson)) (repor
 
 function decisionLink(d) {
   if (!/^\d{4}$/.test(String(d))) return String(d);
-  const f = src.decisions && readdirSync(src.decisions).find((x) => x.startsWith(d + '-'));
+  const list = src.decisions ? readdirSync(src.decisions) : existsSync(join(SRC, 'migrations/decisions.json')) ? Object.values(JSON.parse(readFileSync(join(SRC, 'migrations/decisions.json'), 'utf8'))) : [];
+  const f = list.find((x) => x.startsWith(d + '-'));
   return f ? `[${d}](${PAGES_BASE}docs/decisions/${f})` : d;
 }
 function markdown() {

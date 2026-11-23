@@ -1,0 +1,6 @@
+/* Ledger's own styles */
+.lg-total { padding: var(--s4-gap); gap: var(--s4-gap-small); }
+.lg-total .s4-chip:hover, .lg-total .s4-chips { color: inherit; }
+/* Orion issue #101: chips lost their gap on Safari; spacing set by hand */
+.lg-row { gap: var(--s4-space-2); }
+/* Orion issue #7: an older workaround whose issue is not in this range */

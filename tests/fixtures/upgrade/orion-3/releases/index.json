@@ -1,0 +1,7 @@
+{
+ "note": "A stand-in release list for tests/upgrade.mjs: 3.0.0 is published, so URLs pin to it.",
+ "latest": "3.0.0",
+ "versions": {
+  "3.0.0": { "date": "2027-06-01", "files": { "orion.min.css": "0", "orion.min.js": "0", "icons.js": "0", "api.json": "0" } }
+ }
+}

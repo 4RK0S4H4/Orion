@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pantry · Shopping</title>
+<!-- Upgrade fixture (decision 0075): a small app written against Orion 1.0.0, with no orion.json and no stamp. The
+     vendored files in vendor/ are copied from releases/1.0.0 by tests/upgrade.mjs, so the version comes from their
+     banners. Never edit it to match a newer Orion: tests/upgrade.mjs upgrades a copy and checks the result. -->
+<link rel="stylesheet" href="vendor/orion.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="s4-app">
+  <div class="s4-app-body">
+    <header class="s4-top-app-bar">
+      <div class="s4-app-bar-title-group"><h1 class="s4-app-bar-title">Shopping</h1></div>
+    </header>
+    <main class="s4-content" data-width="reading">
+      <div class="s4-stack">
+        <p class="pt-note">Seven things for the weekend. The s4-list below is the app's own list; this sentence names it on purpose.</p>
+        <ul class="s4-list pt-list" aria-label="Shopping List">
+          <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Oat Milk</span><span class="s4-list-supporting">Two cartons</span></span></div></li>
+          <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Lemons</span><span class="s4-list-supporting">For the cake</span></span></div></li>
+          <li><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Rye Bread</span><span class="s4-list-supporting">Sliced</span></span></div></li>
+        </ul>
+        <div class="pt-actions">
+          <button class="s4-button" data-variant="filled" type="button" id="add">Add Item</button>
+          <button class="s4-button" data-variant="outlined" type="button" id="share">Share List</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="vendor/icons.js"></script>
+<script src="vendor/orion.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
