@@ -24,6 +24,14 @@ labelled `from-app` (form `.github/ISSUE_TEMPLATE/from-app.yml`) or as entries i
 `issues/<app>-<date>`. Every round starts by moving each of them here, numbered, with its image in `img/` (the Triage step
 in [`../PLAN.md`](../PLAN.md)).
 
+## Requests (2026-11-23)
+
+- **83.** Done 2026-11-23 (round 0063, decision 0075). Updating apps to the latest Orion (owner, 2026-11-23): "I want this design language to be easily
+  used to update apps to the latest version. make sure this repo and skill makes that possible, maybe versioning, idk, you can figure it out. like if I
+  make an app using orion 2.0, but then I make some big changes and improvements in Orion 3.0, I should just be able to say to that app's session 'update
+  to latest Orion' and it can do it." Built: version stamps and `orion.json`, `migrations/`, `check:api`, pinned `releases/`, `upgrade.mjs` and the
+  skill's "Update to latest Orion"; proven by `npm run test:upgrade`.
+
 ## Found by QA pass 1 (2026-11-22, round 0062)
 
 The first Full QA pass ([`history/round-0062/qa-1.md`](../history/round-0062/qa-1.md), a fresh agent, Chromium, ~100 pages).

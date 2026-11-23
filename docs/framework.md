@@ -83,6 +83,9 @@ inside of `orion.js`) can change at any time.
   `S4.menu.open/close` (with submenus: `data-submenu`), `S4.palette.*`.
 - **Events** (bubbling `CustomEvent`s): `s4-change`, `s4-select`, `s4-toggle`, `s4-open`, `s4-close`, `s4-theme`, `s4-context`, `s4-window`, `s4-command`, `s4-commands`, `s4-reorder`, `s4-resize`, `s4-rename`, `s4-move`.
 - **Icon names** in `components/icons/names.json`.
+- **The version** (decision 0075): `S4.version`, the bundle banners and the app's `<meta name="orion" content="…">` stamp,
+  all from `package.json`; the shipped file names and pack names. `components/api.json` is this list as built
+  (`scripts/api.mjs`).
 
 ## Versioning
 
@@ -90,11 +93,28 @@ Semantic versioning on the public API above, recorded in `CHANGELOG.md`:
 
 - **Patch:** fixes that don't change markup or tokens.
 - **Minor:** new components, attributes, tokens, icons, templates; visual refinements decided by the owner.
-- **Major:** renaming or removing anything public. Removed names keep working as aliases for one minor version first
-  and are listed under "Deprecated".
+- **Major:** renaming or removing anything public, or a rule that changes how existing apps should look. Removed names
+  keep working as aliases for one minor version first and are listed under "Deprecated" and in the migration file.
 
 The skill ships the matching `orion.css`/`orion.js`, so a page built by the skill always matches the rules it was built
 with.
+
+**Migrations and releases (decision 0075).** One version, in `package.json`: the build writes it into `S4.version`, every
+banner and every template's `<meta name="orion">`, and `core.js` warns (the page checker fails) when a page's stamp and its
+files disagree. The policy:
+
+- An old name keeps working as an **alias for at least one minor version** before it is removed, and is listed in that
+  version's migration as a rename with `"alias": true`, so `upgrade.mjs` moves apps off it at once.
+- **Every removal or rename of a public name needs a migration entry** in `migrations/<version>.json` (renames, removals,
+  and judgment items for rules and behaviour that changed, each with its decision; `fixed` lists the issues fixed).
+  `npm run check` (`scripts/check-api.mjs`) compares the public API with the last release's snapshot and fails a name
+  that is gone without an entry, a rename to a name that does not exist, and any change to a released file.
+- **Releases** are cut by `node scripts/release.mjs` once the CHANGELOG entry is dated: `releases/<version>/` holds the
+  shipped files (minified bundles, packs, icons, fonts, `packs.json`) and `api.json`, recorded with their SHA-1 in
+  `releases/index.json`. They are immutable and kept forever, so `https://4rk0s4h4.github.io/Orion/releases/<version>/<file>`
+  never breaks. No git tags are needed.
+- Apps upgrade with `skill/orion/scripts/upgrade.mjs` (dry run by default); the steps are in `docs/upgrading.md`, which
+  the skill carries as `references/upgrading.md`.
 
 **Bundles (decisions 0066 and 0069).** Three ways to load Orion, all built from the same folders and held by budgets in
 `scripts/build.mjs`: the full bundle (`orion.css`/`orion.js`, or `.min` for lighter copies; prototypes and the Showcase), the
@@ -127,6 +147,7 @@ classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` an
 | Icons | `npm run check:icons` | Every semantic name resolves in every set. |
 | Glass | `npm run check:glass` | Text on glass stays AA over pure black and white backdrops across 97 color schemes; text on the tints of items on glass; FAB icons 3:1. |
 | Bundle | `npm run check:bundle` | Every generated file (bundle, skill assets, references, templates, cache stamps) is fresh. |
+| API | `npm run check:api` | No public name disappears without a migration entry; renames point at real names; released files never change (decision 0075). `npm run test:upgrade` proves it and the upgrade script on fixture apps. |
 | Pages | `node skill/orion/scripts/check.mjs page.html` | Console errors, unknown icons, overflow, rendered contrast (also on glass), app-CSS rule lint; 390 dark + 1280 light. |
 
 CI runs the first four on every push. Run the page checker on every template, the showcase and any new page.

@@ -10,6 +10,18 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
 
+Versions and upgrades (decision 0075, issue 83): "update to latest Orion" in an app's session now works with no guesswork.
+
+- Changed: one version. `package.json` says 1.2.0 (it said 1.1.0 while the runtime said 1.0.0); the build writes it into `S4.version`, every banner and the tokens.
+- Added: every template, example and the Showcase carries `<meta name="orion" content="1.2.0">`; `core.js` warns, and the page checker fails, when the stamp and the loaded files disagree (`tests/fixtures/bad-stamp.html`).
+- Added: `orion.json` at an app's root (version, how Orion is loaded, packs, brand and dials, pages, workarounds with their issue); the skill writes it when it starts an app (`upgrade.mjs --init`).
+- Added: `migrations/1.1.0.json` and `1.2.0.json` (renames, removals, judgment items with their decision, fixed issues) and `docs/upgrading.md` (also the skill's `references/upgrading.md`).
+- Added: `scripts/api.mjs` and `components/api.json` (the public API as built); `npm run check:api` fails a public name gone since the last release without a migration entry, a rename to a missing name and any change to a released file.
+- Added: `releases/1.0.0/` and `releases/1.1.0/` (backfilled from their tags) and `scripts/release.mjs`: immutable pinned copies at `https://4rk0s4h4.github.io/Orion/releases/<version>/<file>`.
+- Added: `skill/orion/scripts/upgrade.mjs <app-dir> [--to] [--write]` (dry run by default; vendored files, pinned URLs, renames by context, packs, brand file, stamps, `orion.json`, `orion-upgrade.md`, the page checker) and the skill's "Update to latest Orion" section; the description now triggers on it.
+- Deprecated: `S4.transition.drop`, `unfold` (use `follow`), `slide` (use `pop`) and `containerTransform` (use `pop(surface, opts)`); they stay as aliases until 1.3.0 and the upgrade renames the first three.
+- Added: `npm run test:upgrade` (in CI's pages job).
+
 - Changed: window controls draw Orion's duotone icons again (decision 0074, issue 82): new icon names `window-minimize`, `window-maximize`, `window-restore`, `window-close` (Solar Bold Duotone square tiles; Phosphor too), written into each `.s4-window-control` by `desktop.js` at the new `--s4-size-window-control-icon` (24); the 12px drawn glyphs are gone. Cells, corner rule, firm layer, Close error on hover, Restore, right to left and forced colors are unchanged.
 
 Round 0062, the first Full QA pass (decision 0073, issues 73 to 81):

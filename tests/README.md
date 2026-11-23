@@ -23,6 +23,14 @@
 5. **`npm run test:back`** (`tests/back.mjs`): Back from a page (the browser's Back and the top bar's) restores the
    view's scroll and returns focus to the opener, in the editor, the calendar and the Showcase, at 390 and a short desktop window.
 
+6. **`npm run test:upgrade`** (`tests/upgrade.mjs`, decision 0075, a few seconds): a fixture app written against Orion 1.0.0
+   (`tests/fixtures/upgrade/app-1.0`, with the real 1.0.0 files from `releases/1.0.0`) is upgraded to this version by
+   `skill/orion/scripts/upgrade.mjs`: the dry run changes nothing, `--write` applies exactly the renames, replaces the vendored
+   files, writes the stamp and `orion.json`, reports the judgment items and the fixed workaround, and the page checker is
+   clean; a synthetic future major (`orion-3`) must turn `app-2` into `app-2.expected` byte for byte (look-alikes untouched);
+   `scripts/check-api.mjs` must fail a public name that vanishes without a migration entry. `test:checker` also proves
+   `bad-stamp.html` (a stamp that disagrees with the loaded files).
+
 Options: `node tests/suite.mjs --browser=chromium --only=list-detail --shots --workers=4`. Screenshots of failing
 pages go to `tests/out/` (not committed).
 

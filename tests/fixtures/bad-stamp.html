@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="orion" content="0.9.0">
+<title>Known Bad: Stamp</title>
+<!-- Known-bad fixture (decision 0075). tests/checker.mjs expects the page checker to FAIL this page with the message
+     named in tests/checker.mjs: the page is stamped Orion 0.9.0 but loads this repo's files (a half-done upgrade).
+     Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<main class="s4-content" style="padding: 16px"><h1>Stamp</h1><p>The stamp and the loaded files disagree.</p></main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

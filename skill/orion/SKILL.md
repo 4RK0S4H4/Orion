@@ -1,6 +1,6 @@
 ---
 name: orion
-description: "Orion (formerly S4 Orion), the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 78 components (app shell, navigation, buttons, cards, lists, data tables, filters, boards, fields, menus, dialogs, code, chat, desktop menu bar…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates, tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in Orion, S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses Orion, S4 Orion or S4 Material. It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
+description: "Orion (formerly S4 Orion), the user's own design system: Material 3 Expressive (M3 color roles from one seed, M3 type and shape scales, springs) with a very clear, contrast-guaranteed glass layer on floating chrome, Inter, Solar icons, Title Case labels, monochrome by default. Ships orion.css + orion.js with 78 components (app shell, navigation, cards, lists, data tables, filters, fields, menus, dialogs, desktop menu bar…), 15 app templates (dashboard, data table, desktop app, board, chat…), five site templates, tokens, and a page checker. Use it whenever the user wants a web app, tool, dashboard, page, prototype or mockup built or restyled in Orion, S4 Orion, S4 Material, Material / Material You / M3 / M3E or a Google/Android look, or asks to apply their design system to an app that already uses Orion, S4 Orion or S4 Material, or says \"update to latest Orion\" (upgrade an app). It replaces the S4 Material skill. Not for S4 Glass or S4 Flat, and not for documents, slides or charts on their own."
 ---
 
 # Orion
@@ -66,6 +66,11 @@ rename, replace the content). They are complete, checker-clean pages; keep their
 | `gallery.html` | photos, files, products, designs, anything browsed as a grid | tile grid, filter chips, `data-selectable` with the bar in the top app bar, viewer page |
 | `checkout.html` | checkout, booking, sign-up, applications, any task in a few steps | stepper + `.s4-form` steps (Switch between them), summary in a supporting split, done mark |
 | `onboarding.html` | first-run welcome and setup | no shell; steps with dots, Skip, accent swatches, done mark |
+
+**Every new app records its Orion version:** keep the template's `<meta name="orion" content="…">` in every page, and
+once the files are in place run `node <skill>/scripts/upgrade.mjs <app-dir> --init`, which writes `orion.json` at the app's
+root (version, how Orion is loaded, packs, brand and dials, and an `overrides` list for workarounds with their issue).
+Commit it; it is what "update to latest Orion" reads later.
 
 Mixed apps combine them: a dashboard app whose Clients view is the list-detail screen, with the settings screen as its
 last destination. Keep one shell (`.s4-app`) per page.
@@ -409,6 +414,25 @@ It also warns on more than one filled action on the first screen (0070), and fai
 Also check by eye: one filled button per area, Title Case labels, status words, the nav bar on a phone and the rail on a
 desktop, and both themes.
 
+## Update to latest Orion
+
+When the user says **"update to latest Orion"** (or "upgrade Orion", "move this app to Orion 2"), follow
+`references/upgrading.md`. In short (decision 0075):
+
+1. **Get the latest Orion first**, even if this skill is older: the attached repo `4RK0S4H4/Orion` (pull it), else download
+   `https://github.com/4RK0S4H4/Orion/raw/main/skill/dist/orion.skill` and unzip it; use that folder as `<source>`.
+2. Read the app's `orion.json` (and its last `orion-upgrade.md`).
+3. Dry run: `node <source>/scripts/upgrade.mjs <app-dir> --source <source>`; read the plan.
+4. Apply with `--write`: vendored files replaced, URLs pinned to `releases/<version>/` (never a moving address), renames
+   applied by context, packs linked, brand file regenerated, stamps and `orion.json` updated, `orion-upgrade.md` written.
+5. Work through every judgment item in the report (each names its decision); try removing workarounds whose issue it
+   says is fixed.
+6. Run the page checker on every page and look at the screens at 390 and 1280, light and dark; commit
+   ("Update to Orion x.y.z"); log any Orion defect as below.
+
+A **major** version changes how things should look: after the script, redraw each screen in the new rules and keep every
+screen and element the app has (decision 0053); never swap one for the nearest stock component.
+
 ## Found a problem in Orion?
 
 If a component, token, rule or the checker is broken, missing something the app needs, or surprising: do not patch Orion's files from the app and do not work around it silently. Log it. Where the repo `4RK0S4H4/Orion` is attached, follow "If you are a session building another app with Orion" in its `CLAUDE.md`: a GitHub issue with the `from-app` form (app name, component or page, what happened, what was expected, steps, screenshot, browser/device/shell, Orion version from `CHANGELOG.md`), else an entry in `docs/issues/inbox.md` on a branch `issues/<app>-<date>` (never push `s4-orion` or `main`). With only this skill, tell the owner in chat in that same shape. One problem per report. The app's workaround goes in its own stylesheet with a comment naming the issue. A missing element Orion's rules can make is not a defect: build it in the app's stylesheet (decision 0053).
@@ -425,4 +449,5 @@ If a component, token, rule or the checker is broken, missing something the app 
 | `references/glass.md` | Anything about glass, transparency, blur or overlays. |
 | `references/motion.md` | Choosing or writing an animation or transition. |
 | `references/color.md`, `typography.md`, `shape.md`, `spacing.md`, `elevation.md` | The reasoning and rules behind each foundation. |
+| `references/upgrading.md` | Updating an app to a newer Orion: `orion.json`, the upgrade script, migrations, releases. |
 | `references/accessibility.md` | What the system guarantees and what the app must still do. |

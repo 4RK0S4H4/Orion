@@ -126,9 +126,9 @@ accessibility, so some scores fell although nothing got worse.
    - **Pass 1** (done, `history/round-0062/qa-1.md`): eight findings and the owner's nav hover request, fixed at their root with rules and known-bad
      fixtures (0073). **Pass 2 next**, on what pass 1 did not exercise: field typing and blur errors, table resize/edit/undo, board moves, swipe and
      reorder keyboard alternatives, snackbar Undo, the palette, each dial alone, 360 and 430 wide, WebKit and Firefox where installable.
-   - Exit: no open issue from the passes; then re-grade (review 5), then the dated 1.2.0 release.
+   - Exit: no open issue from the passes; then re-grade (review 5), then the dated 1.2.0 release: date the CHANGELOG entry and `migrations/1.2.0.json`, `node scripts/release.mjs` (writes `releases/1.2.0/`, decision 0075), `npm run build`, re-package the skill.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
-   release 1.2 with a git tag and a re-packaged skill (CHANGELOG 1.0.0 and 1.1.0 are still "Unreleased").
+   release 1.2 (`scripts/release.mjs`, no git tag needed, decision 0075) and a re-packaged skill.
 
 ## Calls we made under the owner's handover (so nobody reopens them by accident)
 
@@ -151,3 +151,4 @@ action now. The owner can overrule any of these; otherwise they stand.
 - 2026-11-22 (round 0062, QA pass 1): the first Full QA pass found eight things; all fixed at their root (decision 0073, issues 73 to 81 with the owner's nav-bar hover request): combobox Escape, `S4.util.copy`, list gaps at 320, stack and pane children may shrink, `S4.util.onLayoutChange`, no split words at 320 with 200% text, trailing slots wrap, overfull-control lint, the nav tab's state layer is the highlight's box. New rules: suite opener and clipboard audits, reach `reflowz`, `dirflip`, `long320`, `check:clipboard`, seven known-bad fixtures. Pass 2 is next.
 - 2026-11-22 (round 0061, integration): merged the titlebar branch (decision 0072, issues 69 and 70) and the mobile branch (issues 71 and 72, renumbered because both had used 69 and 70), added intake from app sessions (CLAUDE.md, SKILL.md, from-app form, inbox, the Triage step above) and the Full QA pass stage. Next: publish, the owner's device looks, the QA pass, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.
+- 2026-11-23 (round 0063, upgrade path): decision 0075 built (one version from package.json, `<meta name="orion">` stamps and the mismatch warning, `orion.json`, `migrations/` 1.1.0 and 1.2.0, `scripts/api.mjs` + `check:api`, `releases/1.0.0` and `1.1.0` backfilled with `scripts/release.mjs`, `skill/orion/scripts/upgrade.mjs`, the skill's "Update to latest Orion", `test:upgrade`; issue 83 Done). Next: publish with the round; cut `releases/1.2.0` when 1.2.0 is dated.

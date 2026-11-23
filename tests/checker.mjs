@@ -13,6 +13,7 @@
      bad-clipboard.html a bare clipboard.writeText (page checker and npm run check:clipboard; decision 0073)
      bad-overfull.html  a control whose label is wider than its box (decision 0073)
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
+     bad-stamp.html     <meta name="orion"> says 0.9.0 but the page loads this version (decision 0075)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
    Usage: node tests/checker.mjs */
 import { spawnSync } from 'node:child_process';
@@ -39,6 +40,7 @@ const CASES = [
   ['bad-clipboard-marker.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a second call under the helper\'s exemption marker'],
   ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
+  ['bad-stamp.html', /this page is stamped Orion 0\.9\.0 \(meta name="orion"\) but loads Orion \d+\.\d+\.\d+/, 'a stamp that disagrees with the loaded files'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],
   ['bad-rail-motion.html', /mid-motion \(rail [a-z ]+, (25|50|75)%\): "(Scripts|Starred|Translations)" breaks across lines/, 'rail labels that wrap while the rail widens'],
   ['bad-window-controls.html', /window control "Close" is 32x28, \d+px below the top of a 40px title bar/, 'a window control smaller than a full cell'],

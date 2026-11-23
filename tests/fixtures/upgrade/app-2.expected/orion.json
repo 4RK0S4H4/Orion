@@ -1,0 +1,26 @@
+{
+  "about": "Orion app record (decision 0075). Kept by node <skill>/scripts/upgrade.mjs; edit \"overrides\" and \"ignore\" by hand.",
+  "orion": "3.0.0",
+  "load": {
+    "files": [
+      "vendor/orion.js"
+    ],
+    "urls": [
+      "https://4rk0s4h4.github.io/Orion/releases/3.0.0/orion.min.css"
+    ],
+    "bundle": "full"
+  },
+  "packs": [],
+  "pages": [
+    "index.html"
+  ],
+  "brand": {
+    "seed": null,
+    "file": null,
+    "dials": {
+      "data-corners": "soft"
+    }
+  },
+  "overrides": [],
+  "ignore": []
+}
