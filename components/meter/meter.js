@@ -29,7 +29,7 @@ S4.register('meter', function (scope) {
     m.setAttribute('aria-valuemax', String(max));
     m.setAttribute('aria-valuenow', String(Math.min(max, Math.max(min, now))));
     var text = m.querySelector('.s4-meter-value');
-    if (text && text.textContent.trim()) m.setAttribute('aria-valuetext', text.textContent.trim().replace(/\s+/g, ' '));   /* without a written value, the author's own aria-valuetext stays */
+    if (text && text.textContent.trim()) m.setAttribute('aria-valuetext', text.textContent.trim().replace(/\s+/g, ' '));   /* without a written value, aria-valuetext from the page stays */
     if (!m.hasAttribute('aria-label') && !m.hasAttribute('aria-labelledby')) {
       var label = m.querySelector('.s4-meter-label');
       if (label) { if (!label.id) label.id = 's4-meter-' + Math.random().toString(36).slice(2, 8); m.setAttribute('aria-labelledby', label.id); }

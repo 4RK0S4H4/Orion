@@ -148,7 +148,7 @@
     document.querySelectorAll('.s4-menu').forEach(function (m) {
       if (!isOpen(m) || m._s4closing || m.contains(e.target)) return;
       if (openChildren(m).some(function (c) { return c.contains(e.target); })) return;   /* inside one of its submenus */
-      if (m._s4anchor && m._s4anchor.contains(e.target)) return;   /* the anchor's own click toggles */
+      if (m._s4anchor && m._s4anchor.contains(e.target)) return;   /* a click on the anchor toggles it */
       close(m, false);
     });
   }, true);

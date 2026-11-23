@@ -81,7 +81,7 @@
     release: function (box, to) {
       var a = document.activeElement;
       if (!box.contains(a)) return;
-      if (to && to.isConnected && !box.contains(to)) { if (to.tabIndex < 0) to.tabIndex = -1; to.focus({ preventScroll: true }); }
+      if (to && !box.contains(to)) { to.tabIndex = to.tabIndex; to.focus(); }
       if (document.activeElement === a || document.activeElement === document.body) S4.util.land();
     },
     /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
@@ -227,7 +227,7 @@
          0063: never more colorful than M3's calm tonal palette for the same hue, so a vivid accent (Parley's vermilion,
          an indigo) selects a row clearly but quietly instead of painting it a saturated block */
       var calm = M.palettes(cfg.seed, 'tonal'), sel = function (t, row) { var a = tone(t), b = calm.rows[row || 'Primary'][calm.tones.indexOf(t)]; return M.hct(b).chroma < M.hct(a).chroma ? b : a; };
-      o['secondary-container'] = dark ? sel(25, 'Secondary') : sel(90);   /* dark: M3's quiet secondary tone, a little lighter than the page's panes */
+      o['secondary-container'] = dark ? sel(25, 'Secondary') : sel(90);   /* dark: the quiet M3 secondary tone, a little lighter than the page's panes */
       o['on-secondary-container'] = sel(dark ? 90 : 10);
       o['--s4-focus-ring-color'] = s.primary;
       return fabTints(o, c, tone);

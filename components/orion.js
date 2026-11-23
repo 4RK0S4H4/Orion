@@ -84,7 +84,7 @@
     release: function (box, to) {
       var a = document.activeElement;
       if (!box.contains(a)) return;
-      if (to && to.isConnected && !box.contains(to)) { if (to.tabIndex < 0) to.tabIndex = -1; to.focus({ preventScroll: true }); }
+      if (to && !box.contains(to)) { to.tabIndex = to.tabIndex; to.focus(); }
       if (document.activeElement === a || document.activeElement === document.body) S4.util.land();
     },
     /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
@@ -230,7 +230,7 @@
          0063: never more colorful than M3's calm tonal palette for the same hue, so a vivid accent (Parley's vermilion,
          an indigo) selects a row clearly but quietly instead of painting it a saturated block */
       var calm = M.palettes(cfg.seed, 'tonal'), sel = function (t, row) { var a = tone(t), b = calm.rows[row || 'Primary'][calm.tones.indexOf(t)]; return M.hct(b).chroma < M.hct(a).chroma ? b : a; };
-      o['secondary-container'] = dark ? sel(25, 'Secondary') : sel(90);   /* dark: M3's quiet secondary tone, a little lighter than the page's panes */
+      o['secondary-container'] = dark ? sel(25, 'Secondary') : sel(90);   /* dark: the quiet M3 secondary tone, a little lighter than the page's panes */
       o['on-secondary-container'] = sel(dark ? 90 : 10);
       o['--s4-focus-ring-color'] = s.primary;
       return fabTints(o, c, tone);
@@ -645,7 +645,7 @@
   function track(el, anim) { el._s4anims.push(anim); return anim; }
   function settle(el, anims, keep) {
     return Promise.all(anims.map(function (a) { return a.finished; })).then(function () {
-      if (!keep) anims.forEach(function (a) { a.cancel(); });   /* opened: the element's own styles take over */
+      if (!keep) anims.forEach(function (a) { a.cancel(); });   /* opened: the styles of the element take over */
       return true;
     }, function () { return false; });
   }
@@ -742,7 +742,7 @@
   function scrim(dialog, open, opts) {
     open = open !== false;
     var s = M.spring(open ? 'effects' : 'fast-effects');
-    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* a dragged panel's scrim leaves from where the finger left it */
+    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* the scrim of a dragged panel leaves from where the finger left it */
     return dialog.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
   }
 
@@ -5583,7 +5583,7 @@ S4.register('meter', function (scope) {
     m.setAttribute('aria-valuemax', String(max));
     m.setAttribute('aria-valuenow', String(Math.min(max, Math.max(min, now))));
     var text = m.querySelector('.s4-meter-value');
-    if (text && text.textContent.trim()) m.setAttribute('aria-valuetext', text.textContent.trim().replace(/\s+/g, ' '));   /* without a written value, the author's own aria-valuetext stays */
+    if (text && text.textContent.trim()) m.setAttribute('aria-valuetext', text.textContent.trim().replace(/\s+/g, ' '));   /* without a written value, aria-valuetext from the page stays */
     if (!m.hasAttribute('aria-label') && !m.hasAttribute('aria-labelledby')) {
       var label = m.querySelector('.s4-meter-label');
       if (label) { if (!label.id) label.id = 's4-meter-' + Math.random().toString(36).slice(2, 8); m.setAttribute('aria-labelledby', label.id); }
@@ -5933,7 +5933,8 @@ S4.register('month', function (scope) {
   }
   function render(fig) {
     var code = fig.querySelector('pre > code'); if (!code) return;
-    if (!fig._s4src || !code.querySelector('.s4-code-line')) fig._s4src = {   /* new code written into it since the last render is read afresh */ text: code.textContent, html: code.innerHTML, tokens: !!code.querySelector('[class*="s4-syntax-"]') };
+    /* new code written into it since the last render is read afresh */
+    if (!fig._s4src || !code.querySelector('.s4-code-line')) fig._s4src = { text: code.textContent, html: code.innerHTML, tokens: !!code.querySelector('[class*="s4-syntax-"]') };
     var src = fig._s4src, lang = (fig.getAttribute('data-lang') || '').toLowerCase(), diff = fig.getAttribute('data-variant') === 'diff';
     var text = src.text.replace(/\n$/, '');
     var html = diff ? esc(text) : src.tokens || fig.hasAttribute('data-plain') ? src.html.replace(/\n$/, '') : tokenize(text, lang).map(function (t) { return t[0] ? '<span class="s4-syntax-' + t[0] + '">' + esc(t[1]) + '</span>' : esc(t[1]); }).join('');
@@ -7773,7 +7774,6 @@ S4.register('text-field', function (scope) {
       /* Reset puts the form back to the state it loaded in (decision 0076): values, and the errors, valid marks and "touched" that came
          with them, and the autosave status; the reset event fires before the values change, so this waits one tick */
       form.addEventListener('reset', function () {
-        clearTimeout(timer);
         setTimeout(function () {
           controls(form).forEach(function (c) { var w = wrap(c); delete c.dataset.s4Touched; c.removeAttribute('aria-invalid'); w.removeAttribute('data-error'); w.removeAttribute('data-valid'); });
           status(form, '', false);
@@ -9072,7 +9072,7 @@ S4.register('skeleton', function (scope) {
     document.querySelectorAll('.s4-menu').forEach(function (m) {
       if (!isOpen(m) || m._s4closing || m.contains(e.target)) return;
       if (openChildren(m).some(function (c) { return c.contains(e.target); })) return;   /* inside one of its submenus */
-      if (m._s4anchor && m._s4anchor.contains(e.target)) return;   /* the anchor's own click toggles */
+      if (m._s4anchor && m._s4anchor.contains(e.target)) return;   /* a click on the anchor toggles it */
       close(m, false);
     });
   }, true);
@@ -9390,7 +9390,7 @@ S4.register('sheet', function () {});
     document.body.appendChild(host);
     return host;
   }
-  function offset() {   /* lift above anything fixed in the lower half (a FAB sits above the nav bar, so it isn't flush with the edge) */
+  function offset() {   /* lift above anything fixed in the lower half (a FAB sits above the nav bar, so it is not flush with the edge) */
     var lift = 0, vh = window.innerHeight;
     document.querySelectorAll('.s4-nav-bar, .s4-toolbar[data-type="docked"], .s4-fab[data-fixed], .s4-toolbar-dock').forEach(function (el) {
       var r = el.getBoundingClientRect(); if (r.height && getComputedStyle(el).display !== 'none' && r.top > vh / 2) lift = Math.max(lift, vh - r.top);
@@ -9402,21 +9402,16 @@ S4.register('sheet', function () {});
   S4.snackbar = function (o) {
     o = typeof o === 'string' ? { text: o } : (o || {});
     var ae = document.activeElement, opener = ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
-    if (current) {
-      var was = current;
-      if (was.o.action) waiting.push(was.o);
-      was.dismiss(true);
-    }
+    if (current) { if (current.o.action) waiting.push(current.o); current.dismiss(true); }
     offset();
     var el = document.createElement('div'); el.className = 's4-snackbar';
     if (o.multiline) el.setAttribute('data-multiline', '');
     var t = document.createElement('span'); t.className = 's4-snackbar-text'; t.textContent = o.text || ''; el.appendChild(t);
-    var gone = false, api;
+    var gone, api;
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
         if (o.onAction) o.onAction();
-        S4.util.release(el, back(opener));
         api.dismiss(true);
         /* the one under it is undoable now */
         var next = waiting.pop(); if (next) S4.snackbar(next);

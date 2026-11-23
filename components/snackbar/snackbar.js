@@ -16,7 +16,7 @@
     document.body.appendChild(host);
     return host;
   }
-  function offset() {   /* lift above anything fixed in the lower half (a FAB sits above the nav bar, so it isn't flush with the edge) */
+  function offset() {   /* lift above anything fixed in the lower half (a FAB sits above the nav bar, so it is not flush with the edge) */
     var lift = 0, vh = window.innerHeight;
     document.querySelectorAll('.s4-nav-bar, .s4-toolbar[data-type="docked"], .s4-fab[data-fixed], .s4-toolbar-dock').forEach(function (el) {
       var r = el.getBoundingClientRect(); if (r.height && getComputedStyle(el).display !== 'none' && r.top > vh / 2) lift = Math.max(lift, vh - r.top);
@@ -28,21 +28,16 @@
   S4.snackbar = function (o) {
     o = typeof o === 'string' ? { text: o } : (o || {});
     var ae = document.activeElement, opener = ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
-    if (current) {
-      var was = current;
-      if (was.o.action) waiting.push(was.o);
-      was.dismiss(true);
-    }
+    if (current) { if (current.o.action) waiting.push(current.o); current.dismiss(true); }
     offset();
     var el = document.createElement('div'); el.className = 's4-snackbar';
     if (o.multiline) el.setAttribute('data-multiline', '');
     var t = document.createElement('span'); t.className = 's4-snackbar-text'; t.textContent = o.text || ''; el.appendChild(t);
-    var gone = false, api;
+    var gone, api;
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
         if (o.onAction) o.onAction();
-        S4.util.release(el, back(opener));
         api.dismiss(true);
         /* the one under it is undoable now */
         var next = waiting.pop(); if (next) S4.snackbar(next);

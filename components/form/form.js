@@ -88,7 +88,6 @@
       /* Reset puts the form back to the state it loaded in (decision 0076): values, and the errors, valid marks and "touched" that came
          with them, and the autosave status; the reset event fires before the values change, so this waits one tick */
       form.addEventListener('reset', function () {
-        clearTimeout(timer);
         setTimeout(function () {
           controls(form).forEach(function (c) { var w = wrap(c); delete c.dataset.s4Touched; c.removeAttribute('aria-invalid'); w.removeAttribute('data-error'); w.removeAttribute('data-valid'); });
           status(form, '', false);

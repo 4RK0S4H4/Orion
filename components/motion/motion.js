@@ -59,7 +59,7 @@
   function track(el, anim) { el._s4anims.push(anim); return anim; }
   function settle(el, anims, keep) {
     return Promise.all(anims.map(function (a) { return a.finished; })).then(function () {
-      if (!keep) anims.forEach(function (a) { a.cancel(); });   /* opened: the element's own styles take over */
+      if (!keep) anims.forEach(function (a) { a.cancel(); });   /* opened: the styles of the element take over */
       return true;
     }, function () { return false; });
   }
@@ -156,7 +156,7 @@
   function scrim(dialog, open, opts) {
     open = open !== false;
     var s = M.spring(open ? 'effects' : 'fast-effects');
-    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* a dragged panel's scrim leaves from where the finger left it */
+    var from = opts && typeof opts.from === 'number' ? opts.from : (open ? 0 : 1);   /* the scrim of a dragged panel leaves from where the finger left it */
     return dialog.animate([{ opacity: from }, { opacity: open ? 1 : 0 }], { duration: s.duration, easing: s.easing, pseudoElement: '::backdrop', fill: open ? 'none' : 'forwards' });
   }
 

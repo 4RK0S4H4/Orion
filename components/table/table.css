@@ -388,7 +388,6 @@
     opacity: 0;
     transition: opacity var(--s4-motion-state), background-color var(--s4-motion-state);
   }
-  .s4-table-grip::after { content: ""; position: absolute; inset-block: 0; inset-inline: calc(var(--s4-space-1) * -1); }
   @media (hover: hover) { .s4-table thead th:hover > .s4-table-grip::before { opacity: 1; } .s4-table-grip:hover::before { background: var(--md-sys-color-outline); } }
   @media (hover: none) { .s4-table-grip::before { opacity: 1; } }
   .s4-table-grip:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); outline-offset: calc(var(--s4-focus-ring-width) * -1); }
