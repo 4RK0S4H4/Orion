@@ -47,6 +47,8 @@
     if (this.target && this.target.table) this.target.table.addEventListener('s4-change', function (e) {
       if (e.detail.type === 'sort' && !self.applying) { self.state.sort = e.detail.direction === 'none' ? null : { field: e.detail.field, dir: e.detail.direction }; self.after(false); }
       if (e.detail.type === 'update' || e.detail.type === 'edit') self.counts();
+      /* rows added, removed or put back by the app (decision 0076): the count line and the panel's counts follow the table */
+      if (e.detail.type === 'view' && !self.applying) { self.counts(); self.announce(); }
     });
     this.apply(false);
   }

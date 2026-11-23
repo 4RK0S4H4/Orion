@@ -7,7 +7,10 @@
    - S4.app.go(app, name) switches views from code (e.g. a "See All" link, a shortcut like mod+comma): focus moves to the
      new view (a region named by its data-title), so the next Tab starts there. A switch from the navigation keeps focus
      on the navigation item; focus left inside the view that went away also moves to the new view, never to <body>.
-   - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view. */
+   - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view.
+   - Back and Forward (decision 0076): the screen follows the URL both ways. A hash that names a view of the app (or no hash:
+     the view the app started on) switches to that view when the browser's Back or Forward, the phone's Back gesture or a
+     script (location.hash = '#forms') changes it; any open page closes first. */
 (function () {
   /* shared axis lives in motion/motion.js (S4.transition.sharedAxis) */
   function sharedAxis(from, to, dir, state, onSwap) { return S4.transition.sharedAxis(from, to, dir, state, onSwap); }
@@ -63,6 +66,9 @@
     }
   };
 
+  /* the view an app started on: the deep link, else the current destination, else the first view */
+  function name0(app, deep, cur, list) { return deep || (cur ? cur.dataset.view : list.length ? list[0].dataset.view : ''); }
+
   S4.register('app', function (scope) {
     S4.util.all(scope, '.s4-app').forEach(function (app) {
       if (!S4.util.once(app, 'app')) return;
@@ -85,6 +91,21 @@
         var name = deep || (cur ? cur.dataset.view : list[0].dataset.view);
         list.forEach(function (v) { v.hidden = v.dataset.view !== name; });
       }
+      var home = name0(app, deep, cur, list);
+      window.addEventListener('hashchange', function () {
+        if (!app.isConnected) return;
+        var want = decodeURIComponent(location.hash.slice(1)).split('/')[0] || home;
+        if (!list.some(function (v) { return v.dataset.view === want; })) return;
+        var now = app.querySelector('.s4-nav-bar .s4-nav-item[aria-current="page"][data-view], .s4-nav-rail .s4-nav-item[aria-current="page"][data-view]');
+        if (now && now.dataset.view === want) return;
+        if (!now && views(app).some(function (v) { return !v.hidden && v.dataset.view === want; })) return;
+        if (S4.pages) S4.pages.reset(app);
+        /* the navigation item is clicked for the app's own handlers, but its link must not navigate: the URL is already where the person put it (a new entry would cut off Forward) */
+        var veto = function (e) { e.preventDefault(); };
+        document.addEventListener('click', veto, { once: true });
+        S4.app.go(app, want);
+        document.removeEventListener('click', veto);
+      });
       app.addEventListener('s4-change', function (e) {
         var nav = e.target;
         if (!nav.matches || !nav.matches('.s4-nav-bar, .s4-nav-rail') || !e.detail || !e.detail.item) return;

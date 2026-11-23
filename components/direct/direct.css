@@ -67,14 +67,14 @@
     align-items: center;
     gap: var(--s4-space-1);
     padding-inline: var(--s4-space-2);
-    visibility: hidden;
+    opacity: 0;   /* never visibility: hidden (decision 0076): the buttons must take Tab; the face covers them until the row opens */
   }
   /* a long swipe: the main action takes over the whole uncovered strip, in the accent, so letting go is clearly "do it" */
   [data-swipe][data-swipe-commit] > .s4-swipe-actions { inset-inline-start: 0; justify-content: flex-end; background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
   [data-swipe][data-swipe-commit] > .s4-swipe-actions > :not([data-swipe-primary]) { display: none; }
   [data-swipe][data-swipe-commit] > .s4-swipe-actions > [data-swipe-primary] { background: none; color: inherit; }
   /* uncovered only while the row is dragged or open (or the keyboard is on one of them) */
-  [data-swipe]:is([data-swiping], [data-swiped]) > .s4-swipe-actions, .s4-swipe-actions:focus-within { visibility: visible; }
+  [data-swipe]:is([data-swiping], [data-swiped]) > .s4-swipe-actions, .s4-swipe-actions:focus-within { opacity: 1; }
 
   /* ---------- select several ---------- */
   [data-selectable] > [data-picked] > .s4-list-item,

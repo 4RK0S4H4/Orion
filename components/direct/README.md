@@ -37,8 +37,9 @@ Move things with your hand instead of through a menu: **reorder** by dragging, *
 Script: `S4.reorder.move(item, toIndex, toList)`, `S4.swipe.open(row)` / `close(row)`, `S4.selection.items(el)`,
 `clear(el)`, `all(el)`; event `s4-selection { items, count }`.
 
-How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, or tap a
-`data-select-toggle`. After that a tap adds or removes a row instead of opening it. Escape ends it. Put the
+How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, **Shift+Space or
+Shift+Enter on a focused row with the keyboard**, or tap a `data-select-toggle`. After that a tap, Space or Enter adds or
+removes a row instead of opening it. Escape ends it, and when the bar goes away focus lands on a row (never `<body>`). Put the
 `.s4-selection-bar` inside the `.s4-top-app-bar` and it takes the bar's place while anything is selected.
 
 **When to use what**
@@ -51,6 +52,7 @@ How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-clic
 
 **Accessibility:** a handle is a button: Space picks up, Arrow keys move (Left and Right cross between grouped
 lists), Space drops, Escape puts it back, and each step is announced. Swipe actions are real buttons reachable with
-Tab. Picked rows carry `aria-checked`.
+Tab (decision 0076: they stay in the focus order, covered by the row, and Tab onto one opens its row; Tab away closes it;
+an action that removes the row hands focus to the next one). Picked rows carry `aria-checked`.
 **Motion:** Morph calm for rows making room and settling; nothing animates while your finger is down.
 **Tokens:** `secondary-container`, `primary`, `surface-container-highest`, `--s4-size-touch-target`, `--s4-space-*`.

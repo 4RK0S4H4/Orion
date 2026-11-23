@@ -73,6 +73,16 @@
       m.focus({ preventScroll: true });
       return m;
     },
+    /* Decision 0076: before you hide or remove something that may hold focus (a selection bar, a button that turns into
+       something else), move focus out of it: to `fallback` (an element, or a function that returns one), else to main
+       (land). Focus that drops to <body> on its own breaks the keyboard (Tab starts again from the top of the page). Call it
+       BEFORE the change. Returns true when focus moved. */
+    release: function (box, fallback) {
+      var a = document.activeElement, to = typeof fallback === 'function' ? fallback() : fallback;
+      if (!a || !box || !box.contains(a)) return;
+      if (to && to.isConnected && !box.contains(to) && to.getClientRects().length) { to.tabIndex < 0 && !to.hasAttribute('tabindex') && to.setAttribute('tabindex', '-1'); to.focus({ preventScroll: true }); }
+      if (document.activeElement === a || document.activeElement === document.body) S4.util.land();
+    },
     /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
        refused write, an insecure page, an iframe or a browser with no clipboard is "false", not an uncaught error), and says
        what happened in a snackbar: opts.done on success (default "Copied"), opts.fail on refusal (default says to copy it by
@@ -98,6 +108,13 @@
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }
+  };
+
+  /* Decision 0076: a number typed by a person is read strictly, never coerced: a sign, digits, an optional decimal point (a comma
+     only in groups of three: "1,234.5" is 1234.5, "1,5" is refused, not 15), spaces ignored. "abc", "1e3", "12abc" and "" give NaN. */
+  S4.parseNumber = function (text) {
+    var t = String(text == null ? '' : text).replace(/\s/g, '');
+    return /^[+-]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(t) ? parseFloat(t.replace(/,/g, '')) : NaN;
   };
 
   /* ---------- motion ---------- */
@@ -1028,7 +1045,10 @@ S4.register('fab', function (scope) {
    - S4.app.go(app, name) switches views from code (e.g. a "See All" link, a shortcut like mod+comma): focus moves to the
      new view (a region named by its data-title), so the next Tab starts there. A switch from the navigation keeps focus
      on the navigation item; focus left inside the view that went away also moves to the new view, never to <body>.
-   - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view. */
+   - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view.
+   - Back and Forward (decision 0076): the screen follows the URL both ways. A hash that names a view of the app (or no hash:
+     the view the app started on) switches to that view when the browser's Back or Forward, the phone's Back gesture or a
+     script (location.hash = '#forms') changes it; any open page closes first. */
 (function () {
   /* shared axis lives in motion/motion.js (S4.transition.sharedAxis) */
   function sharedAxis(from, to, dir, state, onSwap) { return S4.transition.sharedAxis(from, to, dir, state, onSwap); }
@@ -1084,6 +1104,9 @@ S4.register('fab', function (scope) {
     }
   };
 
+  /* the view an app started on: the deep link, else the current destination, else the first view */
+  function name0(app, deep, cur, list) { return deep || (cur ? cur.dataset.view : list.length ? list[0].dataset.view : ''); }
+
   S4.register('app', function (scope) {
     S4.util.all(scope, '.s4-app').forEach(function (app) {
       if (!S4.util.once(app, 'app')) return;
@@ -1106,6 +1129,21 @@ S4.register('fab', function (scope) {
         var name = deep || (cur ? cur.dataset.view : list[0].dataset.view);
         list.forEach(function (v) { v.hidden = v.dataset.view !== name; });
       }
+      var home = name0(app, deep, cur, list);
+      window.addEventListener('hashchange', function () {
+        if (!app.isConnected) return;
+        var want = decodeURIComponent(location.hash.slice(1)).split('/')[0] || home;
+        if (!list.some(function (v) { return v.dataset.view === want; })) return;
+        var now = app.querySelector('.s4-nav-bar .s4-nav-item[aria-current="page"][data-view], .s4-nav-rail .s4-nav-item[aria-current="page"][data-view]');
+        if (now && now.dataset.view === want) return;
+        if (!now && views(app).some(function (v) { return !v.hidden && v.dataset.view === want; })) return;
+        if (S4.pages) S4.pages.reset(app);
+        /* the navigation item is clicked for the app's own handlers, but its link must not navigate: the URL is already where the person put it (a new entry would cut off Forward) */
+        var veto = function (e) { e.preventDefault(); };
+        document.addEventListener('click', veto, { once: true });
+        S4.app.go(app, want);
+        document.removeEventListener('click', veto);
+      });
       app.addEventListener('s4-change', function (e) {
         var nav = e.target;
         if (!nav.matches || !nav.matches('.s4-nav-bar, .s4-nav-rail') || !e.detail || !e.detail.item) return;
@@ -3470,8 +3508,24 @@ S4.register('accordion', function (scope) {
     window.addEventListener('pointermove', move, { capture: true, passive: false }); window.addEventListener('pointerup', up, true); window.addEventListener('pointercancel', up, true);
     window.addEventListener('touchmove', hold, { capture: true, passive: false });
   });
-  document.addEventListener('focusin', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && !a.parentElement.hasAttribute('data-swiped')) swipeSet(a.parentElement, true); });
-  document.addEventListener('click', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && a.parentElement.hasAttribute('data-swiped')) setTimeout(function () { swipeSet(a.parentElement, false); }, 0); });
+  /* Tab onto an action opens its row (a keyboard has no swipe; decision 0076), and Tab away closes what the keyboard opened */
+  document.addEventListener('focusin', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && !a.parentElement.hasAttribute('data-swiped')) { a.parentElement._s4key = true; swipeSet(a.parentElement, true); } });
+  document.addEventListener('focusout', function (e) { var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (a && a.parentElement._s4key && !(e.relatedTarget && a.contains(e.relatedTarget))) { a.parentElement._s4key = false; swipeSet(a.parentElement, false); } });
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('.s4-swipe-actions') : null; if (!a) return;
+    var row = a.parentElement, near = [row.nextElementSibling, row.previousElementSibling].filter(function (r) { return r && r.hasAttribute('data-swipe'); });
+    row._s4key = false;
+    setTimeout(function () {
+      if (row.hasAttribute('data-swiped')) swipeSet(row, false);
+      /* the action removed its row (or hid it) and took focus with it: the next row, else the one before, else the list (decision 0076) */
+      var ae = document.activeElement; if (!ae || ae === document.body || !ae.isConnected) {
+        var to = near.filter(function (r) { return r.isConnected && r.getClientRects().length; })[0];
+        var target = to && (to.querySelector(':scope > .s4-list-item, :scope > [data-swipe-face]') || to);
+        if (target && target.tabIndex < 0 && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+        if (target) target.focus({ preventScroll: true }); else S4.util.land();
+      }
+    }, 0);
+  });
 
   /* ---------- 3. select several ---------- */
   function sItems(el) { return Array.prototype.filter.call(el.querySelectorAll(':scope > li, :scope > [data-select-item], :scope > tr'), function (x) { return !x.matches('.s4-list-subheader'); }); }
@@ -3483,7 +3537,9 @@ S4.register('accordion', function (scope) {
     sItems(el).forEach(function (x) { if (el.hasAttribute('data-selecting')) x.setAttribute('aria-checked', String(x.hasAttribute('data-picked'))); else x.removeAttribute('aria-checked'); });
     if (b) {
       var c = b.querySelector('[data-selection-count]'); if (c) c.textContent = n + ' Selected';
-      var was = !b.hidden; b.hidden = !n;
+      var was = !b.hidden;
+      if (!n && was) S4.util.release(b, function () { var a = el._s4anchor && el._s4anchor.isConnected ? el._s4anchor : sItems(el)[0]; return a && (a.querySelector('button, a[href], [tabindex]') || a); });   /* its action had focus (decision 0076) */
+      b.hidden = !n;
       var top = b.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', n > 0);
       if (n && !was) S4.transition.fade(b, true);
     }
@@ -4534,7 +4590,9 @@ S4.register('accordion', function (scope) {
       var count = this.selected.size;
       if (this.bar) {
         var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected';
-        var was = !this.bar.hidden; this.bar.hidden = !count;
+        var was = !this.bar.hidden;
+        if (!count && was) S4.util.release(this.bar, function () { return self.tabRow && self.tabRow.isConnected ? self.tabRow : self.row(Math.max(0, Math.min(self.current, self.items.length - 1))); });   /* its Delete or Clear had focus */
+        this.bar.hidden = !count;
         var top = this.bar.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', count > 0);
         if (count && !was) S4.transition.fade(this.bar, true);
       }
@@ -4577,23 +4635,71 @@ S4.register('accordion', function (scope) {
       var i = this.index[String(id)]; if (i == null) return;
       var row = this.rows[i]; for (var k in patch) row[k] = patch[k];
       var tr = this.rendered.get('r' + id);
-      if (tr) { var fresh = this.make({ t: 'r', i: i }, +tr.dataset.n); tr.replaceWith(fresh); this.rendered.set('r' + id, fresh); this.roving(); }
+      if (tr) {
+        /* the row is drawn again: whatever in it had focus (or is about to: a Tab that is leaving an edited cell) keeps it, on the same cell */
+        var fa = document.activeElement, spot = this.focusSpot(fa === document.body || !fa ? this.nextFocus : fa, tr); this.nextFocus = null;
+        var fresh = this.make({ t: 'r', i: i }, +tr.dataset.n); tr.replaceWith(fresh); this.rendered.set('r' + id, fresh); this.roving();
+        if (spot) this.focusBack(fresh, spot);
+      }
       this.totals();
       if (!silent) S4.util.emit(this.table, 's4-change', { type: 'update', id: String(id), row: row, patch: patch });
     },
+    /* where focus is inside a row, as something that survives the row being drawn again: { row } or { cell, k } (k-th control in the cell) */
+    focusSpot: function (el, tr) {
+      if (!el || !tr.contains(el)) return null;
+      if (el === tr) return { row: true };
+      var td = el.closest('td, th'); if (!td) return { row: true };
+      var q = td.querySelectorAll('button, a[href], input'), k = Array.prototype.indexOf.call(q, el);
+      return { cell: td.cellIndex, k: el === td ? -1 : k };
+    },
+    focusBack: function (tr, spot) {
+      var to = tr; if (!spot.row) { var td = tr.cells[spot.cell]; to = td || tr; if (td && spot.k >= 0 && !td.matches('[data-edit]')) to = td.querySelectorAll('button, a[href], input')[spot.k] || td; }
+      if (to.tabIndex < 0 && !to.hasAttribute('tabindex')) to.setAttribute('tabindex', '-1');
+      to.focus({ preventScroll: true });
+    },
+    /* Returns the removed rows. Decision 0076: the array also says where each one was (`.at`, indices in the rows before the
+       removal), so restore(rows) puts them back in place; Undo never moves a record to the end. */
     remove: function (ids) {
       var gone = {}; (ids || []).forEach(function (id) { gone[String(id)] = true; });
-      var self = this, removed = [];
-      this.rows = this.rows.filter(function (r, i) { var g = gone[self.id(r, i)]; if (g) removed.push(r); return !g; });
+      var self = this, removed = [], at = [], had = this.focusedRow();
+      this.rows = this.rows.filter(function (r, i) { var g = gone[self.id(r, i)]; if (g) { removed.push(r); at.push(i); } return !g; });
       ids.forEach(function (id) { self.selected.delete(String(id)); self.expanded.delete(String(id)); });
       this.setRows(this.rows); this.selectionChanged();
+      removed.at = at;
+      if (had && (document.activeElement === document.body || !document.body.contains(document.activeElement))) this.keepPlace();
       return removed;
+    },
+    /* the rows come back where they were (rows from remove(), or { row, index } pairs); focus stays where it is */
+    restore: function (removed, atList) {
+      var at = atList || removed.at || [], rows = this.rows.slice();
+      removed.forEach(function (r, k) { var i = at[k]; if (i == null || i > rows.length) i = rows.length; rows.splice(i, 0, r); });
+      var had = this.focusedRow(); this.setRows(rows); this.selectionChanged();
+      if (had && (document.activeElement === document.body || !document.body.contains(document.activeElement))) this.keepPlace();
+      return this;
+    },
+    focusedRow: function () { var a = document.activeElement; return a && this.table.contains(a) ? a.closest('tbody tr') : null; },
+    /* a row that held focus went away: the nearest row takes it (the keyboard keeps its place in the table), else the table's own stop */
+    keepPlace: function () {
+      var n = Math.max(0, Math.min(this.items.length - 1, this.current)); if (this.items[n] && this.items[n].t === 'd') n = Math.max(0, n - 1);
+      var tr = this.items.length ? (this.reveal(n), this.row(n)) : null;
+      if (tr) { this.current = n; this.roving(); tr.focus({ preventScroll: true }); } else if (this.wrap && !this.wrap.contains(document.activeElement)) { S4.util.land(); }
     },
     commit: function (input) {
       var td = input.closest('td'), tr = td.closest('tr'), it = this.items[+tr.dataset.n]; if (!it) return;
       var c = this.c.visible()[td.cellIndex], row = this.rows[it.i], id = this.id(row, it.i), before = row[c.field];
       var raw = input.value.trim(), num = c.th.getAttribute('data-edit') === 'number', val = raw;
-      if (num) { val = raw === '' ? null : +raw.replace(/[^\d.\-]/g, ''); if (raw !== '' && isNaN(val)) { input.value = before == null ? '' : before; S4.snackbar((c.label) + ' needs a number'); return; } }
+      if (num) {
+        var n = S4.parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
+          isNaN(n) ? (raw ? 'needs a number' : 'can’t be empty') : c.th.getAttribute('data-format') === 'integer' && n % 1 ? 'needs a whole number' :
+          min !== null && n < +min ? 'can’t be less than ' + min : max !== null && n > +max ? 'can’t be more than ' + max : '';
+        if (raw === '' && !c.th.hasAttribute('data-required')) val = null;
+        else if (why) {
+          /* a refusal is shown (decision 0076): the field says so to a screen reader, the old value comes back, a message says why */
+          input.value = before == null ? '' : String(before); input.setAttribute('aria-invalid', 'true');
+          S4.snackbar(c.label + ' ' + why + (raw ? '. “' + raw + '” was not saved.' : '.'));
+          return;
+        } else val = n;
+      }
       if (String(val == null ? '' : val) === String(before == null ? '' : before)) return;
       if (!num && !raw && c.th.hasAttribute('data-required')) { input.value = before; S4.snackbar(c.label + ' can’t be empty'); return; }
       var self = this, patch = {}; patch[c.field] = val;
@@ -4640,7 +4746,7 @@ S4.register('accordion', function (scope) {
       t.addEventListener('keydown', function (e) {
         var input = e.target.closest && e.target.closest('.s4-table-input');
         if (input) {
-          if (e.key === 'Enter') { e.preventDefault(); self.commit(input); var td = input.closest('td'); td.focus(); }
+          if (e.key === 'Enter') { e.preventDefault(); var td0 = input.closest('td'), tr0 = td0.closest('tr'), ci = td0.cellIndex; self.commit(input); var tr1 = self.row(+tr0.dataset.n) || tr0; (tr1.cells[ci] || tr1).focus({ preventScroll: true }); }
           else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); input.value = input.defaultValue; input._s4cancel = true; input.closest('td').focus(); }
           return;
         }
@@ -4648,8 +4754,9 @@ S4.register('accordion', function (scope) {
       });
       t.addEventListener('focusout', function (e) {
         var input = e.target.closest && e.target.closest('.s4-table-input');
-        if (input) { if (input._s4cancel) { input._s4cancel = false; return; } self.commit(input); }
+        if (input) { if (input._s4cancel) { input._s4cancel = false; return; } self.nextFocus = e.relatedTarget; self.commit(input); self.nextFocus = null; }
       });
+      t.addEventListener('input', function (e) { var input = e.target.closest && e.target.closest('.s4-table-input'); if (input) input.removeAttribute('aria-invalid'); });
       t.addEventListener('focusin', function (e) { var tr = e.target.closest && e.target.closest('tbody tr[data-n]'); if (tr && self.body.contains(tr) && !tr.classList.contains('s4-table-detail')) { self.current = +tr.dataset.n; self.roving(); } });
       if (this.menu) this.menu.addEventListener('s4-select', function (e) {
         if (!self.menuRow) return;
@@ -5036,6 +5143,8 @@ S4.register('table', function (scope) {
     if (this.target && this.target.table) this.target.table.addEventListener('s4-change', function (e) {
       if (e.detail.type === 'sort' && !self.applying) { self.state.sort = e.detail.direction === 'none' ? null : { field: e.detail.field, dir: e.detail.direction }; self.after(false); }
       if (e.detail.type === 'update' || e.detail.type === 'edit') self.counts();
+      /* rows added, removed or put back by the app (decision 0076): the count line and the panel's counts follow the table */
+      if (e.detail.type === 'view' && !self.applying) { self.counts(); self.announce(); }
     });
     this.apply(false);
   }
@@ -8571,11 +8680,13 @@ S4.register('theme-controls', function (scope) {
      </div>
    - Enter or leaving the field saves; Escape puts the saved value back. An empty required value, or one the input
      rejects, is not saved: the old value comes back and a short message says why.
+   - Focus stays where it is (decision 0076): after Enter or Escape the field still has it, or, on a touch screen (no keyboard to
+     keep up), its own box does; never <body>. Several edits in a row each keep their Undo (see S4.snackbar).
    - Saving fires s4-change { value, previous } on the element and offers Undo in a snackbar (data-undo-text sets its
      words, "Display name changed" by default); Undo puts the previous value back and fires s4-change again.
    S4.inlineEdit.set(el, value). */
 (function () {
-  var S4 = window.S4;
+  var S4 = window.S4, root = document.documentElement;
   S4.inlineEdit = { set: function (el, v) { if (el._s4edit) el._s4edit(v); } };
   S4.register('inline-edit', function (scope) {
     S4.util.all(scope, '.s4-inline-edit').forEach(function (el) {
@@ -8591,9 +8702,13 @@ S4.register('theme-controls', function (scope) {
       if (!input.id) input.id = 's4-inline-' + Math.random().toString(36).slice(2, 7);
       msg.id = input.id + '-msg';
       input.setAttribute('aria-describedby', ((input.getAttribute('aria-describedby') || '') + ' ' + msg.id).trim());
-      var cancelled = false;
       function size() { if (input.tagName === 'INPUT') input.style.inlineSize = 'calc(' + Math.max(4, input.value.length + 2) + 'ch + var(--s4-space-2) + var(--s4-space-3) + var(--s4-size-icon-small))'; }
-      function say(t) { msg.textContent = t; el.toggleAttribute('data-message', !!t); }
+      function say(t) { msg.textContent = t; el.toggleAttribute('data-message', !!t); if (t) input.setAttribute('aria-invalid', 'true'); else input.removeAttribute('aria-invalid'); }
+      /* Enter and Escape finish the edit without losing the place. A keyboard keeps the field; a finger puts the keyboard away and
+         the box that holds the field takes focus (a place-holder, ringed only for keys, decision 0065) */
+      function done() {
+        if (root.getAttribute('data-s4-input') === 'pointer') { if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); }
+      }
       function commit() {
         var v = input.value.trim();
         if (v === saved) { input.value = saved; size(); return; }
@@ -8606,12 +8721,12 @@ S4.register('theme-controls', function (scope) {
         if (S4.snackbar && !el.hasAttribute('data-no-undo')) S4.snackbar({ text: el.dataset.undoText || (name.charAt(0) + name.slice(1).toLowerCase()) + ' changed', action: 'Undo', onAction: function () { var now = saved; saved = previous; input.value = previous; size(); S4.util.emit(el, 's4-change', { value: previous, previous: now }); } });
       }
       input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' && input.tagName === 'INPUT') { e.preventDefault(); input.blur(); }
-        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelled = true; input.value = saved; size(); input.blur(); }
+        if (e.key === 'Enter' && input.tagName === 'INPUT') { e.preventDefault(); commit(); done(); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); input.value = saved; size(); say(''); done(); }
       });
       input.addEventListener('focus', function () { say(''); });
-      input.addEventListener('input', size);
-      input.addEventListener('blur', function () { if (cancelled) { cancelled = false; return; } commit(); });
+      input.addEventListener('input', function () { size(); if (input.hasAttribute('aria-invalid')) say(''); });
+      input.addEventListener('blur', commit);
       el._s4edit = function (v) { saved = String(v); input.value = saved; size(); };
       size();
     });
@@ -9189,11 +9304,16 @@ S4.register('sheet', function () {});
 
 /* ---- snackbar/snackbar.js ---- */
 /* S4.snackbar({ text, action, onAction, closable, multiline, duration }) -> { dismiss }
-   One at a time: a new snackbar replaces the one showing. Rises a little and fades in; sits above a nav bar, a docked
+   One shows at a time: a new snackbar replaces the one showing. Rises a little and fades in; sits above a nav bar, a docked
    toolbar or a FAB in the corner. Announced politely to screen readers. Stays while hovered or focused.
-   Default duration: 4s, or 6s when it has an action; 0 keeps it until dismissed. */
+   Default duration: 4s, or 6s when it has an action; 0 keeps it until dismissed.
+   Decision 0076: (1) several pending Undos each stay undoable: a snackbar with an action that a newer one replaces waits
+   underneath, and comes back, newest first, once the newer one's action has run; when the showing one runs
+   out on its own or is closed, the waiting ones are let go with it. (2) Acting on a snackbar or letting it go never leaves
+   focus on <body>: it returns to what had focus when the snackbar was made (never into a text field, 0049: its cell or
+   field's container instead), else to the main landmark (S4.util.land). */
 (function () {
-  var S4 = window.S4, host = null, current = null;
+  var S4 = window.S4, host = null, current = null, waiting = [];
   function ensureHost() {
     if (host && host.isConnected) return host;
     host = document.createElement('div'); host.className = 's4-snackbar-host'; host.setAttribute('role', 'status'); host.setAttribute('aria-live', 'polite');
@@ -9208,38 +9328,52 @@ S4.register('sheet', function () {});
     });
     ensureHost().style.setProperty('--s4-snackbar-offset', lift + 'px');
   }
-  S4.snackbar = function (o) {
+  /* where focus goes when the snackbar's button holds it: what had focus, or (a field) the cell or box round it */
+  function back(op) { return function () { return op && S4.util.typable(op) ? op.closest('[tabindex], td') : op; }; }
+  S4.snackbar = function (o, restored) {
     o = typeof o === 'string' ? { text: o } : (o || {});
-    if (current) current.dismiss(true);
+    var ae = document.activeElement, opener = restored ? restored.opener : ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
+    if (current) {
+      var was = current;
+      if (was.o.action && !was.acted) { waiting.push({ o: was.o, opener: was.opener }); }
+      was.dismiss(true);
+    }
     offset();
     var el = document.createElement('div'); el.className = 's4-snackbar';
     if (o.multiline) el.setAttribute('data-multiline', '');
     var t = document.createElement('span'); t.className = 's4-snackbar-text'; t.textContent = o.text || ''; el.appendChild(t);
+    var gone = false, api = null;
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
-      a.addEventListener('click', function () { if (o.onAction) o.onAction(); api.dismiss(); });
+      a.addEventListener('click', function () {
+        api.acted = true; S4.util.release(el, back(opener));
+        if (o.onAction) o.onAction();
+        api.dismiss(true);
+        var next = waiting.pop(); if (next) S4.snackbar(next.o, next);   /* the one under it is undoable now */
+      });
       el.appendChild(a);
     }
     if (o.closable) {
       var c = document.createElement('button'); c.type = 'button'; c.className = 's4-icon-button'; c.setAttribute('aria-label', 'Dismiss');
-      c.innerHTML = '<span class="s4-icon" data-icon="close"></span>'; c.addEventListener('click', function () { api.dismiss(); });
+      c.innerHTML = '<span class="s4-icon" data-icon="close"></span>'; c.addEventListener('click', function () { api.dismiss(false, true); });
       el.appendChild(c); S4.init(c);
     }
     ensureHost().appendChild(el);
     S4.transition.rise(el, { open: true });
     var ms = o.duration != null ? o.duration : (o.action ? 6000 : 4000), timer = null, held = false;
-    function arm() { clearTimeout(timer); if (ms && !held) timer = setTimeout(function () { api.dismiss(); }, ms); }
+    function arm() { clearTimeout(timer); if (ms && !held) timer = setTimeout(function () { api.dismiss(false, true); }, ms); }
     el.addEventListener('pointerenter', function () { held = true; clearTimeout(timer); });
     el.addEventListener('pointerleave', function () { held = false; arm(); });
     el.addEventListener('focusin', function () { held = true; clearTimeout(timer); });
     el.addEventListener('focusout', function () { held = false; arm(); });
-    var gone = false;
-    var api = {
-      element: el,
-      dismiss: function (instant) {
+    api = {
+      element: el, o: o, opener: opener, acted: false,
+      /* instant: no exit animation; replaced: made room for a newer one (its Undo waits); otherwise it ran out or was closed, so what waits is let go */
+      dismiss: function (instant, letGo) {
         if (gone) return; gone = true; clearTimeout(timer); if (current === api) current = null;
-        if (instant) { el.remove(); return; }
-        S4.transition.rise(el, { open: false }).then(function () { el.remove(); });
+        if (letGo === true && !api.acted) waiting.length = 0;
+        S4.util.release(el, back(opener));
+        if (instant) el.remove(); else S4.transition.rise(el, { open: false }).then(function () { el.remove(); });
       }
     };
     current = api; arm();

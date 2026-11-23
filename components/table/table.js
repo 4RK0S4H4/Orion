@@ -618,7 +618,9 @@
       var count = this.selected.size;
       if (this.bar) {
         var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected';
-        var was = !this.bar.hidden; this.bar.hidden = !count;
+        var was = !this.bar.hidden;
+        if (!count && was) S4.util.release(this.bar, function () { return self.tabRow && self.tabRow.isConnected ? self.tabRow : self.row(Math.max(0, Math.min(self.current, self.items.length - 1))); });   /* its Delete or Clear had focus */
+        this.bar.hidden = !count;
         var top = this.bar.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', count > 0);
         if (count && !was) S4.transition.fade(this.bar, true);
       }
@@ -661,23 +663,71 @@
       var i = this.index[String(id)]; if (i == null) return;
       var row = this.rows[i]; for (var k in patch) row[k] = patch[k];
       var tr = this.rendered.get('r' + id);
-      if (tr) { var fresh = this.make({ t: 'r', i: i }, +tr.dataset.n); tr.replaceWith(fresh); this.rendered.set('r' + id, fresh); this.roving(); }
+      if (tr) {
+        /* the row is drawn again: whatever in it had focus (or is about to: a Tab that is leaving an edited cell) keeps it, on the same cell */
+        var fa = document.activeElement, spot = this.focusSpot(fa === document.body || !fa ? this.nextFocus : fa, tr); this.nextFocus = null;
+        var fresh = this.make({ t: 'r', i: i }, +tr.dataset.n); tr.replaceWith(fresh); this.rendered.set('r' + id, fresh); this.roving();
+        if (spot) this.focusBack(fresh, spot);
+      }
       this.totals();
       if (!silent) S4.util.emit(this.table, 's4-change', { type: 'update', id: String(id), row: row, patch: patch });
     },
+    /* where focus is inside a row, as something that survives the row being drawn again: { row } or { cell, k } (k-th control in the cell) */
+    focusSpot: function (el, tr) {
+      if (!el || !tr.contains(el)) return null;
+      if (el === tr) return { row: true };
+      var td = el.closest('td, th'); if (!td) return { row: true };
+      var q = td.querySelectorAll('button, a[href], input'), k = Array.prototype.indexOf.call(q, el);
+      return { cell: td.cellIndex, k: el === td ? -1 : k };
+    },
+    focusBack: function (tr, spot) {
+      var to = tr; if (!spot.row) { var td = tr.cells[spot.cell]; to = td || tr; if (td && spot.k >= 0 && !td.matches('[data-edit]')) to = td.querySelectorAll('button, a[href], input')[spot.k] || td; }
+      if (to.tabIndex < 0 && !to.hasAttribute('tabindex')) to.setAttribute('tabindex', '-1');
+      to.focus({ preventScroll: true });
+    },
+    /* Returns the removed rows. Decision 0076: the array also says where each one was (`.at`, indices in the rows before the
+       removal), so restore(rows) puts them back in place; Undo never moves a record to the end. */
     remove: function (ids) {
       var gone = {}; (ids || []).forEach(function (id) { gone[String(id)] = true; });
-      var self = this, removed = [];
-      this.rows = this.rows.filter(function (r, i) { var g = gone[self.id(r, i)]; if (g) removed.push(r); return !g; });
+      var self = this, removed = [], at = [], had = this.focusedRow();
+      this.rows = this.rows.filter(function (r, i) { var g = gone[self.id(r, i)]; if (g) { removed.push(r); at.push(i); } return !g; });
       ids.forEach(function (id) { self.selected.delete(String(id)); self.expanded.delete(String(id)); });
       this.setRows(this.rows); this.selectionChanged();
+      removed.at = at;
+      if (had && (document.activeElement === document.body || !document.body.contains(document.activeElement))) this.keepPlace();
       return removed;
+    },
+    /* the rows come back where they were (rows from remove(), or { row, index } pairs); focus stays where it is */
+    restore: function (removed, atList) {
+      var at = atList || removed.at || [], rows = this.rows.slice();
+      removed.forEach(function (r, k) { var i = at[k]; if (i == null || i > rows.length) i = rows.length; rows.splice(i, 0, r); });
+      var had = this.focusedRow(); this.setRows(rows); this.selectionChanged();
+      if (had && (document.activeElement === document.body || !document.body.contains(document.activeElement))) this.keepPlace();
+      return this;
+    },
+    focusedRow: function () { var a = document.activeElement; return a && this.table.contains(a) ? a.closest('tbody tr') : null; },
+    /* a row that held focus went away: the nearest row takes it (the keyboard keeps its place in the table), else the table's own stop */
+    keepPlace: function () {
+      var n = Math.max(0, Math.min(this.items.length - 1, this.current)); if (this.items[n] && this.items[n].t === 'd') n = Math.max(0, n - 1);
+      var tr = this.items.length ? (this.reveal(n), this.row(n)) : null;
+      if (tr) { this.current = n; this.roving(); tr.focus({ preventScroll: true }); } else if (this.wrap && !this.wrap.contains(document.activeElement)) { S4.util.land(); }
     },
     commit: function (input) {
       var td = input.closest('td'), tr = td.closest('tr'), it = this.items[+tr.dataset.n]; if (!it) return;
       var c = this.c.visible()[td.cellIndex], row = this.rows[it.i], id = this.id(row, it.i), before = row[c.field];
       var raw = input.value.trim(), num = c.th.getAttribute('data-edit') === 'number', val = raw;
-      if (num) { val = raw === '' ? null : +raw.replace(/[^\d.\-]/g, ''); if (raw !== '' && isNaN(val)) { input.value = before == null ? '' : before; S4.snackbar((c.label) + ' needs a number'); return; } }
+      if (num) {
+        var n = S4.parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
+          isNaN(n) ? (raw ? 'needs a number' : 'can’t be empty') : c.th.getAttribute('data-format') === 'integer' && n % 1 ? 'needs a whole number' :
+          min !== null && n < +min ? 'can’t be less than ' + min : max !== null && n > +max ? 'can’t be more than ' + max : '';
+        if (raw === '' && !c.th.hasAttribute('data-required')) val = null;
+        else if (why) {
+          /* a refusal is shown (decision 0076): the field says so to a screen reader, the old value comes back, a message says why */
+          input.value = before == null ? '' : String(before); input.setAttribute('aria-invalid', 'true');
+          S4.snackbar(c.label + ' ' + why + (raw ? '. “' + raw + '” was not saved.' : '.'));
+          return;
+        } else val = n;
+      }
       if (String(val == null ? '' : val) === String(before == null ? '' : before)) return;
       if (!num && !raw && c.th.hasAttribute('data-required')) { input.value = before; S4.snackbar(c.label + ' can’t be empty'); return; }
       var self = this, patch = {}; patch[c.field] = val;
@@ -724,7 +774,7 @@
       t.addEventListener('keydown', function (e) {
         var input = e.target.closest && e.target.closest('.s4-table-input');
         if (input) {
-          if (e.key === 'Enter') { e.preventDefault(); self.commit(input); var td = input.closest('td'); td.focus(); }
+          if (e.key === 'Enter') { e.preventDefault(); var td0 = input.closest('td'), tr0 = td0.closest('tr'), ci = td0.cellIndex; self.commit(input); var tr1 = self.row(+tr0.dataset.n) || tr0; (tr1.cells[ci] || tr1).focus({ preventScroll: true }); }
           else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); input.value = input.defaultValue; input._s4cancel = true; input.closest('td').focus(); }
           return;
         }
@@ -732,8 +782,9 @@
       });
       t.addEventListener('focusout', function (e) {
         var input = e.target.closest && e.target.closest('.s4-table-input');
-        if (input) { if (input._s4cancel) { input._s4cancel = false; return; } self.commit(input); }
+        if (input) { if (input._s4cancel) { input._s4cancel = false; return; } self.nextFocus = e.relatedTarget; self.commit(input); self.nextFocus = null; }
       });
+      t.addEventListener('input', function (e) { var input = e.target.closest && e.target.closest('.s4-table-input'); if (input) input.removeAttribute('aria-invalid'); });
       t.addEventListener('focusin', function (e) { var tr = e.target.closest && e.target.closest('tbody tr[data-n]'); if (tr && self.body.contains(tr) && !tr.classList.contains('s4-table-detail')) { self.current = +tr.dataset.n; self.roving(); } });
       if (this.menu) this.menu.addEventListener('s4-select', function (e) {
         if (!self.menuRow) return;

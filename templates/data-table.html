@@ -18,7 +18,7 @@
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.core.min.css?v=2e9d02b">
 <link rel="stylesheet" href="../components/orion.data.min.css?v=383f9ca">
-<link rel="stylesheet" href="../components/orion.direct.min.css?v=a0c88f7">
+<link rel="stylesheet" href="../components/orion.direct.min.css?v=34fcf9c">
 <link rel="stylesheet" href="../components/orion.inputs.min.css?v=30f62ee">
 <link rel="stylesheet" href="brand/data-table.css?v=a9ebee5">
 <style>
@@ -159,7 +159,7 @@
                     <th scope="col" data-field="locality" aria-sort="none"><button type="button" class="s4-table-sort">Locality<span class="s4-icon" data-icon="chevron-down"></span></button></th>
                     <th scope="col" data-field="drawer" data-edit data-required>Drawer</th>
                     <th scope="col" data-field="status" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Status<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-total="sum" aria-sort="none"><button type="button" class="s4-table-sort">Specimens<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-required data-min="0" data-total="sum" aria-sort="none"><button type="button" class="s4-table-sort">Specimens<span class="s4-icon" data-icon="chevron-down"></span></button></th>
                     <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
                   </tr></thead>
                   <tbody></tbody>
@@ -309,10 +309,10 @@
 </dialog>
 
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=c88445c"></script>
-<script src="../components/orion.data.min.js?v=3668d7e"></script>
-<script src="../components/orion.direct.min.js?v=ebca165"></script>
-<script src="../components/orion.inputs.min.js?v=49798a0"></script>
+<script src="../components/orion.core.min.js?v=6f74d76"></script>
+<script src="../components/orion.data.min.js?v=15b8747"></script>
+<script src="../components/orion.direct.min.js?v=5afa9fb"></script>
+<script src="../components/orion.inputs.min.js?v=00f4839"></script>
 <script>
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#24573f', variant: 'fidelity' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
 
@@ -416,7 +416,7 @@ function conserve(list) {
 }
 function remove(ids) {
   var gone = table.remove(ids); rows = table.rows; facts();
-  S4.snackbar({ text: (gone.length === 1 ? gone[0].catalogue : gone.length.toLocaleString() + ' records') + ' deleted', action: 'Undo', onAction: function () { table.setRows(table.rows.concat(gone)); rows = table.rows; facts(); } });
+  S4.snackbar({ text: (gone.length === 1 ? gone[0].catalogue : gone.length.toLocaleString() + ' records') + ' deleted', action: 'Undo', onAction: function () { table.restore(gone); rows = table.rows; facts(); } });
 }
 tableEl.addEventListener('s4-row-action', function (e) {
   var r = e.detail.row, a = e.detail.action;
