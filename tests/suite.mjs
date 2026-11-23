@@ -1247,6 +1247,200 @@ async function apiAudit(page, add) {
   out.forEach(add);
 }
 
+/* QA pass 2 (decision 0076): the flows pass 1 did not exercise, on a fresh copy of the page so nothing `use` left behind matters.
+   Focus never falls to <body> after a commit, a cancel, an Undo or a command; every swipe action takes Tab; a grip's whole box is
+   its own; a number cell refuses garbage out loud; Undo puts rows back where they were and several Undos each stay undoable;
+   Reset clears errors; the palette's list follows its box; a select trigger opens on Down; a code takes a paste; the contrast
+   dial's values are what S4.theme accepts; a deep link to an id that is not there leaves no lying URL. Chromium, 1280 wide. */
+async function qa2Audit(ctx, rel, add) {
+  const p = await ctx.newPage();
+  p.on('pageerror', (e) => add('script error: ' + String(e.message).split('\n')[0]));
+  const at = () => p.evaluate(() => { const a = document.activeElement; return !a || a === document.body ? 'BODY' : a.tagName.toLowerCase() + (typeof a.className === 'string' && a.className ? '.' + a.className.trim().split(/\s+/)[0] : ''); });
+  const notBody = async (what) => { const a = await at(); if (a === 'BODY') add(`${what}: focus fell to <body> (decision 0076: no flow leaves focus on <body>)`); };
+  const flow = async (name, fn) => { try { await fn(); } catch (e) { add(`${name}: could not finish: ${String(e.message).split('\n')[0].slice(0, 120)}`); } };
+  try {
+    await p.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 });
+    await p.waitForTimeout(450);
+    const has = (sel) => p.evaluate((s) => [...document.querySelectorAll(s)].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && !e.closest('[hidden], dialog:not([open])'); }), sel);
+
+    /* swipe actions are reachable with the keyboard; grips are hit at their middle and quarters */
+    (await p.evaluate(() => {
+      const o = [];
+      document.querySelectorAll('[data-swipe]').forEach((r) => {
+        if (!r.getClientRects().length) return;
+        const b = r.querySelector(':scope > .s4-swipe-actions button, :scope > .s4-swipe-actions a[href]'); if (!b) return;
+        b.focus({ preventScroll: true });
+        if (document.activeElement !== b) o.push(`a swipe action "${(b.getAttribute('aria-label') || b.textContent).trim()}" cannot take focus: no keyboard path to it (decision 0051: nothing is gesture-only; decision 0076)`);
+        b.blur();
+      });
+      document.querySelectorAll('.s4-table-grip').forEach((g) => {
+        g.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        const r = g.getBoundingClientRect(); if (!r.width || !r.height) return;
+        for (const f of [0.5, 0.25, 0.75]) {
+          const x = r.left + r.width * f, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+          const t = document.elementFromPoint(x, y);
+          if (t !== g && !g.contains(t)) { o.push(`a column grip is covered at ${Math.round(f * 100)}% of its width by ${t ? t.tagName.toLowerCase() + '.' + String(t.className).split(' ')[0] : 'nothing'}: grabbing the border hits the neighbour (decision 0076)`); break; }
+        }
+      });
+      return o;
+    })).forEach(add);
+
+    /* snackbar: Undo keeps focus, and two pending Undos are both undoable */
+    if (await p.evaluate(() => !!(window.S4 && S4.snackbar))) await flow('snackbar', async () => {
+      const r = await p.evaluate(async () => {
+        const o = [], log = [], wait = (ms) => new Promise((x) => setTimeout(x, ms));
+        const probe = document.createElement('button'); probe.textContent = 'probe'; probe.style.cssText = 'position:fixed;inset-block-start:0;inset-inline-start:0'; document.body.appendChild(probe); probe.focus();
+        S4.snackbar({ text: 'one', action: 'Undo', onAction: () => log.push('one') });
+        S4.snackbar({ text: 'two', action: 'Undo', onAction: () => log.push('two') });
+        await wait(60);
+        const first = document.querySelector('.s4-snackbar-action'); if (!first) { probe.remove(); return ['no Undo showed']; }
+        first.click(); await wait(120);
+        if (document.activeElement === document.body) o.push('after Undo focus is on <body>');
+        const again = document.querySelector('.s4-snackbar-action'), text = document.querySelector('.s4-snackbar-text');
+        if (!again || !text || text.textContent !== 'one') o.push('the first Undo was lost when a second snackbar replaced it (it must come back once the newer one is undone)'); else again.click();
+        await wait(120);
+        if (log.join() !== 'two,one') o.push('Undo ran ' + JSON.stringify(log) + ', not newest then oldest');
+        if (document.activeElement === document.body) o.push('after the last Undo focus is on <body>');
+        probe.remove(); document.querySelectorAll('.s4-snackbar').forEach((e) => e.remove());
+        return o;
+      });
+      r.forEach((m) => add(`snackbar: ${m} (decision 0076)`));
+    });
+
+    /* inline edit: Enter and Escape keep focus; an empty required value says so */
+    if (await has('.s4-inline-edit input')) await flow('inline edit', async () => {
+      const inp = p.locator('.s4-inline-edit input[required]:visible').first();
+      if (!(await inp.count())) return;
+      const keep = await inp.inputValue();
+      await inp.click(); await p.keyboard.press('End'); await p.keyboard.type('x'); await p.keyboard.press('Enter'); await p.waitForTimeout(200);
+      await notBody('inline edit, Enter'); await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+      await inp.click(); await p.keyboard.press('Control+a'); await p.keyboard.type('y'); await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+      await notBody('inline edit, Escape');
+      await inp.click(); await p.keyboard.press('Control+a'); await p.keyboard.press('Backspace'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+      const bad = await inp.evaluate((e) => ({ inv: e.getAttribute('aria-invalid'), msg: e.closest('.s4-inline-edit').querySelector('.s4-inline-edit-message').textContent.trim() }));
+      if (bad.inv !== 'true' || !bad.msg) add('inline edit: an empty required value is refused with no aria-invalid or no message (decision 0065: silent failures)');
+      await notBody('inline edit, a refused value');
+      await p.evaluate((v) => { const e = document.querySelector('.s4-inline-edit input[required]'); e.value = v; }, keep);
+    });
+
+    /* data tables: a number cell refuses garbage; commits and Undo keep focus; Undo of a removal restores the place */
+    if (await has('table.s4-table td[data-edit]')) await flow('table edit', async () => {
+      const info = await p.evaluate(() => {
+        const th = [...document.querySelectorAll('table.s4-table th[data-edit="number"]')].find((t) => t.getClientRects().length); if (!th) return null;
+        const table = th.closest('table'), idx = [...th.parentElement.children].indexOf(th);
+        const tr = [...table.tBodies[0].querySelectorAll('tr[data-n]')].find((r) => r.cells[idx] && r.cells[idx].querySelector('input')); if (!tr) return null;
+        tr.cells[idx].setAttribute('data-qa-cell', ''); return { before: tr.cells[idx].querySelector('input').value };
+      });
+      if (!info) return;
+      const cell = p.locator('[data-qa-cell]');
+      await cell.scrollIntoViewIfNeeded(); await cell.focus();
+      for (const [typed, why] of [['abc', 'text'], ['1e3', 'an exponent'], ['3.7', 'a fraction in a whole-number column'], ['', 'nothing (a required column)']]) {
+        await p.keyboard.press('Enter'); await p.keyboard.press('Control+a'); if (typed) await p.keyboard.type(typed); else await p.keyboard.press('Backspace'); await p.keyboard.press('Enter'); await p.waitForTimeout(120);
+        const s = await cell.evaluate((c) => { const i = c.querySelector('input'); return { v: i.value, inv: i.getAttribute('aria-invalid') }; });
+        if (typed === '' && !(await cell.evaluate((c) => c.closest('table').tHead.rows[0].cells[c.cellIndex].hasAttribute('data-required')))) continue;
+        if (typed === '3.7' && (await cell.evaluate((c) => c.closest('table').tHead.rows[0].cells[c.cellIndex].dataset.format)) !== 'integer') continue;
+        if (s.v !== info.before || s.inv !== 'true') add(`a number cell took ${why} (${JSON.stringify(typed)}): value now "${s.v}", aria-invalid ${s.inv} (it must keep "${info.before}" and say so; decision 0076)`);
+        await notBody(`a number cell after ${why}`);
+      }
+      await p.keyboard.press('Enter'); await p.keyboard.press('Control+a'); await p.keyboard.type(info.before === '7' ? '8' : '7'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+      await notBody('a table cell after a committed edit');
+      await p.keyboard.press('ArrowDown'); await notBody('arrow keys after a committed cell edit');
+      const undo = p.locator('.s4-snackbar-action'); if (await undo.count()) { await undo.first().click(); await p.waitForTimeout(150); await notBody('a table edit after Undo'); }
+    });
+    (await p.evaluate(() => {
+      const o = [];
+      document.querySelectorAll('table.s4-table').forEach((t) => {
+        const d = t._s4data; if (!d || !d.rows || d.rows.length < 4 || !d.restore) return;
+        const before = d.rows.slice(), ids = [d.id(before[0], 0), d.id(before[2], 2)];
+        const gone = d.remove(ids); d.restore(gone);
+        if (d.rows.length !== before.length || d.rows.some((r, i) => r !== before[i])) o.push('a table removed two rows and restored them in another order (Undo puts a row back where it was; decision 0076)');
+      });
+      return o;
+    })).forEach(add);
+
+    /* a command from the keyboard that removes what had focus (Parley's Close File) */
+    if (await p.evaluate(() => !!(window.S4 && S4.commands && S4.commands.get('file.close') && S4.docTabs))) await flow('Close File', async () => {
+      await p.evaluate(() => { const b = document.querySelector('.s4-doc-tab-panel:not([hidden]) input, .s4-doc-tab-panel:not([hidden]) button'); if (b) b.focus(); });
+      await p.keyboard.press('Control+w'); await p.waitForTimeout(400); await notBody('Ctrl+W (Close File)');
+      await p.evaluate(() => { if (document.activeElement) document.activeElement.blur(); });
+      await p.keyboard.press('Control+w'); await p.waitForTimeout(400); await notBody('Ctrl+W with nothing focused');
+    });
+
+    /* the palette: the list follows its box; End and PageDown move; Enter with nothing found says so */
+    if (await p.evaluate(() => !!(window.S4 && S4.palette && S4.commands && S4.commands.list().length > 3))) await flow('palette', async () => {
+      await p.keyboard.press('Control+k'); await p.waitForTimeout(350);
+      const count = () => p.evaluate(() => document.querySelectorAll('.s4-palette [data-i]').length);
+      const all = await count(); await p.keyboard.type('zz'); await p.keyboard.press('Escape'); await p.waitForTimeout(150);
+      if ((await count()) !== all) add(`palette: Escape cleared the box but left ${await count()} of ${all} commands listed (the list follows the box; decision 0076)`);
+      await p.keyboard.press('End'); await p.keyboard.press('PageDown'); await p.waitForTimeout(100);
+      if (!(await p.evaluate(() => !!document.querySelector('.s4-palette [aria-selected="true"]')))) add('palette: End or PageDown left no active option (decision 0076)');
+      await p.keyboard.type('zzzzq'); await p.keyboard.press('Enter'); await p.waitForTimeout(150);
+      const said = await p.evaluate(() => ({ open: document.querySelector('.s4-palette').open, inv: document.querySelector('.s4-palette input').getAttribute('aria-invalid'), msg: !document.querySelector('.s4-palette-empty').hidden }));
+      if (!said.open || said.inv !== 'true' || !said.msg) add('palette: Enter with no match must stay open and say so (decision 0076)');
+      await p.keyboard.press('Escape'); await p.keyboard.press('Escape'); await p.waitForTimeout(500); await notBody('the palette closed');
+    });
+
+    /* Reset puts a form back, errors included */
+    if (await has('form.s4-form [required]')) await flow('form reset', async () => {
+      const r = await p.evaluate(async () => {
+        const f = [...document.querySelectorAll('form.s4-form')].find((x) => x.querySelector('[required]') && x.getClientRects().length); if (!f) return null;
+        f.requestSubmit(); await new Promise((x) => setTimeout(x, 80));
+        const had = f.querySelectorAll('[data-error], [aria-invalid="true"]').length;
+        f.reset(); await new Promise((x) => setTimeout(x, 80));
+        return { had, left: f.querySelectorAll('[data-error], [aria-invalid="true"], [data-valid]').length };
+      });
+      if (r && r.had && r.left) add(`form reset left ${r.left} error or valid marks on the fields (decision 0076)`);
+    });
+
+    /* a code takes a paste over a full code; a select trigger opens on Down */
+    if (await has('.s4-code-field input')) await flow('code field', async () => {
+      const r = await p.evaluate(() => {
+        const i = document.querySelector('.s4-code-field input'), n = +i.closest('.s4-code-field').style.getPropertyValue('--_n') || 6;
+        i.value = '1'.repeat(n); i.dispatchEvent(new Event('input', { bubbles: true }));
+        const dt = new DataTransfer(); dt.setData('text', '9'.repeat(n));
+        i.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+        return { v: i.value, want: '9'.repeat(n) };
+      });
+      if (r.v !== r.want) add(`a code pasted over a full code left "${r.v}", not "${r.want}" (decision 0076)`);
+    });
+    if (await has('.s4-text-field-select')) await flow('select keys', async () => {
+      const t = p.locator('.s4-text-field-select:visible').first(); await t.scrollIntoViewIfNeeded(); await t.focus(); await p.keyboard.press('ArrowDown'); await p.waitForTimeout(250);
+      const open = await t.evaluate((e) => e.getAttribute('aria-expanded'));
+      if (open !== 'true') add('a closed select trigger ignores ArrowDown (the select-only combobox opens on it; decision 0076)');
+      await p.keyboard.press('Escape'); await p.waitForTimeout(250);
+    });
+    if (await has('.s4-number-field input')) (await p.evaluate(() => {
+      const o = [], f = [...document.querySelectorAll('.s4-number-field')].find((x) => x.getClientRects().length), i = f && f.querySelector('input'); if (!i) return o;
+      const mx = i.getAttribute('aria-valuemax'); i.focus(); i.value = '1,5'; i.dispatchEvent(new Event('input', { bubbles: true })); i.blur();
+      if (i.validity.valid) o.push('a number field read "1,5" as a valid number (the comma is a group mark only between groups of three; decision 0076)');
+      if (mx !== null) { i.focus(); i.value = String(+mx + 1000); i.dispatchEvent(new Event('input', { bubbles: true })); i.blur(); const vn = i.getAttribute('aria-valuenow'); if (vn !== null && +vn > +mx) o.push(`a number field says aria-valuenow ${vn} beyond its aria-valuemax ${mx} (decision 0076)`); }
+      return o;
+    })).forEach(add);
+
+    /* the contrast dial's listed values are what S4.theme accepts (decision 0067 says the list is the contract) */
+    (await p.evaluate(() => {
+      if (!window.S4 || !S4.theme || !S4.theme.dials) return [];
+      const warns = [], real = console.warn; console.warn = (m) => warns.push(String(m));
+      const list = S4.theme.dials['data-contrast'] || [];
+      list.forEach((v) => S4.theme({ contrast: v }));
+      console.warn = real;
+      return warns.filter((w) => /contrast/.test(w)).map((w) => `S4.theme.dials lists a contrast value that S4.theme refuses: ${w.slice(0, 100)} (decision 0076)`);
+    })).forEach(add);
+
+    /* a deep link to a page id that is not there: no page under a lying URL (or a visible not-found state) */
+    const names = await p.evaluate(() => [...document.querySelectorAll('.s4-subpage[data-page]')].map((e) => e.dataset.page));
+    const view = await p.evaluate(() => { const v = document.querySelector('.s4-view[data-view]'); return v ? v.dataset.view : ''; });
+    if (names.length && view) for (const name of names.slice(0, 2)) await flow('deep link', async () => {
+      const q = await ctx.newPage(); q.on('pageerror', () => {});
+      await q.goto(`${ORIGIN}/${rel}#${view}/${name}/zz-not-here-9999`, { waitUntil: 'load', timeout: 30000 }); await q.waitForTimeout(500);
+      const r = await q.evaluate(() => ({ hash: location.hash, text: document.body.innerText.slice(0, 20000) }));
+      if (r.hash.includes('zz-not-here-9999') && !/not found|isn.t here|no longer|couldn.t find/i.test(r.text)) add(`a deep link to #${view}/${name}/<an id that is not there> leaves the URL naming it, with no not-found state (decision 0076)`);
+      await q.close();
+    });
+  } catch (e) { add('qa2 audit could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+  await p.close();
+}
+
 const MODES = [
   { key: 'phone-dark', viewport: { width: 390, height: 844 }, colorScheme: 'dark', phone: true },
   { key: 'desktop-light', viewport: { width: 1280, height: 800 }, colorScheme: 'light', phone: false },
@@ -1293,6 +1487,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
     if (!reduced) { await openerAudit(page, add); if (!rel.startsWith('explore/')) await copyAudit(page, add); }   /* labs bring their own copy fallback and are not part of the system */
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
     if (!reduced && !mode.phone) await desktopKeys(page, add);
+    if (!reduced && !mode.phone && bname === 'chromium' && !rel.startsWith('explore/')) await qa2Audit(ctx, rel, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));
   } catch (e) { add('suite could not finish: ' + String(e.message).split('\n')[0].slice(0, 160)); }
   if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', label.replace(/[^\w.-]+/g, '_') + '.png') }).catch(() => {}); }
