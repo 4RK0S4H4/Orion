@@ -1453,7 +1453,7 @@ if (want.includes('chromium') && !arg('preset', '') && targets.includes('templat
 /* decision 0072: Parley in a frameless Windows shell (a stub of window.orionShell, the real shell-bridge.js). The page's
    own window controls appear, the window's top right corner pixel (top left in right-to-left) hits Close, the top edge
    above each control hits it, each is at least 40 wide and the bar's height, Close is not red at rest and is error on
-   hover, Maximize says Restore and draws another glyph while maximized, a click reaches the shell, and a Mac shell
+   hover, Maximize says Restore and draws the Restore icon while maximized (each control draws its duotone icon, 0074), a click reaches the shell, and a Mac shell
    shows none of them. */
 if (want.includes('chromium') && !arg('preset', '') && targets.includes('templates/desktop-app.html')) {
   let b4 = null; try { b4 = await pw.chromium.launch(); } catch (e) {}
@@ -1481,12 +1481,14 @@ if (want.includes('chromium') && !arg('preset', '') && targets.includes('templat
         const box = await (await page.$(closeSel)).boundingBox();
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(400);
         if (await fill(closeSel) !== probe) add(`Close does not turn error on hover (${await fill(closeSel)})`);
-        const maxSel = '.s4-titlebar [data-window-action="maximize"]', glyph = () => page.evaluate((q) => getComputedStyle(document.querySelector(q), '::after').maskImage || getComputedStyle(document.querySelector(q), '::after').webkitMaskImage, maxSel);
+        const maxSel = '.s4-titlebar [data-window-action="maximize"]', glyph = () => page.evaluate((q) => { const i = document.querySelector(q + ' > .s4-icon[data-window-icon]'); return i && i.querySelector('svg') && i.getBoundingClientRect().width >= 16 ? i.getAttribute('data-icon') : 'none'; }, maxSel);
+        const drawn = await page.evaluate(() => [...document.querySelectorAll('.s4-titlebar .s4-window-control')].map((b) => { const i = b.querySelector(':scope > .s4-icon[data-window-icon]'), r = i && i.getBoundingClientRect(); return i && i.querySelector('svg') && r.width >= 16 ? i.getAttribute('data-icon') : b.dataset.windowAction + ' (no icon)'; }).join(' '));
+        if (drawn !== 'window-minimize window-maximize window-close') add(`the window controls draw ${drawn}, not the window-minimize, window-maximize and window-close icons at 16px or more (decision 0074)`);
         const g1 = await glyph();
         await page.evaluate(() => window.__state({ focused: true, fullscreen: false, maximized: true, controls: 'own' })); await page.waitForTimeout(200);
         const lab = await page.evaluate((q) => document.querySelector(q).getAttribute('aria-label'), maxSel);
         if (lab !== 'Restore') add(`maximized, Maximize is labelled "${lab}", not Restore`);
-        if (await glyph() === g1) add('maximized, Maximize still draws the Maximize glyph');
+        if (await glyph() !== 'window-restore') add(`maximized, Maximize draws ${await glyph()}, not the window-restore icon (was ${g1})`);
         await page.click(maxSel);
         if (!(await page.evaluate(() => window.__acts)).includes('maximize')) add('a click on Maximize did not reach the shell');
       } catch (e) { add('window controls check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }

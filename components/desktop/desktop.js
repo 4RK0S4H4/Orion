@@ -9,7 +9,9 @@
      before it opens; choosing an item fires the menu's usual s4-select.
    - [data-window-action="minimize|maximize|close"] fires s4-window { action, maximized } on the document: wire it to the
      shell (Electron ipc, Tauri window API); Orion never talks to a shell itself. While <html data-window-state> holds
-     "maximized", Maximize is labelled Restore (or its data-label-restore) and draws the Restore glyph (decision 0072).
+     "maximized", Maximize is labelled Restore (or its data-label-restore) and shows the Restore icon (decision 0072).
+     Each .s4-window-control gets its icon written in: .s4-icon[data-window-icon] with window-minimize, window-maximize,
+     window-restore or window-close, Orion's duotone icons from the icon registry (decision 0074).
    - Commands (S4.commands, components/commands/) with a shortcut run on it from anywhere, with the same rules.
    - Shift+F10 or the menu key opens an element's data-context-menu from the keyboard, under the element.
    - <html data-window-blurred> while the window is not in front; <html data-window-state="fullscreen"> in full
@@ -124,18 +126,27 @@
   if (window.matchMedia) { var fs = matchMedia('(display-mode: fullscreen)'); state('fullscreen', fs.matches || !!document.fullscreenElement); if (fs.addEventListener) fs.addEventListener('change', function () { state('fullscreen', fs.matches); }); }
   var wco = navigator.windowControlsOverlay;
   if (wco) { state('overlay', wco.visible); wco.addEventListener('geometrychange', function (e) { state('overlay', e.visible); }); }
-  /* window controls (decision 0072): while the window is maximized, Maximize is Restore (its glyph is the CSS's) */
+  /* window controls (decision 0072): while the window is maximized, Maximize is Restore. Each control holds one icon from
+     the registry (decision 0074), written in here so the markup stays an empty button with its label */
   function maximized() { return /(^|\s)maximized(\s|$)/.test(root.dataset.windowState || ''); }
-  function windowLabels() {
+  function windowControls() {
     var max = maximized();
-    document.querySelectorAll('.s4-window-control[data-window-action="maximize"]').forEach(function (b) {
-      if (!b.dataset.labelMaximize) b.dataset.labelMaximize = b.getAttribute('aria-label') || 'Maximize';
-      var want = max ? (b.dataset.labelRestore || 'Restore') : b.dataset.labelMaximize;
-      if (b.getAttribute('aria-label') !== want) b.setAttribute('aria-label', want);
+    document.querySelectorAll('.s4-window-control[data-window-action]').forEach(function (b) {
+      var action = b.getAttribute('data-window-action'), icon = b.querySelector(':scope > [data-window-icon]');
+      if (action === 'maximize') {
+        if (!b.dataset.labelMaximize) b.dataset.labelMaximize = b.getAttribute('aria-label') || 'Maximize';
+        var want = max ? (b.dataset.labelRestore || 'Restore') : b.dataset.labelMaximize;
+        if (b.getAttribute('aria-label') !== want) b.setAttribute('aria-label', want);
+        if (max) action = 'restore';
+      }
+      if (!/^(minimize|restore|maximize|close)$/.test(action)) return;
+      if (!icon) { icon = document.createElement('span'); icon.className = 's4-icon'; icon.setAttribute('data-window-icon', ''); icon.setAttribute('aria-hidden', 'true'); b.appendChild(icon); }
+      var name = 'window-' + action;
+      if (icon.getAttribute('data-icon') !== name) { if (S4.icon) S4.icon.set(icon, name); else icon.setAttribute('data-icon', name); }
     });
   }
-  if (window.MutationObserver) new MutationObserver(windowLabels).observe(root, { attributes: true, attributeFilter: ['data-window-state'] });
-  windowLabels();
+  if (window.MutationObserver) new MutationObserver(windowControls).observe(root, { attributes: true, attributeFilter: ['data-window-state'] });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', windowControls); else windowControls();
 
   /* ---------- the inspector ---------- */
   function store(key, v) { try { if (v == null) localStorage.removeItem(key); else localStorage.setItem(key, String(v)); } catch (e) {} }

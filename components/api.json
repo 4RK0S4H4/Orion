@@ -820,6 +820,7 @@
   "--s4-size-tree-indent",
   "--s4-size-tree-row",
   "--s4-size-window-control",
+  "--s4-size-window-control-icon",
   "--s4-space-0",
   "--s4-space-1",
   "--s4-space-10",
@@ -1592,7 +1593,11 @@
   "wallet",
   "warning",
   "water",
-  "wind"
+  "wind",
+  "window-close",
+  "window-maximize",
+  "window-minimize",
+  "window-restore"
  ],
  "files": [
   "icons-site.js",

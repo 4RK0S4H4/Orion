@@ -49,8 +49,8 @@ step out (under 600 or 840), the rail becomes the nav bar, and each list opens i
 | `.s4-titlebar-title`, `data-align="start"` | The title, centered (or at the start) |
 | `.s4-titlebar-spacer` | Pushes what follows to the end |
 | `data-controls="start"` on the title bar | Room for the Mac's traffic lights in a frameless window (also automatic with `<html data-platform="mac" data-shell="electron\|tauri">`) |
-| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless Windows and Linux shells that draw none (decision 0072): empty buttons with an `aria-label`, in that order, last in the title bar. Full cells like Windows' (46 by the bar's height, touching the window's top and end edges: the corner pixel hits Close), a firm layer on hover and press, drawn glyphs, Close `error` on hover and press only. Each click fires `s4-window { action, maximized }` on the document: wire it to the shell. Hidden on a Mac shell, in the window controls overlay and in full screen. |
-| `data-label-restore` on Maximize | The label while `<html data-window-state>` holds `maximized` (default Restore); the glyph changes with it |
+| `.s4-window-controls` > `.s4-window-control[data-window-action="minimize\|maximize\|close"]` | Window buttons for frameless Windows and Linux shells that draw none (decision 0072): empty buttons with an `aria-label`, in that order, last in the title bar. Full cells like Windows' (46 by the bar's height, touching the window's top and end edges: the corner pixel hits Close), a firm layer on hover and press, Orion's duotone `window-*` icons written in by `desktop.js` (decision 0074), Close `error` on hover and press only. Each click fires `s4-window { action, maximized }` on the document: wire it to the shell. Hidden on a Mac shell, in the window controls overlay and in full screen. |
+| `data-label-restore` on Maximize | The label while `<html data-window-state>` holds `maximized` (default Restore); the icon changes to `window-restore` with it |
 | `hidden data-shell-controls` on `.s4-window-controls` | Written in the page, shown by `examples/shell-bridge.js` when the shell says it draws no buttons (`controls: 'own'`) |
 | `.s4-inspector` (+ `.s4-inspector-header`, `-title`, `-body`, `details.s4-inspector-group`, `.s4-inspector-fields`, `.s4-inspector-row`) | The properties pane at the window's end: solid, resizable from its start edge (drag, arrows, Home/End, Enter hides it), `data-resize-key` remembers the width, groups fold with Reveal. From 840 wide. `S4.desktop.inspector(el, on)`; `--s4-inspector-width`. |
 | `data-shortcut="mod+k"` | That key combination clicks the element. `mod` is ⌘ on Apple platforms, Ctrl elsewhere; also `shift`, `alt`. |
@@ -93,10 +93,11 @@ Electron's `titleBarOverlay` does the same. Draw `.s4-window-controls` only in a
   between them or to the window's top and end edges (the bar drops its end padding when it holds them). Throw the
   pointer into the top corner and it is on Close; along the top edge it is on the control below (Fitts's law). The cell
   is square on purpose: a rounded cell would miss the corner pixel.
-- *Look:* a firm filled layer (8, inset 4 and 2) on hover and press (State), never a disc or a pill; line glyphs drawn
-  by the component (any icon inside is hidden); Close turns `error` on hover and press only, never red at rest. While
+- *Look:* a firm filled layer (8, inset 4 and 2) on hover and press (State), never a disc or a pill; Orion's duotone
+  icons `window-minimize`, `window-maximize`, `window-restore`, `window-close` (Solar's square tiles) at 24
+  (`--s4-size-window-control-icon`), written in by `desktop.js` (decision 0074; any other icon inside is hidden); Close turns `error` on hover and press only, never red at rest. While
   `<html data-window-state>` holds `maximized` (the shell sets it), Maximize draws Restore and is labelled Restore.
-  A window not in front dims the glyphs.
+  A window not in front dims the icons. On Close's error fill the second tone sits at 0.5, so the tile stays visible.
 - *Right to left:* they mirror to the start with Close at the far start, as Windows mirrors a right-to-left window;
   the corner rule holds for the top left.
 - *Drag and resize:* the controls are `app-region: no-drag`. In a Windows or Linux shell, while the window is neither
