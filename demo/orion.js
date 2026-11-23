@@ -2017,6 +2017,8 @@ S4.register('search', function (scope) {
     var c = typeof id === 'string' ? byId[id] : id;
     if (!c || !enabled(c)) return false;
     call(c.run, c, ctx);
+    /* a shortcut or the palette ran it: whatever it removed must not leave the keyboard on <body> (decision 0076) */
+    if (ctx && /^(keyboard|palette)$/.test(ctx.source)) setTimeout(function () { if (document.activeElement === document.body && !document.querySelector('dialog[open]')) S4.util.land(); });
     S4.util.emit(document, 's4-command', { command: c, context: ctx });
     refresh();
     return true;
@@ -2597,14 +2599,17 @@ S4.register('search', function (scope) {
     var panel = panelOf(tab), all = tabs(bar), i = all.indexOf(tab), wasCurrent = current(bar) === tab;
     var ev = new CustomEvent('s4-close', { bubbles: true, cancelable: true, detail: { tab: tab, panel: panel, modified: tab.hasAttribute('data-modified') } });
     if (!bar.dispatchEvent(ev)) return false;
-    var hadFocus = bar.contains(document.activeElement);
+    /* focus in the tab bar, or in the document that is going away (Ctrl+W from the editor), must not fall to <body> (decision 0076) */
+    var hadFocus = bar.contains(document.activeElement), inPanel = !!(panel && panel.contains(document.activeElement));
     var stack = closed.get(bar) || []; stack.push({ tab: tab, panel: panel, index: i, next: panel ? panel.nextElementSibling : null, parent: panel ? panel.parentElement : null }); closed.set(bar, stack.slice(-20));
     tab.remove();
     if (panel && !tabs(bar).some(function (t) { return panelOf(t) === panel; })) panel.remove();
-    else panel = null;
+    else { panel = null; inPanel = false; }   /* another tab still shows it: nothing was lost */
+    if (inPanel) hadFocus = true;
     var rest = tabs(bar);
     if (wasCurrent && rest.length) select(rest[Math.min(i, rest.length - 1)], hadFocus);
     else if (hadFocus && rest.length) labelOf(current(bar) || rest[0]).focus({ preventScroll: true });
+    else if (hadFocus) S4.util.land();
     bar.toggleAttribute('data-empty', !rest.length);
     fit(bar);
     return true;
@@ -3393,7 +3398,10 @@ S4.register('accordion', function (scope) {
   function moveTo(item, toIndex, toList) {
     var from = item.parentElement, list = toList || from, fromIndex = kids(from).indexOf(item);
     var others = kids(list).filter(function (k) { return k !== item; });
+    var had = item.contains(document.activeElement) ? document.activeElement : null;
     place(item, list, others[Math.max(0, toIndex)] || null);
+    /* moving an element drops its focus: give it back before anyone hears s4-reorder (a snackbar made there remembers where focus was; decision 0076) */
+    if (had && document.activeElement !== had) had.focus({ preventScroll: true });
     var to = kids(list).indexOf(item);
     if (list !== from || to !== fromIndex) S4.util.emit(list, 's4-reorder', { item: item, from: fromIndex, to: to, fromList: from, toList: list });
     return to;
@@ -5640,6 +5648,7 @@ S4.register('board', function (scope) {
       input.placeholder = add.getAttribute('data-lane-add') || 'Title';
       var form = li.querySelector('form');
       form.setAttribute('aria-label', input.getAttribute('aria-label'));
+      input.addEventListener('input', function () { input.parentElement.removeAttribute('data-error'); });
       list.appendChild(li); add.hidden = true;
       /* the button just went away: hold the focus on the draft (never on the field, decision 0049) */
       form.focus({ preventScroll: true }); li.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -5648,7 +5657,8 @@ S4.register('board', function (scope) {
       li.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); close(); } });
       li.querySelector('form').addEventListener('submit', function (ev) {
         ev.preventDefault();
-        var v = input.value.trim(); if (!v) return;
+        var v = input.value.trim();
+        if (!v) { input.parentElement.setAttribute('data-error', 'Enter a title, or press Escape to cancel.'); return; }   /* an empty draft says so, never nothing (decision 0076) */
         li.remove(); add.hidden = false; add.focus({ preventScroll: true });
         S4.util.emit(lane, 's4-lane-add', { value: v, lane: lane, list: list });
         say((title ? title.textContent.trim() + ': ' : '') + 'added ' + v);
@@ -9256,6 +9266,8 @@ S4.register('skeleton', function (scope) {
     dlg.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      /* the first Escape clears the box and the list with it (the search field may have cleared the box already and said so by consuming the key); the next one closes */
+      else if (e.key === 'Escape' && (input.value || e.defaultPrevented)) { e.preventDefault(); input.value = ''; render(''); }
       else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); if (shown.length) mark(Math.max(0, Math.min(shown.length - 1, active + (e.key === 'PageDown' ? 8 : -8)))); }
       else if ((e.key === 'Home' || e.key === 'End') && (document.activeElement !== input || !input.value)) { e.preventDefault(); if (shown.length) mark(e.key === 'Home' ? 0 : shown.length - 1); }   /* in a typed query they move the caret */
       else if (e.key === 'Enter') {
@@ -9399,8 +9411,8 @@ S4.register('sheet', function () {});
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
-        S4.util.release(el, back(opener));
         if (o.onAction) o.onAction();
+        S4.util.release(el, back(opener));
         api.dismiss(true);
         /* the one under it is undoable now */
         var next = waiting.pop(); if (next) S4.snackbar(next);

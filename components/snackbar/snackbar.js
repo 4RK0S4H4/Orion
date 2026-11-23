@@ -41,8 +41,8 @@
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
-        S4.util.release(el, back(opener));
         if (o.onAction) o.onAction();
+        S4.util.release(el, back(opener));
         api.dismiss(true);
         /* the one under it is undoable now */
         var next = waiting.pop(); if (next) S4.snackbar(next);

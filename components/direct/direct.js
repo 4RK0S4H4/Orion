@@ -125,7 +125,10 @@
   function moveTo(item, toIndex, toList) {
     var from = item.parentElement, list = toList || from, fromIndex = kids(from).indexOf(item);
     var others = kids(list).filter(function (k) { return k !== item; });
+    var had = item.contains(document.activeElement) ? document.activeElement : null;
     place(item, list, others[Math.max(0, toIndex)] || null);
+    /* moving an element drops its focus: give it back before anyone hears s4-reorder (a snackbar made there remembers where focus was; decision 0076) */
+    if (had && document.activeElement !== had) had.focus({ preventScroll: true });
     var to = kids(list).indexOf(item);
     if (list !== from || to !== fromIndex) S4.util.emit(list, 's4-reorder', { item: item, from: fromIndex, to: to, fromList: from, toList: list });
     return to;

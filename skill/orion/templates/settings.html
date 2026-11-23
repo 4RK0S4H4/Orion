@@ -370,12 +370,13 @@ $('packs').addEventListener('click', function (e) {
     return;
   }
   /* download in place: the button becomes a progress bar, then the pack joins the bar above */
+  S4.util.release(btn, li);   /* the button that had focus is about to be hidden: its row holds the place (decision 0076) */
   btn.hidden = true;
   var bar = document.createElement('div'); bar.className = 's4-progress'; bar.setAttribute('aria-label', 'Downloading ' + name); bar.dataset.value = '0';
   li.appendChild(bar); S4.init(li);
   var v = 0, t = setInterval(function () {
     v = Math.min(1, v + 0.2); bar.dataset.value = String(v);
-    if (v >= 1) { clearInterval(t); bar.remove(); btn.hidden = false; setPack(li, true); S4.snackbar(name + ' is ready. Larkline can name its birds offline.'); }
+    if (v >= 1) { clearInterval(t); bar.remove(); btn.hidden = false; if (document.activeElement === li) btn.focus({ preventScroll: true }); setPack(li, true); S4.snackbar(name + ' is ready. Larkline can name its birds offline.'); }
   }, 450);
 });
 drawStore();

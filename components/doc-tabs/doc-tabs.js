@@ -81,14 +81,17 @@
     var panel = panelOf(tab), all = tabs(bar), i = all.indexOf(tab), wasCurrent = current(bar) === tab;
     var ev = new CustomEvent('s4-close', { bubbles: true, cancelable: true, detail: { tab: tab, panel: panel, modified: tab.hasAttribute('data-modified') } });
     if (!bar.dispatchEvent(ev)) return false;
-    var hadFocus = bar.contains(document.activeElement);
+    /* focus in the tab bar, or in the document that is going away (Ctrl+W from the editor), must not fall to <body> (decision 0076) */
+    var hadFocus = bar.contains(document.activeElement), inPanel = !!(panel && panel.contains(document.activeElement));
     var stack = closed.get(bar) || []; stack.push({ tab: tab, panel: panel, index: i, next: panel ? panel.nextElementSibling : null, parent: panel ? panel.parentElement : null }); closed.set(bar, stack.slice(-20));
     tab.remove();
     if (panel && !tabs(bar).some(function (t) { return panelOf(t) === panel; })) panel.remove();
-    else panel = null;
+    else { panel = null; inPanel = false; }   /* another tab still shows it: nothing was lost */
+    if (inPanel) hadFocus = true;
     var rest = tabs(bar);
     if (wasCurrent && rest.length) select(rest[Math.min(i, rest.length - 1)], hadFocus);
     else if (hadFocus && rest.length) labelOf(current(bar) || rest[0]).focus({ preventScroll: true });
+    else if (hadFocus) S4.util.land();
     bar.toggleAttribute('data-empty', !rest.length);
     fit(bar);
     return true;

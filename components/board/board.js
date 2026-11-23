@@ -49,6 +49,7 @@ S4.register('board', function (scope) {
       input.placeholder = add.getAttribute('data-lane-add') || 'Title';
       var form = li.querySelector('form');
       form.setAttribute('aria-label', input.getAttribute('aria-label'));
+      input.addEventListener('input', function () { input.parentElement.removeAttribute('data-error'); });
       list.appendChild(li); add.hidden = true;
       /* the button just went away: hold the focus on the draft (never on the field, decision 0049) */
       form.focus({ preventScroll: true }); li.scrollIntoView({ block: 'nearest', inline: 'nearest' });
@@ -57,7 +58,8 @@ S4.register('board', function (scope) {
       li.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); close(); } });
       li.querySelector('form').addEventListener('submit', function (ev) {
         ev.preventDefault();
-        var v = input.value.trim(); if (!v) return;
+        var v = input.value.trim();
+        if (!v) { input.parentElement.setAttribute('data-error', 'Enter a title, or press Escape to cancel.'); return; }   /* an empty draft says so, never nothing (decision 0076) */
         li.remove(); add.hidden = false; add.focus({ preventScroll: true });
         S4.util.emit(lane, 's4-lane-add', { value: v, lane: lane, list: list });
         say((title ? title.textContent.trim() + ': ' : '') + 'added ' + v);

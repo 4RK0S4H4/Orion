@@ -32,6 +32,8 @@
     dlg.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
+      /* the first Escape clears the box and the list with it (the search field may have cleared the box already and said so by consuming the key); the next one closes */
+      else if (e.key === 'Escape' && (input.value || e.defaultPrevented)) { e.preventDefault(); input.value = ''; render(''); }
       else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); if (shown.length) mark(Math.max(0, Math.min(shown.length - 1, active + (e.key === 'PageDown' ? 8 : -8)))); }
       else if ((e.key === 'Home' || e.key === 'End') && (document.activeElement !== input || !input.value)) { e.preventDefault(); if (shown.length) mark(e.key === 'Home' ? 0 : shown.length - 1); }   /* in a typed query they move the caret */
       else if (e.key === 'Enter') {

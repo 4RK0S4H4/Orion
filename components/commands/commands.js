@@ -40,6 +40,8 @@
     var c = typeof id === 'string' ? byId[id] : id;
     if (!c || !enabled(c)) return false;
     call(c.run, c, ctx);
+    /* a shortcut or the palette ran it: whatever it removed must not leave the keyboard on <body> (decision 0076) */
+    if (ctx && /^(keyboard|palette)$/.test(ctx.source)) setTimeout(function () { if (document.activeElement === document.body && !document.querySelector('dialog[open]')) S4.util.land(); });
     S4.util.emit(document, 's4-command', { command: c, context: ctx });
     refresh();
     return true;

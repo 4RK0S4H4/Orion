@@ -297,7 +297,7 @@
   <div class="s4-dialog-actions"><button class="s4-button" data-variant="tonal" data-close="cancel" type="button">Keep It</button><button class="s4-button" data-variant="tonal" data-color="error" data-close="delete" type="button">Delete</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=d89bb0c"></script>
+<script src="../components/orion.core.min.js?v=0a337fc"></script>
 <script>
 /* Larkline's look, saved under its own key: the visitor's choices from the Appearance section win over the defaults. */
 var LOOK = { seed: '#7c4f24', variant: 'fidelity', surfaces: 'tinted', display: 'inter', contrast: 0, corners: 'soft', energy: 'calm' };
@@ -370,12 +370,13 @@ $('packs').addEventListener('click', function (e) {
     return;
   }
   /* download in place: the button becomes a progress bar, then the pack joins the bar above */
+  S4.util.release(btn, li);   /* the button that had focus is about to be hidden: its row holds the place (decision 0076) */
   btn.hidden = true;
   var bar = document.createElement('div'); bar.className = 's4-progress'; bar.setAttribute('aria-label', 'Downloading ' + name); bar.dataset.value = '0';
   li.appendChild(bar); S4.init(li);
   var v = 0, t = setInterval(function () {
     v = Math.min(1, v + 0.2); bar.dataset.value = String(v);
-    if (v >= 1) { clearInterval(t); bar.remove(); btn.hidden = false; setPack(li, true); S4.snackbar(name + ' is ready. Larkline can name its birds offline.'); }
+    if (v >= 1) { clearInterval(t); bar.remove(); btn.hidden = false; if (document.activeElement === li) btn.focus({ preventScroll: true }); setPack(li, true); S4.snackbar(name + ' is ready. Larkline can name its birds offline.'); }
   }, 450);
 });
 drawStore();
