@@ -88,7 +88,7 @@
       var cb = null;
       try { cb = navigator.clipboard; } catch (e) { /* a sandboxed frame throws on access */ }
       if (!cb || !cb.writeText) return Promise.resolve(say(false));
-      var p; try { p = cb.writeText(String(text)); } catch (e) { return Promise.resolve(say(false)); }
+      var p; try { p = cb.writeText(String(text)); /* s4-clipboard-helper */ } catch (e) { return Promise.resolve(say(false)); }
       return Promise.resolve(p).then(function () { return say(true); }, function () { return say(false); });
     },
     /* Decision 0073 (issue 77): a script that measures the layout once (the sliding ink and highlights) calls this to measure again

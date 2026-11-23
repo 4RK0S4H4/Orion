@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bad Clipboard Marker</title>
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<!-- Decision 0076: only the first call carrying the helper's marker is exempt (S4.util.copy's own); a page cannot exempt itself by copying the marker -->
+<main class="s4-content">
+  <h1>Share</h1>
+  <button class="s4-button" id="share" type="button">Share Link</button>
+</main>
+<script src="../../components/orion.js"></script>
+<script>
+document.getElementById('share').addEventListener('click', function () {
+  navigator.clipboard.writeText('a'); /* s4-clipboard-helper */
+  navigator.clipboard.writeText('b'); /* s4-clipboard-helper */
+});
+</script>
+</body>
+</html>

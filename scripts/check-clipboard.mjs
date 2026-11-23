@@ -12,7 +12,6 @@ import { fileURLToPath } from 'node:url';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SKIP_DIRS = new Set(['node_modules', 'out', 'dist', 'explore', 'docs', 'history', '.git', '.claude', 'fixtures']);
 const GENERATED = /(^|\/)orion([.-][a-z]+)*(\.min)?\.js$|(^|\/)icons[\w.-]*\.js$|skill\/orion\/(assets|templates)\//;
-const HELPER = 'components/core/core.js';
 /* a call, with whatever sits between the dots (optional chaining, brackets, a variable that holds the clipboard) */
 export const WRITE = /(\bwriteText\s*\(|\[\s*['"]writeText['"]\s*\])/;
 
@@ -24,9 +23,12 @@ function walk(dir, out = []) {
   }
   return out;
 }
+/* The helper's own call carries this marker; it is exempt, once per file, so a second marked call still fails (the page checker reads it too). */
+export const MARKER = '/* s4-clipboard-helper */';
 export function scan(text, file) {
   const hits = [];
-  text.split('\n').forEach((line, i) => { if (WRITE.test(line.replace(/\/\*.*?\*\//g, '').replace(/^\s*\/\/.*$/, ''))) hits.push(`${file}:${i + 1}: ${line.trim().slice(0, 100)}`); });
+  let marked = 0;
+  text.split('\n').forEach((line, i) => { if (line.includes(MARKER) && !marked++) return; if (WRITE.test(line.replace(/\/\*.*?\*\//g, '').replace(/^\s*\/\/.*$/, ''))) hits.push(`${file}:${i + 1}: ${line.trim().slice(0, 100)}`); });
   return hits;
 }
 
@@ -35,10 +37,9 @@ const files = given.length ? given.map((f) => resolve(f)) : walk(root);
 const bad = [];
 for (const f of files) {
   const rel = relative(root, f).split('\\').join('/');
-  if (!existsSync(f) || (!given.length && (GENERATED.test(rel) || rel === HELPER || rel.startsWith('scripts/') || rel.startsWith('tests/')))) continue;
+  if (!existsSync(f) || (!given.length && (GENERATED.test(rel) || rel.startsWith('scripts/') || rel.startsWith('tests/')))) continue;
   const hits = scan(readFileSync(f, 'utf8'), rel);
-  /* the helper itself is the one allowed caller, and only the helper */
-  if (!given.length || rel !== HELPER) bad.push(...hits);
+  bad.push(...hits);
 }
 if (bad.length) {
   console.error('Clipboard: call S4.util.copy(text, { done, fail }) instead of clipboard.writeText (decision 0073); it never rejects and says what happened:\n  ' + bad.join('\n  '));

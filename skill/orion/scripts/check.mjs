@@ -287,8 +287,12 @@ for (const page of pages) {
       if (/^(https?:)?\/\//.test(href) || /(^|\/)(orion|icons)[\w.-]*\.js$/.test(href)) continue;
       const f = resolve(dirname(resolve(page)), href); if (existsSync(f)) scripts.push([href, readFileSync(f, 'utf8')]);
     }
-    for (const [where, code] of scripts) if (/\bwriteText\s*\(|\[\s*['"]writeText['"]\s*\]/.test(code.replace(/\/\*[\s\S]*?\*\/|(^|\n)\s*\/\/[^\n]*/g, '')))
+    for (const [where, rawCode] of scripts) {
+      /* S4.util.copy's own call carries a marker and is exempt, once per file (decision 0076; scripts/check-clipboard.mjs) */
+      let seen = 0; const code = rawCode.split('\n').filter((l) => !(l.includes('/* s4-clipboard-helper */') && !seen++)).join('\n');
+      if (/\bwriteText\s*\(|\[\s*['"]writeText['"]\s*\]/.test(code.replace(/\/\*[\s\S]*?\*\/|(^|\n)\s*\/\/[^\n]*/g, '')))
       errors.add(`${where}: calls clipboard.writeText directly; use S4.util.copy(text, { done: 'Copied', fail: '…' }) (it never rejects, and says when the browser refuses; decision 0073)`);
+    }
     for (const m of html.matchAll(/\sstyle="([^"]*)"/gi)) lintCss(`.x{${m[1]}}`, `style=""`).forEach((e) => errors.add(e.replace(/: \.x → /, " → ")));
   }
 
