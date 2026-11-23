@@ -10,6 +10,8 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
 
+- Changed: window controls draw Orion's duotone icons again (decision 0074, issue 82): new icon names `window-minimize`, `window-maximize`, `window-restore`, `window-close` (Solar Bold Duotone square tiles; Phosphor too), written into each `.s4-window-control` by `desktop.js` at the new `--s4-size-window-control-icon` (24); the 12px drawn glyphs are gone. Cells, corner rule, firm layer, Close error on hover, Restore, right to left and forced colors are unchanged.
+
 Round 0062, the first Full QA pass (decision 0073, issues 73 to 81):
 
 - Fixed: the combobox's list closed on Escape only from its input; now from the Show Options button too (issue 73). The suite clicks every popup opener on every page and requires Escape to close it with focus on the opener.

@@ -64,6 +64,14 @@ notes, not committed.
   inset, at every width; the rail's rows already were); a selected tab layers its state on the highlight. Rule: the page
   checker fails a layer that is not the highlight's box within 1px (two known-bad fixtures).
 
+## Owner notes (2026-11-23)
+
+- **82.** Done 2026-11-23 (round 0063, decision 0074). Title bar window controls: "For the title bar window buttons I
+  like the change, but I did like the duotone icons btw, you can still use them. My main concern was that I felt they
+  were too small and round, and didn't behave like normal windows title bar buttons." Minimize, Maximize, Restore and
+  Close draw Solar Bold Duotone square tiles (icon names `window-*`) at 24px; 0072's cells and behaviour stay. No
+  reference image.
+
 ## Owner notes (2026-11-22)
 
 - **69.** Done 2026-11-22 (decision 0072). Title bar window controls: "I really like how it's unique from windows, but I
