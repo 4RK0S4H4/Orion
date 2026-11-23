@@ -311,7 +311,9 @@ document.addEventListener('selectionchange', showKind);
 sheet.addEventListener('blur', function () { sheet.querySelectorAll('[data-here]').forEach(function (x) { x.removeAttribute('data-here'); }); });
 function setRev(r) { $('sl-rev-mark').dataset.rev = r; $('sl-rev-name').textContent = REV[r]; }
 page.addEventListener('s4-open', function (e) {
-  cur = docs.filter(function (d) { return d.id === e.detail.id; })[0] || docs[0];
+  var hit = docs.filter(function (d) { return d.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
+  cur = hit || docs[0];
   page.dataset.title = cur.title || 'Untitled Script'; title.value = cur.title; sheet.innerHTML = cur.html; mark('', false); outline();
   $('sl-rev').value = cur.rev; $('sl-rev').dispatchEvent(new Event('change')); setRev(cur.rev);   /* a change event redraws the field's glass picker */ $('sl-star').setAttribute('aria-pressed', String(!!cur.star)); $('sl-star').setAttribute('aria-label', cur.star ? 'Unstar' : 'Star');
 });

@@ -29,6 +29,12 @@
     try { if (val === undefined) return JSON.parse(localStorage.getItem('s4-table:' + key) || 'null'); localStorage.setItem('s4-table:' + key, JSON.stringify(val)); } catch (e) {}
     return null;
   }
+  /* Decision 0076: a number typed by a person is read strictly, never coerced: a sign, digits, an optional decimal point (a comma only
+     in groups of three: "1,234.5" is 1234.5, "1,5" is refused, not 15), spaces ignored. "abc", "1e3", "12abc" and "" give NaN. */
+  function parseNumber(text) {
+    var t = String(text == null ? '' : text).replace(/\s/g, '');
+    return /^[+-]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(t) ? parseFloat(t.replace(/,/g, '')) : NaN;
+  }
   var rtl = function (el) { return getComputedStyle(el).direction === 'rtl'; };
   /* a table needs its wrap (the scroller, and the container that stacks rows on a phone): a bare one gets it here
      (decision 0065), so it never squeezes a phone into broken words */
@@ -619,7 +625,7 @@
       if (this.bar) {
         var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected';
         var was = !this.bar.hidden;
-        if (!count && was) S4.util.release(this.bar, function () { return self.tabRow && self.tabRow.isConnected ? self.tabRow : self.row(Math.max(0, Math.min(self.current, self.items.length - 1))); });   /* its Delete or Clear had focus */
+        if (!count && was) S4.util.release(this.bar, this.tabRow && this.tabRow.isConnected ? this.tabRow : this.row(Math.max(0, Math.min(this.current, this.items.length - 1))));   /* its Delete or Clear had focus */
         this.bar.hidden = !count;
         var top = this.bar.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', count > 0);
         if (count && !was) S4.transition.fade(this.bar, true);
@@ -717,7 +723,7 @@
       var c = this.c.visible()[td.cellIndex], row = this.rows[it.i], id = this.id(row, it.i), before = row[c.field];
       var raw = input.value.trim(), num = c.th.getAttribute('data-edit') === 'number', val = raw;
       if (num) {
-        var n = S4.parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
+        var n = parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
           isNaN(n) ? (raw ? 'needs a number' : 'can’t be empty') : c.th.getAttribute('data-format') === 'integer' && n % 1 ? 'needs a whole number' :
           min !== null && n < +min ? 'can’t be less than ' + min : max !== null && n > +max ? 'can’t be more than ' + max : '';
         if (raw === '' && !c.th.hasAttribute('data-required')) val = null;

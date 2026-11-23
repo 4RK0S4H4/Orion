@@ -3,7 +3,8 @@
        <div class="s4-text-field"><input id="e" type="email" required data-msg-required="Enter your email." data-msg-type="That doesn’t look like an email address."><label for="e">Email</label></div>
        <span class="s4-form-status"></span>
      </form>
-   - Errors appear when you leave a field, never while you type. Typing in a field with an error clears it at once.
+   - Errors appear when you leave a field that you typed in (or that has a value), never while you type, and never for a field you
+     only tabbed through: an empty required field is reported by Submit. Reset clears errors, checks and touched state too. Typing in a field with an error clears it at once.
    - A field that was wrong and is now right shows a quiet check (data-valid) until you move on.
    - Submit with something wrong: every problem is shown, the first one is scrolled into view (never focused, decision
      0049), s4-invalid { fields } fires and nothing is sent. Otherwise s4-submit { values } fires (cancel it to stop the
@@ -83,6 +84,15 @@
         var c = e.target; if (!c.matches || !c.matches(CONTROL)) return;
         if (/^(checkbox|radio|range|date|color|file)$/.test(c.type) || c.tagName === 'SELECT') check(c, true);
         if (auto) later(250);
+      });
+      /* Reset puts the form back to the state it loaded in (decision 0076): values, and the errors, valid marks and "touched" that came
+         with them, and the autosave status; the reset event fires before the values change, so this waits one tick */
+      form.addEventListener('reset', function () {
+        clearTimeout(timer);
+        setTimeout(function () {
+          controls(form).forEach(function (c) { var w = wrap(c); delete c.dataset.s4Touched; c.removeAttribute('aria-invalid'); w.removeAttribute('data-error'); w.removeAttribute('data-valid'); });
+          status(form, '', false);
+        }, 0);
       });
       form.addEventListener('submit', function (e) {
         var bad = validate(form, true);

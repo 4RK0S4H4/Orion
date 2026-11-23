@@ -6,7 +6,8 @@
        <div class="s4-text-field-supporting">We sent it to •••• 4021.</div>
      </div>
    - Typing or pasting fills the boxes from the start (only digits, or letters and digits with data-type="alphanumeric",
-     upper-cased); a pasted "123 456" or "123-456" fills all six. Backspace removes the last character.
+     upper-cased); a pasted "123 456" or "123-456" fills all six and replaces any code already there, as does typing over
+     Select All. Backspace removes the last character.
    - When the last box fills, s4-complete { value } fires on the field (data-autosubmit also submits its form). The app
      checks the code, then sets data-error="That code didn’t work." (or data-success) on the field. Typing again clears it.
    - It never takes focus by itself (decision 0049): the person taps it, or the phone's suggestion fills it.
@@ -69,7 +70,16 @@
       });
       /* the caret always sits after the last character: the boxes fill in order */
       input.addEventListener('keydown', function (e) { if (/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)) e.preventDefault(); });
-      ['focus', 'click', 'select'].forEach(function (ev) { input.addEventListener(ev, function () { end(); render(); }); });
+      ['focus', 'click', 'select'].forEach(function (ev) { input.addEventListener(ev, function () {
+        if (ev === 'select' && input.value && input.selectionStart === 0 && input.selectionEnd === input.value.length) { render(); return; }   /* Select All stays selected: typing or pasting then replaces the code (decision 0076) */
+        end(); render();
+      }); });
+      /* a paste is a whole code: it replaces what is there (appending to a full code would cut it off and keep the old one) */
+      input.addEventListener('paste', function (e) {
+        var t = clean((e.clipboardData || window.clipboardData || { getData: function () { return ''; } }).getData('text'));
+        if (!t) return;
+        e.preventDefault(); input.value = t; input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
       input.addEventListener('blur', render);
       input.value = clean(input.value); full = input.value.length === n;
       render();

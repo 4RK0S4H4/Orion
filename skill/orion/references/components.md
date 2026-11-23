@@ -425,7 +425,8 @@ an order, a profile, a document, a step-by-step task.
 
 Script: `S4.pages.open(app, name, { id, title })`, `S4.pages.back(app)`, `S4.pages.home(app)` (all the way out),
 `S4.pages.current(app)` gives `{ name, id }` or `null`. The page fires `s4-open { id, from }` just before it shows:
-fill it from your data there. It fires `s4-close` when left.
+fill it from your data there. If the id is not there, call `event.preventDefault()`: the page does not open and the URL keeps
+the view's address (decision 0076; a deep link to a missing id otherwise shows another item under the wrong URL). It fires `s4-close` when left.
 
 **What it does for you**
 - **Back, three ways:** the bar's Back button, the phone's Back gesture or the browser's Back button, and

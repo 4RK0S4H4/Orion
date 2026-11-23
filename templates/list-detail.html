@@ -216,8 +216,8 @@
   <div class="s4-sheet-actions"><button class="s4-button" data-variant="text" data-close="cancel" type="button">Discard</button><button class="s4-button" data-variant="filled" data-close="send" type="button">Create Ticket</button></div>
 </dialog>
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=6f74d76"></script>
-<script src="../components/orion.commands.min.js?v=9842239"></script>
+<script src="../components/orion.core.min.js?v=d89bb0c"></script>
+<script src="../components/orion.commands.min.js?v=8b37d45"></script>
 <script>
 /* the hub's light or dark choice carries over; Relay's accent and tinted surfaces are its own, never saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#4f46e5', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -297,6 +297,7 @@ function openPage() { S4.pages.open(appEl, 'ticket', { id: current, title: T[cur
 document.getElementById('d-open').addEventListener('click', openPage);
 list.addEventListener('dblclick', function (e) { if (e.target.closest('.s4-list-item')) openPage(); });
 page.addEventListener('s4-open', function (e) {
+  if (e.detail.id && !T[e.detail.id]) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
   var t = T[e.detail.id] || T[current];
   document.getElementById('r-subject').textContent = t.subject;
   document.getElementById('r-avatar').textContent = t.av;

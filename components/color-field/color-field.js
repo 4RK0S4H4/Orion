@@ -42,6 +42,12 @@
       var theme = f.hasAttribute('data-theme-seed');
       input.setAttribute('autocomplete', 'off'); input.setAttribute('spellcheck', 'false'); input.setAttribute('autocapitalize', 'off');
       input.maxLength = 7;
+      /* a pasted code is trimmed before the length limit cuts it ("  #abcdef " would have lost its end, decision 0076) */
+      input.addEventListener('paste', function (e) {
+        var t = ((e.clipboardData || window.clipboardData || { getData: function () { return ''; } }).getData('text') || '');
+        if (t === t.trim() || !t.trim()) return;
+        e.preventDefault(); input.setRangeText(t.trim(), input.selectionStart, input.selectionEnd, 'end'); input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
       var id = 's4-color-' + (++uid);
 
       /* the swatch: a button before the code */

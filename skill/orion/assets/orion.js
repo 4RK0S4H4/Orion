@@ -74,13 +74,13 @@
       return m;
     },
     /* Decision 0076: before you hide or remove something that may hold focus (a selection bar, a button that turns into
-       something else), move focus out of it: to `fallback` (an element, or a function that returns one), else to main
+       something else), move focus out of it: to `to` (an element, or nothing), else to main
        (land). Focus that drops to <body> on its own breaks the keyboard (Tab starts again from the top of the page). Call it
        BEFORE the change. Returns true when focus moved. */
-    release: function (box, fallback) {
-      var a = document.activeElement, to = typeof fallback === 'function' ? fallback() : fallback;
-      if (!a || !box || !box.contains(a)) return;
-      if (to && to.isConnected && !box.contains(to) && to.getClientRects().length) { to.tabIndex < 0 && !to.hasAttribute('tabindex') && to.setAttribute('tabindex', '-1'); to.focus({ preventScroll: true }); }
+    release: function (box, to) {
+      var a = document.activeElement;
+      if (!box.contains(a)) return;
+      if (to && to.isConnected && !box.contains(to)) { if (to.tabIndex < 0) to.tabIndex = -1; to.focus({ preventScroll: true }); }
       if (document.activeElement === a || document.activeElement === document.body) S4.util.land();
     },
     /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
@@ -108,13 +108,6 @@
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }
-  };
-
-  /* Decision 0076: a number typed by a person is read strictly, never coerced: a sign, digits, an optional decimal point (a comma
-     only in groups of three: "1,234.5" is 1234.5, "1,5" is refused, not 15), spaces ignored. "abc", "1e3", "12abc" and "" give NaN. */
-  S4.parseNumber = function (text) {
-    var t = String(text == null ? '' : text).replace(/\s/g, '');
-    return /^[+-]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(t) ? parseFloat(t.replace(/,/g, '')) : NaN;
   };
 
   /* ---------- motion ---------- */
@@ -496,7 +489,9 @@
     opts = Object.assign({}, opts);   /* a value off the dial's list is dropped, with a warning, never written (decision 0067) */
     if ('mode' in opts && !dialOk('data-theme', 'mode', opts.mode)) delete opts.mode;
     if ('variant' in opts && !dialOk('data-accent-variant', 'variant', opts.variant)) delete opts.variant;
-    if ('contrast' in opts && opts.contrast !== '' && opts.contrast != null && !(+opts.contrast >= 0 && +opts.contrast <= 1)) { warnOnce('S4: theme contrast "' + opts.contrast + '" ignored (not written); use 0, 0.5 or 1.'); delete opts.contrast; }
+    /* the dial's own words (S4.theme.dials) are accepted too (decision 0076) */
+    var cw = DIALS['data-contrast'].indexOf(opts.contrast); if (cw >= 0) opts.contrast = cw / 2;
+    if ('contrast' in opts && opts.contrast !== '' && opts.contrast != null && !(+opts.contrast >= 0 && +opts.contrast <= 1)) { warnOnce('S4: theme contrast "' + opts.contrast + '" ignored (not written); use standard, medium or high.'); delete opts.contrast; }
     BRAND.forEach(function (d) { if (d.key in opts && !brandOk(d, opts[d.key])) delete opts[d.key]; });
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;
@@ -1370,10 +1365,17 @@ S4.register('fab', function (scope) {
     var prev = from === page ? s.stack[s.stack.length - 1] : null;
     var entry = { el: page, from: prev ? prev.from : from, title: opts.title || page.dataset.title || '', id: id, scroll: prev ? prev.scroll : getScroll(app), name: page.dataset.page,
       opener: prev ? prev.opener : opener(app, from, opts.from), openerId: prev ? prev.openerId : id };
+    var oldId = page.dataset.pageId;
     if (from === page) s.stack.pop();
     s.stack.push(entry);
     page.dataset.pageId = id;
-    S4.util.emit(page, 's4-open', { id: id, from: opts.from || null });
+    /* the page's own s4-open handler fills it from the id, and may refuse (preventDefault): an id that is not there opens nothing,
+       and the URL stays where it was instead of naming a page that does not exist (decision 0076) */
+    if (!page.dispatchEvent(new CustomEvent('s4-open', { bubbles: true, cancelable: true, detail: { id: id, from: opts.from || null } }))) {
+      s.stack.pop(); if (prev) s.stack.push(prev);
+      if (oldId == null) delete page.dataset.pageId; else page.dataset.pageId = oldId;
+      return false;
+    }
     if (!opts.title && page.dataset.title) entry.title = page.dataset.title;   /* the s4-open handler may have set data-title */
     if (!opts.silent) {
       var base = viewName(app) || (s.stack[0].from && s.stack[0].from.dataset.view) || '';
@@ -3538,7 +3540,7 @@ S4.register('accordion', function (scope) {
     if (b) {
       var c = b.querySelector('[data-selection-count]'); if (c) c.textContent = n + ' Selected';
       var was = !b.hidden;
-      if (!n && was) S4.util.release(b, function () { var a = el._s4anchor && el._s4anchor.isConnected ? el._s4anchor : sItems(el)[0]; return a && (a.querySelector('button, a[href], [tabindex]') || a); });   /* its action had focus (decision 0076) */
+      if (!n && was) S4.util.release(b, (function (a) { return a && (a.querySelector('button, a[href], [tabindex]') || a); })(el._s4anchor && el._s4anchor.isConnected ? el._s4anchor : sItems(el)[0]));   /* its action had focus (decision 0076) */
       b.hidden = !n;
       var top = b.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', n > 0);
       if (n && !was) S4.transition.fade(b, true);
@@ -4000,6 +4002,12 @@ S4.register('accordion', function (scope) {
     if (!key) return null;
     try { if (val === undefined) return JSON.parse(localStorage.getItem('s4-table:' + key) || 'null'); localStorage.setItem('s4-table:' + key, JSON.stringify(val)); } catch (e) {}
     return null;
+  }
+  /* Decision 0076: a number typed by a person is read strictly, never coerced: a sign, digits, an optional decimal point (a comma only
+     in groups of three: "1,234.5" is 1234.5, "1,5" is refused, not 15), spaces ignored. "abc", "1e3", "12abc" and "" give NaN. */
+  function parseNumber(text) {
+    var t = String(text == null ? '' : text).replace(/\s/g, '');
+    return /^[+-]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(t) ? parseFloat(t.replace(/,/g, '')) : NaN;
   }
   var rtl = function (el) { return getComputedStyle(el).direction === 'rtl'; };
   /* a table needs its wrap (the scroller, and the container that stacks rows on a phone): a bare one gets it here
@@ -4591,7 +4599,7 @@ S4.register('accordion', function (scope) {
       if (this.bar) {
         var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected';
         var was = !this.bar.hidden;
-        if (!count && was) S4.util.release(this.bar, function () { return self.tabRow && self.tabRow.isConnected ? self.tabRow : self.row(Math.max(0, Math.min(self.current, self.items.length - 1))); });   /* its Delete or Clear had focus */
+        if (!count && was) S4.util.release(this.bar, this.tabRow && this.tabRow.isConnected ? this.tabRow : this.row(Math.max(0, Math.min(this.current, this.items.length - 1))));   /* its Delete or Clear had focus */
         this.bar.hidden = !count;
         var top = this.bar.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', count > 0);
         if (count && !was) S4.transition.fade(this.bar, true);
@@ -4689,7 +4697,7 @@ S4.register('accordion', function (scope) {
       var c = this.c.visible()[td.cellIndex], row = this.rows[it.i], id = this.id(row, it.i), before = row[c.field];
       var raw = input.value.trim(), num = c.th.getAttribute('data-edit') === 'number', val = raw;
       if (num) {
-        var n = S4.parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
+        var n = parseNumber(raw), min = c.th.getAttribute('data-min'), max = c.th.getAttribute('data-max'), why =
           isNaN(n) ? (raw ? 'needs a number' : 'can’t be empty') : c.th.getAttribute('data-format') === 'integer' && n % 1 ? 'needs a whole number' :
           min !== null && n < +min ? 'can’t be less than ' + min : max !== null && n > +max ? 'can’t be more than ' + max : '';
         if (raw === '' && !c.th.hasAttribute('data-required')) val = null;
@@ -6219,6 +6227,14 @@ S4.register('text-field', function (scope) {
         menu.style.minWidth = f.querySelector(':scope > .s4-text-field-select').closest('.s4-text-field').getBoundingClientRect().width + 'px';
         menu.hasAttribute('data-open') || menu.matches(':popover-open') ? S4.menu.close(menu) : S4.menu.open(menu, trigger);
       });
+      /* the select-only combobox keys (decision 0076): Down, Up and Alt+Down open the list on the chosen option; Home, End and a letter
+         open it and hand the key to the list, which moves to the first, last or matching option */
+      trigger.addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (c.disabled || e.ctrlKey || e.metaKey || (e.altKey && k !== 'ArrowDown') || !/^(Arrow(Down|Up)|Home|End|\S)$/.test(k)) return;
+        e.preventDefault(); trigger.click();
+        if (k[1] !== 'r' && document.activeElement !== trigger) document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      });
       menu.addEventListener('s4-select', function (e) {
         c.value = e.detail.item.dataset.value; build();
         c.dispatchEvent(new Event('input', { bubbles: true })); c.dispatchEvent(new Event('change', { bubbles: true }));
@@ -6928,6 +6944,9 @@ S4.register('text-field', function (scope) {
       function parse(text) {
         var t = String(text).trim().replace(/\s| | /g, '');
         if (!t) return null;
+        /* a group mark only counts between groups of three ("1,234", never "1,5"): otherwise "1,5" would be read as 15 (decision 0076) */
+        var esc = function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+        if (t.indexOf(group) >= 0 && !new RegExp('^[-−]?\\d{1,3}(' + esc(group) + '\\d{3})+(' + esc(dec) + '\\d*)?$').test(t)) return NaN;
         t = t.split(group).join('');
         if (dec !== '.') t = t.replace(dec, '.');
         t = t.replace(/^−/, '-');
@@ -6972,7 +6991,7 @@ S4.register('text-field', function (scope) {
         input.setCustomValidity(message(n));
         if (n === null || isNaN(n)) { input.removeAttribute('aria-valuenow'); input.removeAttribute('aria-valuetext'); }
         else {
-          input.setAttribute('aria-valuenow', n);
+          input.setAttribute('aria-valuenow', clamp(n));   /* never past aria-valuemin / max, whatever was typed (the text and the error carry the rest) */
           var words = (prefix ? prefix.textContent.trim() : '') + fmt.format(n) + (suffix ? ' ' + suffix.textContent.trim() : '');
           input.setAttribute('aria-valuetext', words);
         }
@@ -7048,7 +7067,8 @@ S4.register('text-field', function (scope) {
        <div class="s4-text-field-supporting">We sent it to •••• 4021.</div>
      </div>
    - Typing or pasting fills the boxes from the start (only digits, or letters and digits with data-type="alphanumeric",
-     upper-cased); a pasted "123 456" or "123-456" fills all six. Backspace removes the last character.
+     upper-cased); a pasted "123 456" or "123-456" fills all six and replaces any code already there, as does typing over
+     Select All. Backspace removes the last character.
    - When the last box fills, s4-complete { value } fires on the field (data-autosubmit also submits its form). The app
      checks the code, then sets data-error="That code didn’t work." (or data-success) on the field. Typing again clears it.
    - It never takes focus by itself (decision 0049): the person taps it, or the phone's suggestion fills it.
@@ -7111,7 +7131,16 @@ S4.register('text-field', function (scope) {
       });
       /* the caret always sits after the last character: the boxes fill in order */
       input.addEventListener('keydown', function (e) { if (/^(ArrowLeft|ArrowRight|Home|End)$/.test(e.key)) e.preventDefault(); });
-      ['focus', 'click', 'select'].forEach(function (ev) { input.addEventListener(ev, function () { end(); render(); }); });
+      ['focus', 'click', 'select'].forEach(function (ev) { input.addEventListener(ev, function () {
+        if (ev === 'select' && input.value && input.selectionStart === 0 && input.selectionEnd === input.value.length) { render(); return; }   /* Select All stays selected: typing or pasting then replaces the code (decision 0076) */
+        end(); render();
+      }); });
+      /* a paste is a whole code: it replaces what is there (appending to a full code would cut it off and keep the old one) */
+      input.addEventListener('paste', function (e) {
+        var t = clean((e.clipboardData || window.clipboardData || { getData: function () { return ''; } }).getData('text'));
+        if (!t) return;
+        e.preventDefault(); input.value = t; input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
       input.addEventListener('blur', render);
       input.value = clean(input.value); full = input.value.length === n;
       render();
@@ -7645,7 +7674,8 @@ S4.register('text-field', function (scope) {
        <div class="s4-text-field"><input id="e" type="email" required data-msg-required="Enter your email." data-msg-type="That doesn’t look like an email address."><label for="e">Email</label></div>
        <span class="s4-form-status"></span>
      </form>
-   - Errors appear when you leave a field, never while you type. Typing in a field with an error clears it at once.
+   - Errors appear when you leave a field that you typed in (or that has a value), never while you type, and never for a field you
+     only tabbed through: an empty required field is reported by Submit. Reset clears errors, checks and touched state too. Typing in a field with an error clears it at once.
    - A field that was wrong and is now right shows a quiet check (data-valid) until you move on.
    - Submit with something wrong: every problem is shown, the first one is scrolled into view (never focused, decision
      0049), s4-invalid { fields } fires and nothing is sent. Otherwise s4-submit { values } fires (cancel it to stop the
@@ -7725,6 +7755,15 @@ S4.register('text-field', function (scope) {
         var c = e.target; if (!c.matches || !c.matches(CONTROL)) return;
         if (/^(checkbox|radio|range|date|color|file)$/.test(c.type) || c.tagName === 'SELECT') check(c, true);
         if (auto) later(250);
+      });
+      /* Reset puts the form back to the state it loaded in (decision 0076): values, and the errors, valid marks and "touched" that came
+         with them, and the autosave status; the reset event fires before the values change, so this waits one tick */
+      form.addEventListener('reset', function () {
+        clearTimeout(timer);
+        setTimeout(function () {
+          controls(form).forEach(function (c) { var w = wrap(c); delete c.dataset.s4Touched; c.removeAttribute('aria-invalid'); w.removeAttribute('data-error'); w.removeAttribute('data-valid'); });
+          status(form, '', false);
+        }, 0);
       });
       form.addEventListener('submit', function (e) {
         var bad = validate(form, true);
@@ -8475,6 +8514,12 @@ S4.register('theme-controls', function (scope) {
       var theme = f.hasAttribute('data-theme-seed');
       input.setAttribute('autocomplete', 'off'); input.setAttribute('spellcheck', 'false'); input.setAttribute('autocapitalize', 'off');
       input.maxLength = 7;
+      /* a pasted code is trimmed before the length limit cuts it ("  #abcdef " would have lost its end, decision 0076) */
+      input.addEventListener('paste', function (e) {
+        var t = ((e.clipboardData || window.clipboardData || { getData: function () { return ''; } }).getData('text') || '');
+        if (t === t.trim() || !t.trim()) return;
+        e.preventDefault(); input.setRangeText(t.trim(), input.selectionStart, input.selectionEnd, 'end'); input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
       var id = 's4-color-' + (++uid);
 
       /* the swatch: a button before the code */
@@ -9187,7 +9232,8 @@ S4.register('skeleton', function (scope) {
        the app's navigation                                                                 "Go To Inbox", one per destination
                                                                                             (left out when a command of that name opens it)
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
-   - Type to filter (every word must match), Arrow keys move, Enter runs, Escape closes.
+   - Type to filter (every word must match), Arrow keys move (Home, End, PageUp and PageDown too, when the box is empty or the
+     focus is on the list), Enter runs, Escape closes; clearing the box (Escape, the cross) shows every command again.
    - S4.palette.open() / close(). Fires s4-open and s4-close on the dialog and s4-command { command } on document.
    Focus (decision 0049): opened with the keyboard, the cursor is in the box (you are already typing). Opened by tap or
    click it is not, so no keyboard jumps up on a phone; the first key you press goes into the box anyway.
@@ -9202,14 +9248,21 @@ S4.register('skeleton', function (scope) {
     dlg.innerHTML = '<div class="s4-search s4-palette-search" role="search"><span class="s4-icon" data-icon="search"></span>' +
       '<input class="s4-search-input" type="search" placeholder="Search Or Run A Command" aria-label="Search or run a command" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="s4-palette-list"></div>' +
       '<ul class="s4-list s4-palette-list" id="s4-palette-list" role="listbox" aria-label="Commands"></ul>' +
-      '<p class="s4-palette-empty" hidden>No matches. Try another word.</p>';
+      '<p class="s4-palette-empty" role="status" hidden>No matches. Try another word.</p>';
     document.body.appendChild(dlg);
     input = dlg.querySelector('input'); list = dlg.querySelector('ul'); empty = dlg.querySelector('.s4-palette-empty');
     input.addEventListener('input', function () { render(input.value); });
+    input.addEventListener('search', function () { render(input.value); });   /* the field's own clear (Escape, the cross) fires no input event: the list follows the box (decision 0076) */
     dlg.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
-      else if (e.key === 'Enter') { e.preventDefault(); if (shown[active]) run(shown[active]); }
+      else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); if (shown.length) mark(Math.max(0, Math.min(shown.length - 1, active + (e.key === 'PageDown' ? 8 : -8)))); }
+      else if ((e.key === 'Home' || e.key === 'End') && (document.activeElement !== input || !input.value)) { e.preventDefault(); if (shown.length) mark(e.key === 'Home' ? 0 : shown.length - 1); }   /* in a typed query they move the caret */
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (shown[active]) run(shown[active]);
+        else { input.setAttribute('aria-invalid', 'true'); empty.hidden = false; empty.textContent = ''; empty.textContent = 'No matches. Try another word.'; }   /* nothing to run: say so again, stay open */
+      }
       else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement !== input) input.focus({ preventScroll: true });   /* your own key press starts the typing */
     });
     list.addEventListener('click', function (e) { var li = e.target.closest('[data-i]'); if (li) run(shown[+li.dataset.i]); });
@@ -9254,7 +9307,7 @@ S4.register('skeleton', function (scope) {
         '<span class="s4-list-content"><span class="s4-list-headline">' + esc(c.label) + '</span></span>' +
         (c.shortcut ? '<span class="s4-list-trailing"><kbd class="s4-kbd">' + esc(S4.desktop ? S4.desktop.format(c.shortcut) : c.shortcut) + '</kbd></span>' : '') + '</div></li>';
     });
-    list.innerHTML = html; list.hidden = !shown.length; empty.hidden = !!shown.length;
+    list.innerHTML = html; list.hidden = !shown.length; empty.hidden = !!shown.length; input.removeAttribute('aria-invalid');
     if (S4.init) S4.init(list);
     mark(shown.length ? 0 : -1, false);
   }
@@ -9329,27 +9382,28 @@ S4.register('sheet', function () {});
     ensureHost().style.setProperty('--s4-snackbar-offset', lift + 'px');
   }
   /* where focus goes when the snackbar's button holds it: what had focus, or (a field) the cell or box round it */
-  function back(op) { return function () { return op && S4.util.typable(op) ? op.closest('[tabindex], td') : op; }; }
-  S4.snackbar = function (o, restored) {
+  function back(op) { return op && S4.util.typable(op) ? op.closest('[tabindex], td') : op; }
+  S4.snackbar = function (o) {
     o = typeof o === 'string' ? { text: o } : (o || {});
-    var ae = document.activeElement, opener = restored ? restored.opener : ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
+    var ae = document.activeElement, opener = ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
     if (current) {
       var was = current;
-      if (was.o.action && !was.acted) { waiting.push({ o: was.o, opener: was.opener }); }
+      if (was.o.action) waiting.push(was.o);
       was.dismiss(true);
     }
     offset();
     var el = document.createElement('div'); el.className = 's4-snackbar';
     if (o.multiline) el.setAttribute('data-multiline', '');
     var t = document.createElement('span'); t.className = 's4-snackbar-text'; t.textContent = o.text || ''; el.appendChild(t);
-    var gone = false, api = null;
+    var gone = false, api;
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
-        api.acted = true; S4.util.release(el, back(opener));
+        S4.util.release(el, back(opener));
         if (o.onAction) o.onAction();
         api.dismiss(true);
-        var next = waiting.pop(); if (next) S4.snackbar(next.o, next);   /* the one under it is undoable now */
+        /* the one under it is undoable now */
+        var next = waiting.pop(); if (next) S4.snackbar(next);
       });
       el.appendChild(a);
     }
@@ -9367,11 +9421,11 @@ S4.register('sheet', function () {});
     el.addEventListener('focusin', function () { held = true; clearTimeout(timer); });
     el.addEventListener('focusout', function () { held = false; arm(); });
     api = {
-      element: el, o: o, opener: opener, acted: false,
+      element: el, o: o,
       /* instant: no exit animation; replaced: made room for a newer one (its Undo waits); otherwise it ran out or was closed, so what waits is let go */
       dismiss: function (instant, letGo) {
         if (gone) return; gone = true; clearTimeout(timer); if (current === api) current = null;
-        if (letGo === true && !api.acted) waiting.length = 0;
+        if (letGo) waiting.length = 0;
         S4.util.release(el, back(opener));
         if (instant) el.remove(); else S4.transition.rise(el, { open: false }).then(function () { el.remove(); });
       }

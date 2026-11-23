@@ -71,13 +71,13 @@
       return m;
     },
     /* Decision 0076: before you hide or remove something that may hold focus (a selection bar, a button that turns into
-       something else), move focus out of it: to `fallback` (an element, or a function that returns one), else to main
+       something else), move focus out of it: to `to` (an element, or nothing), else to main
        (land). Focus that drops to <body> on its own breaks the keyboard (Tab starts again from the top of the page). Call it
        BEFORE the change. Returns true when focus moved. */
-    release: function (box, fallback) {
-      var a = document.activeElement, to = typeof fallback === 'function' ? fallback() : fallback;
-      if (!a || !box || !box.contains(a)) return;
-      if (to && to.isConnected && !box.contains(to) && to.getClientRects().length) { to.tabIndex < 0 && !to.hasAttribute('tabindex') && to.setAttribute('tabindex', '-1'); to.focus({ preventScroll: true }); }
+    release: function (box, to) {
+      var a = document.activeElement;
+      if (!box.contains(a)) return;
+      if (to && to.isConnected && !box.contains(to)) { if (to.tabIndex < 0) to.tabIndex = -1; to.focus({ preventScroll: true }); }
       if (document.activeElement === a || document.activeElement === document.body) S4.util.land();
     },
     /* Decision 0073: the one way to put text on the clipboard. Returns a promise of true or false that never rejects (a
@@ -105,13 +105,6 @@
     /* each component instance is wired once */
     once: function (el, key) { var k = 's4' + key; if (el.dataset[k]) return false; el.dataset[k] = '1'; return true; },
     all: function (scope, sel) { var out = Array.prototype.slice.call(scope.querySelectorAll ? scope.querySelectorAll(sel) : []); if (scope.matches && scope.matches(sel)) out.unshift(scope); return out; }
-  };
-
-  /* Decision 0076: a number typed by a person is read strictly, never coerced: a sign, digits, an optional decimal point (a comma
-     only in groups of three: "1,234.5" is 1234.5, "1,5" is refused, not 15), spaces ignored. "abc", "1e3", "12abc" and "" give NaN. */
-  S4.parseNumber = function (text) {
-    var t = String(text == null ? '' : text).replace(/\s/g, '');
-    return /^[+-]?(\d{1,3}(,\d{3})+|\d+)(\.\d+)?$/.test(t) ? parseFloat(t.replace(/,/g, '')) : NaN;
   };
 
   /* ---------- motion ---------- */
@@ -493,7 +486,9 @@
     opts = Object.assign({}, opts);   /* a value off the dial's list is dropped, with a warning, never written (decision 0067) */
     if ('mode' in opts && !dialOk('data-theme', 'mode', opts.mode)) delete opts.mode;
     if ('variant' in opts && !dialOk('data-accent-variant', 'variant', opts.variant)) delete opts.variant;
-    if ('contrast' in opts && opts.contrast !== '' && opts.contrast != null && !(+opts.contrast >= 0 && +opts.contrast <= 1)) { warnOnce('S4: theme contrast "' + opts.contrast + '" ignored (not written); use 0, 0.5 or 1.'); delete opts.contrast; }
+    /* the dial's own words (S4.theme.dials) are accepted too (decision 0076) */
+    var cw = DIALS['data-contrast'].indexOf(opts.contrast); if (cw >= 0) opts.contrast = cw / 2;
+    if ('contrast' in opts && opts.contrast !== '' && opts.contrast != null && !(+opts.contrast >= 0 && +opts.contrast <= 1)) { warnOnce('S4: theme contrast "' + opts.contrast + '" ignored (not written); use standard, medium or high.'); delete opts.contrast; }
     BRAND.forEach(function (d) { if (d.key in opts && !brandOk(d, opts[d.key])) delete opts[d.key]; });
     if ('seed' in opts) {
       var seed = opts.seed && S4.theme.accents[String(opts.seed).toLowerCase()] || opts.seed;

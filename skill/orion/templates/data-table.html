@@ -439,7 +439,7 @@ document.getElementById('ln-new').addEventListener('s4-close', function (e) {
 /* ---------- a record's page: filled from its id, so a link or a reload shows the same record ---------- */
 var recordPage = document.querySelector('.s4-subpage[data-page="record"]'), currentId = null;
 recordPage.addEventListener('s4-open', function (e) {
-  var r = table.rows.filter(function (x) { return x.id === e.detail.id; })[0] || rows.filter(function (x) { return x.id === e.detail.id; })[0]; if (!r) return;
+  var r = table.rows.filter(function (x) { return x.id === e.detail.id; })[0] || rows.filter(function (x) { return x.id === e.detail.id; })[0]; if (!r) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
   currentId = r.id;
   document.getElementById('r-cat').textContent = r.catalogue;
   document.getElementById('r-type').textContent = r.type || r.group;

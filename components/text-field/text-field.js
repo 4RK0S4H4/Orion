@@ -52,6 +52,14 @@ S4.register('text-field', function (scope) {
         menu.style.minWidth = f.querySelector(':scope > .s4-text-field-select').closest('.s4-text-field').getBoundingClientRect().width + 'px';
         menu.hasAttribute('data-open') || menu.matches(':popover-open') ? S4.menu.close(menu) : S4.menu.open(menu, trigger);
       });
+      /* the select-only combobox keys (decision 0076): Down, Up and Alt+Down open the list on the chosen option; Home, End and a letter
+         open it and hand the key to the list, which moves to the first, last or matching option */
+      trigger.addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (c.disabled || e.ctrlKey || e.metaKey || (e.altKey && k !== 'ArrowDown') || !/^(Arrow(Down|Up)|Home|End|\S)$/.test(k)) return;
+        e.preventDefault(); trigger.click();
+        if (k[1] !== 'r' && document.activeElement !== trigger) document.activeElement.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true }));
+      });
       menu.addEventListener('s4-select', function (e) {
         c.value = e.detail.item.dataset.value; build();
         c.dispatchEvent(new Event('input', { bubbles: true })); c.dispatchEvent(new Event('change', { bubbles: true }));

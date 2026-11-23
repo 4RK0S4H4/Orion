@@ -297,6 +297,7 @@ function openPage() { S4.pages.open(appEl, 'ticket', { id: current, title: T[cur
 document.getElementById('d-open').addEventListener('click', openPage);
 list.addEventListener('dblclick', function (e) { if (e.target.closest('.s4-list-item')) openPage(); });
 page.addEventListener('s4-open', function (e) {
+  if (e.detail.id && !T[e.detail.id]) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
   var t = T[e.detail.id] || T[current];
   document.getElementById('r-subject').textContent = t.subject;
   document.getElementById('r-avatar').textContent = t.av;

@@ -83,10 +83,17 @@
     var prev = from === page ? s.stack[s.stack.length - 1] : null;
     var entry = { el: page, from: prev ? prev.from : from, title: opts.title || page.dataset.title || '', id: id, scroll: prev ? prev.scroll : getScroll(app), name: page.dataset.page,
       opener: prev ? prev.opener : opener(app, from, opts.from), openerId: prev ? prev.openerId : id };
+    var oldId = page.dataset.pageId;
     if (from === page) s.stack.pop();
     s.stack.push(entry);
     page.dataset.pageId = id;
-    S4.util.emit(page, 's4-open', { id: id, from: opts.from || null });
+    /* the page's own s4-open handler fills it from the id, and may refuse (preventDefault): an id that is not there opens nothing,
+       and the URL stays where it was instead of naming a page that does not exist (decision 0076) */
+    if (!page.dispatchEvent(new CustomEvent('s4-open', { bubbles: true, cancelable: true, detail: { id: id, from: opts.from || null } }))) {
+      s.stack.pop(); if (prev) s.stack.push(prev);
+      if (oldId == null) delete page.dataset.pageId; else page.dataset.pageId = oldId;
+      return false;
+    }
     if (!opts.title && page.dataset.title) entry.title = page.dataset.title;   /* the s4-open handler may have set data-title */
     if (!opts.silent) {
       var base = viewName(app) || (s.stack[0].from && s.stack[0].from.dataset.view) || '';

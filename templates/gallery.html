@@ -234,8 +234,8 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=6f74d76"></script>
-<script src="../components/orion.direct.min.js?v=5afa9fb"></script>
+<script src="../components/orion.core.min.js?v=d89bb0c"></script>
+<script src="../components/orion.direct.min.js?v=f77cf1c"></script>
 <script>
 /* Crate's brand: a sticker-gold accent over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#e8b400' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -325,7 +325,9 @@ function sides(r) {
   return '<div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side A</h4><ol class="cr-tracks">' + side('A', 0) + '</ol></div><div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side B</h4><ol class="cr-tracks">' + side('B', 4) + '</ol></div>';
 }
 page.addEventListener('s4-open', function (e) {
-  cur = records.filter(function (r) { return r.id === e.detail.id; })[0] || records[0];
+  var hit = records.filter(function (r) { return r.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
+  cur = hit || records[0];
   var list = shown().indexOf(cur) >= 0 ? shown() : records, i = list.indexOf(cur);
   page.dataset.title = cur.album;
   S4.theme({ seed: CHART[cur.c1] }, $('v-booth'));

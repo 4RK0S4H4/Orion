@@ -24,27 +24,28 @@
     ensureHost().style.setProperty('--s4-snackbar-offset', lift + 'px');
   }
   /* where focus goes when the snackbar's button holds it: what had focus, or (a field) the cell or box round it */
-  function back(op) { return function () { return op && S4.util.typable(op) ? op.closest('[tabindex], td') : op; }; }
-  S4.snackbar = function (o, restored) {
+  function back(op) { return op && S4.util.typable(op) ? op.closest('[tabindex], td') : op; }
+  S4.snackbar = function (o) {
     o = typeof o === 'string' ? { text: o } : (o || {});
-    var ae = document.activeElement, opener = restored ? restored.opener : ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
+    var ae = document.activeElement, opener = ae !== document.body && !ae.closest('.s4-snackbar-host') ? ae : null;
     if (current) {
       var was = current;
-      if (was.o.action && !was.acted) { waiting.push({ o: was.o, opener: was.opener }); }
+      if (was.o.action) waiting.push(was.o);
       was.dismiss(true);
     }
     offset();
     var el = document.createElement('div'); el.className = 's4-snackbar';
     if (o.multiline) el.setAttribute('data-multiline', '');
     var t = document.createElement('span'); t.className = 's4-snackbar-text'; t.textContent = o.text || ''; el.appendChild(t);
-    var gone = false, api = null;
+    var gone = false, api;
     if (o.action) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 's4-button s4-snackbar-action'; a.dataset.variant = 'text'; a.textContent = o.action;
       a.addEventListener('click', function () {
-        api.acted = true; S4.util.release(el, back(opener));
+        S4.util.release(el, back(opener));
         if (o.onAction) o.onAction();
         api.dismiss(true);
-        var next = waiting.pop(); if (next) S4.snackbar(next.o, next);   /* the one under it is undoable now */
+        /* the one under it is undoable now */
+        var next = waiting.pop(); if (next) S4.snackbar(next);
       });
       el.appendChild(a);
     }
@@ -62,11 +63,11 @@
     el.addEventListener('focusin', function () { held = true; clearTimeout(timer); });
     el.addEventListener('focusout', function () { held = false; arm(); });
     api = {
-      element: el, o: o, opener: opener, acted: false,
+      element: el, o: o,
       /* instant: no exit animation; replaced: made room for a newer one (its Undo waits); otherwise it ran out or was closed, so what waits is let go */
       dismiss: function (instant, letGo) {
         if (gone) return; gone = true; clearTimeout(timer); if (current === api) current = null;
-        if (letGo === true && !api.acted) waiting.length = 0;
+        if (letGo) waiting.length = 0;
         S4.util.release(el, back(opener));
         if (instant) el.remove(); else S4.transition.rise(el, { open: false }).then(function () { el.remove(); });
       }

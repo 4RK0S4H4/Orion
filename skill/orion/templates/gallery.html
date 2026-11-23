@@ -325,7 +325,9 @@ function sides(r) {
   return '<div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side A</h4><ol class="cr-tracks">' + side('A', 0) + '</ol></div><div class="s4-stack" style="--s4-gap: var(--s4-space-2)"><h4 class="s4-title-small" style="margin:0">Side B</h4><ol class="cr-tracks">' + side('B', 4) + '</ol></div>';
 }
 page.addEventListener('s4-open', function (e) {
-  cur = records.filter(function (r) { return r.id === e.detail.id; })[0] || records[0];
+  var hit = records.filter(function (r) { return r.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
+  cur = hit || records[0];
   var list = shown().indexOf(cur) >= 0 ? shown() : records, i = list.indexOf(cur);
   page.dataset.title = cur.album;
   S4.theme({ seed: CHART[cur.c1] }, $('v-booth'));

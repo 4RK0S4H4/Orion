@@ -173,7 +173,9 @@ document.getElementById('board').addEventListener('s4-lane-add', function (e) {
 /* the card page fills itself from the id in the URL */
 var page = document.querySelector('.s4-subpage[data-page="card"]'), open = null;
 page.addEventListener('s4-open', function (e) {
-  open = cards.filter(function (x) { return x.id === e.detail.id; })[0] || cards[0];
+  var hit = cards.filter(function (x) { return x.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
+  open = hit || cards[0];
   page.dataset.title = open.title;
   document.getElementById('c-title').textContent = open.title;
   document.getElementById('c-lane').textContent = open.lane;

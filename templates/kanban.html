@@ -15,7 +15,7 @@
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.core.min.css?v=2e9d02b">
 <link rel="stylesheet" href="../components/orion.commands.min.css?v=ea87916">
-<link rel="stylesheet" href="../components/orion.data.min.css?v=383f9ca">
+<link rel="stylesheet" href="../components/orion.data.min.css?v=5262b59">
 <link rel="stylesheet" href="../components/orion.direct.min.css?v=34fcf9c">
 <link rel="stylesheet" href="brand/kanban.css?v=c06523d">
 <style>
@@ -118,10 +118,10 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=6f74d76"></script>
-<script src="../components/orion.commands.min.js?v=9842239"></script>
-<script src="../components/orion.data.min.js?v=15b8747"></script>
-<script src="../components/orion.direct.min.js?v=5afa9fb"></script>
+<script src="../components/orion.core.min.js?v=d89bb0c"></script>
+<script src="../components/orion.commands.min.js?v=8b37d45"></script>
+<script src="../components/orion.data.min.js?v=6dabaea"></script>
+<script src="../components/orion.direct.min.js?v=f77cf1c"></script>
 <script>
 /* the hub's light or dark choice carries over; Pressroom's accent is its own and is not saved over the hub's */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#d9480f' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -173,7 +173,9 @@ document.getElementById('board').addEventListener('s4-lane-add', function (e) {
 /* the card page fills itself from the id in the URL */
 var page = document.querySelector('.s4-subpage[data-page="card"]'), open = null;
 page.addEventListener('s4-open', function (e) {
-  open = cards.filter(function (x) { return x.id === e.detail.id; })[0] || cards[0];
+  var hit = cards.filter(function (x) { return x.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
+  open = hit || cards[0];
   page.dataset.title = open.title;
   document.getElementById('c-title').textContent = open.title;
   document.getElementById('c-lane').textContent = open.lane;

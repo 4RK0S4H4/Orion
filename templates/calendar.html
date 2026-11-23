@@ -18,7 +18,7 @@
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../components/orion.core.min.css?v=2e9d02b">
 <link rel="stylesheet" href="../components/orion.commands.min.css?v=ea87916">
-<link rel="stylesheet" href="../components/orion.data.min.css?v=383f9ca">
+<link rel="stylesheet" href="../components/orion.data.min.css?v=5262b59">
 <link rel="stylesheet" href="brand/calendar.css?v=cb619f2">
 <style>
   /* Moorings' own layout and elements: tokens only; nothing here restyles an Orion component */
@@ -305,9 +305,9 @@
   </nav>
 </div>
 <script src="../components/assets/icons.js?v=21b8f13"></script>
-<script src="../components/orion.core.min.js?v=6f74d76"></script>
-<script src="../components/orion.commands.min.js?v=9842239"></script>
-<script src="../components/orion.data.min.js?v=15b8747"></script>
+<script src="../components/orion.core.min.js?v=d89bb0c"></script>
+<script src="../components/orion.commands.min.js?v=8b37d45"></script>
+<script src="../components/orion.data.min.js?v=6dabaea"></script>
 <script>
 /* Moorings' brand: tinted sea teal over the dials set on <html>. The light/dark choice follows the templates hub. */
 S4.theme.restore('orion-template-theme', { mode: 'system', seed: '#006a6a', surfaces: 'tinted' }, { only: ['mode'] });   /* the brand is fixed; only the visitor's light or dark choice is kept (a key the templates share) */
@@ -535,7 +535,9 @@ $('mr-form').addEventListener('s4-submit', function (e) {
 /* ---------- a booking, as a page ---------- */
 var page = document.querySelector('.s4-subpage[data-page="booking"]'), open = null;
 page.addEventListener('s4-open', function (e) {
-  open = bookings.filter(function (x) { return x.id === e.detail.id; })[0] || bookings[8];
+  var hit = bookings.filter(function (x) { return x.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* a link to a booking that is not there: no page, no lying URL (decision 0076) */
+  open = hit || bookings[8];
   var boat = B[open.boat], w = WIND[open.date];
   page.dataset.title = open.title;
   $('b-boat').textContent = boat.name + ' · ' + boat.cls; $('b-title').textContent = open.title; $('b-when').textContent = long(open.date);

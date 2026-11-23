@@ -50,6 +50,9 @@
       function parse(text) {
         var t = String(text).trim().replace(/\s| | /g, '');
         if (!t) return null;
+        /* a group mark only counts between groups of three ("1,234", never "1,5"): otherwise "1,5" would be read as 15 (decision 0076) */
+        var esc = function (x) { return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); };
+        if (t.indexOf(group) >= 0 && !new RegExp('^[-−]?\\d{1,3}(' + esc(group) + '\\d{3})+(' + esc(dec) + '\\d*)?$').test(t)) return NaN;
         t = t.split(group).join('');
         if (dec !== '.') t = t.replace(dec, '.');
         t = t.replace(/^−/, '-');
@@ -94,7 +97,7 @@
         input.setCustomValidity(message(n));
         if (n === null || isNaN(n)) { input.removeAttribute('aria-valuenow'); input.removeAttribute('aria-valuetext'); }
         else {
-          input.setAttribute('aria-valuenow', n);
+          input.setAttribute('aria-valuenow', clamp(n));   /* never past aria-valuemin / max, whatever was typed (the text and the error carry the rest) */
           var words = (prefix ? prefix.textContent.trim() : '') + fmt.format(n) + (suffix ? ' ' + suffix.textContent.trim() : '');
           input.setAttribute('aria-valuetext', words);
         }

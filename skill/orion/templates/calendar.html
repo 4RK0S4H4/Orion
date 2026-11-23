@@ -535,7 +535,9 @@ $('mr-form').addEventListener('s4-submit', function (e) {
 /* ---------- a booking, as a page ---------- */
 var page = document.querySelector('.s4-subpage[data-page="booking"]'), open = null;
 page.addEventListener('s4-open', function (e) {
-  open = bookings.filter(function (x) { return x.id === e.detail.id; })[0] || bookings[8];
+  var hit = bookings.filter(function (x) { return x.id === e.detail.id; })[0];
+  if (!hit && e.detail.id) { e.preventDefault(); return; }   /* a link to a booking that is not there: no page, no lying URL (decision 0076) */
+  open = hit || bookings[8];
   var boat = B[open.boat], w = WIND[open.date];
   page.dataset.title = open.title;
   $('b-boat').textContent = boat.name + ' · ' + boat.cls; $('b-title').textContent = open.title; $('b-when').textContent = long(open.date);

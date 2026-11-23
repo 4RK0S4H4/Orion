@@ -320,6 +320,7 @@ $('dw-meds').innerHTML = Object.keys(MEDS).map(function (id) {
 
 /* a medicine's page: filled from its id, so its link reloads to the same medicine */
 document.querySelector('[data-page="medicine"]').addEventListener('s4-open', function (e) {
+  if (e.detail.id && !MEDS[e.detail.id]) { e.preventDefault(); return; }   /* an id that is not there: no page, no lying URL (decision 0076) */
   var m = MEDS[e.detail.id] || MEDS.amlodipine;
   $('dw-med-title').textContent = m.name; $('dw-med-dose').textContent = m.dose; $('dw-med-for').textContent = m.for;
   var meter = $('dw-med-meter'); meter.setAttribute('data-max', m.of); meter.setAttribute('data-value', m.left);

@@ -8,7 +8,8 @@
        the app's navigation                                                                 "Go To Inbox", one per destination
                                                                                             (left out when a command of that name opens it)
      plus "Switch To Dark Mode" / "Light Mode" unless S4.palette.theme = false.
-   - Type to filter (every word must match), Arrow keys move, Enter runs, Escape closes.
+   - Type to filter (every word must match), Arrow keys move (Home, End, PageUp and PageDown too, when the box is empty or the
+     focus is on the list), Enter runs, Escape closes; clearing the box (Escape, the cross) shows every command again.
    - S4.palette.open() / close(). Fires s4-open and s4-close on the dialog and s4-command { command } on document.
    Focus (decision 0049): opened with the keyboard, the cursor is in the box (you are already typing). Opened by tap or
    click it is not, so no keyboard jumps up on a phone; the first key you press goes into the box anyway.
@@ -23,14 +24,21 @@
     dlg.innerHTML = '<div class="s4-search s4-palette-search" role="search"><span class="s4-icon" data-icon="search"></span>' +
       '<input class="s4-search-input" type="search" placeholder="Search Or Run A Command" aria-label="Search or run a command" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="s4-palette-list"></div>' +
       '<ul class="s4-list s4-palette-list" id="s4-palette-list" role="listbox" aria-label="Commands"></ul>' +
-      '<p class="s4-palette-empty" hidden>No matches. Try another word.</p>';
+      '<p class="s4-palette-empty" role="status" hidden>No matches. Try another word.</p>';
     document.body.appendChild(dlg);
     input = dlg.querySelector('input'); list = dlg.querySelector('ul'); empty = dlg.querySelector('.s4-palette-empty');
     input.addEventListener('input', function () { render(input.value); });
+    input.addEventListener('search', function () { render(input.value); });   /* the field's own clear (Escape, the cross) fires no input event: the list follows the box (decision 0076) */
     dlg.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }
-      else if (e.key === 'Enter') { e.preventDefault(); if (shown[active]) run(shown[active]); }
+      else if (e.key === 'PageDown' || e.key === 'PageUp') { e.preventDefault(); if (shown.length) mark(Math.max(0, Math.min(shown.length - 1, active + (e.key === 'PageDown' ? 8 : -8)))); }
+      else if ((e.key === 'Home' || e.key === 'End') && (document.activeElement !== input || !input.value)) { e.preventDefault(); if (shown.length) mark(e.key === 'Home' ? 0 : shown.length - 1); }   /* in a typed query they move the caret */
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (shown[active]) run(shown[active]);
+        else { input.setAttribute('aria-invalid', 'true'); empty.hidden = false; empty.textContent = ''; empty.textContent = 'No matches. Try another word.'; }   /* nothing to run: say so again, stay open */
+      }
       else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement !== input) input.focus({ preventScroll: true });   /* your own key press starts the typing */
     });
     list.addEventListener('click', function (e) { var li = e.target.closest('[data-i]'); if (li) run(shown[+li.dataset.i]); });
@@ -75,7 +83,7 @@
         '<span class="s4-list-content"><span class="s4-list-headline">' + esc(c.label) + '</span></span>' +
         (c.shortcut ? '<span class="s4-list-trailing"><kbd class="s4-kbd">' + esc(S4.desktop ? S4.desktop.format(c.shortcut) : c.shortcut) + '</kbd></span>' : '') + '</div></li>';
     });
-    list.innerHTML = html; list.hidden = !shown.length; empty.hidden = !!shown.length;
+    list.innerHTML = html; list.hidden = !shown.length; empty.hidden = !!shown.length; input.removeAttribute('aria-invalid');
     if (S4.init) S4.init(list);
     mark(shown.length ? 0 : -1, false);
   }

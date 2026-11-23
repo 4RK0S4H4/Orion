@@ -372,18 +372,16 @@
     inset-block: 0;
     inset-inline-end: 0;
     z-index: 1;
-    inline-size: var(--s4-space-4);
-    margin-inline-end: calc(var(--s4-space-2) * -1);
+    inline-size: var(--s4-space-4);   /* inside the header, on its end edge: a grip that overhangs sits under the next header (each sticky header is its own stacking context), so its middle was never reachable (decision 0076) */
     cursor: col-resize;
     touch-action: none;
     border-radius: var(--md-sys-shape-corner-small);
   }
-  .s4-table thead th:last-child .s4-table-grip { margin-inline-end: 0; }
   .s4-table-grip::before {
     content: "";
     position: absolute;
     inset-block: var(--s4-space-4);
-    inset-inline-start: calc(50% - 1px);
+    inset-inline-end: 0;
     inline-size: 2px;
     border-radius: var(--md-sys-shape-corner-full);
     background: var(--md-sys-color-outline-variant);
