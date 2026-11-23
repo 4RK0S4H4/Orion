@@ -1,0 +1,32 @@
+{
+ "note": "Released Orion versions (scripts/release.mjs, decision 0075). Each folder is immutable; URLs pin to https://4rk0s4h4.github.io/Orion/releases/<version>/<file>.",
+ "latest": "1.1.0",
+ "versions": {
+  "1.0.0": {
+   "date": "2026-11-14",
+   "files": {
+    "icons.js": "27d8ac27eb812e7f0dd91152d648c8babbd6f7f0",
+    "inter-variable.woff2": "2edaa7b3fb586ed9ef568753caa2aa18da8b000f",
+    "m3color.js": "0fd6cc59e49c416cf2a73c915e73419d410e37d8",
+    "orion.css": "f260bf208dfbb605a144ba3e6eaa8ca08fb5edca",
+    "orion.js": "2404ba52be71128206d9b2b84c93f900fb84aea2",
+    "api.json": "50acbc8a79d9518c741c13c199f2def3b63938a3"
+   }
+  },
+  "1.1.0": {
+   "date": "2026-11-22",
+   "files": {
+    "icons-solar.js": "2233020dbf2583698def4e12479976302ec3c186",
+    "icons.js": "9b1efac81077e3eea72d58d611ad4def0cca235e",
+    "inter-site.woff2": "ccb9f716218f1973a29c1fd78681def11daca2aa",
+    "inter-variable.woff2": "2edaa7b3fb586ed9ef568753caa2aa18da8b000f",
+    "m3color.js": "0fd6cc59e49c416cf2a73c915e73419d410e37d8",
+    "orion.min.css": "ffb2785cb4d5455eb8eec0d05b2e5d598b7e14c6",
+    "orion.min.js": "54f970c1fdaec354dc1aae22687ea9a238fc4f79",
+    "orion.site.min.css": "b820613711610930dee48903f2d99110d357c5a7",
+    "orion.site.min.js": "e772ca42cf01273cae367fa3cdf3c24f9536f5fe",
+    "api.json": "b541f51fb57f4236a1bdcd70de50b6b0352b8ffd"
+   }
+  }
+ }
+}

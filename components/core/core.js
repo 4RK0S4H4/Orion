@@ -9,7 +9,7 @@
   'use strict';
   if (window.S4 && window.S4.version) return;
   var root = document.documentElement;
-  var S4 = window.S4 = { version: '1.0.0' };
+  var S4 = window.S4 = { version: '1.2.0' };   /* written by scripts/build.mjs from package.json; never edit by hand */
   var scriptSrc = (document.currentScript && document.currentScript.src) || '';
 
   /* ---------- registry and auto-init ---------- */
@@ -19,6 +19,10 @@
   var ready = false;
   function boot() {
     ready = true; S4.init(document);
+    /* the app's stamp (decision 0075): <meta name="orion" content="1.2.0"> says which Orion the markup was written for;
+       loading another version's files is a half-done upgrade, so say so (the page checker fails S4: warnings) */
+    var stamp = document.querySelector('meta[name="orion"]'), said = stamp && (stamp.getAttribute('content') || '').trim();
+    if (said && said !== S4.version) console.warn('S4: this page is stamped Orion ' + said + ' (meta name="orion") but loads Orion ' + S4.version + '; finish the upgrade (node <skill>/scripts/upgrade.mjs <app-dir> --write) or load the ' + said + ' files.');
     new MutationObserver(function (list) {
       list.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1 && !n.closest('[data-s4-skip]')) S4.init(n); }); });
     }).observe(document.body, { childList: true, subtree: true });

@@ -6,7 +6,7 @@
    - skill/orion/assets/: orion.css, orion.js, icons.js, m3color.js, inter-variable.woff2 (the skill ships its own copy).
    Run after npm run build:tokens and build:icons (npm run build does all three). --check fails if any output is stale.
    No dependencies. */
-import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, posix } from 'node:path';
 
@@ -17,6 +17,12 @@ const comp = join(root, 'components');
 const entry = readFileSync(join(comp, 'index.css'), 'utf8');
 const imports = [...entry.matchAll(/@import url\("([^"]+)"\)/g)].map((m) => m[1]);
 const problems = [];
+/* one version, from package.json (decision 0075): core.js's S4.version is written here, so the runtime, the banners, the
+   tokens and every template's <meta name="orion"> stamp can never disagree */
+const coreSrc = readFileSync(join(comp, 'core/core.js'), 'utf8');
+const coreOut = coreSrc.replace(/(var S4 = window\.S4 = \{ version: ')[^']*(')/, `$1${pkg.version}$2`);
+if (!coreOut.includes(`version: '${pkg.version}'`)) problems.push('components/core/core.js: cannot find S4.version to write');
+const compJs = (f) => (f === 'core/core.js' ? coreOut : readFileSync(join(comp, f), 'utf8'));
 
 /* ---------- CSS ---------- */
 function inlineCss(outDir, fontDir) {
@@ -46,11 +52,12 @@ for (const rel of imports) {
   const js = `${dir}/${dir}.js`;
   if (existsSync(join(comp, js)) && !jsOrder.includes(js)) jsOrder.push(js);
 }
-const js = banner('runtime') + jsOrder.map((f) => `/* ---- ${f} ---- */\n${readFileSync(join(comp, f), 'utf8').trim()}\n`).join('\n');
+const js = banner('runtime') + jsOrder.map((f) => `/* ---- ${f} ---- */\n${compJs(f).trim()}\n`).join('\n');
 
 /* ---------- write ---------- */
 const skillAssets = join(root, 'skill/orion/assets');
 const outputs = {
+  'components/core/core.js': coreOut,
   'components/orion.css': cssRepo,
   'components/orion.js': js,
   'skill/orion/assets/orion.css': cssSkill,
@@ -107,7 +114,7 @@ const sitePartsSkill = inlineCss(comp, '.').filter((p, i) => SITE_CSS.includes(i
 const siteCssRepo = siteFont(banner('site stylesheet') + sitePartsRepo.join('\n'), 'assets/inter-site.woff2');
 const siteCssSkill = siteFont(banner('site stylesheet') + sitePartsSkill.join('\n'), 'inter-site.woff2');
 if (siteCssRepo.includes('inter-variable.woff2') || !siteCssRepo.includes('inter-site.woff2')) problems.push('site bundle: the @font-face in base.css no longer matches; point it at inter-site.woff2');
-const siteJs = banner('site runtime') + jsOrder.filter((f) => SITE_JS.includes(f)).map((f) => `/* ---- ${f} ---- */\n${readFileSync(join(comp, f), 'utf8').trim()}\n`).join('\n');
+const siteJs = banner('site runtime') + jsOrder.filter((f) => SITE_JS.includes(f)).map((f) => `/* ---- ${f} ---- */\n${compJs(f).trim()}\n`).join('\n');
 outputs['components/orion.site.min.css'] = minBanner('site stylesheet') + minCss(siteCssRepo);
 outputs['components/orion.site.min.js'] = minBanner('site runtime') + minJs(siteJs);
 outputs['skill/orion/assets/orion.site.min.css'] = minBanner('site stylesheet') + minCss(siteCssSkill);
@@ -143,7 +150,7 @@ for (const [pk, dirs] of Object.entries(PACKS)) for (const d of dirs) { if (!imp
 const dirOf = (f) => (f.startsWith('../') ? 'tokens' : f.split('/')[0]);
 const APP_BUDGET = { core: { css: 44, js: 38 }, packs: { data: 42, commands: 12, desktop: 13, direct: 10, inputs: 35, sitekit: 10 }, leanTemplate: 170 };   /* gzip KB, a little above what is built; npm run check fails past any of them (the full bundle is held at FULL_BUDGET) */
 const FULL_BUDGET = { css: 66, js: 120 };
-const jsText = (f) => `/* ---- ${f} ---- */\n${readFileSync(join(comp, f), 'utf8').trim()}\n`;
+const jsText = (f) => `/* ---- ${f} ---- */\n${compJs(f).trim()}\n`;
 const packFiles = {};   /* name -> { css, js } as written */
 {
   const cssRepoParts = inlineCss(comp), cssSkillParts = inlineCss(comp, '.');
@@ -269,6 +276,29 @@ for (const page of htmlIn('templates')) {
     src = src.replace(/(<[^>]+data-hub="(\w+)"[^>]*>)[^<]*(<)/g, (m, a, k, c) => (k in vals ? a + vals[k] + c : m));
     if (src !== src0) outputs[page] = src;
   }
+}
+/* ---------- the version stamp and the upgrade path (decision 0075) ----------
+   Every template, example and the Showcase says which Orion its markup was written for (<meta name="orion">, kept equal to
+   package.json here; core.js warns when the files loaded are another version). The public API is snapshotted into
+   components/api.json (scripts/api.mjs; scripts/check-api.mjs compares it with the last release in releases/), and the
+   skill carries the migrations, the release list and the upgrade guide so an app session with only the skill can upgrade. */
+{
+  const exHtml = (d) => (existsSync(join(root, d)) ? readdirSync(join(root, d), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? exHtml(d + '/' + e.name) : e.name.endsWith('.html') ? [d + '/' + e.name] : [])) : []);
+  const stamped = htmlIn('templates').filter((p) => !p.endsWith('/index.html')).concat(exHtml('examples'), existsSync(join(root, 'demo/index.html')) ? ['demo/index.html'] : []);
+  for (const page of stamped) {
+    const src = page in outputs ? outputs[page] : readFileSync(join(root, page), 'utf8');
+    if (!/<meta name="orion" content="[^"]*">/.test(src)) { problems.push(`${page}: no <meta name="orion" content="${pkg.version}"> stamp (decision 0075)`); continue; }
+    const out = src.replace(/<meta name="orion" content="[^"]*">/, `<meta name="orion" content="${pkg.version}">`);
+    if (out !== src) outputs[page] = out;
+  }
+  const { snapshot } = await import('./api.mjs');
+  const overlay = { read: (p) => (typeof outputs[p] === 'string' ? outputs[p] : existsSync(join(root, p)) ? readFileSync(join(root, p), 'utf8') : null),
+    list: (d) => (existsSync(join(root, d)) && statSync(join(root, d)).isDirectory() ? readdirSync(join(root, d)) : []) };
+  outputs['components/api.json'] = JSON.stringify({ ...snapshot(overlay), version: pkg.version }, null, 1) + '\n';
+  if (existsSync(join(root, 'migrations'))) for (const f of readdirSync(join(root, 'migrations')).filter((f) => /^\d+\.\d+\.\d+\.json$/.test(f))) outputs['skill/orion/migrations/' + f] = readFileSync(join(root, 'migrations', f), 'utf8');
+  if (existsSync(join(root, 'releases/index.json'))) outputs['skill/orion/migrations/releases.json'] = readFileSync(join(root, 'releases/index.json'), 'utf8');
+  if (!existsSync(join(root, 'docs/upgrading.md'))) problems.push('missing docs/upgrading.md');
+  else outputs['skill/orion/references/upgrading.md'] = '<!-- GENERATED copy of docs/upgrading.md (scripts/build.mjs). Edit the original. -->\n' + readFileSync(join(root, 'docs/upgrading.md'), 'utf8');
 }
 const fileText = (rel) => (rel in outputs ? outputs[rel] : rel in binaries ? binaries[rel] : existsSync(join(root, rel)) ? readFileSync(join(root, rel)) : null);
 /* the hub links pages (templates) whose own stamps change in this pass, so it is stamped last: one build is enough */

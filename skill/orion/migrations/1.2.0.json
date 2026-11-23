@@ -1,0 +1,30 @@
+{
+ "version": "1.2.0",
+ "from": "1.1.0",
+ "date": null,
+ "major": false,
+ "summary": "The name is Orion (decision 0071: the skill folder, the package and the repository and Pages addresses moved; the old Pages address no longer works), the lean app bundle (0069), one accent job per screen (0068, 0070), validated dial values (0067), window controls and nothing re-wraps mid-motion (0072), the QA pass rules (0073) and the upgrade path itself (0075). No class, token, attribute or file was removed; four old motion names are now deprecated and renamed.",
+ "renames": [
+  { "kind": "skill", "from": "s4-orion", "to": "orion", "decision": "0071", "note": "skill/s4-orion/ is skill/orion/ and s4-orion.skill is orion.skill." },
+  { "kind": "url", "from": "https://4rk0s4h4.github.io/s4-orion/", "to": "https://4rk0s4h4.github.io/Orion/", "decision": "0071", "note": "The old Pages address no longer works." },
+  { "kind": "url", "from": "https://github.com/4RK0S4H4/s4-orion", "to": "https://github.com/4RK0S4H4/Orion", "decision": "0071" },
+  { "kind": "url", "from": "https://raw.githubusercontent.com/4RK0S4H4/s4-orion/", "to": "https://raw.githubusercontent.com/4RK0S4H4/Orion/", "decision": "0071" },
+  { "kind": "api", "from": "S4.transition.drop", "to": "S4.transition.follow", "alias": true, "decision": "0046", "note": "Old name, same function; kept as an alias until 1.3.0." },
+  { "kind": "api", "from": "S4.transition.unfold", "to": "S4.transition.follow", "alias": true, "decision": "0046", "note": "Old name, same function; kept as an alias until 1.3.0." },
+  { "kind": "api", "from": "S4.transition.slide", "to": "S4.transition.pop", "alias": true, "decision": "0043", "note": "Panels pop; nothing slides from an edge. Same arguments. Kept as an alias until 1.3.0." }
+ ],
+ "removals": [],
+ "judgment": [
+  { "id": "1.2.0-container-transform", "decision": "0046", "title": "S4.transition.containerTransform is deprecated", "what": "containerTransform(surface, source, opts) only pops the surface now; call S4.transition.pop(surface, opts) (drop the source argument). The alias goes in 1.3.0.", "find": { "text": ["S4\\.transition\\.containerTransform"] } },
+  { "id": "1.2.0-dial-values", "decision": "0067", "title": "Dial values are checked", "what": "S4.theme with a value off a dial's list warns and writes nothing, and the page checker fails a bad data-* dial value in markup. Use only the values in S4.theme.dials (no data-scale=\"roomy\", no corners: 'square').", "find": { "attrs": ["data-scale", "data-corners", "data-density", "data-headings", "data-energy"] } },
+  { "id": "1.2.0-one-accent-job", "decision": "0070", "title": "One accent job per screen", "what": "At rest a screen shows one filled action (the next act on the work in front of you) and one accent selection (the navigation's). Other buttons are elevated or text; the open row beside its detail is neutral (data-split-open does it); no pressed \"All\" chip (data-select=\"single\" data-clearable). The page checker warns on a second filled action on the first screen.", "find": { "text": ["data-variant=\"filled\"", "aria-pressed=\"true\""] } },
+  { "id": "1.2.0-lean-bundle", "decision": "0069", "title": "A finished app loads the lean bundle", "what": "Prefer orion.core.min.css and .js plus only the packs the app uses (data, commands, desktop, direct, inputs, sitekit; core first). node <skill>/scripts/packs.mjs page.html lists them; the page checker fails a lean page that links too few or too many. Prototypes may keep orion.css and orion.js.", "find": { "text": ["orion(\\.min)?\\.css"] } },
+  { "id": "1.2.0-name", "decision": "0071", "title": "The product is called Orion", "what": "Say Orion, not S4 Orion, in the app's own words (about pages, credits, docs). The s4 prefix of classes, tokens and S4.* never changes.", "find": { "text": ["S4 Orion"] } },
+  { "id": "1.2.0-window-controls", "decision": "0072", "title": "Window controls are full cells", "what": "In a frameless Windows or Linux shell, .s4-window-control buttons are 46 wide, the bar's height, flush with the window's top and end edges; remove app CSS that sizes or spaces them. While anything changes size its contents keep their end layout (the checker freezes every motion at 25, 50 and 75%).", "find": { "classes": ["s4-window-control", "s4-titlebar"] } },
+  { "id": "1.2.0-focus-rings", "decision": "round 0061", "title": "Place-holding containers ring only for the keyboard", "what": "A container that takes focus only to hold the place (tabindex=\"-1\" on main, a view, a page, a dialog's box) rings only while <html data-s4-input=\"key\">; never write a ring on :focus alone or rely on :focus-visible for it (WebKit draws it after a tap).", "find": { "text": [":focus(-visible)?\\b", "tabindex=\"-1\""] } },
+  { "id": "1.2.0-clipboard", "decision": "0073", "title": "Copy with S4.util.copy", "what": "Replace navigator.clipboard.writeText with S4.util.copy(text, { done: 'Link copied' }): it never rejects and says when the browser refused. The page checker fails a direct writeText.", "find": { "text": ["clipboard\\.writeText"] } },
+  { "id": "1.2.0-trailing-text", "decision": "0073", "title": "Trailing and meta text wraps", "what": "An app's own grid names its column (grid-template-columns: minmax(0, 1fr)) and trailing, meta and status text wraps inside its row; it never truncates or widens the page. Check the app at 320 wide with 200% text.", "find": { "text": ["text-overflow:\\s*ellipsis", "white-space:\\s*nowrap"] } },
+  { "id": "1.2.0-stamp", "decision": "0075", "title": "The app knows its Orion version", "what": "Every page that loads Orion carries <meta name=\"orion\" content=\"<version>\"> and the app keeps orion.json at its root (upgrade.mjs writes both). core.js warns, and the page checker fails, when the stamp and the loaded files disagree.", "find": { "text": ["name=\"orion\""] } }
+ ],
+ "fixed": [69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 83]
+}
