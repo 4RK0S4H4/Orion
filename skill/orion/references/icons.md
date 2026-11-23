@@ -109,3 +109,7 @@ Arrows and chevrons are Linear, everything else Bold Duotone. Other sets: solar,
 | `temperature` | thermometer |
 | `compass` | compass |
 | `hike` | hiking |
+| `window-minimize` | minus-square |
+| `window-maximize` | maximize-square |
+| `window-restore` | minimize-square |
+| `window-close` | close-square |

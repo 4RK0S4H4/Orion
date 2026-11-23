@@ -214,6 +214,7 @@
     --s4-size-nav-row: 48px;
     --s4-size-titlebar: 40px;
     --s4-size-window-control: 46px;
+    --s4-size-window-control-icon: 24px;
     --s4-size-statusbar: 28px;
     --s4-size-menubar-item: 28px;
     --s4-size-doc-tab: 40px;
@@ -4770,9 +4771,9 @@
      They behave as Windows' own: each is a full cell, the bar's whole height and 46 wide, the last one touching the
      window's end edge and all of them its top edge with no gap, so a pointer thrown into the top corner hits Close and
      one thrown at the top edge hits the control below it (Fitts's law; the title bar keeps no end padding for them).
-     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), line glyphs drawn here
-     (any icon inside the button is replaced), Close turning error only on hover and press (never red at rest), the
-     Restore glyph and label while the window is maximized. In right-to-left they mirror to the start with Close at the
+     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), Orion's duotone window
+     icons written in by desktop.js (decision 0074; any other icon inside the button is hidden), Close turning error only on hover and press (never red at rest), the
+     Restore icon and label while the window is maximized. In right-to-left they mirror to the start with Close at the
      far start, as Windows mirrors a right-to-left window. They step out where the system draws its own buttons: a
      Mac shell (traffic lights), the window controls overlay of an installed web app, full screen. */
   :root:not([data-window-state~="overlay"], [data-window-state~="fullscreen"], [data-platform="mac"][data-shell]:not([data-shell="pwa"])) .s4-titlebar:has(> .s4-window-controls:not([hidden])) { padding-inline-end: 0; }
@@ -4789,7 +4790,6 @@
   :root[data-window-state~="fullscreen"] .s4-window-controls,
   :root[data-platform="mac"][data-shell]:not([data-shell="pwa"]) .s4-window-controls { display: none; }
   .s4-window-control {
-    --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1.75 6h8.5'/%3E%3C/svg%3E");
     --_fill: transparent;
     position: relative;
     display: grid;
@@ -4808,7 +4808,9 @@
     app-region: no-drag;
     transition: color var(--s4-motion-state);
   }
-  .s4-window-control > * { display: none; }
+  /* the icon is Orion's own (decision 0074): desktop.js writes one .s4-icon[data-window-icon] in each control, at
+     --s4-size-window-control-icon (24, a step above the bar's other icons); anything else written inside is hidden, so apps built with older markup get the same icons */
+  .s4-window-control > :not([data-window-icon]) { display: none; }
   /* the drawn layer: firm (8, never sharp, never a pill), inset so neighbours stay apart */
   .s4-window-control::before {
     content: "";
@@ -4818,19 +4820,12 @@
     background: var(--_fill);
     transition: background-color var(--s4-motion-state);
   }
-  .s4-window-control::after {
-    content: "";
-    position: relative;
-    inline-size: var(--s4-space-3);
-    block-size: var(--s4-space-3);
-    background: currentColor;
-    -webkit-mask: var(--_glyph) center / 100% no-repeat;
-    mask: var(--_glyph) center / 100% no-repeat;
-  }
-  .s4-window-control[data-window-action="maximize"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='1.75' width='8.5' height='8.5' rx='2'/%3E%3C/svg%3E"); }
-  :root[data-window-state~="maximized"] .s4-window-control[data-window-action="maximize"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='1.75' y='3.75' width='6.5' height='6.5' rx='1.5'/%3E%3Cpath d='M3.9 1.75h4.35a2 2 0 0 1 2 2v4.35'/%3E%3C/svg%3E"); }
-  .s4-window-control[data-window-action="maximize"]:dir(rtl)::after { transform: scaleX(-1); }
-  .s4-window-control[data-window-action="close"] { --_glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23000' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.25 2.25l7.5 7.5M9.75 2.25l-7.5 7.5'/%3E%3C/svg%3E"); }
+  .s4-window-control > [data-window-icon] { position: relative; --s4-icon-size: var(--s4-size-window-control-icon); }
+  /* Maximize and Restore point along the window's corner: they mirror with the window in right-to-left, as Windows' do */
+  .s4-window-control[data-window-action="maximize"]:dir(rtl) > [data-window-icon] > svg { transform: scaleX(-1); }
+  /* on Close's error fill the second tone sits halfway (Solar's own 0.5), where the tile is as clear of the red as the
+     cross is of the tile: about 2.5:1 each in light and dark, 3.2:1 or more in high contrast (decision 0074) */
+  .s4-window-control[data-window-action="close"]:is(:hover, :active) > [data-window-icon] { --s4-icon-duo-opacity: 0.5; }
   @media (hover: hover) {
     .s4-window-control:hover { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 150%), transparent); }
     .s4-window-control[data-window-action="close"]:hover { --_fill: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
@@ -4993,10 +4988,9 @@
   @media (forced-colors: active) {
     .s4-titlebar { border-block-end: 1px solid CanvasText; }
     .s4-kbd { border: 1px solid CanvasText; }
-    .s4-window-control::after { forced-color-adjust: none; background: ButtonText; }
-    .s4-window-control::before { forced-color-adjust: none; }
+    .s4-window-control { forced-color-adjust: none; color: ButtonText; }
+    .s4-window-control:is(:hover, :active) { color: HighlightText; }
     .s4-window-control:is(:hover, :active)::before { background: Highlight; }
-    .s4-window-control:is(:hover, :active)::after { background: HighlightText; }
     .s4-window-control:focus-visible::before { outline-color: Highlight; }
   }
 }

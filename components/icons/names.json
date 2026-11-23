@@ -112,7 +112,11 @@
         "sunset": "sunset",
         "temperature": "thermometer",
         "compass": "compass",
-        "hike": "hiking"
+        "hike": "hiking",
+        "window-minimize": "minus-square",
+        "window-maximize": "maximize-square",
+        "window-restore": "minimize-square",
+        "window-close": "close-square"
       }
     },
     "phosphor-duotone": {
@@ -225,7 +229,11 @@
         "sunset": "sun-horizon",
         "temperature": "thermometer",
         "compass": "compass",
-        "hike": "person-simple-hike"
+        "hike": "person-simple-hike",
+        "window-minimize": "minus-square",
+        "window-maximize": "corners-out",
+        "window-restore": "corners-in",
+        "window-close": "x-square"
       }
     },
     "phosphor-bold-duotone": {
@@ -338,7 +346,11 @@
         "sunset": "sun-horizon",
         "temperature": "thermometer",
         "compass": "compass",
-        "hike": "person-simple-hike"
+        "hike": "person-simple-hike",
+        "window-minimize": "minus-square",
+        "window-maximize": "corners-out",
+        "window-restore": "corners-in",
+        "window-close": "x-square"
       }
     }
   }
