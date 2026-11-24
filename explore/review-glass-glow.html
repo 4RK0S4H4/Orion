@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orion: Glass Glow</title>
+<link rel="stylesheet" href="../components/orion.css?v=3f1092c">
+<style>
+/* The quiz around the previews: layout only (decision 0048). Looks come from Orion. */
+body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.lab { max-inline-size: var(--s4-layout-content-wide, 1200px); margin: 0 auto; padding: var(--s4-space-6) var(--s4-space-4) var(--s4-space-16); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+.lab h1, .lab h2, .lab p { margin: 0; }
+.lab-intro { display: flex; flex-direction: column; gap: var(--s4-space-3); max-inline-size: 72ch; }
+.lab-intro p, .lab-sec > p { color: var(--md-sys-color-on-surface-variant); }
+.lab-sec { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+.lab-sec > .rv-group { --rv-min: 720px; margin-block-start: var(--s4-space-3); }
+
+/* ================= what is being judged: everything below lives inside the previews ================= */
+.pv { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-3); }
+.pv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--s4-space-3); justify-items: center; }
+.pv-mode { display: flex; flex-direction: column; gap: var(--s4-space-1); inline-size: 100%; max-inline-size: 390px; min-inline-size: 0; }
+.pv-cap { font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); color: var(--md-sys-color-on-surface-variant); }
+.slot { inline-size: 100%; block-size: 600px; }
+
+/* ---- the phone scene: solid content (a photo made of shapes, a vivid purple record sleeve, text, colored tiles) under today's glass ---- */
+.sc { position: relative; inline-size: 100%; block-size: 600px; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-body-medium-font); }
+.sc-photo { position: absolute; inset: 0 0 auto 0; block-size: 190px; overflow: hidden; background: linear-gradient(180deg, #1d2671 0%, #6a3093 38%, #f0657a 68%, #ffb36b 100%); }
+.sc-photo i { position: absolute; display: block; }
+.sc-sun { inline-size: 96px; block-size: 96px; inset-inline-start: 22%; inset-block-start: 74px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #fff6c9 0 30%, #ffd25e 55%, #ff9f43 100%); }
+.sc-hill-1 { inline-size: 70%; block-size: 160px; inset-inline-start: -10%; inset-block-start: 140px; border-radius: 50% 50% 0 0; background: #1e5f74; }
+.sc-hill-2 { inline-size: 80%; block-size: 150px; inset-inline-end: -20%; inset-block-start: 128px; border-radius: 50% 50% 0 0; background: #133b5c; }
+.sc-hill-3 { inline-size: 120%; block-size: 120px; inset-inline-start: -10%; inset-block-start: 170px; border-radius: 50% 50% 0 0; background: #0b2239; }
+.sc-art { position: absolute; inset-block-start: 206px; inset-inline-start: 16px; inline-size: 132px; block-size: 132px; border-radius: 20px; overflow: hidden; background: #8a1fe6; }
+.sc-art::before { content: ""; position: absolute; inset: 22px; border-radius: 50%; background: radial-gradient(circle, #8a1fe6 0 16%, #b65cff 17% 36%, #8a1fe6 37% 52%, #6c0fc0 53% 100%); }
+.sc-art::after { content: ""; position: absolute; inset: 59px; border-radius: 50%; background: #f4e9ff; }
+.sc-art { inset-block-start: 188px; }
+.sc-meta { position: absolute; inset-block-start: 196px; inset-inline: 168px 12px; display: flex; flex-direction: column; gap: var(--s4-space-1); }
+.sc-meta b { font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); font-weight: 600; }
+.sc-meta span { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); color: var(--md-sys-color-on-surface-variant); }
+.sc-copy { position: absolute; inset-block-start: 340px; inset-inline: 16px; margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.sc-tiles { position: absolute; inset-block-start: 436px; inset-inline: 16px; block-size: 84px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.sc-tiles i { display: block; border-radius: 16px; background: #8a1fe6; }
+.sc-tiles i:nth-child(2) { background: #ff8a3d; }
+.sc-tiles i:nth-child(3) { background: #13a3a0; }
+
+/* glass pieces: today's glass from .s4-glass, .s4-fab and .s4-nav-bar; the lab only places them */
+.g-bar { position: absolute; inset-block-start: 14px; inset-inline-start: 14px; display: flex; gap: var(--s4-space-1); padding: var(--s4-space-1); border-radius: var(--s4-shape-toolbar); }
+.g-menu { position: absolute; inset-block-start: 76px; inset-inline-end: 12px; inline-size: 164px; padding: var(--s4-space-2); border-radius: var(--s4-shape-menu); display: flex; flex-direction: column; }
+.g-menu .g-item { display: flex; align-items: center; gap: var(--s4-space-3); min-block-size: 40px; padding-inline: var(--s4-space-3); border-radius: var(--s4-shape-menu-item); font-size: var(--md-sys-typescale-body-large-size); }
+.g-menu .g-item[data-on] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.g-menu .s4-icon { --s4-icon-size: 20px; }
+.g-panel { position: absolute; inset-block-start: 214px; inset-inline: 52px 14px; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-extra-large); display: flex; flex-direction: column; gap: var(--s4-space-2); }
+.g-panel b { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: 600; }
+.g-panel .g-text { font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.g-chips { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+.g-tip { position: absolute; inset-block-start: 396px; inset-inline-end: 84px; padding: var(--s4-space-1) var(--s4-space-2); border-radius: var(--s4-shape-tooltip); font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); white-space: nowrap; }
+.g-fab { position: absolute; inset-block-start: 382px; inset-inline-end: 16px; }
+.g-xfab { position: absolute; inset-block-start: 382px; inset-inline-start: 16px; }
+.g-snack { position: absolute; inset-block-end: 92px; inset-inline: 12px; min-block-size: 48px; padding-inline: var(--s4-space-4) var(--s4-space-2); border-radius: var(--s4-shape-snackbar); display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); font-size: var(--md-sys-typescale-body-medium-size); }
+.g-nav { position: absolute; inset: auto 0 0 0; }
+
+/* ---- the glow (lab only). Today it is an inset shadow 12px deep (--s4-glass-glow-size) at the top and bottom of every floating
+        glass surface, white at 24% on dark glass and an ink shade at 28% on light glass (0036, 0037). The options only change
+        those three tokens on the scene; glass.css draws everything else as it ships. ---- */
+.sc[data-k="60"] { --s4-glass-glow-alpha: calc(.24 * .6); --s4-glass-glow-shade-alpha: calc(.28 * .6); }
+.sc[data-k="35"] { --s4-glass-glow-alpha: calc(.24 * .35); --s4-glass-glow-shade-alpha: calc(.28 * .35); }
+.sc[data-k="15"] { --s4-glass-glow-alpha: calc(.24 * .15); --s4-glass-glow-shade-alpha: calc(.28 * .15); }
+.sc[data-k="0"] { --s4-glass-glow-alpha: 0; --s4-glass-glow-shade-alpha: 0; }
+.sc[data-depth="thin"] { --s4-glass-glow-size: 5px; }
+/* data-depth="scaled": the lab script writes --s4-glass-glow-size on each surface: 15% of its height, between 3px and 12px */
+
+/* ---- the zoomed snackbar edge ---- */
+.zm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: var(--s4-space-3); }
+.zm-cell { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
+.zm-win { position: relative; block-size: 220px; overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+.zm-in.sc { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 260px; block-size: 140px; border-radius: 0; transform-origin: 0 0; transform: translate(calc(var(--zw, 160px) / 2 - 4 * 56px), calc(110px - 4 * 64px)) scale(4); }
+.zm-art { position: absolute; inset-block-start: 10px; inset-inline-start: 10px; inline-size: 100px; block-size: 110px; border-radius: 16px; background: #8a1fe6; }
+.zm-snack { position: absolute; inset-block-start: 40px; inset-inline-start: 24px; inline-size: 210px; min-block-size: 48px; border-radius: var(--s4-shape-snackbar); }
+</style>
+</head>
+<body>
+<main class="lab">
+  <header class="lab-intro">
+    <h1 class="s4-headline-small">Glass Glow</h1>
+    <p class="s4-body-large">Today's glass and today's rim, with only the glow changed (on light glass the glow is a soft ink shade). Today it reaches a fixed 12px in from the top and the bottom edge at every size, so a 32px tooltip or a 48px snackbar is mostly glow, while a tall panel barely shows it.</p>
+    <p class="s4-body-large">Every preview is a phone over colorful content with the short surfaces (a glass toolbar, a menu, chips on a panel, a tooltip, a FAB, an extended FAB, a snackbar) and one tall panel, in light and dark. The nav bar is docked, so it draws today's hairline and no glow in all of them (decision 0064). Tap a card's header to pick it; tapping a preview never answers.</p>
+  </header>
+
+  <section class="lab-sec" aria-labelledby="q0">
+    <h2 class="s4-title-large" id="q0">At A Glance</h2>
+    <p>A snackbar's edge over the purple sleeve, scaled up four times: today, and Calm (35%, depth scaled to the height) from question 3.</p>
+    <div class="rv-preview pv" id="zoom"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q1">
+    <h2 class="s4-title-large" id="q1">1. Strength</h2>
+    <p>Today's 12px depth in all five; only how strong the glow (and the shade) is.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Strength" id="g-strength"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q2">
+    <h2 class="s4-title-large" id="q2">2. Depth On Short Surfaces</h2>
+    <p>Today's strength in all three; only how far the glow reaches in.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Depth on short surfaces" id="g-depth"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q3">
+    <h2 class="s4-title-large" id="q3">3. One Combined Pick</h2>
+    <p>The three combinations that look best to me. Pick one, or Other with a note (for example "Calm but 15%").</p>
+    <div class="rv-group" role="radiogroup" aria-label="Combined pick" id="g-combo"></div>
+  </section>
+</main>
+<footer></footer>
+<script src="../components/assets/icons.js?v=4471e5a"></script>
+<script src="../components/orion.js?v=a877791"></script>
+<script src="lib/questions.js?v=d1e051b"></script>
+<script src="lib/review.js?v=6adf197"></script>
+<script>
+(function () {
+  function attrs(theme, o) {
+    return ' data-theme="' + theme + '"' + (o.k != null ? ' data-k="' + o.k + '"' : '') + (o.depth ? ' data-depth="' + o.depth + '"' : '');
+  }
+  function scene(theme, o) {
+    return '<div class="sc"' + attrs(theme, o) + ' inert>' +
+      '<div class="sc-photo"><i class="sc-sun"></i><i class="sc-hill-1"></i><i class="sc-hill-2"></i><i class="sc-hill-3"></i></div>' +
+      '<div class="sc-art"></div>' +
+      '<div class="sc-meta"><b>Night Orchard</b><span>Lumen Vale, 2026</span></div>' +
+      '<p class="sc-copy">Recorded in a greenhouse in the rain.</p>' +
+      '<div class="sc-tiles"><i></i><i></i><i></i></div>' +
+      '<div class="s4-glass g-bar" data-g><button class="s4-icon-button" type="button" aria-label="Search"><span class="s4-icon" data-icon="search"></span></button><button class="s4-icon-button" type="button" aria-label="Share"><span class="s4-icon" data-icon="share"></span></button><button class="s4-icon-button" type="button" aria-label="Save"><span class="s4-icon" data-icon="bookmark"></span></button></div>' +
+      '<div class="s4-glass g-menu" data-g><span class="g-item" data-on><span class="s4-icon" data-icon="share"></span>Share</span><span class="g-item"><span class="s4-icon" data-icon="download"></span>Download</span><span class="g-item"><span class="s4-icon" data-icon="bookmark"></span>Save</span></div>' +
+      '<div class="s4-glass g-panel" data-g><b>Filters</b><span class="g-text">Songs from this album.</span><div class="g-chips"><button class="s4-chip" data-type="filter" type="button">Live</button><button class="s4-chip" data-type="filter" type="button">Remix</button></div></div>' +
+      '<div class="s4-glass g-tip" data-g>Add to library</div>' +
+      '<button class="s4-fab g-fab" data-g type="button" aria-label="Add To Library"><span class="s4-icon" data-icon="add"></span></button>' +
+      '<button class="s4-fab g-xfab" data-g type="button"><span class="s4-icon" data-icon="play"></span><span class="s4-fab-label">Play All</span></button>' +
+      '<div class="s4-glass g-snack" data-g><span>Saved to your library</span><button class="s4-button" data-variant="text" type="button">Undo</button></div>' +
+      '<nav class="s4-nav-bar g-nav" aria-label="Example navigation">' +
+        '<button class="s4-nav-item" type="button" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Listen</span></button>' +
+        '<button class="s4-nav-item" type="button"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="compass"></span></span><span class="s4-nav-label">Browse</span></button>' +
+        '<button class="s4-nav-item" type="button"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="search"></span></span><span class="s4-nav-label">Search</span></button>' +
+      '</nav></div>';
+  }
+  /* scaled depth: 15% of each surface's own height, never under 3px or over today's 12px */
+  function scale(root) {
+    root.querySelectorAll('.sc[data-depth="scaled"] [data-g]').forEach(function (el) {
+      var h = el.offsetHeight; if (h) el.style.setProperty('--s4-glass-glow-size', Math.max(3, Math.min(12, h * 0.15)).toFixed(1) + 'px');
+    });
+  }
+  /* To stay light on a phone, a scene exists only while it is near the screen: an empty slot of the same size holds its
+     place, and the scene is built when the slot comes near and removed when it is far away (8 glass surfaces a scene). */
+  var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      var s = e.target;
+      if (e.isIntersecting && !s.firstChild) { s.innerHTML = scene(s.dataset.theme, JSON.parse(s.dataset.o)); requestAnimationFrame(function () { scale(s); }); }
+      else if (!e.isIntersecting && s.firstChild) s.textContent = '';
+    });
+  }, { rootMargin: '300px 0px' }) : null;
+  function slot(theme, o) {
+    var s = document.createElement('div'); s.className = 'slot'; s.dataset.theme = theme; s.dataset.o = JSON.stringify(o);
+    if (io) io.observe(s); else s.innerHTML = scene(theme, o);
+    return s;
+  }
+  function phones(o) {
+    var el = document.createElement('div'); el.className = 'pv';
+    var g = document.createElement('div'); g.className = 'pv-grid';
+    ['light', 'dark'].forEach(function (t) {
+      var m = document.createElement('div'); m.className = 'pv-mode';
+      m.innerHTML = '<span class="pv-cap">' + (t === 'light' ? 'Light' : 'Dark') + '</span>'; m.appendChild(slot(t, o)); g.appendChild(m);
+    });
+    el.appendChild(g); return el;
+  }
+  function group(id, qid, opts) {
+    var box = document.getElementById(id);
+    opts.forEach(function (x) { box.appendChild(S4Review.card({ pick: qid + ':' + x.k, letter: x.k, title: x.title, desc: x.desc, tag: x.tag || '', preview: phones(x.o) })); });
+  }
+  group('g-strength', 'strength', [
+    { k: 'A', title: 'Today', tag: 'Today', desc: 'White glow at 24% on dark glass, ink shade at 28% on light glass.', o: {} },
+    { k: 'B', title: '60%', desc: 'Glow 14%, shade 17%.', o: { k: 60 } },
+    { k: 'C', title: '35%', desc: 'Glow 8%, shade 10%.', o: { k: 35 } },
+    { k: 'D', title: '15%', desc: 'Glow 4%, shade 4%: barely there.', o: { k: 15 } },
+    { k: 'E', title: 'None (Rim Only)', desc: 'No glow or shade: today’s rim line alone.', o: { k: 0 } }
+  ]);
+  group('g-depth', 'depth', [
+    { k: 'A', title: 'Today’s Fixed Depth', tag: 'Today', desc: '12px at every size.', o: {} },
+    { k: 'B', title: 'Scaled To Height', desc: '15% of the surface’s height, between 3 and 12px: about 5px on a tooltip, 7px on a snackbar, 8px on a FAB, 12px on the panel.', o: { depth: 'scaled' } },
+    { k: 'C', title: 'Thinner Fixed', desc: '5px at every size.', o: { depth: 'thin' } }
+  ]);
+  group('g-combo', 'combo', [
+    { k: 'A', title: 'Softer', desc: '60% strength, depth scaled to the height: today’s look on big panels, quieter on small things.', o: { k: 60, depth: 'scaled' } },
+    { k: 'B', title: 'Calm', desc: '35% strength, depth scaled to the height: a soft rounding on every size.', o: { k: 35, depth: 'scaled' } },
+    { k: 'C', title: 'Hint', desc: '15% strength, a thin 5px fixed depth: close to the rim alone.', o: { k: 15, depth: 'thin' } }
+  ]);
+
+  /* the zoomed snackbar edge */
+  function zcell(theme, o, cap) {
+    return '<div class="zm-cell"><span class="pv-cap">' + cap + '</span><div class="zm-win" inert data-theme="' + theme + '">' +
+      '<div class="zm-in sc"' + attrs(theme, o) + '><div class="zm-art"></div><div class="s4-glass zm-snack" data-g></div></div></div></div>';
+  }
+  var zoom = document.getElementById('zoom');
+  zoom.innerHTML = '<div class="zm-grid">' + zcell('dark', {}, 'Today, dark') + zcell('dark', { k: 35, depth: 'scaled' }, 'Calm, dark') +
+    zcell('light', {}, 'Today, light') + zcell('light', { k: 35, depth: 'scaled' }, 'Calm, light') + '</div>';
+  function fit() { zoom.querySelectorAll('.zm-win').forEach(function (w) { w.style.setProperty('--zw', w.clientWidth + 'px'); }); scale(zoom); }
+  fit(); window.addEventListener('resize', fit);
+
+  S4Review.page('glass-glow');
+})();
+</script>
+</body>
+</html>

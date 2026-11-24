@@ -329,5 +329,14 @@ window.S4_REVIEW_DEMOS = [
       { id: 'boost', label: 'Color boost', options: [{ v: 'A', label: 'None' }, { v: 'B', label: 'Light' }, { v: 'C', label: 'Medium' }, { v: 'Other', label: 'Describe in notes' }] },
       { id: 'width', label: 'Rim width', options: [{ v: 'A', label: 'Today\u2019s Width' }, { v: 'B', label: '1.5x' }, { v: 'Other', label: 'Describe in notes' }] }
     ]
+  },
+  {
+    id: 'glass-glow', title: 'Glass Glow', href: 'explore/review-glass-glow.html',
+    questions: [
+      { id: 'strength', label: 'Glow strength', help: 'Today\u2019s glass and rim; only the glow (the shade on light glass) changes.',
+        options: [{ v: 'A', label: 'Today' }, { v: 'B', label: '60%' }, { v: 'C', label: '35%' }, { v: 'D', label: '15%' }, { v: 'E', label: 'None (Rim Only)' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'depth', label: 'Depth on short surfaces', options: [{ v: 'A', label: 'Today\u2019s Fixed Depth' }, { v: 'B', label: 'Scaled To Height' }, { v: 'C', label: 'Thinner Fixed' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'combo', label: 'Combined pick', options: [{ v: 'A', label: 'Softer' }, { v: 'B', label: 'Calm' }, { v: 'C', label: 'Hint' }, { v: 'Other', label: 'Describe in notes' }] }
+    ]
   }
 ];
