@@ -583,6 +583,153 @@
   }).observe(root, { attributes: true, subtree: true, attributeFilter: ['data-accent', 'data-accent-variant', 'data-surfaces'] });
 })();
 
+/* ---- core/select.js ---- */
+/* Orion runtime core, part two: saying what changed, and selecting several (decision 0078). It is part of the core pack
+   (orion.core.min.js) and the full bundle, and is left out of the site bundle (decision 0066: a site has no collection that
+   selects several; a site's multi-select listbox keeps plain toggling). */
+(function () {
+  'use strict';
+  var S4 = window.S4;
+  if (!S4 || !S4.util || S4.util.multiselect) return;
+  /* ---------- saying what changed (one polite live region for the page) ---------- */
+  var live = null, liveT = 0;
+  S4.util.say = function (text) {
+    if (!live || !live.isConnected) { live = document.createElement('div'); live.className = 's4-visually-hidden'; live.setAttribute('role', 'status'); live.setAttribute('aria-live', 'polite'); document.body.appendChild(live); }
+    clearTimeout(liveT); live.textContent = ''; liveT = setTimeout(function () { live.textContent = text; }, 60);
+  };
+
+  /* ---------- selecting several (decision 0078) ----------
+     One selection model for every collection that selects several: data tables, static tables with a select column,
+     multi-select listboxes and trees, and select-several lists. The collection keeps its own markup, focus and drawing;
+     the model keeps which keys are selected, the anchor, and what each mouse and key gesture does, the way Windows
+     Explorer and the macOS Finder do (WAI-ARIA grid, listbox and tree multi-select):
+       click             only this one (click: 'select'), or adds and removes it (click: 'toggle')
+       Shift+click       the range from the anchor, replacing the last range drawn from that anchor
+       Ctrl/⌘+click      adds or removes one and moves the anchor;  Ctrl/⌘+Shift+click adds a range
+       Shift+Up/Down, Shift+PageUp/PageDown, Shift+Home/End   extend the range from the anchor as focus moves
+       Ctrl/⌘+Up/Down, Ctrl/⌘+PageUp/PageDown                  move focus and leave the selection alone
+       Space / Ctrl+Space toggles the focused item;  Shift+Space selects from the anchor to it
+       Ctrl/⌘+A          every item, the ones not drawn too (the collection says what "every" is: what its filter shows)
+       Escape            clears, when something is selected and nothing else took the Escape first
+     S4.util.multiselect(o) -> model. o: count() items in order; key(i) a stable key (an id, or the element itself);
+     skip(i) true for an item that is not selectable (a group header); index(key) optional fast lookup; every() the keys
+     Ctrl+A selects when they are more than the items in order (rows in a collapsed group, rows not drawn); focus(i) moves
+     focus there and returns the index that took it; page() items per page; multi() false for single select (the range
+     keys are ignored); read() for a collection whose markup is its data: the keys selected now; apply(added, removed)
+     draws the change; changed({ why, added, removed }) fires the collection's own event; noun(n) for the announcement.
+     model.selected is the Set of keys (the same object for the model's life). Every change is said: "12 selected". */
+  function Multi(o) { this.o = o; this.selected = new Set(); this.base = new Set(); this.anchor = null; }
+  Multi.prototype = {
+    multi: function () { return !this.o.multi || this.o.multi(); },
+    n: function () { return this.o.count(); },
+    ok: function (i) { return i >= 0 && i < this.n() && !(this.o.skip && this.o.skip(i)); },
+    index: function (k) { if (k == null) return -1; if (this.o.index) return this.o.index(k); for (var i = 0, n = this.n(); i < n; i++) if (this.o.key(i) === k) return i; return -1; },
+    sync: function () { if (!this.o.read) return; var s = this.selected; s.clear(); this.o.read().forEach(function (k) { s.add(k); }); },
+    /* replace the selection with `next` (a Set): only what changed is drawn, said and fired */
+    commit: function (next, why) {
+      var prev = this.selected, added = [], removed = [];
+      next.forEach(function (k) { if (!prev.has(k)) added.push(k); });
+      prev.forEach(function (k) { if (!next.has(k)) removed.push(k); });
+      if (!added.length && !removed.length) return false;
+      removed.forEach(function (k) { prev.delete(k); }); added.forEach(function (k) { prev.add(k); });
+      if (this.o.apply) this.o.apply(added, removed);
+      this.say();
+      if (this.o.changed) this.o.changed({ why: why, added: added, removed: removed });
+      return true;
+    },
+    say: function (extra) { var n = this.selected.size; S4.util.say((extra ? extra + ' ' : '') + (n ? n.toLocaleString() + ' selected' : 'Nothing selected')); },
+    between: function (a, b) { var out = []; for (var i = Math.max(0, Math.min(a, b)), z = Math.min(this.n() - 1, Math.max(a, b)); i <= z; i++) if (this.ok(i)) out.push(this.o.key(i)); return out; },
+    setAnchor: function (i) { this.anchor = this.ok(i) ? this.o.key(i) : this.anchor; },
+    only: function (i, why) { this.sync(); if (!this.ok(i)) return false; this.anchor = this.o.key(i); this.base = new Set(); return this.commit(new Set([this.anchor]), why || 'click'); },
+    toggle: function (i, on, why) {
+      this.sync(); if (!this.ok(i)) return false;
+      var k = this.o.key(i), next = new Set(this.selected); if (on === undefined) on = !next.has(k);
+      if (!this.multi()) next.clear();
+      if (on) next.add(k); else next.delete(k);
+      this.anchor = k; this.base = new Set(next); this.base.delete(k);
+      return this.commit(next, why || 'toggle');
+    },
+    /* the range from the anchor to item i; add keeps everything selected now (Ctrl+Shift), otherwise it replaces the last range */
+    extend: function (i, add, why) {
+      this.sync(); if (!this.multi()) return this.only(i, why);
+      var a = this.index(this.anchor);
+      if (a < 0) { this.anchor = this.ok(i) ? this.o.key(i) : null; a = i; this.base = new Set(this.selected); }
+      var next = new Set(add ? this.selected : this.base);
+      this.between(a, i).forEach(function (k) { next.add(k); });
+      var done = this.commit(next, why || 'range');
+      if (add) this.base = new Set(this.selected);
+      return done;
+    },
+    all: function (why) {
+      this.sync(); if (!this.multi()) return false;
+      var next = new Set(this.o.every ? this.o.every() : []), n = this.n();
+      if (!this.o.every) for (var i = 0; i < n; i++) if (this.ok(i)) next.add(this.o.key(i));
+      this.base = new Set(); return this.commit(next, why || 'all');
+    },
+    clear: function (why) { this.sync(); this.base = new Set(); this.anchor = null; return this.commit(new Set(), why || 'clear'); },   /* nothing selected: the next range starts where focus is */
+    set: function (keys, why) { this.sync(); this.base = new Set(); return this.commit(new Set(keys), why || 'set'); },
+    /* a click on item i. mode: 'select' (only this one), 'toggle' (adds or removes it), or null (a plain click is the
+       collection's own: it opens the item). Returns true when the click was a selection. */
+    click: function (e, i, mode) {
+      var mod = e.ctrlKey || e.metaKey, many = this.multi();
+      if (many && e.shiftKey) return this.extend(i, mod, 'range') || true;
+      if (many && mod) return this.toggle(i, undefined, 'toggle') || true;
+      if (mode === 'select' || (!many && mode === 'toggle')) { this.only(i, 'click'); return true; }
+      if (mode === 'toggle') { this.toggle(i, undefined, 'toggle'); return true; }
+      return false;
+    },
+    /* a key on item i (the focused one). Returns true when the model took it (the caller stops there). */
+    keydown: function (e, i) {
+      if (e.defaultPrevented || e.altKey || !this.multi()) return false;
+      var k = e.key, mod = e.ctrlKey || e.metaKey, n = this.n(), page = Math.max(1, (this.o.page && this.o.page()) || 10), to = -1;
+      if (k === 'ArrowDown') to = i + 1; else if (k === 'ArrowUp') to = i - 1;
+      else if (k === 'PageDown') to = i + page; else if (k === 'PageUp') to = i - page;
+      else if (k === 'Home' && (e.shiftKey || mod)) to = 0; else if (k === 'End' && (e.shiftKey || mod)) to = n - 1;
+      if (to !== -1 || k === 'Home' || k === 'End') {
+        if (!e.shiftKey && !mod) return false;              /* plain movement is the collection's own */
+        e.preventDefault();
+        if (e.shiftKey && this.index(this.anchor) < 0) this.setAnchor(i);
+        var at = this.o.focus(Math.max(0, Math.min(n - 1, to)));
+        if (e.shiftKey) this.extend(at == null ? to : at, false, 'range');
+        return true;
+      }
+      if (k === ' ' || k === 'Spacebar') {
+        if (!this.ok(i)) return false;
+        e.preventDefault();
+        if (e.shiftKey) this.extend(i, mod, 'range'); else this.toggle(i, undefined, 'toggle');
+        return true;
+      }
+      if (mod && !e.shiftKey && (k === 'a' || k === 'A')) { e.preventDefault(); this.all('all'); return true; }
+      if (k === 'Escape' && this.selected.size) { this.sync(); if (!this.selected.size) return false; e.preventDefault(); this.clear('escape'); return true; }
+      return false;
+    }
+  };
+  S4.util.multiselect = function (o) { return new Multi(o); };
+  /* a multi-select listbox (list.js): its enabled options in order, the option itself as the key, aria-selected the data */
+  S4.util.listbox = function (list, enabled, focus, value) {
+    list.setAttribute('data-s4-multiselect', '');
+    return new Multi({
+      count: function () { return enabled().length; },
+      key: function (i) { return enabled()[i]; },
+      index: function (o) { return enabled().indexOf(o); },
+      read: function () { return enabled().filter(function (o) { return o.getAttribute('aria-selected') === 'true'; }); },
+      focus: function (i) { focus(enabled()[i]); return i; },
+      apply: function (added, removed) { added.forEach(function (o) { o.setAttribute('aria-selected', 'true'); }); removed.forEach(function (o) { o.setAttribute('aria-selected', 'false'); }); },
+      changed: function (d) {
+        if (d.added.length + d.removed.length === 1) { var o = d.added[0] || d.removed[0]; S4.util.emit(o, 's4-select', { item: o, value: o.dataset.value || o.textContent.trim(), selected: !!d.added.length }); }
+        S4.util.emit(list, 's4-change', { value: value(), added: d.added, removed: d.removed, why: d.why });
+      }
+    });
+  };
+  /* Shift+click extends a range: the browser would select the text between the two clicks, so it does not (text in a
+     cell is still selectable with a plain drag) */
+  document.addEventListener('mousedown', function (e) {
+    if (!e.shiftKey || e.button || !e.target.closest) return;
+    var c = e.target.closest('[data-s4-multiselect]');
+    if (c && !S4.util.typable(e.target) && !e.target.closest('[contenteditable], .s4-table-grip')) e.preventDefault();
+  });
+})();
+
 /* ---- motion/motion.js ---- */
 /* Orion motion patterns in script (decision 0046, one motion philosophy; builds on 0022 and 0042).
    Components never call element.animate or pick a spring themselves: they name a pattern here (npm run check:motion).
@@ -2914,25 +3061,31 @@ S4.register('search', function (scope) {
   /* ---------- selection ---------- */
   var anchors = new WeakMap();
   function selected(tree) { return Array.prototype.slice.call(tree.querySelectorAll('.s4-tree-item[aria-selected="true"]')); }
+  /* selecting is the shared model (decision 0078): the items you can see, in order, keyed by the item itself; the
+     markup (aria-selected) is the data. A plain arrow or click selects the one it lands on (as in a source list). */
+  var models = new WeakMap(), lastItem = null;
+  function model(tree) {
+    var m = models.get(tree); if (m) return m;
+    m = S4.util.multiselect({
+      multi: function () { return multi(tree); },
+      count: function () { return visible(tree).length; },
+      key: function (i) { return visible(tree)[i]; },
+      index: function (item) { return visible(tree).indexOf(item); },
+      read: function () { return selected(tree); },
+      focus: function (i) { var to = visible(tree)[i]; if (to) { focus(to); lastItem = to; } return i; },
+      page: function () { var r = tree.querySelector('.s4-tree-row'), h = r ? r.offsetHeight : 40, box = tree.closest('.s4-split-pane, .s4-pane, .s4-nav-rail') || tree; return Math.max(1, Math.floor(Math.min(box.clientHeight || 400, innerHeight) / h) - 1); },
+      apply: function (added, removed) { added.forEach(function (x) { x.setAttribute('aria-selected', 'true'); }); removed.forEach(function (x) { x.setAttribute('aria-selected', 'false'); }); },
+      changed: function (d) { S4.util.emit(tree, 's4-change', { items: selected(tree), item: lastItem, added: d.added, removed: d.removed, why: d.why }); }
+    });
+    models.set(tree, m); return m;
+  }
   function select(item, opts) {
     opts = opts || {};
-    var tree = treeOf(item), many = multi(tree), before = selected(tree);
-    if (opts.range && many) {
-      var all = visible(tree), a = anchors.get(tree) || item, i = all.indexOf(a), j = all.indexOf(item);
-      if (i < 0) i = j;
-      var lo = Math.min(i, j), hi = Math.max(i, j);
-      if (!opts.add) before.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
-      all.slice(lo, hi + 1).forEach(function (x) { x.setAttribute('aria-selected', 'true'); });
-    } else if (opts.add && many) {
-      item.setAttribute('aria-selected', String(item.getAttribute('aria-selected') !== 'true'));
-      anchors.set(tree, item);
-    } else {
-      before.forEach(function (x) { if (x !== item) x.setAttribute('aria-selected', 'false'); });
-      item.setAttribute('aria-selected', 'true');
-      anchors.set(tree, item);
-    }
-    var now = selected(tree);
-    if (now.length !== before.length || now.some(function (x, k) { return x !== before[k]; })) S4.util.emit(tree, 's4-change', { items: now, item: item });
+    var tree = treeOf(item), m = model(tree), i = visible(tree).indexOf(item); if (i < 0) return;
+    lastItem = item;
+    if (opts.range && multi(tree)) m.extend(i, !!opts.add, 'range');
+    else if (opts.add && multi(tree)) m.toggle(i, undefined, 'toggle');
+    else m.only(i, 'select');
   }
 
   /* ---------- rename (F2, Enter on a Mac, or a command) ---------- */
@@ -2997,6 +3150,7 @@ S4.register('search', function (scope) {
     S4.util.all(scope, '.s4-tree').forEach(function (tree) {
       if (!S4.util.once(tree, 'tree')) { return; }
       prepare(tree);
+      if (multi(tree)) tree.setAttribute('data-s4-multiselect', '');
       var typed = '', typedAt = 0, apple = S4.desktop && /mac|ios/.test(S4.desktop.platform);
 
       tree.addEventListener('click', function (e) {
@@ -3006,7 +3160,8 @@ S4.register('search', function (scope) {
         var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || item.hasAttribute('data-loading')) return;
         var mod = apple ? e.metaKey : e.ctrlKey;
         if (e.target.closest('.s4-tree-toggle') && groupOf(item)) { open(item); focus(item, false); return; }
-        select(item, { add: mod, range: e.shiftKey });
+        lastItem = item;
+        if (!model(tree).click(e, visible(tree).indexOf(item), 'select')) select(item);
         focus(item, false);
         /* a folder in a single-select tree opens and closes with a click on its row, as in a sidebar */
         if (!multi(tree) && !mod && !e.shiftKey && groupOf(item) && tree.hasAttribute('data-open-on-click')) open(item);
@@ -3031,6 +3186,11 @@ S4.register('search', function (scope) {
         var item = e.target.closest('.s4-tree-item'); if (!item || e.target.closest('.s4-tree-rename') || e.target !== item) return;
         var all = visible(tree), i = all.indexOf(item), rtl = getComputedStyle(tree).direction === 'rtl';
         var mod = apple ? e.metaKey : e.ctrlKey, many = multi(tree), to = null;
+        if (e.key === 'Escape' && clip) { e.preventDefault(); cut([]); clip = null; return; }
+        /* Shift with the arrows, Home, End, PageUp and PageDown extends; Ctrl or ⌘ with them moves without selecting;
+           Space and Shift+Space; mod+A; Escape clears (decision 0078) */
+        lastItem = item;
+        if (many && !(mod && /^[xv]$/i.test(e.key)) && model(tree).keydown(e, i)) return;
         var inward = rtl ? 'ArrowLeft' : 'ArrowRight', outward = rtl ? 'ArrowRight' : 'ArrowLeft';
         if (e.key === 'ArrowDown') to = all[i + 1];
         else if (e.key === 'ArrowUp') to = all[i - 1];
@@ -3040,12 +3200,9 @@ S4.register('search', function (scope) {
         else if (e.key === outward) { e.preventDefault(); if (groupOf(item) && isOpen(item)) { open(item, false); return; } to = parentItem(item); if (!to) return; }
         else if (e.key === 'Enter' && !mod) { e.preventDefault(); if (apple && !e.shiftKey) rename(item); else if (groupOf(item)) open(item); else S4.util.emit(tree, 's4-select', { item: item }); return; }
         else if (e.key === 'F2') { e.preventDefault(); rename(item); return; }
-        else if (e.key === ' ' && many) { e.preventDefault(); select(item, { add: true }); return; }
         else if (e.key === '*') { e.preventDefault(); var p = item.parentElement; Array.prototype.forEach.call(p.children, function (s) { if (s.classList.contains('s4-tree-item') && groupOf(s)) open(s, true); }); return; }
-        else if (mod && !e.shiftKey && e.key.toLowerCase() === 'a' && many) { e.preventDefault(); all.forEach(function (x) { x.setAttribute('aria-selected', 'true'); }); S4.util.emit(tree, 's4-change', { items: selected(tree), item: item }); return; }
         else if (mod && !e.shiftKey && e.key.toLowerCase() === 'x') { e.preventDefault(); cut(selected(tree).length ? selected(tree) : [item]); return; }
         else if (mod && !e.shiftKey && e.key.toLowerCase() === 'v' && clip) { e.preventDefault(); paste(item); return; }
-        else if (e.key === 'Escape' && clip) { e.preventDefault(); cut([]); clip = null; return; }
         else if (e.key.length === 1 && /\S/.test(e.key) && !mod && !e.altKey) {
           typed = (Date.now() - typedAt > 600 ? '' : typed) + e.key.toLowerCase(); typedAt = Date.now();
           var order = all.slice(i + (typed.length === 1 ? 1 : 0)).concat(all.slice(0, i + (typed.length === 1 ? 1 : 0)));
@@ -3057,7 +3214,7 @@ S4.register('search', function (scope) {
         e.preventDefault();
         focus(to);
         if (many && mod) return;                       /* move without selecting */
-        select(to, { range: many && e.shiftKey });
+        select(to);
       });
       tree.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-tree-item'); if (item && e.target === item) { tree.querySelectorAll('.s4-tree-item[tabindex="0"]').forEach(function (x) { if (x !== item) x.tabIndex = -1; }); item.tabIndex = 0; } });
 
@@ -3099,7 +3256,10 @@ S4.register('search', function (scope) {
      <li role="none"><div class="s4-list-item" role="option" aria-selected="true" data-value="checking">…</div></li>
    </ul>
    One option is in the tab order (roving tabindex). Up/Down/Home/End move focus; click, Enter or Space selects.
-   Single select moves aria-selected; multi select toggles it. Fires s4-select { item, value, selected } on the item and
+   Single select moves aria-selected; multi select toggles it, and takes the shared selection keys (decision 0078):
+   Shift+click and Shift with Up, Down, Home, End, PageUp or PageDown select the range from the anchor, Ctrl/⌘+click
+   adds or removes one, Ctrl/⌘ with the arrows moves without selecting, Shift+Space selects to the focused option,
+   Ctrl/⌘+A selects every option, Escape clears. Fires s4-select { item, value, selected } on the item and
    s4-change { value } on the list (value is an array for multi select). Plain lists of links need no script. */
 S4.register('list', function (scope) {
   S4.util.all(scope, '.s4-list[role="listbox"]').forEach(function (list) {
@@ -3136,19 +3296,24 @@ S4.register('list', function (scope) {
       S4.util.emit(list, 's4-change', { value: value() });
     }
 
+    var model = multi && S4.util.listbox && S4.util.listbox(list, enabled, focus, value);   /* the shared keys (core/select.js); the site bundle has none, so there a multi listbox keeps plain toggling */
+
     list.addEventListener('click', function (e) {
       var o = e.target.closest('.s4-list-item[role="option"]');
-      if (o && list.contains(o)) select(o);
+      if (!o || !list.contains(o)) return;
+      if (model) { if (o.getAttribute('aria-disabled') === 'true') return; model.click(e, enabled().indexOf(o), 'toggle'); focus(o); }
+      else select(o);
     });
     list.addEventListener('keydown', function (e) {
       var o = e.target.closest('.s4-list-item[role="option"]'); if (!o) return;
       var all = enabled(), i = all.indexOf(o), next = null;
+      if (model && model.keydown(e, i)) return;
       switch (e.key) {
         case 'ArrowDown': next = all[Math.min(i + 1, all.length - 1)]; break;
         case 'ArrowUp': next = all[Math.max(i - 1, 0)]; break;
         case 'Home': next = all[0]; break;
         case 'End': next = all[all.length - 1]; break;
-        case 'Enter': case ' ': e.preventDefault(); select(o); return;
+        case 'Enter': case ' ': e.preventDefault(); if (model) model.toggle(i); else select(o); return;
         default: return;
       }
       e.preventDefault();
@@ -3286,8 +3451,8 @@ S4.register('accordion', function (scope) {
       On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe (past a little over half
       the row) runs the action marked data-swipe-primary, which fills the uncovered strip to show it. The same buttons are always reachable by keyboard and are in the row's menu.
    3. Select several.  <ul data-selectable data-selection-bar="#bar"> and <div class="s4-selection-bar" id="bar" hidden>
-      Hold a row (or Ctrl/⌘-click it, or Shift-click for a range) to start selecting; after that a tap adds or removes a
-      row. The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
+      Hold a row (or Ctrl/⌘-click it, Shift-click for a range, or Shift+Space) to start selecting; after that a tap adds or
+      removes a row. The keys are the shared ones of decision 0078 (see below). The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
       Escape or [data-selection-clear] ends it. Fires s4-selection { items, count }. S4.selection.items(el) / clear(el) / all(el).
    Motion: Morph calm (rows making room and settling); nothing else animates while your finger is down. */
 (function () {
@@ -3541,10 +3706,18 @@ S4.register('accordion', function (scope) {
     }, 0);
   });
 
-  /* ---------- 3. select several ---------- */
+  /* ---------- 3. select several ----------
+     The shared selection model (decision 0078), keyed by the item itself (the markup's data-picked is the data). With a
+     mouse or the keyboard: Shift+click and Shift with the arrows, Home, End, PageUp or PageDown select the range from the
+     anchor, Ctrl/⌘+click adds or removes one (Ctrl+Shift+click adds a range), Ctrl/⌘ with the arrows moves without
+     selecting, Shift+Space selects from the anchor (and starts selecting), Space adds or removes while selecting,
+     Ctrl/⌘+A selects every item shown, Escape clears. Up and Down (and Left and Right in a grid of tiles) move between
+     items. A plain click opens the item until something is selected, then adds or removes it, as a tap does. */
   function sItems(el) { return Array.prototype.filter.call(el.querySelectorAll(':scope > li, :scope > [data-select-item], :scope > tr'), function (x) { return !x.matches('.s4-list-subheader'); }); }
+  function shown(el) { return sItems(el).filter(function (x) { return !x.hidden && x.getClientRects().length; }); }
   function picked(el) { return sItems(el).filter(function (x) { return x.hasAttribute('data-picked'); }); }
   function bar(el) { var s = el.getAttribute('data-selection-bar'); return s ? document.querySelector(s) : null; }
+  function face(item) { return item.querySelector(':scope > .s4-list-item, :scope > [data-swipe-face], :scope > button, :scope > a[href]') || item.querySelector('button, a[href], [tabindex]') || item; }
   function sync(el) {
     var items = picked(el), n = items.length, b = bar(el);
     el.toggleAttribute('data-selecting', n > 0);
@@ -3559,15 +3732,33 @@ S4.register('accordion', function (scope) {
     }
     S4.util.emit(el, 's4-selection', { items: items, count: n });
   }
-  function toggle(el, item, on) { item.toggleAttribute('data-picked', on === undefined ? !item.hasAttribute('data-picked') : on); el._s4anchor = item; sync(el); }
-  function clear(el) { picked(el).forEach(function (x) { x.removeAttribute('data-picked'); }); sync(el); }
+  var models = new WeakMap();
+  function model(el) {
+    var m = models.get(el); if (m) return m;
+    m = S4.util.multiselect({
+      count: function () { return shown(el).length; },
+      key: function (i) { return shown(el)[i]; },
+      index: function (x) { return shown(el).indexOf(x); },
+      read: function () { return picked(el); },
+      focus: function (i) { var x = shown(el)[i]; if (x) focusItem(x); return i; },
+      page: function () { var x = shown(el)[0]; return x ? Math.max(1, Math.floor(innerHeight / Math.max(24, x.offsetHeight)) - 1) * columns(el) : 10; },
+      apply: function (added, removed) { added.forEach(function (x) { x.setAttribute('data-picked', ''); }); removed.forEach(function (x) { x.removeAttribute('data-picked'); }); },
+      changed: function () { var a = m.index(m.anchor); el._s4anchor = a >= 0 ? m.anchor : el._s4anchor; sync(el); }
+    });
+    models.set(el, m); return m;
+  }
+  function focusItem(x) { var f = face(x); if (f === x && !x.hasAttribute('tabindex')) x.tabIndex = -1; f.focus({ preventScroll: true }); if (f.scrollIntoView) f.scrollIntoView({ block: 'nearest' }); }
+  /* tiles in a grid: how many sit on the first line */
+  function columns(el) { var xs = shown(el), top = xs[0] && xs[0].offsetTop, n = 0; while (n < xs.length && xs[n].offsetTop === top) n++; return Math.max(1, n); }
+  function toggle(el, item, on) { var m = model(el), i = m.index(item); if (i >= 0) m.toggle(i, on); else { item.toggleAttribute('data-picked', on === undefined ? !item.hasAttribute('data-picked') : on); el._s4anchor = item; sync(el); } }
+  function clear(el) { if (!model(el).clear()) sync(el); }
   S4.selection = {
     items: picked, clear: clear,
-    all: function (el) { sItems(el).forEach(function (x) { if (!x.hidden) x.setAttribute('data-picked', ''); }); sync(el); },
+    all: function (el) { if (!model(el).all()) sync(el); },
     toggle: function (el, item, on) { toggle(el, item, on); }
   };
   function itemOf(el, t) { var x = t; while (x && x.parentElement !== el) x = x.parentElement; return x && sItems(el).indexOf(x) >= 0 ? x : null; }
-  var holdDone = false;
+  var holdDone = false, swallow = 0;
   document.addEventListener('pointerdown', function (e) {
     holdDone = false;
     if (!e.target.closest || e.pointerType === 'mouse') return;
@@ -3588,24 +3779,47 @@ S4.register('accordion', function (scope) {
     var el = e.target.closest('[data-selectable]'); if (!el) return;
     var item = itemOf(el, e.target); if (!item) return;
     if (holdDone) { holdDone = false; e.preventDefault(); e.stopPropagation(); return; }   /* the tap that ended the hold */
+    if (!e.detail && Date.now() - swallow < 400) { e.preventDefault(); e.stopPropagation(); return; }   /* the click a selection key would have made */
     var pick = e.target.closest('[data-select-toggle]');
     if (!(el.hasAttribute('data-selecting') || e.ctrlKey || e.metaKey || e.shiftKey || pick)) return;
     if (e.target.closest('.s4-swipe-actions, .s4-drag-handle')) return;
     e.preventDefault(); e.stopPropagation();
-    if (e.shiftKey && el._s4anchor) {
-      var all = sItems(el), a = all.indexOf(el._s4anchor), z = all.indexOf(item);
-      all.slice(Math.min(a, z), Math.max(a, z) + 1).forEach(function (x) { x.setAttribute('data-picked', ''); });
-      sync(el);
-    } else toggle(el, item);
+    var m = model(el), i = m.index(item);
+    if (i < 0) toggle(el, item); else m.click(e, i, 'toggle');
+    if (e.shiftKey || e.ctrlKey || e.metaKey) focusItem(item);   /* the pressed item holds focus, so the keyboard carries on from it */
   }, true);
   document.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented || !e.target.closest) return;
+    var el = e.target.closest('[data-selectable]');
+    if (el && !e.target.closest('.s4-swipe-actions, .s4-drag-handle, input, textarea, select, [contenteditable]')) {
+      var item = itemOf(el, e.target), m = model(el), i = item ? m.index(item) : -1;
+      if (i >= 0) {
+        var k = e.key, mod = e.ctrlKey || e.metaKey, cols = columns(el), rtl = getComputedStyle(el).direction === 'rtl';
+        /* a plain Space opens the item until something is selected (it is a button), then adds or removes it */
+        if ((k === ' ' || k === 'Spacebar') && !e.shiftKey && !mod && !el.hasAttribute('data-selecting')) return;
+        if (cols > 1 && (k === 'ArrowLeft' || k === 'ArrowRight') && !e.altKey) {
+          var step = (k === 'ArrowRight') !== rtl ? 1 : -1, to = Math.max(0, Math.min(m.n() - 1, i + step));
+          e.preventDefault(); m.o.focus(to); if (e.shiftKey) m.extend(to, false, 'range'); return;
+        }
+        if (cols > 1 && (k === 'ArrowDown' || k === 'ArrowUp') && !e.altKey) {
+          var to2 = Math.max(0, Math.min(m.n() - 1, i + (k === 'ArrowDown' ? cols : -cols)));
+          e.preventDefault(); if (e.shiftKey && m.index(m.anchor) < 0) m.setAnchor(i); m.o.focus(to2); if (e.shiftKey) m.extend(to2, false, 'range'); return;
+        }
+        if (m.keydown(e, i)) { if (k === ' ' || k === 'Spacebar') swallow = Date.now(); return; }
+        if ((k === 'ArrowDown' || k === 'ArrowUp' || ((k === 'Home' || k === 'End') && e.target === face(item))) && !e.altKey && !mod) {
+          e.preventDefault(); m.o.focus(k === 'Home' ? 0 : k === 'End' ? m.n() - 1 : Math.max(0, Math.min(m.n() - 1, i + (k === 'ArrowDown' ? 1 : -1)))); return;
+        }
+      }
+    }
     if (e.key !== 'Escape') return;
+    /* Escape ends selecting, unless something open took it first (a menu, a dialog, a panel) */
+    if (document.querySelector('dialog[open], :popover-open')) return;
     var any = false;
-    document.querySelectorAll('[data-selectable][data-selecting]').forEach(function (el) { any = true; clear(el); });
+    document.querySelectorAll('[data-selectable][data-selecting]').forEach(function (s) { any = true; clear(s); });
     if (any) e.preventDefault();
   });
   S4.register('direct', function (scope) {
-    S4.util.all(scope, '[data-selectable]').forEach(function (el) { if (S4.util.once(el, 'selectable')) { var b = bar(el); if (b) b.hidden = true; } });
+    S4.util.all(scope, '[data-selectable]').forEach(function (el) { if (S4.util.once(el, 'selectable')) { el.setAttribute('data-s4-multiselect', ''); var b = bar(el); if (b) b.hidden = true; } });
     S4.util.all(scope, '.s4-drag-handle').forEach(function (h) { if (!h.hasAttribute('aria-pressed')) h.setAttribute('aria-pressed', 'false'); });
   });
 })();
@@ -4296,7 +4510,8 @@ S4.register('accordion', function (scope) {
     this.c.onLayout = function () { if (self.edgeKey !== self.c.edgeKey) { self.edgeKey = self.c.edgeKey; if (self.loaded) self.draw(true); } else self.schedule(); };
     this.idKey = this.opts.id || 'id';
     this.rows = []; this.view = []; this.items = [];
-    this.selected = new Set(); this.expanded = new Set(); this.collapsed = new Set();
+    this.expanded = new Set(); this.collapsed = new Set();
+    this.selectModel();
     this.sortBy = null; this.pred = null; this.query = ''; this.groupBy = this.opts.group || table.getAttribute('data-group') || null;
     this.rendered = new Map(); this.current = 0; this.measuredAt = {};
     this.body = table.tBodies[0] || table.appendChild(document.createElement('tbody'));
@@ -4312,6 +4527,8 @@ S4.register('accordion', function (scope) {
     if (head) head.setAttribute('aria-rowindex', '1');
     this.menu = this.opts.rowMenu || (table.getAttribute('data-row-menu') && document.querySelector(table.getAttribute('data-row-menu')));
     this.bar = table.getAttribute('data-selection-bar') && document.querySelector(table.getAttribute('data-selection-bar'));
+    if (!table.hasAttribute('role')) table.setAttribute('role', 'grid');   /* the grid pattern (decision 0065): one Tab stop, arrows move */
+    if (this.multi()) { table.setAttribute('aria-multiselectable', 'true'); table.setAttribute('data-s4-multiselect', ''); }
     this.wire();
     this.columnMenus();
     this.headKeys();
@@ -4515,6 +4732,7 @@ S4.register('accordion', function (scope) {
       }
       tr.tabIndex = -1;
       if (this.selected.has(id)) tr.setAttribute('data-picked', '');
+      if (this.multi()) tr.setAttribute('aria-selected', String(this.selected.has(id)));
       var name = this.name(row), cells = [];
       for (var k = 0; k < vis.length; k++) cells.push(this.cell(vis[k], row, id, name));
       tr.innerHTML = cells.join('');
@@ -4596,28 +4814,76 @@ S4.register('accordion', function (scope) {
       if (open) open.click();
       S4.util.emit(tr, 's4-select', { row: tr, data: row });
     },
-    /* ---------- selection ---------- */
-    pick: function (id, on) {
-      if (on === undefined) on = !this.selected.has(id);
-      if (on) this.selected.add(id); else this.selected.delete(id);
+    /* ---------- selection (decision 0078): the shared model in core, keyed by row id, so it lives in the data and
+       survives virtual scrolling, sorting and filtering. A table selects several when it has a select column. ---------- */
+    multi: function () { return !!this.table.querySelector('thead [data-check]'); },
+    selectModel: function () {
+      var self = this;
+      this.sel = S4.util.multiselect({
+        multi: function () { return self.multi(); },
+        count: function () { return self.items.length; },
+        key: function (n) { var it = self.items[n]; return self.id(self.rows[it.i], it.i); },
+        skip: function (n) { return !self.items[n] || self.items[n].t !== 'r'; },
+        index: function (id) { return self.find('r' + id); },
+        every: function () { return self.view.map(function (i) { return self.id(self.rows[i], i); }); },   /* every row the filter shows, drawn or not */
+        focus: function (n) { self.go(n); return self.current; },
+        page: function () { return self.pageSize(); },
+        apply: function (added, removed) { added.forEach(function (id) { self.paintPick(id, true); }); removed.forEach(function (id) { self.paintPick(id, false); }); },
+        changed: function (d) { self.selectionChanged(d); }
+      });
+      this.selected = this.sel.selected;
+    },
+    pageSize: function () { return Math.max(1, Math.floor((this.wrap ? this.wrap.clientHeight : 480) / (this.est ? this.est.r : 52)) - 2); },
+    paintPick: function (id, on) {
       var tr = this.rendered.get('r' + id);
-      if (tr) { tr.toggleAttribute('data-picked', on); var b = tr.querySelector('[data-check] input'); if (b) b.checked = on; }
+      if (tr) { tr.toggleAttribute('data-picked', on); tr.setAttribute('aria-selected', String(on)); var b = tr.querySelector('[data-check] input'); if (b) b.checked = on; }
+    },
+    /* one row on or off (or flipped), without the event: pick() then selectionChanged(), or use select() */
+    pick: function (id, on) {
+      id = String(id); if (on === undefined) on = !this.selected.has(id);
+      if (on) this.selected.add(id); else this.selected.delete(id);
+      this.paintPick(id, on);
+    },
+    /* selected rows the filter or search hides now (they stay selected; the count says so) */
+    hiddenPicks: function () {
+      if (!this.selected.size) return 0;
+      var shown = 0, self = this; this.view.forEach(function (i) { if (self.selected.has(self.id(self.rows[i], i))) shown++; });
+      return this.selected.size - shown;
     },
     syncAll: function () {
       var a = this.table.querySelector('thead [data-check] input'), self = this;
       var n = this.view.reduce(function (k, i) { return k + (self.selected.has(self.id(self.rows[i], i)) ? 1 : 0); }, 0);
       if (a) { a.checked = n > 0 && n === this.view.length; a.indeterminate = n > 0 && n < this.view.length; }
-      var count = this.selected.size;
+      var count = this.selected.size, hidden = count - n;
       if (this.bar) {
-        var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected';
+        var c = this.bar.querySelector('[data-selection-count]'); if (c) c.textContent = count.toLocaleString() + ' Selected' + (hidden ? ', ' + hidden.toLocaleString() + ' Not Shown' : '');
         var was = !this.bar.hidden;
         if (!count && was) S4.util.release(this.bar, this.tabRow && this.tabRow.isConnected ? this.tabRow : this.row(Math.max(0, Math.min(this.current, this.items.length - 1))));   /* its Delete or Clear had focus */
         this.bar.hidden = !count;
         var top = this.bar.closest('.s4-top-app-bar'); if (top) top.toggleAttribute('data-selecting', count > 0);
         if (count && !was) S4.transition.fade(this.bar, true);
       }
+      /* a filter that hides selected rows says so once (they are still selected: the bar's actions include them) */
+      if (hidden !== (this.saidHidden || 0)) { if (hidden && this.loaded) S4.util.say(hidden.toLocaleString() + ' of ' + count.toLocaleString() + ' selected not shown by the filter'); this.saidHidden = hidden; }
     },
-    selectionChanged: function () { this.syncAll(); S4.util.emit(this.table, 's4-change', { type: 'select', rows: this.selectedRows(), count: this.selected.size }); },
+    selectionChanged: function (d) {
+      this.syncAll(); d = d || {};
+      S4.util.emit(this.table, 's4-change', { type: 'select', rows: this.selectedRows(), ids: this.selection(), count: this.selected.size, hidden: this.hiddenPicks(), added: d.added || [], removed: d.removed || [], why: d.why || 'api' });
+    },
+    /* the selected ids: the shown ones in the table's order, then any the filter hides */
+    selection: function () {
+      var self = this, out = [], seen = {};
+      this.view.forEach(function (i) { var id = self.id(self.rows[i], i); if (self.selected.has(id)) { out.push(id); seen[id] = 1; } });
+      this.selected.forEach(function (id) { if (!seen[id]) out.push(id); });
+      return out;
+    },
+    /* select(ids) replaces the selection; select(ids, { add: true }) adds; select('all') is every row the filter shows */
+    select: function (ids, o) {
+      if (ids === 'all') { this.sel.all('api'); return this; }
+      var next = new Set(o && o.add ? this.selected : []);
+      (ids || []).forEach(function (id) { if (id != null) next.add(String(id)); });
+      this.sel.set(next, 'api'); return this;
+    },
     selectedRows: function () { var self = this; return Array.from(this.selected).map(function (id) { return self.rows[self.index[id]]; }).filter(Boolean); },
     /* ---------- expand ---------- */
     expand: function (id, open) {
@@ -4748,19 +5014,29 @@ S4.register('accordion', function (scope) {
         var exp = e.target.closest('.s4-table-expand'); if (exp) { self.expand(id); return; }
         var menuBtn = e.target.closest('.s4-table-row-menu');
         if (menuBtn && self.menu) { self.menuRow = self.rows[it.i]; self.menuId = id; if (self.menu.matches(':popover-open') && self.menu._s4anchor === menuBtn) S4.menu.close(self.menu); else S4.menu.open(self.menu, menuBtn); return; }
+        /* a row's own checkbox adds or removes that row (Shift: the range from the anchor), never clearing the others */
+        var box = e.target.closest('[data-check] input[type="checkbox"]');
+        if (box) { if (self.multi()) { if (e.shiftKey) self.sel.extend(n, e.ctrlKey || e.metaKey, 'range'); else self.sel.toggle(n, box.checked, 'toggle'); } return; }
         if (e.target.closest('[data-check]')) return;
         if (e.target.closest('a, button, input, label, select, textarea')) return;
-        /* while rows are picked, a tap picks (like a list) */
-        if (self.selected.size && t.querySelector('thead [data-check]') || e.ctrlKey || e.metaKey) { self.pick(id); self.anchor = n; self.selectionChanged(); return; }
-        if (e.shiftKey && self.anchor != null) { self.range(self.anchor, n); return; }
+        if (self.multi()) {
+          /* decision 0078: a mouse click selects the row (Shift, Ctrl and both as in a file manager; double-click or Enter
+             opens it); a finger opens it, and while rows are picked a tap picks (select several on touch, unchanged) */
+          if (self.pointer !== 'touch' && self.pointer !== 'pen') { self.sel.click(e, n, 'select'); tr.focus({ preventScroll: true }); return; }
+          if (self.selected.size || e.ctrlKey || e.metaKey || e.shiftKey) { self.sel.click(e, n, 'toggle'); return; }
+        }
         self.activate(tr);
       });
+      t.addEventListener('pointerdown', function (e) { self.pointer = e.pointerType; }, true);
+      t.addEventListener('dblclick', function (e) {
+        var tr = e.target.closest('tbody tr'); if (!tr || !self.body.contains(tr) || !self.multi() || self.pointer === 'touch') return;
+        if (e.target.closest('a, button, input, label, select, textarea, [data-check]')) return;
+        var it = self.items[+tr.dataset.n]; if (it && it.t === 'r') self.activate(tr);
+      });
       t.addEventListener('change', function (e) {
-        var box = e.target; if (!box.matches('[data-check] input[type="checkbox"]')) return;
-        if (box.closest('thead')) {
-          var on = box.checked; self.view.forEach(function (i) { self.pick(self.id(self.rows[i], i), on); });
-        } else { var tr = box.closest('tr'), it = self.items[+tr.dataset.n]; self.pick(self.id(self.rows[it.i], it.i), box.checked); self.anchor = +tr.dataset.n; }
-        self.selectionChanged();
+        var box = e.target; if (!box.matches('thead [data-check] input[type="checkbox"]')) return;
+        /* Select All picks exactly the rows the filter shows; off clears */
+        if (box.checked) self.sel.all('all'); else self.sel.clear('clear');
       });
       /* editing: a real input that reads as text. Enter (or leaving it) saves, Escape puts it back */
       t.addEventListener('keydown', function (e) {
@@ -4783,22 +5059,21 @@ S4.register('accordion', function (scope) {
         S4.util.emit(t, 's4-row-action', { action: e.detail.value, row: self.menuRow, id: self.menuId });
       });
       if (this.bar) this.bar.addEventListener('click', function (e) { if (e.target.closest('[data-selection-clear]')) self.clear(); });
-      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && self.selected.size && t.contains(document.activeElement) && !document.activeElement.matches('.s4-table-input')) { self.clear(); } });
     },
-    clear: function () { var self = this; Array.from(this.selected).forEach(function (id) { self.pick(id, false); }); this.selectionChanged(); },
-    range: function (a, b) {
-      var self = this;
-      for (var n = Math.min(a, b); n <= Math.max(a, b); n++) { var it = this.items[n]; if (it && it.t === 'r') this.pick(this.id(this.rows[it.i], it.i), true); }
-      this.selectionChanged();
-    },
+    clear: function () { this.sel.clear('api'); return this; },
     keys: function (e) {
       if (e.defaultPrevented) return;
       var self = this, a = document.activeElement, tr = a && a.closest && a.closest('tbody tr[data-n]');
       if (!tr || !this.body.contains(tr)) return;
-      var n = +tr.dataset.n, it = this.items[n], onRow = a === tr, page = Math.max(1, Math.floor(this.wrap.clientHeight / this.est.r) - 2);
+      var n = +tr.dataset.n, it = this.items[n], onRow = a === tr, page = this.pageSize();
       var dir = rtl(this.table) ? -1 : 1, k = e.key;
-      if (k === 'ArrowUp' && !e.shiftKey && n === 0 && this.headTo()) { e.preventDefault(); return; }
-      if (k === 'ArrowDown' || k === 'ArrowUp') { e.preventDefault(); if (e.shiftKey && it.t === 'r') { this.pick(this.id(this.rows[it.i], it.i), true); } this.go(n + (k === 'ArrowDown' ? 1 : -1)); if (e.shiftKey) { var it2 = this.items[this.current]; if (it2 && it2.t === 'r') this.pick(this.id(this.rows[it2.i], it2.i), true); this.selectionChanged(); } return; }
+      if (k === 'ArrowUp' && !e.shiftKey && !e.ctrlKey && !e.metaKey && n === 0 && this.headTo()) { e.preventDefault(); return; }
+      if (k === 'Escape' && !onRow) { e.preventDefault(); e.stopPropagation(); tr.focus({ preventScroll: true }); return; }
+      /* selecting several (decision 0078): Shift with Up, Down, PageUp, PageDown, Home or End extends the rows from the anchor,
+         from the row or from a cell (Orion selects rows, never cell ranges); Ctrl with them moves without selecting; Space
+         and Shift+Space on the row; Ctrl+A every row shown; Escape clears. Plain Home and End stay the row's start and end. */
+      if (this.multi() && (k !== ' ' || onRow) && this.sel.keydown(e, n)) return;
+      if (k === 'ArrowDown' || k === 'ArrowUp') { e.preventDefault(); this.go(n + (k === 'ArrowDown' ? 1 : -1)); return; }
       if (k === 'PageDown' || k === 'PageUp') { e.preventDefault(); this.go(n + (k === 'PageDown' ? page : -page)); return; }
       /* Ctrl+Home and Ctrl+End: the first and last row; Home and End: the start and end of this row (the grid pattern) */
       if ((k === 'Home' || k === 'End') && (e.ctrlKey || e.metaKey || it.t !== 'r')) { e.preventDefault(); this.go(k === 'Home' ? 0 : this.items.length - 1); return; }
@@ -4819,14 +5094,11 @@ S4.register('accordion', function (scope) {
       var fwd = (k === 'ArrowRight' && dir > 0) || (k === 'ArrowLeft' && dir < 0), back = (k === 'ArrowLeft' && dir > 0) || (k === 'ArrowRight' && dir < 0);
       if (fwd && ts.length) { e.preventDefault(); var nx = ts[Math.min(ts.length - 1, ti + 1)]; nx.focus({ preventScroll: true }); this.scrollCell(nx); return; }
       if (back) { e.preventDefault(); if (ti <= 0) { tr.focus({ preventScroll: true }); this.scrollCell(tr.cells[0]); } else { ts[ti - 1].focus({ preventScroll: true }); this.scrollCell(ts[ti - 1]); } return; }
-      if (k === 'Escape' && !onRow) { e.preventDefault(); e.stopPropagation(); tr.focus({ preventScroll: true }); return; }
       if (onRow) {
         var id = this.id(this.rows[it.i], it.i);
-        if (k === ' ' && this.table.querySelector('thead [data-check]')) { e.preventDefault(); this.pick(id); this.anchor = n; this.selectionChanged(); return; }
         if (k === 'Enter') { e.preventDefault(); this.activate(tr); return; }
         if (k === 'F10' && e.shiftKey || k === 'ContextMenu') { var m = tr.querySelector('.s4-table-row-menu'); if (m) { e.preventDefault(); m.click(); } return; }
         if ((k === '+' || k === '-') && tr.querySelector('.s4-table-expand')) { e.preventDefault(); this.expand(id, k === '+'); return; }
-        if (k === 'a' && (e.ctrlKey || e.metaKey) && this.table.querySelector('thead [data-check]')) { e.preventDefault(); this.view.forEach(function (i) { self.pick(self.id(self.rows[i], i), true); }); this.selectionChanged(); return; }
       }
       /* a cell that edits: Enter puts the cursor in it (a key press is the person asking, decision 0049) */
       if (a.matches('td[data-edit]') && (k === 'Enter' || k === 'F2')) { e.preventDefault(); var inp = a.querySelector('input'); inp.defaultValue = inp.value; inp.focus({ preventScroll: true }); inp.select(); return; }
@@ -4851,10 +5123,11 @@ S4.register('accordion', function (scope) {
        on the table leaves the visible line out (the description stays). */
     hint: function () {
       var t = this.table;
-      if (!t.hasAttribute('aria-description')) t.setAttribute('aria-description', 'Arrow keys move between rows and cells. Up from the first row reaches the column headers: Left and Right move between each column\'s sort, options and resize controls, and Down returns to the rows.');
+      var many = this.multi();
+      if (!t.hasAttribute('aria-description')) t.setAttribute('aria-description', 'Arrow keys move between rows and cells. ' + (many ? 'Space selects a row; Shift with Up, Down, Home, End or a click selects a range; Ctrl with a click adds or removes one, with the arrows moves without selecting; Ctrl+A selects every row shown; Escape clears. ' : '') + 'Up from the first row reaches the column headers: Left and Right move between each column\'s sort, options and resize controls, and Down returns to the rows.');
       if (t.getAttribute('data-hint') === 'off' || !this.wrap || (this.wrap.nextElementSibling && this.wrap.nextElementSibling.classList.contains('s4-table-hint'))) return;
       var h = document.createElement('p'); h.className = 's4-table-hint'; h.setAttribute('aria-hidden', 'true');
-      h.textContent = 'Up from the first row reaches the column headers: Left and Right choose sort, options or resize, Down comes back.';
+      h.textContent = (many ? 'Shift with the arrows or a click selects a range, Ctrl adds one, Ctrl+A selects all. ' : '') + 'Up from the first row reaches the column headers: Left and Right choose sort, options or resize, Down comes back.';
       this.wrap.parentNode.insertBefore(h, this.wrap.nextSibling);
       /* a touch screen with a keyboard (decision 0069): the line stays out of the way until a navigation key is pressed inside
          the table, whatever the pointer, then it shows like anywhere else (data-keys, table.css) */
@@ -5077,10 +5350,73 @@ S4.register('table', function (scope) {
       a.indeterminate = n > 0 && n < b.length;
     }
     function selected() { return boxes().filter(function (b) { return b.checked; }).map(function (b) { return b.closest('tr'); }); }
+    /* selecting several (decision 0078): the shared model, keyed by the row itself (rows keep their identity when sorted);
+       the checkboxes are the data. One Tab stop for the rows (the grid pattern): arrows move, Right reaches the row's controls. */
+    var rows = function () { return boxes().map(function (b) { return b.closest('tr'); }); };
+    var multi = !!all();
+    var sel = multi && S4.util.multiselect({
+      count: function () { return rows().length; },
+      key: function (i) { return rows()[i]; },
+      index: function (tr) { return rows().indexOf(tr); },
+      read: selected,
+      focus: function (i) { var tr = rows()[i]; if (tr) rove(tr, true); return i; },
+      page: function () { var w = table.closest('.s4-table-wrap'), r = table.tBodies[0] && table.tBodies[0].rows[0]; return w && r ? Math.max(1, Math.floor(w.clientHeight / (r.offsetHeight || 52)) - 1) : 10; },
+      apply: function (added, removed) { var set = function (on) { return function (tr) { var x = tr.querySelector('[data-check] input[type="checkbox"]'); if (x) x.checked = on; paint(tr); }; }; added.forEach(set(true)); removed.forEach(set(false)); syncAll(); },
+      changed: function (d) { S4.util.emit(table, 's4-change', { type: 'select', rows: selected(), count: selected().length, added: d.added, removed: d.removed, why: d.why }); }
+    });
+    function paint(tr) { var b = tr.querySelector('[data-check] input[type="checkbox"]'); tr.setAttribute('aria-selected', String(!!(b && b.checked))); }
+    function rove(tr, focus) {
+      rows().forEach(function (r) { var want = r === tr ? 0 : -1; if (r.tabIndex !== want) r.tabIndex = want; });
+      if (focus) { tr.focus({ preventScroll: true }); if (tr.scrollIntoView) tr.scrollIntoView({ block: 'nearest' }); }
+    }
+    function controls(tr) { return slice(tr.querySelectorAll('a[href], button, input, select, textarea')).filter(function (x) { return !x.disabled && x.getClientRects().length; }); }
+    if (multi) {
+      table.setAttribute('role', 'grid'); table.setAttribute('aria-multiselectable', 'true'); table.setAttribute('data-s4-multiselect', '');
+      if (!table.hasAttribute('aria-description')) table.setAttribute('aria-description', 'Up and Down move between rows, Right reaches a row\'s controls. Space selects a row; Shift with Up, Down, Home, End or a click selects a range; Ctrl with a click adds or removes one; Ctrl+A selects every row; Escape clears.');
+      var setup = function () {
+        var list = rows(), cur = list.filter(function (r) { return r.tabIndex === 0 && r.hasAttribute('data-s4-rove'); })[0] || list[0];
+        list.forEach(function (r) { r.setAttribute('data-s4-rove', ''); paint(r); controls(r).forEach(function (x) { x.tabIndex = -1; }); });
+        if (cur) rove(cur);
+      };
+      setup(); table._s4rows = setup;
+      var pointer = 'mouse';
+      table.addEventListener('pointerdown', function (e) { pointer = e.pointerType; }, true);
+      table.addEventListener('click', function (e) {
+        if (table._s4data) return;
+        var tr = e.target.closest('tbody tr'), i = rows().indexOf(tr); if (i < 0) return;
+        var box = e.target.closest('[data-check] input[type="checkbox"]');
+        if (box) { if (e.shiftKey) sel.extend(i, e.ctrlKey || e.metaKey, 'range'); else sel.toggle(i, box.checked, 'toggle'); rove(tr); return; }
+        if (e.target.closest(INTERACTIVE)) return;
+        e.s4Handled = true;
+        if (pointer === 'touch' || pointer === 'pen') { if (selected().length || e.shiftKey || e.ctrlKey || e.metaKey) sel.click(e, i, 'toggle'); else { e.s4Handled = false; return; } }
+        else { sel.click(e, i, 'select'); rove(tr, true); }
+      });
+      table.addEventListener('dblclick', function (e) {
+        var tr = e.target.closest('tbody tr[tabindex]'); if (table._s4data || !tr || rows().indexOf(tr) < 0 || e.target.closest(INTERACTIVE)) return;
+        activate(tr, e);
+      });
+      table.addEventListener('focusin', function (e) { var tr = e.target.closest && e.target.closest('tbody tr'); if (tr && rows().indexOf(tr) >= 0) rove(tr); });
+      table.addEventListener('keydown', function (e) {
+        if (table._s4data) return;
+        var a = document.activeElement, tr = a && a.closest && a.closest('tbody tr'), i = rows().indexOf(tr); if (i < 0) return;
+        var onRow = a === tr, list = rows(), k = e.key, cs = controls(tr), ci = cs.indexOf(a), dir = getComputedStyle(table).direction === 'rtl' ? -1 : 1;
+        if (k === 'Escape' && !onRow) { e.preventDefault(); e.stopPropagation(); rove(tr, true); return; }
+        if ((k !== ' ' || onRow) && sel.keydown(e, i)) return;
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        if (k === 'ArrowDown' || k === 'ArrowUp') { e.preventDefault(); var to = list[Math.max(0, Math.min(list.length - 1, i + (k === 'ArrowDown' ? 1 : -1)))]; rove(to, true); return; }
+        if (k === 'PageDown' || k === 'PageUp') { e.preventDefault(); rove(list[Math.max(0, Math.min(list.length - 1, i + (k === 'PageDown' ? 1 : -1) * sel.o.page()))], true); return; }
+        var fwd = k === (dir > 0 ? 'ArrowRight' : 'ArrowLeft'), back = k === (dir > 0 ? 'ArrowLeft' : 'ArrowRight');
+        if (fwd && cs.length) { e.preventDefault(); cs[Math.min(cs.length - 1, ci + 1)].focus(); return; }
+        if (back && !onRow) { e.preventDefault(); if (ci <= 0) tr.focus(); else cs[ci - 1].focus(); return; }
+        if (k === 'Home' && !onRow) { e.preventDefault(); tr.focus(); return; }
+        if (k === 'End' && cs.length) { e.preventDefault(); cs[cs.length - 1].focus(); }
+      });
+    }
     table.addEventListener('change', function (e) {
       if (table._s4data) return;
       var box = e.target; if (!box.matches || !box.matches('[data-check] input[type="checkbox"]')) return;
-      if (box === all()) boxes().forEach(function (b) { b.checked = box.checked; });
+      if (box === all()) { if (sel) { if (box.checked) sel.all('all'); else sel.clear('clear'); return; } boxes().forEach(function (b) { b.checked = box.checked; }); }
+      if (sel) return;   /* a row's box: the model took its click */
       syncAll();
       S4.util.emit(table, 's4-change', { type: 'select', rows: selected() });
     });
@@ -5093,7 +5429,7 @@ S4.register('table', function (scope) {
       S4.util.emit(tr, 's4-select', { row: tr });
     }
     table.addEventListener('click', function (e) {
-      if (table._s4data) return;
+      if (table._s4data || e.s4Handled) return;
       var tr = e.target.closest('tbody tr[tabindex]'); if (!tr || !table.contains(tr)) return;
       if (e.target.closest(INTERACTIVE)) return;
       activate(tr, e);
@@ -5107,7 +5443,7 @@ S4.register('table', function (scope) {
     label();
     syncAll();
     /* rows added or removed later */
-    table._s4mo = new MutationObserver(function () { if (!table._s4data) { label(); syncAll(); } });
+    table._s4mo = new MutationObserver(function () { if (!table._s4data) { label(); syncAll(); if (table._s4rows) table._s4rows(); } });
     table._s4mo.observe(table, { childList: true, subtree: true });
     if (table.hasAttribute('data-resizable') || table.querySelector('th[data-pin]')) S4.tableColumns(table);
   });

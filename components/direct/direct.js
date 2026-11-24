@@ -9,8 +9,8 @@
       On a touch screen, drag a row sideways to uncover its actions; let go past half way and they stay; a long swipe (past a little over half
       the row) runs the action marked data-swipe-primary, which fills the uncovered strip to show it. The same buttons are always reachable by keyboard and are in the row's menu.
    3. Select several.  <ul data-selectable data-selection-bar="#bar"> and <div class="s4-selection-bar" id="bar" hidden>
-      Hold a row (or Ctrl/⌘-click it, or Shift-click for a range) to start selecting; after that a tap adds or removes a
-      row. The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
+      Hold a row (or Ctrl/⌘-click it, Shift-click for a range, or Shift+Space) to start selecting; after that a tap adds or
+      removes a row. The keys are the shared ones of decision 0078 (see below). The bar shows the count and the actions for all of them; inside a .s4-top-app-bar it takes the bar's place.
       Escape or [data-selection-clear] ends it. Fires s4-selection { items, count }. S4.selection.items(el) / clear(el) / all(el).
    Motion: Morph calm (rows making room and settling); nothing else animates while your finger is down. */
 (function () {
@@ -264,10 +264,18 @@
     }, 0);
   });
 
-  /* ---------- 3. select several ---------- */
+  /* ---------- 3. select several ----------
+     The shared selection model (decision 0078), keyed by the item itself (the markup's data-picked is the data). With a
+     mouse or the keyboard: Shift+click and Shift with the arrows, Home, End, PageUp or PageDown select the range from the
+     anchor, Ctrl/⌘+click adds or removes one (Ctrl+Shift+click adds a range), Ctrl/⌘ with the arrows moves without
+     selecting, Shift+Space selects from the anchor (and starts selecting), Space adds or removes while selecting,
+     Ctrl/⌘+A selects every item shown, Escape clears. Up and Down (and Left and Right in a grid of tiles) move between
+     items. A plain click opens the item until something is selected, then adds or removes it, as a tap does. */
   function sItems(el) { return Array.prototype.filter.call(el.querySelectorAll(':scope > li, :scope > [data-select-item], :scope > tr'), function (x) { return !x.matches('.s4-list-subheader'); }); }
+  function shown(el) { return sItems(el).filter(function (x) { return !x.hidden && x.getClientRects().length; }); }
   function picked(el) { return sItems(el).filter(function (x) { return x.hasAttribute('data-picked'); }); }
   function bar(el) { var s = el.getAttribute('data-selection-bar'); return s ? document.querySelector(s) : null; }
+  function face(item) { return item.querySelector(':scope > .s4-list-item, :scope > [data-swipe-face], :scope > button, :scope > a[href]') || item.querySelector('button, a[href], [tabindex]') || item; }
   function sync(el) {
     var items = picked(el), n = items.length, b = bar(el);
     el.toggleAttribute('data-selecting', n > 0);
@@ -282,15 +290,33 @@
     }
     S4.util.emit(el, 's4-selection', { items: items, count: n });
   }
-  function toggle(el, item, on) { item.toggleAttribute('data-picked', on === undefined ? !item.hasAttribute('data-picked') : on); el._s4anchor = item; sync(el); }
-  function clear(el) { picked(el).forEach(function (x) { x.removeAttribute('data-picked'); }); sync(el); }
+  var models = new WeakMap();
+  function model(el) {
+    var m = models.get(el); if (m) return m;
+    m = S4.util.multiselect({
+      count: function () { return shown(el).length; },
+      key: function (i) { return shown(el)[i]; },
+      index: function (x) { return shown(el).indexOf(x); },
+      read: function () { return picked(el); },
+      focus: function (i) { var x = shown(el)[i]; if (x) focusItem(x); return i; },
+      page: function () { var x = shown(el)[0]; return x ? Math.max(1, Math.floor(innerHeight / Math.max(24, x.offsetHeight)) - 1) * columns(el) : 10; },
+      apply: function (added, removed) { added.forEach(function (x) { x.setAttribute('data-picked', ''); }); removed.forEach(function (x) { x.removeAttribute('data-picked'); }); },
+      changed: function () { var a = m.index(m.anchor); el._s4anchor = a >= 0 ? m.anchor : el._s4anchor; sync(el); }
+    });
+    models.set(el, m); return m;
+  }
+  function focusItem(x) { var f = face(x); if (f === x && !x.hasAttribute('tabindex')) x.tabIndex = -1; f.focus({ preventScroll: true }); if (f.scrollIntoView) f.scrollIntoView({ block: 'nearest' }); }
+  /* tiles in a grid: how many sit on the first line */
+  function columns(el) { var xs = shown(el), top = xs[0] && xs[0].offsetTop, n = 0; while (n < xs.length && xs[n].offsetTop === top) n++; return Math.max(1, n); }
+  function toggle(el, item, on) { var m = model(el), i = m.index(item); if (i >= 0) m.toggle(i, on); else { item.toggleAttribute('data-picked', on === undefined ? !item.hasAttribute('data-picked') : on); el._s4anchor = item; sync(el); } }
+  function clear(el) { if (!model(el).clear()) sync(el); }
   S4.selection = {
     items: picked, clear: clear,
-    all: function (el) { sItems(el).forEach(function (x) { if (!x.hidden) x.setAttribute('data-picked', ''); }); sync(el); },
+    all: function (el) { if (!model(el).all()) sync(el); },
     toggle: function (el, item, on) { toggle(el, item, on); }
   };
   function itemOf(el, t) { var x = t; while (x && x.parentElement !== el) x = x.parentElement; return x && sItems(el).indexOf(x) >= 0 ? x : null; }
-  var holdDone = false;
+  var holdDone = false, swallow = 0;
   document.addEventListener('pointerdown', function (e) {
     holdDone = false;
     if (!e.target.closest || e.pointerType === 'mouse') return;
@@ -311,24 +337,47 @@
     var el = e.target.closest('[data-selectable]'); if (!el) return;
     var item = itemOf(el, e.target); if (!item) return;
     if (holdDone) { holdDone = false; e.preventDefault(); e.stopPropagation(); return; }   /* the tap that ended the hold */
+    if (!e.detail && Date.now() - swallow < 400) { e.preventDefault(); e.stopPropagation(); return; }   /* the click a selection key would have made */
     var pick = e.target.closest('[data-select-toggle]');
     if (!(el.hasAttribute('data-selecting') || e.ctrlKey || e.metaKey || e.shiftKey || pick)) return;
     if (e.target.closest('.s4-swipe-actions, .s4-drag-handle')) return;
     e.preventDefault(); e.stopPropagation();
-    if (e.shiftKey && el._s4anchor) {
-      var all = sItems(el), a = all.indexOf(el._s4anchor), z = all.indexOf(item);
-      all.slice(Math.min(a, z), Math.max(a, z) + 1).forEach(function (x) { x.setAttribute('data-picked', ''); });
-      sync(el);
-    } else toggle(el, item);
+    var m = model(el), i = m.index(item);
+    if (i < 0) toggle(el, item); else m.click(e, i, 'toggle');
+    if (e.shiftKey || e.ctrlKey || e.metaKey) focusItem(item);   /* the pressed item holds focus, so the keyboard carries on from it */
   }, true);
   document.addEventListener('keydown', function (e) {
+    if (e.defaultPrevented || !e.target.closest) return;
+    var el = e.target.closest('[data-selectable]');
+    if (el && !e.target.closest('.s4-swipe-actions, .s4-drag-handle, input, textarea, select, [contenteditable]')) {
+      var item = itemOf(el, e.target), m = model(el), i = item ? m.index(item) : -1;
+      if (i >= 0) {
+        var k = e.key, mod = e.ctrlKey || e.metaKey, cols = columns(el), rtl = getComputedStyle(el).direction === 'rtl';
+        /* a plain Space opens the item until something is selected (it is a button), then adds or removes it */
+        if ((k === ' ' || k === 'Spacebar') && !e.shiftKey && !mod && !el.hasAttribute('data-selecting')) return;
+        if (cols > 1 && (k === 'ArrowLeft' || k === 'ArrowRight') && !e.altKey) {
+          var step = (k === 'ArrowRight') !== rtl ? 1 : -1, to = Math.max(0, Math.min(m.n() - 1, i + step));
+          e.preventDefault(); m.o.focus(to); if (e.shiftKey) m.extend(to, false, 'range'); return;
+        }
+        if (cols > 1 && (k === 'ArrowDown' || k === 'ArrowUp') && !e.altKey) {
+          var to2 = Math.max(0, Math.min(m.n() - 1, i + (k === 'ArrowDown' ? cols : -cols)));
+          e.preventDefault(); if (e.shiftKey && m.index(m.anchor) < 0) m.setAnchor(i); m.o.focus(to2); if (e.shiftKey) m.extend(to2, false, 'range'); return;
+        }
+        if (m.keydown(e, i)) { if (k === ' ' || k === 'Spacebar') swallow = Date.now(); return; }
+        if ((k === 'ArrowDown' || k === 'ArrowUp' || ((k === 'Home' || k === 'End') && e.target === face(item))) && !e.altKey && !mod) {
+          e.preventDefault(); m.o.focus(k === 'Home' ? 0 : k === 'End' ? m.n() - 1 : Math.max(0, Math.min(m.n() - 1, i + (k === 'ArrowDown' ? 1 : -1)))); return;
+        }
+      }
+    }
     if (e.key !== 'Escape') return;
+    /* Escape ends selecting, unless something open took it first (a menu, a dialog, a panel) */
+    if (document.querySelector('dialog[open], :popover-open')) return;
     var any = false;
-    document.querySelectorAll('[data-selectable][data-selecting]').forEach(function (el) { any = true; clear(el); });
+    document.querySelectorAll('[data-selectable][data-selecting]').forEach(function (s) { any = true; clear(s); });
     if (any) e.preventDefault();
   });
   S4.register('direct', function (scope) {
-    S4.util.all(scope, '[data-selectable]').forEach(function (el) { if (S4.util.once(el, 'selectable')) { var b = bar(el); if (b) b.hidden = true; } });
+    S4.util.all(scope, '[data-selectable]').forEach(function (el) { if (S4.util.once(el, 'selectable')) { el.setAttribute('data-s4-multiselect', ''); var b = bar(el); if (b) b.hidden = true; } });
     S4.util.all(scope, '.s4-drag-handle').forEach(function (h) { if (!h.hasAttribute('aria-pressed')) h.setAttribute('aria-pressed', 'false'); });
   });
 })();

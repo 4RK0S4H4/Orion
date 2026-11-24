@@ -142,25 +142,31 @@
   /* ---------- selection ---------- */
   var anchors = new WeakMap();
   function selected(tree) { return Array.prototype.slice.call(tree.querySelectorAll('.s4-tree-item[aria-selected="true"]')); }
+  /* selecting is the shared model (decision 0078): the items you can see, in order, keyed by the item itself; the
+     markup (aria-selected) is the data. A plain arrow or click selects the one it lands on (as in a source list). */
+  var models = new WeakMap(), lastItem = null;
+  function model(tree) {
+    var m = models.get(tree); if (m) return m;
+    m = S4.util.multiselect({
+      multi: function () { return multi(tree); },
+      count: function () { return visible(tree).length; },
+      key: function (i) { return visible(tree)[i]; },
+      index: function (item) { return visible(tree).indexOf(item); },
+      read: function () { return selected(tree); },
+      focus: function (i) { var to = visible(tree)[i]; if (to) { focus(to); lastItem = to; } return i; },
+      page: function () { var r = tree.querySelector('.s4-tree-row'), h = r ? r.offsetHeight : 40, box = tree.closest('.s4-split-pane, .s4-pane, .s4-nav-rail') || tree; return Math.max(1, Math.floor(Math.min(box.clientHeight || 400, innerHeight) / h) - 1); },
+      apply: function (added, removed) { added.forEach(function (x) { x.setAttribute('aria-selected', 'true'); }); removed.forEach(function (x) { x.setAttribute('aria-selected', 'false'); }); },
+      changed: function (d) { S4.util.emit(tree, 's4-change', { items: selected(tree), item: lastItem, added: d.added, removed: d.removed, why: d.why }); }
+    });
+    models.set(tree, m); return m;
+  }
   function select(item, opts) {
     opts = opts || {};
-    var tree = treeOf(item), many = multi(tree), before = selected(tree);
-    if (opts.range && many) {
-      var all = visible(tree), a = anchors.get(tree) || item, i = all.indexOf(a), j = all.indexOf(item);
-      if (i < 0) i = j;
-      var lo = Math.min(i, j), hi = Math.max(i, j);
-      if (!opts.add) before.forEach(function (x) { x.setAttribute('aria-selected', 'false'); });
-      all.slice(lo, hi + 1).forEach(function (x) { x.setAttribute('aria-selected', 'true'); });
-    } else if (opts.add && many) {
-      item.setAttribute('aria-selected', String(item.getAttribute('aria-selected') !== 'true'));
-      anchors.set(tree, item);
-    } else {
-      before.forEach(function (x) { if (x !== item) x.setAttribute('aria-selected', 'false'); });
-      item.setAttribute('aria-selected', 'true');
-      anchors.set(tree, item);
-    }
-    var now = selected(tree);
-    if (now.length !== before.length || now.some(function (x, k) { return x !== before[k]; })) S4.util.emit(tree, 's4-change', { items: now, item: item });
+    var tree = treeOf(item), m = model(tree), i = visible(tree).indexOf(item); if (i < 0) return;
+    lastItem = item;
+    if (opts.range && multi(tree)) m.extend(i, !!opts.add, 'range');
+    else if (opts.add && multi(tree)) m.toggle(i, undefined, 'toggle');
+    else m.only(i, 'select');
   }
 
   /* ---------- rename (F2, Enter on a Mac, or a command) ---------- */
@@ -225,6 +231,7 @@
     S4.util.all(scope, '.s4-tree').forEach(function (tree) {
       if (!S4.util.once(tree, 'tree')) { return; }
       prepare(tree);
+      if (multi(tree)) tree.setAttribute('data-s4-multiselect', '');
       var typed = '', typedAt = 0, apple = S4.desktop && /mac|ios/.test(S4.desktop.platform);
 
       tree.addEventListener('click', function (e) {
@@ -234,7 +241,8 @@
         var row = e.target.closest('.s4-tree-row'), item = row && row.parentElement; if (!item || item.hasAttribute('data-loading')) return;
         var mod = apple ? e.metaKey : e.ctrlKey;
         if (e.target.closest('.s4-tree-toggle') && groupOf(item)) { open(item); focus(item, false); return; }
-        select(item, { add: mod, range: e.shiftKey });
+        lastItem = item;
+        if (!model(tree).click(e, visible(tree).indexOf(item), 'select')) select(item);
         focus(item, false);
         /* a folder in a single-select tree opens and closes with a click on its row, as in a sidebar */
         if (!multi(tree) && !mod && !e.shiftKey && groupOf(item) && tree.hasAttribute('data-open-on-click')) open(item);
@@ -259,6 +267,11 @@
         var item = e.target.closest('.s4-tree-item'); if (!item || e.target.closest('.s4-tree-rename') || e.target !== item) return;
         var all = visible(tree), i = all.indexOf(item), rtl = getComputedStyle(tree).direction === 'rtl';
         var mod = apple ? e.metaKey : e.ctrlKey, many = multi(tree), to = null;
+        if (e.key === 'Escape' && clip) { e.preventDefault(); cut([]); clip = null; return; }
+        /* Shift with the arrows, Home, End, PageUp and PageDown extends; Ctrl or ⌘ with them moves without selecting;
+           Space and Shift+Space; mod+A; Escape clears (decision 0078) */
+        lastItem = item;
+        if (many && !(mod && /^[xv]$/i.test(e.key)) && model(tree).keydown(e, i)) return;
         var inward = rtl ? 'ArrowLeft' : 'ArrowRight', outward = rtl ? 'ArrowRight' : 'ArrowLeft';
         if (e.key === 'ArrowDown') to = all[i + 1];
         else if (e.key === 'ArrowUp') to = all[i - 1];
@@ -268,12 +281,9 @@
         else if (e.key === outward) { e.preventDefault(); if (groupOf(item) && isOpen(item)) { open(item, false); return; } to = parentItem(item); if (!to) return; }
         else if (e.key === 'Enter' && !mod) { e.preventDefault(); if (apple && !e.shiftKey) rename(item); else if (groupOf(item)) open(item); else S4.util.emit(tree, 's4-select', { item: item }); return; }
         else if (e.key === 'F2') { e.preventDefault(); rename(item); return; }
-        else if (e.key === ' ' && many) { e.preventDefault(); select(item, { add: true }); return; }
         else if (e.key === '*') { e.preventDefault(); var p = item.parentElement; Array.prototype.forEach.call(p.children, function (s) { if (s.classList.contains('s4-tree-item') && groupOf(s)) open(s, true); }); return; }
-        else if (mod && !e.shiftKey && e.key.toLowerCase() === 'a' && many) { e.preventDefault(); all.forEach(function (x) { x.setAttribute('aria-selected', 'true'); }); S4.util.emit(tree, 's4-change', { items: selected(tree), item: item }); return; }
         else if (mod && !e.shiftKey && e.key.toLowerCase() === 'x') { e.preventDefault(); cut(selected(tree).length ? selected(tree) : [item]); return; }
         else if (mod && !e.shiftKey && e.key.toLowerCase() === 'v' && clip) { e.preventDefault(); paste(item); return; }
-        else if (e.key === 'Escape' && clip) { e.preventDefault(); cut([]); clip = null; return; }
         else if (e.key.length === 1 && /\S/.test(e.key) && !mod && !e.altKey) {
           typed = (Date.now() - typedAt > 600 ? '' : typed) + e.key.toLowerCase(); typedAt = Date.now();
           var order = all.slice(i + (typed.length === 1 ? 1 : 0)).concat(all.slice(0, i + (typed.length === 1 ? 1 : 0)));
@@ -285,7 +295,7 @@
         e.preventDefault();
         focus(to);
         if (many && mod) return;                       /* move without selecting */
-        select(to, { range: many && e.shiftKey });
+        select(to);
       });
       tree.addEventListener('focusin', function (e) { var item = e.target.closest('.s4-tree-item'); if (item && e.target === item) { tree.querySelectorAll('.s4-tree-item[tabindex="0"]').forEach(function (x) { if (x !== item) x.tabIndex = -1; }); item.tabIndex = 0; } });
 
