@@ -232,6 +232,17 @@ An app that offers appearance settings uses exactly these, so every app feels th
   that never rejects and shows the snackbar. Never call `navigator.clipboard.writeText` yourself; the page checker fails it.
 - Code that measures layout once (a custom sliding highlight) calls `S4.util.onLayoutChange(fn)` to measure again when `dir`, `lang` or a type dial changes.
 
+## Focus, Undo and numbers (decision 0076)
+
+- **Focus never falls to `<body>`.** Before your code hides or removes something that may hold focus (a bar, a button that becomes a progress
+  bar, a row), call `S4.util.release(box, to)`: focus moves to `to` (an element, or nothing for main). After an edit commits, a cancel, an Undo or
+  a command, the keyboard must still be somewhere: the suite and the checker fail `<body>`.
+- **Undo.** `S4.snackbar({ text, action: 'Undo', onAction })`: several in a row each stay undoable (newest first) and focus goes back to what had it.
+  Removing table rows: `var gone = table.remove(ids)` then `table.restore(gone)` in Undo (the rows return where they were; `rows.concat(gone)` does not).
+- **Numbers.** A table column `data-edit="number"` refuses garbage out loud; add `data-required`, `data-min`, `data-max` and `data-format="integer"` as the data needs.
+- **Pages from an id.** In `s4-open`, if the id is not in your data call `event.preventDefault()`: the page does not open and the URL keeps the view's address.
+- **Swipe rows** need their actions in the row's markup (they take Tab); starting a selection by keyboard is Shift+Space.
+
 ## Saving data
 
 - Small apps: `localStorage` under one key per app (`'<app-name>-data'`), JSON, written after each change. Wrap reads in

@@ -301,7 +301,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
   themselves; never position or size them. `data-persistent` blocks tap-outside and swipe. A filter or inspector panel
   is `data-modeless` with no Apply button.
 - Confirmation after an action: **snackbar** with Undo. Naming an icon: **tooltip**.
-- Confirm only what can't be undone. Prefer Undo in a snackbar.
+- Confirm only what can't be undone. Prefer Undo in a snackbar. Before hiding what may hold focus, `S4.util.release(box, to)`; restore removed table rows with `table.restore` (see patterns.md, decision 0076).
 
 **Motion** (decision 0046: ten named patterns, nothing else; full table in `references/motion.md`)
 - In CSS a transition names a pattern token: `transition: transform var(--s4-motion-ink), background-color var(--s4-motion-state);` State (color, opacity), Ink (a state fill moving), Morph (a control's own shape or size), Bend (an icon turning). Never a raw duration, easing, spring token or `transition: all`.

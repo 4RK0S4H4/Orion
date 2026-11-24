@@ -5,6 +5,14 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
+## Also now (2026-11-23, round 0063, branch `round63/qa2`): the second Full QA pass, findings fixed (decision 0076, issues 84 to 102)
+
+A fresh agent's second pass (`history/round-0063/qa-2.md`: 18 findings, six major) is fixed at the roots: focus never falls to `<body>` (`S4.util.release`, table, inline edit,
+snackbar, doc tabs, commands), swipe actions take Tab, the Showcase follows Back and Forward, the column grip is reachable, number cells refuse garbage, Undo restores
+the index and several Undos each stay undoable, Reset clears errors, palette, code field, select keys, deep links to missing ids, contrast dial words. The suite's
+`qa2Audit`, `tests/checker.mjs` (clipboard marker) and `tests/back.mjs` prove them. **Next:** publish both round 0063 branches (the main session), then pass 3 where pass 2
+did not reach (WebKit and Firefox, dark mode for the new flows, real devices and screen readers); exit of stage 6d is no open issue from any pass, then review 5 and the dated 1.2.0.
+
 ## Also now (2026-11-23, round 0063, branch `round63/upgrade`): "update to latest Orion" (decision 0075, issue 83)
 
 An app knows its Orion version (`<meta name="orion">` in every page, `orion.json` at its root; core.js and the page checker catch a mismatch), every

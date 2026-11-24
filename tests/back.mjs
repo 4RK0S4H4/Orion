@@ -88,6 +88,29 @@ for (const t of TARGETS) for (const v of VIEWS) {
   say(!errs.length, `no script errors${errs.length ? ': ' + errs[0] : ''}`);
   await ctx.close();
 }
+/* decision 0076 (QA pass 2, issue 86): the screen follows the URL. After N view switches, Back N times lands on the first view and
+   Forward walks to the last, and at every step the visible view, the nav item marked current and the hash agree. */
+for (const file of ['demo/index.html', 'examples/brand-trial/index.html']) for (const v of VIEWS) {
+  const ctx = await browser.newContext(v), page = await ctx.newPage();
+  console.log(`${file}: Back and Forward change the screen at ${v.name} (issue 86)`);
+  await page.goto(`${ORIGIN}/${file}`, { waitUntil: 'load' }); await page.waitForTimeout(700);
+  const state = () => page.evaluate(() => {
+    const shown = [...document.querySelectorAll('.s4-app .s4-view')].filter((x) => !x.hidden).map((x) => x.dataset.view);
+    const cur = [...document.querySelectorAll('.s4-app .s4-nav-item[aria-current="page"][data-view]')].filter((x) => x.getClientRects().length).map((x) => x.dataset.view);
+    return { shown: shown.join(), cur: cur.join(), hash: location.hash.slice(1).split('/')[0] };
+  });
+  const names = await page.evaluate(() => [...new Set([...document.querySelectorAll('.s4-app .s4-nav-item[data-view]')].filter((x) => x.getClientRects().length).map((x) => x.dataset.view))]);
+  const first = (await state()).shown;
+  const seq = names.filter((n) => n !== first).slice(0, 2);
+  const agree = async (what, want) => { await page.waitForTimeout(800); const s = await state(); say(s.shown === want && (!s.cur || s.cur === want) && (!s.hash || s.hash === want || want === first), `${what}: view "${s.shown}", nav "${s.cur}", hash "#${s.hash}" (wanted "${want}")`); };
+  if (seq.length < 2) { say(false, 'fewer than three views to switch between'); await ctx.close(); continue; }
+  for (const n of seq) { await page.locator(`.s4-app .s4-nav-item[data-view="${n}"]:visible`).first().click(); await agree(`switch to ${n}`, n); }
+  await page.goBack(); await agree('Back', seq[0]);
+  await page.goBack(); await agree('Back again', first);
+  await page.goForward(); await agree('Forward', seq[0]);
+  await page.evaluate((n) => { location.hash = '#' + n; }, seq[1]); await agree(`location.hash = #${seq[1]}`, seq[1]);
+  await ctx.close();
+}
 /* round 0061: a place-holder that takes focus on the way (a view, the main landmark) rings only for the keyboard. On an
    iPhone a tap focuses no link, so the view takes focus after every switch, and WebKit counts a script's focus as
    :focus-visible: the whole screen was outlined. The tap is replayed as iOS does it (pointerdown, then a click that moves

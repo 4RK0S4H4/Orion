@@ -108,7 +108,7 @@ accessibility, so some scores fell although nothing got worse.
    iPhone. Window controls like Windows' and nothing wrapping mid-motion (decision 0072, issues 69 and 70, with
    `midmotion.mjs`); a ring round the whole phone screen and the round nav bar highlight (issues 71 and 72); intake from
    app sessions (this file's Triage step, `from-app` form, `docs/issues/inbox.md`).
-6d. **Full QA pass** (current: pass 1 done and its findings fixed in round 0062, decision 0073, issues 73 to 81; pass 2 next, before any area counts as a 10 and before release 1.2): a bug hunt separate from the design
+6d. **Full QA pass** (current: pass 1 done and fixed in round 0062, decision 0073, issues 73 to 81; pass 2 done and fixed in round 0063, decision 0076, issues 84 to 102; pass 3 on what neither reached, WebKit and Firefox, real devices, before any area counts as a 10 and before release 1.2): a bug hunt separate from the design
    reviews, by a fresh agent that did not build the work, over every component page, template, example and the Showcase.
    - **Covers:** every interactive state (hover, press, focus, disabled, selected, error, loading, empty); mid-motion
      frames with `midmotion.mjs` for every motion; phone 320 to 430 and desktop 1280 to 1920; dark and light; every dial

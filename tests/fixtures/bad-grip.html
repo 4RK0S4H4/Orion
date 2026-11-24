@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="orion" content="1.2.0">
+<title>Bad Grip</title>
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+/* the old rule (decision 0076): the grip overhangs its header by 8px, under the next sticky header, so the border itself hits the neighbour */
+.s4-table-grip { inset-inline-end: -8px; }
+.s4-table[data-resizable] thead th { position: sticky; inset-block-start: 0; }
+</style>
+</head>
+<body>
+<main class="s4-content">
+  <h1>Records</h1>
+  <div class="s4-table-wrap">
+    <table class="s4-table" data-resizable>
+      <caption class="s4-visually-hidden">Records</caption>
+      <thead><tr><th scope="col">Taxon</th><th scope="col">Family</th><th scope="col">Collector</th></tr></thead>
+      <tbody><tr><td>Limosa limosa</td><td>Scolopacidae</td><td>H. Whitlow</td></tr><tr><td>Strix aluco</td><td>Strigidae</td><td>A. Marsh</td></tr></tbody>
+    </table>
+  </div>
+</main>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

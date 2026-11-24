@@ -1274,7 +1274,6 @@ async function qa2Audit(ctx, rel, add) {
         b.blur();
       });
       document.querySelectorAll('.s4-table-grip').forEach((g) => {
-        g.scrollIntoView({ block: 'nearest', inline: 'nearest' });
         const r = g.getBoundingClientRect(); if (!r.width || !r.height) return;
         for (const f of [0.5, 0.25, 0.75]) {
           const x = r.left + r.width * f, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
@@ -1451,6 +1450,7 @@ let ran = 0, skipped = [];
 
 async function runPage(browser, bname, rel, mode, reduced) {
   const label = `${bname} ${reduced ? 'reduced-motion' : mode.key}  ${rel}`;
+  if (process.env.SUITE_PROGRESS) console.error('run ' + label);
   const ctx = await browser.newContext({ viewport: mode.viewport, colorScheme: mode.colorScheme, reducedMotion: reduced ? 'reduce' : 'no-preference', hasTouch: mode.phone && bname !== 'firefox', deviceScaleFactor: 1 });
   const page = await ctx.newPage();
   const found = new Set(), add = (m) => found.add(m);
@@ -1561,6 +1561,7 @@ async function pressAudit(page, add) {
 
 async function runDialPage(browser, preset, rel, mode) {
   const label = `chromium dials ${preset.key} ${mode.key}  ${rel}`;
+  if (process.env.SUITE_PROGRESS) console.error('run ' + label);
   const ctx = await browser.newContext({ viewport: mode.viewport, colorScheme: mode.colorScheme, hasTouch: false, deviceScaleFactor: 1 });
   const page = await ctx.newPage();
   const found = new Set(), add = (m) => found.add(m);

@@ -11,6 +11,8 @@
      bad-rail-motion.html  a rail whose labels follow its moving edge and wrap mid-motion (issue 70)
      bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
      bad-clipboard.html a bare clipboard.writeText (page checker and npm run check:clipboard; decision 0073)
+     bad-swipe.html, bad-grip.html  a swipe action nothing can focus, a column grip covered by the next header (decision 0076)
+     bad-clipboard-marker.html  a second call under the helper's exemption marker (decision 0076)
      bad-overfull.html  a control whose label is wider than its box (decision 0073)
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
      bad-stamp.html     <meta name="orion"> says 0.9.0 but the page loads this version (decision 0075)
@@ -38,6 +40,8 @@ const CASES = [
   ['bad-nav-hover-box.html', /the hover layer of "Settings" is \d+x\d+ at -?\d+,-?\d+ from the selected highlight/, 'a nav tab hover layer narrower than the selected highlight'],
   ['bad-clipboard.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a bare clipboard.writeText call'],
   ['bad-clipboard-marker.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a second call under the helper\'s exemption marker'],
+  ['bad-swipe.html', /a swipe action that cannot take focus[^\n]*decision 0076/, 'a swipe action hidden until swiped (no keyboard path)'],
+  ['bad-grip.html', /the column grip is covered at \d+% of its width by [^\n]*, so the border cannot be grabbed/, 'a column grip that overhangs under the next header'],
   ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-stamp.html', /this page is stamped Orion 0\.9\.0 \(meta name="orion"\) but loads Orion \d+\.\d+\.\d+/, 'a stamp that disagrees with the loaded files'],
@@ -106,6 +110,11 @@ for (const [key, val] of Object.entries(BAD)) {
   const wrote = await page.evaluate(([k, v, a]) => { S4.theme({ [k]: v }); return document.documentElement.getAttribute(a); }, [key, val, ATTR[key]]);
   expect(wrote !== String(val) && !(key === 'contrast' && wrote === 'high'), `${key}: "${val}" is not written to <html> (found ${JSON.stringify(wrote)})`);
   expect(warns.some((w) => /^S4: theme /.test(w) && w.includes(`"${val}"`) && /use .+\./.test(w)), `${key}: "${val}" warns and names the allowed values`);
+}
+/* every value a dial lists is accepted without a warning (decision 0076: the list is the contract; contrast listed words S4.theme refused) */
+{
+  const listed = await page.evaluate(() => { const w = []; const real = console.warn; console.warn = (m) => w.push(String(m)); const out = []; const D = S4.theme.dials; const KEY = { 'data-contrast': 'contrast', 'data-theme': 'mode', 'data-accent-variant': 'variant', 'data-corners': 'corners', 'data-gray': 'gray', 'data-page': 'page', 'data-energy': 'energy', 'data-scale': 'scale', 'data-headings': 'headings', 'data-surfaces': 'surfaces' }; for (const attr of Object.keys(KEY)) for (const v of D[attr] || []) { w.length = 0; S4.theme({ [KEY[attr]]: v }); if (w.some((m) => /^S4: theme /.test(m))) out.push(attr + '=' + v); } console.warn = real; S4.theme({ contrast: 0, mode: 'system', corners: 'round', gray: 'pure', page: 'plain', energy: 'standard', scale: 'default', headings: 'default', variant: 'auto', surfaces: 'neutral' }); return out; });
+  expect(listed.length === 0, `every value a dial lists is accepted by S4.theme (refused: ${listed.join(', ') || 'none'})`);
 }
 /* the same on a container, and the good values still work */
 warns.length = 0;

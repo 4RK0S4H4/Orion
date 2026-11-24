@@ -3,7 +3,7 @@
    the page (pass it to page.evaluate); none of them changes the page.
      knownClasses()   async: every s4- name the page's stylesheets and scripts know (Orion's and the app's own), kept on
                       window.__s4known for the audit below
-     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...], nav: [...], overfull: [...] }
+     silentAudit()    { unknown: [...], broken: [...], container: [...], loud: [...], nav: [...], overfull: [...], reach: [...] }
        unknown        an s4- class nothing defines (a misremembered name such as .s4-card-content styles nothing)
        broken         a word split across lines, or a box one glyph wide (a column too narrow for its words: a table
                       that cannot stack, a FAB squeezed into a rail)
@@ -32,7 +32,7 @@ export async function knownClasses() {
 }
 
 export function silentAudit() {
-  const out = { unknown: [], broken: [], container: [], loud: [], nav: [], overfull: [] };
+  const out = { unknown: [], broken: [], container: [], loud: [], nav: [], overfull: [], reach: [] };
   const TRUNCATES = '.s4-timeline-label, .s4-app-bar-title, .s4-app-bar-collapsed-title, .s4-titlebar-title, .s4-date-picker-value';   /* the five places (decision 0058) */
   const known = new Set(window.__s4known || []);
   const skip = (e) => !!e.closest('[data-s4-skip], iframe, template, pre, code, .s4-code, svg, [hidden], [inert], [aria-hidden="true"], .s4-visually-hidden');
@@ -128,6 +128,26 @@ export function silentAudit() {
     const tol = 1;
     const side = c.left < r.left - tol ? 'start' : c.right > r.right + tol ? 'end' : '';
     if (side) { wide++; out.overfull.push(`${path(el)} holds ${Math.round(c.width)}px of content in a ${Math.round(r.width)}px box, ${Math.round(Math.max(r.left - c.left, c.right - r.right))}px past its ${side} edge ("${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 20)}")`); }
+  }
+
+  /* decision 0076: what the pointer can do, the keyboard can too, and a handle is hit where it is drawn. A swipe row's first action
+     must be able to take focus (a hidden or inert strip is no keyboard path); a column grip must be the element under its own
+     middle and quarter points (a grip under the next header cannot be grabbed at the border). */
+  for (const row of document.querySelectorAll('[data-swipe]')) {
+    const b = row.querySelector(':scope > .s4-swipe-actions button, :scope > .s4-swipe-actions a[href]');
+    if (!b || skip(row) || !row.getClientRects().length) continue;
+    b.focus({ preventScroll: true });
+    if (document.activeElement !== b) out.reach.push(`${path(b)}: a swipe action that cannot take focus (visibility: hidden or display: none until swiped): there is no keyboard path to it`);
+    b.blur();
+  }
+  for (const g of document.querySelectorAll('.s4-table-grip')) {
+    if (skip(g)) continue;
+    const r = g.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    for (const f of [0.5, 0.25, 0.75]) {
+      const x = r.left + r.width * f, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
+      const t = document.elementFromPoint(x, y);
+      if (t !== g && !g.contains(t)) { out.reach.push(`${path(g)}: the column grip is covered at ${Math.round(f * 100)}% of its width by ${t ? path(t) : 'nothing'}, so the border cannot be grabbed`); break; }
+    }
   }
 
   /* the nav bar's highlight (round 0061): where the icon sits over the label it holds both, so it is a rounded rectangle

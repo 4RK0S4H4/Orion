@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="orion" content="1.2.0">
+<title>Bad Swipe</title>
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+/* the old rule (decision 0076): the strip is hidden until swiped, so its buttons can never take Tab */
+.s4-swipe-actions { visibility: hidden; }
+[data-swipe]:is([data-swiping], [data-swiped]) > .s4-swipe-actions { visibility: visible; }
+</style>
+</head>
+<body>
+<main class="s4-content">
+  <h1>Messages</h1>
+  <ul class="s4-list">
+    <li data-swipe><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Invoice for October</span></span></div><div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Invoice for October"><span class="s4-icon" data-icon="archive"></span></button></div></li>
+    <li data-swipe><div class="s4-list-item"><span class="s4-list-content"><span class="s4-list-headline">Contract renewal</span></span></div><div class="s4-swipe-actions"><button class="s4-icon-button" data-variant="tonal" type="button" aria-label="Archive Contract renewal"><span class="s4-icon" data-icon="archive"></span></button></div></li>
+  </ul>
+</main>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

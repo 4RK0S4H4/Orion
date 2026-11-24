@@ -10,6 +10,19 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
 
+QA pass 2 (round 0063, decision 0076, issues 84 to 102): the second Full QA pass found 18 things; all are fixed at their root.
+
+- Fixed: focus no longer falls to `<body>` after a table or inline edit, Undo, a hidden selection bar, a removed row, a moved card, a closed document tab or a keyboard command. New `S4.util.release(box, to)`.
+- Fixed: swipe actions take Tab (they were `visibility: hidden`); starting a selection by keyboard is documented (Shift+Space).
+- Fixed: the Showcase (any `.s4-app` with views) follows the browser's Back and Forward; `hashchange` switches the view.
+- Fixed: the column-resize grip lives inside its header, so its whole box is reachable.
+- Fixed: number cells (`data-edit="number"`) refuse garbage with `aria-invalid` and a message; `data-min`, `data-max`, `data-required`, `data-format="integer"` apply. The number field no longer reads "1,5" as 15.
+- Changed: `S4.snackbar` keeps several pending Undos (newest first) and returns focus to what had it.
+- Added: `table.restore(rows)` and `.at` on `table.remove()`'s result: Undo puts rows back where they were; the filter's count follows the table.
+- Fixed: `.s4-form` Reset clears errors; palette list follows its box, End, PageDown, Enter with no match; code field takes a paste over a full code; select trigger opens on Down, Up, Home, End and letters; inline edit says `aria-invalid`; pasted color codes are trimmed; an empty board draft says so.
+- Added: `s4-open` on a page is cancelable (a missing id opens nothing and leaves the URL alone); `S4.theme({ contrast })` takes `standard`, `medium`, `high`.
+- Fixed: `check:clipboard` and the page checker exempt only `S4.util.copy`'s own call.
+
 Versions and upgrades (decision 0075, issue 83): "update to latest Orion" in an app's session now works with no guesswork.
 
 - Changed: one version. `package.json` says 1.2.0 (it said 1.1.0 while the runtime said 1.0.0); the build writes it into `S4.version`, every banner and the tokens.
