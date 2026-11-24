@@ -142,12 +142,17 @@ export function silentAudit() {
   }
   for (const g of document.querySelectorAll('.s4-table-grip')) {
     if (skip(g)) continue;
-    const r = g.getBoundingClientRect(); if (!r.width || !r.height) continue;
+    /* a wide table scrolls inside its wrap: bring the grip to the middle of the wrap first (a grip scrolled under a pinned column is
+       reachable by scrolling, not covered), then put the scroll back */
+    const wrap = g.closest('.s4-table-wrap'), was = wrap ? wrap.scrollLeft : 0;
+    if (wrap && wrap.scrollWidth > wrap.clientWidth) { const a = g.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollLeft += (a.left + a.width / 2) - (w.left + w.width / 2); }
+    const r = g.getBoundingClientRect(); if (!r.width || !r.height) { if (wrap) wrap.scrollLeft = was; continue; }
     for (const f of [0.5, 0.25, 0.75]) {
       const x = r.left + r.width * f, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
       const t = document.elementFromPoint(x, y);
       if (t !== g && !g.contains(t)) { out.reach.push(`${path(g)}: the column grip is covered at ${Math.round(f * 100)}% of its width by ${t ? path(t) : 'nothing'}, so the border cannot be grabbed`); break; }
     }
+    if (wrap) wrap.scrollLeft = was;
   }
 
   /* the nav bar's highlight (round 0061): where the icon sits over the label it holds both, so it is a rounded rectangle

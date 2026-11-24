@@ -1274,12 +1274,15 @@ async function qa2Audit(ctx, rel, add) {
         b.blur();
       });
       document.querySelectorAll('.s4-table-grip').forEach((g) => {
-        const r = g.getBoundingClientRect(); if (!r.width || !r.height) return;
+        const wrap = g.closest('.s4-table-wrap'), was = wrap ? wrap.scrollLeft : 0;   /* a grip scrolled under a pinned column is reachable by scrolling: centre it first */
+        if (wrap && wrap.scrollWidth > wrap.clientWidth) { const a = g.getBoundingClientRect(), w = wrap.getBoundingClientRect(); wrap.scrollLeft += (a.left + a.width / 2) - (w.left + w.width / 2); }
+        const r = g.getBoundingClientRect(); if (!r.width || !r.height) { if (wrap) wrap.scrollLeft = was; return; }
         for (const f of [0.5, 0.25, 0.75]) {
           const x = r.left + r.width * f, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
           const t = document.elementFromPoint(x, y);
           if (t !== g && !g.contains(t)) { o.push(`a column grip is covered at ${Math.round(f * 100)}% of its width by ${t ? t.tagName.toLowerCase() + '.' + String(t.className).split(' ')[0] : 'nothing'}: grabbing the border hits the neighbour (decision 0076)`); break; }
         }
+        if (wrap) wrap.scrollLeft = was;
       });
       return o;
     })).forEach(add);
