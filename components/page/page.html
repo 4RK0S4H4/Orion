@@ -70,7 +70,8 @@
 <script>
 var orders = document.getElementById('pg-orders');
 document.querySelector('[data-page="order"]').addEventListener('s4-open', function (e) {
-  var row = orders.querySelector('[data-page-id="' + e.detail.id + '"]') || orders.querySelector('[data-page-id]');
+  var row = orders.querySelector('[data-page-id="' + e.detail.id + '"]');
+  if (!row) { e.preventDefault(); return; }   /* an id that is not there opens nothing and the URL keeps its place (decision 0076) */
   var bits = row.querySelector('.s4-list-supporting').textContent.split(' · '), state = row.querySelector('.s4-status');
   document.getElementById('pg-title').textContent = row.querySelector('.s4-list-headline').textContent;
   this.dataset.title = row.querySelector('.s4-list-headline').textContent;

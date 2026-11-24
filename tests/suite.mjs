@@ -1331,16 +1331,15 @@ async function qa2Audit(ctx, rel, add) {
         const th = [...document.querySelectorAll('table.s4-table th[data-edit="number"]')].find((t) => t.getClientRects().length); if (!th) return null;
         const table = th.closest('table'), idx = [...th.parentElement.children].indexOf(th);
         const tr = [...table.tBodies[0].querySelectorAll('tr[data-n]')].find((r) => r.cells[idx] && r.cells[idx].querySelector('input')); if (!tr) return null;
-        tr.cells[idx].setAttribute('data-qa-cell', ''); return { before: tr.cells[idx].querySelector('input').value };
+        tr.cells[idx].setAttribute('data-qa-cell', ''); return { before: tr.cells[idx].querySelector('input').value, required: th.hasAttribute('data-required'), integer: th.dataset.format === 'integer' };
       });
       if (!info) return;
       const cell = p.locator('[data-qa-cell]');
       await cell.scrollIntoViewIfNeeded(); await cell.focus();
       for (const [typed, why] of [['abc', 'text'], ['1e3', 'an exponent'], ['3.7', 'a fraction in a whole-number column'], ['', 'nothing (a required column)']]) {
+        if ((typed === '' && !info.required) || (typed === '3.7' && !info.integer)) continue;   /* a blank is a legal value in a column that is not required (and re-renders the cell); a fraction is legal outside whole-number columns */
         await p.keyboard.press('Enter'); await p.keyboard.press('Control+a'); if (typed) await p.keyboard.type(typed); else await p.keyboard.press('Backspace'); await p.keyboard.press('Enter'); await p.waitForTimeout(120);
         const s = await cell.evaluate((c) => { const i = c.querySelector('input'); return { v: i.value, inv: i.getAttribute('aria-invalid') }; });
-        if (typed === '' && !(await cell.evaluate((c) => c.closest('table').tHead.rows[0].cells[c.cellIndex].hasAttribute('data-required')))) continue;
-        if (typed === '3.7' && (await cell.evaluate((c) => c.closest('table').tHead.rows[0].cells[c.cellIndex].dataset.format)) !== 'integer') continue;
         if (s.v !== info.before || s.inv !== 'true') add(`a number cell took ${why} (${JSON.stringify(typed)}): value now "${s.v}", aria-invalid ${s.inv} (it must keep "${info.before}" and say so; decision 0076)`);
         await notBody(`a number cell after ${why}`);
       }
@@ -1386,6 +1385,7 @@ async function qa2Audit(ctx, rel, add) {
     if (await has('form.s4-form [required]')) await flow('form reset', async () => {
       const r = await p.evaluate(async () => {
         const f = [...document.querySelectorAll('form.s4-form')].find((x) => x.querySelector('[required]') && x.getClientRects().length); if (!f) return null;
+        f.addEventListener('submit', (e) => e.preventDefault(), true);   /* a valid template form with no handler would navigate; only its marks matter here */
         f.requestSubmit(); await new Promise((x) => setTimeout(x, 80));
         const had = f.querySelectorAll('[data-error], [aria-invalid="true"]').length;
         f.reset(); await new Promise((x) => setTimeout(x, 80));
@@ -1430,7 +1430,8 @@ async function qa2Audit(ctx, rel, add) {
     })).forEach(add);
 
     /* a deep link to a page id that is not there: no page under a lying URL (or a visible not-found state) */
-    const names = await p.evaluate(() => [...document.querySelectorAll('.s4-subpage[data-page]')].map((e) => e.dataset.page));
+    /* only a page that is opened with an id (an opener names data-page-id) has an id that can be missing; a page with none (a library, a customer) ignores the id */
+    const names = await p.evaluate(() => [...document.querySelectorAll('.s4-subpage[data-page]')].map((e) => e.dataset.page).filter((n) => document.querySelector(`[data-page-open="${n}"][data-page-id]`)));
     const view = await p.evaluate(() => { const v = document.querySelector('.s4-view[data-view]'); return v ? v.dataset.view : ''; });
     if (names.length && view) for (const name of names.slice(0, 2)) await flow('deep link', async () => {
       const q = await ctx.newPage(); q.on('pageerror', () => {});
@@ -1511,7 +1512,25 @@ for (const bname of want) {
   const jobs = [];
   for (const rel of targets) { for (const mode of MODES) jobs.push([rel, mode, false]); if (bname === 'chromium' && /^(demo|templates)\//.test(rel)) jobs.push([rel, MODES[0], true]); }
   let i = 0;
-  await Promise.all(Array.from({ length: WORKERS }, async () => { while (i < jobs.length) { const [rel, mode, reduced] = jobs[i++]; await runPage(browser, bname, rel, mode, reduced); } }));
+  /* a browser that dies mid-run (a renderer or GPU crash, seen once after about 3 minutes of contexts) is relaunched and the page
+     it was on is run again; a page that kills the browser twice is a failure, not a hang or a crash of the suite */
+  let relaunching = null;
+  const revive = async (dead) => { if (browser !== dead) return; relaunching = relaunching || (async () => { try { await dead.close(); } catch (e) {} browser = await pw[bname].launch(); relaunching = null; })(); await relaunching; };
+  await Promise.all(Array.from({ length: WORKERS }, async () => {
+    while (i < jobs.length) {
+      const [rel, mode, reduced] = jobs[i++];
+      for (let attempt = 1; ; attempt++) {
+        const b = browser;
+        try { await runPage(b, bname, rel, mode, reduced); break; }
+        catch (e) {
+          if (b.isConnected() && !/closed|crash/i.test(String(e.message))) throw e;
+          if (attempt >= 2) { failures.push({ label: `${bname} ${mode.key}  ${rel}`, list: ['the browser died twice on this page: ' + String(e.message).split('\n')[0]] }); break; }
+          console.error(`browser died on ${rel} (${mode.key}); relaunching and running it again`);
+          await revive(b);
+        }
+      }
+    }
+  }));
   await browser.close();
 }
 
