@@ -15,6 +15,7 @@ component are in `components.md`. Live demo app: https://4rk0s4h4.github.io/Orio
 - One accent job per screen
 - Making it the app's own (from the brand trial)
 - Theme controls
+- Selecting several
 - Saving data
 - Theming API
 - From the product templates
@@ -242,6 +243,23 @@ An app that offers appearance settings uses exactly these, so every app feels th
 - **Numbers.** A table column `data-edit="number"` refuses garbage out loud; add `data-required`, `data-min`, `data-max` and `data-format="integer"` as the data needs.
 - **Pages from an id.** In `s4-open`, if the id is not in your data call `event.preventDefault()`: the page does not open and the URL keeps the view's address.
 - **Swipe rows** need their actions in the row's markup (they take Tab); starting a selection by keyboard is Shift+Space.
+
+## Selecting several (decision 0078)
+
+- Every collection that selects several uses Orion's one selection model (`core/select.js`): `S4.table` or a `.s4-table` with a
+  select column, a `.s4-list[role="listbox"][aria-multiselectable="true"]`, a `.s4-tree[aria-multiselectable="true"]`, or
+  `data-selectable` (select several). Never hand-roll selection: the page checker fails a multi-select collection the model
+  does not drive.
+- What people get, everywhere: click selects one (in a select-several list, a click opens until something is selected),
+  Shift+click a range from the anchor, Ctrl/⌘+click one more, Ctrl+Shift+click another range, a row's checkbox one more;
+  Shift with the arrows, Home, End, Page Up and Page Down extend, Ctrl with the arrows moves without selecting, Space and
+  Shift+Space, Ctrl/⌘+A every item shown (rows not drawn too), Escape clears. Touch is unchanged (hold, then tap). Each change
+  is said ("12 selected"). Single-select collections ignore the range keys.
+- In a data table read the selection from data, never the DOM: `table.selection()` (ids), `table.selectedRows()`,
+  `table.select(ids, { add })`, `table.clear()`, and `s4-change` with `type: 'select'` (`ids`, `count`, `hidden`, `added`,
+  `removed`, `why`). Selected rows a filter hides stay selected and the bar says "N Not Shown"; act on what the bar counts.
+- A data table with a select column: a mouse click on a row selects it; the row opens by its own link, Enter or a
+  double-click. Give every row a link or `data-page-open` in its name cell so a single click can still open it.
 
 ## Saving data
 

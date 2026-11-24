@@ -3,7 +3,10 @@
      <li role="none"><div class="s4-list-item" role="option" aria-selected="true" data-value="checking">…</div></li>
    </ul>
    One option is in the tab order (roving tabindex). Up/Down/Home/End move focus; click, Enter or Space selects.
-   Single select moves aria-selected; multi select toggles it. Fires s4-select { item, value, selected } on the item and
+   Single select moves aria-selected; multi select toggles it, and takes the shared selection keys (decision 0078):
+   Shift+click and Shift with Up, Down, Home, End, PageUp or PageDown select the range from the anchor, Ctrl/⌘+click
+   adds or removes one, Ctrl/⌘ with the arrows moves without selecting, Shift+Space selects to the focused option,
+   Ctrl/⌘+A selects every option, Escape clears. Fires s4-select { item, value, selected } on the item and
    s4-change { value } on the list (value is an array for multi select). Plain lists of links need no script. */
 S4.register('list', function (scope) {
   S4.util.all(scope, '.s4-list[role="listbox"]').forEach(function (list) {
@@ -40,19 +43,24 @@ S4.register('list', function (scope) {
       S4.util.emit(list, 's4-change', { value: value() });
     }
 
+    var model = multi && S4.util.listbox && S4.util.listbox(list, enabled, focus, value);   /* the shared keys (core/select.js); the site bundle has none, so there a multi listbox keeps plain toggling */
+
     list.addEventListener('click', function (e) {
       var o = e.target.closest('.s4-list-item[role="option"]');
-      if (o && list.contains(o)) select(o);
+      if (!o || !list.contains(o)) return;
+      if (model) { if (o.getAttribute('aria-disabled') === 'true') return; model.click(e, enabled().indexOf(o), 'toggle'); focus(o); }
+      else select(o);
     });
     list.addEventListener('keydown', function (e) {
       var o = e.target.closest('.s4-list-item[role="option"]'); if (!o) return;
       var all = enabled(), i = all.indexOf(o), next = null;
+      if (model && model.keydown(e, i)) return;
       switch (e.key) {
         case 'ArrowDown': next = all[Math.min(i + 1, all.length - 1)]; break;
         case 'ArrowUp': next = all[Math.max(i - 1, 0)]; break;
         case 'Home': next = all[0]; break;
         case 'End': next = all[all.length - 1]; break;
-        case 'Enter': case ' ': e.preventDefault(); select(o); return;
+        case 'Enter': case ' ': e.preventDefault(); if (model) model.toggle(i); else select(o); return;
         default: return;
       }
       e.preventDefault();

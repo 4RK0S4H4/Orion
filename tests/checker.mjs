@@ -13,6 +13,7 @@
      bad-window-inset.html     Close's layer nearer the window's end edge than its top edge, Minimize inset differently (decision 0077)
      bad-clipboard.html a bare clipboard.writeText (page checker and npm run check:clipboard; decision 0073)
      bad-swipe.html, bad-grip.html  a swipe action nothing can focus, a column grip covered by the next header (decision 0076)
+     bad-select.html                a multi-select listbox and grid that the selection model does not drive (decision 0078)
      bad-clipboard-marker.html  a second call under the helper's exemption marker (decision 0076)
      bad-overfull.html  a control whose label is wider than its box (decision 0073)
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
@@ -42,6 +43,8 @@ const CASES = [
   ['bad-clipboard.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a bare clipboard.writeText call'],
   ['bad-clipboard-marker.html', /calls clipboard\.writeText directly; use S4\.util\.copy/, 'a second call under the helper\'s exemption marker'],
   ['bad-swipe.html', /a swipe action that cannot take focus[^\n]*decision 0076/, 'a swipe action hidden until swiped (no keyboard path)'],
+  ['bad-select.html', /div#bs-tags: a collection that selects several that Orion's selection model does not drive[^\n]*decision 0078/, 'a multi-select listbox written by hand (no Shift, Ctrl+A or Escape)'],
+  ['bad-select.html', /table\.bs-grid: a collection that selects several that Orion's selection model does not drive/, 'a hand-made grid that says aria-multiselectable'],
   ['bad-grip.html', /the column grip is covered at \d+% of its width by [^\n]*, so the border cannot be grabbed/, 'a column grip that overhangs under the next header'],
   ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],

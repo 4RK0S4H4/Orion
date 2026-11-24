@@ -5,6 +5,14 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
+## Also now (2026-11-24, round 0064, branch `round64/tsel`): selecting several the desktop way (decision 0078, issue 104)
+
+The owner asked for Shift ranges and the like in tables. One selection model (`core/select.js`) now drives data and static tables with a select
+column, multi-select trees and listboxes and select-several lists: click, Shift+click, Ctrl+click, Ctrl+Shift+click, Shift and Ctrl with the
+arrows, Home, End and Page keys, Space, Shift+Space, Ctrl+A, Escape; touch unchanged. The suite's `selectAudit` drives every collection on every
+page; `tests/fixtures/bad-select.html` proves the checker rule. **Next:** publish with the other round 0064 branch (the main session); the owner
+tries it on the data table.
+
 ## Also now (2026-11-23, round 0063, branch `round63/qa2`): the second Full QA pass, findings fixed (decision 0076, issues 84 to 102)
 
 A fresh agent's second pass (`history/round-0063/qa-2.md`: 18 findings, six major) is fixed at the roots: focus never falls to `<body>` (`S4.util.release`, table, inline edit,

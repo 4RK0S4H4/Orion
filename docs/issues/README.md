@@ -24,6 +24,15 @@ labelled `from-app` (form `.github/ISSUE_TEMPLATE/from-app.yml`) or as entries i
 `issues/<app>-<date>`. Every round starts by moving each of them here, numbered, with its image in `img/` (the Triage step
 in [`../PLAN.md`](../PLAN.md)).
 
+## Requests (2026-11-24)
+
+- **104.** Done 2026-11-24 (round 0064, decision 0078). Tables and lists with the keyboard and the mouse the desktop way (owner, 2026-11-24): "I'd like
+  tables to work with keyboards btw, like holding shift after selecting a row, then selecting another row and having it select everything in between,
+  stuff like that." Root: four collections selected several four ways, none anchored a range and none had a test. Built: one selection model
+  (`core/select.js`) for data and static tables, trees, listboxes and select-several lists (click, Shift, Ctrl and Ctrl+Shift clicks; Shift and Ctrl
+  with the arrows, Home, End and Page keys; Space, Shift+Space, Ctrl+A, Escape; announced; touch unchanged). Proof: the suite's `selectAudit`,
+  `tests/fixtures/bad-select.html`.
+
 ## Requests (2026-11-23)
 
 - **83.** Done 2026-11-23 (round 0063, decision 0075). Updating apps to the latest Orion (owner, 2026-11-23): "I want this design language to be easily

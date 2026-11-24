@@ -46,7 +46,7 @@ const cssRepo = banner('stylesheet') + inlineCss(comp).join('\n');
 const cssSkill = banner('stylesheet') + inlineCss(comp, '.').join('\n');
 
 /* ---------- JS ---------- */
-const jsOrder = ['core/core.js', 'motion/motion.js'];
+const jsOrder = ['core/core.js', 'core/select.js', 'motion/motion.js'];   /* core/select.js: the selection model (decision 0078), core pack, not the site bundle */
 for (const rel of imports) {
   const dir = rel.split('/')[0];
   const js = `${dir}/${dir}.js`;
@@ -148,8 +148,8 @@ const PACK_ATTRS = {
 const packOf = {};
 for (const [pk, dirs] of Object.entries(PACKS)) for (const d of dirs) { if (!imports.some((f) => f.split('/')[0] === d)) problems.push(`packs: ${d} is not a component stylesheet`); packOf[d] = pk; }
 const dirOf = (f) => (f.startsWith('../') ? 'tokens' : f.split('/')[0]);
-const APP_BUDGET = { core: { css: 44, js: 38 }, packs: { data: 42, commands: 12, desktop: 13, direct: 10, inputs: 35, sitekit: 10 }, leanTemplate: 170 };   /* gzip KB, a little above what is built; npm run check fails past any of them (the full bundle is held at FULL_BUDGET) */
-const FULL_BUDGET = { css: 66, js: 120 };
+const APP_BUDGET = { core: { css: 44, js: 40 }, packs: { data: 44, commands: 12, desktop: 13, direct: 10, inputs: 35, sitekit: 10 }, leanTemplate: 170 };   /* core js 38 -> 40 and data 42 -> 44 for the shared selection model and the keyboard of static tables (decision 0078) */   /* gzip KB, a little above what is built; npm run check fails past any of them (the full bundle is held at FULL_BUDGET) */
+const FULL_BUDGET = { css: 66, js: 124 };   /* js 120 -> 124: selecting several with the keyboard and the mouse (decision 0078) */
 const jsText = (f) => `/* ---- ${f} ---- */\n${compJs(f).trim()}\n`;
 const packFiles = {};   /* name -> { css, js } as written */
 {

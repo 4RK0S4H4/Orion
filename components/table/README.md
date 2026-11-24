@@ -108,9 +108,13 @@ t.setRows(rows);                      // 10,000 rows: only what is on screen is 
 
 Script: `setRows(rows)`, `filter(fn)`, `search(text, fields)`, `sort(field, 'ascending'|'descending'|null)`,
 `group(field|null)`, `expand(id, open)`, `update(id, patch)`, `remove(ids)` (returns the removed rows, for Undo),
-`selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown), `.selected`. Columns: `S4.tableColumns(table)`:
+`selection()` (the selected ids: the shown ones in the table's order, then any the filter hides), `select(ids, { add })`
+(`select('all')` is every row the filter shows), `selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown),
+`.selected` (the Set of selected ids). Columns: `S4.tableColumns(table)`:
 `width(field, px)`, `fit(field)`, `hide(field, on)`, `move(field, index)`, `pin(field, 'start'|'end'|'')`.
-Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `count`), `edit`
+Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `ids`, `count`,
+`hidden` (selected but filtered out), `added`, `removed`, `why`: `click`, `toggle`, `range`, `all`, `clear`, `escape` or
+`api`), `edit`
 (`field`, `value`, `previous`, `undo`), `update`, `resize`, `columns`; `s4-select { row, data }` when a row opens;
 `s4-toggle { id, open }` for details; `s4-row-action`. The [filter](../filter/) component drives `filter`, `search` and
 `sort` and writes them into the address.
@@ -129,9 +133,40 @@ column's sort button, its options button and its grip, in that order in every co
 last, Down to the body. On a grip, Shift with Left or Right resizes, or Enter (or F2) starts resizing with the plain
 arrows until Enter, Tab or Escape (which puts the width back). **Body** (the current row): Up and Down move a row (Up
 from the first row goes to the header), Page Up and Page Down a screen, Ctrl+Home and Ctrl+End the first and last row;
-Right and Left move through the row's controls and cells that edit, Home and End to the start and end of the row; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
-extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
+Right and Left move through the row's controls and cells that edit, Home and End to the start and end of the row; Enter opens the row (its `data-page-open` link) or edits a cell; `+` and `-` open and close details; Shift+F10 opens the row menu.
 On a group row, Enter or Right and Left open and close the group.
+
+**Selecting several (decision 0078),** in a table with a select column (`th[data-check]`), data or static: the desktop
+model of Windows Explorer and the macOS Finder, the same in every Orion collection (`core/select.js`).
+
+| Mouse | |
+|---|---|
+| Click a row | selects only that row and sets the anchor (a double-click, Enter or the row's own link opens it) |
+| Shift+click | the range from the anchor, replacing the last range drawn from it |
+| Ctrl+click (⌘ on a Mac) | adds or removes that row and moves the anchor |
+| Ctrl+Shift+click | adds the range to what is selected |
+| A row's checkbox | adds or removes that row, never clearing the others (Shift: the range) |
+| A tap (touch) | opens the row; while rows are picked a tap picks (select several on touch, unchanged) |
+
+| Keys (body) | |
+|---|---|
+| Up, Down, Page Up, Page Down | move focus; the selection stays |
+| Shift with Up, Down, Page Up, Page Down, Home, End | extend the range from the anchor to where focus lands (to the first or last row with Home and End) |
+| Ctrl with Up, Down, Page Up, Page Down | move focus without touching the selection (Ctrl+Home and Ctrl+End: the first and last row) |
+| Space | adds or removes the focused row (Ctrl+Space too) |
+| Shift+Space | selects from the anchor to the focused row (with nothing selected, starts at it) |
+| Ctrl+A (⌘A) | every row the filter shows, the ones not drawn too |
+| Escape | clears, when nothing else took the Escape first (a cell goes back to its row first, an edit is cancelled first, an open menu closes first) |
+
+Key conflicts, settled: rows are what is selected, never cell ranges, so Shift with Up or Down extends the rows from a
+cell too (focus moves to the row); Shift with Left and Right is not a selection key (in the header it resizes a column);
+plain Home and End stay the start and end of the row, so only Shift+Home and Shift+End reach the first and last row with
+the selection. Space on a row selects; on a control in a cell it presses the control. The selection is the data (ids),
+so it survives virtual scrolling, sorting and filtering; selected rows that a filter hides stay selected, and the bar
+says so (`12 Selected, 3 Not Shown`, said once in the live region); Select All and Ctrl+A select exactly the rows shown.
+Every change is said in a polite live region ("12 selected"). The table is `role="grid"` with
+`aria-multiselectable="true"` and every drawn row carries `aria-selected`. Text in cells is still selectable with a plain
+drag; a Shift+click never selects text. A table without a select column has no selection: a click opens the row.
 
 **Header keys, said out loud (decision 0067):** the header's sort, options and resize controls have no Tab stop, so
 nothing on screen shows how to reach them: the way is **Up from the first row**, then Left and Right, then Down to come
@@ -141,7 +176,11 @@ screen reader reads it with the table's name; write your own `aria-description` 
 reserved so nothing moves; in print never; on a touch screen it stays collapsed until the first navigation key is pressed in
 the table, so a tablet with a keyboard gets it too, decision 0069). `data-hint="off"` on the table leaves the visible line
 out when the page explains the keys itself (the description stays). Don't tell the person the keys in a tooltip on each
-header: the hint is one place.
+header: the hint is one place. In a table that selects several, both lead with the selection keys (decision 0078): the
+line reads "Shift with the arrows or a click selects a range, Ctrl adds one, Ctrl+A selects all. Up from the first row
+reaches the column headers…", and the description names Space, Shift, Ctrl, Ctrl+A and Escape. A static table with a
+select column gets the same keys and a description of its own (rows: one Tab stop, Up and Down move, Right reaches a
+row's controls, Escape comes back to the row).
 
 **The wrap:** a table always sits in `.s4-table-wrap` (the scroller, and the container that stacks rows under 600);
 table.js adds one around a bare `.s4-table`, unless its parent already scrolls sideways. Cells that do not stack keep

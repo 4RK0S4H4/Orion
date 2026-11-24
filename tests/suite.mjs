@@ -1445,6 +1445,122 @@ async function qa2Audit(ctx, rel, add) {
   await p.close();
 }
 
+/* decision 0078: every collection that selects several takes the desktop selection model, with the mouse and the keyboard.
+   Each one (a table with a select column, a multi-select tree or listbox, a data-selectable list) on a fresh copy of the
+   page: click, Shift+click, Shift+click back (the range is replaced), Ctrl+click, Shift+Up, Ctrl+Down (focus only), Space,
+   Escape, Ctrl+A (every row the filter shows, drawn or not), Shift+Space from no anchor, Shift+Home, Shift+PageDown; the
+   selected set and the focused item are checked after each, and the change is said. A select-several list opens its item on
+   a plain click, so it starts with Ctrl+click. A single-select listbox or tree ignores the range keys. */
+const SEL_KIT = `window.__qs = (() => {
+  const vis = (e) => e.getClientRects().length && !e.closest('[hidden], dialog:not([open])');
+  const kind = (c) => c.matches('table.s4-table') ? 'table' : c.matches('.s4-tree') ? 'tree' : c.matches('[role="listbox"]') ? 'listbox' : 'direct';
+  const find = () => [...document.querySelectorAll('table.s4-table, .s4-tree[aria-multiselectable="true"], [role="listbox"][aria-multiselectable="true"], [data-selectable]')]
+    .filter((c) => (!c.matches('table.s4-table') || c.querySelector('thead [data-check]')) && !c.closest('.s4-combobox-menu'));   /* a combobox's popup: typing and Enter pick */
+  const items = (c) => { const k = kind(c);
+    if (k === 'table') return [...c.tBodies[0].rows].filter((r) => r.querySelector(':scope > [data-check] input[type="checkbox"]') && vis(r));
+    if (k === 'tree') return [...c.querySelectorAll('.s4-tree-item')].filter((x) => vis(x));
+    if (k === 'listbox') return [...c.querySelectorAll('[role="option"]')].filter((x) => vis(x) && x.getAttribute('aria-disabled') !== 'true');
+    return [...c.children].filter((x) => (x.matches('li, [data-select-item], tr') && !x.matches('.s4-list-subheader')) && vis(x)); };
+  const on = (c, x) => { const k = kind(c); return k === 'table' ? x.querySelector(':scope > [data-check] input').checked : k === 'direct' ? x.hasAttribute('data-picked') : x.getAttribute('aria-selected') === 'true'; };
+  const total = (c) => c._s4data ? c._s4data.selected.size : items(c).filter((x) => on(c, x)).length;
+  const every = (c) => c._s4data ? c._s4data.view.length : items(c).length;
+  const at = (c, xs, a) => { const k = kind(c), own = k === 'tree' ? a.closest('.s4-tree-item') : k === 'listbox' ? a.closest('[role="option"]') : null; return own ? xs.indexOf(own) : xs.findIndex((x) => x.contains(a)); };
+  /* tiles in a grid (more than one on the first line): the audit moves along a line with Left and Right */
+  const grid = (c) => { const xs = items(c); return xs.length > 1 && Math.abs(xs[0].getBoundingClientRect().top - xs[1].getBoundingClientRect().top) < 2; };
+  const state = (c) => { const xs = items(c), a = document.activeElement; return { sel: xs.map((x, i) => on(c, x) ? i : -1).filter((i) => i >= 0), total: total(c), every: every(c), focus: at(c, xs, a), n: xs.length, text: (getSelection() + '').length,
+    said: [...document.querySelectorAll('[role="status"], [aria-live]')].map((e) => e.textContent).join(' | ') }; };
+  /* where to click an item: a cell or a part that is not a control of its own (a table cell with no button or link) */
+  const hit = (c, i) => { const k = kind(c), x = items(c)[i]; let t = x;
+    if (k === 'table') t = [...x.cells].find((td) => !td.matches('[data-check], [data-row-expand], [data-row-actions], [data-edit]') && !td.querySelector('a, button, input, select, textarea') && td.getBoundingClientRect().width > 24) || x;
+    else if (k === 'tree') t = x.querySelector(':scope > .s4-tree-row .s4-tree-label') || x;
+    else if (k === 'direct') t = x.querySelector('.s4-list-headline, .s4-list-content') || x.querySelector('button, a[href]') || x;
+    t.scrollIntoView({ block: 'center' });
+    const r = t.getBoundingClientRect(); return { x: r.left + Math.min(r.width / 2, 40), y: r.top + r.height / 2 }; };
+  return { find, items, state, hit, kind, vis, grid };
+})();`;
+async function selectAudit(ctx, rel, add) {
+  const probe = await ctx.newPage();
+  probe.on('pageerror', () => {});
+  let count = 0;
+  try {
+    await probe.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 }); await probe.waitForTimeout(700);
+    await probe.evaluate(SEL_KIT);
+    count = await probe.evaluate(() => __qs.find().length);
+    /* single select ignores the range keys: Shift+Down on a single-select listbox or tree selects one at most */
+    const singles = await probe.evaluate(() => [...document.querySelectorAll('[role="listbox"]:not([aria-multiselectable="true"]), .s4-tree:not([aria-multiselectable="true"])')].map((c, i) => { c.setAttribute('data-qs-single', i); const o = c.querySelector('[role="option"][tabindex="0"], .s4-tree-item[tabindex="0"]'); return o && __qs.vis(o) ? i : -1; }).filter((i) => i >= 0));
+    for (const i of singles) {
+      const what = await probe.evaluate((i) => { const c = document.querySelector(`[data-qs-single="${i}"]`), o = c && c.querySelector('[role="option"][tabindex="0"], .s4-tree-item[tabindex="0"]'); if (!o) return null; o.focus({ preventScroll: true }); return document.activeElement === o ? (c.getAttribute('role') || 'tree') + ' "' + (c.getAttribute('aria-label') || c.id) + '"' : null; }, i);
+      if (!what) continue;
+      await probe.keyboard.press('Shift+ArrowDown'); await probe.keyboard.press('Shift+ArrowDown');
+      const n = await probe.evaluate((i) => document.querySelector(`[data-qs-single="${i}"]`).querySelectorAll('[aria-selected="true"]').length, i);
+      if (n > 1) add(`selection: the single-select ${what} on ${rel} selected ${n} items with Shift+Down (single select ignores the range keys; decision 0078)`);
+    }
+  } catch (e) { add('selection audit could not open the page: ' + String(e.message).split('\n')[0].slice(0, 120)); }
+  await probe.close();
+  for (let ci = 0; ci < count; ci++) {
+    const p = await ctx.newPage(); p.on('pageerror', () => {});
+    const name = `${rel} collection ${ci + 1}`;
+    try {
+      await p.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 }); await p.waitForTimeout(700);
+      await p.evaluate(SEL_KIT);
+      /* a collection in a view that is not open: open that view */
+      const info = await p.evaluate(async (ci) => {
+        const c = __qs.find()[ci]; c.setAttribute('data-qs', '');
+        const v = c.closest('.s4-view[data-view][hidden]'), app = c.closest('.s4-app');
+        if (v && app && window.S4 && S4.app) { S4.app.go(app, v.dataset.view); await new Promise((r) => setTimeout(r, 900)); }
+        if (c._s4data && !c._s4data.loaded) await new Promise((r) => setTimeout(r, 900));
+        return { kind: __qs.kind(c), n: __qs.items(c).length, grid: __qs.grid(c), label: c.getAttribute('aria-label') || c.id || c.className.split(' ')[0], multi: c.getAttribute('aria-multiselectable') };
+      }, ci);
+      if (info.n < 4) { await p.close(); continue; }
+      const where = `selection (${info.kind} "${info.label}" on ${rel})`;
+      if (process.env.SUITE_PROGRESS) console.error('select ' + where + (info.grid ? ' (a grid)' : ''));
+      const st = () => p.evaluate(() => __qs.state(document.querySelector('[data-qs]')));
+      const click = async (i, mods = []) => { const h = await p.evaluate((i) => __qs.hit(document.querySelector('[data-qs]'), i), i); for (const m of mods) await p.keyboard.down(m); await p.mouse.click(h.x, h.y); for (const m of mods.slice().reverse()) await p.keyboard.up(m); await p.waitForTimeout(80); };
+      const key = async (k) => { if (info.grid) k = k.replace('ArrowUp', 'ArrowLeft').replace('ArrowDown', 'ArrowRight'); await p.keyboard.press(k); await p.waitForTimeout(60); };
+      const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+      let bad = 0;
+      const expect = async (step, sel, focus) => {
+        const s = await st();
+        if (bad > 2) return s;
+        if (sel && !same(s.sel, sel)) { bad++; add(`${where}: after ${step} the selected items are [${s.sel}], not [${sel}] (decision 0078)`); }
+        if (focus != null && s.focus !== focus) { bad++; add(`${where}: after ${step} focus is on item ${s.focus}, not ${focus} (decision 0078)`); }
+        return s;
+      };
+      if (info.kind !== 'direct' && info.multi !== 'true') add(`${where}: the collection selects several but does not say aria-multiselectable="true" (decision 0078)`);
+      /* 1. click, Shift+click, Shift+click back over the anchor, Ctrl+click */
+      if (info.kind === 'direct') await click(1, ['Control']); else await click(1);
+      await expect(info.kind === 'direct' ? 'Ctrl+click on item 1' : 'a click on item 1', [1], 1);
+      await click(3, ['Shift']);
+      let s = await expect('Shift+click on item 3', [1, 2, 3], 3);
+      if (s.text) add(`${where}: Shift+click selected ${s.text} characters of text (decision 0078: a range click selects rows, not text)`);
+      await p.waitForTimeout(150);
+      if (!/\b3 selected\b/i.test((await st()).said)) add(`${where}: nothing said "3 selected" in a live region after a range (decision 0078)`);
+      await click(0, ['Shift']); await expect('Shift+click on item 0 (the range from the anchor is replaced)', [0, 1], 0);
+      await click(3, ['Control']); await expect('Ctrl+click on item 3', [0, 1, 3], 3);
+      /* 2. the keyboard */
+      await key('Shift+ArrowUp'); await expect('Shift+Up from item 3', [0, 1, 2, 3], 2);
+      await key('Control+ArrowDown'); await expect('Ctrl+Down (moves without selecting)', [0, 1, 2, 3], 3);
+      await key('Space'); await expect('Space on item 3', [0, 1, 2], 3);
+      await key('Escape'); s = await expect('Escape', [], 3);
+      if (s.total) add(`${where}: Escape left ${s.total} selected (decision 0078)`);
+      await key('Control+a'); s = await st();
+      if (s.total !== s.every) add(`${where}: Ctrl+A selected ${s.total} of the ${s.every} items shown (it selects every item the filter shows, drawn or not; decision 0078)`);
+      await key('Escape');
+      await key('Shift+Space'); await expect('Shift+Space with nothing selected', [3], 3);
+      await key('Shift+ArrowUp'); await expect('Shift+Up', [2, 3], 2);
+      await key('Shift+Home'); await expect('Shift+Home', [0, 1, 2, 3], 0);
+      await key('Shift+PageDown'); s = await st();
+      const lo = Math.min(3, s.focus), hi = Math.max(3, s.focus), want = []; for (let i = lo; i <= hi; i++) want.push(i);
+      if (s.focus <= 0 || !same(s.sel, want) || (s.total !== want.length && s.focus < s.n - 1)) add(`${where}: Shift+PageDown left focus on ${s.focus} and [${s.sel.slice(0, 12)}${s.sel.length > 12 ? '…' : ''}] selected (${s.total} in all), not the range from the anchor (item 3) to the focus (decision 0078)`);
+      if (info.kind !== 'direct') {
+        const aria = await p.evaluate(() => { const c = document.querySelector('[data-qs]'), xs = __qs.items(c); return xs.filter((x) => { const on = c.matches('table') ? x.querySelector('[data-check] input').checked : x.getAttribute('aria-selected') === 'true'; return on !== (x.getAttribute('aria-selected') === 'true'); }).length; });
+        if (aria) add(`${where}: ${aria} items whose aria-selected does not match their selection (decision 0078)`);
+      }
+    } catch (e) { add(`selection audit (${name}) could not finish: ${String(e.message).split('\n')[0].slice(0, 120)}`); }
+    await p.close();
+  }
+}
+
 const MODES = [
   { key: 'phone-dark', viewport: { width: 390, height: 844 }, colorScheme: 'dark', phone: true },
   { key: 'desktop-light', viewport: { width: 1280, height: 800 }, colorScheme: 'light', phone: false },
@@ -1480,6 +1596,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       quiet.loud.forEach((x) => add(`${x} (decision 0065: a status is a tint)`));
       (quiet.overfull || []).forEach((x) => add(`control content outside its box: ${x} (decision 0073)`));
       (quiet.nav || []).forEach((x) => add(`${x} (round 0061: the highlight holds icon and label)`));
+      (quiet.select || []).forEach((x) => add(`${x} (decision 0078)`));
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);
@@ -1493,6 +1610,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
     if (!reduced && mode === MODES[0]) await apiAudit(page, add);
     if (!reduced && !mode.phone) await desktopKeys(page, add);
     if (!reduced && !mode.phone && bname === 'chromium' && !rel.startsWith('explore/')) await qa2Audit(ctx, rel, add);
+    if (!reduced && !mode.phone && bname === 'chromium' && !rel.startsWith('explore/')) await selectAudit(ctx, rel, add);
     if (!reduced) (await page.evaluate(audit, { phone: false })).filter((m) => /sideways|icon not drawn|duplicate id/.test(m)).forEach((m) => add('after use: ' + m));
   } catch (e) { add('suite could not finish: ' + String(e.message).split('\n')[0].slice(0, 160)); }
   if (found.size && SHOTS) { mkdirSync(join(root, 'tests/out'), { recursive: true }); await page.screenshot({ path: join(root, 'tests/out', label.replace(/[^\w.-]+/g, '_') + '.png') }).catch(() => {}); }
