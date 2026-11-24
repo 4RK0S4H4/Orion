@@ -277,6 +277,18 @@ export function windowAudit() {
     if (!close) { out.push(`window controls without Close in ${path(bar)} (decision 0072)`); continue; }
     const cr = close.getBoundingClientRect(), gap = rtl ? cr.left - b.left : b.right - cr.right;
     if (gap > 0.5) out.push(`Close stops ${Math.round(gap)}px short of the title bar's ${side} edge (${path(bar)}): the window's top ${side} corner must hit Close (decision 0072)`);
+    /* decision 0077: the drawn layer (::before) sits as far from the window's top edge as from its end edge, and every
+       control's layer has the same insets, so the row is even */
+    const layer = (c) => { const r = c.getBoundingClientRect(), s = getComputedStyle(c, '::before'); if (s.content === 'none' || s.position !== 'absolute') return null; const n = (v) => parseFloat(v) || 0; return { t: r.top + n(s.top) - b.top, bt: b.bottom - (r.bottom - n(s.bottom)), l: r.left + n(s.left), rr: r.right - n(s.right), ie: rtl ? n(s.left) : n(s.right), is: rtl ? n(s.right) : n(s.left) }; };
+    const cl = layer(close);
+    if (cl) {
+      const end = rtl ? cl.l - b.left : b.right - cl.rr;
+      if (Math.abs(cl.t - end) > 1) out.push(`Close's hover layer is ${cl.t.toFixed(1)}px from the title bar's top edge and ${end.toFixed(1)}px from its ${side} edge (${path(bar)}): the two gaps must be equal (decision 0077)`);
+      for (const c of ctrls) {
+        const o = layer(c);
+        if (o && c !== close && (Math.abs(o.t - cl.t) > 0.5 || Math.abs(o.bt - cl.bt) > 0.5 || Math.abs(o.ie - cl.ie) > 0.5 || Math.abs(o.is - cl.is) > 0.5)) out.push(`the hover layer of window control "${name(c)}" is inset differently from Close's (${path(bar)}): every control's layer has the same inset (decision 0077)`);
+      }
+    }
     if (b.top >= 0 && b.bottom <= innerHeight && b.left >= 0 && b.right <= innerWidth) {
       const y = Math.ceil(b.top), x = rtl ? Math.ceil(b.left) : Math.floor(b.right) - 1;
       const hit = document.elementFromPoint(x, y);

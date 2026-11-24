@@ -10,6 +10,7 @@
      bad-nav-hover.html / bad-nav-hover-box.html  a tab's hover layer that is the icon chip, or narrower than the selected highlight (issue 81)
      bad-rail-motion.html  a rail whose labels follow its moving edge and wrap mid-motion (issue 70)
      bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
+     bad-window-inset.html     Close's layer nearer the window's end edge than its top edge, Minimize inset differently (decision 0077)
      bad-clipboard.html a bare clipboard.writeText (page checker and npm run check:clipboard; decision 0073)
      bad-swipe.html, bad-grip.html  a swipe action nothing can focus, a column grip covered by the next header (decision 0076)
      bad-select.html                a multi-select listbox and grid that the selection model does not drive (decision 0078)
@@ -53,6 +54,8 @@ const CASES = [
   ['bad-window-controls.html', /window control "Close" is 32x28, \d+px below the top of a 40px title bar/, 'a window control smaller than a full cell'],
   ['bad-window-controls.html', /Close stops 12px short of the title bar's right edge/, 'Close short of the window edge'],
   ['bad-window-controls.html', /the title bar's top right corner pixel hits header\.s4-titlebar, not Close/, 'the corner pixel misses Close'],
+  ['bad-window-inset.html', /Close's hover layer is 4\.0px from the title bar's top edge and 2\.0px from its right edge/, 'Close\'s layer nearer the end edge than the top edge'],
+  ['bad-window-inset.html', /the hover layer of window control "Minimize" is inset differently from Close's/, 'a control inset differently from Close'],
 ];
 const ran = {};
 console.log('known-bad pages fail the page checker');

@@ -12,6 +12,11 @@
         },
         "$description": "Opacity of the faded half of a duotone icon."
       }
+    },
+    "window-control-tone": {
+      "$type": "number",
+      "$value": 0.65,
+      "$description": "Opacity of the second tone in a window control's Line Duotone icon, at rest, hover and press (decision 0079): the two tones sit close, so Minimize, Maximize, Restore and Close each read as one mark; the first tone carries the 3:1."
     }
   }
 }

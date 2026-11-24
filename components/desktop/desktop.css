@@ -144,8 +144,8 @@
      They behave as Windows' own: each is a full cell, the bar's whole height and 46 wide, the last one touching the
      window's end edge and all of them its top edge with no gap, so a pointer thrown into the top corner hits Close and
      one thrown at the top edge hits the control below it (Fitts's law; the title bar keeps no end padding for them).
-     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), Orion's duotone window
-     icons written in by desktop.js (decision 0074; any other icon inside the button is hidden), Close turning error only on hover and press (never red at rest), the
+     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), Orion's Line Duotone window
+     icons written in by desktop.js (decisions 0074, 0079; any other icon inside the button is hidden), Close turning error only on hover and press (never red at rest), the
      Restore icon and label while the window is maximized. In right-to-left they mirror to the start with Close at the
      far start, as Windows mirrors a right-to-left window. They step out where the system draws its own buttons: a
      Mac shell (traffic lights), the window controls overlay of an installed web app, full screen. */
@@ -184,21 +184,33 @@
   /* the icon is Orion's own (decision 0074): desktop.js writes one .s4-icon[data-window-icon] in each control, at
      --s4-size-window-control-icon (24, a step above the bar's other icons); anything else written inside is hidden, so apps built with older markup get the same icons */
   .s4-window-control > :not([data-window-icon]) { display: none; }
-  /* the drawn layer: firm (8, never sharp, never a pill), inset so neighbours stay apart */
+  /* the drawn layer: firm (8, never sharp, never a pill), one inset on every side (decision 0077), so Close's layer is as
+     far from the window's top edge as from its end edge and neighbours stay apart by twice it. Close's outer corner is
+     concentric with the window's (0052): the window's corner minus the inset where the window is rounded, the firm 8
+     where it is square. --s4-window-corner is the window's corner: 0 (a browser tab, a maximized window, Windows 10,
+     Linux); 8 in a restored Windows shell (Windows 11 rounds a window at 8); a page that draws the window in a rounded
+     frame sets it to the frame's radius. The second term of the max() is the firm 8 at a square corner and far below
+     zero at any rounded one. */
+  .s4-window-controls { --_inset: var(--s4-space-1); --_corner: var(--s4-window-corner, 0px); }
+  :root[data-shell][data-platform="windows"]:not([data-window-state~="maximized"], [data-window-state~="fullscreen"]) { --s4-window-corner: var(--md-sys-shape-corner-small); }
   .s4-window-control::before {
     content: "";
     position: absolute;
-    inset: var(--s4-space-1) calc(var(--s4-space-1) / 2);
+    inset: var(--_inset);
     border-radius: var(--md-sys-shape-corner-small);
     background: var(--_fill);
     transition: background-color var(--s4-motion-state);
   }
+  .s4-window-control[data-window-action="close"]::before {
+    border-start-end-radius: max(0px, var(--_corner) - var(--_inset), var(--md-sys-shape-corner-small) - var(--_corner) * 100);
+  }
   .s4-window-control > [data-window-icon] { position: relative; --s4-icon-size: var(--s4-size-window-control-icon); }
   /* Maximize and Restore point along the window's corner: they mirror with the window in right-to-left, as Windows' do */
   .s4-window-control[data-window-action="maximize"]:dir(rtl) > [data-window-icon] > svg { transform: scaleX(-1); }
-  /* on Close's error fill the second tone sits halfway (Solar's own 0.5), where the tile is as clear of the red as the
-     cross is of the tile: about 2.5:1 each in light and dark, 3.2:1 or more in high contrast (decision 0074) */
-  .s4-window-control[data-window-action="close"]:is(:hover, :active) > [data-window-icon] { --s4-icon-duo-opacity: 0.5; }
+  /* the icons are Solar Line Duotone (decision 0079): strokes in the first tone and a second tone at one token, the same at
+     rest, on hover and on Close's error fill, so each mark reads as one. Measured against the shipped roles the first tone is
+     3:1 or more on the bar and on the red in light, dark and high contrast. Stroke width stays Solar's own (1.5 at 24). */
+  .s4-window-control > [data-window-icon] { --s4-icon-duo-opacity: var(--s4-window-control-tone); }
   @media (hover: hover) {
     .s4-window-control:hover { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 150%), transparent); }
     .s4-window-control[data-window-action="close"]:hover { --_fill: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }

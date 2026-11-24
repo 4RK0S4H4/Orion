@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="../index.css">
 <link rel="stylesheet" href="../_example/example.css">
 <style>
-  .dk-frame { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+  .dk-frame { overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); --s4-window-corner: var(--md-sys-shape-corner-large); }   /* the frame is the window: Close's layer is concentric with its corner (decision 0077) */
   .dk-insp-frame { block-size: calc(var(--s4-space-16) * 5.5); }
   .dk-lights { position: absolute; inset-inline-start: var(--s4-space-4); display: flex; gap: var(--s4-space-2); }
   .dk-lights > i { inline-size: var(--s4-space-3); block-size: var(--s4-space-3); border-radius: var(--md-sys-shape-corner-full); background: var(--md-sys-color-outline-variant); }
@@ -23,7 +23,7 @@
   <section class="ex-sec">
     <h2>A Window</h2>
     <p><code>data-window</code> and <code>data-density="compact"</code> on the app. The title bar drags the window in an installed app; the body scrolls on its own.</p>
-    <div style="block-size:calc(var(--s4-space-16) * 6);overflow:hidden;border-radius:var(--md-sys-shape-corner-large)">
+    <div style="block-size:calc(var(--s4-space-16) * 6);overflow:hidden;border-radius:var(--md-sys-shape-corner-large);--s4-window-corner:var(--md-sys-shape-corner-large)">
       <div class="s4-app" data-window data-density="compact" style="block-size:100%">
         <header class="s4-titlebar"><span class="s4-titlebar-title">Ledger</span>
           <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button></div>

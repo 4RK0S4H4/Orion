@@ -390,6 +390,11 @@ export const tokens = {
       "dark-high-contrast": "0.38"
     }
   },
+  "--s4-window-control-tone": {
+    "type": "number",
+    "value": "0.65",
+    "description": "Opacity of the second tone in a window control's Line Duotone icon, at rest, hover and press (decision 0079): the two tones sit close, so Minimize, Maximize, Restore and Close each read as one mark; the first tone carries the 3:1."
+  },
   "--s4-motion-spring-fast-spatial-calm-stiffness": {
     "type": "number",
     "value": "1400"

@@ -105,6 +105,16 @@ The second Full QA pass ([`history/round-0063/qa-2.md`](../history/round-0063/qa
 - **101.** Done 2026-11-23 (round 0063, decision 0076). Form README promised errors on leaving any field; untouched empty fields are reported by Submit (found by QA pass 2); board add-in-place said nothing on an empty draft. Documented; the draft shows "Enter a title".
 - **102.** Done 2026-11-23 (round 0063, decision 0076). Page checker reported "calls clipboard.writeText directly" for `core.js` itself on `components/desktop/desktop.html`. Rule: only `S4.util.copy`'s own call (marked `/* s4-clipboard-helper */`, once per file) is exempt from `check:clipboard` and the page checker; a fixture proves a second marked call still fails.
 
+## Owner notes (2026-11-24)
+
+- **105.** Done 2026-11-24 (decision 0079). Window control icons: the owner picked C in `explore/review-window-icons.html`: Solar Line Duotone marks (minus, full screen, quit full screen, close) with the second tone at 0.65 (`--s4-window-control-tone`), no tile or circle.
+- **103.** Done 2026-11-24 (decision 0077). Window controls not even with the window's edges: "they work but I feel like
+  the buttons aren't aligned properly with edges, I definitely noticed that the close button is way closer to the right
+  edge than the top edge, it should be equal." The layer was inset 4 at the top and 2 at the sides; now 4 on every
+  side, Close's outer corner concentric with the window's. Image: `img/2026-11-24-window-close-inset.png`.
+
+![Close hovered, nearer the end edge than the top](img/2026-11-24-window-close-inset.png)
+
 ## Owner notes (2026-11-23)
 
 - **82.** Done 2026-11-23 (round 0063, decision 0074). Title bar window controls: "For the title bar window buttons I
