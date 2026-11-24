@@ -36,6 +36,7 @@ Versions and upgrades (decision 0075, issue 83): "update to latest Orion" in an 
 - Added: `npm run test:upgrade` (in CI's pages job).
 
 - Changed: window controls draw Orion's duotone icons again (decision 0074, issue 82): new icon names `window-minimize`, `window-maximize`, `window-restore`, `window-close` (Solar Bold Duotone square tiles; Phosphor too), written into each `.s4-window-control` by `desktop.js` at the new `--s4-size-window-control-icon` (24); the 12px drawn glyphs are gone. Cells, corner rule, firm layer, Close error on hover, Restore, right to left and forced colors are unchanged.
+- Fixed: window controls sit evenly in the corner (decision 0077, issue 103): each hover and press layer is inset 4 on every side (it was 4 top and bottom, 2 at the sides), so Close's is as far from the window's top edge as from its end edge; Close's outer corner is concentric with the window's (`--s4-window-corner`, 8 in a restored Windows shell). The page checker and suite fail unequal gaps (`tests/fixtures/bad-window-inset.html`).
 
 Round 0062, the first Full QA pass (decision 0073, issues 73 to 81):
 
