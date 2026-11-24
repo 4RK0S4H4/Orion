@@ -180,8 +180,8 @@ window.S4_REVIEW_DEMOS = [
   {
     id: 'window-icons', title: 'Window Control Icons', href: 'explore/review-window-icons.html',
     questions: [
-      { id: 'icons', label: 'Window control icons', help: 'Bold duotone circles or the current squares, on Minimize, Maximize, Restore and Close.',
-        options: [{ v: 'A', label: 'Round (proposed)' }, { v: 'B', label: 'Square (current)' }, { v: 'Other', label: 'Describe in notes' }] }
+      { id: 'icons', label: 'Window control icons', help: 'Line duotone, bold duotone circles or the current squares, on Minimize, Maximize, Restore and Close.',
+        options: [{ v: 'C', label: 'Line duotone (proposed)' }, { v: 'D', label: 'Line duotone, circled' }, { v: 'A', label: 'Round' }, { v: 'B', label: 'Square (current)' }, { v: 'Other', label: 'Describe in notes' }] }
     ]
   }
   ,
