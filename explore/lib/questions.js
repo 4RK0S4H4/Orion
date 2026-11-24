@@ -319,5 +319,15 @@ window.S4_REVIEW_DEMOS = [
       { id: 'blur', label: 'Rim blur', options: [{ v: 'A', label: 'None' }, { v: 'B', label: 'A Little' }, { v: 'C', label: 'Same As The Body' }, { v: 'Other', label: 'Describe in notes' }] },
       { id: 'docked', label: 'Docked bars', options: [{ v: 'A', label: 'Hairline (Today)' }, { v: 'B', label: 'Lens Rim On The Content Edge' }, { v: 'Other', label: 'Describe in notes' }] }
     ]
+  },
+  {
+    id: 'lens-edge-2', title: 'Lens Edge 2', href: 'explore/review-lens-edge-2.html',
+    questions: [
+      { id: 'overall', label: 'Overall', help: 'Today\u2019s edge, or a thin rim in a slightly different tone of the glass, with or without a faint glow.',
+        options: [{ v: 'A', label: 'Today' }, { v: 'B', label: 'Thin Rim, No Glow' }, { v: 'C', label: 'Thin Rim, Faint Glow' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'tone', label: 'Rim tone', options: [{ v: 'A', label: 'Lighter' }, { v: 'B', label: 'Darker' }, { v: 'C', label: 'Accent' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'boost', label: 'Color boost', options: [{ v: 'A', label: 'None' }, { v: 'B', label: 'Light' }, { v: 'C', label: 'Medium' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'width', label: 'Rim width', options: [{ v: 'A', label: 'Today\u2019s Width' }, { v: 'B', label: '1.5x' }, { v: 'Other', label: 'Describe in notes' }] }
+    ]
   }
 ];

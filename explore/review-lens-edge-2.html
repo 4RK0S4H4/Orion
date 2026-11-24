@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orion: Lens Edge 2</title>
+<link rel="stylesheet" href="../components/orion.css?v=3f1092c">
+<style>
+/* The quiz around the previews: layout only (decision 0048). Looks come from Orion. */
+body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); }
+.lab { max-inline-size: var(--s4-layout-content-wide, 1200px); margin: 0 auto; padding: var(--s4-space-6) var(--s4-space-4) var(--s4-space-16); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+.lab h1, .lab h2, .lab p { margin: 0; }
+.lab-intro { display: flex; flex-direction: column; gap: var(--s4-space-3); max-inline-size: 72ch; }
+.lab-intro p, .lab-sec > p { color: var(--md-sys-color-on-surface-variant); }
+.lab-sec { display: flex; flex-direction: column; gap: var(--s4-space-2); }
+.lab-sec > .rv-group { --rv-min: 340px; margin-block-start: var(--s4-space-3); }
+.lab-sec > .rv-group[data-wide] { --rv-min: 720px; }
+
+/* ================= what is being judged: everything below lives inside the previews ================= */
+.pv { display: flex; flex-direction: column; gap: var(--s4-space-3); padding: var(--s4-space-3); }
+.pv-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: var(--s4-space-3); justify-items: center; }
+.pv-mode { display: flex; flex-direction: column; gap: var(--s4-space-1); inline-size: 100%; max-inline-size: 390px; min-inline-size: 0; }
+.pv-cap { font-size: var(--md-sys-typescale-label-medium-size); line-height: var(--md-sys-typescale-label-medium-line-height); font-weight: var(--md-sys-typescale-label-medium-weight); color: var(--md-sys-color-on-surface-variant); }
+
+/* ---- the phone scene (as in the first Lens Edge lab): solid content under today's glass ---- */
+.sc { position: relative; inline-size: 100%; block-size: 600px; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-family: var(--md-sys-typescale-body-medium-font); }
+.sc[data-crop] { block-size: 420px; }
+.sc[data-crop] :is(.sc-snack, .sc-nav, .sc-bw, .sc-copy, .sc-tiles) { display: none; }
+.sc-photo { position: absolute; inset: 0 0 auto 0; block-size: 190px; overflow: hidden; background: linear-gradient(180deg, #1d2671 0%, #6a3093 38%, #f0657a 68%, #ffb36b 100%); }
+.sc-photo i { position: absolute; display: block; }
+.sc-sun { inline-size: 96px; block-size: 96px; inset-inline-start: 22%; inset-block-start: 74px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #fff6c9 0 30%, #ffd25e 55%, #ff9f43 100%); }
+.sc-hill-1 { inline-size: 70%; block-size: 160px; inset-inline-start: -10%; inset-block-start: 140px; border-radius: 50% 50% 0 0; background: #1e5f74; }
+.sc-hill-2 { inline-size: 80%; block-size: 150px; inset-inline-end: -20%; inset-block-start: 128px; border-radius: 50% 50% 0 0; background: #133b5c; }
+.sc-hill-3 { inline-size: 120%; block-size: 120px; inset-inline-start: -10%; inset-block-start: 170px; border-radius: 50% 50% 0 0; background: #0b2239; }
+.sc-art { position: absolute; inset-block-start: 206px; inset-inline-start: 16px; inline-size: 132px; block-size: 132px; border-radius: 20px; overflow: hidden; background: #8a1fe6; }
+.sc-art::before { content: ""; position: absolute; inset: 22px; border-radius: 50%; background: radial-gradient(circle, #8a1fe6 0 16%, #b65cff 17% 36%, #8a1fe6 37% 52%, #6c0fc0 53% 100%); }
+.sc-art::after { content: ""; position: absolute; inset: 59px; border-radius: 50%; background: #f4e9ff; }
+.sc-meta { position: absolute; inset-block-start: 212px; inset-inline: 160px 12px; display: flex; flex-direction: column; gap: var(--s4-space-1); }
+.sc-meta b { font-size: var(--md-sys-typescale-body-large-size); line-height: var(--md-sys-typescale-body-large-line-height); font-weight: 600; }
+.sc-meta span { font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height); color: var(--md-sys-color-on-surface-variant); }
+.sc-progress { position: absolute; inset-block-start: 382px; inset-inline: 16px; block-size: 12px; border-radius: 6px; background: color-mix(in srgb, #8a1fe6 22%, transparent); }
+.sc-progress i { display: block; inline-size: 82%; block-size: 100%; border-radius: inherit; background: #8a1fe6; }
+.sc-copy { position: absolute; inset-block-start: 404px; inset-inline: 16px; margin: 0; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.sc-bw { position: absolute; inset-block-start: 436px; inset-inline: 16px; block-size: 64px; display: grid; grid-template-columns: 1fr 1fr; }
+.sc-bw i { display: block; }
+.sc-tiles { position: absolute; inset-block-start: 498px; inset-inline: 16px; block-size: 90px; display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+.sc-tiles i { display: block; border-radius: 16px; background: #8a1fe6; }
+.sc-tiles i:nth-child(2) { background: #ff8a3d; }
+.sc-tiles i:nth-child(3) { background: #13a3a0; }
+.sc-bw i:first-child { background: #ffffff; border-start-start-radius: 16px; border-end-start-radius: 16px; }
+.sc-bw i:last-child { background: #000000; border-start-end-radius: 16px; border-end-end-radius: 16px; }
+
+/* glass pieces (today's glass from .s4-glass and .s4-fab; the lab only places them) */
+.sc-menu { position: absolute; inset-block-start: 18px; inset-inline-end: 12px; inline-size: 176px; padding: var(--s4-space-2); border-radius: var(--s4-shape-menu); display: flex; flex-direction: column; }
+.sc-menu .sc-item { display: flex; align-items: center; gap: var(--s4-space-3); min-block-size: 44px; padding-inline: var(--s4-space-3); border-radius: var(--s4-shape-menu-item); font-size: var(--md-sys-typescale-body-large-size); }
+.sc-menu .sc-item[data-on] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.sc-menu .s4-icon { --s4-icon-size: 20px; }
+.sc-panel { position: absolute; inset-block-start: 276px; inset-inline: 64px 44px; padding: var(--s4-space-4); border-radius: var(--md-sys-shape-corner-extra-large); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s4-space-1) var(--s4-space-3); }
+.sc-panel b { font-size: var(--md-sys-typescale-title-medium-size); line-height: var(--md-sys-typescale-title-medium-line-height); font-weight: 600; }
+.sc-panel .sc-sub { grid-column: 1; font-size: var(--md-sys-typescale-body-medium-size); line-height: var(--md-sys-typescale-body-medium-line-height); }
+.sc-panel .s4-button { grid-column: 2; grid-row: 1 / span 2; }
+.sc-fab { position: absolute; inset-block-start: 340px; inset-inline-end: 22px; }
+.sc-snack { position: absolute; inset-block-end: 92px; inset-inline: 12px; min-block-size: 52px; padding-inline: var(--s4-space-4) var(--s4-space-2); border-radius: var(--s4-shape-snackbar); display: flex; align-items: center; justify-content: space-between; gap: var(--s4-space-2); font-size: var(--md-sys-typescale-body-medium-size); }
+.sc-nav { position: absolute; inset: auto 0 0 0; }
+
+/* ---- the strip: one phone-wide box, light on the start half and dark on the end half, with the panel and the FAB over the purple sleeve ---- */
+.st { display: grid; grid-template-columns: 1fr 1fr; inline-size: 100%; max-inline-size: 390px; margin-inline: auto; overflow: hidden; border-radius: var(--md-sys-shape-corner-extra-large); }
+.sc[data-strip] { block-size: 210px; border-radius: 0; }
+.sc[data-strip] :is(.sc-photo, .sc-meta, .sc-menu, .sc-snack, .sc-nav, .sc-bw, .sc-tiles, .sc-copy, .sc-panel .sc-sub, .sc-panel .s4-button) { display: none; }
+.sc[data-strip] .sc-art { inset-block-start: 14px; inset-inline-start: 12px; inline-size: 116px; block-size: 116px; }
+.sc[data-strip] .sc-art::before { inset: 18px; }
+.sc[data-strip] .sc-art::after { inset: 52px; }
+.sc[data-strip] .sc-panel { inset-block-start: 74px; inset-inline: 46px 12px; grid-template-columns: minmax(0, 1fr); white-space: nowrap; }
+.sc[data-strip] .sc-progress { inset-block-start: 172px; inset-inline: 12px; }
+.sc[data-strip] .sc-fab { inset-block-start: 144px; inset-inline-end: 16px; }
+
+/* ---- the zoomed corner: a small copy of the panel over the sleeve, scaled 4x around the panel's corner ---- */
+.zm-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap: var(--s4-space-3); }
+.zm-cell { display: flex; flex-direction: column; gap: var(--s4-space-1); min-inline-size: 0; }
+.zm-win { position: relative; block-size: 170px; overflow: hidden; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface); }
+.zm-in.sc { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 100%; block-size: 170px; border-radius: 0; transform-origin: 0 0; transform: translate(calc(var(--zw, 160px) / 2 - 232px), calc(85px - 192px)) scale(4); }
+.zm-art { position: absolute; inset-block-start: 14px; inset-inline-start: 10px; inline-size: 100px; block-size: 100px; border-radius: 16px; background: #8a1fe6; }
+.zm-art::after { content: ""; position: absolute; inset: 26px; border-radius: 50%; background: #b65cff; }
+.zm-glass { position: absolute; inset-block-start: 46px; inset-inline: 56px 0; block-size: 80px; border-radius: var(--md-sys-shape-corner-extra-large); }
+
+/* ---- the thin rim (lab only). The glass element stops painting itself; two layers behind its content take over, each with its
+        own backdrop filter, so both see the real page:
+          .rx-body  today's glass exactly, inset by the rim width, its corner the outer corner minus the rim (0052)
+          .rx-rim   the full shape masked to a ring as thin as today's edge (--s4-glass-edge-width, scaled by density like it):
+                    the same glass in a slightly different tone of the surface (lighter, darker, or toward the accent), at the
+                    body's own tint, with a gentle saturation lift behind it (no darkening, no hue turn, no contrast push) ---- */
+.rx-body, .rx-rim { display: none; }
+.sc { --rx-k: 1; --rx-boost: 1.4; --rx-glow: 0; }
+.sc[data-width="1.5"] { --rx-k: 1.5; }
+.sc[data-boost="none"] { --rx-boost: 1; }
+.sc[data-boost="medium"] { --rx-boost: 1.8; }
+.sc[data-glow="faint"] { --rx-glow: .3; }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:not([data-contrast="high"]) .sc[data-rim] [data-lx]:not([data-glass="off"]) {
+    --rx-w: calc(var(--s4-glass-edge-width) * var(--_edge-scale, 1) * var(--rx-k));
+    z-index: 0;   /* its own stacking context; never a filter, opacity or mask here (they would cut the layers off from the page) */
+    background-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  :root:not([data-contrast="high"]) .sc[data-rim] [data-lx]:not([data-glass="off"]) > :is(.rx-body, .rx-rim) { display: block; position: absolute; pointer-events: none; }
+  .rx-body {
+    z-index: -1;
+    inset: var(--rx-w);
+    border-radius: max(0px, calc(var(--lx-r) - var(--rx-w)));
+    background-color: color-mix(in srgb, var(--_surface) calc(var(--_glass-tint) * 100%), transparent);
+    -webkit-backdrop-filter: blur(var(--s4-glass-blur-float)) saturate(var(--s4-glass-saturation-float)) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
+    backdrop-filter: blur(var(--s4-glass-blur-float)) saturate(var(--s4-glass-saturation-float)) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
+  }
+  .rx-rim {
+    z-index: -2;
+    inset: 0;
+    box-sizing: border-box;
+    padding: var(--rx-w);
+    border-radius: var(--lx-r);
+    --rx-c: color-mix(in srgb, var(--_surface), white 28%);   /* mixed in sRGB, so a vivid surface (a colored FAB) never leaves the gamut (oklab overshot a light blue into a yellow fringe) */
+    background-color: color-mix(in srgb, var(--rx-c) calc(var(--_glass-tint) * 100%), transparent);
+    -webkit-backdrop-filter: blur(var(--s4-glass-blur-float)) saturate(calc(var(--s4-glass-saturation-float) * var(--rx-boost))) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
+    backdrop-filter: blur(var(--s4-glass-blur-float)) saturate(calc(var(--s4-glass-saturation-float) * var(--rx-boost))) contrast(var(--s4-glass-backdrop-contrast-float)) brightness(var(--s4-glass-backdrop-brightness-float));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  }
+  .sc[data-tone="darker"] .rx-rim { --rx-c: color-mix(in srgb, var(--_surface), black 20%); }
+  .sc[data-tone="accent"] .rx-rim { --rx-c: color-mix(in srgb, var(--_surface), var(--md-sys-color-primary) 45%); }
+  @supports (color: oklch(from red calc(l + .1) c h)) {
+    /* today's glow (light on dark glass, an ink shade on light glass: 0036, 0037), times --rx-glow */
+    .rx-body {
+      --rx-gc: oklch(from var(--_surface) calc(.99 - .96 * clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1)) calc(c * .3) h / calc(var(--rx-glow) * (var(--s4-glass-glow-alpha) * (1 - clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1)) + var(--s4-glass-glow-shade-alpha) * clamp(0, calc((l - var(--s4-glass-glow-flip)) * 1000), 1))));
+      box-shadow:
+        inset 0 var(--s4-glass-glow-size) var(--s4-glass-glow-size) calc(-1 * var(--s4-glass-glow-size)) var(--rx-gc),
+        inset 0 calc(-1 * var(--s4-glass-glow-size)) var(--s4-glass-glow-size) calc(-1 * var(--s4-glass-glow-size)) var(--rx-gc);
+    }
+  }
+}
+/* where glass is solid, so is this: the layers go and the element paints the system's solid surface again */
+@media (prefers-reduced-transparency: reduce) {
+  .sc [data-lx] { background-color: revert-layer; box-shadow: revert-layer; -webkit-backdrop-filter: revert-layer; backdrop-filter: revert-layer; }
+  :root:not([data-contrast="high"]) .sc[data-rim] [data-lx]:not([data-glass="off"]) > :is(.rx-body, .rx-rim) { display: none; }
+}
+@media (forced-colors: active) {
+  :root:not([data-contrast="high"]) .sc[data-rim] [data-lx]:not([data-glass="off"]) > :is(.rx-body, .rx-rim) { display: none; }
+}
+</style>
+</head>
+<body>
+<main class="lab">
+  <header class="lab-intro">
+    <h1 class="s4-headline-small">Lens Edge 2</h1>
+    <p class="s4-body-large">The second try, after your note on the first: the rim is as thin as today's edge, and instead of clear glass it is the same glass in a slightly different tone of the surface (a touch lighter, a touch darker, or toward the accent), so it follows light, dark and any accent. Behind the rim the colors get a gentle lift, a little richer, with no darkening and no change of hue. The body is today's glass.</p>
+    <p class="s4-body-large">Tap a card's header to pick it; tapping a preview never answers. Unless a question changes it, the rim is a touch lighter, today's width, with the light lift and no glow.</p>
+  </header>
+
+  <section class="lab-sec" aria-labelledby="q0">
+    <h2 class="s4-title-large" id="q0">At A Glance</h2>
+    <p>The corner of a glass panel where it crosses the purple sleeve, scaled up four times: today's edge, then the thin rim, in dark and light.</p>
+    <div class="rv-preview pv" id="zoom"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q1">
+    <h2 class="s4-title-large" id="q1">1. Overall</h2>
+    <p>The menu, the panel, the FAB and the snackbar float, so they get the rim; the nav bar is docked and keeps today's hairline in all three.</p>
+    <div class="rv-group" data-wide role="radiogroup" aria-label="Overall" id="g-overall"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q2">
+    <h2 class="s4-title-large" id="q2">2. Rim Tone</h2>
+    <p>Each strip is light on the left and dark on the right, with the blue accent on, so the accent option shows (in black and white, the accent rim leans darker on light glass and lighter on dark glass).</p>
+    <div class="rv-group" role="radiogroup" aria-label="Rim tone" id="g-tone"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q3">
+    <h2 class="s4-title-large" id="q3">3. Color Boost</h2>
+    <p>How much richer the colors are under the rim than under the body. Only the saturation rises; nothing gets darker and no hue turns.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Color boost" id="g-boost"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q4">
+    <h2 class="s4-title-large" id="q4">4. Rim Width</h2>
+    <p>Today's edge width (1px on a phone or retina screen, 1.5x and 2x on standard and large standard screens), or half again as wide. Nothing thicker.</p>
+    <div class="rv-group" role="radiogroup" aria-label="Rim width" id="g-width"></div>
+  </section>
+
+  <section class="lab-sec" aria-labelledby="q5">
+    <h2 class="s4-title-large" id="q5">Where Glass Turns Solid</h2>
+    <p>High contrast, reduced transparency, <code>data-glass="off"</code> and browsers without backdrop filters keep today's solid surfaces: the rim is built inside the same conditions, so it is not drawn there. The rim's colors come from the surface and accent roles, never fixed values, and the body is unchanged, so text and FAB labels on glass keep their proven contrast.</p>
+  </section>
+</main>
+<footer></footer>
+<script src="../components/assets/icons.js?v=4471e5a"></script>
+<script src="../components/orion.js?v=a877791"></script>
+<script src="lib/questions.js?v=7eb1eac"></script>
+<script src="lib/review.js?v=6adf197"></script>
+<script>
+(function () {
+  function attrs(theme, o) {
+    var a = ' data-theme="' + theme + '"';
+    if (o.rim) a += ' data-rim';
+    ['tone', 'boost', 'glow', 'width'].forEach(function (k) { if (o[k]) a += ' data-' + k + '="' + o[k] + '"'; });
+    if (o.accent) a += ' data-accent="' + o.accent + '"';
+    return a;
+  }
+  function scene(theme, o, strip) {
+    o = o || {};
+    return '<div class="sc"' + attrs(theme, o) + (strip ? ' data-strip' : '') + ' inert>' +
+      '<div class="sc-photo"><i class="sc-sun"></i><i class="sc-hill-1"></i><i class="sc-hill-2"></i><i class="sc-hill-3"></i></div>' +
+      '<div class="sc-art"></div>' +
+      '<div class="sc-meta"><b>Night Orchard</b><span>Lumen Vale, 2026</span><span>11 Songs, 42 Min</span></div>' +
+      '<div class="sc-progress"><i></i></div>' +
+      '<p class="sc-copy">Recorded in a greenhouse in the rain.</p>' +
+      '<div class="sc-bw"><i></i><i></i></div><div class="sc-tiles"><i></i><i></i><i></i></div>' +
+      '<div class="s4-glass sc-menu" data-lx><span class="sc-item" data-on><span class="s4-icon" data-icon="share"></span>Share</span><span class="sc-item"><span class="s4-icon" data-icon="download"></span>Download</span><span class="sc-item"><span class="s4-icon" data-icon="bookmark"></span>Save</span></div>' +
+      '<div class="s4-glass sc-panel" data-lx><b>Up Next</b><span class="sc-sub">Glasshouse Rain</span><button class="s4-button" data-variant="tonal" type="button">Play</button></div>' +
+      '<button class="s4-fab sc-fab" data-lx type="button" aria-label="Add To Library"><span class="s4-icon" data-icon="add"></span></button>' +
+      '<div class="s4-glass sc-snack" data-lx><span>Saved to your library</span><button class="s4-button" data-variant="text" type="button">Undo</button></div>' +
+      '<nav class="s4-nav-bar sc-nav" aria-label="Example navigation">' +
+        '<button class="s4-nav-item" type="button" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Listen</span></button>' +
+        '<button class="s4-nav-item" type="button"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="compass"></span></span><span class="s4-nav-label">Browse</span></button>' +
+        '<button class="s4-nav-item" type="button"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="bookmark"></span></span><span class="s4-nav-label">Library</span></button>' +
+        '<button class="s4-nav-item" type="button"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="search"></span></span><span class="s4-nav-label">Search</span></button>' +
+      '</nav></div>';
+  }
+  function phones(o) {
+    var el = document.createElement('div'); el.className = 'pv';
+    el.innerHTML = '<div class="pv-grid"><div class="pv-mode"><span class="pv-cap">Light</span>' + scene('light', o) + '</div>' +
+      '<div class="pv-mode"><span class="pv-cap">Dark</span>' + scene('dark', o) + '</div></div>';
+    return el;
+  }
+  function strip(o) {
+    var el = document.createElement('div'); el.className = 'pv';
+    el.innerHTML = '<span class="pv-cap">Light, then dark' + (o.accent ? ', blue accent' : '') + '</span><div class="st">' + scene('light', o, true) + scene('dark', o, true) + '</div>';
+    return el;
+  }
+  function group(id, qid, make, opts) {
+    var box = document.getElementById(id);
+    opts.forEach(function (x) { box.appendChild(S4Review.card({ pick: qid + ':' + x.k, letter: x.k, title: x.title, desc: x.desc, tag: x.tag || '', preview: make(x.o) })); });
+  }
+  var RIM = { rim: 1 };
+  function rim(extra) { var o = { rim: 1 }; for (var k in extra) o[k] = extra[k]; return o; }
+
+  group('g-overall', 'overall', phones, [
+    { k: 'A', title: 'Today', tag: 'Today', desc: 'The light line top and bottom with the soft glow inside it (an ink shade on light glass).', o: {} },
+    { k: 'B', title: 'Thin Rim, No Glow', desc: 'Today\u2019s width all round, a touch lighter than the body, with a light color lift behind it. Nothing else.', o: RIM },
+    { k: 'C', title: 'Thin Rim, Faint Glow', desc: 'The same rim with today\u2019s glow at 30% inside it.', o: rim({ glow: 'faint' }) }
+  ]);
+  group('g-tone', 'tone', strip, [
+    { k: 'A', title: 'Lighter', desc: 'The surface mixed 28% toward white.', o: rim({ accent: 'blue' }) },
+    { k: 'B', title: 'Darker', desc: 'The surface mixed 20% toward black.', o: rim({ tone: 'darker', accent: 'blue' }) },
+    { k: 'C', title: 'Accent', desc: 'The surface mixed 45% toward the accent (primary).', o: rim({ tone: 'accent', accent: 'blue' }) }
+  ]);
+  group('g-boost', 'boost', strip, [
+    { k: 'A', title: 'None', desc: 'The rim sees the backdrop exactly as the body does; only its tone differs.', o: rim({ boost: 'none' }) },
+    { k: 'B', title: 'Light', desc: '140% of the body\u2019s color boost behind the rim.', o: RIM },
+    { k: 'C', title: 'Medium', desc: '180% of the body\u2019s color boost behind the rim.', o: rim({ boost: 'medium' }) }
+  ]);
+  group('g-width', 'width', strip, [
+    { k: 'A', title: 'Today\u2019s Width', desc: '1px on a phone, scaled by density like today\u2019s edge.', o: RIM },
+    { k: 'B', title: '1.5x', desc: '1.5px on a phone.', o: rim({ width: '1.5' }) }
+  ]);
+
+  /* the zoomed corner */
+  function zcell(theme, on, cap) {
+    return '<div class="zm-cell"><span class="pv-cap">' + cap + '</span><div class="zm-win" inert data-theme="' + theme + '">' +
+      '<div class="zm-in sc"' + attrs(theme, on ? RIM : {}) + '><div class="zm-art"></div><div class="s4-glass zm-glass" data-lx></div></div></div></div>';
+  }
+  document.getElementById('zoom').innerHTML = '<div class="zm-grid">' + zcell('dark', false, 'Today, dark') + zcell('dark', true, 'Thin rim, dark') +
+    zcell('light', false, 'Today, light') + zcell('light', true, 'Thin rim, light') + '</div>';
+
+  /* two empty layers behind each glass element's content */
+  document.querySelectorAll('[data-lx]').forEach(function (el) {
+    var r = document.createElement('span'); r.className = 'rx-rim'; r.setAttribute('aria-hidden', 'true');
+    var b = document.createElement('span'); b.className = 'rx-body'; b.setAttribute('aria-hidden', 'true');
+    el.insertBefore(b, el.firstChild); el.insertBefore(r, el.firstChild);
+  });
+  /* the corner each element really draws (a pill token is clamped to half the height), so the body inside the rim is concentric */
+  function radii() {
+    document.querySelectorAll('[data-lx]').forEach(function (el) {
+      var r = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, h = el.offsetHeight, w = el.offsetWidth;
+      if (h && w) el.style.setProperty('--lx-r', Math.min(r, h / 2, w / 2) + 'px');
+    });
+    document.querySelectorAll('.zm-win').forEach(function (w) { w.style.setProperty('--zw', w.clientWidth + 'px'); });
+  }
+  radii(); window.addEventListener('load', radii); window.addEventListener('resize', radii);
+
+  S4Review.page('lens-edge-2');
+})();
+</script>
+</body>
+</html>
