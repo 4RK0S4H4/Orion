@@ -929,7 +929,11 @@ Electron's `titleBarOverlay` does the same. Draw `.s4-window-controls` only in a
   between them or to the window's top and end edges (the bar drops its end padding when it holds them). Throw the
   pointer into the top corner and it is on Close; along the top edge it is on the control below (Fitts's law). The cell
   is square on purpose: a rounded cell would miss the corner pixel.
-- *Look:* a firm filled layer (8, inset 4 and 2) on hover and press (State), never a disc or a pill; Orion's duotone
+- *Look:* a firm filled layer (8) on hover and press (State), never a disc or a pill, inset 4 on every side (decision
+  0077), so Close's layer is as far from the window's top edge as from its end edge. Close's outer corner is concentric
+  with the window's: `--s4-window-corner` minus the inset where the window is rounded (8 in a restored Windows shell, as
+  Windows 11 draws it; set it to a frame's radius when the page draws the window in a rounded frame), the firm 8 where
+  it is square (a browser tab, maximized, Linux); Orion's duotone
   icons `window-minimize`, `window-maximize`, `window-restore`, `window-close` (Solar's square tiles) at 24
   (`--s4-size-window-control-icon`), written in by `desktop.js` (decision 0074; any other icon inside is hidden); Close turns `error` on hover and press only, never red at rest. While
   `<html data-window-state>` holds `maximized` (the shell sets it), Maximize draws Restore and is labelled Restore.
@@ -942,7 +946,8 @@ Electron's `titleBarOverlay` does the same. Draw `.s4-window-controls` only in a
   on Windows, the very top pixel resizes a restored window and is Close's in a maximized one. Tauri: put
   `data-tauri-drag-region` on the bar only, never on the controls.
 - *Proof:* the page checker and the suite fail a control under 40 wide or shorter than its bar, Close short of the
-  window's end edge, and a corner or top-edge pixel that hits anything else in the bar.
+  window's end edge, a corner or top-edge pixel that hits anything else in the bar, Close's layer more than 1px nearer
+  one of the top and end edges than the other, and a control whose layer is inset differently from Close's (0077).
 
 **In front or not.** A window that is not in front dims its chrome a step and its selections turn gray, as every
 desktop does, so you can tell which window has the keyboard. Content never dims.

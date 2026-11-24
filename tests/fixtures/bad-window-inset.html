@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: Window Control Inset</title>
+<!-- Known-bad fixture (decision 0077, after decision 0067). tests/checker.mjs expects the page checker to FAIL this page
+     with the messages named in tests/checker.mjs. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  /* the layer as it was before decision 0077 (issue 103): inset 4 at the top and bottom but 2 at the sides, so Close's
+     layer sits twice as far from the window's top edge as from its end edge; Minimize is inset differently again */
+  .s4-titlebar .s4-window-control::before { inset: var(--s4-space-1) calc(var(--s4-space-1) / 2); }
+  .s4-titlebar .s4-window-control[data-window-action="minimize"]::before { inset: var(--s4-space-2); }
+</style>
+</head>
+<body>
+<header class="s4-titlebar"><span class="s4-titlebar-title">Ledger</span>
+  <div class="s4-window-controls"><button class="s4-window-control" type="button" data-window-action="minimize" aria-label="Minimize"></button><button class="s4-window-control" type="button" data-window-action="maximize" aria-label="Maximize"></button><button class="s4-window-control" type="button" data-window-action="close" aria-label="Close"></button></div>
+</header>
+<main style="padding: 16px"><p>Ledger</p></main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

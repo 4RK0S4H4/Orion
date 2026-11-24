@@ -4811,14 +4811,25 @@
   /* the icon is Orion's own (decision 0074): desktop.js writes one .s4-icon[data-window-icon] in each control, at
      --s4-size-window-control-icon (24, a step above the bar's other icons); anything else written inside is hidden, so apps built with older markup get the same icons */
   .s4-window-control > :not([data-window-icon]) { display: none; }
-  /* the drawn layer: firm (8, never sharp, never a pill), inset so neighbours stay apart */
+  /* the drawn layer: firm (8, never sharp, never a pill), one inset on every side (decision 0077), so Close's layer is as
+     far from the window's top edge as from its end edge and neighbours stay apart by twice it. Close's outer corner is
+     concentric with the window's (0052): the window's corner minus the inset where the window is rounded, the firm 8
+     where it is square. --s4-window-corner is the window's corner: 0 (a browser tab, a maximized window, Windows 10,
+     Linux); 8 in a restored Windows shell (Windows 11 rounds a window at 8); a page that draws the window in a rounded
+     frame sets it to the frame's radius. The second term of the max() is the firm 8 at a square corner and far below
+     zero at any rounded one. */
+  .s4-window-controls { --_inset: var(--s4-space-1); --_corner: var(--s4-window-corner, 0px); }
+  :root[data-shell][data-platform="windows"]:not([data-window-state~="maximized"], [data-window-state~="fullscreen"]) { --s4-window-corner: var(--md-sys-shape-corner-small); }
   .s4-window-control::before {
     content: "";
     position: absolute;
-    inset: var(--s4-space-1) calc(var(--s4-space-1) / 2);
+    inset: var(--_inset);
     border-radius: var(--md-sys-shape-corner-small);
     background: var(--_fill);
     transition: background-color var(--s4-motion-state);
+  }
+  .s4-window-control[data-window-action="close"]::before {
+    border-start-end-radius: max(0px, var(--_corner) - var(--_inset), var(--md-sys-shape-corner-small) - var(--_corner) * 100);
   }
   .s4-window-control > [data-window-icon] { position: relative; --s4-icon-size: var(--s4-size-window-control-icon); }
   /* Maximize and Restore point along the window's corner: they mirror with the window in right-to-left, as Windows' do */
