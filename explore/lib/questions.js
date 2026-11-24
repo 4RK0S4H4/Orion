@@ -178,6 +178,14 @@ window.S4_REVIEW_DEMOS = [
   }
   ,
   {
+    id: 'window-icons', title: 'Window Control Icons', href: 'explore/review-window-icons.html',
+    questions: [
+      { id: 'icons', label: 'Window control icons', help: 'Bold duotone circles or the current squares, on Minimize, Maximize, Restore and Close.',
+        options: [{ v: 'A', label: 'Round (proposed)' }, { v: 'B', label: 'Square (current)' }, { v: 'Other', label: 'Describe in notes' }] }
+    ]
+  }
+  ,
+  {
     id: 'button-group', title: 'Button Groups', href: 'explore/review-button-group.html',
     questions: [
       { id: 'group', label: 'Button group', help: 'A group where you pick a value. Rounded, filled, and not tabs.',
