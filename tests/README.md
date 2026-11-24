@@ -33,6 +33,9 @@
 
 Options: `node tests/suite.mjs --browser=chromium --only=list-detail --shots --workers=4`. Screenshots of failing
 pages go to `tests/out/` (not committed).
+A full run takes about 20 minutes and prints its problems only at the end: `SUITE_PROGRESS=1` writes one `run <browser> <mode>  <page>` line
+to stderr per page run (the dial-preset phase is the long one), so a stall shows as a line that does not change. A browser that dies
+mid-run is relaunched and the page it was on is run again; a page that kills it twice is reported as a failure.
 
 Needs Playwright (`npm i --no-save playwright && npx playwright install chromium webkit`). CI runs it on every push
 (`.github/workflows/check.yml`, job `pages`). A browser that is missing fails the run in CI and is skipped with a
