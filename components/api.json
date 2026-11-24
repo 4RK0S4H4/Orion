@@ -1234,6 +1234,7 @@
   "data-pin=start",
   "data-placement=center",
   "data-platform=mac",
+  "data-platform=windows",
   "data-position=bottom",
   "data-rail=auto",
   "data-rail=collapsed",
