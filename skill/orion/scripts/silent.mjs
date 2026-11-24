@@ -17,7 +17,8 @@
                       outline drawn at the edge clips, and a hit area that is smaller than what it holds misleads (decision 0073)
        select         a collection that selects several (aria-multiselectable="true", a .s4-table with a select column, or
                       data-selectable) that Orion's selection model does not drive (no data-s4-multiselect, which only the
-                      model writes): Shift+click, Shift with the arrows, Ctrl+A and Escape do nothing there (decision 0078)
+                      model writes): Shift+click, Shift with the arrows, Ctrl+A and Escape do nothing there (decision 0078).
+                      A combobox's popup listbox is not one: focus stays in its field, typing and Enter pick
    Words that may truncate (decision 0058: the timeline label, top app bar title, title bar title, text field value and date
    value) never count as split: they stay on one line behind an ellipsis. */
 
@@ -161,6 +162,8 @@ export function silentAudit() {
   /* selecting several (decision 0078): every collection that selects several is driven by the one selection model */
   for (const c of document.querySelectorAll('[aria-multiselectable="true"], table.s4-table, [data-selectable]')) {
     if (c.matches('table.s4-table') && !c.querySelector('thead [data-check]')) continue;
+    /* a combobox's popup listbox is the combobox pattern: focus stays in the field, typing and Enter pick (decision 0049) */
+    if (c.closest('.s4-combobox-menu') || (c.id && document.querySelector(`[role="combobox"][aria-controls="${c.id}"]`))) continue;
     if (skip(c) || c.hasAttribute('data-s4-multiselect')) continue;
     out.select.push(`${path(c)}: a collection that selects several that Orion's selection model does not drive, so Shift+click, Shift with the arrows, Ctrl+A and Escape do nothing there (build it from S4.table, a .s4-table with a select column, a .s4-list listbox, a .s4-tree or data-selectable, on the app bundle)`);
   }

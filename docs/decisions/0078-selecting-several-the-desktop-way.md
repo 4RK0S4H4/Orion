@@ -62,7 +62,8 @@ none said the change out loud, and none had a test.
 - Every collection that selects several is driven by the one model; never hand-roll selection. The page checker (and the suite
   through `silentAudit`) fails a collection that says it selects several (`aria-multiselectable="true"`, a `.s4-table` with a
   select column, `data-selectable`) without the model's `data-s4-multiselect` mark (`tests/fixtures/bad-select.html`, a case in
-  `tests/checker.mjs`).
+  `tests/checker.mjs`). A combobox's popup listbox (tag input, a multi-select combobox, a filter's facet search) is not such a
+  collection: it is the combobox pattern, where focus stays in the field and typing and Enter pick (decision 0049).
 - The suite's `selectAudit` drives every such collection on every page (Chromium, 1280) with the clicks and keys above and checks
   the selected set and the focus after each, the live region, `aria-multiselectable` and `aria-selected`, and that a single-select
   listbox or tree ignores Shift+Down. It fails on the code before this decision (proved in a temporary worktree).

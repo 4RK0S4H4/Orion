@@ -1455,7 +1455,7 @@ const SEL_KIT = `window.__qs = (() => {
   const vis = (e) => e.getClientRects().length && !e.closest('[hidden], dialog:not([open])');
   const kind = (c) => c.matches('table.s4-table') ? 'table' : c.matches('.s4-tree') ? 'tree' : c.matches('[role="listbox"]') ? 'listbox' : 'direct';
   const find = () => [...document.querySelectorAll('table.s4-table, .s4-tree[aria-multiselectable="true"], [role="listbox"][aria-multiselectable="true"], [data-selectable]')]
-    .filter((c) => !c.matches('table.s4-table') || c.querySelector('thead [data-check]'));
+    .filter((c) => (!c.matches('table.s4-table') || c.querySelector('thead [data-check]')) && !c.closest('.s4-combobox-menu'));   /* a combobox's popup: typing and Enter pick */
   const items = (c) => { const k = kind(c);
     if (k === 'table') return [...c.tBodies[0].rows].filter((r) => r.querySelector(':scope > [data-check] input[type="checkbox"]') && vis(r));
     if (k === 'tree') return [...c.querySelectorAll('.s4-tree-item')].filter((x) => vis(x));
