@@ -308,5 +308,16 @@ window.S4_REVIEW_DEMOS = [
       { id: 'panels', label: 'A floating panel on a phone', options: [{ v: 'A', label: 'Before' }, { v: 'B', label: 'After (actions in reach)' }, { v: 'Other', label: 'Describe in notes' }] },
       { id: 'docked', label: 'Docked glass bars', options: [{ v: 'A', label: 'Before (rim and glow)' }, { v: 'B', label: 'After (one hairline)' }, { v: 'Other', label: 'Describe in notes' }] }
     ]
+  },
+  {
+    id: 'lens-edge', title: 'Lens Edge', href: 'explore/review-lens-edge.html',
+    questions: [
+      { id: 'overall', label: 'Overall', help: 'Today\u2019s edge, or a clear lens rim around the same glass, with or without a glow.',
+        options: [{ v: 'A', label: 'Today' }, { v: 'B', label: 'Lens Rim, No Glow' }, { v: 'C', label: 'Lens Rim, Faint Glow' }, { v: 'D', label: 'Lens Rim, Today\u2019s Glow' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'width', label: 'Rim width', options: [{ v: 'A', label: '1.5px' }, { v: 'B', label: '3px' }, { v: 'C', label: '5px' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'strength', label: 'Rim strength', options: [{ v: 'A', label: 'Subtle' }, { v: 'B', label: 'Medium' }, { v: 'C', label: 'Strong' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'blur', label: 'Rim blur', options: [{ v: 'A', label: 'None' }, { v: 'B', label: 'A Little' }, { v: 'C', label: 'Same As The Body' }, { v: 'Other', label: 'Describe in notes' }] },
+      { id: 'docked', label: 'Docked bars', options: [{ v: 'A', label: 'Hairline (Today)' }, { v: 'B', label: 'Lens Rim On The Content Edge' }, { v: 'Other', label: 'Describe in notes' }] }
+    ]
   }
 ];
