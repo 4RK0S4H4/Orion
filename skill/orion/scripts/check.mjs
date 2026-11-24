@@ -324,6 +324,7 @@ for (const page of pages) {
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
       (r.overfull || []).forEach((x) => errors.add(`${at} control content outside its box: ${x}: size the control to what it holds (min-inline-size, padding or a shorter label); a ring or outline at the edge would clip it (decision 0073)`));
       (r.reach || []).forEach((x) => errors.add(`${at} ${x} (decision 0076: nothing is gesture-only, a handle is hit where it is drawn)`));
+      (r.select || []).forEach((x) => errors.add(`${at} ${x} (decision 0078)`));
       (r.nav || []).forEach((x) => errors.add(`${at} ${x}: the highlight is a rounded rectangle that holds the icon and the label (nav-bar.css; never give .s4-nav-pill its own corner)`));
       (r.loud || []).forEach((x) => errors.add(`${at} ${x}: a status is a tint (no data-tone, or success, warning, info, error; the accent tones draw as a wash); only the state that needs action now is warm`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));

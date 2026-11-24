@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="orion" content="1.2.0">
+<title>Bad Select</title>
+<link rel="stylesheet" href="../../components/orion.css">
+</head>
+<body>
+<main class="s4-content">
+  <h1>Tags</h1>
+  <!-- decision 0078: a multi-select listbox written by hand (not a .s4-list, so list.js leaves it alone) toggles on a click
+       and nothing else: no Shift range, no Ctrl+A, no Escape -->
+  <div role="listbox" aria-multiselectable="true" aria-label="Tags" id="bs-tags" tabindex="0">
+    <div role="option" aria-selected="false">Billing</div>
+    <div role="option" aria-selected="false">Contracts</div>
+    <div role="option" aria-selected="false">Payroll</div>
+    <div role="option" aria-selected="false">Travel</div>
+  </div>
+  <!-- and a grid that says it selects several, with selection of its own -->
+  <table class="bs-grid" role="grid" aria-multiselectable="true" aria-label="Invoices">
+    <thead><tr><th scope="col">Vendor</th><th scope="col">Amount</th></tr></thead>
+    <tbody><tr aria-selected="false" tabindex="0"><td>Staples</td><td>212.48</td></tr><tr aria-selected="false" tabindex="-1"><td>FedEx</td><td>88.64</td></tr></tbody>
+  </table>
+</main>
+<script src="../../components/orion.js"></script>
+<script>
+document.getElementById('bs-tags').addEventListener('click', function (e) { var o = e.target.closest('[role="option"]'); if (o) o.setAttribute('aria-selected', String(o.getAttribute('aria-selected') !== 'true')); });
+document.querySelector('.bs-grid').addEventListener('click', function (e) { var r = e.target.closest('tbody tr'); if (r) r.setAttribute('aria-selected', String(r.getAttribute('aria-selected') !== 'true')); });
+</script>
+</body>
+</html>

@@ -40,7 +40,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | `data-dividers` (list) | 1px outline-variant line between items | — |
 | `data-style="segmented"` (list) | M3E segmented: items 2 apart on surface-container-low (`--s4-list-segment-color`), extra-small inner corners, large outer corners per group | — |
 | `.s4-list-subheader` (an `li`) | title-small, on-surface-variant; starts a group; optional `.s4-list-subtotal` at the end | — |
-| `role="listbox"` + `aria-multiselectable` | list.js: roving focus, Up/Down/Home/End, click/Enter/Space selects; `s4-select` on the item, `s4-change { value }` on the list | single |
+| `role="listbox"` + `aria-multiselectable` | list.js: roving focus, Up/Down/Home/End, click/Enter/Space selects; `s4-select` on the item, `s4-change { value }` on the list. Multi select takes the shared selection keys (decision 0078): a click adds or removes one, Shift+click and Shift with the arrows, Home, End, Page Up or Page Down select the range from the anchor, Ctrl/⌘ with the arrows moves without selecting, Shift+Space selects to the focused option, Ctrl/⌘+A all, Escape clears; each change is said. The site bundle leaves the model out: there a multi listbox only toggles | single |
 
 **When to use what:** a list for scanning items of one kind on any screen size; a [table](../table/) when people compare
 several columns. Use **segmented** for settings-style groups on a plain surface; plain lists inside cards and panes.

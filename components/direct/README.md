@@ -37,10 +37,19 @@ Move things with your hand instead of through a menu: **reorder** by dragging, *
 Script: `S4.reorder.move(item, toIndex, toList)`, `S4.swipe.open(row)` / `close(row)`, `S4.selection.items(el)`,
 `clear(el)`, `all(el)`; event `s4-selection { items, count }`.
 
-How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, **Shift+Space or
-Shift+Enter on a focused row with the keyboard**, or tap a `data-select-toggle`. After that a tap, Space or Enter adds or
-removes a row instead of opening it. Escape ends it, and when the bar goes away focus lands on a row (never `<body>`). Put the
-`.s4-selection-bar` inside the `.s4-top-app-bar` and it takes the bar's place while anything is selected.
+How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, **Shift+Space (or Ctrl+Space)
+on a focused row with the keyboard**, or tap a `data-select-toggle`. After that a tap, a click, Space or Enter adds or
+removes a row instead of opening it. Escape ends it (unless an open menu, dialog or panel takes the Escape first), and when
+the bar goes away focus lands on a row (never `<body>`). Put the `.s4-selection-bar` inside the `.s4-top-app-bar` and it
+takes the bar's place while anything is selected.
+
+**Keys and clicks (decision 0078):** the shared selection model (`core/select.js`), the same as tables, trees and
+listboxes. Up and Down move between items (in a grid of tiles, Left and Right along a line, Up and Down by a line);
+Shift with them, Home, End, Page Up or Page Down extends the range from the anchor; Ctrl/⌘ with them moves without
+selecting; Shift+click selects the range from the anchor (replacing the last range from it), Ctrl/⌘+click adds or removes
+one, Ctrl+Shift+click adds a range; Ctrl/⌘+A selects every item shown. A plain click or Space opens the item until
+something is selected (its items are links and buttons that open things); on touch nothing changed. Every change is said
+("3 selected"). Picked rows keep `aria-checked` (the items are buttons, not options, so the list is not a listbox).
 
 **When to use what**
 - Reorder: anything whose order is the person's own (priorities, playlists, columns, steps, a board).

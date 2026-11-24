@@ -10,6 +10,16 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
 
+Selecting several (round 0064, decision 0078, issue 104): tables, trees, listboxes and select-several lists take the desktop selection model.
+
+- Added: `components/core/select.js` (core pack and full bundle, not the site bundle): `S4.util.multiselect(o)`, the one selection model, and `S4.util.say(text)`, a polite live region.
+- Added: Shift+click selects the range from the anchor (replacing the last range from it), Ctrl/⌘+click adds or removes one, Ctrl+Shift+click adds a range; Shift with Up, Down, Home, End, Page Up and Page Down extends; Ctrl with them moves without selecting; Space, Shift+Space, Ctrl/⌘+A (every row the filter shows, drawn or not) and Escape, in `S4.table`, static tables with a select column, multi-select trees and listboxes and `data-selectable` lists. Each change is said ("12 selected"). Touch is unchanged.
+- Changed: in a table with a select column a mouse click on a row selects it (it opens by its link, Enter or a double-click); a tap still opens it. Static tables with a select column are one Tab stop with the grid's keys, `role="grid"`, `aria-multiselectable` and `aria-selected`; data tables are `role="grid"`.
+- Added: `table.selection()`, `table.select(ids, { add })`, `select('all')`; `s4-change` `select` carries `ids`, `hidden`, `added`, `removed` and `why`. Selected rows a filter hides stay selected and the bar counts them ("12 Selected, 3 Not Shown").
+- Changed: the data table's header keys line and `aria-description` (0067) name the selection keys.
+- Added: the page checker fails a collection that selects several without the model (`tests/fixtures/bad-select.html`); the suite's `selectAudit` drives every one on every page.
+- Changed: budgets: core js 40 KB, data pack 44 KB, full bundle js 124 KB.
+
 QA pass 2 (round 0063, decision 0076, issues 84 to 102): the second Full QA pass found 18 things; all are fixed at their root.
 
 - Fixed: focus no longer falls to `<body>` after a table or inline edit, Undo, a hidden selection bar, a removed row, a moved card, a closed document tab or a keyboard command. New `S4.util.release(box, to)`.

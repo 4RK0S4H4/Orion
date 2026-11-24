@@ -1508,7 +1508,7 @@ surfaces, never glass. Also home of `.s4-avatar`.
 | `data-dividers` (list) | 1px outline-variant line between items | — |
 | `data-style="segmented"` (list) | M3E segmented: items 2 apart on surface-container-low (`--s4-list-segment-color`), extra-small inner corners, large outer corners per group | — |
 | `.s4-list-subheader` (an `li`) | title-small, on-surface-variant; starts a group; optional `.s4-list-subtotal` at the end | — |
-| `role="listbox"` + `aria-multiselectable` | list.js: roving focus, Up/Down/Home/End, click/Enter/Space selects; `s4-select` on the item, `s4-change { value }` on the list | single |
+| `role="listbox"` + `aria-multiselectable` | list.js: roving focus, Up/Down/Home/End, click/Enter/Space selects; `s4-select` on the item, `s4-change { value }` on the list. Multi select takes the shared selection keys (decision 0078): a click adds or removes one, Shift+click and Shift with the arrows, Home, End, Page Up or Page Down select the range from the anchor, Ctrl/⌘ with the arrows moves without selecting, Shift+Space selects to the focused option, Ctrl/⌘+A all, Escape clears; each change is said. The site bundle leaves the model out: there a multi listbox only toggles | single |
 
 **When to use what:** a list for scanning items of one kind on any screen size; a [table](#table) when people compare
 several columns. Use **segmented** for settings-style groups on a plain surface; plain lists inside cards and panes.
@@ -1649,9 +1649,13 @@ t.setRows(rows);                      // 10,000 rows: only what is on screen is 
 
 Script: `setRows(rows)`, `filter(fn)`, `search(text, fields)`, `sort(field, 'ascending'|'descending'|null)`,
 `group(field|null)`, `expand(id, open)`, `update(id, patch)`, `remove(ids)` (returns the removed rows, for Undo),
-`selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown), `.selected`. Columns: `S4.tableColumns(table)`:
+`selection()` (the selected ids: the shown ones in the table's order, then any the filter hides), `select(ids, { add })`
+(`select('all')` is every row the filter shows), `selectedRows()`, `clear()`, `.rows`, `.view` (indices of the rows shown),
+`.selected` (the Set of selected ids). Columns: `S4.tableColumns(table)`:
 `width(field, px)`, `fit(field)`, `hide(field, on)`, `move(field, index)`, `pin(field, 'start'|'end'|'')`.
-Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `count`), `edit`
+Events on the table: `s4-change` with `type` `view` (`count`, `total`), `sort`, `select` (`rows`, `ids`, `count`,
+`hidden` (selected but filtered out), `added`, `removed`, `why`: `click`, `toggle`, `range`, `all`, `clear`, `escape` or
+`api`), `edit`
 (`field`, `value`, `previous`, `undo`), `update`, `resize`, `columns`; `s4-select { row, data }` when a row opens;
 `s4-toggle { id, open }` for details; `s4-row-action`. The [filter](#filter) component drives `filter`, `search` and
 `sort` and writes them into the address.
@@ -1670,9 +1674,40 @@ column's sort button, its options button and its grip, in that order in every co
 last, Down to the body. On a grip, Shift with Left or Right resizes, or Enter (or F2) starts resizing with the plain
 arrows until Enter, Tab or Escape (which puts the width back). **Body** (the current row): Up and Down move a row (Up
 from the first row goes to the header), Page Up and Page Down a screen, Ctrl+Home and Ctrl+End the first and last row;
-Right and Left move through the row's controls and cells that edit, Home and End to the start and end of the row; Enter opens the row (its `data-page-open` link) or edits a cell; Space picks the row, Shift with Up or Down
-extends, Ctrl+A picks every row shown, Escape clears; `+` and `-` open and close details; Shift+F10 opens the row menu.
+Right and Left move through the row's controls and cells that edit, Home and End to the start and end of the row; Enter opens the row (its `data-page-open` link) or edits a cell; `+` and `-` open and close details; Shift+F10 opens the row menu.
 On a group row, Enter or Right and Left open and close the group.
+
+**Selecting several (decision 0078),** in a table with a select column (`th[data-check]`), data or static: the desktop
+model of Windows Explorer and the macOS Finder, the same in every Orion collection (`core/select.js`).
+
+| Mouse | |
+|---|---|
+| Click a row | selects only that row and sets the anchor (a double-click, Enter or the row's own link opens it) |
+| Shift+click | the range from the anchor, replacing the last range drawn from it |
+| Ctrl+click (⌘ on a Mac) | adds or removes that row and moves the anchor |
+| Ctrl+Shift+click | adds the range to what is selected |
+| A row's checkbox | adds or removes that row, never clearing the others (Shift: the range) |
+| A tap (touch) | opens the row; while rows are picked a tap picks (select several on touch, unchanged) |
+
+| Keys (body) | |
+|---|---|
+| Up, Down, Page Up, Page Down | move focus; the selection stays |
+| Shift with Up, Down, Page Up, Page Down, Home, End | extend the range from the anchor to where focus lands (to the first or last row with Home and End) |
+| Ctrl with Up, Down, Page Up, Page Down | move focus without touching the selection (Ctrl+Home and Ctrl+End: the first and last row) |
+| Space | adds or removes the focused row (Ctrl+Space too) |
+| Shift+Space | selects from the anchor to the focused row (with nothing selected, starts at it) |
+| Ctrl+A (⌘A) | every row the filter shows, the ones not drawn too |
+| Escape | clears, when nothing else took the Escape first (a cell goes back to its row first, an edit is cancelled first, an open menu closes first) |
+
+Key conflicts, settled: rows are what is selected, never cell ranges, so Shift with Up or Down extends the rows from a
+cell too (focus moves to the row); Shift with Left and Right is not a selection key (in the header it resizes a column);
+plain Home and End stay the start and end of the row, so only Shift+Home and Shift+End reach the first and last row with
+the selection. Space on a row selects; on a control in a cell it presses the control. The selection is the data (ids),
+so it survives virtual scrolling, sorting and filtering; selected rows that a filter hides stay selected, and the bar
+says so (`12 Selected, 3 Not Shown`, said once in the live region); Select All and Ctrl+A select exactly the rows shown.
+Every change is said in a polite live region ("12 selected"). The table is `role="grid"` with
+`aria-multiselectable="true"` and every drawn row carries `aria-selected`. Text in cells is still selectable with a plain
+drag; a Shift+click never selects text. A table without a select column has no selection: a click opens the row.
 
 **Header keys, said out loud (decision 0067):** the header's sort, options and resize controls have no Tab stop, so
 nothing on screen shows how to reach them: the way is **Up from the first row**, then Left and Right, then Down to come
@@ -1682,7 +1717,11 @@ screen reader reads it with the table's name; write your own `aria-description` 
 reserved so nothing moves; in print never; on a touch screen it stays collapsed until the first navigation key is pressed in
 the table, so a tablet with a keyboard gets it too, decision 0069). `data-hint="off"` on the table leaves the visible line
 out when the page explains the keys itself (the description stays). Don't tell the person the keys in a tooltip on each
-header: the hint is one place.
+header: the hint is one place. In a table that selects several, both lead with the selection keys (decision 0078): the
+line reads "Shift with the arrows or a click selects a range, Ctrl adds one, Ctrl+A selects all. Up from the first row
+reaches the column headers…", and the description names Space, Shift, Ctrl, Ctrl+A and Escape. A static table with a
+select column gets the same keys and a description of its own (rows: one Tab stop, Up and Down move, Right reaches a
+row's controls, Escape comes back to the row).
 
 **The wrap:** a table always sits in `.s4-table-wrap` (the scroller, and the container that stacks rows under 600);
 table.js adds one around a bare `.s4-table`, unless its parent already scrolls sideways. Cells that do not stack keep
@@ -2257,10 +2296,19 @@ Move things with your hand instead of through a menu: **reorder** by dragging, *
 Script: `S4.reorder.move(item, toIndex, toList)`, `S4.swipe.open(row)` / `close(row)`, `S4.selection.items(el)`,
 `clear(el)`, `all(el)`; event `s4-selection { items, count }`.
 
-How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, **Shift+Space or
-Shift+Enter on a focused row with the keyboard**, or tap a `data-select-toggle`. After that a tap, Space or Enter adds or
-removes a row instead of opening it. Escape ends it, and when the bar goes away focus lands on a row (never `<body>`). Put the
-`.s4-selection-bar` inside the `.s4-top-app-bar` and it takes the bar's place while anything is selected.
+How selecting starts: hold a row on a touch screen, Ctrl/⌘-click or Shift-click with a mouse, **Shift+Space (or Ctrl+Space)
+on a focused row with the keyboard**, or tap a `data-select-toggle`. After that a tap, a click, Space or Enter adds or
+removes a row instead of opening it. Escape ends it (unless an open menu, dialog or panel takes the Escape first), and when
+the bar goes away focus lands on a row (never `<body>`). Put the `.s4-selection-bar` inside the `.s4-top-app-bar` and it
+takes the bar's place while anything is selected.
+
+**Keys and clicks (decision 0078):** the shared selection model (`core/select.js`), the same as tables, trees and
+listboxes. Up and Down move between items (in a grid of tiles, Left and Right along a line, Up and Down by a line);
+Shift with them, Home, End, Page Up or Page Down extends the range from the anchor; Ctrl/⌘ with them moves without
+selecting; Shift+click selects the range from the anchor (replacing the last range from it), Ctrl/⌘+click adds or removes
+one, Ctrl+Shift+click adds a range; Ctrl/⌘+A selects every item shown. A plain click or Space opens the item until
+something is selected (its items are links and buttons that open things); on touch nothing changed. Every change is said
+("3 selected"). Picked rows keep `aria-checked` (the items are buttons, not options, so the list is not a listbox).
 
 **When to use what**
 - Reorder: anything whose order is the person's own (priorities, playlists, columns, steps, a board).
@@ -2415,8 +2463,12 @@ phone's file browser, in a pane.
 
 **Keys:** Up and Down move, Right opens or goes to the first child, Left closes or goes to the parent, Home and End,
 a letter jumps by name, `*` opens every sibling, Enter chooses (on a Mac it renames, as in the Finder), F2 renames.
-Several: Shift with the arrows or a click selects a range, Ctrl or ⌘ with a click adds one, Ctrl or ⌘ with the arrows
-moves without selecting and Space adds, mod+A selects all. mod+X then mod+V on a folder moves; Escape cancels.
+Several (the shared selection model, decision 0078): a click or a plain arrow selects the one it lands on (a source list);
+Shift with a click, the arrows, Home, End, Page Up or Page Down selects the range from the anchor (replacing the last
+range from it); Ctrl or ⌘ with a click adds or removes one, with Shift it adds a range; Ctrl or ⌘ with the arrows moves
+without selecting, then Space adds or removes and Shift+Space selects to the anchor; mod+A selects every item shown;
+Escape clears (after a cut, Escape cancels the cut first). Each change is said ("4 selected"). mod+X then mod+V on a
+folder moves.
 Shift+F10 or the menu key opens the item's menu.
 
 **Moving:** drag rows onto a folder with a mouse or pen (the folder fills); never drag-only: cut and paste, and the

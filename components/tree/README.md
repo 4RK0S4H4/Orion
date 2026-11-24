@@ -40,8 +40,12 @@ phone's file browser, in a pane.
 
 **Keys:** Up and Down move, Right opens or goes to the first child, Left closes or goes to the parent, Home and End,
 a letter jumps by name, `*` opens every sibling, Enter chooses (on a Mac it renames, as in the Finder), F2 renames.
-Several: Shift with the arrows or a click selects a range, Ctrl or ⌘ with a click adds one, Ctrl or ⌘ with the arrows
-moves without selecting and Space adds, mod+A selects all. mod+X then mod+V on a folder moves; Escape cancels.
+Several (the shared selection model, decision 0078): a click or a plain arrow selects the one it lands on (a source list);
+Shift with a click, the arrows, Home, End, Page Up or Page Down selects the range from the anchor (replacing the last
+range from it); Ctrl or ⌘ with a click adds or removes one, with Shift it adds a range; Ctrl or ⌘ with the arrows moves
+without selecting, then Space adds or removes and Shift+Space selects to the anchor; mod+A selects every item shown;
+Escape clears (after a cut, Escape cancels the cut first). Each change is said ("4 selected"). mod+X then mod+V on a
+folder moves.
 Shift+F10 or the menu key opens the item's menu.
 
 **Moving:** drag rows onto a folder with a mouse or pen (the folder fills); never drag-only: cut and paste, and the

@@ -20,6 +20,11 @@
    whose content sticks out of its box), `dirflip` (dir flipped after load: ink, tabs and nav highlight re-measure) and `long320` (long phrases and
    words in every trailing, meta and label slot at 320). `test:suite` clicks every popup opener and requires Escape to close it with focus on it,
    and runs every page with the clipboard refusing. `test:checker` proves each on a known-bad fixture.
+   `test:suite` also runs `selectAudit` (decision 0078) in Chromium at 1280: every collection that selects several (a table with a select column,
+   a multi-select tree or listbox, `data-selectable`), on a fresh copy of its page, is driven with click, Shift+click, Ctrl+click, Shift+Up,
+   Ctrl+Down, Space, Escape, Ctrl+A, Shift+Space, Shift+Home and Shift+PageDown, and the selected set, the focus, the live region and
+   `aria-selected` are checked after each; a single-select listbox or tree must ignore Shift+Down. With `SUITE_PROGRESS=1` it prints one
+   `select …` line per collection.
 5. **`npm run test:back`** (`tests/back.mjs`): Back from a page (the browser's Back and the top bar's) restores the
    view's scroll and returns focus to the opener, in the editor, the calendar and the Showcase, at 390 and a short desktop window.
 

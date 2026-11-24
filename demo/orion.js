@@ -2930,9 +2930,10 @@ S4.register('search', function (scope) {
    The script adds roles, levels, the open/close chevron and one tab stop for the whole tree.
    Keys: Up and Down move, Right opens (or goes to the first child), Left closes (or goes to the parent), Home and End,
    a letter jumps by name, * opens every sibling, Enter (or a double-click) chooses the item, F2 renames it (Enter too
-   on a Mac, as in the Finder). With aria-multiselectable: Shift with arrows or a click selects a range, Ctrl or ⌘ with a
-   click adds or removes one, Ctrl or ⌘ with arrows moves without selecting and Space then adds the item, mod+A selects
-   every shown item. Moving things: drag rows onto a folder with a mouse or pen, or mod+X then mod+V on the folder (the
+   on a Mac, as in the Finder). With aria-multiselectable, the shared selection keys (decision 0078, core/select.js): Shift
+   with a click, the arrows, Home, End, PageUp or PageDown selects a range, Ctrl or ⌘ with a click adds or removes one,
+   Ctrl or ⌘ with the arrows moves without selecting and Space then adds the item, mod+A selects every shown item, Escape
+   clears. Moving things: drag rows onto a folder with a mouse or pen, or mod+X then mod+V on the folder (the
    app's menu can offer the same: S4.tree.cut / S4.tree.paste); nothing is drag-only.
    Rename is the one time the tree puts the cursor in a field: you asked to type a name (F2, Enter on a Mac, or a Rename
    command), the way the palette takes typing when opened by a key (decision 0049). It never happens on load.
