@@ -98,6 +98,7 @@ The second Full QA pass ([`history/round-0063/qa-2.md`](../history/round-0063/qa
 
 ## Owner notes (2026-11-24)
 
+- **105.** Done 2026-11-24 (decision 0079). Window control icons: the owner picked C in `explore/review-window-icons.html`: Solar Line Duotone marks (minus, full screen, quit full screen, close) with the second tone at 0.65 (`--s4-window-control-tone`), no tile or circle.
 - **103.** Done 2026-11-24 (decision 0077). Window controls not even with the window's edges: "they work but I feel like
   the buttons aren't aligned properly with edges, I definitely noticed that the close button is way closer to the right
   edge than the top edge, it should be equal." The layer was inset 4 at the top and 2 at the sides; now 4 on every

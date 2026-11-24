@@ -60,6 +60,7 @@
     --s4-glass-fill-opacity: 0.07;
     --s4-glass-fill-selected-opacity: 0.14;
     --s4-icon-duo-opacity: 0.42;
+    --s4-window-control-tone: 0.65;
     --s4-motion-spring-fast-spatial-calm-stiffness: 1400;
     --s4-motion-spring-fast-spatial-calm-damping: 1;
     --s4-motion-spring-fast-spatial-calm-duration: 200ms;

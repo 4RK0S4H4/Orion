@@ -845,6 +845,7 @@
   "--s4-syntax-type",
   "--s4-tree-guides",
   "--s4-type-caps-tracking",
+  "--s4-window-control-tone",
   "--s4-z-app-bar",
   "--s4-z-content",
   "--s4-z-dialog",

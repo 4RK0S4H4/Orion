@@ -20,7 +20,7 @@ option card. Answers are saved in the browser so several labs can be worked thro
 | `review-button-group.html` | Answered: E, Joined Capsule ([0026](../docs/decisions/0026-joined-capsule-and-accurate-glass-lab.md), superseded by 0059) |
 | `review-button-group-2.html` | Answered 2026-11-17: A, Ink Track; pairs Same As The Take (issue 63, [0059](../docs/decisions/0059-button-groups-and-tabs.md), which also moved tabs to the navigation family). Its Keep card now shows the shipped Ink Track |
 | `review-lens-edge.html` | Open: a lens rim in place of today's glass edge (the body unchanged, an even band of clear glass that deepens what is behind it): overall with or without glow, width, strength, blur, docked bars |
-| `review-window-icons.html` | Open: window control icons, Bold Duotone circles (minus, full screen, quit full screen, close) against today's squares, at rest, hovered and maximized, light and dark |
+| `review-window-icons.html` | Answered 2026-11-24: C, Line Duotone, no tile (issue 105, [0079](../docs/decisions/0079-window-controls-use-the-line-duotone-icons.md)) |
 | `review-light-edge.html` | Open: how glass edges should read on light mode (today, hairline outline, shaded rim, edge shade); dark unchanged |
 | `review-depth.html` | Open: how glass and the solid base combine as elevation (chrome only, three levels, one glass hero, glass sheet) |
 | `review-edge-refract.html` | Open: glass rim line (clear rim that shows and brightens the backdrop; today, hairline, bright, wide) |

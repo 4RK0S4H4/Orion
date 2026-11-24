@@ -144,8 +144,8 @@
      They behave as Windows' own: each is a full cell, the bar's whole height and 46 wide, the last one touching the
      window's end edge and all of them its top edge with no gap, so a pointer thrown into the top corner hits Close and
      one thrown at the top edge hits the control below it (Fitts's law; the title bar keeps no end padding for them).
-     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), Orion's duotone window
-     icons written in by desktop.js (decision 0074; any other icon inside the button is hidden), Close turning error only on hover and press (never red at rest), the
+     What is drawn inside stays Orion: a firm filled layer that fills most of the cell (State), Orion's Line Duotone window
+     icons written in by desktop.js (decisions 0074, 0079; any other icon inside the button is hidden), Close turning error only on hover and press (never red at rest), the
      Restore icon and label while the window is maximized. In right-to-left they mirror to the start with Close at the
      far start, as Windows mirrors a right-to-left window. They step out where the system draws its own buttons: a
      Mac shell (traffic lights), the window controls overlay of an installed web app, full screen. */
@@ -207,9 +207,10 @@
   .s4-window-control > [data-window-icon] { position: relative; --s4-icon-size: var(--s4-size-window-control-icon); }
   /* Maximize and Restore point along the window's corner: they mirror with the window in right-to-left, as Windows' do */
   .s4-window-control[data-window-action="maximize"]:dir(rtl) > [data-window-icon] > svg { transform: scaleX(-1); }
-  /* on Close's error fill the second tone sits halfway (Solar's own 0.5), where the tile is as clear of the red as the
-     cross is of the tile: about 2.5:1 each in light and dark, 3.2:1 or more in high contrast (decision 0074) */
-  .s4-window-control[data-window-action="close"]:is(:hover, :active) > [data-window-icon] { --s4-icon-duo-opacity: 0.5; }
+  /* the icons are Solar Line Duotone (decision 0079): strokes in the first tone and a second tone at one token, the same at
+     rest, on hover and on Close's error fill, so each mark reads as one. Measured against the shipped roles the first tone is
+     3:1 or more on the bar and on the red in light, dark and high contrast. Stroke width stays Solar's own (1.5 at 24). */
+  .s4-window-control > [data-window-icon] { --s4-icon-duo-opacity: var(--s4-window-control-tone); }
   @media (hover: hover) {
     .s4-window-control:hover { --_fill: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 150%), transparent); }
     .s4-window-control[data-window-action="close"]:hover { --_fill: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }

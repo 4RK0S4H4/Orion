@@ -11,7 +11,7 @@
      shell (Electron ipc, Tauri window API); Orion never talks to a shell itself. While <html data-window-state> holds
      "maximized", Maximize is labelled Restore (or its data-label-restore) and shows the Restore icon (decision 0072).
      Each .s4-window-control gets its icon written in: .s4-icon[data-window-icon] with window-minimize, window-maximize,
-     window-restore or window-close, Orion's duotone icons from the icon registry (decision 0074).
+     window-restore or window-close, Orion's Line Duotone icons from the icon registry (decisions 0074, 0079).
    - Commands (S4.commands, components/commands/) with a shortcut run on it from anywhere, with the same rules.
    - Shift+F10 or the menu key opens an element's data-context-menu from the keyboard, under the element.
    - <html data-window-blurred> while the window is not in front; <html data-window-state="fullscreen"> in full
