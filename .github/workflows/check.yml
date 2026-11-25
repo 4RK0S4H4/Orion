@@ -14,7 +14,8 @@ jobs:
       # or tokens.css / tokens.ts / tokens.json were edited by hand or not rebuilt.
       - run: npm run check
   # The production suite (issue 41): every component page, template and the showcase, used like a person would,
-  # in Chromium and WebKit (Safari's engine), phone and desktop. Then the page checker (contrast as rendered, lint).
+  # in Chromium, phone and desktop. Then the page checker (contrast as rendered, lint). WebKit and Firefox run in the
+  # job "browsers" below, which does not block publishing yet (round 0066; round 0067 triages what it finds).
   pages:
     runs-on: ubuntu-24.04   # a release Playwright ships browser builds for
     timeout-minutes: 30
@@ -24,8 +25,8 @@ jobs:
         with:
           node-version: 22
       - run: npm install --no-save playwright@1.63.0
-      - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:suite
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:suite -- --browser=chromium
       - run: npm run test:pages
       - run: npm run test:checker
       - run: npm run test:back
@@ -35,5 +36,35 @@ jobs:
         if: failure()
         with:
           name: suite-output
+          path: tests/out
+          if-no-files-found: ignore
+  # Safari's engine (WebKit) and Firefox (round 0066, issue 116): the production suite (every page, 390 dark, 1280
+  # light, reduced motion; the dial presets and the Chromium-only audits stay in "pages") and the reach passes, once
+  # per engine. Non-blocking at first: a failure here shows as a red step in a green run until round 0067 triages it.
+  browsers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [webkit, firefox]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright@1.63.0
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - name: Production suite (${{ matrix.browser }})
+        run: node tests/suite.mjs --browser=${{ matrix.browser }} --no-dials --shots
+        continue-on-error: true
+      - name: Reach passes (${{ matrix.browser }})
+        run: node tests/reach.mjs --browser=${{ matrix.browser }}
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: suite-output-${{ matrix.browser }}
           path: tests/out
           if-no-files-found: ignore

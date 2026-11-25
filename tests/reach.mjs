@@ -20,7 +20,8 @@
      motion    reduced motion: no looping animation keeps running
      keys      Tab through the page: everything reachable, a focus ring of at least 3:1 against what is behind it,
                focus order follows the visual order
-   Usage: node tests/reach.mjs [--pass=rtl,print,...] [--only=text] [--workers=4] [--shots=dir]
+   Usage: node tests/reach.mjs [--pass=rtl,print,...] [--only=text] [--workers=4] [--shots=dir] [--browser=chromium|webkit|firefox]
+   --browser picks the engine (default chromium); CI's "browsers" job runs WebKit and Firefox (round 0066).
    Zoom method: browsers have no scripting API for text-only zoom, and the type scale is in px (the M3 dp scale,
    deliberately), so a root font-size of 200% would change nothing. The pass instead doubles the computed font size
    and line height of every element (what Android's font scale, iOS Larger Text and Firefox's text-only zoom do),
@@ -36,6 +37,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const arg = (n, d) => { const a = process.argv.find((x) => x.startsWith('--' + n + '=')); return a ? a.split('=')[1] : d; };
 const ONLY = arg('only', ''), WORKERS = +arg('workers', 4), SHOTS = arg('shots', '');
 const PASSES = arg('pass', 'rtl,print,zoom,reflow,reflowz,dirflip,long320,longtext,forced,motion,keys').split(',');
+const BROWSER = arg('browser', 'chromium');
+if (!['chromium', 'webkit', 'firefox'].includes(BROWSER)) { console.error(`--browser=${BROWSER}: use chromium, webkit or firefox`); process.exit(2); }
 const FILE = arg('file', '');   /* run the named page(s) only (tests/checker.mjs proves a rule on a known-bad fixture this way) */
 
 import { silentAudit } from '../skill/orion/scripts/silent.mjs';
@@ -463,7 +466,7 @@ let ran = 0;
 
 async function runOne(browser, pass, rel, mode) {
   const label = `${pass} ${mode.key}  ${rel}`;
-  const opts = { viewport: mode.viewport, colorScheme: mode.colorScheme, hasTouch: mode.phone, deviceScaleFactor: 1 };
+  const opts = { viewport: mode.viewport, colorScheme: mode.colorScheme, hasTouch: mode.phone && BROWSER !== 'firefox', deviceScaleFactor: 1 };   /* Firefox takes no touch emulation */
   if (pass === 'rtl') opts.locale = 'ar';
   if (pass === 'forced') opts.forcedColors = 'active';
   if (pass === 'motion') opts.reducedMotion = 'reduce';
@@ -549,7 +552,7 @@ async function runOne(browser, pass, rel, mode) {
 }
 
 let browser;
-try { browser = await pw.chromium.launch(); } catch (e) { console.error('chromium is not installed'); process.exit(2); }
+try { browser = await pw[BROWSER].launch(); } catch (e) { console.error(`${BROWSER} is not installed (npx playwright install ${BROWSER})`); process.exit(2); }
 const jobs = [];
 for (const pass of PASSES) for (const rel of targets) {
   if (pass === 'print' || pass === 'reflow' || pass === 'dirflip' || pass === 'long320') { jobs.push([pass, rel, MODES[0]]); continue; }
@@ -568,4 +571,4 @@ if (failures.length) {
   for (const f of failures.sort((a, b) => a.label.localeCompare(b.label))) console.error(f.label + '\n' + f.list.map((m) => '  x ' + m).join('\n'));
   process.exit(1);
 }
-console.log(`Reach suite passed: ${targets.length} pages, ${ran} page runs (${PASSES.join(', ')}), nothing wrong.`);
+console.log(`Reach suite passed: ${targets.length} pages, ${ran} page runs (${PASSES.join(', ')}; ${BROWSER}), nothing wrong.`);

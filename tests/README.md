@@ -3,7 +3,7 @@
 `npm test` runs these (the first two are the long ones):
 
 1. **`npm run test:suite`** (`tests/suite.mjs`): every component reference page, every template, the showcase, the
-   hub and the tokens page, in **Chromium and WebKit**, as a 390px dark phone and a 1280px light desktop, plus a
+   hub and the tokens page, in **Chromium and WebKit** by default (Firefox too with `--browser`, see below), as a 390px dark phone and a 1280px light desktop, plus a
    reduced-motion pass over the templates and the showcase. On each page it checks the load (no errors, no failed
    requests, no sideways scroll, every icon drawn, no duplicate ids, every control named, every field labelled),
    focus rings (none cut off by a bar, a scrolling pane or the screen edge), touch targets (24px at 390), and then
@@ -41,6 +41,26 @@
    fetched twice (the font preloaded with `?v=` and asked for again without it was review 5's N1), a failed request, and Orion files
    that transfer more than the page kind's budget in `scripts/budgets.mjs` (site total; lean bundle, font and icons; full bundle).
 
+8. **Round 0066 additions to `test:suite`** (Chromium): `ringAudit` (issue 113: a focused table row's ring shows on all four sides,
+   never under a pinned cell or the scroll-edge cue; also in the page checker, proven by `tests/fixtures/bad-row-ring.html`) on every
+   desktop page and on Linnea left to right and right to left, light and dark; a scroll-edge cue on every table that hides columns to one
+   side (decision 0083); Linnea at 1024, 1280 and 1600 (Status on screen without scrolling, folded columns in the Columns menu and a row's
+   details, the cue when a kept column makes the table scroll); and in every app shell, one Tab reaches the skip link and Enter puts the
+   focus on main, and in a desktop app F6, Shift+F6 and Ctrl+F6 move through the regions (decision 0084).
+
+## WebKit and Firefox (round 0066, issue 116)
+
+Both scripts take `--browser`: `node tests/suite.mjs --browser=webkit` (or `firefox`, or a list such as `chromium,webkit`), and
+`node tests/reach.mjs --browser=firefox` (default `chromium`). Firefox gets no touch emulation (Playwright has none for it), so its
+phone runs are a narrow window with a mouse.
+
+CI (`.github/workflows/check.yml`): the blocking job `pages` runs the suite in **Chromium** (dial presets and the Chromium-only audits
+included), the page checker and the other tests. The job **`browsers`** installs WebKit and Firefox on Ubuntu and runs, once per
+engine, the whole suite without the dial presets (`--no-dials --shots`, every page at 390 dark, 1280 light and reduced motion) and
+every reach pass. It is **non-blocking** (`continue-on-error: true`): a failure shows as a red step and uploads `tests/out` as
+`suite-output-<browser>`, but does not stop publishing. Round 0067 triages what it finds and then makes the job blocking. Locally,
+install the engines with `npx playwright install webkit firefox`.
+
 Options: `node tests/suite.mjs --browser=chromium --only=list-detail --shots --workers=4`. Screenshots of failing
 pages go to `tests/out/` (not committed).
 A full run takes about 20 minutes and prints its problems only at the end: `SUITE_PROGRESS=1` writes one `run <browser> <mode>  <page>` line
@@ -48,7 +68,7 @@ to stderr per page run (the dial-preset phase is the long one), so a stall shows
 mid-run is relaunched and the page it was on is run again; a page that kills it twice is reported as a failure.
 
 Needs Playwright (`npm i --no-save playwright && npx playwright install chromium webkit`). CI runs it on every push
-(`.github/workflows/check.yml`, job `pages`). A browser that is missing fails the run in CI and is skipped with a
+(`.github/workflows/check.yml`, job `pages` in Chromium, job `browsers` in WebKit and Firefox). A browser that is missing fails the run in CI and is skipped with a
 warning elsewhere.
 
 When a component gains a new kind of interaction, teach `use()` in `suite.mjs` to exercise it.
