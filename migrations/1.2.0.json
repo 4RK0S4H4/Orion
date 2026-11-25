@@ -27,5 +27,5 @@
   { "id": "1.2.0-select-several", "decision": "0078", "title": "Selecting several is one model", "what": "Tables with a select column, multi-select trees and listboxes and data-selectable lists take Shift, Ctrl and Ctrl+Shift clicks, Shift and Ctrl with the arrows, Home, End and Page keys, Space, Shift+Space, Ctrl+A and Escape by themselves. Remove app code that selects rows on its own (the page checker fails a multi-select collection the model does not drive). In a data table with a select column a mouse click now selects the row; make sure each row opens by a link or data-page-open in a cell (Enter and a double-click open it too). Read the selection with table.selection() or s4-change type 'select'.", "find": { "attrs": ["aria-multiselectable", "data-selectable", "data-check"] } },
   { "id": "1.2.0-stamp", "decision": "0075", "title": "The app knows its Orion version", "what": "Every page that loads Orion carries <meta name=\"orion\" content=\"<version>\"> and the app keeps orion.json at its root (upgrade.mjs writes both). core.js warns, and the page checker fails, when the stamp and the loaded files disagree.", "find": { "text": ["name=\"orion\""] } }
  ],
- "fixed": [69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 83, 104]
+ "fixed": [69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 83, 104, 106]
 }

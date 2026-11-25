@@ -105,6 +105,12 @@ The second Full QA pass ([`history/round-0063/qa-2.md`](../history/round-0063/qa
 - **101.** Done 2026-11-23 (round 0063, decision 0076). Form README promised errors on leaving any field; untouched empty fields are reported by Submit (found by QA pass 2); board add-in-place said nothing on an empty draft. Documented; the draft shows "Enter a title".
 - **102.** Done 2026-11-23 (round 0063, decision 0076). Page checker reported "calls clipboard.writeText directly" for `core.js` itself on `components/desktop/desktop.html`. Rule: only `S4.util.copy`'s own call (marked `/* s4-clipboard-helper */`, once per file) is exempt from `check:clipboard` and the page checker; a fixture proves a second marked call still fails.
 
+## Owner notes (2026-11-25)
+
+- **106.** Done 2026-11-25 (round 0065, decision 0080). The glow inside the glass edge was too strong on short surfaces (a
+  fixed 12px on a 24px tooltip or a 52px snackbar). The owner picked A "Softer" in `explore/review-glass-glow.html`: 60%
+  strength (glow 0.144, shade 0.168) and a depth of 15% of the surface's height, 3 to 12px. No image: the lab is the reference.
+
 ## Owner notes (2026-11-24)
 
 - **105.** Done 2026-11-24 (decision 0079). Window control icons: the owner picked C in `explore/review-window-icons.html`: Solar Line Duotone marks (minus, full screen, quit full screen, close) with the second tone at 0.65 (`--s4-window-control-tone`), no tile or circle.

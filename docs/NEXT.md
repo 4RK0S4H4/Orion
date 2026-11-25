@@ -5,6 +5,14 @@
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
 
+## Also now (2026-11-25, round 0065, branch `round65/glow`): a softer glass glow, scaled to the surface (decision 0080, issue 106)
+
+The owner answered the Glass Glow lab with A "Softer": the glow is 0.144 and the shade 0.168 (60%), reaching 15% of the surface's height, 3 to
+12px (about 4 on a tooltip, 7 on a snackbar, 8 on a FAB, 10 on the toolbar, 12 on menus and panels). Each short component names its least height
+from its size tokens; `glass/glass.js` measures an app's own `.s4-glass`. `glowAudit` in the page checker and suite fails a deeper glow
+(`tests/fixtures/bad-glow.html`). The site bundle sits at its 150 KB budget with almost nothing to spare. **Next:** publish (the main session);
+the owner looks at a snackbar and a tooltip on an iPhone.
+
 ## Also now (2026-11-24, round 0064, branch `round64/tsel`): selecting several the desktop way (decision 0078, issue 104)
 
 The owner asked for Shift ranges and the like in tables. One selection model (`core/select.js`) now drives data and static tables with a select

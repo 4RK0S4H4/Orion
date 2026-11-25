@@ -10,6 +10,12 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
 
+A softer glass glow (round 0065, decision 0080, issue 106): the owner's "Softer" from the Glass Glow lab.
+
+- Changed: the glow inside a glass edge is 0.144 (was 0.24) and the shade on light glass 0.168 (was 0.28), and it reaches 15% of the surface's height, 3 to 12px, instead of a fixed 12px: about 4 on a tooltip, 7 on a snackbar, 8 on a FAB, 10 on the glass toolbar, 12 on menus, panels and dialogs.
+- Added: `--s4-glass-glow-ratio` (0.15). Each short component names its least height from its size tokens (no script, follows density and the scale dial); new `glass/glass.js` (core pack and full bundle) measures an app's own `.s4-glass`.
+- Added: the page checker and the suite fail a glass glow deeper than 15% of its surface plus 1px (`glowAudit`, `tests/fixtures/bad-glow.html`).
+
 Selecting several (round 0064, decision 0078, issue 104): tables, trees, listboxes and select-several lists take the desktop selection model.
 
 - Added: `components/core/select.js` (core pack and full bundle, not the site bundle): `S4.util.multiselect(o)`, the one selection model, and `S4.util.say(text)`, a polite live region.

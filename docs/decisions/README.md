@@ -18,7 +18,7 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | Repo, build, generated files | 0002, 0041 |
 | Glass: where it goes (chrome and overlays only, two layers max, solid fallbacks, AA floor) | 0004 |
 | Glass: the look (tint 75%, blur 8px, saturate 150%, no shadow) | 0021, 0028, 0035, 0017 |
-| Glass: the edge (thin rim top and bottom, glow or shade by lightness, width by screen density, docked bars light only the free edge) | 0034, 0036, 0037, 0029, 0040 |
+| Glass: the edge (thin rim top and bottom, glow or shade by lightness, a soft glow 15% of the surface's height, width by screen density, docked bars a hairline) | 0034, 0036, 0037, 0080, 0029, 0064 |
 | Items on glass are tints, not solid patches | 0043 (replaces 0015) |
 | Motion: pop, drop, slide, rise, shared axis; only transform and opacity | 0022, amended by 0042 (liquid ink) |
 | Shape and fill: nothing outlined, small things are pills, no sharp corners, inputs medium-rounded | 0023, 0024, 0025 |
@@ -64,10 +64,10 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0031 | Edge light color from the surface | Active |
 | 0032 | Colored FABs at 90% tint | Active |
 | 0033 | Top and bottom lit equally | Active |
-| 0034 | Edge calibrated to the iOS tab bar | Active |
+| 0034 | Edge calibrated to the iOS tab bar | Active (glow strength and depth amended by 0080) |
 | 0035 | Owner's tailored glass set; light edge quiz | Active |
-| 0036 | Glow inverts into an edge shade on light surfaces | Active |
-| 0037 | Glow / shade flip at OKLCH lightness 0.6 | Active, awaiting the owner's iPhone check |
+| 0036 | Glow inverts into an edge shade on light surfaces | Active (strength and depth amended by 0080) |
+| 0037 | Glow / shade flip at OKLCH lightness 0.6 | Active, awaiting the owner's iPhone check (strength and depth amended by 0080) |
 | 0038 | Floating bars | Tried and reverted |
 | 0039 | Docked glass gets the full edge | Superseded by 0040 |
 | 0040 | Docked glass lights only its free edge | Active, awaiting the owner's iPhone check |
@@ -110,5 +110,6 @@ reasoning. A decision isn't reopened without the owner; a new one gets the next 
 | 0077 | Window control layers sit evenly in the corner (amends 0072, issue 103): every control's hover and press layer is inset 4 on every side, so Close's is as far from the window's top edge as from its end edge; Close's outer corner is the window's corner (`--s4-window-corner`, 8 in a restored Windows shell) minus the inset, the firm 8 where the window is square. `windowAudit` and the stubbed Windows shell prove it (`tests/fixtures/bad-window-inset.html`). | our call |
 | 0078 | Selecting several, the desktop way (issue 104): one selection model in `core/select.js` for data and static tables with a select column, multi-select trees and listboxes and select-several lists; click, Shift+click (the range from the anchor, replacing the last one), Ctrl/⌘+click, Ctrl+Shift+click; Shift and Ctrl with the arrows, Home, End and Page keys; Space, Shift+Space, Ctrl/⌘+A (every row the filter shows), Escape; touch unchanged; selection is data (ids) and survives virtual rows, sorting and filtering; a mouse click on a data table row selects it; every change is said. Proofs: the suite's `selectAudit`, `tests/fixtures/bad-select.html`. | Active (our design, owner can overrule) |
 | 0079 | Window controls use the line duotone icons (amends 0074, issue 105): `window-minimize`, `window-maximize`, `window-restore`, `window-close` are Solar Line Duotone (`minus`, `full-screen`, `quit-full-screen`, `close`, strokes 1.5 at 24, no tile); the second tone is one token, `--s4-window-control-tone` (0.65), at rest, hover and press (Close's 0.5 is gone); Phosphor keeps its square tiles (no stroke equivalent); cells, corner rule and layer from 0072 and 0077 stand | Active (owner, 2026-11-24, issue 105, lab `review-window-icons`, answer C) |
+| 0080 | A softer glow, scaled to the surface (amends 0034, 0036, 0037; issue 106): glow 0.144 and shade 0.168 (60%), reaching 15% of the surface's height (`--s4-glass-glow-ratio`), 3 to 12px; each short component names its least height from its size tokens, `glass.js` measures app-made `.s4-glass`; proofs: `glowAudit` in the page checker and suite, `tests/fixtures/bad-glow.html`. | Active (owner, 2026-11-25, lab `review-glass-glow`, answer A "Softer") |
 
 Round 0061 also fixed two iPhone bugs with no decision of their own (issues 71, 72 in `docs/issues/README.md`; notes `docs/history/round-0061/mobile.md`): a place-holding container rings only for the keyboard (`data-s4-input`), and the nav bar's highlight is a rounded rectangle holding its label again.
