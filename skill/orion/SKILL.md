@@ -122,9 +122,9 @@ S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft
 | `text` | the same | only when the brand truly has a text face; otherwise keep Inter |
 | `scale` | `compact`, `large` | type and spacing step together: compact for dense tools read at a desk, large for reading-first or older audiences. Never to fix one component |
 | `headings` | `tight`, `editorial` | tight: bold, tracked in (product, tool); editorial: regular weight, open leading (magazine, studio). Use it instead of weight or tracking on headings; pair editorial with a serif display, tight with Inter |
-| `data-density` | comfortable, `compact`, `auto` | desktop tools |
+| `density` | `comfortable` (default), `compact`, `auto`, `roomy` | auto or compact: desktop tools; roomy: content sites only |
 
-A value that is not in this table is a mistake, not a variation (decision 0067): `S4.theme({ scale: 'roomy' })` logs a warning naming the allowed values and writes nothing, and the page checker fails `data-scale="roomy"` in markup.
+A value that is not in this table is a mistake, not a variation (decision 0067): `S4.theme({ scale: 'roomy' })` logs a warning naming the allowed values and writes nothing, and the page checker fails `data-scale="roomy"` in markup. The same goes for a seed that is no color (`'#zzz'`) and a key `S4.theme` does not know (`accent`, `icons`): a warning, nothing written (issue 108). `S4.theme.keys` lists every key and the attribute it writes.
 
 Pick at most three dials beyond the accent; an app that turns every dial stops looking designed. Pair them with intent:
 editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mono display for numbers); friendly

@@ -1449,6 +1449,8 @@
   "tagInput.source",
   "tagInput.values",
   "theme",
+  "theme.dials",
+  "theme.keys",
   "theme.restore",
   "timeField.parse",
   "timeField.set",

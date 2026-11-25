@@ -2,7 +2,8 @@
 /* Orion checker proofs (round 0059, decision 0067): a rule is only a rule if a known-bad page fails it. Runs the page
    checker (skill/orion/scripts/check.mjs) over the pages in tests/fixtures and expects each to fail with the named
    message, so the claim "the checker catches it" is regression tested; then proves the dial values at runtime:
-   S4.theme with a value off a dial's list warns, names the allowed values and writes nothing.
+   S4.theme with a value off a dial's list warns, names the allowed values and writes nothing; every key in S4.theme.keys takes every
+   value S4.theme.dials lists, and a seed that is no color, a bad surfaces and an unknown key warn and change nothing (issue 108).
      bad-words.html     a table nothing wraps or stacks, squeezed at 390 until its words break across lines
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
      bad-nav-pill.html  five destinations at 390 with the highlight's corner at half its height: a circle "Settings" pokes out of
@@ -124,6 +125,69 @@ for (const [key, val] of Object.entries(BAD)) {
 {
   const listed = await page.evaluate(() => { const w = []; const real = console.warn; console.warn = (m) => w.push(String(m)); const out = []; const D = S4.theme.dials; const KEY = { 'data-contrast': 'contrast', 'data-theme': 'mode', 'data-accent-variant': 'variant', 'data-corners': 'corners', 'data-gray': 'gray', 'data-page': 'page', 'data-energy': 'energy', 'data-scale': 'scale', 'data-headings': 'headings', 'data-surfaces': 'surfaces' }; for (const attr of Object.keys(KEY)) for (const v of D[attr] || []) { w.length = 0; S4.theme({ [KEY[attr]]: v }); if (w.some((m) => /^S4: theme /.test(m))) out.push(attr + '=' + v); } console.warn = real; S4.theme({ contrast: 0, mode: 'system', corners: 'round', gray: 'pure', page: 'plain', energy: 'standard', scale: 'default', headings: 'default', variant: 'auto', surfaces: 'neutral' }); return out; });
   expect(listed.length === 0, `every value a dial lists is accepted by S4.theme (refused: ${listed.join(', ') || 'none'})`);
+}
+/* issue 108: every key, every bad-value case. S4.theme.keys names each key and its attribute; every dial in S4.theme.dials has a
+   key; every listed value of every key is accepted, written, and read back by S4.theme(); a value off the list, a seed that is no
+   color, a bad surfaces and an unknown key each warn, saying what is expected, and change nothing (attributes, the color block) */
+{
+  const r = await page.evaluate(() => {
+    const w = []; const real = console.warn; console.warn = (m) => w.push(String(m));
+    const K = S4.theme.keys, D = S4.theme.dials, h = document.documentElement, out = { missing: [], refused: [], unwritten: [], unread: [] };
+    for (const a of Object.keys(D)) if (!Object.values(K).includes(a)) out.missing.push(a);
+    const reset = { mode: 'system', contrast: 0, corners: 'round', gray: 'pure', page: 'plain', energy: 'standard', scale: 'default', headings: 'default', density: 'comfortable', buttons: 'filled', cards: 'elevated', lists: 'plain', rail: 'auto', displayWeight: 'semibold', display: 'inter', text: 'inter', variant: 'auto', surfaces: 'neutral' };
+    for (const [key, attr] of Object.entries(K)) {
+      if (key === 'seed') continue;
+      for (const v of D[attr] || []) {
+        if (v === 'custom') continue;
+        w.length = 0; const got = S4.theme({ [key]: v });
+        if (w.some((m) => /^S4: theme /.test(m))) out.refused.push(key + '=' + v);
+        const at = h.getAttribute(attr), base = reset[key];
+        const shown = key === 'contrast' ? ['standard', 'medium', 'high'][Math.round(got.contrast * 2)] : got[key];
+        if (key !== 'contrast' && key !== 'variant' && key !== 'surfaces' && v !== base && v !== 'system' && at !== v) out.unwritten.push(`${key}=${v} wrote ${at}`);
+        if (String(shown) !== String(v) && !(key === 'mode' && v === 'system')) out.unread.push(`${key}=${v} reads ${shown}`);
+      }
+      S4.theme(reset);
+    }
+    console.warn = real; return out;
+  });
+  expect(r.missing.length === 0, `every dial in S4.theme.dials is a key of S4.theme (missing: ${r.missing.join(', ') || 'none'})`);
+  expect(r.refused.length === 0, `every listed value of every key is accepted (refused: ${r.refused.join(', ') || 'none'})`);
+  expect(r.unwritten.length === 0, `every listed value is written to <html> (${r.unwritten.join('; ') || 'all written'})`);
+  expect(r.unread.length === 0, `S4.theme() reads every value back (${r.unread.join('; ') || 'all read'})`);
+  const density = await page.evaluate(() => { S4.theme({ density: 'roomy' }); const a = document.documentElement.getAttribute('data-density'); S4.theme({ density: 'comfortable' }); return [a, document.documentElement.getAttribute('data-density')]; });
+  expect(density[0] === 'roomy' && density[1] === null, `density roomy is written and comfortable removes it (${density.join(', ')})`);
+  const CASES = [
+    [{ density: 'tight' }, /density "tight" ignored .*use comfortable, compact, auto or roomy/, 'data-density'],
+    [{ seed: 'notacolor' }, /seed "notacolor" ignored .*#rrggbb or an accent name: mono, blue/, null],
+    [{ seed: '#zzz' }, /seed "#zzz" ignored .*#rrggbb/, null],
+    [{ seed: '#12' }, /seed "#12" ignored/, null],
+    [{ seed: 42 }, /seed "42" ignored/, null],
+    [{ surfaces: 'glossy' }, /surfaces "glossy" ignored .*use neutral or tinted/, 'data-surfaces'],
+    [{ accent: '#12' }, /key "accent" ignored; use seed instead\. S4\.theme takes mode, seed/, null],
+    [{ icons: 'fontawesome' }, /key "icons" ignored; use S4\.icon\.use/, null],
+    [{ sparkle: true }, /key "sparkle" ignored; S4\.theme takes .*density.* or save\./, null],
+    [{ buttons: 'outlined' }, /buttons "outlined" ignored .*use filled or tonal/, 'data-buttons'],
+    [{ rail: 'wide' }, /rail "wide" ignored .*auto, expanded or collapsed/, 'data-rail'],
+  ];
+  for (const [opts, re, attr] of CASES) {
+    warns.length = 0;
+    const res = await page.evaluate(([o, a]) => {
+      const h = document.documentElement, before = { attrs: [...h.attributes].map((x) => x.name + '=' + x.value).join(' '), color: (document.getElementById('s4-dynamic-color') || {}).textContent || '', primary: getComputedStyle(h).getPropertyValue('--md-sys-color-primary') };
+      S4.theme(o);
+      return new Promise((r) => setTimeout(() => r({ same: before.attrs === [...h.attributes].map((x) => x.name + '=' + x.value).join(' ') && before.color === ((document.getElementById('s4-dynamic-color') || {}).textContent || '') && before.primary === getComputedStyle(h).getPropertyValue('--md-sys-color-primary'), attr: a ? h.getAttribute(a) : null }), 300));
+    }, [opts, attr]);
+    const label = JSON.stringify(opts);
+    expect(res.same, `${label} changes nothing on the page`);
+    expect(warns.some((w) => re.test(w)), `${label} warns (${re}); got ${JSON.stringify(warns.filter((w) => /^S4/.test(w)).slice(0, 2))}`);
+  }
+  warns.length = 0;
+  const seeds = await page.evaluate(() => { const r = []; for (const v of ['blue', 'Teal', '#0B57D0', 'mono', null]) { S4.theme({ seed: v }); r.push(S4.theme().seed); } return r; });
+  expect(!warns.some((w) => /^S4: theme/.test(w)) && seeds[0] === '#0b57d0' && seeds[2] === '#0B57D0' && seeds[3] === null && seeds[4] === null, `a named accent, #rrggbb, mono and null are accepted (${JSON.stringify(seeds)})`);
+  /* on a container: the same checks, and the page-wide keys say so */
+  warns.length = 0;
+  const box = await page.evaluate(() => { const d = document.createElement('div'); document.body.appendChild(d); S4.theme({ density: 'compact', seed: 'nope', surfaces: 'shiny', contrast: 1, accent: 'red' }, d); return [...d.attributes].map((x) => x.name + '=' + x.value).join(' '); });
+  expect(box === 'data-density=compact', `a container takes density and drops the bad seed, surfaces, contrast and accent (${box})`);
+  for (const re of [/seed "nope" ignored/, /surfaces "shiny" ignored/, /contrast is page-wide/, /key "accent" ignored/]) expect(warns.some((w) => re.test(w)), `a container warns: ${re}`);
 }
 /* the same on a container, and the good values still work */
 warns.length = 0;

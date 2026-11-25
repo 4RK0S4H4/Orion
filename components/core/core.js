@@ -180,6 +180,8 @@
 
   /* ---------- theme ----------
      S4.theme({ seed: '#0b57d0', variant: 'vibrant', surfaces: 'neutral'|'tinted', mode: 'system'|'light'|'dark', contrast: 0|0.5|1, save: 'app-key' })
+     plus the brand dials (corners, gray, page, display, text, displayWeight, energy, scale, headings), density and the app
+     defaults (buttons, cards, lists, rail): S4.theme.keys names the attribute each writes, S4.theme.dials the values.
      Monochrome (no seed) uses the roles already in tokens.css. A seed generates every M3 role with Material Color
      Utilities (m3color.js, loaded on demand) for light and dark, written in the same zero-specificity blocks as
      tokens.css, so device dark mode and high contrast keep working. */
@@ -405,7 +407,14 @@
     { key: 'displayWeight', attr: 'data-type-display-weight', base: 'semibold' },   /* regular, medium: for a display face lighter than Inter (decision 0060) */
     { key: 'energy', attr: 'data-energy', base: 'standard' },   /* motion energy: calm, standard, lively (motion.css, motion.js) */
     { key: 'scale', attr: 'data-scale', base: 'default' },   /* type and spacing together: compact, default, large (scale.css, decision 0066) */
-    { key: 'headings', attr: 'data-headings', base: 'default' }   /* heading style: default, tight, editorial (brand.css, decision 0066) */
+    { key: 'headings', attr: 'data-headings', base: 'default' },   /* heading style: default, tight, editorial (brand.css, decision 0066) */
+    /* issue 108: every dial S4.theme.dials lists is a key of S4.theme (decision 0076 (6)); density and the app defaults were
+       only attributes, so S4.theme({ density: 'roomy' }) did nothing and said nothing */
+    { key: 'density', attr: 'data-density', base: 'comfortable' },   /* comfortable, compact, auto, roomy (density.css; roomy for content sites) */
+    { key: 'buttons', attr: 'data-buttons', base: 'filled' },   /* app defaults (defaults.css, decision 0056): the unmarked variant */
+    { key: 'cards', attr: 'data-cards', base: 'elevated' },
+    { key: 'lists', attr: 'data-lists', base: 'plain' },
+    { key: 'rail', attr: 'data-rail', base: 'auto' }
   ];
   /* Dial values (decision 0067): every dial takes a short list of values; anything else matches no rule and used to be
      written to the page silently (S4.theme({ scale: 'roomy' }) wrote data-scale="roomy" and nothing changed). S4.theme
@@ -449,6 +458,31 @@
   }
   /* a typeface dial also takes a font-family value, so it is never checked as a preset */
   function brandOk(d, v) { return d.prop ? true : dialOk(d.attr, d.key, v); }
+  /* S4.theme never fails silently (issue 108): a seed that is not a color, a surfaces value off its list and a key S4.theme
+     does not know each warn, say what is expected, and change nothing. A seed is #rrggbb or a name in S4.theme.accents;
+     null, '' or 'mono' goes back to monochrome. */
+  var HEX = /^#[0-9a-f]{6}$/i;
+  function seedOk(v) {
+    if (v == null || v === '' || v === false) return true;
+    if (typeof v === 'string' && (HEX.test(v) || S4.theme.accents[v.toLowerCase()])) return true;
+    warnOnce('S4: theme seed "' + v + '" ignored (not written); use a color as #rrggbb or an accent name: ' + sayList(Object.keys(S4.theme.accents)) + '.');
+    return false;
+  }
+  var HINT = { accent: 'seed', color: 'seed', theme: 'mode', icons: 'S4.icon.use(…)', iconSet: 'S4.icon.use(…)', font: 'display or text', typeface: 'display or text', shape: 'corners', motion: 'energy' };
+  function keysOk(opts, el) {
+    var known = ['mode', 'seed', 'variant', 'surfaces'].concat(BRAND.map(function (d) { return d.key; }));
+    Object.keys(opts).forEach(function (k) {
+      if (!el && (k === 'contrast' || k === 'save')) return;
+      if (known.indexOf(k) >= 0) return;
+      warnOnce(el && (k === 'contrast' || k === 'save')
+        ? 'S4: theme ' + k + ' is page-wide; call S4.theme({ ' + k + ': … }) without an element (ignored).'
+        : 'S4: theme key "' + k + '" ignored; ' + (HINT[k] ? 'use ' + HINT[k] + ' instead. ' : '') + 'S4.theme takes ' + sayList(known.concat(el ? [] : ['contrast', 'save'])) + '.');
+      delete opts[k];
+    });
+    if ('seed' in opts && !seedOk(opts.seed)) delete opts.seed;
+    if ('surfaces' in opts && opts.surfaces != null && opts.surfaces !== '' && !dialOk('data-surfaces', 'surfaces', opts.surfaces)) delete opts.surfaces;
+    return opts;
+  }
   function auditDials(scope) {
     var out = [], seen = {}, attrs = Object.keys(DIALS);
     [].slice.call((scope || document).querySelectorAll(attrs.map(function (a) { return '[' + a + ']'; }).join(','))).forEach(function (n) {
@@ -466,6 +500,7 @@
   function themeElement(el, opts) {
     var attr = function (name, v) { if (v == null || v === '' || v === 'system') el.removeAttribute(name); else el.setAttribute(name, v); };
     if (opts) {
+      opts = keysOk(Object.assign({}, opts), el);
       if ('mode' in opts && dialOk('data-theme', 'mode', opts.mode)) attr('data-theme', opts.mode);
       if ('seed' in opts) attr('data-accent', opts.seed);
       if ('variant' in opts && dialOk('data-accent-variant', 'variant', opts.variant)) attr('data-accent-variant', opts.variant);
@@ -490,9 +525,10 @@
     if (el && el !== root) return themeElement(el, opts);
     if (!opts) return { seed: state.seed, variant: state.variantSet ? state.variant : 'auto', mode: state.mode, contrast: state.contrast, surfaces: state.surfaces,
       corners: state.corners || 'round', gray: state.gray || 'pure', page: state.page || 'plain', display: state.display || 'inter', text: state.text || 'inter', energy: state.energy || 'standard', displayWeight: state.displayWeight || 'semibold',
-      scale: state.scale || 'default', headings: state.headings || 'default' };
+      scale: state.scale || 'default', headings: state.headings || 'default', density: state.density || 'comfortable',
+      buttons: state.buttons || 'filled', cards: state.cards || 'elevated', lists: state.lists || 'plain', rail: state.rail || 'auto' };
     var colorChanged = false;
-    opts = Object.assign({}, opts);   /* a value off the dial's list is dropped, with a warning, never written (decision 0067) */
+    opts = keysOk(Object.assign({}, opts));   /* a value off the dial's list, a seed that is no color and an unknown key are dropped, with a warning, never written (decisions 0067, 0076; issue 108) */
     if ('mode' in opts && !dialOk('data-theme', 'mode', opts.mode)) delete opts.mode;
     if ('variant' in opts && !dialOk('data-accent-variant', 'variant', opts.variant)) delete opts.variant;
     /* the dial's own words (S4.theme.dials) are accepted too (decision 0076) */
@@ -536,6 +572,9 @@
     state[d.key] = v === 'custom' && d.prop ? (root.style.getPropertyValue(d.prop).trim() || null) : v;
   });
   S4.theme.dials = DIALS;
+  /* which attribute each S4.theme key writes (issue 108): every dial in S4.theme.dials has a key, and only these keys exist */
+  S4.theme.keys = { mode: 'data-theme', contrast: 'data-contrast', surfaces: 'data-surfaces', variant: 'data-accent-variant', seed: 'data-accent' };
+  BRAND.forEach(function (d) { S4.theme.keys[d.key] = d.attr; });
   S4.theme.audit = auditDials;   /* the dial attributes in the page whose value is not on the list, as messages (the page checker fails them) */
   S4.register('dial-values', function (scope) { auditDials(scope).forEach(warnOnce); });
   new MutationObserver(function (list) {
