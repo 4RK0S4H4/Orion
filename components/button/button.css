@@ -1,6 +1,6 @@
 /* Button (M3 Expressive)
    <button class="s4-button" data-variant="filled|tonal|outlined|elevated|text" data-size="xs|s|m|l|xl"
-           data-shape="round|square" data-color="error">
+           data-shape="round|square" data-color="error|neutral">
      <span class="s4-icon" data-icon="add"></span>Label
    </button>
    Defaults: filled, size s (40), round. Toggle buttons add aria-pressed (and data-toggle so orion.js flips it).
@@ -87,6 +87,12 @@
   .s4-button[data-color="error"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
   .s4-button[data-color="error"]:where([data-variant="text"]) { --_bg: transparent; --_fg: var(--md-sys-color-error); }
   .s4-button[data-color="error"][data-variant="outlined"] { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
+  /* neutral (decision 0085): a secondary action that keeps its look but leaves the accent to the screen's one accent job;
+     text in on-surface-variant, elevated and tonal in on-surface on a neutral fill, filled as the inverse surface */
+  .s4-button[data-color="neutral"]:where(:not([data-variant]), [data-variant="filled"]) { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="tonal"], [data-variant="outlined"]) { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="elevated"]) { --_fg: var(--md-sys-color-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="text"]) { --_bg: transparent; --_fg: var(--md-sys-color-on-surface-variant); }
 
   /* ---------- sizes (M3 Expressive: xs 32, s 40, m 56, l 96, xl 136) ---------- */
   .s4-button[data-size="xs"] { --_h: var(--s4-size-button-small); --_pad: var(--s4-space-3); --_gap: var(--s4-space-1); }

@@ -281,6 +281,15 @@
     font-weight: var(--md-sys-typescale-emphasized-body-large-weight);
   }
 
+  /* with one pane at a time (under 840 the list or its detail, never both) the open item has no resting mark while the
+     list is the pane shown: nothing beside it is open (decision 0085) */
+  @container s4-app (width < 840px) {
+    .s4-split:not([data-open]) .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])),
+    .s4-split:not([data-open]) .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] { --_bg: transparent; }
+    .s4-split:not([data-open]) .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) .s4-list-headline,
+    .s4-split:not([data-open]) .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] .s4-list-headline { font-weight: inherit; }
+  }
+
   /* ---------- disabled ---------- */
   .s4-list-item:is(:disabled, [aria-disabled="true"], :has(input:disabled)) {
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);

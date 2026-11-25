@@ -15,7 +15,7 @@ Starts an action. M3 Expressive buttons: five variants, five sizes, round or squ
 | `data-variant` | `filled`, `tonal`, `elevated`, `text` (the old `outlined` still works as an alias and draws a filled button; nothing is outlined, decision 0023) | `filled` |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136) | `s` |
 | `data-shape` | `round`, `square` | `round` |
-| `data-color` | `error` (destructive) | — |
+| `data-color` | `error` (destructive), `neutral` (decision 0085: a secondary action that leaves the accent to the screen's one accent job: text in `on-surface-variant`, elevated and tonal in `on-surface`) | — |
 | `data-toggle` + `aria-pressed` | toggle button; `data-label-on/off`, `data-icon-on/off` swap label and icon | — |
 
 **When to use what:** one **filled** button for the most important action in an area; **tonal** for a strong secondary
