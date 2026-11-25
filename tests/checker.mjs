@@ -16,6 +16,7 @@
      bad-select.html                a multi-select listbox and grid that the selection model does not drive (decision 0078)
      bad-clipboard-marker.html  a second call under the helper's exemption marker (decision 0076)
      bad-overfull.html  a control whose label is wider than its box (decision 0073)
+     bad-glow.html      a glass glow turned up to 40% of the surface's height on a FAB and a toolbar (decision 0080)
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
      bad-stamp.html     <meta name="orion"> says 0.9.0 but the page loads this version (decision 0075)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
@@ -47,6 +48,8 @@ const CASES = [
   ['bad-select.html', /table\.bs-grid: a collection that selects several that Orion's selection model does not drive/, 'a hand-made grid that says aria-multiselectable'],
   ['bad-grip.html', /the column grip is covered at \d+% of its width by [^\n]*, so the border cannot be grabbed/, 'a column grip that overhangs under the next header'],
   ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
+  ['bad-glow.html', /the glass glow on [^\n]*button\.s4-fab reaches 12\.0px into a 56px surface, more than 15% of its height[^\n]*decision 0080/, 'a glow deeper than 15% of a FAB'],
+  ['bad-glow.html', /the glass glow on [^\n]*div\.s4-toolbar reaches 12\.0px into a 64px surface/, 'a glow deeper than 15% of a toolbar'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-stamp.html', /this page is stamped Orion 0\.9\.0 \(meta name="orion"\) but loads Orion \d+\.\d+\.\d+/, 'a stamp that disagrees with the loaded files'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],

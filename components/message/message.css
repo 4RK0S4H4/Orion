@@ -97,6 +97,7 @@
      when pressed, so they always follow the pill's curve (decision 0043). */
   .s4-composer {
     --_row: var(--s4-size-touch-target);
+    --_glass-h: calc(var(--_row) + 2 * var(--s4-space-1));   /* one row, for the glass glow's depth (decision 0080) */
     position: sticky;
     inset-block-end: calc(var(--s4-app-inset-bottom, 0px) + var(--s4-space-2));
     z-index: var(--s4-z-sticky);

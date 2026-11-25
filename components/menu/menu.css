@@ -33,6 +33,7 @@
     gap: 2px;
   }
   .s4-menu:popover-open, .s4-menu[data-open] { display: flex; }
+  .s4-menu:not(:has(> * + *)) { --_glass-h: calc(2 * var(--s4-space-2) + var(--s4-size-touch-target)); }   /* one item: its height for the glass glow's depth; two or more are tall (decision 0080) */
   .s4-menu[data-color="vibrant"] { background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container); }
 
   .s4-menu-item {

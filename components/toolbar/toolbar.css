@@ -19,6 +19,7 @@
     gap: var(--s4-space-1);
     flex: none;
     min-block-size: var(--_size);   /* never a fixed height on what holds text (decision 0058): labelled tools wrap to a second row at 200% text on a phone (issue 78) */
+    --_glass-h: var(--_size);   /* its least height, for the glass glow's depth (decision 0080); a vertical toolbar of two tools or more is tall */
     flex-wrap: wrap;
     max-inline-size: 100%;
     padding-inline: var(--s4-space-2);
@@ -53,6 +54,7 @@
     inline-size: var(--_size);
     padding: var(--s4-space-2) 0;
   }
+  .s4-toolbar[data-orientation="vertical"]:has(> * + *) { --_glass-h: 1000px; }
 
   /* docked: edge to edge, square corners, no shadow */
   .s4-toolbar[data-type="docked"] {

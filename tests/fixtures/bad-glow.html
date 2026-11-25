@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: A Glow Deeper Than The Surface Allows</title>
+<!-- Known-bad fixture (issue 106, decision 0080). tests/checker.mjs expects the page checker to FAIL this page: the app turned
+     the glass glow back up to reach 40% of each surface's height, so a 56px FAB and a 64px toolbar are mostly glow. The glow
+     reaches at most 15% of a surface's height plus 1px. Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  :root { --s4-glass-glow-ratio: 0.4; }
+</style>
+</head>
+<body>
+<main style="padding: 16px; display: grid; gap: 16px; justify-items: start">
+  <h1>Notes</h1>
+  <button class="s4-fab" type="button" aria-label="New Note"><span class="s4-icon" data-icon="add"></span></button>
+  <div class="s4-toolbar" role="toolbar" aria-label="Note Actions">
+    <button class="s4-icon-button" type="button" aria-label="Edit"><span class="s4-icon" data-icon="edit"></span></button>
+    <button class="s4-icon-button" type="button" aria-label="Share"><span class="s4-icon" data-icon="share"></span></button>
+  </div>
+</main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>

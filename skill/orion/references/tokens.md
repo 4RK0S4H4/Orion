@@ -465,10 +465,11 @@ Light values are shown; a second value is dark mode. Color roles also change wit
 | `--s4-glass-edge-side-alpha` | 0 | 0 | How strong the faint line all round is (0 to 1). |
 | `--s4-glass-edge-bottom-alpha` | 0.46 | 0.12 | How strong the light line along the bottom edge is (0 to 1). Lit like the top (decision 0033), in the same surface-based color, so a surface looks evenly lit and not raised. |
 | `--s4-glass-edge-lift` | 1 |  | Decision 0031: the edge light is the surface's own color moved this far toward white (0 = the surface color, 1 = pure white). A pale glass gets a near-white line; a dark glass or a dark floating button gets a softer, lighter version of itself instead of a hard white line. |
-| `--s4-glass-glow-alpha` | 0.24 |  | Strength of the white glow on a dark surface at the top edge (0 to 1), the same in light and dark mode. |
-| `--s4-glass-glow-shade-alpha` | 0.28 |  | Strength of the ink edge shade on a light surface at the top edge (0 to 1), the same in light and dark mode. |
+| `--s4-glass-glow-alpha` | 0.144 |  | Strength of the white glow on a dark surface at the top edge (0 to 1), the same in light and dark mode. Decision 0080: 60% of 0.24, the owner's Softer. |
+| `--s4-glass-glow-shade-alpha` | 0.168 |  | Strength of the ink edge shade on a light surface at the top edge (0 to 1), the same in light and dark mode. Decision 0080: 60% of 0.28, the owner's Softer. |
 | `--s4-glass-glow-flip` | 0.6 |  | OKLCH lightness (0 black to 1 white) at which a surface flips from the glow to the shade. A surface at or above it gets the shade; below it, the glow. A mid gray therefore gets a glow or a shade, never nothing. |
-| `--s4-glass-glow-size` | 12px |  | How far the glow or shade reaches inward from the edge. |
+| `--s4-glass-glow-size` | 12px |  | The deepest the glow or shade reaches inward from the edge: tall surfaces (80 and up) and surfaces of unknown height. Shorter ones reach `ratio` of their height (decision 0080). |
+| `--s4-glass-glow-ratio` | 0.15 |  | Decision 0080: the glow or shade reaches this share of the surface's height inward (8 on a 56 FAB, 10 on a 64 toolbar), between a quarter of `size` (3px) and `size`. glass.css works it out from each component's own size tokens, so it follows density and the scale dial without script. |
 | `--s4-glass-fill-opacity` | 0.07 | 0.06 | Decision 0043: a filled control on glass (field, chip, neutral button) is a tint of the text color at this opacity instead of an opaque surface role, so it reads as part of the glass. |
 | `--s4-glass-fill-selected-opacity` | 0.14 | 0.07 | Decision 0043: a selected item on glass (nav pill, checked menu item, tonal button) is a tint of the accent at this opacity; its text is on-surface. |
 

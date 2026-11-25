@@ -29,6 +29,7 @@
     min-width: var(--_h);
     block-size: max-content;
     min-block-size: var(--_h);
+    --_glass-h: var(--_h);   /* 56, 80 or 96: its height for the glass glow's depth (decision 0080) */
     padding: 0 calc((var(--_h) - var(--_icon)) / 2);
     border: 0;
     border-radius: var(--_radius);

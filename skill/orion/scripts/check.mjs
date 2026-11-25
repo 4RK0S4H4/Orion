@@ -20,7 +20,7 @@ import { resolve, dirname, basename, join, parse, sep } from 'node:path';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { knownClasses, silentAudit, windowAudit } from './silent.mjs';
+import { knownClasses, silentAudit, windowAudit, glowAudit } from './silent.mjs';
 import { midMotion } from './midmotion.mjs';
 
 const argv = process.argv.slice(2);
@@ -318,7 +318,8 @@ for (const page of pages) {
       r.glassContent.forEach((x) => errors.add(`${at} glass on content: ${x}`));
       r.roles.forEach((x) => errors.add(`${at} ${x}`));
       (r.dials || []).forEach((x) => errors.add(`${at} ${x}`));
-      (r.windows || []).forEach((x) => errors.add(`${at} ${x}`));   /* window controls are full cells to the window's edges (decision 0072) */   /* a dial attribute with a value Orion has no rule for (decision 0067) */
+      (r.windows || []).forEach((x) => errors.add(`${at} ${x}`));
+      (r.glow || []).forEach((x) => errors.add(`${at} ${x}`));   /* the glow scales with the surface (decision 0080) */   /* window controls are full cells to the window's edges (decision 0072) */   /* a dial attribute with a value Orion has no rule for (decision 0067) */
       (r.unknown || []).forEach((x) => errors.add(`${at} unknown class ${x}: nothing in Orion or the page defines it (check the name in the component's README)`));
       (r.broken || []).forEach((x) => errors.add(`${at} ${x}: the box is too narrow for its words (a fixed width, a column that cannot stack, or a part outside its component)`));
       (r.container || []).forEach((x) => errors.add(`${at} ${x}: put it inside its component (see its README)`));
@@ -332,7 +333,7 @@ for (const page of pages) {
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };
     await p.evaluate(knownClasses);
-    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])), windows: await p.evaluate(windowAudit) });
+    const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])), windows: await p.evaluate(windowAudit), glow: await p.evaluate(glowAudit) });
     report(await audited());
     const shot = join(OUT, `${label}-${v.name}.png`);
     await p.screenshot({ path: shot, fullPage: true });

@@ -622,6 +622,7 @@
   "--s4-glass-fill-selected-opacity",
   "--s4-glass-glow-alpha",
   "--s4-glass-glow-flip",
+  "--s4-glass-glow-ratio",
   "--s4-glass-glow-shade-alpha",
   "--s4-glass-glow-size",
   "--s4-glass-item-fill",

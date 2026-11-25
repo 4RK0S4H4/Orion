@@ -19,6 +19,7 @@
                       data-selectable) that Orion's selection model does not drive (no data-s4-multiselect, which only the
                       model writes): Shift+click, Shift with the arrows, Ctrl+A and Escape do nothing there (decision 0078).
                       A combobox's popup listbox is not one: focus stays in its field, typing and Enter pick
+     glowAudit()      the glass glow deeper than 15% of its surface's height plus 1px (decision 0080), as a list of problems
    Words that may truncate (decision 0058: the timeline label, top app bar title, title bar title, text field value and date
    value) never count as split: they stay on one line behind an ellipsis. */
 
@@ -298,6 +299,34 @@ export function windowAudit() {
         if (h && bar.contains(h) && !c.contains(h)) out.push(`the top edge above "${name(c)}" hits ${path(h)}, not the control (decision 0072)`);
       }
     }
+  }
+  return out;
+}
+
+/* Glow depth (decision 0080): the glow or shade inside a glass edge reaches at most 15% of the surface's height (3 to
+   12px), so a tooltip or a snackbar is not mostly glow. For every shown element with a backdrop filter, the depth is read
+   from its computed box-shadow (the inset layers whose blur equals their offset and whose spread is minus the offset)
+   and must not pass 15% of its layout height (offsetHeight: transforms of a pop or a rise do not count) plus 1px.
+   Returns a list of problems. */
+export function glowAudit() {
+  const out = [];
+  const path = (e) => { const bits = []; for (let n = e; n && n !== document.body && bits.length < 3; n = n.parentElement) { let s = n.tagName.toLowerCase(); if (n.id) s += '#' + n.id; else if (n.classList.length) s += '.' + [...n.classList].slice(0, 2).join('.'); bits.unshift(s); } return bits.join(' > '); };
+  const layers = (v) => { const o = []; let d = 0, cur = ''; for (const ch of v) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { o.push(cur); cur = ''; } else cur += ch; } if (cur.trim()) o.push(cur); return o; };
+  for (const el of document.querySelectorAll('[class*="s4-"]')) {
+    const cs = getComputedStyle(el), bf = cs.backdropFilter || cs.webkitBackdropFilter;
+    if (!bf || bf === 'none' || cs.boxShadow === 'none' || !el.getClientRects().length || cs.visibility === 'hidden') continue;
+    const h = el.offsetHeight; if (!h) continue;
+    let depth = 0;
+    for (const l of layers(cs.boxShadow)) {
+      if (!/\binset\b/.test(l)) continue;
+      const color = (l.match(/(?:rgba?|oklch|oklab|color|hsla?)\([^)]*\)|transparent/) || [''])[0];
+      if (color === 'transparent' || /[,/]\s*0\s*\)$/.test(color)) continue;   /* a glow at strength 0 draws nothing */
+      const n = l.replace(color, '').match(/-?[\d.]+px/g); if (!n || n.length < 4) continue;
+      const [x, y, b, s] = n.map(parseFloat);
+      if (x === 0 && y !== 0 && Math.abs(b - Math.abs(y)) < 0.01 && Math.abs(s + Math.abs(y)) < 0.01) depth = Math.max(depth, Math.abs(y));
+      if (y === 0 && x !== 0 && Math.abs(b - Math.abs(x)) < 0.01 && Math.abs(s + Math.abs(x)) < 0.01) depth = Math.max(depth, Math.abs(x));
+    }
+    if (depth > 0.15 * h + 1) out.push(`the glass glow on ${path(el)} reaches ${depth.toFixed(1)}px into a ${h}px surface, more than 15% of its height (${(0.15 * h).toFixed(1)}px): the glow scales with the surface (decision 0080: leave --s4-glass-glow-ratio and -size as they are; glass of the app's own takes the .s4-glass class, which measures its height)`);
   }
   return out;
 }

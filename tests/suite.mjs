@@ -17,7 +17,7 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
-import { knownClasses, silentAudit, windowAudit } from '../skill/orion/scripts/silent.mjs';
+import { knownClasses, silentAudit, windowAudit, glowAudit } from '../skill/orion/scripts/silent.mjs';
 import { midMotion } from '../skill/orion/scripts/midmotion.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -354,6 +354,7 @@ async function use(page, add, phone) {
       const f = await fits(id); if (f) add(`dialog "${id}" ${f}`);
       (await page.evaluate(nestAudit)).forEach(add);
       (await page.evaluate(windowAudit)).forEach(add);                    /* window controls are full cells (decision 0072) */
+      (await page.evaluate(glowAudit)).forEach(add);                      /* decision 0080 */
       const fieldFocused = await page.evaluate((id) => { const a = document.activeElement, d = document.getElementById(id); return d.contains(a) && a.matches('input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), textarea, select, [contenteditable]'); }, id);
       if (fieldFocused) add(`dialog "${id}" put the cursor in a text field when it opened (decision 0049)`);
       /* decision 0064: on a phone a dialog or panel sits in the bottom of the screen, in reach of the thumb, and a swipe
@@ -392,6 +393,7 @@ async function use(page, add, phone) {
       await settle(480);
       const f = await fits(id); if (f) add(`menu "${id}" ${f}`);
       (await page.evaluate(nestAudit)).forEach(add);
+      (await page.evaluate(glowAudit)).forEach(add);                      /* decision 0080 */
       await page.keyboard.press('Escape'); await settle(380);
       const gone = await until((id) => { const m = document.getElementById(id); if (!m) return true; const r = m.getBoundingClientRect(); return !(r.width > 0 && getComputedStyle(m).visibility !== 'hidden' && getComputedStyle(m).display !== 'none'); }, id);
       if (!gone) { add(`menu "${id}" did not close with Escape`); await page.mouse.click(2, 2); await settle(300); }
@@ -756,7 +758,7 @@ async function use(page, add, phone) {
     /* tooltips (pointer devices) */
     if (!phone) {
       const tip = (await visible('[data-tooltip]'))[0];
-      if (tip) { try { await tip.scrollIntoViewIfNeeded({ timeout: 1000 }); await tip.hover({ timeout: 1500 }); await settle(700); await page.mouse.move(1, 1); await settle(300); } catch (e) {} }
+      if (tip) { try { await tip.scrollIntoViewIfNeeded({ timeout: 1000 }); await tip.hover({ timeout: 1500 }); await settle(700); (await page.evaluate(glowAudit)).forEach(add); await page.mouse.move(1, 1); await settle(300); } catch (e) {} }
     }
     /* data at scale (issue 59, round 0056): data tables, filters and views, code blocks, chart ranges and legends */
     for (const t of (await visible('table.s4-table[data-s4-cols]')).slice(0, 1)) {
@@ -1307,6 +1309,11 @@ async function qa2Audit(ctx, rel, add) {
         return o;
       });
       r.forEach((m) => add(`snackbar: ${m} (decision 0076)`));
+      /* its glass glow scales with its height (decision 0080) */
+      await p.evaluate(() => S4.snackbar({ text: 'Glow', duration: 60000 }));
+      await p.waitForTimeout(500);
+      (await p.evaluate(glowAudit)).forEach((m) => add(`snackbar: ${m}`));
+      await p.evaluate(() => document.querySelectorAll('.s4-snackbar').forEach((e) => e.remove()));
     });
 
     /* inline edit: Enter and Escape keep focus; an empty required value says so */
@@ -1597,6 +1604,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       (quiet.overfull || []).forEach((x) => add(`control content outside its box: ${x} (decision 0073)`));
       (quiet.nav || []).forEach((x) => add(`${x} (round 0061: the highlight holds icon and label)`));
       (quiet.select || []).forEach((x) => add(`${x} (decision 0078)`));
+      (await page.evaluate(glowAudit)).forEach(add);                       /* the glass glow scales with the surface (decision 0080) */
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);

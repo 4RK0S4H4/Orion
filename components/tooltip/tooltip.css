@@ -18,6 +18,7 @@
     letter-spacing: var(--md-sys-typescale-body-small-tracking);
     pointer-events: none;
     overflow-wrap: anywhere;
+    --_glass-h: calc(2 * var(--s4-space-1) + var(--md-sys-typescale-body-small-line-height));   /* its least height, for the glass glow's depth (decision 0080) */
   }
   .s4-rich-tooltip {
     position: fixed;
@@ -38,6 +39,8 @@
     gap: var(--s4-space-1);
   }
   .s4-rich-tooltip:popover-open { display: flex; }
+  /* the least height for the glass glow's depth (decision 0080): one line of text; with actions it is tall (full depth) */
+  .s4-rich-tooltip:not(:has(> .s4-rich-tooltip-actions)) { --_glass-h: calc(var(--s4-space-4) + var(--s4-space-3) + var(--md-sys-typescale-body-medium-line-height)); }
   .s4-rich-tooltip-subhead {
     color: var(--md-sys-color-on-surface);
     font-family: var(--md-sys-typescale-title-small-font);

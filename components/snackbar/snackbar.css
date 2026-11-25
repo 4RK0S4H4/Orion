@@ -22,6 +22,7 @@
     min-width: min(344px, 100%);
     max-width: min(600px, 100%);
     min-height: var(--s4-size-touch-target);
+    --_glass-h: var(--s4-size-touch-target);   /* its least height, for the glass glow's depth (decision 0080) */
     padding: var(--s4-space-1) var(--s4-space-2) var(--s4-space-1) var(--s4-space-5);
     border-radius: var(--s4-shape-snackbar);
     background: var(--md-sys-color-surface-container-high);
