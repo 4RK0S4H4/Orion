@@ -190,10 +190,15 @@
   var m3src = (document.currentScript && document.currentScript.dataset.m3color) ||
     (scriptSrc.indexOf('/components/') >= 0 ? scriptSrc.slice(0, scriptSrc.indexOf('/components/')) + '/components/assets/m3color.js'
                                            : scriptSrc.replace(/[^/]*$/, '') + 'm3color.js');
+  /* one request however many calls arrive before it loads (issue 107: two theme calls fetched it twice) */
+  var colorWaiting = null;
   function loadColor(cb) {
     if (window.M3Color) return cb();
-    var s = document.createElement('script'); s.src = m3src; s.onload = cb;
-    s.onerror = function () { console.error('S4: could not load ' + m3src + ' (set data-m3color on the orion.js script tag)'); };
+    if (colorWaiting) return colorWaiting.push(cb);
+    colorWaiting = [cb];
+    var s = document.createElement('script'); s.src = m3src;
+    s.onload = function () { var w = colorWaiting; colorWaiting = null; w.forEach(function (f) { f(); }); };
+    s.onerror = function () { colorWaiting = null; console.error('S4: could not load ' + m3src + ' (set data-m3color on the orion.js script tag)'); };
     document.head.appendChild(s);
   }
   /* color-kit:begin. The pure part of the color engine: no DOM, no S4. scripts/brand.mjs runs exactly this block in Node
