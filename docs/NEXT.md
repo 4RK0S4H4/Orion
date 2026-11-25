@@ -1,9 +1,21 @@
 # Where Orion stands (resume here)
 
-**The plan to a 10 in every area, the current stage (round 0060) and how sessions work is in [`PLAN.md`](PLAN.md). Read it next.**
+**The plan, the owner's finish line (what a 10 means, the stages left, the hard cap after review 7, maintenance after the release), the current stage (round 0066) and how sessions work are in [`PLAN.md`](PLAN.md). Read it next.**
 
 Read [`framework.md`](framework.md) for how the system fits together and [`decisions/README.md`](decisions/README.md)
 for what applies today. The full log up to 2026-11-13 is in [`history/NEXT-2026-10-to-11-13.md`](history/NEXT-2026-10-to-11-13.md).
+
+## Now (2026-11-25, round 0066, branch `round66/a`): review 5's items 1, 3, 8 and 10 (decision 0081, issues 107 to 110)
+
+Review 5 ([`history/round-0065/regrade-5.md`](history/round-0065/regrade-5.md)) scored 9 / 9.5 / 9 / 9 / 9 / 9 / 9 / 9.5. Workstream A built:
+**one fetch per file** (the `@font-face` url carries the font's `?v=`; `m3color.js` loads once; `npm run test:network` loads every template, the
+Showcase, the hub and the brand trial and fails a duplicate, a failed request or a transfer over `scripts/budgets.mjs`); **headroom** without
+raising a budget (site 150.0 → 141.2 of 150, core js 39.5 → 37.7 of 40, lean pages 169 → 162 of 170; how: in the CHANGELOG); **`icons-app.js`**
+(25 KB) for apps instead of `icons.js` (103 KB, now 60); **`S4.theme` never silent** (density and the app defaults are keys, `S4.theme.keys`,
+bad seeds, surfaces and keys warn); **drift** (outlined in the gallery and docs, `check:words` on component pages; this file, PLAN, the CHANGELOG
+and `migrations/1.2.0.json` through 0081; a quieter upgrade report). Still near the line: core css 42.2 of 44 and site css 42.6 of 44 (under
+5% headroom). **Next:** workstream B (review 5's items 4, 5, 6, 9), item 2 (the Ink Track) for the owner, then round 0067 (WebKit and Firefox
+in CI, the owner's device session with `docs/device-check.md`), reviews 6 and 7, the dated 1.2.0, maintenance.
 
 ## Also now (2026-11-25, round 0065, branch `round65/glow`): a softer glass glow, scaled to the surface (decision 0080, issue 106)
 

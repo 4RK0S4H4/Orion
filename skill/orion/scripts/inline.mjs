@@ -48,7 +48,9 @@ const brandOnly = hasBrand && !/data-theme-seed|data-accent=|S4\.theme\s*\(\s*\{
 let m3inlined = false;
 html = html.replace(/<script\b([^>]*)\bsrc=["']?([^"'\s>]+)["']?([^>]*)><\/script>/gi, (tag, a, href, b) => {
   if (isRemote(href)) return tag;
-  const f = find(href); if (!f) { missing.push(href); return tag; }
+  /* an icon pack (icons-app.js, icons-site.js) fetches the full set for a name it lacks; a single file cannot, so it carries the full set */
+  const pack = /(^|\/)icons-(app|site)\.js$/.test(href.split(/[?#]/)[0]) && find('icons-solar.js');
+  const f = pack || find(href); if (!f) { missing.push(href); return tag; }
   let js = readFileSync(f, 'utf8').replace(/<\/script/gi, '<\\/script');
   let pre = '';
   if (/(^|\/)orion(\.(site|core))?(\.min)?\.js$/.test(href.split(/[?#]/)[0]) && usesSeed && !brandOnly) {
