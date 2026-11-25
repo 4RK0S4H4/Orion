@@ -21,14 +21,14 @@ of the surface's height (`--s4-glass-glow-ratio`), 3 to 12px (`--s4-glass-glow-s
 | Surface | Least height it names (`--_glass-h`) | Depth |
 |---|---|---|
 | Tooltip | `2 × space-1` + body-small line (24) | 3.6 |
-| Snackbar | touch target (48; 52 with its text padding) | 7.2 |
+| Snackbar | touch target (48); `glass.js` measures it once laid out (52 with one line) | 7.2, then 7.8 |
 | FAB, extended FAB | its `--_h`: 56, 80, 96 | 8.4, 12, 12 |
 | Glass toolbar (horizontal, or vertical with one tool) | `size-toolbar` (64) | 9.6 |
 | Menu with one item | `2 × space-2` + touch target (64) | 9.6 |
 | Rich tooltip without actions | `space-4` + `space-3` + body-medium line (48) | 7.2 |
 | Composer (`.s4-composer.s4-glass`) | touch target + `2 × space-1` (56) | 8.4 |
 | Menus of two items or more, rich tooltips with actions, panels, dialogs, the site's phone panel | (none: tall) | 12 |
-| An app's own `.s4-glass` | measured by `glass.js` (ResizeObserver, layout height) | 15% |
+| An app's own `.s4-glass` | measured by `glass.js` (ResizeObserver, layout height) | 15%, 3 to 12 |
 
 The heights come from size tokens, so compact density, the scale dial and text size change them with no script.
 `--_glass-h` never inherits. A component whose short height is new names it in its own stylesheet.
