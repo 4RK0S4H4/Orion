@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Bad: A Row Ring Under Its Pinned Cells</title>
+<!-- Known-bad fixture (round 0066, issue 113). tests/checker.mjs expects the page checker to FAIL on this page: the app puts
+     back the row's own outline for a focused row of a data table with a pinned first and last column, so the pinned cells
+     paint over the ring's sides (review 5's N4). Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .br-table tbody tr:focus-visible { outline-color: var(--s4-focus-ring-color); }
+  .br-table tbody tr:focus-visible > :is(td, th)::after { content: none; }
+</style>
+</head>
+<body>
+<main style="padding: 16px; max-inline-size: 720px">
+  <h1>Records</h1>
+  <div class="s4-table-wrap" data-sticky>
+    <table class="s4-table br-table" id="br-records" aria-label="Records">
+      <thead><tr>
+        <th scope="col" data-field="catalogue" data-pin>Catalogue No.</th>
+        <th scope="col" data-field="taxon" data-primary>Taxon</th>
+        <th scope="col" data-field="collector">Collector</th>
+        <th scope="col" data-field="place">Locality</th>
+        <th scope="col" data-field="year" class="s4-num">Collected</th>
+        <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+<script>
+  var rows = []; for (var i = 1; i <= 12; i++) rows.push({ id: i, catalogue: 'NHM-' + String(i).padStart(5, '0'), taxon: 'Limosa limosa', collector: 'F. Norgate', place: 'Scolt Head Island, Norfolk', year: 1840 + i });
+  S4.table(document.getElementById('br-records'), { id: 'id', noun: 'record', nouns: 'records' }).setRows(rows);
+</script>
+</body>
+</html>

@@ -16,6 +16,11 @@
                                    (Shift for bigger steps); double-click or Enter fits the column to its content.
      th[data-pin] / data-pin="end" the column stays while the table scrolls sideways (solid, a tonal edge, no shadow).
      data-key="name" on the table  widths, order, hidden and pinned columns are saved per table under that name.
+     th[data-priority="1…5"]       (data tables) a column that may fold away when the window is too narrow for every
+                                   column: the highest number folds first, a column without it never folds, a pinned
+                                   one never folds. A folded column is listed unticked in the Columns menu with "Folded
+                                   to Fit" and in a row's details; ticking it there keeps it (the table then scrolls).
+                                   Decision 0083.
    Data (S4.table(el, options)): the rows come from data, not markup. Each th[data-field] is a column; the body is drawn
    for what is on screen only (virtual rows: thousands of rows, a scrollbar that never jumps, aria-rowcount and
    aria-rowindex on every row), with sorting, selection, grouping with subtotals, a sticky totals footer, expandable
@@ -47,6 +52,40 @@
     return w;
   }
   S4.tableWrap = wrapOf;
+  /* the scroll-edge cue (decision 0083): while a wrap hides columns to one side, that side fades into the table's own
+     surface (no shadow), just inside any pinned columns, so a person sees there is more. A zero-height sticky layer at the
+     wrap's top holds the two fades; data-scrolled-start / data-scrolled-end say which side has more (the pinned columns'
+     tonal edge reads them too). */
+  function cueOf(wrap) {
+    if (!wrap) return;
+    var cue = wrap._s4cue;
+    if (!cue) {
+      cue = wrap._s4cue = document.createElement('div'); cue.className = 's4-table-cue'; cue.setAttribute('aria-hidden', 'true');
+      cue.innerHTML = '<span data-side="start"></span><span data-side="end"></span>';
+      wrap.insertBefore(cue, wrap.firstChild);
+      var raf = 0, run = function () { raf = 0; edgesOf(wrap); };
+      var later = function () { if (!raf) raf = requestAnimationFrame(run); };
+      wrap.addEventListener('scroll', later, { passive: true });
+      if (window.ResizeObserver) { var ro = new ResizeObserver(later); ro.observe(wrap); var t = wrap.querySelector('table'); if (t) ro.observe(t); }
+      if (S4.util.onLayoutChange) S4.util.onLayoutChange(later);
+    }
+    edgesOf(wrap);
+  }
+  function edgesOf(w) {
+    /* a reserved scrollbar gutter can stop the scroll that much short of scrollWidth - clientWidth (Chromium with
+       scrollbar-gutter: stable): the end counts as reached within the gutter */
+    var x = Math.abs(w.scrollLeft), max = w.scrollWidth - w.clientWidth, gutter = Math.max(0, w.offsetWidth - w.clientWidth - 2 * w.clientLeft);
+    var start = max > 1 && x > 1, end = max > 1 && x < max - 1 - gutter;
+    if (w.hasAttribute('data-scrolled-start') !== start) w.toggleAttribute('data-scrolled-start', start);
+    if (w.hasAttribute('data-scrolled-end') !== end) w.toggleAttribute('data-scrolled-end', end);
+    if (!w._s4cue || (!start && !end)) return;
+    /* the fades sit inside the pinned columns: their widths, and the height they cover */
+    var t = w.querySelector('table'), head = t && t.tHead && t.tHead.rows[t.tHead.rows.length - 1], ps = 0, pe = 0;
+    if (head) slice(head.cells).forEach(function (th) { if (th.hidden || !th.hasAttribute('data-pin')) return; var wd = th.getBoundingClientRect().width; if (th.getAttribute('data-pin') === 'end') pe += wd; else ps += wd; });
+    var h = Math.min(w.clientHeight, t ? t.getBoundingClientRect().height : w.clientHeight);
+    w.style.setProperty('--_cue-start', ps + 'px'); w.style.setProperty('--_cue-end', pe + 'px'); w.style.setProperty('--_cue-h', h + 'px');
+  }
+  S4.tableCue = cueOf;
   /* right-aligned figures: .s4-num (the documented class) or .num (the older name, still read) */
   function isNum(el) { return el.classList.contains('s4-num') || el.classList.contains('num'); }
   S4.tableIsNum = isNum;
@@ -78,7 +117,8 @@
       var kind = th.hasAttribute('data-check') ? 'check' : th.hasAttribute('data-row-expand') ? 'expand' : th.hasAttribute('data-row-actions') ? 'actions' : 'field';
       var field = th.getAttribute('data-field') || (kind === 'field' ? 'c' + i : kind);
       var label = (th.getAttribute('data-label') || th.textContent).trim();
-      return { th: th, kind: kind, field: field, label: label, index: i, pin: th.getAttribute('data-pin') === 'end' ? 'end' : th.hasAttribute('data-pin') ? 'start' : '', hidden: th.hidden, width: 0 };
+      var prio = kind === 'field' && th.hasAttribute('data-priority') ? Math.max(1, parseInt(th.getAttribute('data-priority'), 10) || 1) : 0;
+      return { th: th, kind: kind, field: field, label: label, index: i, pin: th.getAttribute('data-pin') === 'end' ? 'end' : th.hasAttribute('data-pin') ? 'start' : '', hidden: th.hidden, width: 0, prio: prio, folded: false, keep: false };
     }) : [];
     /* the order, pins and hidden columns saved last time */
     if (saved.order) {
@@ -87,6 +127,7 @@
     }
     if (saved.hidden) this.cols.forEach(function (c) { if (c.kind === 'field') c.hidden = saved.hidden.indexOf(c.field) >= 0; });
     if (saved.pins) this.cols.forEach(function (c) { if (c.field in saved.pins) c.pin = saved.pins[c.field]; });
+    if (saved.keep) this.cols.forEach(function (c) { c.keep = saved.keep.indexOf(c.field) >= 0; });
     this.cols.forEach(function (c) { c.width = (saved.widths && saved.widths[c.field]) || 0; c.th.hidden = c.hidden; });
     this.pinSort();
     this.colgroup = table.querySelector(':scope > colgroup[data-s4]');
@@ -101,7 +142,26 @@
     requestAnimationFrame(function () { self.layout(); });
   }
   Columns.prototype = {
-    visible: function () { return this.cols.filter(function (c) { return !c.hidden; }); },
+    visible: function () { return this.cols.filter(function (c) { return !c.hidden && !c.folded; }); },
+    /* column priority (decision 0083): with less room than the columns need, the lowest-priority columns fold away (the
+       highest data-priority first) until the rest fit; a pinned column, one without a priority and one the person chose to
+       keep never fold. Only a data table folds (its rows are drawn from the visible columns). Returns whether it changed. */
+    fold: function () {
+      if (!this.table._s4data || !this.wrap) return false;
+      var room = this.wrap.clientWidth, shown = this.cols.filter(function (c) { return !c.hidden; });
+      var total = shown.reduce(function (a, c) { return a + (c.width || 0); }, 0), out = new Set();
+      shown.filter(function (c) { return c.prio && !c.pin && !c.keep && c.width; })
+        .sort(function (a, b) { return b.prio - a.prio || b.index - a.index; })
+        .forEach(function (c) { if (total > room + 1) { out.add(c); total -= c.width; } });
+      var changed = false;
+      this.cols.forEach(function (c) {
+        var f = out.has(c); if (c.folded !== f) changed = true;
+        c.folded = f; c.th.hidden = c.hidden || f; c.th.toggleAttribute('data-s4-folded', f);
+      });
+      this.table.toggleAttribute('data-s4-folding', out.size > 0);
+      return changed;
+    },
+    folded: function () { return this.cols.filter(function (c) { return c.folded; }); },
     /* pinned columns sit together at their edge: start pins first, end pins last */
     pinSort: function () {
       /* the checkbox and details columns lead the row and travel with the start pins */
@@ -122,15 +182,19 @@
     },
     save: function () {
       if (!this.key) return;
-      var o = { widths: {}, order: this.cols.map(function (c) { return c.field; }), hidden: [], pins: {} };
-      this.cols.forEach(function (c) { if (c.width) o.widths[c.field] = Math.round(c.width); if (c.hidden) o.hidden.push(c.field); if (c.kind === 'field') o.pins[c.field] = c.pin; });
+      var o = { widths: {}, order: this.cols.map(function (c) { return c.field; }), hidden: [], pins: {}, keep: [] };
+      this.cols.forEach(function (c) { if (c.width) o.widths[c.field] = Math.round(c.width); if (c.hidden) o.hidden.push(c.field); if (c.keep) o.keep.push(c.field); if (c.kind === 'field') o.pins[c.field] = c.pin; });
       store(this.key, o);
     },
     min: function (c) { return c.kind === 'field' ? Math.max(64, textWidth([c.label], c.th) * 0.5 + 48) : 0; },
     /* measure the widths the browser chose once, then hold them: table-layout fixed from here on */
     layout: function () {
       var t = this.table, self = this, vis = this.visible();
-      if (!this.wrap || getComputedStyle(t).display !== 'table') { t.removeAttribute('data-fixed'); return; }
+      if (!this.wrap || getComputedStyle(t).display !== 'table') {
+        /* stacked rows (a phone) show every field: nothing is folded */
+        if (this.cols.some(function (c) { return c.folded; })) { this.cols.forEach(function (c) { c.folded = false; c.th.hidden = c.hidden; c.th.removeAttribute('data-s4-folded'); }); t.removeAttribute('data-s4-folding'); if (this.onChange) this.onChange('fold'); }
+        t.removeAttribute('data-fixed'); return;
+      }
       if (!this.wrap.clientWidth) return;   /* not on screen (a view not shown yet): measure when it shows (the wrap's ResizeObserver) */
       if (t._s4data && !t._s4data.sized) return;   /* a data table takes its first widths from its data */
       if (!this.measured) {
@@ -138,6 +202,7 @@
         vis.forEach(function (c, i) { c.width = Math.max(self.min(c), Math.ceil(w[i]));   /* never round a column below its text: the last letter would wrap */ });
         this.measured = true;
       }
+      if (this.fold()) { vis = this.visible(); if (this.onChange) this.onChange('fold'); }
       /* the fill column takes what is left when the columns are narrower than the table */
       var fill = vis.filter(function (c) { return c.th.hasAttribute('data-fill'); })[0] || vis.filter(function (c) { return c.th.hasAttribute('data-primary'); })[0] || vis.filter(function (c) { return c.kind === 'field' && !c.pin; })[0];
       var total = vis.reduce(function (a, c) { return a + c.width; }, 0), room = this.wrap.clientWidth;
@@ -166,12 +231,7 @@
       this.edges();
     },
     /* the tonal edge shows only while something is under it */
-    edges: function () {
-      var w = this.wrap; if (!w) return;
-      var x = Math.abs(w.scrollLeft), max = w.scrollWidth - w.clientWidth;
-      w.toggleAttribute('data-scrolled-start', x > 1);
-      w.toggleAttribute('data-scrolled-end', x < max - 1);
-    },
+    edges: function () { if (this.wrap) edgesOf(this.wrap); },
     style: function (c) {
       return c.pin ? ' data-pin="' + c.pin + '" style="--_pin-at:var(--s4-pin-' + c.field + ',0px)"' + (c.field === this.lastStart || c.field === this.firstEnd ? ' data-pin-edge' : '') : '';
     },
@@ -241,7 +301,9 @@
     hide: function (field, hidden) {
       var c = this.col(field); if (!c || c.kind !== 'field') return;
       if (hidden && this.visible().filter(function (x) { return x.kind === 'field'; }).length <= 1) return;   /* never hide the last column */
-      c.hidden = !!hidden; c.th.hidden = c.hidden;
+      /* showing a folded column keeps it (the person asked for it: the table scrolls instead); hiding one lets it fold again later */
+      c.keep = !hidden && (c.folded || c.keep) && !!c.prio;
+      c.hidden = !!hidden; c.folded = false; c.th.hidden = c.hidden; c.th.removeAttribute('data-s4-folded');
       this.changed('columns');
     },
     move: function (field, to) {
@@ -261,7 +323,7 @@
       this.measured = this.cols.every(function (c) { return c.width; });
       this.save(); this.layout();
       if (this.onChange) this.onChange(type);
-      S4.util.emit(this.table, 's4-change', { type: type, columns: this.cols.map(function (c) { return { field: c.field, label: c.label, hidden: c.hidden, pin: c.pin, width: c.width }; }) });
+      S4.util.emit(this.table, 's4-change', { type: type, columns: this.cols.map(function (c) { return { field: c.field, label: c.label, hidden: c.hidden, folded: c.folded, pin: c.pin, width: c.width }; }) });
     }
   };
   S4.tableColumns = function (table) { return table._s4cols || (table._s4cols = new Columns(table)); };
@@ -528,6 +590,13 @@
         var html = this.opts.detail ? this.opts.detail(row) : '';
         tr.innerHTML = '<td colspan="' + vis.length + '" data-label=""><div class="s4-table-detail-body">' + (typeof html === 'string' ? html : '') + '</div></td>';
         if (html && typeof html !== 'string') tr.querySelector('.s4-table-detail-body').appendChild(html);
+        /* the columns folded to fit (decision 0083) are read here, under the app's own details */
+        var folded = this.c.folded();
+        if (folded.length) {
+          var dl = document.createElement('dl'); dl.className = 's4-table-folded'; dl.setAttribute('aria-label', 'Folded columns');
+          dl.innerHTML = folded.map(function (c) { var v = row[c.field], custom = self.opts.cell && self.opts.cell[c.field]; return '<div><dt>' + esc(c.label) + '</dt><dd>' + (custom ? custom(v, row) : esc(formatter(c.th.getAttribute('data-format'))(v))) + '</dd></div>'; }).join('');
+          tr.querySelector('.s4-table-detail-body').appendChild(dl);
+        }
         return tr;
       }
       tr.tabIndex = -1;
@@ -977,11 +1046,12 @@
         this.colsMenu = colsMenu;
         var fill = function () {
           colsMenu.innerHTML = '<div class="s4-menu-label">Show Columns</div>' + self.fields().map(function (c) {
-            return '<button class="s4-menu-item" type="button" role="menuitemcheckbox" tabindex="-1" aria-checked="' + !c.hidden + '" value="' + esc(c.field) + '"><span class="s4-menu-item-text">' + esc(c.label) + '</span>' + (c.pin ? '<span class="s4-menu-item-trailing">' + icon('pin') + '</span>' : '') + '</button>';
+            /* a folded column (decision 0083) is unticked and says why: ticking it keeps it on screen and the table scrolls */
+            return '<button class="s4-menu-item" type="button" role="menuitemcheckbox" tabindex="-1" aria-checked="' + !(c.hidden || c.folded) + '" value="' + esc(c.field) + '"><span class="s4-menu-item-text">' + esc(c.label) + (c.folded ? '<span class="s4-menu-item-supporting">Folded to Fit</span>' : '') + '</span>' + (c.pin ? '<span class="s4-menu-item-trailing">' + icon('pin') + '</span>' : '') + '</button>';
           }).join('') + '<div class="s4-menu-label s4-table-menu-hint">Alt and the arrow keys move a column</div>';
         };
         fill();
-        colsMenu.addEventListener('click', function (e) { var it = e.target.closest('[role="menuitemcheckbox"]'); if (!it) return; setTimeout(function () { self.c.hide(it.value, it.getAttribute('aria-checked') !== 'true'); if (self.c.col(it.value).hidden !== (it.getAttribute('aria-checked') !== 'true')) it.setAttribute('aria-checked', 'true'); }); });
+        colsMenu.addEventListener('click', function (e) { var it = e.target.closest('[role="menuitemcheckbox"]'); if (!it) return; setTimeout(function () { self.c.hide(it.value, it.getAttribute('aria-checked') !== 'true'); if (self.c.col(it.value).hidden !== (it.getAttribute('aria-checked') !== 'true')) it.setAttribute('aria-checked', 'true'); var sup = it.querySelector('.s4-menu-item-supporting'); if (sup) sup.remove(); }); });
         colsMenu.addEventListener('keydown', function (e) {
           if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown')) return;
           var it = e.target.closest('[role="menuitemcheckbox"]'); if (!it) return;
@@ -1051,7 +1121,7 @@
 S4.register('table', function (scope) {
   S4.util.all(scope, 'table.s4-table').forEach(function (table) {
     if (!S4.util.once(table, 'table')) return;
-    if (S4.tableWrap) S4.tableWrap(table);
+    if (S4.tableWrap) S4.tableCue(S4.tableWrap(table));
     var slice = function (l) { return Array.prototype.slice.call(l); };
     var bodies = function () { return slice(table.tBodies); };
     var bodyRows = function () { return bodies().reduce(function (a, b) { return a.concat(slice(b.rows)); }, []); };

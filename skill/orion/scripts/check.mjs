@@ -11,7 +11,8 @@
                 a dial attribute (data-scale, data-corners, data-energy …) with a value that is not on its list (decision 0067),
                 window controls that are not full cells to the window's top and end edges (decision 0072), and a
                 word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs),
-                a nav bar highlight drawn as a circle or narrower than its label (round 0061)
+                a nav bar highlight drawn as a circle or narrower than its label (round 0061), a focused table row
+                whose ring is missing on a side or covered by a pinned cell or the scroll-edge cue (issue 113)
      warnings – more than one filled button in one area, more than one filled accent action or more than one accent
                 selection fill on the first screen (decisions 0070, 0082), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
@@ -20,7 +21,7 @@ import { resolve, dirname, basename, join, parse, sep } from 'node:path';
 import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { knownClasses, silentAudit, windowAudit, glowAudit } from './silent.mjs';
+import { knownClasses, silentAudit, windowAudit, glowAudit, ringAudit } from './silent.mjs';
 import { midMotion } from './midmotion.mjs';
 
 const argv = process.argv.slice(2);
@@ -362,6 +363,8 @@ for (const page of pages) {
     await p.evaluate(knownClasses);
     const audited = async () => Object.assign(await p.evaluate(audit), await p.evaluate(silentAudit), { dials: await p.evaluate(() => (window.S4 && S4.theme && S4.theme.audit ? S4.theme.audit() : [])), windows: await p.evaluate(windowAudit), glow: await p.evaluate(glowAudit) });
     report(await audited());
+    /* a focused table row's ring shows on all four sides, over pinned cells and the scroll-edge cue (issue 113) */
+    if (!v.isMobile) { await p.keyboard.press('Shift'); (await p.evaluate(ringAudit)).forEach((x) => errors.add(`[${v.name}] ${x}`)); }
     const shot = join(OUT, `${label}-${v.name}.png`);
     await p.screenshot({ path: shot, fullPage: true });
     /* app shell views that were hidden on load get the same audit (screenshots show the first view only) */

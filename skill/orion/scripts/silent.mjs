@@ -20,6 +20,7 @@
                       model writes): Shift+click, Shift with the arrows, Ctrl+A and Escape do nothing there (decision 0078).
                       A combobox's popup listbox is not one: focus stays in its field, typing and Enter pick
      glowAudit()      the glass glow deeper than 15% of its surface's height plus 1px (decision 0080), as a list of problems
+     ringAudit()      a focused table row whose ring is missing on a side, under a pinned cell or the scroll-edge cue (issue 113)
    Words that may truncate (decision 0058: the timeline label, top app bar title, title bar title, text field value and date
    value) never count as split: they stay on one line behind an ellipsis. */
 
@@ -328,5 +329,61 @@ export function glowAudit() {
     }
     if (depth > 0.15 * h + 1) out.push(`the glass glow on ${path(el)} reaches ${depth.toFixed(1)}px into a ${h}px surface, more than 15% of its height (${(0.15 * h).toFixed(1)}px): the glow scales with the surface (decision 0080: leave --s4-glass-glow-ratio and -size as they are; glass of the app's own takes the .s4-glass class, which measures its height)`);
   }
+  return out;
+}
+
+/* A focused row's ring shows on all four sides (issue 113): for the first focusable row of every table drawn as a table, at
+   rest and with its wrap scrolled halfway, the ring must be drawn and not covered on every side of the row that is inside
+   the wrap's visible box: by the row's own outline over unpinned cells, or by the cells' ring (table.css); a pinned cell
+   over the row's outline, a sticky header or the scroll-edge cue over it is a failure. Focuses rows (the caller presses a
+   key first, so focus is keyboard focus) and puts the focus and scroll back. Returns a list of problems. */
+export function ringAudit() {
+  const out = [], seen = new Set();
+  const before = document.activeElement, sx = scrollX, sy = scrollY;
+  const tag = (t) => (t.id ? '#' + t.id : 'table.' + [...t.classList].join('.')) + (t.getAttribute('aria-label') ? ` "${t.getAttribute('aria-label')}"` : '');
+  const tables = [...document.querySelectorAll('table.s4-table')].filter((t) => { const r = t.getBoundingClientRect(); return r.width > 0 && getComputedStyle(t).display === 'table' && !t.closest('[hidden], [inert], [data-s4-skip], dialog:not([open]), [popover]:not(:popover-open)'); });
+  for (const t of tables) {
+    const row = t.querySelector('tbody tr[tabindex]:not(.s4-table-spacer, .s4-table-detail, .s4-table-group)');
+    if (!row) continue;
+    const wrap = t.closest('.s4-table-wrap'), rtl = getComputedStyle(t).direction === 'rtl';
+    const spots = [0]; if (wrap && wrap.scrollWidth > wrap.clientWidth + 1) spots.push(0.5);
+    for (const at of spots) {
+      if (wrap) wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) * at * (rtl ? -1 : 1);
+      try { row.focus({ preventScroll: true }); } catch (e) { continue; }
+      row.scrollIntoView({ block: 'center', inline: 'nearest' });
+      if (wrap) wrap.scrollLeft = (wrap.scrollWidth - wrap.clientWidth) * at * (rtl ? -1 : 1);
+      if (document.activeElement !== row || !row.matches(':focus-visible')) continue;
+      const r = row.getBoundingClientRect(), wr = wrap ? wrap.getBoundingClientRect() : { left: 0, right: innerWidth, top: 0, bottom: innerHeight };
+      const box = { l: Math.max(r.left, wr.left + (wrap ? wrap.clientLeft : 0)), r: Math.min(r.right, wrap ? wr.left + wrap.clientLeft + wrap.clientWidth : wr.right), t: Math.max(r.top, 0), b: Math.min(r.bottom, innerHeight) };
+      if (box.r - box.l < 40 || box.b - box.t < 8) continue;
+      const rs = getComputedStyle(row), outline = rs.outlineStyle !== 'none' && parseFloat(rs.outlineWidth) >= 1 && !/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(rs.outlineColor);
+      const cues = wrap ? [...wrap.querySelectorAll(':scope > .s4-table-cue > span')].filter((c) => +getComputedStyle(c).opacity > 0.01).map((c) => c.getBoundingClientRect()) : [];
+      const sides = [];
+      if (Math.abs(r.top - box.t) < 1) sides.push(['top', (x) => [x, r.top + 1]]);
+      if (Math.abs(r.bottom - box.b) < 1) sides.push(['bottom', (x) => [x, r.bottom - 1.5]]);
+      if (Math.abs(r.left - box.l) < 1) sides.push(['left', () => [r.left + 1, (r.top + r.bottom) / 2]]);
+      if (Math.abs(r.right - box.r) < 1) sides.push(['right', () => [r.right - 1.5, (r.top + r.bottom) / 2]]);
+      for (const [side, at2] of sides) {
+        const xs = side === 'top' || side === 'bottom' ? [0.02, 0.25, 0.5, 0.75, 0.98].map((f) => box.l + 2 + (box.r - box.l - 4) * f).concat(cues.map((c) => (c.left + c.right) / 2).filter((x) => x > box.l && x < box.r)) : [0];
+        for (const x0 of xs) {
+          const [x, y] = at2(x0), hit = document.elementFromPoint(x, y);
+          let why = '';
+          if (!hit || !row.contains(hit)) why = `covered by ${hit ? hit.tagName.toLowerCase() + (hit.className && typeof hit.className === 'string' ? '.' + hit.className.trim().split(/\s+/)[0] : '') : 'nothing'}`;
+          else {
+            const cell = hit.closest('td, th'), a = cell && getComputedStyle(cell, '::after');
+            const prop = { top: 'Top', bottom: 'Bottom', left: 'Left', right: 'Right' }[side];
+            const drawn = a && a.content !== 'none' && parseFloat(a['border' + prop + 'Width']) >= 1 && a['border' + prop + 'Style'] !== 'none' && !/rgba\(\d+, \d+, \d+, 0\)/.test(a['border' + prop + 'Color']);
+            const positioned = cell && /sticky|fixed|absolute/.test(getComputedStyle(cell).position) && getComputedStyle(cell).zIndex !== 'auto';
+            if (!drawn && !(outline && !positioned)) why = outline ? `the row's outline is under the pinned cell "${(cell.textContent || cell.getAttribute('data-field') || '').trim().slice(0, 16)}"` : 'nothing draws it';
+          }
+          if (!why && cues.some((c) => x >= c.left && x <= c.right && y >= c.top && y <= c.bottom)) why = 'the scroll-edge cue is over it';
+          if (why) { const k = `${tag(t)} ${side} ${at}`; if (!seen.has(k)) { seen.add(k); out.push(`the focused row's ring in ${tag(t)} is missing on its ${side} side${at ? ' with the table scrolled sideways' : ''}: ${why} (issue 113)`); } break; }
+        }
+      }
+    }
+    if (wrap) wrap.scrollLeft = 0;
+  }
+  if (before && before !== document.body && before.focus) { try { before.focus({ preventScroll: true }); } catch (e) {} } else if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  scrollTo(sx, sy);
   return out;
 }

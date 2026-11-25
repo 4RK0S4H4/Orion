@@ -9,7 +9,7 @@
      use       it then uses the page: opens and closes every dialog, panel, menu, expand, page, inline confirm, accordion,
                tab, date picker and select, visits every view, hovers a tooltip. Each overlay must fit the screen, close
                with Escape and give focus back; nothing may be left open, stuck mid-animation or throw.
-   Usage: node tests/suite.mjs [--browser=chromium|webkit] [--only=text] [--shots] [--workers=4]
+   Usage: node tests/suite.mjs [--browser=chromium|webkit|firefox] [--only=text] [--shots] [--workers=4]
    Without --browser both run; a browser that is not installed fails the run in CI and is skipped (loudly) elsewhere.
    Playwright is the only dependency (npm i -D playwright && npx playwright install chromium webkit). */
 import { readFileSync, readdirSync, existsSync, statSync, mkdirSync } from 'node:fs';
@@ -17,7 +17,7 @@ import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, extname, resolve } from 'node:path';
-import { knownClasses, silentAudit, windowAudit, glowAudit } from '../skill/orion/scripts/silent.mjs';
+import { knownClasses, silentAudit, windowAudit, glowAudit, ringAudit } from '../skill/orion/scripts/silent.mjs';
 import { midMotion } from '../skill/orion/scripts/midmotion.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -69,6 +69,13 @@ function audit(opts) {
     const wide = [...document.querySelectorAll('body *')].filter((e) => vis(e) && e.getBoundingClientRect().right > window.innerWidth + 1 && !e.closest('[data-scroll], .s4-table-wrap, [style*="overflow"]')).slice(0, 3).map(tag);
     out.push(`sideways scroll: page is ${ov}px wider than the screen (${wide.join(', ')})`);
   }
+  /* decision 0083: a table that hides columns to one side says so (the scroll-edge cue fades that side) */
+  document.querySelectorAll('.s4-table-wrap').forEach((w) => {
+    if (!vis(w) || inPreview(w) || w.scrollWidth - w.clientWidth <= 1 + Math.max(0, w.offsetWidth - w.clientWidth - 2 * w.clientLeft)) return;   /* within a reserved scrollbar gutter (table.js) */
+    const side = Math.abs(w.scrollLeft) < 1 ? 'end' : 'start', cue = w.querySelector(`:scope > .s4-table-cue > [data-side="${side}"]`);
+    const r = cue && cue.getBoundingClientRect();
+    if (!cue || +getComputedStyle(cue).opacity < 0.5 || r.width < 8 || r.height < 8) out.push(`table ${tag(w)} hides ${w.scrollWidth - w.clientWidth}px of columns to its ${side} with no scroll-edge cue (decision 0083)`);
+  });
   /* icons */
   document.querySelectorAll('.s4-icon[data-icon]').forEach((i) => { if (!i.querySelector('svg') && !inPreview(i)) out.push(`icon not drawn: "${i.dataset.icon}"`); });
   /* decision 0059: a button group sets a value or changes how the same thing is shown; tabs swap panels */
@@ -1608,6 +1615,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
       (await page.evaluate(nestAudit)).forEach(add);
       await page.keyboard.press('Tab');                                   /* keyboard modality, so rings show */
       (await page.evaluate(focusAudit)).forEach(add);
+      if (!mode.phone) (await page.evaluate(ringAudit)).forEach(add);     /* a focused table row's ring shows on every side (issue 113) */
       await page.evaluate(() => { if (document.activeElement) document.activeElement.blur(); window.scrollTo(0, 0); });
       /* mid-motion (issue 70): rail, dialog, panel, menu, expand, accordion and page frozen at 25, 50 and 75% */
       (await midMotion(page)).forEach(add);
@@ -1628,6 +1636,7 @@ async function runPage(browser, bname, rel, mode, reduced) {
 }
 
 const want = arg('browser', 'chromium,webkit').split(',');
+for (const b of want) if (!['chromium', 'webkit', 'firefox'].includes(b)) { console.error(`--browser=${b}: use chromium, webkit or firefox (comma-separated)`); process.exit(2); }
 for (const bname of want) {
   let browser;
   try { browser = await pw[bname].launch(); }
@@ -1793,6 +1802,110 @@ if (want.includes('chromium') && !arg('preset', '') && targets.includes('templat
       }
     } catch (e) { add('touch keyboard check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
     await ctx.close(); await b3.close(); ran++;
+  }
+}
+/* decision 0084: getting past the chrome. In every app shell (a template or the Showcase with .s4-app), from load, one Tab
+   reaches the skip link (a visible pill once focused) and Enter puts the focus on main without changing the address; in a
+   desktop app (the desktop pack loaded) F6 visits every region on screen in order and comes back round, Shift+F6 goes back
+   and Ctrl+F6 moves too. */
+if (want.includes('chromium') && !arg('preset', '')) {
+  const shells = targets.filter((t) => /^(templates\/(?!index)|demo\/)/.test(t) && /class="s4-app"/.test(readFileSync(join(root, t), 'utf8')));
+  let b6 = null; if (shells.length) try { b6 = await pw.chromium.launch(); } catch (e) {}
+  for (const rel of b6 ? shells : []) {
+    const label = `skip link and F6  ${rel}`, add = (m) => failures.push({ label, list: [m] });
+    const ctx = await b6.newContext({ viewport: { width: 1280, height: 800 }, colorScheme: 'light' }), page = await ctx.newPage();
+    try {
+      await page.goto(ORIGIN + '/' + rel, { waitUntil: 'load', timeout: 30000 }); await page.waitForTimeout(700);
+      const hash0 = await page.evaluate(() => location.hash);
+      await page.keyboard.press('Tab'); await page.waitForTimeout(100);
+      const skip = await page.evaluate(() => { const a = document.activeElement, r = a.getBoundingClientRect(), cs = getComputedStyle(a); return { is: a.matches('.s4-skip-link'), what: a.tagName.toLowerCase() + '.' + [...a.classList].join('.'), shown: r.top >= 0 && r.bottom <= innerHeight && r.width > 40, pill: parseFloat(cs.borderTopLeftRadius) >= 8 && cs.backgroundColor !== 'rgba(0, 0, 0, 0)', text: a.textContent.trim() }; });
+      if (!skip.is) add(`the first Tab stop is ${skip.what}, not the skip link`);
+      else {
+        if (!skip.shown || !skip.pill) add(`the focused skip link is not a visible pill on screen (shown ${skip.shown}, pill ${skip.pill})`);
+        if (skip.text !== 'Skip to Content') add(`the skip link says "${skip.text}", not "Skip to Content"`);
+        await page.keyboard.press('Enter'); await page.waitForTimeout(250);
+        const at = await page.evaluate(() => { const a = document.activeElement; return { main: !!(a && a.closest('main, [role="main"]')), what: a ? a.tagName.toLowerCase() + '.' + [...a.classList].join('.') : 'nothing', hash: location.hash }; });
+        if (!at.main) add(`Enter on the skip link left the focus on ${at.what}, not on main`);
+        if (at.hash !== hash0) add(`the skip link changed the address to ${at.hash}`);
+      }
+      const regions = await page.evaluate(() => (window.S4 && S4.desktop && S4.desktop.regions ? S4.desktop.regions().map((r) => r.tagName.toLowerCase() + '.' + (r.classList[0] || '')) : []));
+      if (regions.length >= 2) {
+        const now = () => page.evaluate(() => { const list = S4.desktop.regions(); return list.findIndex((r) => r.contains(document.activeElement)); });
+        let i0 = await now(); if (i0 < 0) { await page.evaluate(() => { const m = document.querySelector('main'); m.setAttribute('tabindex', '-1'); m.focus(); }); i0 = await now(); }
+        const seen = [];
+        for (let k = 1; k <= regions.length; k++) {
+          await page.keyboard.press('F6'); await page.waitForTimeout(80);
+          const i = await now(), want = (i0 + k) % regions.length; seen.push(i);
+          if (i !== want) { add(`F6 ${k} time(s) from ${regions[i0]} went to ${i < 0 ? 'nothing in a region' : regions[i]}, not ${regions[want]} (regions: ${regions.join(', ')})`); break; }
+        }
+        await page.keyboard.press('Shift+F6'); await page.waitForTimeout(80);
+        const back = await now(), wantBack = (i0 - 1 + regions.length) % regions.length;
+        if (back !== wantBack) add(`Shift+F6 from ${regions[i0]} went to ${back < 0 ? 'nothing in a region' : regions[back]}, not ${regions[wantBack]}`);
+        await page.keyboard.press('Control+F6'); await page.waitForTimeout(80);
+        if (await now() !== i0) add(`Ctrl+F6 did not move on to ${regions[i0]}`);
+        if (await page.evaluate(() => document.activeElement === document.body)) add('F6 left the focus on <body>');
+      } else if (/data-window/.test(readFileSync(join(root, rel), 'utf8'))) add(`a desktop app with ${regions.length} F6 region(s) (S4.desktop.regions): it needs the desktop pack and at least a rail or menu bar beside main`);
+    } catch (e) { add('skip link and F6 check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+    await ctx.close(); ran++;
+  }
+  if (b6) await b6.close();
+}
+/* decision 0083: Linnea at common desktop widths. The column a person scans (Status) is on screen without scrolling at
+   1024, 1280 and 1600; whatever folded to fit is in the Columns menu (unticked, "Folded to Fit") and in a row's details;
+   a column the person keeps makes the table scroll, and then the side with more shows the scroll-edge cue (and the other
+   side once scrolled to the end). */
+if (want.includes('chromium') && !arg('preset', '') && targets.includes('templates/data-table.html')) {
+  let b5 = null; try { b5 = await pw.chromium.launch(); } catch (e) {}
+  if (b5) {
+    for (const width of [1024, 1280, 1600]) {
+      const label = `column priority at ${width}  templates/data-table.html`, add = (m) => failures.push({ label, list: [m] });
+      const ctx = await b5.newContext({ viewport: { width, height: 900 }, colorScheme: 'light' }), page = await ctx.newPage();
+      try {
+        await page.goto(ORIGIN + '/templates/data-table.html', { waitUntil: 'load', timeout: 30000 }); await page.waitForTimeout(900);
+        const st = await page.evaluate(() => {
+          const t = document.getElementById('ln-table'), w = t.closest('.s4-table-wrap'), wr = w.getBoundingClientRect();
+          const th = t.querySelector('th[data-field="status"]'), r = th.getBoundingClientRect();
+          return { hidden: th.hidden, inside: r.left >= wr.left - 1 && r.right <= wr.right + 1 && r.width > 20, scrolls: w.scrollWidth - w.clientWidth, folded: [...t.querySelectorAll('thead th[data-s4-folded]')].map((x) => x.dataset.field) };
+        });
+        if (st.hidden || !st.inside) add(`Status is not on screen without scrolling (${st.hidden ? 'folded' : 'outside the table\'s visible box'})`);
+        if (st.scrolls > 1) add(`the table still scrolls ${st.scrolls}px sideways after folding ${st.folded.join(', ') || 'nothing'}`);
+        if (width < 1600 && !st.folded.length) add('nothing folded although the columns are wider than the window');
+        if (st.folded.length) {
+          await page.click('[data-menu="ln-columns"]'); await page.waitForTimeout(300);
+          const menu = await page.evaluate((f) => f.map((x) => { const it = document.querySelector(`#ln-columns [value="${x}"]`); return it ? `${x}:${it.getAttribute('aria-checked')}:${/Folded to Fit/.test(it.textContent)}` : `${x}:missing`; }), st.folded);
+          menu.filter((m) => !m.endsWith(':false:true')).forEach((m) => add(`a folded column is not listed unticked with "Folded to Fit" in the Columns menu (${m})`));
+          await page.keyboard.press('Escape'); await page.waitForTimeout(250);
+          await page.evaluate(() => document.querySelector('#ln-table .s4-table-expand').click()); await page.waitForTimeout(400);
+          const shown = await page.evaluate(() => [...document.querySelectorAll('#ln-table .s4-table-detail .s4-table-folded dt')].map((d) => d.textContent));
+          const want = await page.evaluate((f) => f.map((x) => document.getElementById('ln-table')._s4cols.col(x).label), st.folded);
+          if (want.join('|') !== shown.join('|')) add(`a row's details show the folded columns as [${shown.join(', ')}], not [${want.join(', ')}]`);
+          /* keep every folded column: the table scrolls and the cue shows on the side with more */
+          await page.evaluate((f) => { const c = document.getElementById('ln-table')._s4cols; f.forEach((x) => c.hide(x, false)); }, st.folded); await page.waitForTimeout(600);
+          const cue = () => page.evaluate(() => { const w = document.getElementById('ln-table').closest('.s4-table-wrap'), o = (s) => +getComputedStyle(w.querySelector(`.s4-table-cue > [data-side="${s}"]`)).opacity; return { more: w.scrollWidth - w.clientWidth, start: o('start'), end: o('end') }; });
+          const a = await cue();
+          if (a.more > 1 && (a.end < 0.99 || a.start > 0.01)) add(`with kept columns the table scrolls ${a.more}px but the cue is start ${a.start}, end ${a.end} (the end side must show)`);
+          await page.evaluate(() => { const w = document.getElementById('ln-table').closest('.s4-table-wrap'); w.scrollLeft = w.scrollWidth; }); await page.waitForTimeout(600);
+          const b = await cue();
+          if (b.more > 1 && (b.start < 0.99 || b.end > 0.01)) add(`scrolled to the end the cue is start ${b.start}, end ${b.end} (the start side must show, the end must not)`);
+        }
+      } catch (e) { add('column priority check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+      await ctx.close(); ran++;
+    }
+    /* issue 113: the focused row's ring shows on all four sides over the pinned cells, left to right and right to left, light and dark */
+    for (const [dir, scheme] of [['ltr', 'dark'], ['rtl', 'light'], ['rtl', 'dark']]) {
+      const label = `row ring (${dir}, ${scheme})  templates/data-table.html`, add = (m) => failures.push({ label, list: [m] });
+      const ctx = await b5.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: scheme }), page = await ctx.newPage();
+      try {
+        await page.goto(ORIGIN + '/templates/data-table.html', { waitUntil: 'load', timeout: 30000 }); await page.waitForTimeout(700);
+        await page.evaluate((d) => { document.documentElement.dir = d; const c = document.getElementById('ln-table')._s4cols; ['family', 'drawer'].forEach((x) => c.hide(x, false)); }, dir);
+        await page.waitForTimeout(600); await page.keyboard.press('Shift');
+        const found = await page.evaluate(ringAudit);
+        if (!found.length && !(await page.evaluate(() => { const w = document.getElementById('ln-table').closest('.s4-table-wrap'); return w.scrollWidth > w.clientWidth + 12; }))) add('the table did not scroll sideways with two kept columns, so the pinned cells were never over the ring');
+        found.forEach(add);
+      } catch (e) { add('row ring check could not finish: ' + String(e.message).split('\n')[0].slice(0, 140)); }
+      await ctx.close(); ran++;
+    }
+    await b5.close();
   }
 }
 /* decision 0072: Parley in a frameless Windows shell (a stub of window.orionShell, the real shell-bridge.js). The page's

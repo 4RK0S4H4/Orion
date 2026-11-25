@@ -18,6 +18,7 @@
      bad-select.html                a multi-select listbox and grid that the selection model does not drive (decision 0078)
      bad-clipboard-marker.html  a second call under the helper's exemption marker (decision 0076)
      bad-overfull.html  a control whose label is wider than its box (decision 0073)
+     bad-row-ring.html  a focused data-table row drawn with the row's own outline, under its pinned cells (issue 113)
      bad-glow.html      a glass glow turned up to 40% of the surface's height on a FAB and a toolbar (decision 0080)
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
      bad-stamp.html     <meta name="orion"> says 0.9.0 but the page loads this version (decision 0075)
@@ -61,6 +62,7 @@ const CASES = [
   ['bad-window-controls.html', /window control "Close" is 32x28, \d+px below the top of a 40px title bar/, 'a window control smaller than a full cell'],
   ['bad-window-controls.html', /Close stops 12px short of the title bar's right edge/, 'Close short of the window edge'],
   ['bad-window-controls.html', /the title bar's top right corner pixel hits header\.s4-titlebar, not Close/, 'the corner pixel misses Close'],
+  ['bad-row-ring.html', /the focused row's ring in #br-records "Records" is missing on its left side: the row's outline is under the pinned cell/, 'a focused row whose ring sits under its pinned cells (issue 113)'],
   ['bad-window-inset.html', /Close's hover layer is 4\.0px from the title bar's top edge and 2\.0px from its right edge/, 'Close\'s layer nearer the end edge than the top edge'],
   ['bad-window-inset.html', /the hover layer of window control "Minimize" is inset differently from Close's/, 'a control inset differently from Close'],
 ];

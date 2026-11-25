@@ -1,0 +1,81 @@
+/* Tables: the parts only data tables use (table.js, the data pack; a site's static table never draws them).
+   A focused row's ring drawn by its cells (issue 113), the scroll-edge cue (decision 0083) and the columns folded to fit
+   (decision 0083). See table.css for the table itself and README.md for the markup. */
+@layer s4.components {
+  /* ---------- a focused row's ring (issue 113) ----------
+     The ring of a row that holds the focus is drawn by its cells, not by the row's outline: pinned cells are solid and sit
+     above the row, so an outline on the row lost its sides under them. Every cell draws the ring's top and bottom, the
+     first cell its start side and the last its end side, inside the cell (the wrap never cuts it); a cell scrolled under
+     a pinned one is covered with its part of the ring, and the pinned cells draw theirs. Stacked rows (a phone) keep the
+     row's own outline. While a row holds the focus the scroll-edge cue steps aside so the ring shows in full. */
+  .s4-table tbody tr:focus-visible { outline-color: transparent; }
+  .s4-table tbody tr:focus-visible > :is(td, th):not([data-pin]) { position: relative; }
+  .s4-table tbody tr:focus-visible > :is(td, th)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-block: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
+  }
+  .s4-table tbody tr:focus-visible > :is(td, th):first-child::after { border-inline-start: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
+  .s4-table tbody tr:focus-visible > :is(td, th):last-child::after { border-inline-end: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
+  .s4-table-wrap:has(tbody tr:focus-visible) > .s4-table-cue > span[data-side] { opacity: 0; transition: none; }
+  @container s4-table (width < 600px) {
+    .s4-table tbody tr:focus-visible { outline-color: var(--s4-focus-ring-color); }
+    .s4-table tbody tr:focus-visible > :is(td, th)::after { content: none; }
+  }
+  @media (forced-colors: active) { .s4-table tbody tr:focus-visible > :is(td, th)::after { border-color: Highlight; } }
+
+  /* ---------- the scroll-edge cue (decision 0083) ----------
+     While columns are out of sight to one side, that side of the visible table fades into the table's own surface over
+     --s4-space-8, just inside the pinned columns: no shadow, no glass. table.js keeps a zero-height layer stuck to the
+     wrap's top start corner (so it never scrolls away) and sets the pinned widths and the height to cover. */
+  .s4-table-cue {
+    position: sticky;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 4;                                  /* over the cells and the sticky header, beside (never over) the pinned columns */
+    block-size: 0;
+    inline-size: 100%;
+    pointer-events: none;
+  }
+  .s4-table-cue > span {
+    position: absolute;
+    inset-block-start: 0;
+    block-size: var(--_cue-h, 0px);
+    inline-size: var(--s4-space-8);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state);
+  }
+  .s4-table-cue > [data-side="start"] {
+    inset-inline-start: var(--_cue-start, 0px);
+    background: linear-gradient(to var(--_cue-to-start, left), transparent, var(--_table-bg));
+  }
+  .s4-table-cue > [data-side="end"] {
+    inset-inline-end: var(--_cue-end, 0px);
+    background: linear-gradient(to var(--_cue-to-end, right), transparent, var(--_table-bg));
+  }
+  .s4-table-wrap:dir(rtl) { --_cue-to-start: right; --_cue-to-end: left; }
+  .s4-table-wrap[data-scrolled-start] > .s4-table-cue > [data-side="start"],
+  .s4-table-wrap[data-scrolled-end] > .s4-table-cue > [data-side="end"] { opacity: 1; }
+  @media (forced-colors: active) { .s4-table-cue { display: none; } }
+  @media print { .s4-table-cue { display: none; } }
+
+  /* the columns folded to fit (decision 0083), read under the app's own details: label over value, as many across as fit */
+  .s4-table-folded {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4-space-2) var(--s4-space-6);
+    margin: var(--s4-space-2) 0 0;
+  }
+  .s4-table-folded > div { display: flex; flex-direction: column; min-inline-size: 0; }
+  .s4-table-folded dt {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+  }
+  .s4-table-folded dd { margin: 0; overflow-wrap: break-word; }
+}

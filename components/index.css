@@ -44,6 +44,7 @@
 @import url("pagination/pagination.css");
 @import url("stepper/stepper.css");
 @import url("table/table.css");
+@import url("table/table-edges.css");
 @import url("filter/filter.css");
 @import url("stat/stat.css");
 @import url("ring/ring.css");
