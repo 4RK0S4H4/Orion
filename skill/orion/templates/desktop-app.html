@@ -97,7 +97,7 @@
   .pl-tm > li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--s4-space-3); padding: var(--s4-space-2) var(--s4-space-2) var(--s4-space-2) var(--s4-space-3); border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container-low); }
   .pl-tm p { margin: 0; overflow-wrap: anywhere; }
   .pl-tm small { display: block; color: var(--md-sys-color-on-surface-variant); }
-  .pl-match { min-inline-size: var(--s4-space-10); text-align: center; font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-emphasized-label-large-weight); color: var(--md-sys-color-primary); }
+  .pl-match { min-inline-size: var(--s4-space-10); text-align: center; font-variant-numeric: tabular-nums; font-weight: var(--md-sys-typescale-emphasized-label-large-weight); color: var(--md-sys-color-on-surface-variant); }   /* a score is a reading, not an accent (decision 0085) */
 
   /* on a phone the inspector steps out, so the string's facts sit under the editor */
   .pl-facts { display: none; }
@@ -211,10 +211,10 @@
               </div>
               <div class="pl-actions">
                 <button class="s4-button" data-variant="filled" type="button" data-cmd="string.approve">Approve<kbd class="s4-kbd"></kbd></button>
-                <button class="s4-button" data-variant="elevated" type="button" data-cmd="string.copySource">Copy Source</button>
+                <button class="s4-button" data-variant="elevated" data-color="neutral" type="button" data-cmd="string.copySource">Copy Source</button>
                 <span class="pl-grow"></span>
-                <button class="s4-button" data-variant="text" type="button" data-cmd="string.prev">Previous</button>
-                <button class="s4-button" data-variant="text" type="button" data-cmd="string.next">Next</button>
+                <button class="s4-button" data-variant="text" data-color="neutral" type="button" data-cmd="string.prev">Previous</button>
+                <button class="s4-button" data-variant="text" data-color="neutral" type="button" data-cmd="string.next">Next</button>
               </div>
               <!-- how it looks in the game: the night scene is always dark, in light mode too (a scoped theme) -->
               <figure class="pl-stage" data-theme="dark">
@@ -463,7 +463,7 @@ function renderDetail() {
   $('d-target').value = l.tr[lang] || '';
   $('d-speaker').textContent = l.speaker; $('d-portrait').textContent = l.speaker.replace(/^The /, '').charAt(0);
   $('d-tm').innerHTML = l.tm.length && lang === 'fr' ? l.tm.map(function (m, i) {
-    return '<li><span class="pl-match">' + m.m + '%</span><div><p>' + esc(m.t) + '</p><small>' + esc(m.from) + '</small></div><button class="s4-button" data-variant="text" data-size="s" type="button" data-tm="' + i + '">Use</button></li>';
+    return '<li><span class="pl-match">' + m.m + '%</span><div><p>' + esc(m.t) + '</p><small>' + esc(m.from) + '</small></div><button class="s4-button" data-variant="text" data-color="neutral" data-size="s" type="button" data-tm="' + i + '">Use</button></li>';
   }).join('') : '<li><span class="pl-match">·</span><div><p>No earlier translation is close to this line.</p><small>Translation memory, ' + L.name + '</small></div><span></span></li>';
   $('i-key').textContent = l.key; $('i-file').textContent = FILES.filter(function (f) { return f.id === l.file; })[0].name; $('i-changed').textContent = l.changed;
   $('i-speaker').value = l.speaker; $('i-note').value = l.note; $('i-max').value = l.max;

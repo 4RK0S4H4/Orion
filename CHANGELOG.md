@@ -8,7 +8,19 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 ## [1.2.0] - Unreleased
 
-Rounds 0059 to 0066 (decisions 0067 to 0081: dial values, one accent job, the lean bundle, the name Orion, window controls, the two QA passes, versions and upgrades, selecting several, a softer glow, real requests and headroom). The release is dated after round 0066 B and the finish line in `docs/PLAN.md`; no git tag is needed (decision 0075).
+Rounds 0059 to 0066 (decisions 0067 to 0085: dial values, one accent job, the lean bundle, the name Orion, window controls, the two QA passes, versions and upgrades, selecting several, a softer glow, real requests and headroom, a neutral Ink Track, tables at common widths, getting past the chrome). The release is dated after round 0066 B and the finish line in `docs/PLAN.md`; no git tag is needed (decision 0075).
+
+Review 5's items 2, 4, 5, 6 and 9 (round 0066 B, decisions 0082 to 0085, issues 111 to 117).
+
+- Changed: the Ink Track's selected option is neutral (decision 0082, the owner's "Neutral fill"): `on-surface` at the new `--s4-selection-neutral-opacity` (0.12) over the track, an `on-surface` label; on glass `on-surface` at the selected-fill opacity. Motion, trailing copy, multi fusing and the glass track unchanged. `check-glass` and `check-accent` prove the new pairs (worst label 6.84:1).
+- Added: the page checker warns on more than one accent selection fill on the first screen at rest (selected, current or pressed things drawn in `primary`, `primary-container` or `secondary-container`; today, the current step and chart marks not counted), with `tests/fixtures/loud-selection.html`. Tally's chart month is `aria-current="date"`.
+- Added: column priority for data tables (decision 0083): `th[data-priority="1…5"]` folds the lowest-priority columns when the window is narrow; folded columns are "Folded to Fit" in the Columns menu and listed in a row's details (`.s4-table-folded`). Linnea keeps Status on screen at 1024, 1280 and 1600 without scrolling.
+- Added: the scroll-edge cue (decision 0083): a table that hides columns to one side fades that side into its surface inside the pinned columns (`.s4-table-cue`); the suite fails a sideways-scrolling table without it.
+- Fixed: a focused grid row's ring is drawn by its cells and shows on all four sides over pinned cells, in both directions and modes (issue 113); `ringAudit` in the page checker and suite, `tests/fixtures/bad-row-ring.html`. New stylesheet `table/table-edges.css` (data pack only).
+- Added: a skip link in every app shell, written by `app.js` (decision 0084), and F6 / Shift+F6 / Ctrl+F6 region cycling in desktop apps (`desktop.js`, `S4.desktop.regions()`); the skip link's style moved from the site kit to base. The suite proves one Tab plus Enter reaches main in every app template and that F6 cycles.
+- Added: `.s4-button[data-color="neutral"]` (decision 0085). Changed: the rail's stepped-down action has an `on-surface` label; Parley's secondary actions and match scores are neutral; the selection bar spans the top app bar with words beside its icons from 840; under 840 a list beside a closed detail shows no resting selection.
+- Added: `--browser=webkit|firefox` for `tests/suite.mjs` and `tests/reach.mjs`, and a non-blocking CI job `browsers` (WebKit and Firefox); the blocking `pages` job runs the suite in Chromium (issue 116).
+- Added: `docs/device-check.md`, the owner's one-time 20-minute device checklist (issue 117).
 
 Real requests, headroom and an app icon pack (round 0066 A, decision 0081, issues 107 to 110): review 5's N1, N3, N8, N9 and N12.
 

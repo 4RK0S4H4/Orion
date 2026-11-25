@@ -92,9 +92,9 @@
       <div class="s4-selection-bar" id="ln-bar" hidden>
         <button class="s4-icon-button" type="button" aria-label="Clear Selection" data-selection-clear><span class="s4-icon" data-icon="close"></span></button>
         <span class="s4-selection-count" data-selection-count>0 Selected</span>
-        <button class="s4-icon-button" type="button" aria-label="Send Selected to Conservation" data-tooltip="Send to Conservation" id="ln-conserve"><span class="s4-icon" data-icon="archive"></span></button>
-        <button class="s4-icon-button" type="button" aria-label="Export Selected" data-tooltip="Export" id="ln-export"><span class="s4-icon" data-icon="export"></span></button>
-        <button class="s4-icon-button" type="button" aria-label="Delete Selected" data-tooltip="Delete" id="ln-delete"><span class="s4-icon" data-icon="delete"></span></button>
+        <button class="s4-button" data-variant="text" type="button" aria-label="Send Selected to Conservation" id="ln-conserve"><span class="s4-icon" data-icon="archive"></span><span class="s4-button-label">Send to Conservation</span></button>
+        <button class="s4-button" data-variant="text" type="button" aria-label="Export Selected" id="ln-export"><span class="s4-icon" data-icon="export"></span><span class="s4-button-label">Export</span></button>
+        <button class="s4-button" data-variant="text" type="button" aria-label="Delete Selected" id="ln-delete"><span class="s4-icon" data-icon="delete"></span><span class="s4-button-label">Delete</span></button>
       </div>
       <div class="s4-app-bar-actions">
         <button class="s4-icon-button" type="button" aria-label="Help" data-tooltip="Help"><span class="s4-icon" data-icon="help"></span></button>
@@ -154,11 +154,11 @@
                     <th scope="col" data-row-expand><span class="s4-visually-hidden">Details</span></th>
                     <th scope="col" data-field="catalogue" data-pin aria-sort="none"><button type="button" class="s4-table-sort">Catalogue No.<span class="s4-icon" data-icon="chevron-down"></span></button></th>
                     <th scope="col" data-field="taxon" data-primary aria-sort="none"><button type="button" class="s4-table-sort">Taxon<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="family" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Family<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="collector" aria-sort="none"><button type="button" class="s4-table-sort">Collector<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="year" class="num" aria-sort="none"><button type="button" class="s4-table-sort">Collected<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="locality" aria-sort="none"><button type="button" class="s4-table-sort">Locality<span class="s4-icon" data-icon="chevron-down"></span></button></th>
-                    <th scope="col" data-field="drawer" data-edit data-required>Drawer</th>
+                    <th scope="col" data-field="family" data-priority="4" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Family<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="collector" data-priority="3" aria-sort="none"><button type="button" class="s4-table-sort">Collector<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="year" class="num" data-priority="2" aria-sort="none"><button type="button" class="s4-table-sort">Collected<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="locality" data-priority="1" aria-sort="none"><button type="button" class="s4-table-sort">Locality<span class="s4-icon" data-icon="chevron-down"></span></button></th>
+                    <th scope="col" data-field="drawer" data-priority="5" data-edit data-required>Drawer</th>
                     <th scope="col" data-field="status" data-groupable aria-sort="none"><button type="button" class="s4-table-sort">Status<span class="s4-icon" data-icon="chevron-down"></span></button></th>
                     <th scope="col" data-field="count" class="num" data-format="integer" data-edit="number" data-required data-min="0" data-total="sum" aria-sort="none"><button type="button" class="s4-table-sort">Specimens<span class="s4-icon" data-icon="chevron-down"></span></button></th>
                     <th scope="col" data-row-actions data-pin="end"><span class="s4-visually-hidden">Actions</span></th>

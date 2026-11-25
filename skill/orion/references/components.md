@@ -33,7 +33,7 @@ Starts an action. M3 Expressive buttons: five variants, five sizes, round or squ
 | `data-variant` | `filled`, `tonal`, `elevated`, `text` (the old `outlined` still works as an alias and draws a filled button; nothing is outlined, decision 0023) | `filled` |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136) | `s` |
 | `data-shape` | `round`, `square` | `round` |
-| `data-color` | `error` (destructive) | — |
+| `data-color` | `error` (destructive), `neutral` (decision 0085: a secondary action that leaves the accent to the screen's one accent job: text in `on-surface-variant`, elevated and tonal in `on-surface`) | — |
 | `data-toggle` + `aria-pressed` | toggle button; `data-label-on/off`, `data-icon-on/off` swap label and icon | — |
 
 **When to use what:** one **filled** button for the most important action in an area; **tonal** for a strong secondary
@@ -1607,6 +1607,11 @@ Everything below is opt-in; markup without these attributes behaves exactly as a
 | `th[data-fill]` | the column that takes the spare width when the columns are narrower than the table (default: the `data-primary` one) |
 | `data-column-menu` on a data table | a menu on every column header: Sort Ascending, Sort Descending, Group by (with `th[data-groupable]`), Pin, Fit to Content, Move Left, Move Right, Hide. Never drag-only. With a pointer the button shows on hover or focus; on touch it is always there. |
 | `.s4-menu[data-table-columns="#table-id"]` | a Columns menu for that table: a check item per column to show or hide it; Alt and Up / Down move the focused column |
+| `th[data-priority="1"…"5"]` on a data table | **column priority** (decision 0083): when the window is too narrow for every column, columns fold away, the highest number first, until the rest fit. A column without a priority, a pinned one and the checkbox, details and actions columns never fold. A folded column is listed unticked in the Columns menu with "Folded to Fit" and its value is shown in each row's details (`.s4-table-folded`, under the app's own `detail`); ticking it keeps it on screen (the table then scrolls), saved with `data-key`. On a phone (stacked rows) nothing folds. Give the column a person scans (a status) no priority, and the least needed the highest. |
+
+**The scroll-edge cue** (every table, decision 0083): while a table hides columns to one side, that side of the visible table
+fades into the table's own surface over 32px, just inside any pinned columns (`.s4-table-cue`, written by `table.js`; the
+wrap carries `data-scrolled-start` / `data-scrolled-end`). No shadow and no glass; forced colors and print leave it out.
 
 ### Data (`S4.table`)
 

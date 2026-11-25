@@ -75,7 +75,7 @@ root (version, how Orion is loaded, packs, brand and dials, and an `overrides` l
 Commit it; it is what "update to latest Orion" reads later.
 
 Mixed apps combine them: a dashboard app whose Clients view is the list-detail screen, with the settings screen as its
-last destination. Keep one shell (`.s4-app`) per page.
+last destination. Keep one shell (`.s4-app`) per page. The shell writes its own skip link (first Tab stop, Enter focuses main) and a desktop app moves between regions with F6 (decision 0084): never write either by hand.
 
 ## Websites
 
@@ -89,7 +89,7 @@ from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` 
   is fluid, app type is not. Start-aligned; center only short blocks (a short hero, the pricing heading, a closing band).
 - **One accent a page:** the featured plan, the call-to-action band, one bento cell or a cover. Toned bands are inset
   rounded blocks, never full-bleed stripes. Bento spans add up to 12 per row; equal grids use `data-columns`.
-- **One accent job per screen (decision 0070):** one filled action and one accent selection (the navigation's) at rest; other selections neutral, other actions `elevated`, `tonal` or `text`; no pressed chip at rest. A site header's action does not count (it is the hero's, kept in reach as the page scrolls).
+- **One accent job per screen (decision 0070):** one filled action and one accent selection (the navigation's) at rest; other selections neutral, other actions `elevated`, `tonal` or `text` (`data-color="neutral"` beside the main action, 0085); no pressed chip at rest; a connected button group's selection is neutral by itself (0082). The checker warns on a second filled action or accent selection. A site header's action does not count (it is the hero's, kept in reach as the page scrolls).
   docs sidebar) is quieter. A site header never opens with a nav item selected.
 - **Pictures:** no network fetches, no gray boxes, no gradients. Show real Orion components in a phone or browser frame
   (`inert`, `role="img"`, an `aria-label`), covers set in type on a tone, or the media empty state. Real images get
@@ -234,7 +234,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 - One **filled** button per area for the main action, and one per screen at rest (0070: the next act on the work in front of the person); **tonal** for a strong second; **text** for the rest. Nothing is ever outlined (decision 0023): fields, chips, checkboxes, radios and cards are filled; the old `outlined` variants draw filled. Small things are pills (chips, status, buttons, fields, FAB); no sharp or squared corners on them.
 - A **FAB** only when one action dominates a screen (Add Bill); never two FABs.
 - Icon-only actions are icon buttons with `aria-label` and usually a `data-tooltip`.
-- **Tabs, button group or chips** (decision 0059): if it swaps what is on the screen, it is **tabs** (`.s4-tabs`, every tab with a `tabpanel`); if it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid, units), it is a **connected button group** (`data-connected data-select="single|multi"`, 2 to 5 short options, the Ink Track); if it narrows a collection and there can be many, it is **filter chips**. Never a button group with `aria-controls` panels, never tabs without panels: the page checker fails both.
+- **Tabs, button group or chips** (decision 0059): if it swaps what is on the screen, it is **tabs** (`.s4-tabs`, every tab with a `tabpanel`); if it changes a value or how the same thing is shown (Week / Month / Year on a chart, list or grid, units), it is a **connected button group** (`data-connected data-select="single|multi"`, 2 to 5 short options, the Ink Track, its selection neutral); if it narrows a collection and there can be many, it is **filter chips**. Never a button group with `aria-controls` panels, never tabs without panels: the page checker fails both.
 - A destructive answer is `data-variant="tonal" data-color="error"` (the error container, never a red slab) and Cancel is `tonal` (decision 0064); a per-row delete stays a plain icon button.
 
 **Showing data**
@@ -264,7 +264,7 @@ app's own stylesheet (decision 0053). A custom corner is `--s4-shape-control` on
 
 **Data at scale** (decision 0061; markup in `references/components.md`)
 - Keyboard: a data table is two Tab stops (header, body); never add `tabindex` to cells or header controls yourself.
-- More than about 50 rows, or rows from data: `S4.table(table, { cell, detail }).setRows(rows)` inside `.s4-states`, `data-sticky` on the wrap and a height (`--s4-table-max-height`). Pin the identifying column (`th[data-pin]`); `data-resizable` and `data-key` for tools used daily; `data-column-menu` past six columns; `data-edit` only for short values (Undo follows). A record opens as a page, never a dialog. Phones stack rows; `data-layout="scroll"` only for numbers compared across a row.
+- More than about 50 rows, or rows from data: `S4.table(table, { cell, detail }).setRows(rows)` inside `.s4-states`, `data-sticky` on the wrap and a height (`--s4-table-max-height`). Pin the identifying column (`th[data-pin]`); `data-resizable` and `data-key` for tools used daily; `data-column-menu` past six columns; `data-edit` only for short values (Undo follows); `th[data-priority="1…5"]` on columns that may fold away at narrower widths (never the one a person scans, 0083). A record opens as a page, never a dialog. Phones stack rows; `data-layout="scroll"` only for numbers compared across a row.
 - Narrowing a collection: `.s4-filter` (`S4.filter`), not a hand-made bar: saved views (two to five, named after the questions people ask), search, Add Filter, an All Filters tool panel (choice facets for a few values, tags for long lists, ranges for numbers and years), filters in force as chips, a count; always a `no-results` state with Clear Filters. Never an Apply button; never drag-only column order.
 - Code: `.s4-code` with a file name (`S4.code` colors it with the fixed `--s4-syntax-*` tokens; never by hand); `.s4-code-inline` in sentences, `.s4-keys` / `.s4-kbd` for keys. Charts over time: `.s4-chart-range` above the chart; `data-legend="toggle"` with three or more series.
 

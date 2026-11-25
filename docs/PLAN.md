@@ -24,9 +24,10 @@ The owner, 2026-11-25: "let's be realistic, I don't want this to be a never endi
   once they are added), and two independent reviews in a row both find no major or medium items. When that holds, the area is
   recorded as 10.
 - **Device items are tracked separately.** The iPhone, VoiceOver, Safari on a real device, NVDA or Narrator, and real Electron and
-  Tauri shells live in a one-time owner checklist (`docs/device-check.md`) and never hold a score down.
+  Tauri shells live in a one-time owner checklist ([`device-check.md`](device-check.md), written in round 0066: about 20 minutes,
+  numbered steps, a screenshot and one line per problem) and never hold a score down.
 - **The remaining stages, and nothing more:**
-  1. Round 0066 A and B (review 5's Top 10).
+  1. Round 0066 A and B (review 5's Top 10). Both built; WebKit and Firefox now run in CI (job `browsers`, non-blocking).
   2. Round 0067: fixes from the WebKit and Firefox CI run and from the owner's device session.
   3. Review 6, fixes, then review 7.
 - **The hard cap.** An area still under 10 after review 7 has its leftover items written down as known limits, and 1.2.0 (or
@@ -149,8 +150,10 @@ accessibility, so some scores fell although nothing got worse. Review 5 is [`his
    - **A** (built, decision 0081; branch `round66/a`, worktree `r66-a`, owns shared docs): one fetch per file proven on the network
      (`test:network`), headroom in every budget (`scripts/budgets.mjs`), the app icon pack `icons-app.js`, `S4.theme` never silent,
      drift (outlined, the CHANGELOG, NEXT, PLAN, migrations) and a quieter upgrade report; issues 107 to 110.
-   - **B** (next; its own branch): review 5's UI items 4, 5, 6 and 9 (table columns at common widths, the grid row's focus ring,
-     a skip link and F6 regions, Parley and the selection bar). Item 2 (the Ink Track and one accent job) waits for the owner.
+   - **B** (built, decisions 0082 to 0085; branch `round66/b`, worktree `r66-b`): items 2 (the Ink Track is neutral, the owner's
+     "Neutral fill", and the checker counts accent selections), 4 (column priority and the scroll-edge cue), 5 (the row ring on every
+     side, `ringAudit`), 6 (a skip link in every app shell, F6 regions in desktop apps), 9 (Parley's accent text, the selection bar,
+     no resting selection on a phone); setup: the non-blocking `browsers` CI job and `docs/device-check.md`; issues 111 to 117.
    - Then round 0067, review 6, fixes, review 7, the dated 1.2.0 (`node scripts/release.mjs`), maintenance.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 (`scripts/release.mjs`, no git tag needed, decision 0075) and a re-packaged skill.
@@ -177,4 +180,5 @@ action now. The owner can overrule any of these; otherwise they stand.
 - 2026-11-22 (round 0061, integration): merged the titlebar branch (decision 0072, issues 69 and 70) and the mobile branch (issues 71 and 72, renumbered because both had used 69 and 70), added intake from app sessions (CLAUDE.md, SKILL.md, from-app form, inbox, the Triage step above) and the Full QA pass stage. Next: publish, the owner's device looks, the QA pass, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.
 - 2026-11-23 (round 0063, upgrade path): decision 0075 built (one version from package.json, `<meta name="orion">` stamps and the mismatch warning, `orion.json`, `migrations/` 1.1.0 and 1.2.0, `scripts/api.mjs` + `check:api`, `releases/1.0.0` and `1.1.0` backfilled with `scripts/release.mjs`, `skill/orion/scripts/upgrade.mjs`, the skill's "Update to latest Orion", `test:upgrade`; issue 83 Done). Next: publish with the round; cut `releases/1.2.0` when 1.2.0 is dated.
+- 2026-11-25 (round 0066, workstream B): decisions 0082 to 0085 built (issues 111 to 117), the `browsers` CI job (WebKit and Firefox, non-blocking) and the owner's `device-check.md`. Next: merge with A's docs and publish (the main session), then round 0067: triage the first `browsers` run, the owner's device session, then make `browsers` blocking.
 - 2026-11-25 (round 0066, workstream A): decision 0081 built (one fetch per file and `tests/network.mjs`; budgets in `scripts/budgets.mjs` with headroom: site 141.2/150, core 42.2 + 37.7, lean pages at most 162; `icons-app.js` for apps; `S4.theme` keys and warnings; outlined drift and `check:words` on component pages; a quieter upgrade report; issues 107 to 110). The owner's finish line written above. Next: workstream B, then round 0067.

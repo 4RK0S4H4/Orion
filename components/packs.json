@@ -76,9 +76,11 @@
     "s4-syntax-type",
     "s4-table",
     "s4-table-col-menu",
+    "s4-table-cue",
     "s4-table-detail",
     "s4-table-detail-body",
     "s4-table-expand",
+    "s4-table-folded",
     "s4-table-foot-count",
     "s4-table-grip",
     "s4-table-group",
@@ -118,6 +120,7 @@
     "month",
     "table",
     "tableColumns",
+    "tableCue",
     "tableIsNum",
     "tableWrap"
    ]
@@ -413,7 +416,6 @@
     "s4-site-stage",
     "s4-site-subtitle",
     "s4-site-title",
-    "s4-skip-link",
     "s4-toc"
    ],
    "attrs": [

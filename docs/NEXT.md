@@ -14,8 +14,20 @@ raising a budget (site 150.0 → 141.2 of 150, core js 39.5 → 37.7 of 40, lean
 (25 KB) for apps instead of `icons.js` (103 KB, now 60); **`S4.theme` never silent** (density and the app defaults are keys, `S4.theme.keys`,
 bad seeds, surfaces and keys warn); **drift** (outlined in the gallery and docs, `check:words` on component pages; this file, PLAN, the CHANGELOG
 and `migrations/1.2.0.json` through 0081; a quieter upgrade report). Still near the line: core css 42.2 of 44 and site css 42.6 of 44 (under
-5% headroom). **Next:** workstream B (review 5's items 4, 5, 6, 9), item 2 (the Ink Track) for the owner, then round 0067 (WebKit and Firefox
-in CI, the owner's device session with `docs/device-check.md`), reviews 6 and 7, the dated 1.2.0, maintenance.
+5% headroom). **Next:** workstream B (built, below), then round 0067 (triage the WebKit and Firefox CI run, the owner's device session with `docs/device-check.md`), reviews 6 and 7, the dated 1.2.0, maintenance.
+
+## Also now (2026-11-25, round 0066, branch `round66/b`): review 5's items 2, 4, 5, 6 and 9 (decisions 0082 to 0085, issues 111 to 117)
+
+Workstream B built: **the Ink Track is neutral** (the owner's "Neutral fill", 0082: `on-surface` over the track, the motion and glass
+track kept; the page checker now warns on more than one accent selection, `tests/fixtures/loud-selection.html`); **tables at common
+widths** (0083: `th[data-priority]` folds columns into the Columns menu and the row's details, Linnea keeps Status on screen at 1024,
+1280 and 1600; a scroll-edge cue; the focused row's ring drawn by its cells, `ringAudit` in the checker and suite,
+`tests/fixtures/bad-row-ring.html`); **getting past the chrome** (0084: a skip link written by every app shell, F6 / Shift+F6 /
+Ctrl+F6 regions in desktop apps, proven on every app template); **polish** (0085: `data-color="neutral"` buttons, Parley's accent
+text, the selection bar with words, no resting selection on a phone). **Setup:** `--browser=webkit|firefox` on the suite and reach and a
+non-blocking CI job `browsers` (the blocking `pages` job is now Chromium only; never run here, only Chromium is installed); the owner's
+one-time device checklist [`device-check.md`](device-check.md). **Next:** publish (the main session); round 0067 triages the first
+`browsers` run and the owner's device session, then makes `browsers` blocking. **Needs the owner:** the 20-minute `device-check.md`.
 
 ## Also now (2026-11-25, round 0065, branch `round65/glow`): a softer glass glow, scaled to the surface (decision 0080, issue 106)
 

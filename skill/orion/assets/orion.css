@@ -1644,6 +1644,31 @@
     outline: none;
   }
 
+  /* ---------- the skip link (sites write it; app shells get it from app.js, decision 0084) ----------
+     <a class="s4-skip-link" href="#main">Skip to Content</a>, first in the document: the first Tab stop, out of sight
+     until it has the focus, then a pill in the window's top start corner above everything. */
+  .s4-skip-link {
+    position: fixed;
+    inset-block-start: var(--s4-space-2);
+    inset-inline-start: var(--s4-space-2);
+    z-index: var(--s4-z-tooltip);                  /* above the bars, the rail and its FAB while it has the focus */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--s4-size-button);
+    padding-inline: var(--s4-space-4);
+    border-radius: min(calc(var(--s4-size-button) / 2), var(--s4-shape-control));
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    text-decoration: none;
+    white-space: nowrap;
+    transform: translateY(calc(-100% - var(--s4-space-4)));
+  }
+  .s4-skip-link:focus { transform: none; }
+  .s4-skip-link:not(:focus) { pointer-events: none; }
+
   /* ---------- icons: <span class="s4-icon" data-icon="search"></span>, drawn by orion.js from the icon registry ---------- */
   .s4-icon {
     display: inline-grid;
@@ -2751,7 +2776,7 @@
 /* ---- button/button.css ---- */
 /* Button (M3 Expressive)
    <button class="s4-button" data-variant="filled|tonal|outlined|elevated|text" data-size="xs|s|m|l|xl"
-           data-shape="round|square" data-color="error">
+           data-shape="round|square" data-color="error|neutral">
      <span class="s4-icon" data-icon="add"></span>Label
    </button>
    Defaults: filled, size s (40), round. Toggle buttons add aria-pressed (and data-toggle so orion.js flips it).
@@ -2838,6 +2863,12 @@
   .s4-button[data-color="error"]:where([data-variant="tonal"]) { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
   .s4-button[data-color="error"]:where([data-variant="text"]) { --_bg: transparent; --_fg: var(--md-sys-color-error); }
   .s4-button[data-color="error"][data-variant="outlined"] { --_bg: var(--md-sys-color-error-container); --_fg: var(--md-sys-color-on-error-container); }
+  /* neutral (decision 0085): a secondary action that keeps its look but leaves the accent to the screen's one accent job;
+     text in on-surface-variant, elevated and tonal in on-surface on a neutral fill, filled as the inverse surface */
+  .s4-button[data-color="neutral"]:where(:not([data-variant]), [data-variant="filled"]) { --_bg: var(--md-sys-color-inverse-surface); --_fg: var(--md-sys-color-inverse-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="tonal"], [data-variant="outlined"]) { --_bg: var(--md-sys-color-surface-container-highest); --_fg: var(--md-sys-color-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="elevated"]) { --_fg: var(--md-sys-color-on-surface); }
+  .s4-button[data-color="neutral"]:where([data-variant="text"]) { --_bg: transparent; --_fg: var(--md-sys-color-on-surface-variant); }
 
   /* ---------- sizes (M3 Expressive: xs 32, s 40, m 56, l 96, xl 136) ---------- */
   .s4-button[data-size="xs"] { --_h: var(--s4-size-button-small); --_pad: var(--s4-space-3); --_gap: var(--s4-space-1); }
@@ -4115,13 +4146,14 @@
     font-weight: var(--md-sys-typescale-emphasized-label-large-weight);
   }
   /* one filled action per screen (decision 0070): while the open view or page shows a filled action of its own
-     (Approve, Reply, Order Refill), the rail's action steps down to the elevated look, a neutral fill with the accent
-     label and icon; on a view with none it is the filled main action again. data-variant="elevated" keeps it there. */
+     (Approve, Reply, Order Refill), the rail's action steps down to the elevated look, a neutral fill with an on-surface
+     label and icon (decision 0085: the rail's accent is its current place); on a view with none it is the filled main
+     action again. data-variant="elevated" keeps it there. */
   .s4-app:has(.s4-content .s4-button[data-variant="filled"]:not([hidden], [hidden] *, dialog *, .s4-menu *, .s4-button-group *)) .s4-nav-rail .s4-fab:not([data-variant]),
   :root:not([data-buttons]) .s4-app:has(.s4-content .s4-button:not([data-variant]):not([hidden], [hidden] *, dialog *, .s4-menu *, .s4-button-group *)) .s4-nav-rail .s4-fab:not([data-variant]),
   .s4-nav-rail .s4-fab[data-variant="elevated"] {
     --_bg: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--md-sys-color-surface-container-low));
-    --_fg: var(--md-sys-color-primary);
+    --_fg: var(--md-sys-color-on-surface);
   }
   .s4-nav-rail .s4-fab > :not(.s4-icon) { margin: 0; max-width: none; }
   /* collapsed, the hidden label must not wrap into a tall column */
@@ -5976,6 +6008,15 @@
     font-weight: var(--md-sys-typescale-emphasized-body-large-weight);
   }
 
+  /* with one pane at a time (under 840 the list or its detail, never both) the open item has no resting mark while the
+     list is the pane shown: nothing beside it is open (decision 0085) */
+  @container s4-app (width < 840px) {
+    .s4-split:not([data-open]) .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])),
+    .s4-split:not([data-open]) .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] { --_bg: transparent; }
+    .s4-split:not([data-open]) .s4-list-item[data-split-open]:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) .s4-list-headline,
+    .s4-split:not([data-open]) .s4-list > li:is([aria-selected="true"], [aria-current]:not([aria-current="false"])) > .s4-list-item[data-split-open] .s4-list-headline { font-weight: inherit; }
+  }
+
   /* ---------- disabled ---------- */
   .s4-list-item:is(:disabled, [aria-disabled="true"], :has(input:disabled)) {
     --_fg: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-disabled-content-opacity) * 100%), transparent);
@@ -6329,7 +6370,15 @@
     text-overflow: ellipsis;
   }
   /* inside the top app bar it takes the bar's place while anything is selected */
-  .s4-top-app-bar > .s4-selection-bar { flex: 1; min-block-size: 0; align-self: center; margin-inline: calc(var(--s4-space-2) * -1); }
+  .s4-top-app-bar > .s4-selection-bar { flex: 1; grid-column: 1 / -1; min-block-size: 0; align-self: center; }   /* the whole bar, not the lead slot (decision 0085) */
+  /* actions as words beside their icons (decision 0085): <button class="s4-button" data-variant="text"><span class="s4-icon"
+     data-icon="export"></span><span class="s4-button-label">Export</span></button>; under 840 the words go and the icon
+     stays, the label still the button's name */
+  .s4-selection-bar > .s4-button { --_fg: var(--md-sys-color-on-secondary-container); }
+  @container s4-app (width < 840px) {
+    .s4-selection-bar > .s4-button { --_pad: var(--s4-space-2); }
+    .s4-selection-bar > .s4-button > .s4-button-label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  }
   .s4-top-app-bar[data-selecting] > :not(.s4-selection-bar) { display: none; }
   @media (forced-colors: active) { .s4-selection-bar, [data-selectable] > [data-picked] > .s4-list-item { outline: 1px solid Highlight; } }
 }
@@ -7221,6 +7270,89 @@
     .s4-table-input { min-inline-size: 0; inline-size: 100%; }   /* an input's own width must not stretch a column past the sheet */
     .s4-table-grip, .s4-table-col-menu { display: none; }
   }
+}
+
+/* ---- table/table-edges.css ---- */
+/* Tables: the parts only data tables use (table.js, the data pack; a site's static table never draws them).
+   A focused row's ring drawn by its cells (issue 113), the scroll-edge cue (decision 0083) and the columns folded to fit
+   (decision 0083). See table.css for the table itself and README.md for the markup. */
+@layer s4.components {
+  /* ---------- a focused row's ring (issue 113) ----------
+     The ring of a row that holds the focus is drawn by its cells, not by the row's outline: pinned cells are solid and sit
+     above the row, so an outline on the row lost its sides under them. Every cell draws the ring's top and bottom, the
+     first cell its start side and the last its end side, inside the cell (the wrap never cuts it); a cell scrolled under
+     a pinned one is covered with its part of the ring, and the pinned cells draw theirs. Stacked rows (a phone) keep the
+     row's own outline. While a row holds the focus the scroll-edge cue steps aside so the ring shows in full. */
+  .s4-table tbody tr:focus-visible { outline-color: transparent; }
+  .s4-table tbody tr:focus-visible > :is(td, th):not([data-pin]) { position: relative; }
+  .s4-table tbody tr:focus-visible > :is(td, th)::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-block: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color);
+  }
+  .s4-table tbody tr:focus-visible > :is(td, th):first-child::after { border-inline-start: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
+  .s4-table tbody tr:focus-visible > :is(td, th):last-child::after { border-inline-end: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
+  .s4-table-wrap:has(tbody tr:focus-visible) > .s4-table-cue > span[data-side] { opacity: 0; transition: none; }
+  @container s4-table (width < 600px) {
+    .s4-table tbody tr:focus-visible { outline-color: var(--s4-focus-ring-color); }
+    .s4-table tbody tr:focus-visible > :is(td, th)::after { content: none; }
+  }
+  @media (forced-colors: active) { .s4-table tbody tr:focus-visible > :is(td, th)::after { border-color: Highlight; } }
+
+  /* ---------- the scroll-edge cue (decision 0083) ----------
+     While columns are out of sight to one side, that side of the visible table fades into the table's own surface over
+     --s4-space-8, just inside the pinned columns: no shadow, no glass. table.js keeps a zero-height layer stuck to the
+     wrap's top start corner (so it never scrolls away) and sets the pinned widths and the height to cover. */
+  .s4-table-cue {
+    position: sticky;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 4;                                  /* over the cells and the sticky header, beside (never over) the pinned columns */
+    block-size: 0;
+    inline-size: 100%;
+    pointer-events: none;
+  }
+  .s4-table-cue > span {
+    position: absolute;
+    inset-block-start: 0;
+    block-size: var(--_cue-h, 0px);
+    inline-size: var(--s4-space-8);
+    opacity: 0;
+    transition: opacity var(--s4-motion-state);
+  }
+  .s4-table-cue > [data-side="start"] {
+    inset-inline-start: var(--_cue-start, 0px);
+    background: linear-gradient(to var(--_cue-to-start, left), transparent, var(--_table-bg));
+  }
+  .s4-table-cue > [data-side="end"] {
+    inset-inline-end: var(--_cue-end, 0px);
+    background: linear-gradient(to var(--_cue-to-end, right), transparent, var(--_table-bg));
+  }
+  .s4-table-wrap:dir(rtl) { --_cue-to-start: right; --_cue-to-end: left; }
+  .s4-table-wrap[data-scrolled-start] > .s4-table-cue > [data-side="start"],
+  .s4-table-wrap[data-scrolled-end] > .s4-table-cue > [data-side="end"] { opacity: 1; }
+  @media (forced-colors: active) { .s4-table-cue { display: none; } }
+  @media print { .s4-table-cue { display: none; } }
+
+  /* the columns folded to fit (decision 0083), read under the app's own details: label over value, as many across as fit */
+  .s4-table-folded {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4-space-2) var(--s4-space-6);
+    margin: var(--s4-space-2) 0 0;
+  }
+  .s4-table-folded > div { display: flex; flex-direction: column; min-inline-size: 0; }
+  .s4-table-folded dt {
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: var(--md-sys-typescale-label-medium-size);
+    line-height: var(--md-sys-typescale-label-medium-line-height);
+    letter-spacing: var(--md-sys-typescale-label-medium-tracking);
+    font-weight: var(--md-sys-typescale-label-medium-weight);
+  }
+  .s4-table-folded dd { margin: 0; overflow-wrap: break-word; }
 }
 
 /* ---- filter/filter.css ---- */
@@ -8615,25 +8747,6 @@
   }
   :where(html:has(> body.s4-site)) { scroll-padding-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-4)); }
 
-  .s4-skip-link {
-    position: absolute;
-    inset-block-start: var(--s4-space-2);
-    inset-inline-start: var(--s4-space-2);
-    z-index: calc(var(--s4-z-app-bar) + 1);
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--s4-size-button);
-    padding-inline: var(--s4-space-4);
-    border-radius: min(calc(var(--s4-size-button) / 2), var(--s4-shape-control));
-    background: var(--md-sys-color-inverse-surface);
-    color: var(--md-sys-color-inverse-on-surface);
-    font-family: var(--md-sys-typescale-label-large-font);
-    font-size: var(--md-sys-typescale-label-large-size);
-    font-weight: var(--md-sys-typescale-label-large-weight);
-    text-decoration: none;
-    transform: translateY(calc(-100% - var(--s4-space-4)));
-  }
-  .s4-skip-link:focus { transform: none; }
 
   /* ================= announcement bar ================= */
   .s4-announce {
