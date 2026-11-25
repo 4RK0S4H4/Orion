@@ -22,6 +22,7 @@
      bad-nav-200.html, bad-dirflip.html, bad-long-slot.html  proofs for the reach passes reflowz, dirflip and long320 (decision 0073)
      bad-stamp.html     <meta name="orion"> says 0.9.0 but the page loads this version (decision 0075)
      loud-screen.html   two filled actions and a pressed "All" chip on one screen (a warning, decision 0070)
+     loud-selection.html  the rail's place, an accent list row and an Ink Track painted back in the accent (a warning, decision 0082)
    Usage: node tests/checker.mjs */
 import { spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -74,6 +75,7 @@ for (const [file, re, what] of CASES) {
 /* 1b. known-loud pages pass but warn with the right message */
 const WARN_CASES = [
   ['loud-screen.html', /more than one filled action on one screen at rest \(decision 0070[^\n]*3 accent fills: "All", "Next Untranslated", "Approve"/, 'two filled actions and a pressed All chip'],
+  ['loud-selection.html', /more than one accent selection on one screen at rest \(decisions 0070, 0082[^\n]*3 accent selections: "Notes", "Month", "Shopping"/, 'three accent selections, an Ink Track among them'],
 ];
 for (const [file, re, what] of WARN_CASES) {
   const r = spawnSync(process.execPath, [join(root, 'skill/orion/scripts/check.mjs'), join(root, 'tests/fixtures', file), '--out', join(root, 'tests/out/checker')], { encoding: 'utf8', timeout: 120000 });

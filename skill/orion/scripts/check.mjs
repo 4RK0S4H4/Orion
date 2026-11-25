@@ -12,8 +12,8 @@
                 window controls that are not full cells to the window's top and end edges (decision 0072), and a
                 word split or a page scrolling sideways in the middle of a motion (issue 70, midmotion.mjs),
                 a nav bar highlight drawn as a circle or narrower than its label (round 0061)
-     warnings – more than one filled button in one area, more than one filled accent action on the first screen
-                (decision 0070), labels that look sentence case
+     warnings – more than one filled button in one area, more than one filled accent action or more than one accent
+                selection fill on the first screen (decisions 0070, 0082), labels that look sentence case
    Saves a full-page screenshot per viewport in --out (default ./s4-check). Exit code 1 when there are errors. */
 import { readFileSync, mkdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, basename, join, parse, sep } from 'node:path';
@@ -211,6 +211,31 @@ function audit() {
     return getComputedStyle(b).backgroundColor === primary;
   });
   if (loudFills.length > 1) issues.screenFilled = [`${loudFills.length} accent fills: ${loudFills.map((b) => '"' + b.textContent.trim().slice(0, 30) + '"').join(', ')}`];
+  /* one accent selection per screen (decisions 0070, 0082): at rest the first screen shows at most one selection drawn in
+     an accent fill (primary, primary-container or the selection tone, secondary-container, each in its own scope), and it
+     is the navigation's. A selection counts once, whatever draws it: its own fill or pseudo-element, a part inside it, the
+     pill that slides behind a tab or nav item, or a connected button group's ink. Pressed chips are counted above; marks
+     of where you are (today, the current step or time: aria-current date, time, step, data-today) and chart marks are readings, not
+     selections (0070). */
+  const accentFills = (el) => {
+    const probe = document.createElement('i'); el.parentElement.appendChild(probe);
+    const out = new Set(['primary', 'primary-container', 'secondary-container'].map((r) => { probe.style.cssText = `position:absolute;background:var(--md-sys-color-${r})`; return getComputedStyle(probe).backgroundColor; }));
+    probe.remove(); return out;
+  };
+  const paints = (n, accent, pseudo) => { const cs = getComputedStyle(n, pseudo); if (!accent.has(cs.backgroundColor) || cs.display === 'none' || +cs.opacity === 0) return false; if (pseudo) return true; const r = n.getBoundingClientRect(); return r.width >= 8 && r.height >= 8; };
+  const SELECTED = '[aria-selected="true"], [aria-current]:not([aria-current="false"], [aria-current="date"], [aria-current="time"], [aria-current="step"]), [aria-pressed="true"], [aria-checked="true"]:is([role="radio"], [role="tab"], [role="option"])';
+  const owners = [...document.querySelectorAll(SELECTED)].filter((e) => !hidden(e) && e.getClientRects().length && onScreen(e) && !e.matches('.s4-chip, .s4-fab, input, option, [aria-current="date"], [aria-current="time"], [aria-current="step"], [data-today]') && !e.closest('dialog, [popover], .s4-menu, .s4-sheet, .s4-site-header, .s4-chart'));
+  const counted = [];
+  for (const e of owners) {
+    if (counted.some((c) => c.contains(e) || e.contains(c))) continue;
+    const accent = accentFills(e);
+    const parts = [e, ...[...e.querySelectorAll('*')].slice(0, 40)];
+    const pill = e.matches('.s4-tab, .s4-nav-item') && e.parentElement ? e.parentElement.querySelector(':scope > .s4-tabs-indicator, :scope > .s4-nav-pill') : null;
+    const ink = e.matches('.s4-button-group[data-s4-ink] > *') ? e.parentElement.querySelector(':scope > .s4-button-group-ink:not([hidden])') : null;
+    const drawn = parts.some((n) => paints(n, accent) || paints(n, accent, '::before') || paints(n, accent, '::after')) || (pill && paints(pill, accent)) || (ink && (paints(ink, accent, '::before') && +getComputedStyle(ink).opacity > 0.5));
+    if (drawn) counted.push(e);
+  }
+  if (counted.length > 1) issues.screenSelected = [`${counted.length} accent selections: ${counted.map((b) => '"' + (b.getAttribute('aria-label') || b.textContent).trim().replace(/\s+/g, ' ').slice(0, 30) + '"').join(', ')}`];
   /* Title Case labels */
   const small = new Set('a an the and but or nor for so yet on at to by in of up as vs via with per from into off out over'.split(' '));
   for (const e of document.querySelectorAll('.s4-button, .s4-chip, .s4-tab, .s4-nav-label, .s4-menu-item, th, .s4-app-bar-title, .s4-pane-title, .s4-card-title, .s4-dialog-title, .s4-sheet-title, .s4-text-field label')) {
@@ -330,6 +355,7 @@ for (const page of pages) {
       (r.nav || []).forEach((x) => errors.add(`${at} ${x}: the highlight is a rounded rectangle that holds the icon and the label (nav-bar.css; never give .s4-nav-pill its own corner)`));
       (r.loud || []).forEach((x) => errors.add(`${at} ${x}: a status is a tint (no data-tone, or success, warning, info, error; the accent tones draw as a wash); only the state that needs action now is warm`));
       r.filled.forEach((x) => warnings.add(`more than one filled button in an area: ${x}`));
+      (r.screenSelected || []).forEach((x) => warnings.add(`${at} more than one accent selection on one screen at rest (decisions 0070, 0082: the navigation's selection is the one accent selection; others are neutral, as the Ink Track is): ${x}`));
       (r.screenFilled || []).forEach((x) => warnings.add(`${at} more than one filled action on one screen at rest (decision 0070: one filled main action; step the others down to elevated, no "All" chip pressed): ${x}`));
       r.caseWarn.forEach((x) => warnings.add(`label may not be Title Case: ${x}`));
     };

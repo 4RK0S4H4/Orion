@@ -38,7 +38,8 @@ for (const mode of ['light', 'dark']) {
     if (r < 4.5) { failures++; console.error(`  x ${mode}: ${seed} ${v}: on-surface on glass is ${r.toFixed(2)}:1`); }
   }
   worstAll = Math.min(worstAll, worst.r);
-  /* items on glass (decision 0043): on-surface text on a filled control (ink tint) and on a selected item (accent tint),
+  /* items on glass (decision 0043): on-surface text on a filled control (ink tint), on a selected item (accent tint) and on a
+     neutral selection (on-surface at the selected opacity, decision 0082),
      with neutral surfaces (the default) and with stock tinted surfaces */
   const fo = val('--s4-glass-fill-opacity', mode), so = val('--s4-glass-fill-selected-opacity', mode);
   const mono = tokenScheme(mode);
@@ -49,7 +50,7 @@ for (const mode of ['light', 'dark']) {
       const tint = rgb(surf['surface-container']), text = rgb(surf['on-surface']), accent = rgb(s.primary);
       for (const back of [lo, hi]) {
         const glass = mix(tint, [back, back, back], t);
-        const r = Math.min(ratio(text, mix(text, glass, fo)), ratio(text, mix(accent, glass, so)));
+        const r = Math.min(ratio(text, mix(text, glass, fo)), ratio(text, mix(accent, glass, so)), ratio(text, mix(text, glass, so)));   /* the last: a neutral selection on glass (the Ink Track's ink, decision 0082) */
         if (r < fillWorst.r) fillWorst = { r, seed, v, surfaces: surf === mono ? 'neutral' : 'tinted' };
         if (r < 4.5) { failures++; console.error(`  x ${mode}: ${seed} ${v} (${surf === mono ? 'neutral' : 'tinted'} surfaces): on-surface on a fill on glass is ${r.toFixed(2)}:1`); }
       }

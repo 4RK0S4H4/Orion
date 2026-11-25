@@ -280,6 +280,7 @@
     --s4-focus-ring-offset: 2px;
     --s4-focus-ring-color: var(--md-sys-color-secondary);
     --s4-scrim-opacity: 0.16;
+    --s4-selection-neutral-opacity: 0.12;
     --s4-color-success: #146c40;
     --s4-color-success-container: #d7f2e1;
     --s4-color-on-success-container: #0b4429;
@@ -3009,8 +3010,9 @@
    Standard: <div class="s4-button-group"> <button class="s4-button">…</button> … </div>
      Buttons 8dp apart. Pressing one widens it a little while its neighbours give way (M3 Expressive press interaction).
    Connected: <div class="s4-button-group" data-connected data-select="single|multi" aria-label="Period">
-     The Ink Track (decision 0059): one filled track with the options as words on it; the selected option is an accent
-     ink pill that slides to the next choice, its front edge leading and its back edge trailing (the Ink pattern). With
+     The Ink Track (decision 0059): one filled track with the options as words on it; the selected option is a neutral
+     ink pill (decision 0082: on-surface over the track, never the accent, which belongs to the navigation's selection and
+     the main action) that slides to the next choice, its front edge leading and its back edge trailing (the Ink pattern). With
      several choices (data-select="multi") each selected option fills in place and selected neighbours fuse into one pill.
      Connected groups stretch to fill their width (equal weights); data-fit="content" keeps them as wide as their labels.
    A button group sets a value or changes how the same content is shown. If it swaps what is on the screen, it is tabs.
@@ -3055,8 +3057,10 @@
     --_gp: var(--s4-space-1);                                                /* the track's padding */
     --_track: var(--md-sys-color-surface-container-highest);
     --_rest: var(--md-sys-color-on-surface-variant);
-    --_ink: var(--md-sys-color-primary);                                     /* the accent */
-    --_on-ink: var(--md-sys-color-on-primary);
+    /* decision 0082: the selected option is a neutral selection (0068, 0070), on-surface over the track, with the
+       on-surface label; the accent is left for the navigation's selection and the main action */
+    --_ink: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--s4-selection-neutral-opacity) * 100%), var(--_track));
+    --_on-ink: var(--md-sys-color-on-surface);
     --_ink-alpha: 1;
     --_ink-fill: color-mix(in srgb, var(--_ink) calc(var(--_ink-alpha) * 100%), transparent);
     position: relative;
@@ -3149,13 +3153,14 @@
   /* the focus ring stays above the neighbours */
   .s4-button-group[data-connected] > :focus-visible { z-index: 2; }
 
-  /* items on glass are tints (decision 0043): the glass is the track (a fill under the ink would stack two tints, which
-     check-glass cannot prove for every accent), the ink is the accent at the selected-fill opacity and every label is
-     on-surface, exactly the selected item check-glass proves for 210 schemes. */
+  /* items on glass are tints (decision 0043): the glass is the track (a fill under the ink would stack two tints), the
+     ink is on-surface at the selected-fill opacity (neutral, decision 0082) and every label is on-surface, the neutral
+     selected tint check-glass proves for every scheme. */
   :where(.s4-glass, .s4-top-app-bar[data-scrolled], .s4-site-header[data-scrolled], .s4-site-panel[data-open], .s4-nav-bar,
          .s4-nav-rail:is([data-modal], [data-overlay]), .s4-toolbar, .s4-menu, .s4-dialog, .s4-bottom-sheet, .s4-side-sheet,
          .s4-snackbar) .s4-button-group[data-connected] {
     --_track: transparent;
+    --_ink: var(--md-sys-color-on-surface);
     --_ink-alpha: var(--s4-glass-fill-selected-opacity);
     --_on-ink: var(--md-sys-color-on-surface);
     --_rest: var(--md-sys-color-on-surface);

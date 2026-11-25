@@ -113,8 +113,8 @@ disabled uses M3's 12% / 38%; forced-colors mode draws a border on contained var
 ## Button Group
 
 Groups related buttons. A **standard** group reacts as one when pressed; a **connected** group is one control for
-choosing a value: the **Ink Track** (decision 0059), one filled track with the options on it and an accent ink pill that
-slides to the choice.
+choosing a value: the **Ink Track** (decision 0059), one filled track with the options on it and a neutral ink pill that
+slides to the choice (decision 0082: the accent is left for the navigation's selection and the main action).
 
 **Button group, tabs or chips?** If it swaps what is on the screen, it is [tabs](#tabs). If it changes a value or how
 the same thing is shown, it is a button group. If it narrows a collection and there can be many, it is
@@ -143,7 +143,7 @@ the same thing is shown, it is a button group. If it narrows a collection and th
 
 | Attribute (on the group) | Values | Default |
 |---|---|---|
-| `data-connected` | the Ink Track: a filled track (`surface-container-highest`, 4dp padding, corner concentric with the options) holding the options as words; the selected option is the accent ink | standard: buttons 8dp apart |
+| `data-connected` | the Ink Track: a filled track (`surface-container-highest`, 4dp padding, corner concentric with the options) holding the options as words; the selected option is the neutral ink (`on-surface` at `--s4-selection-neutral-opacity` over the track, `on-surface` label, decision 0082) | standard: buttons 8dp apart |
 | `data-select` | `single` (exactly one pressed, radio-like: the ink slides), `multi` (each toggles: each selected option fills in place, selected neighbours fuse into one pill) | none: plain buttons |
 | `data-fit` | `content`: as wide as the labels (never stretched by its parent) | connected groups stretch to fill (equal weights) |
 | `aria-label` | names the choice ("Period") | — |
@@ -186,9 +186,9 @@ for a set of related actions. A toolbar of actions can be connected (`role="tool
 - Don't make it scroll; it wraps.
 
 **On glass** (inside a glass bar, panel, menu or dialog): items on glass are tints (decision 0043). The glass is the
-track (no fill of its own: a fill under the ink would stack two tints, which `check-glass` cannot prove for every
-accent); the ink is the accent at `--s4-glass-fill-selected-opacity`; every label is `on-surface`. That selected tint
-is what `scripts/check-glass.mjs` proves for 210 schemes.
+track (no fill of its own: a fill under the ink would stack two tints); the ink is `on-surface` at
+`--s4-glass-fill-selected-opacity` (neutral, decision 0082); every label is `on-surface`. `scripts/check-glass.mjs` proves
+that neutral tint for every scheme, and `scripts/check-accent.mjs` proves the label on the neutral ink off glass.
 
 **Accessibility:** buttons stay native `<button>`s with `aria-pressed`; one tab stop per group with arrow keys; the
 focus ring stays above the neighbours; selection shows as fill and label color, never color alone. Forced colors: the
@@ -196,7 +196,7 @@ track and every option get a border; the selected option is `Highlight` with `Hi
 
 **Tokens:** `--s4-space-1` (track padding), `--s4-space-2` (standard gap), `--s4-shape-control` (option corner, clamped to
 half the height; the track adds its padding), `--md-sys-color-surface-container-highest` (track),
-`--md-sys-color-on-surface-variant` (labels), `--md-sys-color-primary` / `on-primary` (ink), `--s4-motion-ink`,
+`--md-sys-color-on-surface-variant` (labels), `--md-sys-color-on-surface` and `--s4-selection-neutral-opacity` (ink and its label), `--s4-motion-ink`,
 `--s4-motion-ink-calm` (the ink), `--s4-motion-morph` (press and fusing corners), `--s4-motion-state` (colors),
 `--s4-glass-fill-selected-opacity` (on glass), plus the button and icon-button tokens.
 

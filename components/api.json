@@ -731,6 +731,7 @@
   "--s4-nav-rail-expanded-width",
   "--s4-pane-padding",
   "--s4-scrim-opacity",
+  "--s4-selection-neutral-opacity",
   "--s4-shape-button",
   "--s4-shape-button-pressed",
   "--s4-shape-card",

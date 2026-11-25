@@ -12,7 +12,7 @@
      Its own elements, drawn from Orion's rules: the runway (an Orion meter since 0063), paired in/out bars and the aging bar. -->
 <script>(function (k) { try { var t = JSON.parse(localStorage.getItem(k) || 'null'); if (t && t.mode && t.mode !== 'system') document.documentElement.dataset.theme = t.mode; } catch (e) {} })('orion-template-theme');</script>
 <link rel="preload" href="../components/assets/inter-variable.woff2?v=2edaa7b" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../components/orion.core.min.css?v=6e79932">
+<link rel="stylesheet" href="../components/orion.core.min.css?v=a60daad">
 <link rel="stylesheet" href="../components/orion.data.min.css?v=fd1444e">
 <link rel="stylesheet" href="brand/dashboard.css?v=8a9e8db">
 <style>
@@ -306,7 +306,7 @@ var MONTHS = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 var IN = [18, 22, 19, 26, 24, 31, 28, 27, 33, 29, 35, 38], OUT = [20, 19, 21, 22, 23, 24, 25, 24, 26, 27, 27, 29], MAX = 40;
 var bars = document.getElementById('tl-bars'), rows = document.getElementById('tl-flow-rows');
 MONTHS.forEach(function (m, i) {
-  var d = document.createElement('div'); d.className = 'tl-month'; if (i === MONTHS.length - 1) d.setAttribute('aria-current', 'true'); if (i % 3 === 0 || i === MONTHS.length - 1) d.setAttribute('data-tick', '');
+  var d = document.createElement('div'); d.className = 'tl-month'; if (i === MONTHS.length - 1) d.setAttribute('aria-current', 'date'); if (i % 3 === 0 || i === MONTHS.length - 1) d.setAttribute('data-tick', '');
   d.innerHTML = '<div class="tl-pair"><i style="--h:' + (IN[i] / MAX * 100) + '%"></i><i style="--h:' + (OUT[i] / MAX * 100) + '%"></i></div><span>' + m + '</span>';
   bars.appendChild(d);
   var tr = document.createElement('tr'); var net = IN[i] - OUT[i];

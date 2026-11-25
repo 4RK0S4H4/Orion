@@ -277,6 +277,7 @@
     --s4-focus-ring-offset: 2px;
     --s4-focus-ring-color: var(--md-sys-color-secondary);
     --s4-scrim-opacity: 0.16;
+    --s4-selection-neutral-opacity: 0.12;
     --s4-color-success: #146c40;
     --s4-color-success-container: #d7f2e1;
     --s4-color-on-success-container: #0b4429;

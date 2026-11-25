@@ -50,5 +50,17 @@ for (const dark of [false, true]) for (const [seed, variants] of seeds) for (con
   const s = M3.scheme(seed, v, dark, 0);
   for (const surf of SURFACES) for (const r of SYNTAX) { const x = ratio(syntax(r, dark), s[surf]); worst.syntax = Math.min(worst.syntax, x); if (x < 4.5) { failures++; console.error(`  x ${dark ? 'dark' : 'light'} ${seed} ${v} tinted: syntax ${r} on ${surf} is ${x.toFixed(2)}:1, needs 4.5:1`); } }
 }
+/* decision 0082: the Ink Track's selected option is neutral, on-surface at --s4-selection-neutral-opacity over the track
+   (surface-container-highest), its label on-surface; on the neutral base and on every tinted scheme it keeps 4.5:1 */
+const nOp = T['--s4-selection-neutral-opacity'].value;
+const hex = (c) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+const rgbOf = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+const over = (fg, bg, a) => hex(rgbOf(fg).map((v, i) => v * a + rgbOf(bg)[i] * (1 - a)));
+worst.neutral = Infinity;
+for (const dark of [false, true]) {
+  const schemes = [{ 'on-surface': neutral('on-surface', dark), 'surface-container-highest': neutral('surface-container-highest', dark) }];
+  for (const [seed, variants] of seeds) for (const v of ['tonal', ...variants]) schemes.push(M3.scheme(seed, v, dark, 0));
+  for (const s of schemes) { const r = ratio(s['on-surface'], over(s['on-surface'], s['surface-container-highest'], nOp)); worst.neutral = Math.min(worst.neutral, r); if (r < 4.5) { failures++; console.error(`  x ${dark ? 'dark' : 'light'}: the neutral Ink Track label is ${r.toFixed(2)}:1, needs 4.5:1`); } }
+}
 if (failures) { console.error(`${failures} accent pair(s) below the bar.`); process.exit(1); }
-console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + the named accents in vibrant and their default variant, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed); syntax colors on ${tinted} tinted schemes worst ${worst.syntax.toFixed(2)}:1 (4.5 needed).`);
+console.log(`Accents: ${n} accent schemes (24 hues x 4 variants + the named accents in vibrant and their default variant, light and dark) on the neutral base: text on accent fills worst ${worst.text.toFixed(2)}:1 (4.5 needed), accent on neutral surfaces worst ${worst.shape.toFixed(2)}:1 (3 needed); syntax colors on ${tinted} tinted schemes worst ${worst.syntax.toFixed(2)}:1 (4.5 needed); the neutral Ink Track label worst ${worst.neutral.toFixed(2)}:1 (4.5 needed, decision 0082).`);

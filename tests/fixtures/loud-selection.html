@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Known Loud: Three Accent Selections</title>
+<!-- Known-loud fixture (round 0066, decision 0082). tests/checker.mjs expects the page checker to WARN on this page:
+     the rail's current place, a list row selected in the accent and a connected button group whose ink the page has
+     painted back in the accent: three accent selections on one screen at rest. Never "fix" it. -->
+<link rel="stylesheet" href="../../components/orion.css">
+<style>
+  .ls-period { --_ink: var(--md-sys-color-primary); --_on-ink: var(--md-sys-color-on-primary); }
+</style>
+</head>
+<body>
+<div style="display: grid; grid-template-columns: auto minmax(0, 1fr); min-block-size: 100vh">
+  <nav class="s4-nav-rail" aria-label="Main">
+    <div class="s4-nav-rail-items">
+      <a class="s4-nav-item" href="#notes" aria-current="page"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="home"></span></span><span class="s4-nav-label">Notes</span></a>
+      <a class="s4-nav-item" href="#tasks"><span class="s4-nav-indicator"><span class="s4-icon" data-icon="settings"></span></span><span class="s4-nav-label">Tasks</span></a>
+    </div>
+  </nav>
+  <main style="padding: 16px; display: grid; gap: 16px; align-content: start">
+    <h1>Notes</h1>
+    <div class="s4-button-group ls-period" data-connected data-select="single" data-fit="content" aria-label="Period">
+      <button class="s4-button" type="button" value="week">Week</button>
+      <button class="s4-button" type="button" value="month" aria-pressed="true">Month</button>
+    </div>
+    <ul class="s4-list" aria-label="Notes">
+      <li><a class="s4-list-item" href="#n1" aria-current="true"><span class="s4-list-content"><span class="s4-list-headline">Shopping</span></span></a></li>
+      <li><a class="s4-list-item" href="#n2"><span class="s4-list-content"><span class="s4-list-headline">Ideas</span></span></a></li>
+    </ul>
+  </main>
+</div>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.js"></script>
+</body>
+</html>
