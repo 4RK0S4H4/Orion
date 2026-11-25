@@ -29,25 +29,6 @@
   }
   :where(html:has(> body.s4-site)) { scroll-padding-block-start: calc(var(--s4-size-top-app-bar) + var(--s4-space-4)); }
 
-  .s4-skip-link {
-    position: absolute;
-    inset-block-start: var(--s4-space-2);
-    inset-inline-start: var(--s4-space-2);
-    z-index: calc(var(--s4-z-app-bar) + 1);
-    display: inline-flex;
-    align-items: center;
-    min-block-size: var(--s4-size-button);
-    padding-inline: var(--s4-space-4);
-    border-radius: min(calc(var(--s4-size-button) / 2), var(--s4-shape-control));
-    background: var(--md-sys-color-inverse-surface);
-    color: var(--md-sys-color-inverse-on-surface);
-    font-family: var(--md-sys-typescale-label-large-font);
-    font-size: var(--md-sys-typescale-label-large-size);
-    font-weight: var(--md-sys-typescale-label-large-weight);
-    text-decoration: none;
-    transform: translateY(calc(-100% - var(--s4-space-4)));
-  }
-  .s4-skip-link:focus { transform: none; }
 
   /* ================= announcement bar ================= */
   .s4-announce {

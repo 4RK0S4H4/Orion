@@ -19,7 +19,9 @@
      controls overlay). A shell may set data-window-state itself (Electron and Tauri know the real state).
    - .s4-inspector: a grip on its start edge (drag, arrows, Home/End, Enter to hide), the width remembered with
      data-resize-key; its .s4-inspector-group sections open and close with Reveal. S4.desktop.inspector(el, on).
-   S4.desktop.platform, S4.desktop.format('mod+k'), S4.desktop.matches(event, 'mod+k'). */
+   - F6 / Shift+F6 (and Ctrl+F6 / Ctrl+Shift+F6) move the focus between the app's regions: menu bar, rail, main, inspector,
+     status bar (decision 0084).
+   S4.desktop.platform, S4.desktop.format('mod+k'), S4.desktop.matches(event, 'mod+k'), S4.desktop.regions(). */
 (function () {
   var S4 = window.S4, root = document.documentElement;
   var ua = navigator.userAgent || '', plat = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
@@ -203,7 +205,61 @@
     });
   }
 
+  /* ---------- F6 regions (decision 0084) ----------
+     F6 / Shift+F6 move the focus between the app's regions on screen, in reading order: the menu bar, the rail, main, the
+     inspector and the status bar, each to what last had the focus in it (the rail to its current place, a region with
+     nothing to focus to the region itself; never into a field, 0049). Ctrl+F6 / Ctrl+Shift+F6 do the same, for browsers
+     that keep F6 for their address bar. A dialog, palette or open menu keeps the focus. S4.desktop.regions() lists them. */
+  var REGIONS = '.s4-menubar, .s4-nav-rail, main, [role="main"], .s4-inspector, .s4-statusbar';
+  function regions(app) {
+    return Array.prototype.slice.call(app.querySelectorAll(REGIONS)).filter(function (r) {
+      if (!r.getClientRects().length || r.closest('[hidden], [inert], dialog, [popover]')) return false;
+      var cs = getComputedStyle(r); if (cs.visibility === 'hidden' || cs.display === 'none') return false;
+      var box = r.getBoundingClientRect(); if (box.width < 8 || box.height < 8) return false;
+      return !(r.matches('main, [role="main"]') && r.parentElement.closest('main, [role="main"]'));
+    });
+  }
+  function enter(region) {
+    var last = region._s4last, items;
+    if (last && last.isConnected && region.contains(last) && last.getClientRects().length && !last.disabled && !S4.util.typable(last)) { last.focus({ preventScroll: false }); if (document.activeElement === last) return; }
+    if (region.matches('.s4-nav-rail')) {
+      var cur = region.querySelector('.s4-nav-item[aria-current]:not([aria-current="false"])') || region.querySelector('.s4-nav-item');
+      if (cur) { cur.focus(); if (document.activeElement === cur) return; }
+    }
+    if (region.matches('.s4-menubar')) {
+      items = region.querySelector('[role="menuitem"][tabindex="0"], [role="menuitem"]');
+      if (items) { items.focus(); if (document.activeElement === items) return; }
+    }
+    if (!region.matches('main, [role="main"]')) {
+      items = Array.prototype.slice.call(region.querySelectorAll('a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]')).filter(function (x) { return x.getClientRects().length && !x.closest('[hidden], [inert]') && !S4.util.typable(x); });   /* never a field (decision 0049) */
+      if (items[0]) { items[0].focus(); if (document.activeElement === items[0]) return; }
+    }
+    if (!region.hasAttribute('tabindex')) region.setAttribute('tabindex', '-1');
+    region.focus({ preventScroll: false });
+  }
+  function cycle(app, back) {
+    var list = regions(app); if (!list.length) return false;
+    var a = document.activeElement, at = -1;
+    list.forEach(function (r, i) { if (r.contains(a)) at = i; });
+    if (at < 0 && back) at = 0;
+    var next = list[(at + (back ? -1 : 1) + list.length) % list.length];
+    enter(next);
+    return true;
+  }
+  S4.desktop.regions = function () { var app = document.querySelector('.s4-app'); return app ? regions(app) : []; };
+  function regionKeys() {
+    if (regionKeys.done) return; regionKeys.done = true;
+    /* each region remembers what last had the focus in it */
+    document.addEventListener('focusin', function (e) { var r = e.target.closest && e.target.closest(REGIONS); if (r && r !== e.target && r.closest('.s4-app')) r._s4last = e.target; });
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'F6' || e.altKey || e.metaKey || e.defaultPrevented) return;
+      var app = document.querySelector('.s4-app'); if (!app || !app.getClientRects().length) return;
+      if (document.querySelector('dialog[open], [popover]:popover-open')) return;   /* a dialog, palette or menu keeps the focus */
+      if (cycle(app, e.shiftKey)) e.preventDefault();
+    });
+  }
   S4.register('desktop', function (scope) {
+    if (document.querySelector('.s4-app')) regionKeys();
     S4.util.all(scope, '.s4-inspector').forEach(function (el) { if (S4.util.once(el, 'inspector')) wireInspector(el); });
     S4.util.all(scope, '.s4-kbd').forEach(function (k) {
       if (k.textContent.trim()) return;

@@ -52,6 +52,31 @@
     outline: none;
   }
 
+  /* ---------- the skip link (sites write it; app shells get it from app.js, decision 0084) ----------
+     <a class="s4-skip-link" href="#main">Skip to Content</a>, first in the document: the first Tab stop, out of sight
+     until it has the focus, then a pill in the window's top start corner above everything. */
+  .s4-skip-link {
+    position: fixed;
+    inset-block-start: var(--s4-space-2);
+    inset-inline-start: var(--s4-space-2);
+    z-index: var(--s4-z-tooltip);                  /* above the bars, the rail and its FAB while it has the focus */
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--s4-size-button);
+    padding-inline: var(--s4-space-4);
+    border-radius: min(calc(var(--s4-size-button) / 2), var(--s4-shape-control));
+    background: var(--md-sys-color-inverse-surface);
+    color: var(--md-sys-color-inverse-on-surface);
+    font-family: var(--md-sys-typescale-label-large-font);
+    font-size: var(--md-sys-typescale-label-large-size);
+    font-weight: var(--md-sys-typescale-label-large-weight);
+    text-decoration: none;
+    white-space: nowrap;
+    transform: translateY(calc(-100% - var(--s4-space-4)));
+  }
+  .s4-skip-link:focus { transform: none; }
+  .s4-skip-link:not(:focus) { pointer-events: none; }
+
   /* ---------- icons: <span class="s4-icon" data-icon="search"></span>, drawn by orion.js from the icon registry ---------- */
   .s4-icon {
     display: inline-grid;

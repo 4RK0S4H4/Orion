@@ -8,6 +8,9 @@
      new view (a region named by its data-title), so the next Tab starts there. A switch from the navigation keeps focus
      on the navigation item; focus left inside the view that went away also moves to the new view, never to <body>.
    - Deep links: nav items are <a href="#name">, so the URL follows the view; on load, #name opens that view.
+   - Getting past the chrome (decision 0084): every app shell gets a skip link as the first Tab stop ("Skip to Content",
+     hidden until it has the focus; Enter puts the focus on main). Nothing to write in markup. F6 region cycling for
+     desktop apps is in desktop/desktop.js.
    - Back and Forward (decision 0076): the screen follows the URL both ways. A hash that names a view of the app (or no hash:
      the view the app started on) switches to that view when the browser's Back or Forward, the phone's Back gesture or a
      script (location.hash = '#forms') changes it; any open page closes first. */
@@ -66,12 +69,38 @@
     }
   };
 
+  /* ---------- getting past the chrome (decision 0084) ---------- */
+  function mainOf(app) {
+    var all = app.querySelectorAll('main, [role="main"]');
+    for (var i = 0; i < all.length; i++) if (all[i].getClientRects().length && !all[i].closest('[hidden]')) return all[i];
+    return all[0] || null;
+  }
+  function toMain(app) {
+    var m = mainOf(app); if (!m) return false;
+    if (!m.hasAttribute('tabindex')) m.setAttribute('tabindex', '-1');
+    m.focus({ preventScroll: true });
+    m.scrollIntoView({ block: 'nearest' });
+    return true;
+  }
+  /* the skip link: a real Orion pill (base.css), first in the document so it is the first Tab stop; a page that wrote its own keeps it */
+  function skipLink(app) {
+    if (document.querySelector('.s4-skip-link') || !mainOf(app)) return;
+    var m = mainOf(app);
+    if (!m.id) m.id = 's4-main';
+    var a = document.createElement('a');
+    a.className = 's4-skip-link'; a.href = '#' + m.id; a.textContent = 'Skip to Content';
+    a.setAttribute('data-s4-skip-link', '');
+    /* the link never changes the address (an app's views and pages live in the hash): it moves the focus */
+    a.addEventListener('click', function (e) { if (toMain(app)) e.preventDefault(); });
+    document.body.insertBefore(a, document.body.firstChild);
+  }
   /* the view an app started on: the deep link, else the current destination, else the first view */
   function name0(app, deep, cur, list) { return deep || (cur ? cur.dataset.view : list.length ? list[0].dataset.view : ''); }
 
   S4.register('app', function (scope) {
     S4.util.all(scope, '.s4-app').forEach(function (app) {
       if (!S4.util.once(app, 'app')) return;
+      if (app === document.querySelector('.s4-app')) skipLink(app);   /* one shell per page has the skip link */
       /* start with only the current destination's view visible */
       var cur = app.querySelector('.s4-nav-item[aria-current="page"][data-view]');
       var list = views(app);
