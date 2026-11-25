@@ -3,7 +3,8 @@
    like the same page on the full bundle. For every page that links the lean files, at 390 dark and 1280 light, it is
    loaded twice: as written, and with the lean files swapped for orion.min.css/js (requests intercepted, so the page is
    untouched). Compared: page errors and console errors, the S4 runtime (every public name), the element count, and the
-   computed style of every element (all properties), with motion reduced and random numbers seeded so the two runs can match.
+   computed style of every element (all properties), every drawn icon (icons-app.js against icons.js, issue 109, and no fetch of the
+   full set at load), with motion reduced and random numbers seeded so the two runs can match.
    A difference names the first elements and properties that differ. Usage: node tests/lean.mjs [--browser=chromium] [--only=part-of-a-path] */
 import { readFileSync, existsSync, statSync, readdirSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -31,7 +32,7 @@ const VIEWS = [
   { name: '390 dark', viewport: { width: 390, height: 844 }, colorScheme: 'dark', reducedMotion: 'reduce', isMobile: true, hasTouch: true, deviceScaleFactor: 1 },
   { name: '1280 light', viewport: { width: 1280, height: 900 }, colorScheme: 'light', reducedMotion: 'reduce' },
 ];
-const fullCss = readFileSync(join(root, 'components/orion.min.css')), fullJs = readFileSync(join(root, 'components/orion.min.js'));
+const fullCss = readFileSync(join(root, 'components/orion.min.css')), fullJs = readFileSync(join(root, 'components/orion.min.js')), allIcons = readFileSync(join(root, 'components/assets/icons.js'));
 const index = JSON.parse(readFileSync(join(root, 'components/packs.json'), 'utf8'));
 const SEED = () => { let a = 123456789; Math.random = () => { a = (a * 1664525 + 1013904223) % 4294967296; return a / 4294967296; }; };
 
@@ -45,7 +46,9 @@ async function snapshot(page, url, full) {
     await page.route(/\/orion\.core\.min\.js/, (r) => r.fulfill({ body: fullJs, contentType: 'text/javascript' }));
     await page.route(/\/orion\.(data|commands|desktop|direct|inputs|sitekit)\.min\.css/, (r) => r.fulfill({ body: '', contentType: 'text/css' }));
     await page.route(/\/orion\.(data|commands|desktop|direct|inputs|sitekit)\.min\.js/, (r) => r.fulfill({ body: '', contentType: 'text/javascript' }));
+    await page.route(/\/assets\/icons-app\.js/, (r) => r.fulfill({ body: allIcons, contentType: 'text/javascript' }));   /* the app icon pack (issue 109) against every set */
   }
+  const fetched = []; page.on('request', (r) => fetched.push(new URL(r.url()).pathname));
   await page.goto(url, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready); await page.waitForTimeout(1500);
   /* read only a settled layout: the page's height and width unchanged over three looks (a slow machine finishes the two runs at different moments, and a scrollbar that appears late moves a centered column) */
@@ -61,9 +64,10 @@ async function snapshot(page, url, full) {
       for (let k = 0; k < cs.length; k++) { const p = cs[k]; if (/^(transition|animation|-webkit-locale)/.test(p)) continue; o[p] = cs.getPropertyValue(p); }
       return { i, tag: e.tagName.toLowerCase() + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/).slice(0, 2).join('.') : ''), o };
     });
-    return { names, rows };
+    const icons = [...document.querySelectorAll('.s4-icon[data-icon]')].map((e) => e.getAttribute('data-icon') + ':' + e.innerHTML);
+    return { names, rows, icons };
   });
-  return { errs, ...data };
+  return { errs, fetched, ...data };
 }
 
 const fails = [];
@@ -81,6 +85,10 @@ async function compare(pg, opts) {
   if (missing.length || extra.length) probs.push(`S4 differs: missing ${missing.join(',') || '-'}, extra ${extra.join(',') || '-'}`);
   const le = lean.errs.filter((e) => !full.errs.includes(e));
   if (le.length) probs.push(`errors only on the lean bundle: ${le.slice(0, 3).join(' | ')}`);
+  /* the app icon pack draws every icon the page shows, the same as the whole registry, without fetching the full set */
+  const iconDiff = lean.icons.filter((x, i) => x !== full.icons[i]);
+  if (lean.icons.length !== full.icons.length || iconDiff.length) probs.push(`icons differ from icons.js: ${iconDiff.slice(0, 3).map((x) => x.split(':')[0]).join(', ') || lean.icons.length + ' vs ' + full.icons.length}`);
+  if (/icons-app\.js/.test(html) && lean.fetched.some((p) => /\/icons-solar\.js$/.test(p))) probs.push('the app icon pack lacked an icon the page draws at load, so icons-solar.js was fetched (add the name where the page or its script names it)');
   if (lean.rows.length !== full.rows.length) probs.push(`element count ${lean.rows.length} vs ${full.rows.length}`);
   else {
     let shown = 0, bad = 0;

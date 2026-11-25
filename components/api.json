@@ -1449,6 +1449,8 @@
   "tagInput.source",
   "tagInput.values",
   "theme",
+  "theme.dials",
+  "theme.keys",
   "theme.restore",
   "timeField.parse",
   "timeField.set",
@@ -1604,6 +1606,7 @@
   "window-restore"
  ],
  "files": [
+  "icons-app.js",
   "icons-site.js",
   "icons-solar.js",
   "icons.js",

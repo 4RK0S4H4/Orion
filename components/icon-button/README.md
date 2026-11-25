@@ -13,7 +13,7 @@ toggleable, with the same press morph as the [button](../button/).
 | Attribute | Values | Default |
 |---|---|---|
 | `aria-label` | what the button does, Title Case | required |
-| `data-variant` | `standard`, `filled`, `tonal`, `outlined` | `standard` (no container, on-surface-variant icon) |
+| `data-variant` | `standard`, `filled`, `tonal`, `outlined` (M3's name, kept; it draws a neutral filled container, decision 0023) | `standard` (no container, on-surface-variant icon) |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136); icons 20 / 24 / 24 / 32 / 40 | `s` |
 | `data-width` | `narrow`, `default`, `wide` (e.g. s: 32 / 40 / 52) | `default` |
 | `data-shape` | `round`, `square` | `round` |
@@ -26,7 +26,7 @@ on-secondary; outlined selected = inverse-surface. A selected toggle swaps shape
 the group manages it instead.
 
 **When to use what:** **standard** in toolbars, app bars and list rows; **filled** for the one key action in a compact
-spot; **tonal** for a strong secondary action; **outlined** next to filled/tonal ones for a quieter alternative.
+spot; **tonal** for a strong secondary action; `outlined` (a neutral fill) next to filled or tonal ones for a quieter alternative.
 
 **Do**
 - Always give an `aria-label` that names the action ("Delete Electric Co.", not "Trash").

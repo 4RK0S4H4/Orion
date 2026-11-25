@@ -16,22 +16,40 @@ pause for what truly needs the owner's eyes or hands (device checks, taste calls
 A 10 means: a top-tier professional team would ship it without reservations, checked by an **independent** review
 (a fresh agent that did not build the work), not by the builder's own word.
 
+## The finish line
+
+The owner, 2026-11-25: "let's be realistic, I don't want this to be a never ending journey". So the journey has an end:
+
+- **What a 10 means.** Nothing above minor is left in what this environment can check (Chromium, plus WebKit and Firefox in CI
+  once they are added), and two independent reviews in a row both find no major or medium items. When that holds, the area is
+  recorded as 10.
+- **Device items are tracked separately.** The iPhone, VoiceOver, Safari on a real device, NVDA or Narrator, and real Electron and
+  Tauri shells live in a one-time owner checklist (`docs/device-check.md`) and never hold a score down.
+- **The remaining stages, and nothing more:**
+  1. Round 0066 A and B (review 5's Top 10).
+  2. Round 0067: fixes from the WebKit and Firefox CI run and from the owner's device session.
+  3. Review 6, fixes, then review 7.
+- **The hard cap.** An area still under 10 after review 7 has its leftover items written down as known limits, and 1.2.0 (or
+  2.0) ships anyway.
+- **After the release, Orion is in maintenance.** Work comes only from issues logged by app sessions (`from-app`) and from the
+  owner's own requests. No more open-ended improvement rounds.
+
 ## Status
 
-| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Review 3 (11-22, c089ade) | Review 4 (11-22, 032c225) | Target |
-|---|---|---|---|---|---|
-| Foundations | 9 | 8.5 | 9 | 9 | 10 |
-| Behaviour | 9 | 8 | 8.5 | 9 | 10 |
-| Accessibility | 8 | 7.5 | 8.5 | 8.5 | 10 |
-| App Components | 8 | 8.5 | 9 | 9 | 10 |
-| Visual Hierarchy | 6 | 7.5 | 8.5 | 8.5 | 10 |
-| Desktop Apps | 6 | 7.5 | 8.5 | 8.5 | 10 |
-| Websites | 4 | 7.5 | 8.5 | 9 | 10 |
-| Per-App Customization | 4 | 8 | 9 | 9.5 | 10 |
+| Area | Review 1 (11-16) | Review 2 (11-21, 8ca40e5) | Review 3 (11-22, c089ade) | Review 4 (11-22, 032c225) | Review 5 (11-25, 4081644) | Target |
+|---|---|---|---|---|---|---|
+| Foundations | 9 | 8.5 | 9 | 9 | 9 | 10 (by review 7, or known limits) |
+| Behaviour | 9 | 8 | 8.5 | 9 | 9.5 | 10 (by review 7, or known limits) |
+| Accessibility | 8 | 7.5 | 8.5 | 8.5 | 9 | 10 (by review 7, or known limits) |
+| App Components | 8 | 8.5 | 9 | 9 | 9 | 10 (by review 7, or known limits) |
+| Visual Hierarchy | 6 | 7.5 | 8.5 | 8.5 | 9 | 10 (by review 7, or known limits) |
+| Desktop Apps | 6 | 7.5 | 8.5 | 8.5 | 9 | 10 (by review 7, or known limits) |
+| Websites | 4 | 7.5 | 8.5 | 9 | 9 | 10 (by review 7, or known limits) |
+| Per-App Customization | 4 | 8 | 9 | 9.5 | 9.5 | 10 (by review 7, or known limits) |
 
 Review 1 is `explore/design-review.html` (issues 51-60). Review 2, with every blocker ranked and tagged, is
 [`history/round-0058/regrade-2.md`](history/round-0058/regrade-2.md). Review 3 is [`history/round-0058/regrade-3.md`](history/round-0058/regrade-3.md); its Top 10 plans round 0059. Review 2 was stricter on behaviour and
-accessibility, so some scores fell although nothing got worse.
+accessibility, so some scores fell although nothing got worse. Review 5 is [`history/round-0065/regrade-5.md`](history/round-0065/regrade-5.md); its Top 10 plans round 0066.
 
 ## How we work (owner's rules plus what we learned)
 
@@ -104,7 +122,7 @@ accessibility, so some scores fell although nothing got worse.
      third-party-brand trial: a new app built from the skill alone, checked for a bespoke look, its lessons fed back.
    - Then A merges B, publish, review 5. Later rounds: WebKit/Firefox runs, screen-reader passes, shells
      run for real, print pagination, skill evals proving bespoke results.
-6c. **Round 0061 — current stage** (integrated on `round61/int`): the owner's notes from a Windows desktop app and an
+6c. **Round 0061** (integrated on `round61/int`): the owner's notes from a Windows desktop app and an
    iPhone. Window controls like Windows' and nothing wrapping mid-motion (decision 0072, issues 69 and 70, with
    `midmotion.mjs`); a ring round the whole phone screen and the round nav bar highlight (issues 71 and 72); intake from
    app sessions (this file's Triage step, `from-app` form, `docs/issues/inbox.md`).
@@ -127,6 +145,13 @@ accessibility, so some scores fell although nothing got worse.
      fixtures (0073). **Pass 2 next**, on what pass 1 did not exercise: field typing and blur errors, table resize/edit/undo, board moves, swipe and
      reorder keyboard alternatives, snackbar Undo, the palette, each dial alone, 360 and 430 wide, WebKit and Firefox where installable.
    - Exit: no open issue from the passes; then re-grade (review 5), then the dated 1.2.0 release: date the CHANGELOG entry and `migrations/1.2.0.json`, `node scripts/release.mjs` (writes `releases/1.2.0/`, decision 0075), `npm run build`, re-package the skill.
+6e. **Round 0066 — current stage** (the finish line's stage 1): review 5's Top 10 in two workstreams.
+   - **A** (built, decision 0081; branch `round66/a`, worktree `r66-a`, owns shared docs): one fetch per file proven on the network
+     (`test:network`), headroom in every budget (`scripts/budgets.mjs`), the app icon pack `icons-app.js`, `S4.theme` never silent,
+     drift (outlined, the CHANGELOG, NEXT, PLAN, migrations) and a quieter upgrade report; issues 107 to 110.
+   - **B** (next; its own branch): review 5's UI items 4, 5, 6 and 9 (table columns at common widths, the grid row's focus ring,
+     a skip link and F6 regions, Parley and the selection bar). Item 2 (the Ink Track and one accent job) waits for the owner.
+   - Then round 0067, review 6, fixes, review 7, the dated 1.2.0 (`node scripts/release.mjs`), maintenance.
 7. **After the 10s**: Horizon 1 in `ROADMAP.md` (real apps built end to end with the skill), skill evals, a dated
    release 1.2 (`scripts/release.mjs`, no git tag needed, decision 0075) and a re-packaged skill.
 
@@ -152,3 +177,4 @@ action now. The owner can overrule any of these; otherwise they stand.
 - 2026-11-22 (round 0061, integration): merged the titlebar branch (decision 0072, issues 69 and 70) and the mobile branch (issues 71 and 72, renumbered because both had used 69 and 70), added intake from app sessions (CLAUDE.md, SKILL.md, from-app form, inbox, the Triage step above) and the Full QA pass stage. Next: publish, the owner's device looks, the QA pass, review 5.
 - 2026-11-22 (round 0059): A merged B (decision 0068: one accent fill per job, wide-window content, `icons-site.js` and a 150 KB site budget); shared docs folded; layout test made to wait for views to settle. App bundle split is planned in `history/round-0059/b.md`, not built.
 - 2026-11-23 (round 0063, upgrade path): decision 0075 built (one version from package.json, `<meta name="orion">` stamps and the mismatch warning, `orion.json`, `migrations/` 1.1.0 and 1.2.0, `scripts/api.mjs` + `check:api`, `releases/1.0.0` and `1.1.0` backfilled with `scripts/release.mjs`, `skill/orion/scripts/upgrade.mjs`, the skill's "Update to latest Orion", `test:upgrade`; issue 83 Done). Next: publish with the round; cut `releases/1.2.0` when 1.2.0 is dated.
+- 2026-11-25 (round 0066, workstream A): decision 0081 built (one fetch per file and `tests/network.mjs`; budgets in `scripts/budgets.mjs` with headroom: site 141.2/150, core 42.2 + 37.7, lean pages at most 162; `icons-app.js` for apps; `S4.theme` keys and warnings; outlined drift and `check:words` on component pages; a quieter upgrade report; issues 107 to 110). The owner's finish line written above. Next: workstream B, then round 0067.

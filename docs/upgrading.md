@@ -46,7 +46,8 @@ means the steps below, with no guesswork.
    packs a lean page now needs, regenerates the brand file, updates the stamps and `orion.json`, writes
    `orion-upgrade.md` and runs the page checker when Playwright is installed.
 5. **Work through the judgment items** in `orion-upgrade.md`: each names its decision and the places in the app it
-   concerns. Tick each off. Try removing each workaround whose issue the report says is fixed; keep it if the checker
+   concerns. Tick each off. Changed rules whose search found nothing in the app share one line at the end of the list:
+   glance at the screens for them. Try removing each workaround whose issue the report says is fixed; keep it if the checker
    or the screens disagree.
 6. **Check:** `node <source>/scripts/check.mjs` on every page, then look at the screens at 390 and 1280, light and dark.
 7. **Commit** ("Update to Orion 1.2.0"), and log any Orion defect found on the way (SKILL.md, "Found a problem in

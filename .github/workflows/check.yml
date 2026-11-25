@@ -30,6 +30,7 @@ jobs:
       - run: npm run test:checker
       - run: npm run test:back
       - run: npm run test:upgrade
+      - run: npm run test:network   # one fetch per file, transfers inside the budgets (issue 107)
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

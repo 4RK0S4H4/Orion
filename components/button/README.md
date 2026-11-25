@@ -5,21 +5,21 @@ Starts an action. M3 Expressive buttons: five variants, five sizes, round or squ
 ```html
 <button class="s4-button" type="button"><span class="s4-icon" data-icon="add"></span>Add Bill</button>
 <button class="s4-button" data-variant="tonal" type="button">Export</button>
-<button class="s4-button" data-variant="outlined" data-size="xs" type="button">Filter</button>
+<button class="s4-button" data-variant="elevated" data-size="xs" type="button">Filter</button>
 <button class="s4-button" data-toggle aria-pressed="false" type="button">Autopay</button>
 <button class="s4-button" data-color="error" type="button">Delete All Data</button>
 ```
 
 | Attribute | Values | Default |
 |---|---|---|
-| `data-variant` | `filled`, `tonal`, `elevated`, `text` (`outlined` still works and draws filled) | `filled` |
+| `data-variant` | `filled`, `tonal`, `elevated`, `text` (the old `outlined` still works as an alias and draws a filled button; nothing is outlined, decision 0023) | `filled` |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136) | `s` |
 | `data-shape` | `round`, `square` | `round` |
 | `data-color` | `error` (destructive) | — |
 | `data-toggle` + `aria-pressed` | toggle button; `data-label-on/off`, `data-icon-on/off` swap label and icon | — |
 
 **When to use what:** one **filled** button for the most important action in an area; **tonal** for a strong secondary
-action; **outlined** and **text** for the rest; **elevated** when a button needs to read as raised: its fill is one step above whatever it sits on (the page, a card, a
+action; **elevated** or **text** for the rest (decisions 0068, 0070); **elevated** when a button needs to read as raised: its fill is one step above whatever it sits on (the page, a card, a
 pane, a menu), a tenth of the text color mixed into that surface, so it works in light and dark and on both a page and a card (Orion has no shadows).
 
 **Do**

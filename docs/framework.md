@@ -130,7 +130,9 @@ classes, attributes and `S4.` names belong to which pack; `scripts/packs.mjs` an
    opt-in for something that floats). Never restyle components by class from the app.
 2. **Override by token:** set a token on `:root` or on a container (`--s4-content-max: none`). Color only through
    `S4.theme({ seed, variant, contrast })`.
-   The look beyond color only through the brand dials (decision 0055): `S4.theme({ gray, page, corners, display, text, energy })`.
+   The look beyond color only through the brand dials (decision 0055): `S4.theme({ gray, page, corners, display, text, energy, scale, headings, density })`.
+   Every key is in `S4.theme.keys` (with the attribute it writes) and every value in `S4.theme.dials`; anything else (a value off a list,
+   a seed that is not `#rrggbb` or an accent name, an unknown key) warns in the console and writes nothing (decisions 0067, 0076; issue 108).
    Every dial and the light or dark mode also work on any container (`data-theme="dark"` on a sidebar, `data-accent` on a band,
    or `S4.theme({ … }, element)`); the nearest one wins. App defaults (`data-buttons`, `data-cards`, `data-lists`, `data-rail`)
    pick which existing variant is unmarked. See `components/base/themes.html`.

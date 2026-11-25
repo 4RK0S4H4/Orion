@@ -36,6 +36,11 @@
    `scripts/check-api.mjs` must fail a public name that vanishes without a migration entry. `test:checker` also proves
    `bad-stamp.html` (a stamp that disagrees with the loaded files).
 
+7. **`npm run test:network`** (`tests/network.mjs`, issue 107, about 30 seconds): every template, the Showcase, the hub and the brand
+   trial are loaded in Chromium from a server that gzips text like a static host, and every request is recorded. It fails on one file
+   fetched twice (the font preloaded with `?v=` and asked for again without it was review 5's N1), a failed request, and Orion files
+   that transfer more than the page kind's budget in `scripts/budgets.mjs` (site total; lean bundle, font and icons; full bundle).
+
 Options: `node tests/suite.mjs --browser=chromium --only=list-detail --shots --workers=4`. Screenshots of failing
 pages go to `tests/out/` (not committed).
 A full run takes about 20 minutes and prints its problems only at the end: `SUITE_PROGRESS=1` writes one `run <browser> <mode>  <page>` line

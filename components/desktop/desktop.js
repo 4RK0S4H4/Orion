@@ -141,7 +141,7 @@
       }
       if (!/^(minimize|restore|maximize|close)$/.test(action)) return;
       if (!icon) { icon = document.createElement('span'); icon.className = 's4-icon'; icon.setAttribute('data-window-icon', ''); icon.setAttribute('aria-hidden', 'true'); b.appendChild(icon); }
-      var name = 'window-' + action;
+      var name = { minimize: 'window-minimize', maximize: 'window-maximize', restore: 'window-restore', close: 'window-close' }[action];   /* whole names, so the app icon pack finds them (issue 109) */
       if (icon.getAttribute('data-icon') !== name) { if (S4.icon) S4.icon.set(icon, name); else icon.setAttribute('data-icon', name); }
     });
   }

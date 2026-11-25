@@ -272,7 +272,8 @@ for (const page of pages) {
     /* the lean app bundle (decision 0069): a page that links orion.core.min.* links exactly the packs it uses */
     if (/orion\.core\.min\.(css|js)/.test(html)) {
       try {
-        const { needsOf, linkedPacks } = await import('./packs.mjs');
+        const { needsOf, linkedPacks, iconsOf } = await import('./packs.mjs');
+        const ic = iconsOf(html); if (ic.problem) errors.add(`lean bundle: the page ${ic.problem} (issue 109)`);
         const index = JSON.parse(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../assets/packs.json'), 'utf8'));
         const need = needsOf(html, index), have = linkedPacks(html, index);
         for (const p of need.packs) if (!have.has(p)) errors.add(`lean bundle: the page uses ${need.why[p].slice(0, 3).join(', ')} but does not link orion.${p}.min.css and orion.${p}.min.js (node scripts/packs.mjs page.html lists them)`);

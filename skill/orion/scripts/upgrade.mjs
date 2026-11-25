@@ -401,8 +401,12 @@ function markdown() {
   if (!report.removals.length) L.push('- None.');
   for (const r of report.removals) L.push(`- **${r.kind} ${r.name}** (${r.version || TO}${r.decision ? ', decision ' + decisionLink(r.decision) : ''}): ${r.what}${r.where.length ? `. Found at ${r.where.slice(0, 12).join(', ')}` : '. Not used by this app.'}`);
   L.push('', '## Review (judgment items)', '', 'Each is a rule or behaviour that changed. Read the decision, look at the places listed (and the screens at 390 and 1280), and change the app where it no longer follows the rule. Tick each one off.', '');
+  /* issue 110: list the items that matched something in the app, and items with no search (they always need a look); every
+     item whose search found nothing goes on one line at the end, so a small app's report is not a page of "nothing matched" */
+  const listed = report.judgment.filter((j) => j.where.length || !j.find), quiet = report.judgment.filter((j) => !j.where.length && j.find);
   if (!report.judgment.length) L.push('- None.');
-  for (const j of report.judgment) L.push(`- [ ] **${j.title}** (${j.version || TO}, decision ${decisionLink(j.decision)}): ${j.what}${j.where.length ? ` Places: ${j.where.join('; ')}.` : ' Nothing in the app matched the search; check the screens anyway.'}`);
+  for (const j of listed) L.push(`- [ ] **${j.title}** (${j.version || TO}, decision ${decisionLink(j.decision)}): ${j.what}${j.where.length ? ` Places: ${j.where.join('; ')}.` : ''}`);
+  if (quiet.length) L.push(`- ${listed.length ? 'Also changed, nothing' : 'Nothing'} in the app matched (${quiet.length}): ${quiet.map((j) => `${j.title} (${decisionLink(j.decision)})`).join('; ')}. Glance at the screens; the details are in the migration notes.`);
   L.push('', '## The app\'s own workarounds', '');
   if (!report.overrides.length) L.push('- None recorded (orion.json "overrides" and "Orion issue #N" comments).');
   for (const o of report.overrides) L.push(`- ${o.where}: ${o.what}${o.fixed ? ` **Issue ${o.issue} is fixed in ${o.fixed}: this workaround may now be unnecessary. Try the page without it; remove it only if the page checker and the screens agree.**` : o.issue ? ` (issue ${o.issue}: not marked fixed between ${FROM} and ${TO}; keep it)` : ''}`);

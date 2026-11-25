@@ -28,7 +28,9 @@ Everything ships in this skill's `assets/` folder: `orion.css` (tokens, every co
 - **Lean app (decision 0069, prefer it for a finished app):** instead of `orion.css` and `orion.js`, link
   `orion.core.min.css` / `orion.core.min.js` and one pair per pack the page uses (`data`, `commands`, `desktop`, `direct`,
   `inputs`, `sitekit`), core first, packs after it. `node <skill>/scripts/packs.mjs page.html` lists exactly which and
-  prints the tags; the page checker fails a lean page that links too few. Core is about 78 KB gzip, everything 178 KB.
+  prints the tags; the page checker fails a lean page that links too few. Core is about 80 KB gzip, everything 180 KB.
+  Icons: a lean page loads `icons-app.js` (25 KB, the icons the templates draw; copy `icons-solar.js` beside it, fetched
+  once for any other name), never `icons.js` (every set, 60 KB) unless it switches sets with `S4.icon.use` (decision 0081).
   Most templates already use it (see their header comment). Prototypes and one-file pages keep `orion.css`/`orion.js`.
 - **One self-contained HTML file** (only when asked for a single file): build the page with the normal links, then run
   `node <skill>/scripts/inline.mjs page.html` to inline the CSS, JS, icons and font. Run it again after edits.
@@ -94,7 +96,7 @@ from `landing.html`, `site.html`, `pricing.html`, `blog.html` (+ `article.html` 
   `width`, `height`, `loading="lazy"` below the first screen, inside a `.s4-media-box` with a ratio.
 - **Glass** only on the site header (once content scrolls under it) and the phone menu panel. No shadows or outlines.
 - **Files (decision 0066):** link `inter-site.woff2` (preload), `orion.site.min.css`, the brand file, then
-  `icons-site.js` and `orion.site.min.js` (both `defer`; copy `icons-solar.js` beside them for an icon the templates do not use): 147 KB gzip in all. It has the site kit and what a site
+  `icons-site.js` and `orion.site.min.js` (both `defer`; copy `icons-solar.js` beside them for an icon the templates do not use): about 141 KB gzip in all, each file fetched once (`npm run test:network`). It has the site kit and what a site
   normally shows (buttons, groups, tabs, cards, lists, accordion, static table, stat, ring, meter, prose, code, field
   basics, chips, slider, menu, snackbar, tooltip, glass). A site that needs an app part (dialog, sheet, data table,
   filter, chart, board, rich inputs) loads `orion.min.css` and `orion.min.js` instead. Text outside Latin: use
@@ -122,9 +124,9 @@ S4.theme.restore('my-app-theme', { seed: '#a33a12', gray: 'warm', corners: 'soft
 | `text` | the same | only when the brand truly has a text face; otherwise keep Inter |
 | `scale` | `compact`, `large` | type and spacing step together: compact for dense tools read at a desk, large for reading-first or older audiences. Never to fix one component |
 | `headings` | `tight`, `editorial` | tight: bold, tracked in (product, tool); editorial: regular weight, open leading (magazine, studio). Use it instead of weight or tracking on headings; pair editorial with a serif display, tight with Inter |
-| `data-density` | comfortable, `compact`, `auto` | desktop tools |
+| `density` | `comfortable` (default), `compact`, `auto`, `roomy` | auto or compact: desktop tools; roomy: content sites only |
 
-A value that is not in this table is a mistake, not a variation (decision 0067): `S4.theme({ scale: 'roomy' })` logs a warning naming the allowed values and writes nothing, and the page checker fails `data-scale="roomy"` in markup.
+A value that is not in this table is a mistake, not a variation (decision 0067): `S4.theme({ scale: 'roomy' })` logs a warning naming the allowed values and writes nothing, and the page checker fails `data-scale="roomy"` in markup. The same goes for a seed that is no color (`'#zzz'`) and a key `S4.theme` does not know (`accent`, `icons`): a warning, nothing written (issue 108). `S4.theme.keys` lists every key and the attribute it writes.
 
 Pick at most three dials beyond the accent; an app that turns every dial stops looking designed. Pair them with intent:
 editorial = warm + serif display + soft; pro tool = cool + firm + compact (+ mono display for numbers); friendly

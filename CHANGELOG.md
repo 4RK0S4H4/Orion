@@ -8,7 +8,18 @@ All notable changes to Orion are recorded here. The format follows [Keep a Chang
 
 ## [1.2.0] - Unreleased
 
-Rounds 0059, 0060, 0061 and 0062 (decisions 0067 to 0073; the dated release and its git tag come after review 5 and the full QA pass).
+Rounds 0059 to 0066 (decisions 0067 to 0081: dial values, one accent job, the lean bundle, the name Orion, window controls, the two QA passes, versions and upgrades, selecting several, a softer glow, real requests and headroom). The release is dated after round 0066 B and the finish line in `docs/PLAN.md`; no git tag is needed (decision 0075).
+
+Real requests, headroom and an app icon pack (round 0066 A, decision 0081, issues 107 to 110): review 5's N1, N3, N8, N9 and N12.
+
+- Fixed: the font was fetched twice on 21 pages (a preload with `?v=`, a `@font-face` without): the build stamps the `@font-face` url in every repo bundle with the font's hash. `m3color.js` loads once however many theme calls wait for it.
+- Added: `tests/network.mjs` (`npm run test:network`, in `npm test` and CI): every template, the Showcase, the hub and the brand trial, from a gzipping server; fails on a file fetched twice, a failed request, or Orion files over the page kind's budget. Budgets now live in `scripts/budgets.mjs`.
+- Changed: room won back without raising a budget (gzip KB): site bundle 150.0 → 141.2 of 150 (css 43.0 → 42.6, js 28.7 → 27.6, font 67.4 → 63.3, icons 10.9 → 7.7); core css 42.7 → 42.2 of 44, core js 39.5 → 37.7 of 40; packs data 42.9 → 40.9, inputs 33.6 → 31.7, direct 9.8 → 9.4, commands 11.3 → 10.8, desktop 12.0 → 11.6; lean pages 82–169 → 80–162 of 170; full bundle 188 → 180. How: a minifier that drops spaces no token needs and joins lines that cannot end a statement (the full bundle parses to its source's syntax tree); leading zeros and repeated layer blocks out of the CSS; `icons.js` no longer writes the active set twice (103 → 60 KB) and icon paths are written at three decimals; the site font zeroes variation rows only unkept glyphs reach; the site icon set no longer counts words that only look like icon names.
+- Added: `icons-app.js` (25 KB, was `icons.js` at 103): the icons the app templates and the lean bundle draw; any other name fetches `icons-solar.js` once (icons an app added stay). The 13 lean templates load it; `scripts/packs.mjs` names it; the build and the page checker fail a lean page that loads `icons.js` without switching sets (`tests/fixtures/bad-icons.html`); `test:lean` compares every drawn icon with `icons.js`.
+- Added: `density`, `buttons`, `cards`, `lists` and `rail` are `S4.theme` keys (every dial in `S4.theme.dials` is one); `S4.theme.keys` lists each key and its attribute. Changed: a seed that is not `#rrggbb` or an accent name, a `surfaces` off its list and an unknown key warn with what is expected and write nothing (they were silent).
+- Fixed: the site font's pair-kerning variation data is read from the pair set, as OpenType says (no visible change: every pair renders the same at four weights).
+- Changed: the upgrade report gives a tick box only to review items that matched something in the app (or have no search) and lists the rest on one line.
+- Fixed: the components gallery and the button, card and icon-button docs no longer describe an outlined look; `check:words` reads component pages, READMEs, templates and the Showcase.
 
 A softer glass glow (round 0065, decision 0080, issue 106): the owner's "Softer" from the Glass Glow lab.
 

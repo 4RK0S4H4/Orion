@@ -62,6 +62,14 @@ const md = existsSync(join(app1, 'orion-upgrade.md')) ? text(join(app1, 'orion-u
 expect(/# Orion upgrade: 1\.0\.0 to /.test(md) && /\*\*1\.1\.0\*\*/.test(md) && /\*\*1\.2\.0\*\*/.test(md), 'the report lists both steps');
 expect(/S4\.transition\.containerTransform is deprecated\*\* \(1\.2\.0, decision \[0046\]\([^)]+0046-one-motion-philosophy\.md\)\)[^\n]*Places: app\.js:11/.test(md), 'the report lists a judgment item with its decision link and place');
 expect(/\*\*Nothing is outlined\*\*[^\n]*Places: index\.html:29/.test(md), 'the report finds the outlined button');
+/* issue 110: the review lists only what matched (or has no search), and the rest on one line */
+{
+  const items = R.judgment || [], matched = items.filter((j) => j.where.length || !j.find), quiet = items.filter((j) => !j.where.length && j.find);
+  const ticks = (md.match(/^- \[ \] /gm) || []).length, line = md.split('\n').filter((l) => /^- Also changed, nothing in the app matched \(\d+\): /.test(l));
+  expect(!/Nothing in the app matched the search/.test(md), 'no item says "nothing matched" on a line of its own');
+  expect(ticks === matched.length && ticks < items.length, `only the ${matched.length} items that matched get a tick box (${ticks} of ${items.length})`);
+  expect(line.length === 1 && line[0].includes(`(${quiet.length})`) && quiet.every((j) => line[0].includes(j.title)), `the ${quiet.length} unmatched items share one line that names each`);
+}
 expect(/app\.css:6: [^\n]*Orion issue #70[^\n]*Issue 70 is fixed in 1\.2\.0: this workaround may now be unnecessary/.test(md), 'the report flags the workaround whose issue is fixed, and leaves it in place');
 if (R.check && /Playwright is not installed/.test(R.check)) console.log('  ! Playwright is not installed: the page checker part is skipped');
 else expect(/0 error\(s\)/.test(R.check || '') && R.checkStatus === 0, `the page checker is clean after the upgrade (${(R.check || 'not run').split('\n')[0]})`);
