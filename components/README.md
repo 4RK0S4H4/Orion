@@ -50,9 +50,9 @@ components/
 └── CONVENTIONS.md    the rules every component follows
 ```
 
-Core set (decided in Phase 1): app shell (nav rail and nav bar), top app bar, buttons (filled, tonal, outlined, text,
+Core set (decided in Phase 1): app shell (nav rail and nav bar), top app bar, buttons (filled, tonal, text,
 elevated), icon button, connected button group, FAB and extended FAB, card, pane, list (including segmented and grouped),
-data table that becomes a list on phones, divider, text field (filled and outlined, including select and textarea), switch,
+data table that becomes a list on phones, divider, text field (filled, including select and textarea), switch,
 checkbox, radio, chips (filter, assist, input), slider, search bar, tabs, menu, dialog, bottom sheet, side sheet, snackbar,
 tooltip, badge, status pill, progress (linear and circular), color swatches.
 

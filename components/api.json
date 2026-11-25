@@ -1606,6 +1606,7 @@
   "window-restore"
  ],
  "files": [
+  "icons-app.js",
   "icons-site.js",
   "icons-solar.js",
   "icons.js",

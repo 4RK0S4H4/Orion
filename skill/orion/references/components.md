@@ -23,21 +23,21 @@ Starts an action. M3 Expressive buttons: five variants, five sizes, round or squ
 ```html
 <button class="s4-button" type="button"><span class="s4-icon" data-icon="add"></span>Add Bill</button>
 <button class="s4-button" data-variant="tonal" type="button">Export</button>
-<button class="s4-button" data-variant="outlined" data-size="xs" type="button">Filter</button>
+<button class="s4-button" data-variant="elevated" data-size="xs" type="button">Filter</button>
 <button class="s4-button" data-toggle aria-pressed="false" type="button">Autopay</button>
 <button class="s4-button" data-color="error" type="button">Delete All Data</button>
 ```
 
 | Attribute | Values | Default |
 |---|---|---|
-| `data-variant` | `filled`, `tonal`, `elevated`, `text` (`outlined` still works and draws filled) | `filled` |
+| `data-variant` | `filled`, `tonal`, `elevated`, `text` (the old `outlined` still works as an alias and draws a filled button; nothing is outlined, decision 0023) | `filled` |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136) | `s` |
 | `data-shape` | `round`, `square` | `round` |
 | `data-color` | `error` (destructive) | — |
 | `data-toggle` + `aria-pressed` | toggle button; `data-label-on/off`, `data-icon-on/off` swap label and icon | — |
 
 **When to use what:** one **filled** button for the most important action in an area; **tonal** for a strong secondary
-action; **outlined** and **text** for the rest; **elevated** when a button needs to read as raised: its fill is one step above whatever it sits on (the page, a card, a
+action; **elevated** or **text** for the rest (decisions 0068, 0070); **elevated** when a button needs to read as raised: its fill is one step above whatever it sits on (the page, a card, a
 pane, a menu), a tenth of the text color mixed into that surface, so it works in light and dark and on both a page and a card (Orion has no shadows).
 
 **Do**
@@ -77,7 +77,7 @@ toggleable, with the same press morph as the [button](#button).
 | Attribute | Values | Default |
 |---|---|---|
 | `aria-label` | what the button does, Title Case | required |
-| `data-variant` | `standard`, `filled`, `tonal`, `outlined` | `standard` (no container, on-surface-variant icon) |
+| `data-variant` | `standard`, `filled`, `tonal`, `outlined` (M3's name, kept; it draws a neutral filled container, decision 0023) | `standard` (no container, on-surface-variant icon) |
 | `data-size` | `xs` (32), `s` (40), `m` (56), `l` (96), `xl` (136); icons 20 / 24 / 24 / 32 / 40 | `s` |
 | `data-width` | `narrow`, `default`, `wide` (e.g. s: 32 / 40 / 52) | `default` |
 | `data-shape` | `round`, `square` | `round` |
@@ -90,7 +90,7 @@ on-secondary; outlined selected = inverse-surface. A selected toggle swaps shape
 the group manages it instead.
 
 **When to use what:** **standard** in toolbars, app bars and list rows; **filled** for the one key action in a compact
-spot; **tonal** for a strong secondary action; **outlined** next to filled/tonal ones for a quieter alternative.
+spot; **tonal** for a strong secondary action; `outlined` (a neutral fill) next to filled or tonal ones for a quieter alternative.
 
 **Do**
 - Always give an `aria-label` that names the action ("Delete Electric Co.", not "Trash").
@@ -1359,7 +1359,7 @@ Progress through a fixed sequence of steps, such as a checkout or setup. Dots jo
 
 ## Card
 
-Holds content and actions about one subject. M3 cards: elevated, filled and outlined, with optional media, body and
+Holds content and actions about one subject. Cards are elevated or filled (nothing is outlined, decision 0023), with optional media, body and
 actions. Cards are content surfaces: always solid, never glass.
 
 ```html
@@ -1376,20 +1376,20 @@ actions. Cards are content surfaces: always solid, never glass.
   </div>
 </article>
 
-<a class="s4-card" data-variant="outlined" href="/bills/10451">…</a>   <!-- the whole card opens something -->
+<a class="s4-card" data-variant="filled" href="/bills/10451">…</a>   <!-- the whole card opens something -->
 ```
 
 | Attribute / part | Values | Default |
 |---|---|---|
-| `data-variant` | `elevated` (surface-container-low, level 1), `filled` (surface-container-highest), `outlined` (surface + outline-variant) | `elevated` |
+| `data-variant` | `elevated` (surface-container-low, level 1), `filled` (surface-container-highest); the old `outlined` is an alias that draws `filled` | `elevated` |
 | `.s4-card-media` | image, video or SVG area; takes the card's top corners (bottom corners when last). `--s4-card-media-ratio` sets the aspect ratio | 16 / 9 |
 | `.s4-card-body` | 16 padding; `.s4-card-title` (title-medium), `.s4-card-subhead` and `.s4-card-supporting` (body-medium, on-surface-variant) | — |
 | `.s4-card-actions` | buttons, end-aligned, 8 apart; pushed to the bottom in a grid of cards | — |
-| `a.s4-card`, `button.s4-card` | interactive card: state layer from base; hover raises elevated to level 2, filled and outlined to level 1 | — |
-| `disabled` / `aria-disabled="true"` | container at 38%, content on-surface at 38%, outline at 12% | — |
+| `a.s4-card`, `button.s4-card` | interactive card: state layer from base; hover raises elevated to level 2, filled to level 1 | — |
+| `disabled` / `aria-disabled="true"` | container at 38%, content on-surface at 38% | — |
 
-**When to use what:** **elevated** to lift a card off a busy page; **filled** for quiet grouping; **outlined** when cards
-sit on a surface of the same color or in dense grids. For a section of settings or a form, use a [pane](#pane) instead.
+**When to use what:** **elevated** to lift a card off a busy page; **filled** for quiet grouping, and
+when cards sit on a surface of the same color or in dense grids. For a section of settings or a form, use a [pane](#pane) instead.
 
 **Do**
 - Make the whole card a link or button when it opens one thing, and keep other buttons out of it.

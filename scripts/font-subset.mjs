@@ -12,6 +12,8 @@
      (100 to 399) is dropped: every gvar tuple that only acts below the default weight is removed (exact for 400 and
      up, because such a tuple scales to zero at the default), fvar's weight minimum becomes 400 and lighter named
      instances go. The CSS @font-face says font-weight: 400 900, so the browser never asks for less.
+   - Variation deltas (issue 109): HVAR rows and GDEF's kerning-delta rows that only unkept glyphs reach are zeroed, and
+     unkept glyphs map to HVAR's empty first row, in the same nothing-moves way as GPOS.
    - Output: WOFF2 with null transforms (glyf and loca stored as plain tables, allowed by WOFF2 1.0 section 5.1),
      Brotli quality 11.
    Usage: node scripts/font-subset.mjs in.woff2 out.woff2   (the build calls subsetInter() itself) */
@@ -432,7 +434,7 @@ export function pruneGpos(src, keep, markGlyphs, direct = keep) {
         for (let j = 0; j < m; j++) {
           const r = ps + 2 + j * rs;
           if (!keep.has(t.readUInt16BE(r))) t.fill(0, r + 2, r + rs);
-          else { devices(so, r + 2, vf1); devices(so, r + 2 + s1, vf2); }
+          else { devices(ps, r + 2, vf1); devices(ps, r + 2 + s1, vf2); }   /* a pair set's device offsets count from the pair set (OpenType ValueRecord) */
         }
       }
       for (const ps of allSets) if (!keptSets.has(ps)) { const m = t.readUInt16BE(ps), end = ps + 2 + m * (2 + s1 + s2); for (let p = ps; p < end; p++) if (!protect[p]) t[p] = 0; }
@@ -455,6 +457,59 @@ export function pruneGpos(src, keep, markGlyphs, direct = keep) {
     for (const [, so] of l.subs) { const i = starts.indexOf(so), end = starts[i + 1] || t.length; for (let p = so; p < end; p++) if (!protect[p]) t[p] = 0; }
     t.writeUInt16BE(0, l.lo + 4);
   }
+  return t;
+}
+/* ---------------- variation deltas only unkept glyphs use (issue 109) ----------------
+   The same idea as pruneGpos: nothing moves, unused rows become zeros. HVAR maps each glyph to a row of advance-width deltas;
+   an unkept glyph is mapped to the store's first row (which holds no deltas in Inter; checked below) and a row no kept glyph
+   reaches is zeroed. GDEF's store holds the kerning deltas: a row no kept kerning value points at (after pruneGpos) is zeroed. */
+function storeRows(t, vs, each) {
+  const n = t.readUInt16BE(vs + 6);
+  for (let i = 0; i < n; i++) {
+    const o = vs + t.readUInt32BE(vs + 8 + i * 4), items = t.readUInt16BE(o), wc = t.readUInt16BE(o + 2), long = wc & 0x8000, words = wc & 0x7fff, regions = t.readUInt16BE(o + 4);
+    const row = words * (long ? 4 : 2) + (regions - words) * (long ? 2 : 1), start = o + 6 + regions * 2;
+    for (let j = 0; j < items; j++) each(i, j, start + j * row, row);
+  }
+}
+export function pruneHvar(src, keep) {
+  const t = Buffer.from(src), vs = t.readUInt32BE(4), am = t.readUInt32BE(8);
+  if (!am || t.readUInt32BE(12) || t.readUInt32BE(16)) return t;   /* only the shape Inter has: an advance map, no side-bearing maps */
+  const fmt = t[am], ef = t[am + 1], inner = (ef & 0x0f) + 1, size = ((ef >> 4) & 3) + 1, count = fmt === 0 ? t.readUInt16BE(am + 2) : t.readUInt32BE(am + 2), base = am + (fmt === 0 ? 4 : 6);
+  let zeroIsEmpty = false; storeRows(t, vs, (i, j, at, row) => { if (i === 0 && j === 0) zeroIsEmpty = row === 0 || t.subarray(at, at + row).every((b) => b === 0); });
+  if (!zeroIsEmpty) return t;
+  const read = (g) => { let v = 0; for (let b = 0; b < size; b++) v = v * 256 + t[base + g * size + b]; return v; };
+  const used = new Set();
+  for (let g = 0; g < count; g++) {
+    if (keep.has(g) || g === count - 1) { const v = read(g); used.add(`${Math.floor(v / 2 ** inner)}/${v & (2 ** inner - 1)}`); }   /* the last entry also serves every glyph past the map */
+    else t.fill(0, base + g * size, base + (g + 1) * size);
+  }
+  storeRows(t, vs, (i, j, at, row) => { if (!used.has(`${i}/${j}`)) t.fill(0, at, at + row); });
+  return t;
+}
+/* every VariationIndex a value record in GPOS still points at */
+function gposVariationRefs(t) {
+  const refs = new Set(), ll = t.readUInt16BE(8), n = t.readUInt16BE(ll);
+  const dev = (base, rec, vf) => { let p = rec; for (let b = 0; b < 8; b++) if (vf & (1 << b)) { if (b >= 4) { const o = t.readUInt16BE(p); if (o && t.readUInt16BE(base + o + 4) === 0x8000) refs.add(`${t.readUInt16BE(base + o)}/${t.readUInt16BE(base + o + 2)}`); } p += 2; } };
+  for (let i = 0; i < n; i++) {
+    const lo = ll + t.readUInt16BE(ll + 2 + i * 2), type = t.readUInt16BE(lo), cnt = t.readUInt16BE(lo + 4);
+    for (let k = 0; k < cnt; k++) {
+      let so = lo + t.readUInt16BE(lo + 6 + k * 2), ty = type; if (ty === 9) { ty = t.readUInt16BE(so + 2); so += t.readUInt32BE(so + 4); }
+      const fmt = t.readUInt16BE(so);
+      if (ty === 1) { const vf = t.readUInt16BE(so + 4), sz = vrSize(vf); if (fmt === 1) dev(so, so + 6, vf); else for (let j = 0, c = t.readUInt16BE(so + 6); j < c; j++) dev(so, so + 8 + j * sz, vf); }
+      else if (ty === 2) {
+        const vf1 = t.readUInt16BE(so + 4), vf2 = t.readUInt16BE(so + 6), s1 = vrSize(vf1), s2 = vrSize(vf2);
+        if (fmt === 1) for (let j = 0, c = t.readUInt16BE(so + 8); j < c; j++) { const ps = so + t.readUInt16BE(so + 10 + j * 2); for (let q = 0, m = t.readUInt16BE(ps); q < m; q++) { const r = ps + 2 + q * (2 + s1 + s2); dev(ps, r + 2, vf1); dev(ps, r + 2 + s1, vf2); } }
+        else { const c1 = t.readUInt16BE(so + 12), c2 = t.readUInt16BE(so + 14); for (let a = 0; a < c1 * c2; a++) { const r = so + 16 + a * (s1 + s2); dev(so, r, vf1); dev(so, r + s1, vf2); } }
+      } else if (cnt) return null;   /* a kind of lookup this does not read: keep every row */
+    }
+  }
+  return refs;
+}
+export function pruneGdefStore(gdef, gpos) {
+  const t = Buffer.from(gdef);
+  if (t.readUInt16BE(2) < 3 || !t.readUInt32BE(14)) return t;
+  const refs = gposVariationRefs(gpos); if (!refs) return t;
+  storeRows(t, t.readUInt32BE(14), (i, j, at, row) => { if (!refs.has(`${i}/${j}`)) t.fill(0, at, at + row); });
   return t;
 }
 export function markGlyphsOf(gdef) {
@@ -515,6 +570,8 @@ export function subsetTables(tables, ranges = SITE_RANGES, { minWeight = 400 } =
   }
   if (t.has('gvar')) t.set('gvar', subsetGvar(t.get('gvar'), keep, wIndex));
   if (t.has('GPOS')) t.set('GPOS', pruneGpos(t.get('GPOS'), keep, markGlyphsOf(t.get('GDEF')), new Set(map.values())));
+  if (t.has('GPOS') && t.has('GDEF')) t.set('GDEF', pruneGdefStore(t.get('GDEF'), t.get('GPOS')));
+  if (t.has('HVAR')) t.set('HVAR', pruneHvar(t.get('HVAR'), keep));
   /* advances of unkept glyphs: zero (nothing draws them) */
   { const hm = Buffer.from(t.get('hmtx')), nh = t.get('hhea').readUInt16BE(34), ng = t.get('maxp').readUInt16BE(4);
     for (let g = 0; g < ng; g++) if (!keep.has(g)) { if (g < nh) hm.writeUInt32BE(0, g * 4); else hm.writeInt16BE(0, nh * 4 + (g - nh) * 2); }

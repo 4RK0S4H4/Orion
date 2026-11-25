@@ -141,7 +141,11 @@
   var fullIcons = null;
   function loadFullIcons(url) {
     if (fullIcons) return; fullIcons = document.createElement('script'); fullIcons.src = url;
-    fullIcons.onload = function () { drawIcons(document); };
+    var pack = window.S4_ICONS;
+    fullIcons.onload = function () {   /* icons the app added with S4.icon.add stay (issue 109) */
+      var r = window.S4_ICONS; if (r && pack && r !== pack) for (var k in pack.icons) if (!(k in r.icons)) r.icons[k] = pack.icons[k];
+      drawIcons(document);
+    };
     fullIcons.onerror = function () { console.warn('S4: could not load the full icon set from ' + url); };
     document.head.appendChild(fullIcons);
   }

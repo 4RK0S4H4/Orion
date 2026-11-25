@@ -16,6 +16,11 @@ const BANNED = [
   [/side rim/i, 'the glass edge has no side rim: top and bottom only (decision 0034)'],
   [/outlined (chips?|text fields?|cards?)/i, 'nothing is outlined (decision 0023)'],
   [/drop for menus/i, 'menus fade in place (decision 0042)'],
+  /* issue 110: the gallery and the button README still listed "outlined" as a look; these catch a variant list that names it */
+  [/\b(filled|tonal|elevated),? (and |or )?outlined\b/i, 'nothing is outlined: name filled, tonal, elevated or text (decision 0023)'],
+  [/\boutlined,? (and |or )?(elevated|text|filled)\b/i, 'nothing is outlined: name filled, tonal, elevated or text (decision 0023)'],
+  [/\*\*outlined\*\*|<b>outlined<\/b>/i, 'nothing is outlined: the old variant name is only an alias (decision 0023)'],
+  [/class="s4-(button|card)\b[^"]*"[^>]*data-variant="outlined"/, 'write the variant the markup means (elevated, tonal or text for a button, filled for a card); "outlined" is only an alias (decision 0023, migration 1.1.0-outlined)'],
   [/S4 Orion/, 'the product is called Orion (decision 0071); the s4 prefix is only a technical namespace (s4- classes, --s4- tokens, S4.theme)'],
 ];
 const SKIP_DIRS = new Set(['decisions', 'history', 'issues', 'dist', 'node_modules', 'out', 'img']);
@@ -36,6 +41,9 @@ const files = [
   ...walk(join(root, 'docs'), (p) => /\.(md|html)$/.test(p)),
   ...walk(join(root, 'skill'), (p) => /\.(md|mjs|html)$/.test(p)),
 ].filter((p) => !p.endsWith('check-words.mjs'));
+/* the component reference pages, their READMEs and the gallery describe today's look too (issue 110) */
+files.push(...walk(join(root, 'components'), (p) => /\/README\.md$/.test(p) || /components\/([^/]+)\/\1\.html$/.test(p) || /components\/(index\.html|CONVENTIONS\.md)$/.test(p)),
+  ...walk(join(root, 'templates'), (p) => /\.html$/.test(p)), join(root, 'demo/index.html'));
 /* the product name is checked in more places than the old-look phrases (labs and templates may show old looks on purpose) */
 const nameFiles = [
   ...['README.md', 'CHANGELOG.md', 'CLAUDE.md', 'package.json', 'index.html'].map((f) => join(root, f)),

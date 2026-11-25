@@ -8,6 +8,7 @@
      bad-fab-rail.html  a .s4-fab straight in .s4-nav-rail, squeezed to a box one glyph wide
      bad-nav-pill.html  five destinations at 390 with the highlight's corner at half its height: a circle "Settings" pokes out of
      bad-dial.html      data-scale="roomy" and data-corners="square" on <html>
+     bad-icons.html     a lean page that loads icons.js (every set) without switching sets (issue 109)
      bad-nav-hover.html / bad-nav-hover-box.html  a tab's hover layer that is the icon chip, or narrower than the selected highlight (issue 81)
      bad-rail-motion.html  a rail whose labels follow its moving edge and wrap mid-motion (issue 70)
      bad-window-controls.html  small window controls with a gap to the window's top and end edges (decision 0072)
@@ -51,6 +52,7 @@ const CASES = [
   ['bad-overfull.html', /button\.s4-button\.bf-day holds \d+px of content in a 28px box, \d+px past its (start|end) edge \("1000"\)/, 'a button whose label is wider than its box'],
   ['bad-glow.html', /the glass glow on [^\n]*button\.s4-fab reaches 12\.0px into a 56px surface, more than 15% of its height[^\n]*decision 0080/, 'a glow deeper than 15% of a FAB'],
   ['bad-glow.html', /the glass glow on [^\n]*div\.s4-toolbar reaches 12\.0px into a 64px surface/, 'a glow deeper than 15% of a toolbar'],
+  ['bad-icons.html', /lean bundle: the page loads icons\.js \(every icon set\) but never switches sets; load icons-app\.js/, 'a lean page that loads every icon set (issue 109)'],
   ['bad-dial.html', /data-scale="roomy" is not a value of that dial; use default, compact or large/, 'an unknown data-scale value'],
   ['bad-stamp.html', /this page is stamped Orion 0\.9\.0 \(meta name="orion"\) but loads Orion \d+\.\d+\.\d+/, 'a stamp that disagrees with the loaded files'],
   ['bad-dial.html', /data-corners="square" is not a value of that dial; use round, soft or firm/, 'an unknown data-corners value'],

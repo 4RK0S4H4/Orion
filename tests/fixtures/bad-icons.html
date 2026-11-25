@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="orion" content="1.2.0">
+<title>Known Bad: Icons</title>
+<!-- Known-bad fixture (issue 109). tests/checker.mjs expects the page checker to FAIL this page with the message named in
+     tests/checker.mjs: a lean page that loads icons.js (every icon set, the biggest file on the page) although it never
+     switches sets. Never "fix" it: it exists to prove the rule fires. -->
+<link rel="stylesheet" href="../../components/orion.core.min.css">
+</head>
+<body>
+<main class="s4-content" style="padding: 16px"><h1>Icons</h1><p><span class="s4-icon" data-icon="settings"></span> One set, loaded whole.</p></main>
+<script src="../../components/assets/icons.js"></script>
+<script src="../../components/orion.core.min.js"></script>
+</body>
+</html>

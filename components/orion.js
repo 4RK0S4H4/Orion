@@ -144,7 +144,11 @@
   var fullIcons = null;
   function loadFullIcons(url) {
     if (fullIcons) return; fullIcons = document.createElement('script'); fullIcons.src = url;
-    fullIcons.onload = function () { drawIcons(document); };
+    var pack = window.S4_ICONS;
+    fullIcons.onload = function () {   /* icons the app added with S4.icon.add stay (issue 109) */
+      var r = window.S4_ICONS; if (r && pack && r !== pack) for (var k in pack.icons) if (!(k in r.icons)) r.icons[k] = pack.icons[k];
+      drawIcons(document);
+    };
     fullIcons.onerror = function () { console.warn('S4: could not load the full icon set from ' + url); };
     document.head.appendChild(fullIcons);
   }
@@ -2474,7 +2478,7 @@ S4.register('search', function (scope) {
       }
       if (!/^(minimize|restore|maximize|close)$/.test(action)) return;
       if (!icon) { icon = document.createElement('span'); icon.className = 's4-icon'; icon.setAttribute('data-window-icon', ''); icon.setAttribute('aria-hidden', 'true'); b.appendChild(icon); }
-      var name = 'window-' + action;
+      var name = { minimize: 'window-minimize', maximize: 'window-maximize', restore: 'window-restore', close: 'window-close' }[action];   /* whole names, so the app icon pack finds them (issue 109) */
       if (icon.getAttribute('data-icon') !== name) { if (S4.icon) S4.icon.set(icon, name); else icon.setAttribute('data-icon', name); }
     });
   }

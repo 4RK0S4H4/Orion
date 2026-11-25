@@ -1,6 +1,6 @@
 # Card
 
-Holds content and actions about one subject. M3 cards: elevated, filled and outlined, with optional media, body and
+Holds content and actions about one subject. Cards are elevated or filled (nothing is outlined, decision 0023), with optional media, body and
 actions. Cards are content surfaces: always solid, never glass.
 
 ```html
@@ -17,20 +17,20 @@ actions. Cards are content surfaces: always solid, never glass.
   </div>
 </article>
 
-<a class="s4-card" data-variant="outlined" href="/bills/10451">…</a>   <!-- the whole card opens something -->
+<a class="s4-card" data-variant="filled" href="/bills/10451">…</a>   <!-- the whole card opens something -->
 ```
 
 | Attribute / part | Values | Default |
 |---|---|---|
-| `data-variant` | `elevated` (surface-container-low, level 1), `filled` (surface-container-highest), `outlined` (surface + outline-variant) | `elevated` |
+| `data-variant` | `elevated` (surface-container-low, level 1), `filled` (surface-container-highest); the old `outlined` is an alias that draws `filled` | `elevated` |
 | `.s4-card-media` | image, video or SVG area; takes the card's top corners (bottom corners when last). `--s4-card-media-ratio` sets the aspect ratio | 16 / 9 |
 | `.s4-card-body` | 16 padding; `.s4-card-title` (title-medium), `.s4-card-subhead` and `.s4-card-supporting` (body-medium, on-surface-variant) | — |
 | `.s4-card-actions` | buttons, end-aligned, 8 apart; pushed to the bottom in a grid of cards | — |
-| `a.s4-card`, `button.s4-card` | interactive card: state layer from base; hover raises elevated to level 2, filled and outlined to level 1 | — |
-| `disabled` / `aria-disabled="true"` | container at 38%, content on-surface at 38%, outline at 12% | — |
+| `a.s4-card`, `button.s4-card` | interactive card: state layer from base; hover raises elevated to level 2, filled to level 1 | — |
+| `disabled` / `aria-disabled="true"` | container at 38%, content on-surface at 38% | — |
 
-**When to use what:** **elevated** to lift a card off a busy page; **filled** for quiet grouping; **outlined** when cards
-sit on a surface of the same color or in dense grids. For a section of settings or a form, use a [pane](../pane/) instead.
+**When to use what:** **elevated** to lift a card off a busy page; **filled** for quiet grouping, and
+when cards sit on a surface of the same color or in dense grids. For a section of settings or a form, use a [pane](../pane/) instead.
 
 **Do**
 - Make the whole card a link or button when it opens one thing, and keep other buttons out of it.

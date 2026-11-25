@@ -27,6 +27,22 @@ export function needsOf(src, index) {
   return { packs: [...packs].sort(), why: Object.fromEntries(Object.entries(why).map(([k, v]) => [k, [...v].slice(0, 6)])) };
 }
 
+/* the icon file a lean page loads (issue 109): icons-app.js, the icons the app templates and the lean bundle draw (any
+   other name fetches icons-solar.js once), or a single set's file such as icons-phosphor-duotone.js; icons.js holds every
+   set and is only for a page that switches sets at run time (S4.icon.use, S4.icon.restore, a data-icons switch) */
+export function iconsOf(src) {
+  const text = src.replace(/<!--[\s\S]*?-->/g, '');
+  const loaded = [...text.matchAll(/(?:^|["'/])(icons(?:-[a-z-]+)?\.js)(?:\?[^"']*)?["']/g)].map((m) => m[1]);
+  const switches = /S4\.icon\.(use|restore)\(|data-icons\b/.test(text);
+  const want = switches ? 'icons.js' : 'icons-app.js';
+  const problem = loaded.length === 0 ? `loads no icon file; load ${want}`
+    : loaded.length > 1 ? `loads ${loaded.length} icon files (${loaded.join(', ')}); load one: ${want}`
+    : loaded[0] === 'icons.js' && !switches ? 'loads icons.js (every icon set) but never switches sets; load icons-app.js'
+    : loaded[0] !== 'icons.js' && switches ? `switches icon sets (S4.icon.use) but loads ${loaded[0]}, which holds one set; load icons.js`
+    : null;
+  return { want, loaded, switches, problem };
+}
+
 /* the packs a page links (orion.<pack>.min.css) */
 export function linkedPacks(src, index) {
   const out = new Set();
@@ -45,6 +61,9 @@ if (process.argv[1] === fileURLToPath(import.meta.url) && process.argv[2]) {
   for (const p of need.packs) console.log(`  ${p}: ${need.why[p].join(', ')}`);
   console.log('links (CSS in the head after orion.core.min.css, scripts after orion.core.min.js):');
   for (const p of need.packs) console.log(`  <link rel="stylesheet" href="orion.${p}.min.css"> <script src="orion.${p}.min.js"></script>`);
+  const ic = iconsOf(src);
+  console.log(`icons: <script src="${ic.want}"></script>${ic.switches ? ' (the page switches icon sets)' : ' (any icon it lacks loads icons-solar.js from the same folder)'}`);
+  if (ic.problem && /orion\.core\.min\.(css|js)/.test(src)) { console.error(`ICONS: the page ${ic.problem}`); process.exitCode = 1; }
   if (have.size) {
     const miss = need.packs.filter((p) => !have.has(p)), extra = [...have].filter((p) => p !== 'core' && !need.packs.includes(p));
     if (miss.length) { console.error(`MISSING packs: ${miss.join(', ')}`); process.exitCode = 1; }
