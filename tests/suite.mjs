@@ -516,10 +516,13 @@ async function use(page, add, phone) {
         else {
           if (!ks.inBox) add('the command palette opened by mod+K did not put the cursor in its box (decision 0067: a shortcut the person typed is their own action)');
           await page.keyboard.press('Escape'); await settle(420);
+          /* the close finishes (and focus lands) in a promise after the pop; on a loaded machine the fixed wait can end first, so read focus only once the palette is closed, as the first close above does */
+          if (!(await until(() => !document.querySelector('.s4-palette').open))) add('the command palette opened by mod+K did not close with Escape');
+          await page.waitForTimeout(60);
           /* decision 0069: opened with nothing focused, there is no opener to go back to; focus lands on the main landmark, never <body> */
-          const fb = await page.evaluate(() => { const a = document.activeElement, m = [...document.querySelectorAll('main, [role="main"]')].find((x) => x.getClientRects().length && !x.closest('[hidden]')); return { body: !a || a === document.body, hasMain: !!m, inMain: !!m && !!a && m.contains(a) }; });
+          const fb = await page.evaluate(() => { const a = document.activeElement, m = [...document.querySelectorAll('main, [role="main"]')].find((x) => x.getClientRects().length && !x.closest('[hidden]')); return { body: !a || a === document.body, hasMain: !!m, inMain: !!m && !!a && m.contains(a), at: a ? a.tagName.toLowerCase() + (typeof a.className === 'string' && a.className ? '.' + a.className.trim().split(/\s+/)[0] : '') + (a.id ? '#' + a.id : '') : '', open: !!document.querySelector('.s4-palette').open }; });
           if (fb.body) add('the command palette opened by mod+K with nothing focused left focus on <body> after Escape (decision 0069: focus goes to the main landmark)');
-          else if (fb.hasMain && !fb.inMain) add('the command palette opened by mod+K with nothing focused did not return focus to the main landmark after Escape (decision 0069)');
+          else if (fb.hasMain && !fb.inMain) add('the command palette opened by mod+K with nothing focused did not return focus to the main landmark after Escape (decision 0069; focus is on ' + fb.at + ', palette ' + (fb.open ? 'still open' : 'closed') + ')');
         }
       }
     }
@@ -657,8 +660,8 @@ async function use(page, add, phone) {
       /* the zone is a real button that opens the file chooser (never drag-only) */
       try {
         if (!(await zone.evaluate((z) => z.tagName === 'BUTTON' && !z.disabled && z.tabIndex >= 0))) add('upload: the drop zone is not a real button in the Tab order');
-        await zone.scrollIntoViewIfNeeded({ timeout: 2000 });
-        const [chooser] = await Promise.all([page.waitForEvent('filechooser', { timeout: 6000 }), zone.click({ timeout: 3000 })]);
+        await zone.scrollIntoViewIfNeeded({ timeout: 8000 });   /* generous: parallel workers on a loaded machine made 2 to 3 seconds too tight */
+        const [chooser] = await Promise.all([page.waitForEvent('filechooser', { timeout: 15000 }), zone.click({ timeout: 10000 })]);
         await chooser.setFiles({ name: 'suite-receipt.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4 suite') });
       } catch (e) { add('upload: the drop zone did not open the file chooser (' + String(e.message).split('\n')[0].slice(0, 80) + ')'); continue; }
       await settle(400);
