@@ -9,7 +9,7 @@
      paint over the ring's sides (review 5's N4). Never "fix" it. -->
 <link rel="stylesheet" href="../../components/orion.css">
 <style>
-  .br-table tbody tr:focus-visible { outline-color: var(--s4-focus-ring-color); }
+  .br-table tbody tr:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
   .br-table tbody tr:focus-visible > :is(td, th)::after { content: none; }
 </style>
 </head>

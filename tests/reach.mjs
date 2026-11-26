@@ -397,6 +397,8 @@ function ringInfo() {
       return { width: w, contrast: c, rect: el.getBoundingClientRect(), ringBox: b.tagName };
     }
   }
+  /* a focused table row's ring is drawn by its cells (issue 113): the first cell's ::after border, on the cell's own fill */
+  if (el.matches('tr') && el.cells && el.cells[0]) { const c = el.cells[0], a = getComputedStyle(c, '::after'), bw = parseFloat(a.borderTopWidth) || 0; if (a.content !== 'none' && bw >= 1) { const col = h.parse(a.borderTopColor), back = h.behind(c); return { width: bw, contrast: h.contrast(col[3] < 1 ? h.over(col, back) : col, back), rect: el.getBoundingClientRect(), ringBox: 'cells' }; } }
   /* a field's keyboard ring is an outline on its box (the field's ::before, issues 62 and 64): outside the box, so it is
      measured against what is behind the field */
   const box = el.closest('.s4-text-field');

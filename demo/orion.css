@@ -7283,7 +7283,7 @@
      first cell its start side and the last its end side, inside the cell (the wrap never cuts it); a cell scrolled under
      a pinned one is covered with its part of the ring, and the pinned cells draw theirs. Stacked rows (a phone) keep the
      row's own outline. While a row holds the focus the scroll-edge cue steps aside so the ring shows in full. */
-  .s4-table tbody tr:focus-visible { outline-color: transparent; }
+  .s4-table tbody tr:focus-visible { outline: none; }
   .s4-table tbody tr:focus-visible > :is(td, th):not([data-pin]) { position: relative; }
   .s4-table tbody tr:focus-visible > :is(td, th)::after {
     content: "";
@@ -7297,7 +7297,7 @@
   .s4-table tbody tr:focus-visible > :is(td, th):last-child::after { border-inline-end: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
   .s4-table-wrap:has(tbody tr:focus-visible) > .s4-table-cue > span[data-side] { opacity: 0; transition: none; }
   @container s4-table (width < 600px) {
-    .s4-table tbody tr:focus-visible { outline-color: var(--s4-focus-ring-color); }
+    .s4-table tbody tr:focus-visible { outline: var(--s4-focus-ring-width) solid var(--s4-focus-ring-color); }
     .s4-table tbody tr:focus-visible > :is(td, th)::after { content: none; }
   }
   @media (forced-colors: active) { .s4-table tbody tr:focus-visible > :is(td, th)::after { border-color: Highlight; } }
