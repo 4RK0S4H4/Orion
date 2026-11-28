@@ -21,6 +21,7 @@ Review 5's items 2, 4, 5, 6 and 9 (round 0066 B, decisions 0082 to 0085, issues 
 - Added: `.s4-button[data-color="neutral"]` (decision 0085). Changed: the rail's stepped-down action has an `on-surface` label; Parley's secondary actions and match scores are neutral; the selection bar spans the top app bar with words beside its icons from 840; under 840 a list beside a closed detail shows no resting selection.
 - Added: `--browser=webkit|firefox` for `tests/suite.mjs` and `tests/reach.mjs`, and a non-blocking CI job `browsers` (WebKit and Firefox); the blocking `pages` job runs the suite in Chromium (issue 116).
 - Added: `docs/device-check.md`, the owner's one-time 20-minute device checklist (issue 117).
+- Added: two device check review pages, `explore/device-iphone.html` (11 steps) and `explore/device-desktop.html` (6 steps): one card per step with a button to the page under test, Looks Right or Problem with a note, a progress meter and Copy Answers; steps in `explore/lib/device-steps.js` for later rounds. The review kit's copy uses `S4.util.copy`.
 
 Real requests, headroom and an app icon pack (round 0066 A, decision 0081, issues 107 to 110): review 5's N1, N3, N8, N9 and N12.
 

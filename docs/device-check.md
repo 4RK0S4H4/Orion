@@ -1,5 +1,11 @@
 # The device check (about 20 minutes, once)
 
+**Easier: use these pages.** One card per step, a button that opens the page to test, Looks Right or Problem, a note for a
+problem, and Copy Answers at the end (answers save on the device as you go):
+[iPhone Check](https://4rk0s4h4.github.io/Orion/explore/device-iphone.html) (Part 1) and
+[Desktop Check](https://4rk0s4h4.github.io/Orion/explore/device-desktop.html) (Part 2). Their steps live in
+`explore/lib/device-steps.js`: a later round edits that list (and this file) and the pages follow.
+
 Some things only a real phone, a real Windows desktop and a screen reader can show. This is the one time Orion needs your
 hands. Do the steps in order; each says what should happen.
 

@@ -7,6 +7,7 @@ option card. Answers are saved in the browser so several labs can be worked thro
 
 | Page | Decided |
 |---|---|
+| `device-iphone.html`, `device-desktop.html` | Not quizzes: the device check (`docs/device-check.md`) as one card per step, Looks Right or Problem with a note, Copy Answers. Steps in `lib/device-steps.js` (edit that list for a later round), rendered by `lib/device.js` |
 | `direction.html` | Superseded by design drafts (0020 accepted): the overhaul to Orion's own language (surfaces, corners, controls, depth, nav, type, motion, framework shape, token names) ([0020](../docs/decisions/0020-own-language.md)) |
 | `states-shape.html` | States A (stock M3), Shape A (stock M3 Expressive), default color Mono |
 | `motion.html` | Springs D (M3 Expressive) |

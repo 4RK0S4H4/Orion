@@ -27,7 +27,7 @@ Ctrl+F6 regions in desktop apps, proven on every app template); **polish** (0085
 text, the selection bar with words, no resting selection on a phone). **Setup:** `--browser=webkit|firefox` on the suite and reach and a
 non-blocking CI job `browsers` (the blocking `pages` job is now Chromium only; never run here, only Chromium is installed); the owner's
 one-time device checklist [`device-check.md`](device-check.md). **Next:** publish (the main session); round 0067 triages the first
-`browsers` run and the owner's device session, then makes `browsers` blocking. **Needs the owner:** the 20-minute `device-check.md`.
+`browsers` run and the owner's device session, then makes `browsers` blocking. **Needs the owner:** the 20-minute `device-check.md`, easiest through its two review pages, [`explore/device-iphone.html`](../explore/device-iphone.html) and [`explore/device-desktop.html`](../explore/device-desktop.html) (steps in `explore/lib/device-steps.js`).
 
 ## Also now (2026-11-25, round 0065, branch `round65/glow`): a softer glass glow, scaled to the surface (decision 0080, issue 106)
 

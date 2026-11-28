@@ -1,0 +1,17 @@
+/* The device check pages: layout only (decision 0048). Looks come from Orion; the answer cards from review.css. */
+@layer s4.components {
+  .dv-bar { padding: var(--s4-space-4) var(--s4-space-4) 0; max-inline-size: 48rem; margin: 0 auto; }
+  .dv-bar h1 { margin: 0; font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height); font-weight: var(--md-sys-typescale-emphasized-headline-medium-weight, 600); }
+  .dv-page { max-inline-size: 48rem; margin: 0 auto; padding: var(--s4-space-4) var(--s4-space-4) var(--s4-space-6); display: flex; flex-direction: column; gap: var(--s4-space-10); }
+  .dv-page p { margin: 0; }
+  .dv-intro { display: flex; flex-direction: column; gap: var(--s4-space-4); }
+  .dv-intro > p, .dv-setup > p { color: var(--md-sys-color-on-surface-variant); }
+  .dv-setup { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s4-space-2); }
+  .dv-step { display: flex; flex-direction: column; gap: var(--s4-space-3); scroll-margin-block-start: var(--s4-space-4); }
+  .dv-step h2 { margin: 0; font-size: var(--md-sys-typescale-title-large-size); line-height: var(--md-sys-typescale-title-large-line-height); font-weight: var(--md-sys-typescale-emphasized-title-large-weight, 600); }
+  .dv-look { color: var(--md-sys-color-on-surface-variant); }
+  .dv-look b { color: var(--md-sys-color-on-surface); font-weight: 600; }
+  .dv-open { display: flex; flex-wrap: wrap; gap: var(--s4-space-2); }
+  .dv-answers { --rv-min: 16rem; gap: var(--s4-space-2); }
+  .dv-note[hidden] { display: none; }
+}
